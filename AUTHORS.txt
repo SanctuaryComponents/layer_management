@@ -2,3 +2,6 @@ responsible person Michael Schuldt
 E-Mail: Michael.Schuldt@bmw-carit.de 
 responsible person Sven von Beuningen 
 E-Mail: Sven.vonBeuningen@bmw-carit.de 
+
+Furthermore many thanks goes to Jonathan Conrad (BMW Car IT),
+which was also deeply involved in the development of this project.
