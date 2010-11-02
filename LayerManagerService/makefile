@@ -58,6 +58,8 @@ install:
 	install -m 755 include/*.h $(PREFIX)/usr/include/layermanager
 	mkdir -p $(PREFIX)/usr/include/layermanager/commands
 	install -m 755 include/commands/*.h $(PREFIX)/usr/include/layermanager/commands
+	mkdir -p $(PREFIX)/usr/bin
+	install -m 755 build/layermanager $(PREFIX)/usr/bin/layermanager
 
 clean:
 	rm -f $(OBJS) $(TARGET)
