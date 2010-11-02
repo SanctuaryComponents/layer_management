@@ -26,7 +26,7 @@
 
 class XPlatformSurface : public PlatformSurface {
 public:
-	XPlatformSurface (Surface* surface) : PlatformSurface(surface), isMapped(false){};
+	XPlatformSurface (Surface* surface) : PlatformSurface(surface), isMapped(false), pixmap(0){};
 	~XPlatformSurface(){};
 
 	Pixmap pixmap;
