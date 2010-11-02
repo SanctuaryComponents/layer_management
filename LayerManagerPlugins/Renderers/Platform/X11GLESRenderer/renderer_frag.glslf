@@ -27,6 +27,6 @@ varying mediump vec2 vTexout;
 void main()
 {	
 	// correct Texture Coords;
-    vec4 mediump color = texture2D(uTexUnit, vTexout ) * vec4(1.0,1.0,1.0,uAlphaVal);
+    mediump vec4 color = texture2D(uTexUnit, vTexout ) * vec4(1.0,1.0,1.0,uAlphaVal);
     gl_FragColor = color;
 }
