@@ -1,0 +1,147 @@
+Sections in this file describe:
+- Introduction
+- Component Overview
+- Required platform capabilities
+- How to build on different platforms
+
+
+Introduction
+====================================
+In the automotive domain, the most HMI systems are using their own window manager implementation. 
+Many applications (e.g. navigation, reversing camera) are implemented standalone and 
+therefore one service is used to composite all applications to the final image on the screen. This Service
+is also know as LayerManagement. 
+This Component provides a common API and a proof-of-concept implementation for the Layer Management Service. 
+This service should improve the existing vendor-specific layer management implementations 
+which have the following features :
+
+    * Fixed number of hardware layers
+    * Hardware accelerated compositing
+    * Platform dependent
+    * Number of layers not extensible during runtime
+    * Vendor-specific implementation
+    * No standardized interface
+    * Hardware dependent
+    * No change during runtime possible 
+
+The IVI Layer Management have the following enhancements :
+
+    * Well-defined interface
+    * Standardized compositing
+    * Convenient and consistent access to hardware accelerated modules
+    * Separation of HMI and Layer Management
+    * Dynamically Extensions during runtime
+    * Low integration complexity
+    * Reduced dependency on hardware 
+
+Component Overview
+====================================
+The IVI Layer Management consist of three subcomponents.
+
+The LayerManagementService
+===
+This is the main component which controls and handles
+the different layers with its content. Furthermore he
+will execute the commands which are deployed by the corresponding
+communicator. The content of the different layers are deployed to the
+renderer.  
+
+The LayerManagementCommunicator
+===
+This subcomponent will handle the LayerManagement API messages. Generally
+a communicator will establish the communication between application and the
+LayerManagementService. The concept behind the communicator is to abstract
+the required ipc mechanism on the target platform. 
+
+The LayerManagementRenderer
+===
+This subcomponent will handle the rendering of the different layers and its content on the
+final used target platform. The concept behind the renderer is to abstract
+the required rendering mechanism on the target platform. 
+
+Required Platform capabilities
+====================================
+
+Platform with X11 and OpenGL ES 2.0
+===
+
+If you have choosen the X11GLESRenderer as rendering backend, then the following
+Extensions have to be supported by the TargetPlatform :
+
+X11 Extensions:
+
+x-composite : This extension should support redirecting of egl Surfaces to x11 pixmaps too.
+
+EGL / OpenGL ES 2.0:
+
+EGL_IMAGE_KHR : 
+The following functions should be supported by the vendor specific graphic driver
+glEGLImageTargetTexture2DOES
+eglCreateImageKHR
+eglDestroyImageKHR
+Furthermore it should be supported to create an egl image from an x11 pixmap.  
+
+Beagle board platform
+===
+
+If you have choosen the BeagleRenderer as rendering backend, than the following
+kernel module must be available too :
+
+CMEM Module is needed, it can be downloaded from
+
+http://software-dl.ti.com/dsps/dsps_public_sw/sdo_sb/targetcontent/linuxutils/index.html
+
+The EGL implementation on the beagle board should support the following egl config: 
+
+EGL_SURFACE_TYPE = EGL_WINDOW_BIT | EGL_PIXMAP_BIT
+EGL_RENDERABLE_TYPE = EGL_OPENGL_ES2_BIT,
+EGL_RED_SIZE = 8
+EGL_ALPHA_SIZE = 8 
+EGL_BIND_TO_TEXTURE_RGBA = EGL_TRUE
+
+Furthermore the application which should be rendered by the layermanagement, should initialize egl
+by the following steps:
+	
+1. Get EGL Display
+2. Initialize EGL
+3. Bind API
+4. Choose EGL Config
+5. Allocate native pixmap Structure 
+6. Allocate native pixmap space by CMEM_alloc
+7. Get physical address of native pixmap using the CMEM module, and assign the address to the native pixmap structure.
+8. Create egl pixmap surface using the allocated native pixmap.
+9. Create egl context.
+10. Make egl context with the surface as current.
+
+How to build on different platforms
+====================================
+
+If you want to build the layermanagement on your own platform than you have to use the following 
+command line call:
+
+make all [CONFIG=PLATFORM COMMUNICATOR=MyCommunicator RENDERER=MyRenderer]  
+
+Example for Beagle Board:
+make all CONFIG=Beagle 
+
+If you want  you have to provide an additional platform definition file which
+should located at LayerManagerPlatform. The file should provide the following content :
+
+MyPlatform.defs:
+
+RENDERER=MyRenderer
+COMMUNICATOR=MyComunicator
+
+CXXFLAGS = -Wall -fPIC -O2
+
+ADD_INCLUDE_DIR+=<includes of target>
+
+ADD_LIB_DIR+=<libraries of target>
+
+LINKFLAGS = -Xlinker -export-dynamic
+
+CXX = <path to cross compile toolchain> 
+ 
+
+
+
