@@ -16,6 +16,8 @@
 # limitations under the License.
 #
 ############################################################################
+RENDERER=BeagleRenderer
+COMMUNICATOR=DBUSComunicator
 
 CXXFLAGS = -Wall -fPIC -O2
 
@@ -26,3 +28,4 @@ ADD_LIB_DIR+= /home/carit/beagleIncludes
 LINKFLAGS = -Xlinker -export-dynamic
 
 CXX = /home/carit/toolchain/arm-2009q1/bin/arm-none-linux-gnueabi-g++
+
