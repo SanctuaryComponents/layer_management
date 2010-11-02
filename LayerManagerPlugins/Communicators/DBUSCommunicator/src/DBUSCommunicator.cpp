@@ -27,9 +27,6 @@
 #include "DBUSCommunicator.h"
 #include "Log.h"
 
-#define CONNMAN_SERVICE                 "de.bmw.CompositingService"
-#define CONNMAN_PATH                    "/de/bmw/CompositingService"
-
 typedef void (DBUSCommunicator::*CallBackMethod) (DBusConnection *connection, DBusMessage *message);
 
 typedef struct {
