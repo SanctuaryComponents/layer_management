@@ -22,13 +22,6 @@
 #include <RenderUtil.h>
 #include <Log.h>
 
-static const char defaultVertShaderBinary[] = {
-#include "renderer_vert.cghex"
-};
-static const char defaultFragShaderBinary[] = {
-#include "renderer_frag.cghex"
-};
-
 ShaderProgram* ShaderProgramGLES::createProgram(const std::string& vertName, const std::string& fragName)
 {
 	GLuint progHandle;
