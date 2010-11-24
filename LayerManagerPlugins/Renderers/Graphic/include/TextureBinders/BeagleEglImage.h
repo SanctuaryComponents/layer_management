@@ -71,7 +71,7 @@ public:
 	}
 
 	void createClientBuffer(Surface* surface){
-		LOG_INFO("BeagleEglImage", "createClientBuffer");
+		LOG_DEBUG("BeagleEglImage", "createClientBuffer");
 		BeaglePlatformSurface* nativeSurface = (BeaglePlatformSurface*)surface->platform;
 		NATIVE_PIXMAP_STRUCT* pNativePixmap = (NATIVE_PIXMAP_STRUCT*)malloc(sizeof(NATIVE_PIXMAP_STRUCT));
 		pNativePixmap->ePixelFormat = 2;
@@ -108,6 +108,14 @@ public:
 	}
 
 	void destroyClientBuffer(Surface* surface){
+		LOG_DEBUG("BeagleEglImage", "destroyClientBuffer");
+		BeaglePlatformSurface* nativeSurface = (BeaglePlatformSurface*)surface->platform;
+		if (NULL!=nativeSurface && 0!=nativeSurface->eglImage){
+			EGLBoolean status = m_pfEglDestroyImageKHR(m_eglDisplay,nativeSurface->eglImage);
+			if (!status)
+				LOG_ERROR("BeagleEglImage", "could not delete EGLImage");
+			nativeSurface->eglImage = 0;
+		}
 	}
 private:
 	PFNEGLCREATEIMAGEKHRPROC        	m_pfEglCreateImageKHR;

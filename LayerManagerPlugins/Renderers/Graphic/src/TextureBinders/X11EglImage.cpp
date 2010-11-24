@@ -93,9 +93,10 @@
 
 	void X11EglImage::destroyClientBuffer(Surface* surface){
 		EglXPlatformSurface* nativeSurface = (EglXPlatformSurface*)surface->platform;
-		if (nativeSurface->eglImage != NULL )
+		if (nativeSurface != NULL && nativeSurface->eglImage != NULL )
 		{
-			m_pfEglDestroyImageKHR(m_eglDisplay, nativeSurface->eglImage);
+		      m_pfEglDestroyImageKHR(m_eglDisplay, nativeSurface->eglImage);
+	              glDeleteTextures(1,&nativeSurface->texture);
 		}
 		glDeleteTextures(1,&nativeSurface->texture);
 	}

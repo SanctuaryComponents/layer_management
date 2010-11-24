@@ -26,11 +26,11 @@
 
 class XPlatformSurface : public PlatformSurface {
 public:
-	XPlatformSurface (Surface* surface) : PlatformSurface(surface), isMapped(false), pixmap(0){};
+	XPlatformSurface (Surface* surface) : PlatformSurface(surface), isMapped(false), pixmap(0), texture(0){};
 	~XPlatformSurface(){};
 
-	Pixmap pixmap;
 	bool isMapped;
+	Pixmap pixmap;
 	uint texture;
 };
 

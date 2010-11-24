@@ -22,12 +22,15 @@
 
 #include "BaseRenderer.h"
 #include "LayerList.h"
+#include "GraphicSystems/GLESGraphicSystem.h"
 
 class X11GLESRenderer : public BaseRenderer
 {
 public:
 	X11GLESRenderer(LayerList* layerlist);
-
+	void doScreenShot(std::string fileToSave);
+private:
+	BaseGraphicSystem* graphicSystem;
 };
 
 #endif /* _X11GLESRENDERER_H_*/

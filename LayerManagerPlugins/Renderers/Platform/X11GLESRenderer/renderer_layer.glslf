@@ -7,7 +7,7 @@
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
 *
-*		http://www.apache.org/licenses/LICENSE-2.0
+*       http://www.apache.org/licenses/LICENSE-2.0
 *
 * Unless required by applicable law or agreed to in writing, software
 * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,23 +16,12 @@
 * limitations under the License.
 *
 ****************************************************************************/
+// alpha value of the surfaces 
+uniform float uAlphaVal;
 
-#ifndef _BASEWINDOWSYSTEM_H_
-#define _BASEWINDOWSYSTEM_H_
-
-#include "GraphicSystems/BaseGraphicSystem.h"
-#include "LayerList.h"
-
-class BaseWindowSystem {
-public:
-	BaseWindowSystem(LayerList* layerlist, BaseGraphicSystem* graphicSystem) : graphicSystem(graphicSystem), layerlist(layerlist){};
-	virtual ~BaseWindowSystem(){};
-	virtual bool start(int, int, const char*)=0;
-	virtual void stop()=0;
-
-protected:
-	BaseGraphicSystem* graphicSystem;
-	LayerList* layerlist;
-};
-
-#endif /* _BASEWINDOWSYSTEM_H_ */
+void main()
+{	
+	// correct Texture Coords;
+    mediump vec4 color = vec4(0.0,1.0,0.0,uAlphaVal);
+    gl_FragColor = color;
+}

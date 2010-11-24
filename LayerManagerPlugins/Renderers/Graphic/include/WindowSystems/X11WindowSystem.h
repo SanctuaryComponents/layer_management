@@ -32,11 +32,12 @@ typedef XVisualInfo* (*GetVisualInfoFunction)(Display *dpy);
 class X11WindowSystem : public BaseWindowSystem {
 public:
 	X11WindowSystem(LayerList* layerlist, BaseGraphicSystem* graphicSystem,GetVisualInfoFunction func=X11WindowSystem::getDefaultVisual );
+	virtual ~X11WindowSystem();
 	bool start(int, int, const char*);
-	void stop(){};
-
+	void stop();
 	static XVisualInfo *
 	getDefaultVisual(Display *dpy);
+
 private:
 	static void* EventLoop(void * ptr);
 	static int error (Display *dpy, XErrorEvent *ev);
@@ -45,6 +46,7 @@ private:
 protected:
 	Display* x11Display;
 	bool initXServer();
+	pthread_t renderThread;
 	//void setDisplayMode();
 	int windowWidth;
 	int windowHeight;
@@ -55,6 +57,7 @@ protected:
 	static bool m_initialized;
 
 private:
+	void cleanup();
 	void Redraw();
 	void OpenDisplayConnection();
 	void checkForCompositeExtension();
@@ -79,6 +82,7 @@ private:
 	int composite_event, composite_error;
 	int composite_major, composite_minor;
 	static const char CompositorWindowTitle[];
+	bool m_running;
 };
 
 #endif /* _X11WINDOWSYSTEM_H_ */

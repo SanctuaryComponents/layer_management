@@ -19,13 +19,12 @@
 
 #include "X11GLESRenderer.h"
 #include "ShaderProgramGLES.h"
-#include "GraphicSystems/GLESGraphicSystem.h"
 #include "WindowSystems/X11WindowSystem.h"
 #include "X11/Xlib.h"
 #include "TextureBinders/X11CopyGLES.h"
 #include "TextureBinders/X11EglImage.h"
 
-X11GLESRenderer::X11GLESRenderer(LayerList* layerlist) : BaseRenderer(layerlist)
+X11GLESRenderer::X11GLESRenderer(LayerList* layerlist) : BaseRenderer(layerlist), graphicSystem(NULL)
 {
 	LOG_DEBUG("X11GLESRenderer", "Creating Renderer");
 
@@ -41,9 +40,13 @@ X11GLESRenderer::X11GLESRenderer(LayerList* layerlist) : BaseRenderer(layerlist)
 			binder = new X11CopyGLES((Display*)display);
 	#endif
 
-	BaseGraphicSystem* graphicSystem = new GLESGraphicsystem( ShaderProgramGLES::createProgram, binder);
+	graphicSystem = new GLESGraphicsystem( ShaderProgramGLES::createProgram, binder);
 	m_windowSystem = new X11WindowSystem(layerlist, graphicSystem);
 };
+
+void X11GLESRenderer::doScreenShot(std::string fileToSave){
+	graphicSystem->doScreenShot(fileToSave);
+}
 
 extern "C" BaseRenderer* createX11GLESRenderer(LayerList* layerlist){
     return new X11GLESRenderer(layerlist);

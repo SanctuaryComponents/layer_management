@@ -24,6 +24,7 @@
 
 class ITextureBinder {
 public:
+	virtual ~ITextureBinder(){};
 	virtual void bindSurfaceTexture(Surface*s)=0;
 	virtual void unbindSurfaceTexture(Surface*s)=0;
 	virtual void createClientBuffer(Surface*s)=0;

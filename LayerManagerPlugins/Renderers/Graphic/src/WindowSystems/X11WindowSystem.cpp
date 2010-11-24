@@ -40,6 +40,10 @@ X11WindowSystem::X11WindowSystem(LayerList* layerlist, BaseGraphicSystem* graphi
 
 	};
 
+X11WindowSystem::~X11WindowSystem(){
+	delete graphicSystem;
+}
+
 XVisualInfo* X11WindowSystem::getDefaultVisual(Display *dpy)
 	{
 		XVisualInfo* windowVis = new XVisualInfo();
@@ -120,14 +124,12 @@ Surface* X11WindowSystem::getSurfaceForWindow(Window w){
 	const std::map<int,Surface*> surfaces = layerlist->getAllSurfaces();
 	for(std::map<int, Surface*>::const_iterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++){
 		Surface* currentSurface = (*currentS).second;
-		XPlatformSurface* x11surf = NULL;
-		if (NULL != currentSurface->platform){
-			x11surf = (XPlatformSurface*)currentSurface->platform;
-			if (currentSurface->nativeHandle == w){
-				LOG_DEBUG("X11WindowSystem", "surface " << currentSurface->getID() << " corresponds to window" << w);
-				return currentSurface;
-			}
-		}
+		LOG_DEBUG("X11WindowSystem", "CurrentSurface surface for window " << currentSurface->getID());
+                LOG_DEBUG("X11WindowSystem", "CurrentSurface nativeHandle " << currentSurface->nativeHandle);
+                if (currentSurface->nativeHandle == w){
+                        LOG_DEBUG("X11WindowSystem", "surface " << currentSurface->getID() << " corresponds to window" << w);
+                        return currentSurface;
+                }
 	}
 	LOG_DEBUG("X11WindowSystem", "could not find surface for window " << w);
 	return NULL;
@@ -221,7 +223,7 @@ void X11WindowSystem::MapWindow(Window window){
 			LOG_DEBUG("X11WindowSystem", "Done mapping");
 		}
 	}
-	LOG_INFO("EglXCompositeRenderer","mapping end");
+	LOG_INFO("X11WindowSystem","mapping end");
 }
 
 void X11WindowSystem::UnMapWindow(Window window){
@@ -310,7 +312,8 @@ XLowerWindow(x11Display,window);
 }
 
 void X11WindowSystem::DestroyWindow(Window window){
-	if (isWindowValid(window)){
+	if (isWindowValid(window))
+	  {
 		LOG_DEBUG("X11WindowSystem", "Destroying Surface for window " << window);
 		Surface* surface = getSurfaceForWindow(window);
 		if (surface==NULL){
@@ -319,9 +322,11 @@ void X11WindowSystem::DestroyWindow(Window window){
 		}
 		graphicSystem->m_binder->destroyClientBuffer(surface);
 		UnMapWindow(window);
-		layerlist->removeSurface(surface);
-		LOG_DEBUG("X11WindowSystem", "Removed Surface " << surface->getID());
-	}
+                LOG_DEBUG("X11WindowSystem", "Removed Surface " << surface->getID());
+		layerlist->lockList();
+                layerlist->removeSurface(surface);
+                layerlist->unlockList();
+	  }
 }
 
 bool
@@ -349,9 +354,6 @@ X11WindowSystem::CreatePixmapsForAllWindows()
 
 	return result;
 }
-
-
-
 
 bool X11WindowSystem::CreateCompositorWindow()
 {
@@ -383,7 +385,6 @@ bool X11WindowSystem::CreateCompositorWindow()
 		CompositorWindow = XCreateWindow(x11Display, root, 0, 0, windowWidth, windowHeight,
 				0, windowVis->depth, InputOutput,
 				windowVis->visual, CWBorderPixel | CWColormap | CWEventMask | CWOverrideRedirect, &attr);
-
 
 	if (!CompositorWindow)
 	{
@@ -431,31 +432,37 @@ X11WindowSystem::Redraw()
 {
 	// draw all the layers
 	graphicSystem->clearBackground();
+	/*LOG_INFO("X11WindowSystem","Locking List");*/
+	layerlist->lockList();
 	std::list<Layer*> layers = layerlist->getCurrentRenderOrder();
-	for(std::list<Layer*>::const_iterator current = layers.begin(); current != layers.end(); current++){
+	for(std::list<Layer*>::const_iterator current = layers.begin(); current != layers.end(); current++)
+	  {
 		Layer* currentLayer = (Layer*)*current;
-		if ((*currentLayer).visibility && (*currentLayer).opacity>0.0f){
-			//   glRotated(-90*currentLayer->getOrientation(),0,0,1.0);
-			// draw all the surfaces of the layer
+		if ((*currentLayer).visibility && (*currentLayer).opacity>0.0f)
+		  {
+                        /*LOG_INFO("X11WindowSystem","Draw Layer " << currentLayer->getID());*/
 			std::list<Surface*> surfaces = currentLayer->surfaces;
-			for(std::list<Surface*>::const_iterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++){
-				if ((*currentS)->visibility && (*currentS)->opacity>0.0f){
+			for(std::list<Surface*>::const_iterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++)
+			  {
+                                /*LOG_INFO("X11WindowSystem","Surface to draw " << (*currentS)->getID());*/
+                                if ((*currentS)->visibility && (*currentS)->opacity>0.0f)
+                                  {
 					Surface* currentSurface = (Surface*)*currentS;
 					XPlatformSurface* nativeSurface = (XPlatformSurface*)currentSurface->platform;
 					if (NULL==nativeSurface)
 					{
-						LOG_INFO("X11WindowSystem","creating native surface for new window");
+						/*LOG_INFO("X11WindowSystem","creating native surface for new window");*/
 						// this surface does not have a native platform surface attached yet!
 						NewWindow(currentSurface,currentSurface->nativeHandle);
 						MapWindow(currentSurface->nativeHandle);
 					}
+					/*LOG_INFO("X11WindowSystem","Drawing Layer begin");*/
 					graphicSystem->drawSurface(currentLayer,currentSurface);
-
-				}
-			}
-		}
-	}
-
+					/*LOG_INFO("X11WindowSystem","Drawing Layer end");*/
+                                  }
+			  }
+		  }
+	  }
 	if (debugMode)
 	{
 		printDebug(200,windowHeight-40);
@@ -468,7 +475,9 @@ X11WindowSystem::Redraw()
 	{
 		LOG_INFO("X11WindowSystem",floatStringBuffer);
 	}
-	graphicSystem->swapBuffers();
+       layerlist->unlockList();
+       /*LOG_INFO("X11WindowSystem","UnLocking List");*/
+       graphicSystem->swapBuffers();
 }
 
 int
@@ -579,6 +588,7 @@ bool X11WindowSystem::initXServer()
 				XMapRaised(x11Display, w);
 			}
 		}
+		XFree(name);
 	}
 	XFree(children);
 	XUngrabServer (x11Display);
@@ -607,19 +617,19 @@ void* X11WindowSystem::EventLoop(void * ptr)
 	Layer* defaultLayer;
 
 	// run the main event loop while rendering
-	bool running = windowsys->m_success;
+	windowsys->m_running = m_success;
 	gettimeofday(&tv0, NULL);
 	FramesPerFPS = 30;
 	if (windowsys->debugMode)
 	{
-		defaultLayer = windowsys->layerlist->createLayer();
+		defaultLayer = windowsys->layerlist->createLayer(-1);
 		defaultLayer->setOpacity(1.0);
 		defaultLayer->setDestinationRegion(Rectangle(0,0,windowsys->resolutionWidth,windowsys->resolutionHeight));
 		defaultLayer->setSourceRegion(Rectangle(0,0,windowsys->resolutionWidth,windowsys->resolutionHeight));
 		windowsys->layerlist->getCurrentRenderOrder().push_back(defaultLayer);
 	}
 	LOG_DEBUG("X11WindowSystem", "Enter render loop");
-	while (running)
+	while (windowsys->m_running)
 	{
 		if ( XPending(windowsys->x11Display) > 0) {
 			XEvent event;
@@ -630,7 +640,7 @@ void* X11WindowSystem::EventLoop(void * ptr)
 				if (windowsys->debugMode)
 				{
 					LOG_DEBUG("X11WindowSystem", "CreateNotify Event");
-					Surface* s = windowsys->layerlist->createSurface();
+					Surface* s = windowsys->layerlist->createSurface(-1);
 					s->setOpacity(1.0);
 					windowsys->NewWindow(s, event.xcreatewindow.window);
 					defaultLayer->addSurface(s);
@@ -676,14 +686,24 @@ void* X11WindowSystem::EventLoop(void * ptr)
 		}
 		windowsys->Redraw();
 	}
+	windowsys->cleanup();
 	LOG_INFO("X11WindowSystem", "Renderer thread finished");
 	return NULL;
+}
+
+void X11WindowSystem::cleanup(){
+	LOG_INFO("X11WindowSystem", "Cleanup");
+	Window root = RootWindow(x11Display, 0);
+	XCompositeUnredirectSubwindows(x11Display,root,CompositeRedirectManual);
+	XDestroyWindow(x11Display,CompositorWindow);
+	XCloseDisplay(x11Display);
+	m_initialized = false;
+	m_running = false;
 }
 
 
 bool X11WindowSystem::start(int displayWidth, int displayHeight, const char* DisplayName){
 	LOG_INFO("X11WindowSystem", "Starting / Creating thread");
-	pthread_t renderThread;
 	X11WindowSystem *renderer = this;
 	resolutionWidth = displayWidth;
 	resolutionHeight = displayHeight;
@@ -700,3 +720,10 @@ bool X11WindowSystem::start(int displayWidth, int displayHeight, const char* Dis
 	LOG_INFO("X11WindowSystem","Start complete " << m_initialized << " success " << m_success);
 	return m_success;
 }
+
+void X11WindowSystem::stop(){
+	LOG_INFO("X11WindowSystem","Stopping..");
+	this->m_running = false;
+	pthread_join(renderThread,NULL);
+}
+

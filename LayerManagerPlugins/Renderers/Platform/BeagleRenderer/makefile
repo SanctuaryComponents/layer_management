@@ -71,6 +71,8 @@ $(TARGET): $(SHADERS) $(OBJS)
 install:
 	mkdir -p $(PREFIX)/usr/lib/layermanager/renderer
 	install -m 755 $(TARGET) $(PREFIX)/usr/lib/layermanager/renderer
+	install -m 755 renderer_frag.glslf $(PREFIX)/usr/lib/layermanager/renderer
+	install -m 755 renderer_vert.glslv $(PREFIX)/usr/lib/layermanager/renderer
 
 clean:
 	rm -f $(OBJS) $(TARGET)

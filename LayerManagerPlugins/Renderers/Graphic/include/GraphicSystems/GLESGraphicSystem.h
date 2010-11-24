@@ -25,7 +25,8 @@
 #include "EGL/egl.h"
 #include "Log.h"
 #include "Shader.h"
-
+/* uncomment if layer drawing needed */
+/* #define DRAW_LAYER_DEBUG */
 class GLESGraphicsystem : public BaseGraphicSystem {
 public:
 	GLESGraphicsystem(PfnShaderProgramCreator shaderProgram, ITextureBinder* binder);
@@ -36,6 +37,7 @@ public:
 	void drawSurface(Layer* currentLayer, Surface* surface);
 	bool initOpenGLES(EGLint displayWidth, EGLint displayHeight);
 	void resize(EGLint displayWidth, EGLint displayHeight);
+	void doScreenShot(std::string fileToSave);
 
 	PfnShaderProgramCreator 			m_shaderCreatorFunc;
 	EGLConfig 							m_eglConfig;
@@ -46,7 +48,14 @@ public:
 	EGLint								m_displayWidth;
 	EGLint								m_displayHeight;
 	EGLBoolean							m_blendingStatus;
-	Shader* 							defaultShader;
+	Shader* 							m_defaultShader;
+#ifdef DRAW_LAYER_DEBUG
+	Shader* 							m_layerShader;
+#endif
+private:
+	void saveScreenShot();
+	std::string screenShotFile;
+	bool takescreenshot;
 };
 
 #endif /* _GLESGRAPHICSYSTEM_H_ */

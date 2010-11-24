@@ -32,14 +32,6 @@ uniform mediump float uY;
 uniform mediump float uWidth;
 uniform mediump float uHeight;
 
-// texrange describes the width and height of texture area which should be rendered
-uniform mediump vec2 uTexRange;
-// texrange describes the x and y position of the texture area which should be rendered
-uniform mediump vec2 uTexOffset;
-
-// texture coordinates
-varying mediump vec2 vTexout;
-
 void main()
 {
 	// Get the size correct. Multiply by 2 because -1 to +1 is mapped to 
@@ -48,7 +40,6 @@ void main()
 	position.xy = 2.0 * aPosition.xy * vec2( uWidth, uHeight);  			// rechte seite des fensters: volle breite sonst 0
 	position.xy += vec2(uX * 2.0 - 1.0, 1.0 - ((uY + uHeight)* 2.0)); 		// linke seite des fensters                 
 	position.zw = vec2(0.0, 1.0);
-	
-	gl_Position = uMatrix*position;
-	vTexout = vec2(uTexOffset.x + uTexRange.x * aTexCoords.x,1.0-(uTexOffset.y + aTexCoords.y*uTexRange.y+(1.0-uTexRange.y)));
+		 
+	gl_Position	= uMatrix*position;	 
 }
