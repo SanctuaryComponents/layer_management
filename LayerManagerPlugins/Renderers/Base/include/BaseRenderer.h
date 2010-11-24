@@ -26,13 +26,14 @@
 #include "WindowSystems/BaseWindowSystem.h"
 
 class BaseRenderer : public IRenderer{
-protected:
+public:
 	BaseRenderer(LayerList* layerlist);
-	~BaseRenderer();
+	virtual ~BaseRenderer();
 
 	bool start(int, int, const char*);
-	void stop(){};
+	void stop();
 	void setdebug(bool onoff){debugMode = onoff;};
+	virtual void doScreenShot(std::string fileToSave)=0;
 	uint getLayerTypeCapabilities(LayerType layerType);
 
 protected:

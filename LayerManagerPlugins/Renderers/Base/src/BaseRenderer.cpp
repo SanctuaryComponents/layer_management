@@ -55,3 +55,6 @@ bool BaseRenderer::start(int displayWidth, int displayHeight, const char* Displa
 	bool windowSystemStatus = m_windowSystem->start(displayWidth,displayHeight,DisplayName);
 	return windowSystemStatus;
 }
+void BaseRenderer::stop(){
+		m_windowSystem->stop();
+}

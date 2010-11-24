@@ -27,11 +27,12 @@
 
 class BaseGraphicSystem {
 public:
+	virtual ~BaseGraphicSystem(){};
 	virtual bool init(void* display, void* WindowID,int WindowHeight, int WindowWidth)=0;
 	virtual void drawSurface(Layer*,Surface*)=0;
 	virtual void clearBackground()=0;
 	virtual void swapBuffers()=0;
-
+	virtual void doScreenShot(std::string fileToSave)=0;
 	ITextureBinder* m_binder;
 
 };

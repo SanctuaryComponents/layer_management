@@ -33,6 +33,7 @@ public:
 	virtual void setdebug(bool onoff);
 
 	void Debug(DBusConnection* conn,DBusMessage* msg );
+	void ScreenShot(DBusConnection* conn,DBusMessage* msg );
 	void ListAllLayerIDS(DBusConnection* conn,DBusMessage* msg );
 	void ListAllSurfaceIDS(DBusConnection* conn,DBusMessage* msg );
 	void ListAllLayerGroupIDS(DBusConnection* conn,DBusMessage* msg );
@@ -43,8 +44,10 @@ public:
 	void getPropertiesOfSurface(DBusConnection* conn,DBusMessage* msg );
 	void getPropertiesOfLayer(DBusConnection* conn,DBusMessage* msg );
 	void CreateSurface(DBusConnection* conn,DBusMessage* msg );
+	void CreateSurfaceFromId(DBusConnection* conn,DBusMessage* msg );
 	void RemoveSurface(DBusConnection* conn,DBusMessage* msg );
 	void CreateLayer(DBusConnection* conn,DBusMessage* msg );
+	void CreateLayerFromId(DBusConnection* conn,DBusMessage* msg );
 	void RemoveLayer(DBusConnection* conn,DBusMessage* msg );
 	void AddSurfaceToSurfaceGroup(DBusConnection* conn,DBusMessage* msg );
 	void RemoveSurfaceFromSurfaceGroup(DBusConnection* conn,DBusMessage* msg );
@@ -53,8 +56,10 @@ public:
 	void AddSurfaceToLayer(DBusConnection* conn,DBusMessage* msg );
 	void RemoveSurfaceFromLayer(DBusConnection* conn,DBusMessage* msg );
 	void CreateSurfaceGroup(DBusConnection* conn,DBusMessage* msg );
+	void CreateSurfaceGroupFromId(DBusConnection* conn,DBusMessage* msg );
 	void RemoveSurfaceGroup(DBusConnection* conn,DBusMessage* msg );
 	void CreateLayerGroup(DBusConnection* conn,DBusMessage* msg );
+	void CreateLayerGroupFromId(DBusConnection* conn,DBusMessage* msg );
 	void RemoveLayerGroup(DBusConnection* conn,DBusMessage* msg );
 	void SetSurfaceSourceRegion(DBusConnection* conn,DBusMessage* msg );
 	void SetLayerSourceRegion(DBusConnection* conn,DBusMessage* msg );

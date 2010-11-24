@@ -28,6 +28,11 @@
     	<arg type="b" name="onoff" direction="in" />
     </method>
     
+     <method name="Screenshot">
+	<annotation name="org.freedesktop.DBus.GLib.CSymbol" value="DBUSCommunicator::compositeService_screenshot"/>
+    	<arg type="s" name="filename" direction="in" />
+    </method>
+    
     <method name="ListAllLayerIDS">
       <annotation name="org.freedesktop.DBus.GLib.CSymbol" value="DBUSCommunicator::compositeService_list_all_layer_id_s"/>
       <arg type="au" name="layerids" direction="out" />
