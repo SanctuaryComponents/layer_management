@@ -1,3 +1,53 @@
+Version 0.2.0
+-------------
+
+This version consist of new features and several bugfixes :
+
+1. C-API for the LayerManagement
+2. API enhancements
+3. Implementation of the open use case "Make a Screen Shot"
+4. Example applications
+5. Several bugfixes.
+
+1. C-API for the LayerManagement
+
+For better usage of the LayerManagement Service from application
+point of view an additional C-API is implemented (see LayerManagerClient/ilmClient).
+This API is deployed as shared libraries an can be linked to the application
+which will controll the service. For the internal communication between the client
+and the service D-BUS is used.
+
+2. API Enhancements
+
+To support hardware layers and to get a better interoperability with other applications
+and platforms the API was extended by the following features :
+
+* Layer, Surface and Group Ids can be applied by from the client side too.
+* IlmMatrix class is now available in the LayerManagerUtils library, to support
+  simple 3D / 2D transformations
+
+3. Implementation of the open use case "make a screen shot"
+
+The use case "make a screen shot" was still open and is now implemented
+with this release. 
+ 
+4. Example applications
+
+Several example applications were added to demonstrate the usage and capabilities of
+the service. 
+
+* EGLX11ApplicationExample - Rotating triangle which is registered to the service.
+* LayerManagementClientExample - Example for controlling the service and the rendered layers.
+* LayerSceneDescriptionExample - Example for the definition of external layer and surface ids.
+
+5. Several bugfixes
+
+* Race condition during access/creation/deletion of data in layer list removed.
+* Layer and surface compositing in GLESGraphicSystem improved
+* Issue for handling of not applied surface in X11WindowSystem removed
+* Stability improvements
+* Improvement of the build environemt     
+
 Version 0.1.0
 -------------
 Initial published Version.
