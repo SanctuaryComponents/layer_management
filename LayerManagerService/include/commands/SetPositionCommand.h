@@ -33,16 +33,17 @@ public:
 	const int y;
 
 	virtual void execute(LayerList& layerlist){
-		GraphicalSurface* go = NULL;
+		GraphicalSurface* graphicalSurface = NULL;
 		switch(typeToSet){
-			case TypeSurface: {go = layerlist.getSurface(id); break;}
-			case TypeLayer: {go = layerlist.getLayer(id); break;}
+			case TypeSurface: {graphicalSurface = layerlist.getSurface(id); break;}
+			case TypeLayer: {graphicalSurface = layerlist.getLayer(id); break;}
 			case TypeSurfaceGroup: {break;}
 			case TypeLayerGroup: { break;}
+                        default : { break; }
 		}
-		if (NULL != go)
+		if (NULL != graphicalSurface)
 		{
-			go->setPosition(x,y);
+			graphicalSurface->setPosition(x,y);
 		}
 	}
 };

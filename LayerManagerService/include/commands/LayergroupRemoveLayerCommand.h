@@ -32,7 +32,10 @@ public:
 	virtual void execute(LayerList& layerlist){
 			LayerGroup* lg = layerlist.getLayerGroup(layergroupid);
 			Layer* layer = layerlist.getLayer(layerid);
-			lg->removeElement(layer);
+			if ( lg != NULL && layer != NULL )
+			{
+				lg->removeElement(layer);
+			}
 		};
 };
 

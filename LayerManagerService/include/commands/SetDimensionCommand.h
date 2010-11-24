@@ -39,6 +39,7 @@ public:
 			case TypeLayer: {go = layerlist.getLayer(id); break;}
 			case TypeSurfaceGroup: {break;}
 			case TypeLayerGroup: { break;}
+                        default : { break; }
 		}
 		if ( NULL != go )
 		{

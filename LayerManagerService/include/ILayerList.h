@@ -34,8 +34,11 @@ typedef GraphicalGroup<Surface, TypeSurfaceGroup> SurfaceGroup;
  */
 class ILayerList{
 public:
-		virtual Layer* createLayer()=0;
-		virtual Surface* createSurface()=0;
+		virtual Layer* createLayer(int id)=0;
+		virtual Surface* createSurface(int id)=0;
+                virtual LayerGroup* createLayerGroup(int id)=0;
+                virtual SurfaceGroup* createSurfaceGroup(int id)=0;
+
 		virtual void removeLayer(Layer* layer)=0;
 		virtual void removeSurface(Surface* surface)=0;
 		virtual Layer* getLayer(int id)=0;
@@ -55,12 +58,20 @@ public:
 		 * @return list of ids of all currently know layers
 		 */
 		virtual void getLayerGroupIDs(int* length, int* array[])=0;
-
+	        /**
+                 * Get list of ids of all layers currently existing.
+                 * @return list of ids of all currently know layers
+                 */
+                virtual void getSurfaceGroupIDs(int* length, int* array[])=0;
 		/**
-		 * Get list of ids of all layers currently existing.
-		 * @return list of ids of all currently know layers
+		 * Lock the list for read and write access
 		 */
-		virtual void getSurfaceGroupIDs(int* length, int* array[])=0;
+		virtual void lockList()=0;
+
+                /**
+                 * Unlock the list for read and write access
+                 */
+                virtual void unlockList()=0;
 
 		bool debugMode;
 

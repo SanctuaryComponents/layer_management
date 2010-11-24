@@ -40,8 +40,12 @@ public:
 										break;
 				case TypeLayerGroup: go = layerlist.getLayerGroup(id);
 										break;
+                                default : { break; }
 			}
-			*visibility = go->getVisibility();
+			if (go != NULL)
+			{
+				*visibility = go->getVisibility();
+			}
 		}
 };
 

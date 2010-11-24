@@ -19,4 +19,5 @@
 
 #include "LogicalGraphicsObject.h"
 
-int GraphicalObject::NextID = 1;
+int GraphicalObject::nextGraphicId[TypeMax]={1,1,1,1};
+

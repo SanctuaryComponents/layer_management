@@ -51,6 +51,7 @@
 #include "commands/DestroyShaderCommand.h"
 #include "commands/SetShaderCommand.h"
 #include "commands/SetUniformsCommand.h"
+#include "commands/ScreenShotCommand.h"
 
 /**
  * Objects who implement this interface can be used to have command objects executed. Communication

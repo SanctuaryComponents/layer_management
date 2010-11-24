@@ -31,18 +31,32 @@ public:
 
 	virtual void execute(LayerList& layerlist){
 			switch(typeToRemove){
-				case TypeSurface: {Surface* s = layerlist.getSurface(idToRemove);
+				case TypeSurface: {
+									 Surface* s = layerlist.getSurface(idToRemove);
+									 if ( s == NULL ) break;
 									 layerlist.removeSurface(s);
-								 break;}
-				case TypeLayer: {Layer* l = layerlist.getLayer(idToRemove);
+
+									 break;
+								 }
+				case TypeLayer: {
+									Layer* l = layerlist.getLayer(idToRemove);
+									if (l == NULL ) break;
 									layerlist.removeLayer(l);
-								break;}
-				case TypeSurfaceGroup: {SurfaceGroup* sg = layerlist.getSurfaceGroup(idToRemove);
+									break;
+								}
+				case TypeSurfaceGroup: {
+									SurfaceGroup* sg = layerlist.getSurfaceGroup(idToRemove);
+									if (sg == NULL) break;
 									layerlist.removeSurfaceGroup(sg);
-								break;}
-				case TypeLayerGroup: {LayerGroup* lg = layerlist.getLayerGroup(idToRemove);
+									break;
+								}
+				case TypeLayerGroup: {
+									LayerGroup* lg = layerlist.getLayerGroup(idToRemove);
+									if ( lg == NULL ) break;
 									layerlist.removeLayerGroup(lg);
-								break;}
+									break;
+								}
+                                default : { break; }
 			}
 		};
 };

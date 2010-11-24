@@ -55,7 +55,8 @@ public:
 			CreateShader,
 			DestroyShader,
 			SetShader,
-			SetUniforms
+			SetUniforms,
+			ScreenShot
 		};
 
 	Command(CommandType commandType) :commandType(commandType) {};

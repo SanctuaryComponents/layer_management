@@ -35,16 +35,19 @@ public:
 			switch(type){
 				case TypeSurface: {
 					Surface* s = layerlist.getSurface(id);
+					if (s==NULL) break;
 					*returnOrientation = s->getOrientation();
 					break;
 					}
 				case TypeLayer: {
 					Layer*l =layerlist.getLayer(id);
+					if (l==NULL) break;
 					*returnOrientation = l->getOrientation();
 					break;
 					}
 				case TypeSurfaceGroup: {break;}
 				case TypeLayerGroup: {break;}
+                                default : { break; }
 			}
 
 		}

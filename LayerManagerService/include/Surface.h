@@ -45,16 +45,14 @@ public:
 	 * by a specific renderer.unsigned
 	 */
 	PlatformSurface *platform; // platform/rendering specific window attributes
-
 	long nativeHandle;
 
 	int frameCounter;
 private:
-	Surface(): GraphicalSurface(TypeSurface) , platform (NULL), frameCounter(0) {}
-
+	Surface(): GraphicalSurface(TypeSurface) ,platform (NULL), frameCounter(0) {}
+	Surface(int id): GraphicalSurface(id,TypeSurface) ,platform (NULL), frameCounter(0) {}
 	friend class LayerList;
 	PixelFormat pixformat;
-
 };
 
 #endif /* _SURFACE_H_ */

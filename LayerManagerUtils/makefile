@@ -23,7 +23,9 @@ include ../LayerManagerPlatform/Make$(CONFIG).defs
 endif
 
 SRC += Log.cpp \
-	   LogMessageBuffer.cpp 		 
+	   LogMessageBuffer.cpp \
+	   IlmMatrix.cpp 	\
+	   Bitmap.cpp	 
 
 TARGET_NAME = libLayerManagerUtils.a
 LIB_NAME = $(TARGET_NAME).1.0
@@ -58,6 +60,8 @@ install:
 	mkdir -p $(PREFIX)/usr/include/layermanager/	
 	install -m 755 include/Log.h $(PREFIX)/usr/include/layermanager/
 	install -m 755 include/LogMessageBuffer.h $(PREFIX)/usr/include/layermanager/
+	install -m 755 include/IlmMatrix.h $(PREFIX)/usr/include/layermanager/
+	install -m 755 include/Bitmap.h $(PREFIX)/usr/include/layermanager/
 
 clean:
 	rm -f $(OBJS) $(TARGET)

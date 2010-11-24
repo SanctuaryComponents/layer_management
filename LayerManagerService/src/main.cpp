@@ -158,14 +158,9 @@ int main(int argc, char **argv)
 	LOG_INFO("Main", "Loading communicator.");
 	// Create a communication mechanism to use
 	BaseCommunicator* comm = loadCommunicator(manager,&manager->layerlist);
-//comm->start();
-//while(true)
-//		{
-//			sleep(2000);
-//		}
 
 	LOG_INFO("Main", "Loading renderer.");
-	// Create Grafikcontroller to use
+	// Create graphic controller to use
 	IRenderer* renderer = loadRenderer(&manager->layerlist);
 
 	// inform the layermanager about the renderer

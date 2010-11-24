@@ -34,17 +34,18 @@ public:
 	const int width;
 	const int height;
 	virtual void execute(LayerList& layerlist){
-			GraphicalSurface* go = NULL;
+			GraphicalSurface* graphicalSurface = NULL;
 			switch(typeToSet){
-				case TypeSurface: {go = layerlist.getSurface(id); break;}
-				case TypeLayer: {go = layerlist.getLayer(id); break;}
+				case TypeSurface: {graphicalSurface = layerlist.getSurface(id); break;}
+				case TypeLayer: {graphicalSurface = layerlist.getLayer(id); break;}
 				case TypeSurfaceGroup: {break;}
 				case TypeLayerGroup: { break;}
+                                default : { break; }
 			}
 			const Rectangle r(x,y,width,height);
-			if ( NULL != go )
+			if ( NULL != graphicalSurface )
 			{
-				go->setSourceRegion(r);
+				graphicalSurface->setSourceRegion(r);
 			}
 		}
 };

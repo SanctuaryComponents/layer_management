@@ -24,10 +24,11 @@
  * Enumeration of possible graphicalObjectTypes
  */
 enum ObjectType{
-	TypeSurface,
-	TypeLayer,
-	TypeSurfaceGroup,
-	TypeLayerGroup
+	TypeSurface = 0,
+	TypeLayer = 1,
+	TypeSurfaceGroup = 2,
+	TypeLayerGroup =3,
+	TypeMax = 4
 };
 
 #endif /* _GRAPHICALOBJECTTYPE_H_ */

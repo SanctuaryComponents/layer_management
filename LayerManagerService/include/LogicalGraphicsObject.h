@@ -29,8 +29,15 @@ class Shader;
 class GraphicalObject{
 public:
 
-	GraphicalObject(ObjectType type, double opacity, bool visibility) : type(type),id(NextID++),shader(0),opacity(opacity),visibility(visibility)
-	{};
+	GraphicalObject(ObjectType type, double opacity, bool visibility) : type(type),graphicInternalId(nextGraphicId[type]++),shader(0),opacity(opacity),visibility(visibility)
+	{
+	  graphicExternalId = graphicInternalId;
+	};
+
+         GraphicalObject(int externalId,ObjectType type, double opacity, bool visibility) : type(type),graphicInternalId(nextGraphicId[type]++),graphicExternalId(externalId),shader(0),opacity(opacity),visibility(visibility)
+         {
+         };
+
 
 	/**
 	 * Set alpha value
@@ -46,7 +53,7 @@ public:
 	virtual void setVisibility(bool newVisibility){visibility = newVisibility;};
 	bool getVisibility(){ return visibility;};
 
-	int getID() const {return id;};
+	virtual int getID() {return graphicExternalId;};
 
 	/**
 	 * Assign custom shader for rendering
@@ -70,16 +77,16 @@ public:
 
 public:
 	/**
-	 * ID of this graphical object (Layerid, surfaceid etc)
-	 */
-	int id;
-	/**
 	 * Pointer to currently assigned shader. If NULL, a default shader will be used.
 	 */
 	Shader* shader;
 	double opacity;
 	bool visibility;
-	static int NextID;
+protected:
+        int graphicInternalId;
+        int graphicExternalId;
+private:
+	static int nextGraphicId[TypeMax];
 };
 
 #endif /* _LOGICALGRAPHICSOBJECT_H_ */

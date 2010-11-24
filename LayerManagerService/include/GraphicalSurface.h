@@ -30,9 +30,11 @@
  */
 class GraphicalSurface : public GraphicalObject{
 public:
-	GraphicalSurface(ObjectType type) : GraphicalObject(type,1,true),orientation(Zero),SourceViewport(0,0,0,0),DestinationViewport(0,0,0,0)  {
+	GraphicalSurface(ObjectType type) : GraphicalObject(type,1.0,true),orientation(Zero),SourceViewport(0,0,0,0),DestinationViewport(0,0,0,0)  {
 	};
 
+	GraphicalSurface(int externalId,ObjectType type) : GraphicalObject(externalId,type,1.0,true),orientation(Zero),SourceViewport(0,0,0,0),DestinationViewport(0,0,0,0)  {
+        };
 		/**
 		 * Set Orientation value
 		 * @param orientation the new value. Multiples of 90 degrees. (0->0°, 1->90°, 2->180°,3->279°)

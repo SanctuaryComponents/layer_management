@@ -105,6 +105,9 @@ void ShaderProgram::loadCommonUniforms(const CommonUniforms& uniforms) const
 		uniform2fv(_texOffsetLoc, 1, uniforms.texOffset);
 	if (_texUnitLoc>=0)
 		uniform1iv(_texUnitLoc, 1, &uniforms.texUnit);
+       if (_matrixLoc>=0)
+                uniformMatrix4fv(_matrixLoc, 1,false, uniforms.matrix);
+
 }
 
 void ShaderProgram::updateCommonUniformLocations(void)
@@ -118,5 +121,6 @@ void ShaderProgram::updateCommonUniformLocations(void)
 	_texRangeLoc = getUniformLocation("uTexRange");
 	_texOffsetLoc = getUniformLocation("uTexOffset");
 	_texUnitLoc = getUniformLocation("uTexUnit");
+	_matrixLoc = getUniformLocation("uMatrix");
 }
 

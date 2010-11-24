@@ -32,7 +32,10 @@ public:
 	virtual void execute(LayerList& layerlist){
 		Layer* l = layerlist.getLayer(layerid);
 		Surface* s = layerlist.getSurface(surfaceid);
-		l->addSurface(s);
+		if (l != NULL && s != NULL )
+		{
+			l->addSurface(s);
+		}
 	};
 };
 

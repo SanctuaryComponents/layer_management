@@ -34,6 +34,7 @@ public:
 		switch(type){
 			case TypeSurface: {
 				Surface* s = layerlist.getSurface(id);
+				if ( s==NULL ) break;
 				*formatreturn = s->getPixelFormat();
 				break;
 				}
@@ -44,6 +45,7 @@ public:
 				}
 			case TypeSurfaceGroup: break;
 			case TypeLayerGroup: break;
+                        default : { break; }
 		}
 	}
 };

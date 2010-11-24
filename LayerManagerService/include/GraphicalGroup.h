@@ -32,9 +32,13 @@ template <class T, ObjectType thetype>
 class GraphicalGroup : public GraphicalObject{
 public:
 
-	GraphicalGroup() : GraphicalObject(thetype,1,true){
+	GraphicalGroup() : GraphicalObject(thetype,1.0,true){
 		list = std::list<T*>();
 	};
+
+	GraphicalGroup(int externalId) : GraphicalObject(externalId,thetype,1.0,true){
+                list = std::list<T*>();
+        };
 
 	/**
 	 * Set visibility on every element of the group
@@ -57,7 +61,6 @@ public:
 	const std::list<T*> getList(){return list;};
 	void addElement(T* element){list.push_back(element);};
 	void removeElement(T* element){list.remove(element);};
-
 private:
 
 	// the list containing the elements represented by the group

@@ -30,7 +30,6 @@
 #include "LogicalGraphicsObject.h"
 #include "GraphicalSurface.h"
 #include "GraphicalGroup.h"
-#include "errors.h"
 #include "commands/Command.h"
 #include <vector>
 #include "LayerType.h"

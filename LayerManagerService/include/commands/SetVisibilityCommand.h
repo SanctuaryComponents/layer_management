@@ -31,7 +31,7 @@ public:
 	const bool visibility;
 
 	virtual void execute(LayerList& layerlist){
-		GraphicalObject* go;
+		GraphicalObject* go = NULL;
 		switch(otype){
 			case TypeSurface: go = layerlist.getSurface(idtoSet);
 							break;
@@ -41,8 +41,12 @@ public:
 									break;
 			case TypeLayerGroup: go = layerlist.getLayerGroup(idtoSet);
 									break;
+                        default : { break; }
 		}
-		go->setVisibility(visibility);
+		if ( go != NULL )
+		{
+			go->setVisibility(visibility);
+		}
 	}
 };
 

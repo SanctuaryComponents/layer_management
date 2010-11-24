@@ -47,6 +47,8 @@ public:
 	 */
 	virtual void setdebug(bool onoff)=0;
 
+	virtual void doScreenShot(std::string fileToSave)=0;
+
 	virtual uint getLayerTypeCapabilities(LayerType layertype)=0;
 
 

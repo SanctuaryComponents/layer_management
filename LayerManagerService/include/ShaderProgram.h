@@ -27,7 +27,7 @@
  * Represents an OpenGL shader program.
  *
  * There is a global list of allocated shader programs. Each instance is reference
- * counted, so if program is no longer in use by any shader instance, it will 
+ * counted, so if program is no longer in use by any shader instance, it will
  * be deleted automatically.
  */
 class ShaderProgram
@@ -47,6 +47,7 @@ public:
 		float texRange[2];
 		float texOffset[2];
 		int texUnit;
+		float* matrix;
 	};
 
 	/**
@@ -70,7 +71,7 @@ public:
 	virtual void use(void) const = 0;
 
 	/**
-	 * Load uniform values for common surface properties, like position, 
+	 * Load uniform values for common surface properties, like position,
 	 * size, opacity, etc...
 	 *
 	 * @param uniforms   Uniform values
@@ -107,7 +108,7 @@ public:
 	virtual int getUniformLocation(const char* name) const = 0;
 
 	virtual void uniform1iv(int location, int count, const int* v) const = 0;
-	
+
 	virtual void uniform1fv(int location, int count, const float* v) const = 0;
 
 	virtual void uniform2fv(int location, int count, const float* v) const = 0;
@@ -156,8 +157,8 @@ private:
 	int _texRangeLoc;
 	int _texOffsetLoc;
 	int _texUnitLoc;
-
-	/// global list of programs	
+	int _matrixLoc;
+	/// global list of programs
 	static std::list<ShaderProgram*> _programList;
 };
 

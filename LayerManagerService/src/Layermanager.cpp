@@ -26,6 +26,7 @@ Layermanager* Layermanager::instance = new Layermanager();
 Layermanager::Layermanager() {
 	// default layer
 	//Layer* defaultLayer = layerlist.createLayer();
+        layerlist.init();
 }
 
 
@@ -75,7 +76,9 @@ void Layermanager::printDebugInformation(){
 
 
 void Layermanager::execute(Command*  commandToBeExecuted){
-	LOG_DEBUG("Layermanager", "executing a command");
+	LOG_DEBUG("Layermanager", "executing a command, locking list");
+        layerlist.lockList();
+        /*LOG_DEBUG("Layermanager", "executing a command, locking list success");*/
 	switch(commandToBeExecuted->commandType){
 		case Command::Remove:
 		case Command::SetVisibility:
@@ -93,17 +96,39 @@ void Layermanager::execute(Command*  commandToBeExecuted){
 		case Command::SurfacegroupRemoveSurface:
 		case Command::SetLayerRenderOrder:
 		case Command::SetSurfaceRenderOrderWithinLayer:
-					{
-						layerlist.toBeCommittedList.push_back(commandToBeExecuted);
-						break;
-					}
+                {
+                        layerlist.toBeCommittedList.push_back(commandToBeExecuted);
+                        break;
+                }
+		case Command::ScreenShot:
+		{
+			LOG_INFO("LayerManager","making screenshot");
+			ScreenShotCommand* screenShotCommand = (ScreenShotCommand*)commandToBeExecuted;
+			LOG_INFO("LayerManager","file: " << screenShotCommand->filename);
+			// call screen shot on all renderers
+			for( std::list<IRenderer*>::iterator list_iter = compositingControllers.begin();
+			     list_iter != compositingControllers.end();
+			     list_iter++)
+			  {
+                            if ( NULL != *list_iter)
+                              {
+                                    (*list_iter)->doScreenShot(std::string(screenShotCommand->filename));
+                              }
+			  }
+			break;
+		}
 		case Command::Create:
-		default: {
-					commandToBeExecuted->execute(layerlist);
-					delete commandToBeExecuted;
-					break;
-				}
+		default:
+		  {
+                        commandToBeExecuted->execute(layerlist);
+                        delete commandToBeExecuted;
+                        break;
+		  }
 	}
+        /* LOG_DEBUG("Layermanager", "executing a command, unlocking list");*/
+        layerlist.unlockList();
+        LOG_DEBUG("Layermanager", "executing a command, unlocking list success");
+
 }
 
 

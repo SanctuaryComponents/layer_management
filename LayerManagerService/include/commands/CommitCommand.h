@@ -30,8 +30,11 @@ public:
 	virtual void execute(LayerList& layerlist){
 		for (std::list<Command*>::iterator it = layerlist.toBeCommittedList.begin();it!=layerlist.toBeCommittedList.end();it++){
 			Command* c = (*it);
-			c->execute(layerlist);
-			delete c;
+			if ( c!=NULL )
+			{
+				c->execute(layerlist);
+				delete c;
+			}
 		}
 		layerlist.toBeCommittedList.clear();
 	};

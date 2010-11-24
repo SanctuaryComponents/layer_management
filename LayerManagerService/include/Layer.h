@@ -40,14 +40,13 @@ public:
 	void removeSurface(Surface* s){	surfaces.remove(s);		};
 
 	std::list<Surface*>& getAllSurfaces(){return surfaces;}
-
 	std::list<Surface*> surfaces;
 private:
 	LayerType layerType;
 	uint capabilities;
-	Layer() : GraphicalSurface(TypeLayer), layerType(Software_2D), capabilities(0){};
+	Layer() : GraphicalSurface(TypeLayer),layerType(Software_2D), capabilities(0){};
+	Layer(int id) : GraphicalSurface(id,TypeLayer),layerType(Software_2D), capabilities(0){};
 	friend class LayerList;
-
 };
 
 

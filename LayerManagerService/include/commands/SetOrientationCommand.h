@@ -32,15 +32,16 @@ public:
 	const OrientationType Orientation;
 
 	virtual void execute(LayerList& layerlist){
-		GraphicalSurface* gs = NULL;
+		GraphicalSurface* graphicalSurface = NULL;
 		switch(type){
-			case TypeSurface: {gs = layerlist.getSurface(id); break;}
-			case TypeLayer:{gs = layerlist.getLayer(id); break;}
+			case TypeSurface: {graphicalSurface = layerlist.getSurface(id); break;}
+			case TypeLayer:{graphicalSurface = layerlist.getLayer(id); break;}
 			case TypeSurfaceGroup:{ break;}
 			case TypeLayerGroup:{break;}
+                        default : { break; }
 		}
-		if (NULL != gs)
-			gs->setOrientation(Orientation);
+		if (NULL != graphicalSurface)
+			graphicalSurface->setOrientation(Orientation);
 	}
 };
 

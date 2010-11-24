@@ -37,8 +37,12 @@ public:
 			case TypeLayer: {go = layerlist.getLayer(id); break;}
 			case TypeSurfaceGroup: {go = layerlist.getSurfaceGroup(id); break;}
 			case TypeLayerGroup: { go = layerlist.getLayerGroup(id); break;}
+                        default : { break; }
 		}
-		*returnOpacity = go->getOpacity();
+		if ( go!= NULL )
+		{
+			*returnOpacity = go->getOpacity();
+		}
 	}
 };
 

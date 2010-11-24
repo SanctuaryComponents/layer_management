@@ -32,7 +32,10 @@ public:
 	virtual void execute(LayerList& layerlist){
 		SurfaceGroup* sg = layerlist.getSurfaceGroup(surfacegroupid);
 		Surface* surface = layerlist.getSurface(surfaceid);
-		sg->removeElement(surface);
+		if ( sg != NULL && surface != NULL )
+		{
+			sg->removeElement(surface);
+		}
 	};
 };
 

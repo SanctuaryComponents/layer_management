@@ -26,35 +26,45 @@
 
 class CreateCommand : public Command{
 public:
-	CreateCommand(int handle, ObjectType createType, PixelFormat pixelformat,uint OriginalWidth,uint OriginalHeight,unsigned int* idReturn) : Command(Create), createType(createType), nativeHandle(handle), pixelformat(pixelformat),OriginalWidth(OriginalWidth),OriginalHeight(OriginalHeight), idReturn(idReturn){};
+	CreateCommand(int handle, ObjectType createType, PixelFormat pixelformat,uint OriginalWidth,uint OriginalHeight,int* idReturn) : Command(Create), createType(createType), nativeHandle(handle), pixelformat(pixelformat),OriginalWidth(OriginalWidth),OriginalHeight(OriginalHeight), idReturn(idReturn){};
 	const ObjectType createType;
 	const int nativeHandle;
 	const PixelFormat pixelformat;
 	unsigned int OriginalWidth;
 	unsigned int OriginalHeight;
-	unsigned int* idReturn;
+	int* idReturn;
 	virtual void execute(LayerList& layerlist){
 		switch(createType){
-			case TypeSurface: {Surface* s = layerlist.createSurface();
+			case TypeSurface: {
+							 Surface* s = layerlist.createSurface(*idReturn);
+							 if ( s == NULL ) break;
 							 *idReturn = s->getID();
 							 s->nativeHandle = nativeHandle;
 							 s->setPixelFormat(pixelformat);
 							 s->OriginalSourceWidth = OriginalWidth;
 							 s->OriginalSourceHeight = OriginalHeight;
-							 LOG_DEBUG("created surface with id:", s->getID());
-							 break;}
-			case TypeLayer: {Layer* l = layerlist.createLayer();
+							 LOG_DEBUG("CreateCommand","Created surface with : " << s->getID() << " handle " << nativeHandle);
+							 break;
+							 }
+			case TypeLayer: {
+							Layer* l = layerlist.createLayer(*idReturn);
+							if ( l == NULL ) break;
 							*idReturn = l->getID();
 //							LOG_DEBUG("created layer with id:", l->getID());
 							break;}
-			case TypeSurfaceGroup: {SurfaceGroup* sg = layerlist.createSurfaceGroup();
+			case TypeSurfaceGroup: {
+							SurfaceGroup* sg = layerlist.createSurfaceGroup(*idReturn);
+							if ( sg == NULL ) break;
 							*idReturn = sg->getID();
 //							LOG_DEBUG("created surfacegroup with id:", sg->getID());
 							break;}
-			case TypeLayerGroup: {LayerGroup* lg = layerlist.createlayerGroup();
+			case TypeLayerGroup: {
+							LayerGroup* lg = layerlist.createLayerGroup(*idReturn);
+							if ( lg == NULL ) break;
 							*idReturn = lg->getID();
 //							LOG_DEBUG("created layergroup with id:", lg->getID());
 							break;}
+                        default : { break; }
 		}
 	};
 

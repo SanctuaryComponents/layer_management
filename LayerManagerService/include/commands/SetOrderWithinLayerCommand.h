@@ -32,10 +32,17 @@ public:
 
 	virtual void execute(LayerList& layerlist){
 		Layer* l = layerlist.getLayer(layerid);
-		l->getAllSurfaces().clear();
-		for (int i=0;i<length;i++){
-			Surface* s = layerlist.getSurface(array[i]);
-			l->getAllSurfaces().push_back(s);
+		if (l != NULL)
+		{
+			l->getAllSurfaces().clear();
+			for (int i=0;i<length;i++)
+			{
+				Surface* s = layerlist.getSurface(array[i]);
+				if ( s != NULL )
+				{
+					l->getAllSurfaces().push_back(s);
+				}
+			}
 		}
 	};
 };

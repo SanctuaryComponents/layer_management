@@ -41,6 +41,7 @@ public:
 			case TypeLayer: {go = layerlist.getLayer(id); break;}
 			case TypeSurfaceGroup: {break;}
 			case TypeLayerGroup: { break;}
+                        default : { break; }
 		}
 		const Rectangle r(x,y,width,height);
 		if (NULL != go )

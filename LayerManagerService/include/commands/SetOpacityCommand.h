@@ -36,8 +36,12 @@ public:
 				case TypeLayer:gs = layerlist.getLayer(id); break;
 				case TypeSurfaceGroup: gs = layerlist.getSurfaceGroup(id); break;
 				case TypeLayerGroup: gs = layerlist.getLayerGroup(id); break;
+                                default : { break; }
 			}
-			gs->setOpacity(Opacity);
+			if ( gs != NULL )
+			{
+				gs->setOpacity(Opacity);
+			}
 		}
 };
 
