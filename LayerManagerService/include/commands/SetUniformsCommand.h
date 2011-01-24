@@ -38,6 +38,7 @@ public:
 	const std::vector<std::string> getUniforms(){
 		return _uniforms;
 	}
+	const int getShaderId(){ return _shaderid; }
 
 	void execute(LayerList& layerlist){
 		// get shader by its ID

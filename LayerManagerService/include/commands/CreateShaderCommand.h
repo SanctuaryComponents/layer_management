@@ -36,6 +36,9 @@ public:
 		// void
 	};
 
+	const std::string getVertName(){return _vertName;}
+	const std::string getFragName(){return _fragName;}
+
 	void execute(LayerList& layerlist){
 		Shader* shader;
 			int id=0;
@@ -59,4 +62,3 @@ private:
 };
 
 #endif /* _CREATESHADERCOMMAND_H_ */
-

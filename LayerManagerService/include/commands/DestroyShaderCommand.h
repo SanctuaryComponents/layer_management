@@ -33,6 +33,8 @@ public:
 		// void
 	};
 
+	const int getShaderID(){ return _id; }
+
 	void execute(LayerList& layerlist){
 		std::map<int,Shader*>::iterator it;
 

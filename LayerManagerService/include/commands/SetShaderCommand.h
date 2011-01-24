@@ -33,6 +33,9 @@ public:
 		// void
 	};
 
+	const int getID(){ return _id; }
+	const int getShaderID(){ return _shaderid; }
+
 	void execute(LayerList& layerlist){
 		std::map<int,Shader*>::iterator it;
 		GraphicalObject* object = layerlist.getSurface(_id);

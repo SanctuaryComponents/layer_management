@@ -34,6 +34,7 @@ public:
 		Surface* s = layerlist.getSurface(surfaceid);
 		if (l != NULL && s != NULL )
 		{
+			LOG_DEBUG("LayerAddSurfaceCommand","add surface " << surfaceid << " to layer "<< layerid);
 			l->addSurface(s);
 		}
 	};

@@ -40,6 +40,7 @@ public:
 			}
 			if ( gs != NULL )
 			{
+				LOG_DEBUG("SetOpacityCommand","new opacity " << Opacity << " for id: " <<id);
 				gs->setOpacity(Opacity);
 			}
 		}

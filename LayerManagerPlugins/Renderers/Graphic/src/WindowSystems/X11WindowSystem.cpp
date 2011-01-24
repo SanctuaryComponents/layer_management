@@ -335,11 +335,11 @@ X11WindowSystem::CreatePixmapsForAllWindows()
 	bool result = true;
 	LOG_DEBUG("X11WindowSystem", "redirecting all windows");
 	Window root = RootWindow(x11Display, 0);
-	XGrabServer (x11Display);
-	unsigned int numberOfWindows = 0;
-	Window *children = getListOfAllTopLevelWindows(x11Display,&numberOfWindows);
+//	XGrabServer (x11Display);
+//	unsigned int numberOfWindows = 0;
+//	Window *children = getListOfAllTopLevelWindows(x11Display,&numberOfWindows);
 
-	LOG_DEBUG("X11WindowSystem", "Found " << numberOfWindows << " windows");
+//	LOG_DEBUG("X11WindowSystem", "Found " << numberOfWindows << " windows");
 	XCompositeRedirectSubwindows(x11Display,root,CompositeRedirectManual);
 
 /*	for (unsigned int i=0;i< (numberOfWindows-1);i++)
@@ -348,9 +348,9 @@ X11WindowSystem::CreatePixmapsForAllWindows()
 		NewWindow(w);
 		MapWindow(w);
 	} */
-	XFree(children);
-	XUngrabServer (x11Display);
-	XSync(x11Display, 0);
+//	XFree(children);
+//	XUngrabServer (x11Display);
+//	XSync(x11Display, 0);
 
 	return result;
 }
@@ -568,7 +568,7 @@ bool X11WindowSystem::initXServer()
 	XCompositeUnredirectWindow(x11Display,CompositorWindow,CompositeRedirectManual);
 
 	//unredirect special windows if present
-	XGrabServer (x11Display);
+	/*XGrabServer (x11Display);
 	unsigned int numberOfWindows = 0;
 	Window *children = getListOfAllTopLevelWindows(x11Display,&numberOfWindows);
 	LOG_DEBUG("X11WindowSystem", "unredirecting special windows");
@@ -593,7 +593,7 @@ bool X11WindowSystem::initXServer()
 	XFree(children);
 	XUngrabServer (x11Display);
 	XSync(x11Display, 0);
-
+*/
 	LOG_DEBUG("X11WindowSystem", "Initialised XServer connection");
 	return result;
 }
@@ -714,7 +714,7 @@ bool X11WindowSystem::start(int displayWidth, int displayHeight, const char* Dis
 	}
 	while ( m_initialized == false )
 	{
-		sleep(1);
+		usleep(50000);
 		LOG_INFO("X11WindowSystem","Waiting start complete " << m_initialized);
 	}
 	LOG_INFO("X11WindowSystem","Start complete " << m_initialized << " success " << m_success);

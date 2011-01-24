@@ -43,14 +43,14 @@ public:
 							 s->setPixelFormat(pixelformat);
 							 s->OriginalSourceWidth = OriginalWidth;
 							 s->OriginalSourceHeight = OriginalHeight;
-							 LOG_DEBUG("CreateCommand","Created surface with : " << s->getID() << " handle " << nativeHandle);
+							 LOG_DEBUG("CreateCommand","Created surface with new ID: " << s->getID() << " handle " << nativeHandle << " pixelformat:" << pixelformat << " originalwidth:" << OriginalWidth<< " originalheighth:" << OriginalHeight);
 							 break;
 							 }
 			case TypeLayer: {
 							Layer* l = layerlist.createLayer(*idReturn);
 							if ( l == NULL ) break;
 							*idReturn = l->getID();
-//							LOG_DEBUG("created layer with id:", l->getID());
+							LOG_DEBUG("created layer with id:", l->getID());
 							break;}
 			case TypeSurfaceGroup: {
 							SurfaceGroup* sg = layerlist.createSurfaceGroup(*idReturn);
