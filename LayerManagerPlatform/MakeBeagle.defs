@@ -17,7 +17,7 @@
 #
 ############################################################################
 RENDERER=BeagleRenderer
-COMMUNICATOR=DBUSComunicator
+COMMUNICATOR=DBUSCommunicator
 
 CXXFLAGS = -Wall -fPIC -O2
 

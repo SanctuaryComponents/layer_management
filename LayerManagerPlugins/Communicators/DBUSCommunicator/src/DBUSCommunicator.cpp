@@ -568,7 +568,7 @@ void DBUSCommunicator::getPropertiesOfSurface(DBusConnection* conn,DBusMessage* 
   initReply();
   appendDouble(surface->getOpacity());
   Rectangle dest = surface->getDestinationRegion();
-  Rectangle src = surface->getDestinationRegion();
+  Rectangle src = surface->getSourceRegion();
   appendUint(src.x);
   appendUint(src.y);
   appendUint(src.width);
@@ -593,7 +593,7 @@ void DBUSCommunicator::getPropertiesOfLayer(DBusConnection* conn,DBusMessage* ms
   initReply();
   appendDouble(layer->getOpacity());
   Rectangle dest = layer->getDestinationRegion();
-  Rectangle src = layer->getDestinationRegion();
+  Rectangle src = surface->getSourceRegion();
   appendUint(src.x);
   appendUint(src.y);
   appendUint(src.width);
