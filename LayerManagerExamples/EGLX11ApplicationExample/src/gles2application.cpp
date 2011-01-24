@@ -25,9 +25,9 @@
 
 typedef struct t_shaderObject
 {
-    GLuint      uiFragShader;
-    GLuint      uiVertShader;
-    GLuint      uiProgramObject;
+    GLuint      fragmentShaderId;
+    GLuint      vertexShaderId;
+    GLuint      shaderProgramId;
     GLint       matrixLocation;
     GLint       colorLocation;
 } gles2Shader;
@@ -112,24 +112,24 @@ t_ilm_bool initShader()
   t_ilm_bool result = ILM_TRUE;
 
   /* Create the fragment shader object */
-  shader.uiFragShader = glCreateShader(GL_FRAGMENT_SHADER);
+  shader.fragmentShaderId = glCreateShader(GL_FRAGMENT_SHADER);
 
   /* Load Fragment Source */
-  glShaderSource(shader.uiFragShader, 1, (const char**)&sourceFragShader, NULL);
+  glShaderSource(shader.fragmentShaderId, 1, (const char**)&sourceFragShader, NULL);
 
   /* Compile the source code of fragment shader */
-  glCompileShader(shader.uiFragShader);
+  glCompileShader(shader.fragmentShaderId);
 
-  glGetShaderiv(shader.uiFragShader, GL_COMPILE_STATUS, (GLint*)&result);
+  glGetShaderiv(shader.fragmentShaderId, GL_COMPILE_STATUS, (GLint*)&result);
 
   if (!result)
   {
           t_ilm_int infoLength, numberChars;
-          glGetShaderiv(shader.uiFragShader, GL_INFO_LOG_LENGTH, &infoLength);
+          glGetShaderiv(shader.fragmentShaderId, GL_INFO_LOG_LENGTH, &infoLength);
 
           /* Allocate Log Space */
           char* info = (char*)malloc(sizeof(char)*infoLength);
-          glGetShaderInfoLog(shader.uiFragShader, infoLength, &numberChars, info);
+          glGetShaderInfoLog(shader.fragmentShaderId, infoLength, &numberChars, info);
 
           /* Print the error */
           printf("Failed to compile fragment shader: %s\n", info);
@@ -138,24 +138,24 @@ t_ilm_bool initShader()
   }
 
   /* Create the fragment shader object */
-    shader.uiVertShader = glCreateShader(GL_VERTEX_SHADER);
+    shader.vertexShaderId = glCreateShader(GL_VERTEX_SHADER);
 
     /* Load Fragment Source */
-    glShaderSource(shader.uiVertShader, 1, (const char**)&sourceVertShader, NULL);
+    glShaderSource(shader.vertexShaderId, 1, (const char**)&sourceVertShader, NULL);
 
     /* Compile the source code of fragment shader */
-    glCompileShader(shader.uiVertShader);
+    glCompileShader(shader.vertexShaderId);
 
-    glGetShaderiv(shader.uiVertShader, GL_COMPILE_STATUS, (GLint*)&result);
+    glGetShaderiv(shader.vertexShaderId, GL_COMPILE_STATUS, (GLint*)&result);
 
     if (!result)
     {
             t_ilm_int infoLength, numberChars;
-            glGetShaderiv(shader.uiVertShader, GL_INFO_LOG_LENGTH, &infoLength);
+            glGetShaderiv(shader.vertexShaderId, GL_INFO_LOG_LENGTH, &infoLength);
 
             /* Allocate Log Space */
             char* info = (char*)malloc(sizeof(char)*infoLength);
-            glGetShaderInfoLog(shader.uiVertShader, infoLength, &numberChars, info);
+            glGetShaderInfoLog(shader.vertexShaderId, infoLength, &numberChars, info);
 
             /* Print the error */
             printf("Failed to compile vertex shader: %s\n", info);
@@ -163,43 +163,43 @@ t_ilm_bool initShader()
             return ILM_FALSE;
     }
 
-    shader.uiProgramObject = glCreateProgram();
+    shader.shaderProgramId = glCreateProgram();
 
-    glAttachShader(shader.uiProgramObject, shader.uiFragShader);
-    glAttachShader(shader.uiProgramObject, shader.uiVertShader);
+    glAttachShader(shader.shaderProgramId, shader.fragmentShaderId);
+    glAttachShader(shader.shaderProgramId, shader.vertexShaderId);
 
-    glBindAttribLocation(shader.uiProgramObject, 0, "a_vertex");
+    glBindAttribLocation(shader.shaderProgramId, 0, "a_vertex");
 
-    glLinkProgram(shader.uiProgramObject);
+    glLinkProgram(shader.shaderProgramId);
 
-    glGetProgramiv(shader.uiProgramObject, GL_LINK_STATUS, (GLint*)&result);
+    glGetProgramiv(shader.shaderProgramId, GL_LINK_STATUS, (GLint*)&result);
 
     if (!result)
     {
             t_ilm_int infoLength, numberChars;
-            glGetShaderiv(shader.uiProgramObject, GL_INFO_LOG_LENGTH, &infoLength);
+            glGetShaderiv(shader.shaderProgramId, GL_INFO_LOG_LENGTH, &infoLength);
 
             /* Allocate Log Space */
             char* info = (char*)malloc(sizeof(char)*infoLength);
-            glGetShaderInfoLog(shader.uiProgramObject, infoLength, &numberChars, info);
+            glGetShaderInfoLog(shader.shaderProgramId, infoLength, &numberChars, info);
 
             /* Print the error */
             printf("Failed to link program: %s\n", info);
             free(info);
             return ILM_FALSE;
     }
-    glUseProgram(shader.uiProgramObject);
-    shader.matrixLocation = glGetUniformLocation(shader.uiProgramObject, "u_matrix");
-    shader.colorLocation = glGetUniformLocation(shader.uiProgramObject, "u_color");
+    glUseProgram(shader.shaderProgramId);
+    shader.matrixLocation = glGetUniformLocation(shader.shaderProgramId, "u_matrix");
+    shader.colorLocation = glGetUniformLocation(shader.shaderProgramId, "u_color");
     return result;
 }
 
 t_ilm_bool destroyShader()
 {
   t_ilm_bool result = ILM_TRUE;
-  glDeleteProgram(shader.uiProgramObject);
-  glDeleteShader(shader.uiFragShader);
-  glDeleteShader(shader.uiVertShader);
+  glDeleteProgram(shader.shaderProgramId);
+  glDeleteShader(shader.fragmentShaderId);
+  glDeleteShader(shader.vertexShaderId);
   return result;
 }
 
@@ -257,7 +257,7 @@ void draw(t_ilm_uint animTime)
       IlmMatrixRotateZ(matrix,currentAngle);
       float color[4] = {0.0,1.0,1.0, 0.5 +  (0.3 / (float) i) };
       float lineColor[4] = {0.0,0.0,0.0, 0.5 + (0.4 / (float) i) };
-      glUseProgram(shader.uiProgramObject);
+      glUseProgram(shader.shaderProgramId);
       attachVertexBuffer();
 
       glUniformMatrix4fv( shader.matrixLocation, 1, GL_FALSE, &matrix.f[0]);

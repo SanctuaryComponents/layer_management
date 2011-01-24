@@ -28,6 +28,7 @@ t_ilm_bool initShader();
 t_ilm_bool destroyShader();
 
 t_ilm_bool initVertexBuffer();
+
 void attachVertexBuffer();
 void detachVertexBuffer();
 void destroyVertexBuffer();

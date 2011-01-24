@@ -23,101 +23,107 @@
 #include <stdio.h>
 #include <sys/time.h>
 
-typedef struct t_eglstate
+typedef struct t_eglContextStruct
 {
         EGLDisplay                      eglDisplay;
         EGLConfig                       eglConfig;
         EGLSurface                      eglSurface;
         EGLContext                      eglContext;
-} eglState;
+} EglContextStruct;
 
-typedef struct t_x11state
+typedef struct t_x11ContextStruct
 {
   Window        x11Window;
   Display*      x11Display;
   long          x11Screen;
   XVisualInfo*  x11Visual;
   Colormap      x11Colormap;
-} x11State;
+} X11ContextStruct;
 
-static eglState g_eglState;
-static x11State g_x11State;
+static EglContextStruct g_eglContextStruct;
+static X11ContextStruct g_x11ContextStruct;
 EGLint contextAttribs[] = { EGL_CONTEXT_CLIENT_VERSION, 2, EGL_NONE };
 
 t_ilm_bool createX11Context(t_ilm_int width, t_ilm_int height)
 {
   t_ilm_bool result = ILM_TRUE;
-  Window                      sRootWindow;
-  XSetWindowAttributes        sWA;
-  unsigned int                ui32Mask;
-  int                         i32Depth;
-  int                         i32Width, i32Height;
+  Window                      rootWindow;
+  XSetWindowAttributes        windowAttributes;
+  unsigned int                windowMask;
+  int                         colorDepth;
+  int                         widthCorrected, heightCorrected;
   const char* query;
 
-  g_x11State.x11Window = 0;
-  g_x11State.x11Display = NULL;
-  g_x11State.x11Screen = 0;
-  g_x11State.x11Visual = NULL;
+  g_x11ContextStruct.x11Window = 0;
+  g_x11ContextStruct.x11Display = NULL;
+  g_x11ContextStruct.x11Screen = 0;
+  g_x11ContextStruct.x11Visual = NULL;
 
-  g_x11State.x11Display = XOpenDisplay( 0 );
-  if (!g_x11State.x11Display)
+  g_x11ContextStruct.x11Display = XOpenDisplay( 0 );
+  if (!g_x11ContextStruct.x11Display)
   {
       printf("Error: Unable to open X display\n");
       return ILM_FALSE;
   }
-  g_x11State.x11Screen = XDefaultScreen( g_x11State.x11Display );
+  g_x11ContextStruct.x11Screen = XDefaultScreen( g_x11ContextStruct.x11Display );
 
-  // Gets the window parameters
-  sRootWindow = RootWindow(g_x11State.x11Display, g_x11State.x11Screen);
-  i32Depth = DefaultDepth(g_x11State.x11Display, g_x11State.x11Screen);
-  g_x11State.x11Visual = (XVisualInfo*) malloc(sizeof(XVisualInfo));
-  XMatchVisualInfo( g_x11State.x11Display, g_x11State.x11Screen, i32Depth, TrueColor, g_x11State.x11Visual);
-  if (!g_x11State.x11Visual)
+  /* Get the root window parameters */
+  rootWindow = RootWindow(g_x11ContextStruct.x11Display, g_x11ContextStruct.x11Screen);
+  colorDepth = DefaultDepth(g_x11ContextStruct.x11Display, g_x11ContextStruct.x11Screen);
+  /* Alloc memory for the visual info */
+  g_x11ContextStruct.x11Visual = (XVisualInfo*) malloc(sizeof(XVisualInfo));
+  /* Try to find a visual which is matching the needed parameters */
+  XMatchVisualInfo( g_x11ContextStruct.x11Display, g_x11ContextStruct.x11Screen, colorDepth, TrueColor, g_x11ContextStruct.x11Visual);
+  if (!g_x11ContextStruct.x11Visual)
   {
           printf("Error: Unable to acquire visual\n");
-          goto cleanup;
+          destroyX11Context();
+          return ILM_FALSE;
   }
-  g_x11State.x11Colormap = XCreateColormap( g_x11State.x11Display, sRootWindow, g_x11State.x11Visual->visual, AllocNone );
-  sWA.colormap = g_x11State.x11Colormap;
-  // Add to these for handling other events
-  sWA.event_mask = StructureNotifyMask | ExposureMask | ButtonPressMask | ButtonReleaseMask | KeyPressMask | KeyReleaseMask;
-  sWA.backing_store = Always;
-  ui32Mask = CWBackPixel | CWBorderPixel | CWEventMask | CWColormap | CWBackingStore;
 
-  i32Width  = width  < XDisplayWidth(g_x11State.x11Display, g_x11State.x11Screen) ? width: XDisplayWidth(g_x11State.x11Display, g_x11State.x11Screen);
-  i32Height = height < XDisplayHeight(g_x11State.x11Display,g_x11State.x11Screen) ? height: XDisplayHeight(g_x11State.x11Display,g_x11State.x11Screen);
+  /* Create the rendercontext color map */
+  g_x11ContextStruct.x11Colormap = XCreateColormap( g_x11ContextStruct.x11Display, rootWindow, g_x11ContextStruct.x11Visual->visual, AllocNone );
+  windowAttributes.colormap = g_x11ContextStruct.x11Colormap;
 
-  // Creates the X11 window
-  g_x11State.x11Window = XCreateWindow( g_x11State.x11Display, RootWindow(g_x11State.x11Display, g_x11State.x11Screen), 0, 0, i32Width, i32Height,
-                                                           0, CopyFromParent, InputOutput, CopyFromParent, ui32Mask, &sWA);
+  /* Add to these for handling other events */
+  windowAttributes.event_mask = StructureNotifyMask | ExposureMask | ButtonPressMask | ButtonReleaseMask | KeyPressMask | KeyReleaseMask;
+  windowAttributes.backing_store = Always;
 
-  XMapWindow(g_x11State.x11Display, g_x11State.x11Window);
-  XFlush(g_x11State.x11Display);
-  return result;
-  cleanup:
-  destroyX11Context();
-  result = ILM_FALSE;
+  /* Set the window mask attributes */
+  windowMask = CWBackPixel | CWBorderPixel | CWEventMask | CWColormap | CWBackingStore;
+
+  /* get the corrected window dimensions */
+  widthCorrected  = width  < XDisplayWidth(g_x11ContextStruct.x11Display, g_x11ContextStruct.x11Screen) ? width: XDisplayWidth(g_x11ContextStruct.x11Display, g_x11ContextStruct.x11Screen);
+  heightCorrected = height < XDisplayHeight(g_x11ContextStruct.x11Display,g_x11ContextStruct.x11Screen) ? height: XDisplayHeight(g_x11ContextStruct.x11Display,g_x11ContextStruct.x11Screen);
+
+  /* Creates the X11 window */
+  g_x11ContextStruct.x11Window = XCreateWindow( g_x11ContextStruct.x11Display, RootWindow(g_x11ContextStruct.x11Display, g_x11ContextStruct.x11Screen), 0, 0, widthCorrected, heightCorrected,
+                                                           0, CopyFromParent, InputOutput, CopyFromParent, windowMask, &windowAttributes);
+
+  /* map the window */
+  XMapWindow(g_x11ContextStruct.x11Display, g_x11ContextStruct.x11Window);
+  XFlush(g_x11ContextStruct.x11Display);
   return result;
 }
 
 t_ilm_bool createEGLContext(t_ilm_int width, t_ilm_int height, t_ilm_int layerwidth,t_ilm_int layerheight )
 {
         t_ilm_bool result = ILM_TRUE;
-        g_eglState.eglDisplay = NULL;
-        g_eglState.eglSurface = NULL;
-        g_eglState.eglContext = NULL;
+        g_eglContextStruct.eglDisplay = NULL;
+        g_eglContextStruct.eglSurface = NULL;
+        g_eglContextStruct.eglContext = NULL;
         ilmErrorTypes error = ILM_FAILED;
 
-        g_eglState.eglDisplay = eglGetDisplay((EGLNativeDisplayType)g_x11State.x11Display);
+        g_eglContextStruct.eglDisplay = eglGetDisplay((EGLNativeDisplayType)g_x11ContextStruct.x11Display);
         EGLint eglstatus = eglGetError();
-        if (! g_eglState.eglDisplay )
+        if (! g_eglContextStruct.eglDisplay )
         {
                         printf("Error: eglGetDisplay() failed.\n");
         }
 
 
         EGLint iMajorVersion, iMinorVersion;
-        if (!eglInitialize(g_eglState.eglDisplay, &iMajorVersion, &iMinorVersion))
+        if (!eglInitialize(g_eglContextStruct.eglDisplay, &iMajorVersion, &iMinorVersion))
         {
                 printf("Error: eglInitialize() failed.\n");
         }
@@ -137,11 +143,11 @@ t_ilm_bool createEGLContext(t_ilm_int width, t_ilm_int height, t_ilm_int layerwi
         };
         int iConfigs;
 
-        if (!eglChooseConfig(g_eglState.eglDisplay, pi32ConfigAttribs, &g_eglState.eglConfig, 1, &iConfigs) || (iConfigs != 1))
+        if (!eglChooseConfig(g_eglContextStruct.eglDisplay, pi32ConfigAttribs, &g_eglContextStruct.eglConfig, 1, &iConfigs) || (iConfigs != 1))
         {
                 printf("Error: eglChooseConfig() failed.\n");
         }
-        g_eglState.eglSurface = eglCreateWindowSurface(g_eglState.eglDisplay, g_eglState.eglConfig, (EGLNativeWindowType)g_x11State.x11Window, NULL);
+        g_eglContextStruct.eglSurface = eglCreateWindowSurface(g_eglContextStruct.eglDisplay, g_eglContextStruct.eglConfig, (EGLNativeWindowType)g_x11ContextStruct.x11Window, NULL);
         eglstatus = eglGetError();
 
         if (eglstatus != EGL_SUCCESS)
@@ -149,15 +155,15 @@ t_ilm_bool createEGLContext(t_ilm_int width, t_ilm_int height, t_ilm_int layerwi
                         printf("Error: eglCreateWindowSurface() failed.\n");
         }
 
-        g_eglState.eglContext = eglCreateContext(g_eglState.eglDisplay,g_eglState.eglConfig, NULL, contextAttribs);
+        g_eglContextStruct.eglContext = eglCreateContext(g_eglContextStruct.eglDisplay,g_eglContextStruct.eglConfig, NULL, contextAttribs);
         eglstatus = eglGetError();
         if (eglstatus != EGL_SUCCESS)
         {
                 printf("Error: eglCreateContext() failed.\n");
         }
 
-        eglMakeCurrent(g_eglState.eglDisplay, g_eglState.eglSurface, g_eglState.eglSurface, g_eglState.eglContext);
-        eglSwapInterval(g_eglState.eglDisplay,1);
+        eglMakeCurrent(g_eglContextStruct.eglDisplay, g_eglContextStruct.eglSurface, g_eglContextStruct.eglSurface, g_eglContextStruct.eglContext);
+        eglSwapInterval(g_eglContextStruct.eglDisplay,1);
         eglstatus = eglGetError();
         if (eglstatus != EGL_SUCCESS)
         {
@@ -168,8 +174,8 @@ t_ilm_bool createEGLContext(t_ilm_int width, t_ilm_int height, t_ilm_int layerwi
         t_ilm_layer layerid = (t_ilm_layer) LAYER_EXAMPLE_GLES_APPLICATIONS;
         t_ilm_surface surfaceid = (t_ilm_surface) SURFACE_EXAMPLE_EGLX11_APPLICATION;
         //if (error == ILM_FAILED) return ILM_FALSE;
-        printf("create a surface %i\n",(t_ilm_nativehandle)g_x11State.x11Window);
-        error = ilm_surfaceCreate((t_ilm_nativehandle)g_x11State.x11Window,width,height,ILM_PIXELFORMAT_RGBA_8888,&surfaceid);
+        printf("create a surface %i\n",(t_ilm_nativehandle)g_x11ContextStruct.x11Window);
+        error = ilm_surfaceCreate((t_ilm_nativehandle)g_x11ContextStruct.x11Window,width,height,ILM_PIXELFORMAT_RGBA_8888,&surfaceid);
         //if (error == ILM_FAILED) return ILM_FALSE;
         printf("set surface dest region\n");
         error = ilm_surfaceSetDestinationRectangle(surfaceid,0,0,width,height);
@@ -192,22 +198,22 @@ t_ilm_bool createEGLContext(t_ilm_int width, t_ilm_int height, t_ilm_int layerwi
 }
 void destroyEglContext()
 {
-  if ( g_eglState.eglDisplay != NULL )
+  if ( g_eglContextStruct.eglDisplay != NULL )
     {
-      eglMakeCurrent( g_eglState.eglDisplay,
+      eglMakeCurrent( g_eglContextStruct.eglDisplay,
                       EGL_NO_SURFACE,
                       EGL_NO_SURFACE,
                       EGL_NO_CONTEXT);
-      eglTerminate(g_eglState.eglDisplay);
+      eglTerminate(g_eglContextStruct.eglDisplay);
 
     }
 }
 void destroyX11Context()
 {
-  if (g_x11State.x11Window) XDestroyWindow(g_x11State.x11Display, g_x11State.x11Window);
-  if (g_x11State.x11Colormap) XFreeColormap( g_x11State.x11Display, g_x11State.x11Colormap );
-  if (g_x11State.x11Display) XCloseDisplay(g_x11State.x11Display);
-  if (g_x11State.x11Visual) free(g_x11State.x11Visual);
+  if (g_x11ContextStruct.x11Window) XDestroyWindow(g_x11ContextStruct.x11Display, g_x11ContextStruct.x11Window);
+  if (g_x11ContextStruct.x11Colormap) XFreeColormap( g_x11ContextStruct.x11Display, g_x11ContextStruct.x11Colormap );
+  if (g_x11ContextStruct.x11Display) XCloseDisplay(g_x11ContextStruct.x11Display);
+  if (g_x11ContextStruct.x11Visual) free(g_x11ContextStruct.x11Visual);
 }
 
 t_ilm_uint GetTickCount()
@@ -219,5 +225,5 @@ t_ilm_uint GetTickCount()
 
 void swapBuffers()
 {
-  eglSwapBuffers(g_eglState.eglDisplay, g_eglState.eglSurface);
+  eglSwapBuffers(g_eglContextStruct.eglDisplay, g_eglContextStruct.eglSurface);
 }
