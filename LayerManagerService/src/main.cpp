@@ -182,6 +182,7 @@ int main(int argc, char **argv)
 	}
 	LOG_INFO("Main", "Exiting Application.");
 	// cleanup
+	manager->stopManagement();
 	delete renderer;
 	delete comm;
 	delete manager;

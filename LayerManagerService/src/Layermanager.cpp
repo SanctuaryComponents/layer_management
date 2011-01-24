@@ -176,3 +176,26 @@ bool Layermanager::startManagement(int width,int height,const char* displayName)
 
 	return result;
 }
+
+bool Layermanager::stopManagement(){
+	bool result = false;
+
+		for( std::list<IRenderer*>::iterator list_iter = compositingControllers.begin();
+			 list_iter != compositingControllers.end(); list_iter++)
+		{
+			if ( NULL != *list_iter)
+			{
+				(*list_iter)->stop();
+			}
+		}
+			for(std::list<BaseCommunicator*>::iterator list_iter = communicationControllers.begin();
+					list_iter != communicationControllers.end(); list_iter++)
+			{
+				if (NULL != *list_iter )
+				{
+					(*list_iter)->stop();
+				}
+			}
+
+		return true;
+}

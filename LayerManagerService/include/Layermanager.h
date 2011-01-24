@@ -47,6 +47,7 @@ public:
 	void RemoveRenderer(IRenderer* renderer);
 	void addCommunicator(BaseCommunicator* communicator);
 	bool startManagement( int width,int height,const char* displayName );
+	bool stopManagement();
 
 private:
 	Layermanager();
