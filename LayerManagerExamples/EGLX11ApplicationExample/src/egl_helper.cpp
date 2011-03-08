@@ -135,7 +135,6 @@ t_ilm_bool createEGLContext(t_ilm_int width, t_ilm_int height, t_ilm_int layerwi
         }
 
         EGLint pi32ConfigAttribs[] = {
-                        EGL_SURFACE_TYPE,EGL_WINDOW_BIT | EGL_PIXMAP_BIT,
                         EGL_RENDERABLE_TYPE,EGL_OPENGL_ES2_BIT,
                         EGL_RED_SIZE,8,
                         EGL_ALPHA_SIZE,8,
