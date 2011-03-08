@@ -18,10 +18,10 @@
 #
 ############################################################################
 
-export DBUS_SESSION_BUS_ADDRESS=tcp:host=0.0.0.0,port=12434
 export LD_LIBRARY_PATH=/usr/lib:/usr/local/lib
 export DISPLAY=:0.0
 PIDSURFACE1=/var/run/surface1.pid
+PIDSURFACE2=/var/run/surface2.pid
 
 init_scene()
 {
@@ -33,12 +33,20 @@ deinit_scene()
 	./LayerManagerExamples/LayerManagerClientExample/build/LayermanagerClientTest 2
 }
 
-start_example_application()
+start_egl_example_application()
 {
 	./LayerManagerExamples/EGLX11ApplicationExample/build/eglX11_application &
 	pidofdlt=`ps aux | grep eglX11_application | grep -v grep | awk '{print $2}'`
 	echo $pidofdlt > $PIDSURFACE1
 }
+
+start_glx_example_application()
+{
+	./LayerManagerExamples/GLXApplicationExample/build/glxX11_application &
+	pidofdlt=`ps aux | grep glxX11_application | grep -v grep | awk '{print $2}'`
+	echo $pidofdlt > $PIDSURFACE2
+}
+
 
 killprocess()
 {
@@ -50,6 +58,7 @@ killprocess()
 stop() 
 {
 	killprocess $PIDSURFACE1
+	killprocess $PIDSURFACE2
 	deinit_scene
 }
 
@@ -59,7 +68,9 @@ start()
 {
 	init_scene
 	sleep 1
-	start_example_application
+	start_egl_example_application
+	sleep 2
+	start_glx_example_application
 }
 
 case "$1" in
