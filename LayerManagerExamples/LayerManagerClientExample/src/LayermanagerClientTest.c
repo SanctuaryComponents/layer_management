@@ -38,13 +38,14 @@ int main(int argc, char **argv)
                  ilm_surfaceSetDestinationRectangle(SURFACE_EXAMPLE_VIDEO_APPLICATION,0,0,1280,480);
                  ilm_surfaceSetSourceRectangle(SURFACE_EXAMPLE_VIDEO_APPLICATION,107,0,426,360);
                  ilm_surfaceSetDestinationRectangle(SURFACE_EXAMPLE_GDTESTENV_APPLICATION_1,1120,0,160,120);
-                 ilm_surfaceSetDestinationRectangle(SURFACE_EXAMPLE_EGLX11_APPLICATION,1020,240,320,240);
+                 ilm_surfaceSetDestinationRectangle(SURFACE_EXAMPLE_EGLX11_APPLICATION,704,240,320,240);
+                 ilm_surfaceSetDestinationRectangle(SURFACE_EXAMPLE_GLXX11_APPLICATION,0,0,320,240);
                  ilm_commitChanges();
                  sleep(20);
                  t_ilm_string filename = "/var/ilmScreenShot.bmp";
                  ilm_doScreenshot(filename);
                  ilm_layerSetOpacity(LAYER_EXAMPLE_VIDEO_APPLICATIONS,0.0);
-                 ilm_layerSetOpacity(LAYER_EXAMPLE_GLES_APPLICATIONS,0.0);
+                 ilm_layerSetOpacity(LAYER_EXAMPLE_GLES_APPLICATIONS,1.0);
                  ilm_layerSetOpacity(LAYER_EXAMPLE_X_APPLICATIONS,1.0);
                  ilm_commitChanges();
                }
