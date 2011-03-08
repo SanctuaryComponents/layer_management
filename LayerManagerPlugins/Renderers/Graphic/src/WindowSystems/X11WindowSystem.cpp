@@ -23,7 +23,6 @@
 #include <time.h>
 #include <sys/time.h>
 #include <X11/extensions/Xcomposite.h>
-#include <X11/extensions/xf86vmode.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
