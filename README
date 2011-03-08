@@ -81,6 +81,23 @@ eglCreateImageKHR
 eglDestroyImageKHR
 Furthermore it should be supported to create an egl image from an x11 pixmap.  
 
+Platform with X11 and OpenGL
+===
+
+If you have choosen the GLXRenderer as rendering backend, then the following
+Extensions have to be supported by the TargetPlatform :
+
+X11 Extensions:
+
+x-composite : This extension should support redirecting of egl Surfaces to x11 pixmaps too.
+
+GLX / OpenGL :
+
+GLX_TEXTURE_FROM_PIXMAP : 
+The following functions should be supported by the vendor specific graphic driver
+Furthermore it should be supported to create an texture from an x11 pixmap.  
+
+
 Beagle board platform
 ===
 
@@ -123,6 +140,13 @@ make all [CONFIG=PLATFORM COMMUNICATOR=MyCommunicator RENDERER=MyRenderer]
 
 Example for Beagle Board:
 make all CONFIG=Beagle 
+
+Example for Russelville
+make all CONFIG=IGMA500
+
+Example for Desktop
+make all CONFIG=Desktop
+ 
 
 If you want  you have to provide an additional platform definition file which
 should located at LayerManagerPlatform. The file should provide the following content :

@@ -1,3 +1,15 @@
+Version 0.2.2
+-------------
+Due the requriments to support desktop, russelville and beagle board hardware. 
+A new LayerManagerRenderer will be upstreamed to support the russelville hardware and typical desktop pc hardware.
+
+This version includes the following enhancemnents
+
+* GLXApplicationExample - Rotating triangle which is registered to the service.
+* GLX Renderer Package to support Desktop PCs and the Russelvill Platform.
+* Platformdependent Makefiles Extensions (LayerManagerPlatform/MakeIGMA500.defs , LayerManagerPlatform/MakeDesktop.defs)
+
+
 Version 0.2.1
 -------------
 1. Minor Bugfix regarding DBUS Communicator 
@@ -6,6 +18,10 @@ Version 0.2.1
 2. Code Cleanup in EGLX11ExampleApplication
 
 3. Skript GeniviDemo.sh added to run ExampleApplications out of the box 
+
+4. LayerManagerService handling of stopping all plugins improved
+
+5. Logging improved for several components
 
 Version 0.2.0
 -------------
