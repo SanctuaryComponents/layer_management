@@ -1,6 +1,59 @@
+Version 0.8.0
+-------------
+
+This version includes the following enhancements.
+
+- bug fixes in ilmClient API
+- added getLayerIdOfScreen interface in dbus communicator and ilmClient API
+
+
+Version 0.7.0
+-------------
+
+This version includes the following enhancements.
+
+- bug fixes in GLX Renderer regarding surface destroy
+- bug fixes in X11GLES Renderer regarding surface destroy
+
+
+Version 0.6.0
+-------------
+
+This version includes the following enhancements.
+
+- added GLX Renderer support for screen dump / surface dump / layer dump
+- added X11GLES Renderer support for screen dump / surface dump / layer dump
+
+
+Version 0.5.0
+-------------
+
+This version includes the following enhancements.
+
+- bug fixes in ilmClient API and dbus communicator
+- LayerManager types corrected
+- additional Messages introduced to support dump of screen, surfaces and layer to file
+
+
+Version 0.4.0
+-------------
+
+This version includes the following enhancements.
+
+Improved and added new interfaces between Renderer and LayerManagerService.
+
+
+Version 0.3.0
+-------------
+
+This version includes the following enhancements.
+
+Build Environment changed to cmake to fulfill the gnu make process.
+
+
 Version 0.2.2
 -------------
-Due the requriments to support desktop, russelville and beagle board hardware. 
+Due to the requirements to support desktop, russelville and beagle board hardware. 
 A new LayerManagerRenderer will be upstreamed to support the russelville hardware and typical desktop pc hardware.
 
 This version includes the following enhancemnents
