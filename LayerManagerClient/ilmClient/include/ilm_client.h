@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,11 @@
 ****************************************************************************/
 #ifndef _ILM_CLIENT_H_
 #define _ILM_CLIENT_H_
+
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+
 #include "ilm_types.h"
 
 /* Initializes the IVI LayerManagement Client.
@@ -25,6 +30,36 @@
  * @return ILM_FAILED if a connection can not be established to the services.
  */
 ilmErrorTypes ilm_init();
+
+/* Get the screen resolution of a specific screen from the Layermanagement
+ *
+ * @return ILM_FAILED if the client can not get the resolution.
+ */
+ilmErrorTypes ilm_getScreenResolution(t_ilm_uint screenID, t_ilm_uint* width, t_ilm_uint* height);
+
+/* Get the surface properties from the Layermanagement
+ *
+ * @return ILM_FAILED if the client can not get the resolution.
+ */
+ilmErrorTypes ilm_getPropertiesOfSurface(t_ilm_uint surfaceID, struct ilmSurfaceProperties* surfaceProperties);
+
+/* Get the layer properties from the Layermanagement
+ *
+ * @return ILM_FAILED if the client can not get the resolution.
+ */
+ilmErrorTypes ilm_getPropertiesOfLayer(t_ilm_uint layerID, struct ilmLayerProperties* layerProperties);
+
+/* Get the number of hardware layers of a screen
+ *
+ * @return ILM_FAILED if the client can not get the resolution.
+ */
+ilmErrorTypes ilm_getNumberOfHardwareLayers(t_ilm_uint screenID, t_ilm_uint* NumberOfHardwareLayers);
+
+/* Get the screen Ids
+ *
+ * @return ILM_FAILED if the client can not get the resolution.
+ */
+ilmErrorTypes ilm_getScreenIDs(t_ilm_uint* numberOfIDs, t_ilm_uint** IDs);
 
 /* Destroys the IVI LayerManagement Client.
  *
@@ -41,6 +76,27 @@ ilmErrorTypes ilm_destroy();
  * @return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_getLayerIDs(t_ilm_int* length,t_ilm_layer** array);
+
+/* Get all LayerIds of the given screen
+ *
+ * @param screenID		The id of the screen to get the layer IDs of
+ * @param length        Pointer where length of ids array should be stored
+ * @param array         Array where the ids should be stored,
+ *                      the array will be allocated inside
+ *
+ * @return ILM_FAILED if the client can not call the method on the service.
+ */
+ilmErrorTypes ilm_getLayerIDsOnScreen(t_ilm_uint screenID, t_ilm_int* length,t_ilm_layer** array);
+
+/* Get all SurfaceIDs which are currently registered and managed by the services
+ *
+ * @param length        Pointer where length of ids array should be stored
+ * @param array         Array where the ids should be stored,
+ *                      the array will be allocated inside
+ *
+ * @return ILM_FAILED if the client can not call the method on the service.
+ */
+ilmErrorTypes ilm_getSurfaceIDs(t_ilm_int* length,t_ilm_surface** array);
 
 /* Get all LayerGroupIds which are currently registered and managed by the services
  *
@@ -71,12 +127,12 @@ ilmErrorTypes ilm_getSurfaceGroupIDs(t_ilm_int* length,t_ilm_surfacegroup** arra
  *
  * @return ILM_FAILED if the client can not call the method on the service.
  */
-ilmErrorTypes ilm_getSurfaceIDsOnLayer(t_ilm_layer layer,t_ilm_int* length,t_ilm_surfacegroup** array);
+ilmErrorTypes ilm_getSurfaceIDsOnLayer(t_ilm_layer layer,t_ilm_int* length,t_ilm_surface** array);
 
 /* Create a layer which should be managed by the service
  *
  * @param layerId       pointer where the id should be/is stored. It is possible
- *                      to set a id from outside, -1 will create a new id.
+ *                      to set a id from outside, 0 will create a new id.
  * @return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_layerCreate(t_ilm_layer* layerId);
@@ -165,7 +221,7 @@ ilmErrorTypes ilm_layerGetOpacity(t_ilm_layer layerId,t_ilm_float *opacity);
  *
  * @return ILM_FAILED if the client can not call the method on the service.
  */
-ilmErrorTypes ilm_layerSetSourceRectangle(t_ilm_layer layerId,t_ilm_int x,t_ilm_int y,t_ilm_int width,t_ilm_int height);
+ilmErrorTypes ilm_layerSetSourceRectangle(t_ilm_layer layerId,t_ilm_uint x,t_ilm_uint y,t_ilm_uint width,t_ilm_uint height);
 
 /* Set the destination area on the display for a layer. The layer will be scaled and positioned to this rectangle for rendering
  *
@@ -188,7 +244,7 @@ ilmErrorTypes ilm_layerSetDestinationRectangle(t_ilm_layer layerId,t_ilm_int x,t
  *
  * @return ILM_FAILED if the client can not call the method on the service.
  */
-ilmErrorTypes ilm_layerGetDimension(t_ilm_layer layerId,t_ilm_int *dimension);
+ilmErrorTypes ilm_layerGetDimension(t_ilm_layer layerId,t_ilm_uint *dimension);
 
 /* Set the horizontal and vertical dimension of the layer.
  *
@@ -198,7 +254,7 @@ ilmErrorTypes ilm_layerGetDimension(t_ilm_layer layerId,t_ilm_int *dimension);
  *
  * @return ILM_FAILED if the client can not call the method on the service.
  */
-ilmErrorTypes ilm_layerSetDimension(t_ilm_layer layerId, t_ilm_int *dimension);
+ilmErrorTypes ilm_layerSetDimension(t_ilm_layer layerId, t_ilm_uint *dimension);
 
 
 /* Get the horizontal and vertical position of the layer.
@@ -209,7 +265,7 @@ ilmErrorTypes ilm_layerSetDimension(t_ilm_layer layerId, t_ilm_int *dimension);
  *
  * @return ILM_FAILED if the client can not call the method on the service.
  */
-ilmErrorTypes ilm_layerGetPosition(t_ilm_layer layerId, t_ilm_int *position);
+ilmErrorTypes ilm_layerGetPosition(t_ilm_layer layerId, t_ilm_uint *position);
 
 /* Sets the horizontal and vertical position of the layer.
  *
@@ -219,7 +275,7 @@ ilmErrorTypes ilm_layerGetPosition(t_ilm_layer layerId, t_ilm_int *position);
  *
  * @return ILM_FAILED if the client can not call the method on the service.
  */
-ilmErrorTypes ilm_layerSetPosition(t_ilm_layer layerId, t_ilm_int *position);
+ilmErrorTypes ilm_layerSetPosition(t_ilm_layer layerId, t_ilm_uint *position);
 
 /* Sets the orientation of a layer.
  *
@@ -425,7 +481,7 @@ ilmErrorTypes ilm_surfaceSetDestinationRectangle(t_ilm_surface surfaceId, t_ilm_
  *
  * @return ILM_FAILED if the client can not call the method on the service.
  */
-ilmErrorTypes ilm_surfaceGetDimension(t_ilm_surface surfaceId,t_ilm_int *dimension);
+ilmErrorTypes ilm_surfaceGetDimension(t_ilm_surface surfaceId,t_ilm_uint *dimension);
 
 /* Set the horizontal and vertical dimension of the surface.
  *
@@ -435,7 +491,7 @@ ilmErrorTypes ilm_surfaceGetDimension(t_ilm_surface surfaceId,t_ilm_int *dimensi
  *
  * @return ILM_FAILED if the client can not call the method on the service.
  */
-ilmErrorTypes ilm_surfaceSetDimension(t_ilm_surface surfaceId, t_ilm_int *dimension);
+ilmErrorTypes ilm_surfaceSetDimension(t_ilm_surface surfaceId, t_ilm_uint *dimension);
 
 /* Get the horizontal and vertical position of the surface.
  *
@@ -445,7 +501,7 @@ ilmErrorTypes ilm_surfaceSetDimension(t_ilm_surface surfaceId, t_ilm_int *dimens
  *
  * @return ILM_FAILED if the client can not call the method on the service.
  */
-ilmErrorTypes ilm_surfaceGetPosition(t_ilm_surface surfaceId, t_ilm_int *position);
+ilmErrorTypes ilm_surfaceGetPosition(t_ilm_surface surfaceId, t_ilm_uint *position);
 
 /* Sets the horizontal and vertical position of the surface.
  *
@@ -455,7 +511,7 @@ ilmErrorTypes ilm_surfaceGetPosition(t_ilm_surface surfaceId, t_ilm_int *positio
  *
  * @return ILM_FAILED if the client can not call the method on the service.
  */
-ilmErrorTypes ilm_surfaceSetPosition(t_ilm_surface surfaceId, t_ilm_int *position);
+ilmErrorTypes ilm_surfaceSetPosition(t_ilm_surface surfaceId, t_ilm_uint *position);
 
 /* Sets the orientation of a surface.
  *
@@ -568,8 +624,7 @@ ilmErrorTypes ilm_surfacegroupSetOpacity(t_ilm_surfacegroup group, t_ilm_float o
  *
  * @return ILM_FAILED if the client can not call the method on the service.
  */
-ilmErrorTypes ilm_displaySetRenderOrder(t_ilm_display display, t_ilm_layer *layerId, t_ilm_int number);
-
+ilmErrorTypes ilm_displaySetRenderOrder(t_ilm_display display,t_ilm_layer *layerId,const t_ilm_uint number);
 
 /* Take a screenshot from the current displayed layer scene.
  * The screenshot is saved as bmp file with the corresponding filename.
@@ -578,7 +633,27 @@ ilmErrorTypes ilm_displaySetRenderOrder(t_ilm_display display, t_ilm_layer *laye
  *
  * @return ILM_FAILED if the client can not call the method on the service.
  */
-ilmErrorTypes ilm_doScreenshot(t_ilm_string filename);
+ilmErrorTypes ilm_takeScreenshot(t_ilm_uint screen, t_ilm_const_string filename);
+
+/* Take a screenshot of a certain layer
+ * The screenshot is saved as bmp file with the corresponding filename.
+ *
+ * @param filename     Location where the screenshot should be stored
+ * @param layerid     	Identifier of the layer to take the screenshot of
+ *
+ * @return ILM_FAILED if the client can not call the method on the service.
+ */
+ilmErrorTypes ilm_takeLayerScreenshot(t_ilm_const_string filename, t_ilm_layer layerid);
+
+/* Take a screenshot of a certain surface
+ * The screenshot is saved as bmp file with the corresponding filename.
+ *
+ * @param filename     Location where the screenshot should be stored
+ * @param surfaceid    Identifier of the surface to take the screenshot of
+ *
+ * @return ILM_FAILED if the client can not call the method on the service.
+ */
+ilmErrorTypes ilm_takeSurfaceScreenshot(t_ilm_const_string filename, t_ilm_surface surfaceid);
 
 
 
@@ -588,6 +663,9 @@ ilmErrorTypes ilm_doScreenshot(t_ilm_string filename);
  */
 ilmErrorTypes ilm_commitChanges();
 
+#ifdef __cplusplus
+} //
+#endif // __cplusplus
 
 #endif /* _ILM_CLIENT_H_ */
 

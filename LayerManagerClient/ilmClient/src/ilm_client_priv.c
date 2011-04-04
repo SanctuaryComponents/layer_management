@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,6 +22,7 @@
 #include "ilm_client_priv.h"
 #include <stdio.h>
 #include <stdlib.h>
+#define ILM_SERVICE_NAME "de.bmw.CompositingService"
 #define ILM_PATH_COMPOSITE_SERVICE "/de/bmw/CompositingService"
 #define ILM_INTERFACE_COMPOSITE_SERVICE "de.bmw.CompositingService"
 
@@ -30,6 +31,7 @@ void _ilm_setup_param(t_ilm_param* const paramStruc,t_ilm_int type, void* parame
 	paramStruc->param = parameter;
 	paramStruc->paramtype = type;
 	paramStruc->paramlength = 1;
+	paramStruc->isbasictype = ILM_TRUE;
 }
 
 void _ilm_setup_array(t_ilm_param* paramStruc,t_ilm_int type, t_ilm_int length,void* parameter )
@@ -37,6 +39,7 @@ void _ilm_setup_array(t_ilm_param* paramStruc,t_ilm_int type, t_ilm_int length,v
 	paramStruc->param = parameter;
 	paramStruc->paramtype = type;
 	paramStruc->paramlength = length;
+	paramStruc->isbasictype = ILM_FALSE;
 }
 
 
@@ -47,19 +50,19 @@ DBusMessage* _ilm_dbus_method_call(DBusConnection* const connection,const t_ilm_
 	DBusMessageIter msgIter;
 	DBusMessageIter arrayIter;
 	t_ilm_int i,j = 0;
-    message = dbus_message_new_method_call (NULL,
+    message = dbus_message_new_method_call (ILM_SERVICE_NAME,
                                             ILM_PATH_COMPOSITE_SERVICE,
                                             ILM_INTERFACE_COMPOSITE_SERVICE,
                                             method);
-    dbus_message_set_auto_start (message, TRUE);
-    dbus_message_set_destination(message,ILM_INTERFACE_COMPOSITE_SERVICE);
+//    dbus_message_set_auto_start (message, TRUE);
+//    dbus_message_set_destination(message,ILM_INTERFACE_COMPOSITE_SERVICE);
     if (paramlength > 0
     	&& param != NULL )
     {
     	dbus_message_iter_init_append(message,&msgIter);
     	for (i=0;i<paramlength;i++)
     	{
-    		if ( param[i].paramlength == 1)
+    		if ( param[i].isbasictype == ILM_TRUE)
     		{
     			dbus_message_iter_append_basic(&msgIter,param[i].paramtype,param[i].param);
     		} else {
@@ -90,7 +93,7 @@ DBusMessage* _ilm_dbus_method_call(DBusConnection* const connection,const t_ilm_
     	}
     }
 
-    if (!dbus_connection_send_with_reply (connection, message, &pending, 50))
+    if (!dbus_connection_send_with_reply (connection, message, &pending, 500))
 	{
 		   return NULL;
 	}

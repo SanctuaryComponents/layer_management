@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,8 +24,10 @@
 
 typedef enum e_ilmErrorTypes
 {
-	ILM_FAILED= 0,
-	ILM_SUCCESS = 1
+	ILM_SUCCESS = 0,
+	ILM_FAILED= 1,
+	ILM_ERROR_INVALID_ARGUMENTS = 2,
+	ILM_ERROR_ON_CONNECTION = 3
 } ilmErrorTypes;
 
 typedef enum e_ilmPixelFormat
@@ -35,14 +37,17 @@ typedef enum e_ilmPixelFormat
 	ILM_PIXELFORMAT_RGBA_8888 =2,
 	ILM_PIXELFORMAT_RGB_565 = 3,
 	ILM_PIXELFORMAT_RGBA_5551 = 4,
-	ILM_PIXELFORMAT_RGBA_4444 = 5,
-	ILM_PIXEL_FORMAT_UNKNOWN = 6
+	ILM_PIXELFORMAT_RGBA_6661 = 5,
+	ILM_PIXELFORMAT_RGBA_4444 = 6,
+	ILM_PIXEL_FORMAT_UNKNOWN = 7
 } ilmPixelFormat;
 
 typedef enum e_ilmLayerType
 {
-	ILM_LAYETYPE_HARDWARE = 0,
-	ILM_LAYETYPE_SOFTWARE = 1
+	ILM_LAYERTYPE_UNKNOWN = 0,
+	ILM_LAYERTYPE_HARDWARE = 1,
+	ILM_LAYERTYPE_SOFTWARE2D = 2,
+	ILM_LAYERTYPE_SOFTWARE2_5D = 3
 } ilmLayerType;
 
 typedef enum e_ilmObjectType
@@ -61,14 +66,45 @@ typedef enum e_ilmOrientation
 	ILM_TWOHUNDREDSEVENTY = 3
 } ilmOrientation;
 
-typedef t_ilm_int 	t_ilm_layer;
-typedef t_ilm_int 	t_ilm_surface;
+typedef t_ilm_uint 	t_ilm_layer;
+typedef t_ilm_uint 	t_ilm_surface;
 
-typedef t_ilm_int 	t_ilm_layergroup;
-typedef t_ilm_int 	t_ilm_surfacegroup;
-typedef t_ilm_int 	t_ilm_display;
+typedef t_ilm_uint 	t_ilm_layergroup;
+typedef t_ilm_uint 	t_ilm_surfacegroup;
+typedef t_ilm_uint 	t_ilm_display;
 typedef t_ilm_uint 	t_ilm_layercapabilities;
 typedef t_ilm_ulong	t_ilm_nativehandle;
-typedef t_ilm_char*     t_ilm_string;
+typedef t_ilm_char* t_ilm_string;
+typedef t_ilm_const_char* t_ilm_const_string;
+
+struct ilmSurfaceProperties
+{
+	t_ilm_float opacity;
+	t_ilm_uint sourceX;
+	t_ilm_uint sourceY;
+	t_ilm_uint sourceWidth;
+	t_ilm_uint sourceHeight;
+	t_ilm_uint destX;
+	t_ilm_uint destY;
+	t_ilm_uint destWidth;
+	t_ilm_uint destHeight;
+	ilmOrientation orientation;
+	t_ilm_bool visibility;
+};
+
+struct ilmLayerProperties
+{
+	t_ilm_float opacity;
+	t_ilm_uint sourceX;
+	t_ilm_uint sourceY;
+	t_ilm_uint sourceWidth;
+	t_ilm_uint sourceHeight;
+	t_ilm_uint destX;
+	t_ilm_uint destY;
+	t_ilm_uint destWidth;
+	t_ilm_uint destHeight;
+	ilmOrientation orientation;
+	t_ilm_bool visibility;
+};
 
 #endif // _ILM_TYPES_H_

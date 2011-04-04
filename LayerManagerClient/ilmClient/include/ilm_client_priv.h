@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,6 +26,7 @@ typedef struct _ilm_param
 	t_ilm_int paramtype;
 	t_ilm_int paramlength;
 	void* param;
+	t_ilm_bool isbasictype;
 } t_ilm_param;
 #ifdef _ILM_CLIENT_C_
 #define ILM_INTERFACE_COMPOSITE_CLIENT "de.bmw.CompositingClient"
@@ -40,6 +41,15 @@ static t_ilm_bool g_ilm_init = ILM_FALSE;
 static t_ilm_client* g_ilm_client;
 #define ILM_ERROR(method,error) \
 	fprintf (stderr,"[ILM_CLIENT][%s] %s",method,error)
+
+#define ILM_CHECK_METHOD_ERROR(message) \
+if (NULL!=message){ \
+	t_ilm_int messageType = dbus_message_get_type( message ); \
+	if (messageType == DBUS_MESSAGE_TYPE_ERROR){ \
+		fprintf (stderr,"[ILM_CLIENT][%s] DBUS ERROR: %s",__func__,dbus_message_get_error_name(message) ); \
+		return ILM_FAILED; \
+	} \
+}
 
 DBusMessage* _ilm_dbus_method_call(DBusConnection* const connection, const t_ilm_char *method, t_ilm_param* param, const t_ilm_uint paramlength);
 ilmErrorTypes _ilm_get_dbus_array_length(DBusMessage* const message, const t_ilm_int type, t_ilm_int* const length);
