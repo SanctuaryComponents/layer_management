@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,7 +32,7 @@ extern "C" {
 #define SURFACE_WIDTH	320
 #define SURFACE_HEIGHT	240
 
-#define LAYER_WIDTH	1280
+#define LAYER_WIDTH	800
 #define LAYER_HEIGHT	480
 /****************************************************************************/
 

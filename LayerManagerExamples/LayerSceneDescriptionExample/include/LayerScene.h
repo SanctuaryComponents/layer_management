@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,7 +22,7 @@
 
 typedef enum e_layers
 {
-  LAYER_NEW = -1,
+  LAYER_NEW = 0,
   LAYER_EXAMPLE_GLES_APPLICATIONS = 1000,
   LAYER_EXAMPLE_X_APPLICATIONS = 2000,
   LAYER_EXAMPLE_VIDEO_APPLICATIONS = 3000
@@ -30,7 +30,7 @@ typedef enum e_layers
 
 typedef enum e_surfaces
 {
-  SURFACE_NEW = -1,
+  SURFACE_NEW = 0,
   SURFACE_EXAMPLE_EGLX11_APPLICATION = 10,
   SURFACE_EXAMPLE_GDTESTENV_APPLICATION_1 = 11,
   SURFACE_EXAMPLE_GDTESTENV_APPLICATION_2 = 12,
@@ -48,12 +48,12 @@ typedef enum e_surfaces
 
 typedef enum e_surfaceGroups
 {
-  SURFACEGROUP_NEW = -1,
+  SURFACEGROUP_NEW = 0,
 } sceneSurfaceGroups;
 
 typedef enum e_layerGroups
 {
-  LAYERGROUP_NEW = -1,
+  LAYERGROUP_NEW = 0,
 } sceneLayerGroups;
 
 #endif /* _LAYERSCENE_H_ */

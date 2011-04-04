@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -130,7 +130,7 @@ t_ilm_bool createGLXContext(t_ilm_int width, t_ilm_int height, t_ilm_int layerwi
 		t_ilm_layer layerid = (t_ilm_layer) LAYER_EXAMPLE_X_APPLICATIONS;
         t_ilm_surface surfaceid = (t_ilm_surface) SURFACE_EXAMPLE_GLXX11_APPLICATION;
         //if (error == ILM_FAILED) return ILM_FALSE;
-        printf("create a surface %i\n",(t_ilm_nativehandle)(g_x11ContextStruct.x11Window));
+        printf("create a surface %lu\n",(t_ilm_nativehandle)(g_x11ContextStruct.x11Window));
         ilmErrorTypes error = ilm_surfaceCreate((t_ilm_nativehandle)g_x11ContextStruct.x11Window,width,height,ILM_PIXELFORMAT_RGBA_8888,&surfaceid);
         //if (error == ILM_FAILED) return ILM_FALSE;
         printf("set surface dest region\n");
