@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,28 +27,29 @@
 class GetOrientationCommand : public Command{
 public:
 	GetOrientationCommand(int id, ObjectType type, OrientationType* orientation) : Command(GetOrientation), id(id), type(type), returnOrientation(orientation){};
-	const int id;
+	const unsigned  id;
 	const ObjectType type;
 	OrientationType* returnOrientation;
 
-	virtual void execute(LayerList& layerlist){
+	virtual bool execute(LayerList& layerlist){
 			switch(type){
 				case TypeSurface: {
 					Surface* s = layerlist.getSurface(id);
-					if (s==NULL) break;
+					if (s==NULL) return false;
 					*returnOrientation = s->getOrientation();
 					break;
 					}
 				case TypeLayer: {
 					Layer*l =layerlist.getLayer(id);
-					if (l==NULL) break;
+					if (l==NULL) return false;
 					*returnOrientation = l->getOrientation();
 					break;
 					}
-				case TypeSurfaceGroup: {break;}
-				case TypeLayerGroup: {break;}
-                                default : { break; }
+				case TypeSurfaceGroup: {return false;}
+				case TypeLayerGroup: {return false;}
+                                default : { return false; }
 			}
+			return true;
 
 		}
 };

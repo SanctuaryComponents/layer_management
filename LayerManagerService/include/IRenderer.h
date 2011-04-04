@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -48,9 +48,16 @@ public:
 	virtual void setdebug(bool onoff)=0;
 
 	virtual void doScreenShot(std::string fileToSave)=0;
+	virtual void doScreenShotOfLayer(std::string fileToSave, const uint id)=0;
+	virtual void doScreenShotOfSurface(std::string fileToSave, const uint id)=0;
 
 	virtual uint getLayerTypeCapabilities(LayerType layertype)=0;
 
+	virtual uint getNumberOfHardwareLayers(uint screenID)=0;
+
+	virtual uint* getScreenResolution(uint screenID)=0;
+
+	virtual uint* getScreenIDs(uint* length)=0;
 
 };
 #endif /* _IRENDERER_H_ */

@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,9 +25,9 @@
 class Vector2 {
 public:
 	Vector2(){};
-	Vector2(int val1, int val2) : val1(val1), val2(val2){};
-	int val1;
-	int val2;
+	Vector2(unsigned int val1, unsigned int val2) : val1(val1), val2(val2){};
+	unsigned int val1;
+	unsigned int val2;
 
 	bool operator ==(const Vector2 rhs) const{
 		return (val1==rhs.val1 && val2 == rhs.val2);

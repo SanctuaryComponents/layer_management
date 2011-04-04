@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,15 +26,15 @@
 
 class SetDestinationRectangleCommand : public Command{
 public:
-	SetDestinationRectangleCommand(int id, ObjectType typeToSetOn, int x, int y, int width, int height) : Command(SetDestinationRectangle),  id(id), typeToSet(typeToSetOn), x(x),y(y),width(width),height(height){};
-	const int id;
+	SetDestinationRectangleCommand(int id, ObjectType typeToSetOn,unsigned int x,unsigned int y,unsigned int width,unsigned int height) : Command(SetDestinationRectangle),  id(id), typeToSet(typeToSetOn), x(x),y(y),width(width),height(height){};
+	const unsigned int id;
 	const ObjectType typeToSet;
-	const int x;
-	const int y;
-	const int width;
-	const int height;
+	const unsigned int x;
+	const unsigned int y;
+	const unsigned int width;
+	const unsigned int height;
 
-	virtual void execute(LayerList& layerlist){
+	virtual bool execute(LayerList& layerlist){
 		GraphicalSurface* go = NULL;
 		switch(typeToSet){
 			case TypeSurface: {go = layerlist.getSurface(id); break;}
@@ -47,7 +47,10 @@ public:
 		if (NULL != go )
 		{
 			go->setDestinationRegion(r);
+		}else{
+			return false;
 		}
+		return true;
 	}
 };
 

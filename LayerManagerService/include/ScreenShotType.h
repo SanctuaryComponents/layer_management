@@ -17,22 +17,14 @@
 *
 ****************************************************************************/
 
-#ifndef _DEBUGCOMMAND_H_
-#define _DEBUGCOMMAND_H_
+#ifndef SCREENSHOTTYPE_H_
+#define SCREENSHOTTYPE_H_
 
-#include "Command.h"
-#include "ObjectType.h"
-
-class DebugCommand : public Command{
-public:
-	DebugCommand(bool onoff) : Command(Debug), onoff(onoff){};
-	const bool onoff;
-
-	virtual bool execute(LayerList& layerlist){
-		layerlist.debugMode = onoff;
-		return true;
-	};
+enum ScreenShotType{
+	ScreenshotOfDisplay,
+	ScreenshotOfLayer,
+	ScreenshotOfSurface,
+	ScreenShotNone
 };
 
-
-#endif /* _DEBUGCOMMAND_H_ */
+#endif /* SCREENSHOTTYPE_H_ */

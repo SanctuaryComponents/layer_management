@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,14 +26,14 @@
 
 class SetSourceRectangleCommand : public Command{
 public:
-	SetSourceRectangleCommand(int id, ObjectType type, int x, int y, int width, int height) : Command(SetSourceRectangle),  id(id), typeToSet(type), x(x),y(y),width(width),height(height){};
-	const int id;
+	SetSourceRectangleCommand(int id, ObjectType type, unsigned int x, unsigned int y, unsigned int width, unsigned int height) : Command(SetSourceRectangle),  id(id), typeToSet(type), x(x),y(y),width(width),height(height){};
+	const unsigned int id;
 	const ObjectType typeToSet;
-	const int x;
-	const int y;
-	const int width;
-	const int height;
-	virtual void execute(LayerList& layerlist){
+	const unsigned int x;
+	const unsigned int y;
+	const unsigned int width;
+	const unsigned int height;
+	virtual bool execute(LayerList& layerlist){
 			GraphicalSurface* graphicalSurface = NULL;
 			switch(typeToSet){
 				case TypeSurface: {graphicalSurface = layerlist.getSurface(id); break;}
@@ -46,7 +46,10 @@ public:
 			if ( NULL != graphicalSurface )
 			{
 				graphicalSurface->setSourceRegion(r);
+			}else{
+				return false;
 			}
+			return true;
 		}
 };
 

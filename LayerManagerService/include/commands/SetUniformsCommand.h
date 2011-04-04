@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,7 +27,7 @@
 class SetUniformsCommand : public Command
 {
 public:
-	SetUniformsCommand(int shaderid, const std::vector<std::string>& uniforms)
+	SetUniformsCommand(unsigned int shaderid, const std::vector<std::string>& uniforms)
 		: Command(SetUniforms)
 		, _shaderid(shaderid)
 		, _uniforms(uniforms)
@@ -38,44 +38,51 @@ public:
 	const std::vector<std::string> getUniforms(){
 		return _uniforms;
 	}
-	const int getShaderId(){ return _shaderid; }
+	const unsigned int getShaderId(){ return _shaderid; }
 
-	void execute(LayerList& layerlist){
+	bool execute(LayerList& layerlist){
 		// get shader by its ID
-		std::map<int,Shader*>::iterator siterator;
+		std::map<unsigned int,Shader*>::iterator siterator;
 		siterator = layerlist.shaderList.find(_shaderid);
 
 		if (siterator!=layerlist.shaderList.end())
 		{
 			Shader* shader = (*siterator).second;
+			if (shader!=NULL){
+				// get uniform descriptions
+				const std::vector<std::string> uniformDesc = _uniforms;
+				std::vector<std::string>::const_iterator uiterator;
 
-			// get uniform descriptions
-			const std::vector<std::string> uniformDesc = _uniforms;
-			std::vector<std::string>::const_iterator uiterator;
-
-			for (uiterator=uniformDesc.begin(); uiterator!=uniformDesc.end(); uiterator++)
-			{
-				// parse description string and create uniform object
-				ShaderUniform* uniform = ShaderUniform::createFromStringDescription(*uiterator);
-				if (uniform)
+				for (uiterator=uniformDesc.begin(); uiterator!=uniformDesc.end(); uiterator++)
 				{
-					shader->setUniform(*uniform);
-					delete uniform;
+					// parse description string and create uniform object
+					ShaderUniform* uniform = ShaderUniform::createFromStringDescription(*uiterator);
+					if (uniform)
+					{
+						shader->setUniform(*uniform);
+						delete uniform;
+					}
+					else
+					{
+						LOG_ERROR("Layermanager", "Failed to parse uniform description");
+					}
 				}
-				else
-				{
-					LOG_ERROR("Layermanager", "Failed to parse uniform description");
-				}
+			}else{
+				// shader not found
+				LOG_ERROR("Layermanager", "shader ID "<<_shaderid<<" found but object was null");
+				return false;
 			}
 		}
 		else
 		{
 			// shader not found
 			LOG_ERROR("Layermanager", "shader ID "<<_shaderid<<" not found");
+			return false;
 		}
+		return true;
 	}
 private:
-	const int _shaderid;
+	const unsigned int _shaderid;
 	const std::vector<std::string> _uniforms;
 };
 

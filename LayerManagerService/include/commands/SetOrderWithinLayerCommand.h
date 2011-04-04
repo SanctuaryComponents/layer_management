@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,25 +25,32 @@
 
 class SetOrderWithinLayerCommand : public Command{
 public:
-	SetOrderWithinLayerCommand(int layerid, int* array, int length) : Command(SetSurfaceRenderOrderWithinLayer), layerid(layerid), array(array), length(length){};
-	const int layerid;
-	int* array;
-	int length;
+	SetOrderWithinLayerCommand(unsigned int layerid,unsigned  int* array,unsigned  int length) : Command(SetSurfaceRenderOrderWithinLayer), layerid(layerid), array(array), length(length){};
+	const unsigned int layerid;
+	unsigned int* array;
+	unsigned int length;
 
-	virtual void execute(LayerList& layerlist){
+	virtual bool execute(LayerList& layerlist){
+		LOG_DEBUG("SetOrderWithinLayerCommand","trying to add surfaces to layer" << layerid);
 		Layer* l = layerlist.getLayer(layerid);
 		if (l != NULL)
 		{
 			l->getAllSurfaces().clear();
-			for (int i=0;i<length;i++)
+			for (unsigned int i=0;i<length;i++)
 			{
+				LOG_DEBUG("SetOrderWithinLayerCommand","trying to add surfaces " << array[i]);
 				Surface* s = layerlist.getSurface(array[i]);
 				if ( s != NULL )
 				{
 					l->getAllSurfaces().push_back(s);
+					LOG_DEBUG("SetOrderWithinLayerCommand","add surface " << s->getID() << " to renderorder of layer "<< layerid);
 				}
 			}
+		}else{
+			return false;
 		}
+		return true;
+		delete[] array;
 	};
 };
 

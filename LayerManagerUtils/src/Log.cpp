@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,7 +27,7 @@ Log::~Log() {
 }
 Log::Log() {
 	// TODO Auto-generated constructor stub
-	m_fileStream = new std::ofstream("log.txt");
+	m_fileStream = new std::ofstream("/tmp/LayerManagerService.log");
 
 }
 

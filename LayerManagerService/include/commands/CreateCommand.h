@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,46 +26,51 @@
 
 class CreateCommand : public Command{
 public:
-	CreateCommand(int handle, ObjectType createType, PixelFormat pixelformat,uint OriginalWidth,uint OriginalHeight,int* idReturn) : Command(Create), createType(createType), nativeHandle(handle), pixelformat(pixelformat),OriginalWidth(OriginalWidth),OriginalHeight(OriginalHeight), idReturn(idReturn){};
+	CreateCommand(unsigned int handle, ObjectType createType, PixelFormat pixelformat,uint OriginalWidth,uint OriginalHeight,uint* idReturn) : Command(Create), createType(createType), nativeHandle(handle), pixelformat(pixelformat),OriginalWidth(OriginalWidth),OriginalHeight(OriginalHeight), idReturn(idReturn){};
 	const ObjectType createType;
-	const int nativeHandle;
+	const unsigned int nativeHandle;
 	const PixelFormat pixelformat;
-	unsigned int OriginalWidth;
-	unsigned int OriginalHeight;
-	int* idReturn;
-	virtual void execute(LayerList& layerlist){
+	uint OriginalWidth;
+	uint OriginalHeight;
+	uint* idReturn;
+	virtual bool execute(LayerList& layerlist){
 		switch(createType){
 			case TypeSurface: {
 							 Surface* s = layerlist.createSurface(*idReturn);
-							 if ( s == NULL ) break;
+							 if ( s == NULL ) return false;
 							 *idReturn = s->getID();
 							 s->nativeHandle = nativeHandle;
 							 s->setPixelFormat(pixelformat);
 							 s->OriginalSourceWidth = OriginalWidth;
 							 s->OriginalSourceHeight = OriginalHeight;
+							 s->setDestinationRegion(Rectangle(0,0,OriginalWidth,OriginalHeight));
+							 s->setSourceRegion(Rectangle(0,0,OriginalWidth,OriginalHeight));
 							 LOG_DEBUG("CreateCommand","Created surface with new ID: " << s->getID() << " handle " << nativeHandle << " pixelformat:" << pixelformat << " originalwidth:" << OriginalWidth<< " originalheighth:" << OriginalHeight);
 							 break;
 							 }
 			case TypeLayer: {
 							Layer* l = layerlist.createLayer(*idReturn);
-							if ( l == NULL ) break;
+							if ( l == NULL ) return false;
 							*idReturn = l->getID();
+							 l->setDestinationRegion(Rectangle(0,0,OriginalWidth, OriginalHeight));
+							 l->setSourceRegion(Rectangle(0,0, OriginalWidth, OriginalHeight));
 							LOG_DEBUG("created layer with id:", l->getID());
 							break;}
 			case TypeSurfaceGroup: {
 							SurfaceGroup* sg = layerlist.createSurfaceGroup(*idReturn);
-							if ( sg == NULL ) break;
+							if ( sg == NULL ) return false;
 							*idReturn = sg->getID();
-//							LOG_DEBUG("created surfacegroup with id:", sg->getID());
+							LOG_DEBUG("created surfacegroup with id:", sg->getID());
 							break;}
 			case TypeLayerGroup: {
 							LayerGroup* lg = layerlist.createLayerGroup(*idReturn);
-							if ( lg == NULL ) break;
+							if ( lg == NULL ) return false;
 							*idReturn = lg->getID();
-//							LOG_DEBUG("created layergroup with id:", lg->getID());
+							LOG_DEBUG("created layergroup with id:", lg->getID());
 							break;}
-                        default : { break; }
+                        default : { return false; }
 		}
+		return true;
 	};
 
 };

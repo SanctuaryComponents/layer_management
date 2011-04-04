@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,9 +34,11 @@ public:
 	  graphicExternalId = graphicInternalId;
 	};
 
-         GraphicalObject(int externalId,ObjectType type, double opacity, bool visibility) : type(type),graphicInternalId(nextGraphicId[type]++),graphicExternalId(externalId),shader(0),opacity(opacity),visibility(visibility)
-         {
-         };
+	GraphicalObject(int externalId,ObjectType type, double opacity, bool visibility) : type(type),graphicInternalId(nextGraphicId[type]++),graphicExternalId(externalId),shader(0),opacity(opacity),visibility(visibility)
+	{
+	};
+
+	static const unsigned int INVALID_ID;
 
 
 	/**
@@ -53,7 +55,7 @@ public:
 	virtual void setVisibility(bool newVisibility){visibility = newVisibility;};
 	bool getVisibility(){ return visibility;};
 
-	virtual int getID() {return graphicExternalId;};
+	virtual unsigned int getID() {return graphicExternalId;};
 
 	/**
 	 * Assign custom shader for rendering
@@ -82,11 +84,14 @@ public:
 	Shader* shader;
 	double opacity;
 	bool visibility;
+
 protected:
-        int graphicInternalId;
-        int graphicExternalId;
+	unsigned int graphicInternalId;
+	unsigned int graphicExternalId;
+
 private:
-	static int nextGraphicId[TypeMax];
+	static unsigned int nextGraphicId[TypeMax];
+
 };
 
 #endif /* _LOGICALGRAPHICSOBJECT_H_ */

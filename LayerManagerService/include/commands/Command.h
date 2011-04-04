@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -62,7 +62,7 @@ public:
 	Command(CommandType commandType) :commandType(commandType) {};
 	virtual ~Command(){};
 	const CommandType commandType;
-	virtual void execute(LayerList& layerlist)=0;
+	virtual bool execute(LayerList& layerlist)=0;
 };
 
 #endif /* _COMMAND_H_ */

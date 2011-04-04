@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,12 +26,12 @@
 
 class SetOrientationCommand : public Command{
 public:
-	SetOrientationCommand(int id, ObjectType type, OrientationType Orientation) : Command(SetOrientation), id(id), type(type), Orientation(Orientation){};
-	const int id;
+	SetOrientationCommand(unsigned int id, ObjectType type, OrientationType Orientation) : Command(SetOrientation), id(id), type(type), Orientation(Orientation){};
+	const unsigned int id;
 	const ObjectType type;
 	const OrientationType Orientation;
 
-	virtual void execute(LayerList& layerlist){
+	virtual bool execute(LayerList& layerlist){
 		GraphicalSurface* graphicalSurface = NULL;
 		switch(type){
 			case TypeSurface: {graphicalSurface = layerlist.getSurface(id); break;}
@@ -40,8 +40,12 @@ public:
 			case TypeLayerGroup:{break;}
                         default : { break; }
 		}
-		if (NULL != graphicalSurface)
+		if (NULL != graphicalSurface){
 			graphicalSurface->setOrientation(Orientation);
+		}else{
+			return false;
+		}
+		return true;
 	}
 };
 

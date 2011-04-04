@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,5 +19,7 @@
 
 #include "LogicalGraphicsObject.h"
 
-int GraphicalObject::nextGraphicId[TypeMax]={1,1,1,1};
+unsigned int GraphicalObject::nextGraphicId[TypeMax]={1,1,1,1};
+
+const unsigned int GraphicalObject::INVALID_ID=0xFFFFFFFF;
 

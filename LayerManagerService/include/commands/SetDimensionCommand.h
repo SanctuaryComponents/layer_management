@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,13 +26,13 @@
 
 class SetDimensionCommand : public Command{
 public:
-	SetDimensionCommand(int id, ObjectType typeToSetOn, int width, int height) : Command(SetDimension),  id(id), typeToSet(typeToSetOn), width(width),height(height){};
-	const int id;
+	SetDimensionCommand(int id, ObjectType typeToSetOn, unsigned int width,unsigned  int height) : Command(SetDimension),  id(id), typeToSet(typeToSetOn), width(width),height(height){};
+	const unsigned int id;
 	const ObjectType typeToSet;
-	const int width;
-	const int height;
+	const unsigned int width;
+	const unsigned int height;
 
-	virtual void execute(LayerList& layerlist){
+	virtual bool execute(LayerList& layerlist){
 		GraphicalSurface* go = NULL;
 		switch(typeToSet){
 			case TypeSurface: {go = layerlist.getSurface(id); break;}
@@ -44,7 +44,10 @@ public:
 		if ( NULL != go )
 		{
 			go->setDimension(width,height);
+		}else{
+			return false;
 		}
+		return true;
 	}
 };
 

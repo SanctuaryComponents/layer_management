@@ -1,6 +1,6 @@
 /***************************************************************************
  *
- * Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
  *
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -35,37 +35,38 @@ class Command;
  */
 class LayerList : public ILayerList {
 public:
-  void init();
-  Layer* createLayer(int id);
-  Surface* createSurface(int id);
-  SurfaceGroup* createSurfaceGroup(int id);
-  LayerGroup* createLayerGroup(int id);
+  LayerList();
+  ~LayerList();
+  Layer* createLayer(unsigned int id);
+  Surface* createSurface(unsigned int id);
+  SurfaceGroup* createSurfaceGroup(unsigned int id);
+  LayerGroup* createLayerGroup(unsigned int id);
   void removeLayer(Layer* layer);
   void removeSurface(Surface* surface);
   void removeLayerGroup(LayerGroup* layer);
   void removeSurfaceGroup(SurfaceGroup* surface);
-  Layer* getLayer(int id);
-  Surface* getSurface(int id);
-  SurfaceGroup* getSurfaceGroup(const int id);
-  LayerGroup* getLayerGroup(const int id);
-  void getLayerIDs(int* length, int** array);
-  void getSurfaceIDs(int* length, int** array);
-  void getLayerGroupIDs(int* length, int** array);
-  void getSurfaceGroupIDs(int* length, int** array);
+  Layer* getLayer(unsigned int id);
+  Surface* getSurface(unsigned int id);
+  SurfaceGroup* getSurfaceGroup(const unsigned int id);
+  LayerGroup* getLayerGroup(const unsigned int id);
+  void getLayerIDs(unsigned int* length, unsigned int** array);
+  bool getLayerIDsOfScreen(uint screenID, uint* length, uint** array);
+  void getSurfaceIDs(unsigned int* length, unsigned int** array);
+  void getLayerGroupIDs(unsigned int* length, unsigned int** array);
+  void getSurfaceGroupIDs(unsigned int* length, unsigned int** array);
   void lockList(){ pthread_mutex_lock(layerListMutex); }
   void unlockList(){pthread_mutex_unlock(layerListMutex);};
   std::list<Layer*>& getCurrentRenderOrder(){return currentRenderOrder;}
-  const std::map<int,Layer*> getAllLayers(){return allLayers;}
-  const std::map<int,Surface*> getAllSurfaces(){return allSurfaces;}
+  const std::map<unsigned int,Layer*> getAllLayers(){return allLayers;}
+  const std::map<unsigned int,Surface*> getAllSurfaces(){return allSurfaces;}
   std::list<Command*> toBeCommittedList;
-  std::map<int,Shader*> shaderList;
-  void deinit();
+  std::map<unsigned int,Shader*> shaderList;
 private:
   pthread_mutex_t *layerListMutex;
-  std::map<int,LayerGroup*> layerGroupList;
-  std::map<int,SurfaceGroup*> surfaceGroupList;
-  std::map<int,Surface*> allSurfaces;
-  std::map<int,Layer*> allLayers;
+  std::map<unsigned int,LayerGroup*> layerGroupList;
+  std::map<unsigned int,SurfaceGroup*> surfaceGroupList;
+  std::map<unsigned int,Surface*> allSurfaces;
+  std::map<unsigned int,Layer*> allLayers;
   std::list<Layer*> currentRenderOrder;
 };
 

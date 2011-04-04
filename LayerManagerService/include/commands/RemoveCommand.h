@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,39 +25,42 @@
 
 class RemoveCommand : public Command{
 public:
-	RemoveCommand(int objectID, ObjectType typeToRemove) : Command(Remove), idToRemove(objectID), typeToRemove(typeToRemove){};
-	const int idToRemove;
+	RemoveCommand(unsigned int objectID, ObjectType typeToRemove) : Command(Remove), idToRemove(objectID), typeToRemove(typeToRemove){};
+	const unsigned int idToRemove;
 	const ObjectType typeToRemove;
 
-	virtual void execute(LayerList& layerlist){
+	virtual bool execute(LayerList& layerlist){
 			switch(typeToRemove){
 				case TypeSurface: {
 									 Surface* s = layerlist.getSurface(idToRemove);
-									 if ( s == NULL ) break;
+									 if ( s == NULL ){
+										return false;
+									 }
 									 layerlist.removeSurface(s);
 
 									 break;
 								 }
 				case TypeLayer: {
 									Layer* l = layerlist.getLayer(idToRemove);
-									if (l == NULL ) break;
+									if (l == NULL ) return false;;
 									layerlist.removeLayer(l);
 									break;
 								}
 				case TypeSurfaceGroup: {
 									SurfaceGroup* sg = layerlist.getSurfaceGroup(idToRemove);
-									if (sg == NULL) break;
+									if (sg == NULL) return false;
 									layerlist.removeSurfaceGroup(sg);
 									break;
 								}
 				case TypeLayerGroup: {
 									LayerGroup* lg = layerlist.getLayerGroup(idToRemove);
-									if ( lg == NULL ) break;
+									if ( lg == NULL ) return false;
 									layerlist.removeLayerGroup(lg);
 									break;
 								}
-                                default : { break; }
+                                default : { return false; }
 			}
+			return true;
 		};
 };
 

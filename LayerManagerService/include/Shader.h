@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -99,7 +99,7 @@ private:
 
 private:
 	/// unique shader ID
-	const int _id;
+	const unsigned int _id;
 
 	/// reference to OpenGL program object used by this shader instance
 	ShaderProgram& _program;
@@ -108,7 +108,7 @@ private:
 	std::map<std::string,ShaderUniform> _uniformMap;
 	
 	/// next unique ID
-	static int _nextId;
+	static unsigned int _nextId;
 };
 
 #endif /* _SHADER_H_ */

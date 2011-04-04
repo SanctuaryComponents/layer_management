@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +19,7 @@
 
 #include <Shader.h>
 
-int Shader::_nextId=1;
+unsigned int Shader::_nextId=1;
 
 Shader* Shader::createShader(const std::string& vertName, const std::string& fragName)
 {

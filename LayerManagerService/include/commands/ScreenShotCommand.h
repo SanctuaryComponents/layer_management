@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,15 +22,20 @@
 
 #include "Command.h"
 #include <string.h>
+#include "ScreenShotType.h"
 
 class ScreenShotCommand : public Command{
 public:
-	ScreenShotCommand(char* givenfilename) : Command(ScreenShot){
+	ScreenShotCommand(char* givenfilename, ScreenShotType type=ScreenshotOfDisplay, uint id=0) : Command(ScreenShot), type(type), id(id){
 		filename = std::string(givenfilename);
 	};
 	std::string filename;
+	const uint id;
+	const ScreenShotType type;
 
-	virtual void execute(LayerList& layerlist){};
+	virtual bool execute(LayerList& layerlist){
+		return true;
+	};
 };
 
 

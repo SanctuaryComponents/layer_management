@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,17 +25,30 @@
 
 class SurfacegroupAddSurfaceCommand : public Command{
 public:
-	SurfacegroupAddSurfaceCommand(int surfacegroupid, int surfaceid) : Command(SurfacegroupAddSurface), surfacegroupid(surfacegroupid), surfaceid(surfaceid){};
-	const int surfacegroupid;
-	const int surfaceid;
+	SurfacegroupAddSurfaceCommand(unsigned int surfacegroupid, unsigned int surfaceid) : Command(SurfacegroupAddSurface), surfacegroupid(surfacegroupid), surfaceid(surfaceid){};
+	const unsigned int surfacegroupid;
+	const unsigned int surfaceid;
 
-	virtual void execute(LayerList& layerlist){
+	virtual bool execute(LayerList& layerlist){
 		SurfaceGroup* sg = layerlist.getSurfaceGroup(surfacegroupid);
 		Surface* surface = layerlist.getSurface(surfaceid);
 		if ( sg != NULL && surface != NULL )
 		{
+
+			// check if already a member of the group
+			const std::list<Surface*> list = sg->getList();
+			std::list<Surface*>::const_iterator it;
+			it = std::find (list.begin(), list.end(), surface);
+			if (it!=list.end()){
+				LOG_ERROR("SurfacegroupAddSurfaceCommand","Surface is already a member of the group");
+				return false; // already is member of the group
+						}
+
 			sg->addElement(surface);
+		}else{
+			return false;
 		}
+		return true;
 	};
 };
 

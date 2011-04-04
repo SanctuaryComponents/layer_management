@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,10 +26,11 @@
 class GetVisibilityCommand : public Command{
 public:
 	GetVisibilityCommand(int id, ObjectType type, bool* visibility) : Command(GetVisibility), id(id), type(type), visibility(visibility){};
-	const int id;
+	const unsigned  id;
 	const ObjectType type;
 	bool * visibility;
-	void execute(LayerList& layerlist){
+	bool execute(LayerList& layerlist){
+		LOG_DEBUG("GetVisibilityCommand", "start of");
 			GraphicalObject* go;
 			switch(type){
 				case TypeSurface: go = layerlist.getSurface(id);
@@ -44,8 +45,15 @@ public:
 			}
 			if (go != NULL)
 			{
-				*visibility = go->getVisibility();
+				bool temp = go->getVisibility();
+				LOG_DEBUG("GetVisibilityCommand", "returning:" << temp);
+				*visibility = temp;
+			}else{
+				LOG_DEBUG("GetVisibilityCommand", "id not found, return false");
+				return false;
 			}
+			LOG_DEBUG("GetVisibilityCommand", "end of");
+			return true;
 		}
 };
 

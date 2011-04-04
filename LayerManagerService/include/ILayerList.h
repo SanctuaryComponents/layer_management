@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,44 +34,57 @@ typedef GraphicalGroup<Surface, TypeSurfaceGroup> SurfaceGroup;
  */
 class ILayerList{
 public:
-		virtual Layer* createLayer(int id)=0;
-		virtual Surface* createSurface(int id)=0;
-                virtual LayerGroup* createLayerGroup(int id)=0;
-                virtual SurfaceGroup* createSurfaceGroup(int id)=0;
+		virtual Layer* createLayer(uint id)=0;
+		virtual Surface* createSurface(uint id)=0;
+		virtual LayerGroup* createLayerGroup(uint id)=0;
+		virtual SurfaceGroup* createSurfaceGroup(uint id)=0;
 
 		virtual void removeLayer(Layer* layer)=0;
 		virtual void removeSurface(Surface* surface)=0;
-		virtual Layer* getLayer(int id)=0;
-		virtual Surface* getSurface(int id)=0;
-		virtual SurfaceGroup* getSurfaceGroup(const int id)=0;
-		virtual LayerGroup* getLayerGroup(const int id)=0;
-
-		/**
-			 * Get list of ids of all layers currently existing.
-			 * @return list of ids of all currently know layers
-			 */
-		virtual void getLayerIDs(int* length, int** array)=0;
-		virtual void getSurfaceIDs(int* length, int** array)=0;
+		virtual Layer* getLayer(uint id)=0;
+		virtual Surface* getSurface(uint id)=0;
+		virtual SurfaceGroup* getSurfaceGroup(const uint id)=0;
+		virtual LayerGroup* getLayerGroup(const uint id)=0;
 
 		/**
 		 * Get list of ids of all layers currently existing.
 		 * @return list of ids of all currently know layers
 		 */
-		virtual void getLayerGroupIDs(int* length, int* array[])=0;
-	        /**
-                 * Get list of ids of all layers currently existing.
-                 * @return list of ids of all currently know layers
-                 */
-                virtual void getSurfaceGroupIDs(int* length, int* array[])=0;
+		virtual void getLayerIDs(uint* length, uint** array)=0;
+
+		/**
+		 * Get list of ids of all layers currently existing.
+		 * @return list of ids of all currently know layers
+		 */
+		virtual bool getLayerIDsOfScreen(uint screenID, uint* length, uint** array)=0;
+
+		/**
+		 * Get list of ids of all surfaces currently existing.
+		 * @return list of ids of all currently know surfaces
+		 */
+		virtual void getSurfaceIDs(uint* length, uint** array)=0;
+
+		/**
+		 * Get list of ids of all layers currently existing.
+		 * @return list of ids of all currently know layers
+		 */
+		virtual void getLayerGroupIDs(uint* length, uint* array[])=0;
+
+		/**
+		 * Get list of ids of all layers currently existing.
+		 * @return list of ids of all currently know layers
+		 */
+		virtual void getSurfaceGroupIDs(uint* length, uint* array[])=0;
+
 		/**
 		 * Lock the list for read and write access
 		 */
 		virtual void lockList()=0;
 
-                /**
-                 * Unlock the list for read and write access
-                 */
-                virtual void unlockList()=0;
+		/**
+		 * Unlock the list for read and write access
+		 */
+		virtual void unlockList()=0;
 
 		bool debugMode;
 

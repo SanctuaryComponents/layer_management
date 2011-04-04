@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,15 +26,46 @@ Layermanager* Layermanager::instance = new Layermanager();
 Layermanager::Layermanager() {
 	// default layer
 	//Layer* defaultLayer = layerlist.createLayer();
-        layerlist.init();
+    //    layerlist.init();
 }
 
 
 uint Layermanager::getLayerTypeCapabilities(LayerType layertype){
 	// get the first renderer for now TODO
+	// change to possibly load multiple renderers
 	IRenderer* renderer = *compositingControllers.begin();
 	if (NULL!=renderer)
 		return renderer->getLayerTypeCapabilities(layertype);
+	else
+		return 0;
+}
+
+uint Layermanager::getNumberOfHardwareLayers(uint screenID){
+	// get the first renderer for now TODO
+	// change to possibly load multiple renderers
+	IRenderer* renderer = *compositingControllers.begin();
+	if (NULL!=renderer)
+		return renderer->getNumberOfHardwareLayers(screenID);
+	else
+		return 0;
+}
+
+uint* Layermanager::getScreenResolution(uint screenID){
+	// get the first renderer for now TODO
+	// change to possibly load multiple renderers
+	IRenderer* renderer = *compositingControllers.begin();
+	if (NULL!=renderer)
+		return renderer->getScreenResolution(screenID);
+	else
+		return 0;
+}
+
+uint* Layermanager::getScreenIDs(uint* length){
+	// get the first renderer for now TODO
+	// change to possibly load multiple renderers
+	IRenderer* renderer = *compositingControllers.begin();
+	if (NULL!=renderer)
+		return renderer->getScreenIDs(length);
 	else
 		return 0;
 }
@@ -53,12 +84,10 @@ void Layermanager::printDebugInformation(){
 	// print stuff about layerlist
 	LOG_INFO("LayerManager", "Layer: ID |  X |  Y |  W |  H |Al.| Z \n");
 	// loop the layers
-	int length;
-	int* LayerIDs;
+	unsigned int length;
+	unsigned int* LayerIDs;
 	layerlist.getLayerIDs(&length,&LayerIDs);
 	for (int i=0;i<length;i++)
-//	for(std::list<int>::iterator currentLayerID = LayerIDs.begin();
-//		currentLayerID != LayerIDs.end(); currentLayerID++)
 	{
 		Layer* currentLayer = layerlist.getLayer(LayerIDs[i]);
 		LOG_INFO("LayerManager", "      " << std::setw(4) << currentLayer->getID()   << "\n");
@@ -75,12 +104,12 @@ void Layermanager::printDebugInformation(){
 }
 
 
-void Layermanager::execute(Command*  commandToBeExecuted){
+bool Layermanager::execute(Command*  commandToBeExecuted){
+	bool status=false;
 	LOG_DEBUG("Layermanager", "executing a command, locking list");
         layerlist.lockList();
         /*LOG_DEBUG("Layermanager", "executing a command, locking list success");*/
 	switch(commandToBeExecuted->commandType){
-		case Command::Remove:
 		case Command::SetVisibility:
 		case Command::SetOpacity:
 		case Command::SetSourceRectangle:
@@ -98,6 +127,7 @@ void Layermanager::execute(Command*  commandToBeExecuted){
 		case Command::SetSurfaceRenderOrderWithinLayer:
                 {
                         layerlist.toBeCommittedList.push_back(commandToBeExecuted);
+                        status = true;
                         break;
                 }
 		case Command::ScreenShot:
@@ -105,22 +135,46 @@ void Layermanager::execute(Command*  commandToBeExecuted){
 			LOG_INFO("LayerManager","making screenshot");
 			ScreenShotCommand* screenShotCommand = (ScreenShotCommand*)commandToBeExecuted;
 			LOG_INFO("LayerManager","file: " << screenShotCommand->filename);
-			// call screen shot on all renderers
+			// check if screen is valid
+			if (screenShotCommand->type == ScreenshotOfDisplay && screenShotCommand->id!=0){
+				status = false;
+				break;
+			}else if (screenShotCommand->type == ScreenshotOfLayer){
+				Layer* l = layerlist.getLayer(screenShotCommand->id);
+				if (l==NULL){
+					status = false;
+					break;
+				}
+			}else if (screenShotCommand->type == ScreenshotOfSurface){
+				Surface* s = layerlist.getSurface(screenShotCommand->id);
+								if (s==NULL){
+									status = false;
+									break;
+								}
+			}
+
+			// call screen shot on all renderers for now TODO
 			for( std::list<IRenderer*>::iterator list_iter = compositingControllers.begin();
 			     list_iter != compositingControllers.end();
 			     list_iter++)
 			  {
-                            if ( NULL != *list_iter)
-                              {
-                                    (*list_iter)->doScreenShot(std::string(screenShotCommand->filename));
-                              }
+					if ( NULL != *list_iter)
+					  {
+							if (screenShotCommand->type == ScreenshotOfDisplay)
+								(*list_iter)->doScreenShot(std::string(screenShotCommand->filename));
+							else if (screenShotCommand->type == ScreenshotOfLayer)
+								(*list_iter)->doScreenShotOfLayer(std::string(screenShotCommand->filename),screenShotCommand->id);
+							else if (screenShotCommand->type == ScreenshotOfSurface)
+								(*list_iter)->doScreenShotOfSurface(std::string(screenShotCommand->filename),screenShotCommand->id);
+					  }
 			  }
+			status = true;
 			break;
 		}
 		case Command::Create:
 		default:
 		  {
-                        commandToBeExecuted->execute(layerlist);
+                        status = commandToBeExecuted->execute(layerlist);
                         delete commandToBeExecuted;
                         break;
 		  }
@@ -128,7 +182,7 @@ void Layermanager::execute(Command*  commandToBeExecuted){
         /* LOG_DEBUG("Layermanager", "executing a command, unlocking list");*/
         layerlist.unlockList();
         LOG_DEBUG("Layermanager", "executing a command, unlocking list success");
-
+        return status;
 }
 
 

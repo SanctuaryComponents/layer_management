@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,73 +19,73 @@
 #include "Bitmap.h"
 #include "Log.h"
 #include <stdint.h>
-
-typedef uint16_t WORD;
-typedef uint32_t DWORD;
-typedef uint32_t LONG;
-
-typedef struct tagBMPFileHeader {
-	DWORD bfSize; // bytes of entire file
-	WORD bfReserved1; // nothing
-	WORD bfReserved2; // nothing
-	DWORD bfOffBits; // address of bitmap data in file
-} BMPFileHeader;
+#include <sys/stat.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 
-typedef struct tagBMPInfoHeader {
-	DWORD biSize; // Size of this BMPInfoHeader
-	int32_t biWidth;
-	int32_t biHeight;
-	WORD biPlanes; // 1 plane, so this equals 1
-	WORD biBitCount; // 24 bits/pixel
-	DWORD biCompression; // 0 = BMP
-	DWORD biSizeImage; // size of actual bitmap image
-	int32_t biXPelsPerMeter; // Horizontal resolution
-	int32_t biYPelsPerMeter; // Vertical resolution
-	DWORD biClrUsed; // 0
-	DWORD biClrImportant; // 0 important colors (very old)
-} BMPInfoHeader;
+typedef struct BMPHeaderStruct {
+	uint32_t size; // filesize
+	uint16_t a;
+	uint16_t b;
+	uint32_t offset; // offset
+} BMPHeader;
+
+
+typedef struct headerStruct {
+	uint32_t headersize;
+	int32_t width;
+	int32_t height;
+	uint16_t planes;
+	uint16_t bits;
+	uint32_t compress;
+	uint32_t imagesize;
+	int32_t xresolution;
+	int32_t yresolution;
+	uint32_t color1;
+	uint32_t color2;
+} InfoHeader;
 
 void writeBitmap(std::string FileName, char* imagedataRGB, int width, int height)
 {
 	LOG_DEBUG("Bitmap","writing Bitmap to file:" <<FileName);
-	/*
-	The reason these 2 are seperate is because sometimes (never)
-	you might want to use a different BMPInfoHeader
-	*/
 
-	BMPFileHeader bitmapFileHeader;
-	BMPInfoHeader bitmapInfoHeader;
+	BMPHeader bmpHeader;
+	InfoHeader header;
 	int imagebytes=width*height*3;
-	//printf("File Header Size(12) = %lu\n",sizeof(BMPFileHeader));
-	//printf("Info Header Size(40) = %lu\n",sizeof(BMPInfoHeader));
-	char magic[2];
-	magic[0]='B';
-	magic[1]='M';
-	bitmapFileHeader.bfSize = 2+sizeof(BMPFileHeader)+sizeof(BMPInfoHeader)+imagebytes;
-	bitmapFileHeader.bfReserved1 = 0;
-	bitmapFileHeader.bfReserved2 = 0;
-	bitmapFileHeader.bfOffBits = 2+sizeof(BMPFileHeader)+sizeof(BMPInfoHeader);
-	bitmapInfoHeader.biSize = sizeof(BMPInfoHeader);
-	bitmapInfoHeader.biWidth = width;
-	bitmapInfoHeader.biHeight = height;
-	bitmapInfoHeader.biPlanes = 1;
-	bitmapInfoHeader.biBitCount = 24; // 24 bits/pixel
-	bitmapInfoHeader.biCompression = 0; // Zero is the defaut Bitmap
-	bitmapInfoHeader.biSizeImage = imagebytes;
-	bitmapInfoHeader.biXPelsPerMeter = 2835; // 72 pixels/inch = 2834.64567 pixels per meter
-	bitmapInfoHeader.biYPelsPerMeter = 2835;
-	bitmapInfoHeader.biClrUsed = 0;
-	bitmapInfoHeader.biClrImportant = 0;
+	char firstbytes[2];
+	firstbytes[0]='B';
+	firstbytes[1]='M';
+	bmpHeader.size = 2+sizeof(BMPHeader)+sizeof(header)+imagebytes;
+	bmpHeader.a = 0;
+	bmpHeader.b = 0;
+	bmpHeader.offset = 2+sizeof(BMPHeader)+sizeof(header);
+	header.headersize = sizeof(header);
+	header.width = width;
+	header.height = height;
+	header.planes = 1;
+	header.bits = 24; // bitmap does not do alpha
+	header.compress = 0;
+	header.imagesize = imagebytes;
+	header.xresolution = 2835; // because of dpi
+	header.yresolution = 2835;
+	header.color1 = 0;
+	header.color2 = 0;
 
-	// Now to write the file
-	// Open the file in "write binary" mode
+	// make sure parent directory exists
+	int lastPos = FileName.find_last_of("/");
+	if (lastPos!=std::string::npos){
+		std::string directory = FileName.substr(0,lastPos);
+		LOG_DEBUG("Bitmap","Creating directory " << directory);
+		mkdir(directory.c_str(),0666);
+	}
+
 	FILE *f=fopen(FileName.c_str(),"wb");
 	if (NULL != f){
-		fwrite(magic, 2, 1, f);
-		fwrite((void*)&bitmapFileHeader, sizeof(BMPFileHeader), 1, f);
-		fwrite((void*)&bitmapInfoHeader, sizeof(BMPInfoHeader), 1, f);
-		fwrite(imagedataRGB, bitmapInfoHeader.biSizeImage, 1, f);
+		fwrite(firstbytes, 2, 1, f);
+		fwrite((void*)&bmpHeader, sizeof(BMPHeader), 1, f);
+		fwrite((void*)&header, sizeof(header), 1, f);
+		fwrite(imagedataRGB, header.imagesize, 1, f);
 		fclose(f);
 	}else{
 		LOG_DEBUG("Bitmap","File could not be opened for writing");

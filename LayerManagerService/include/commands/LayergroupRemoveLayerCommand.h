@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,17 +25,20 @@
 
 class LayergroupRemoveLayerCommand : public Command{
 public:
-	LayergroupRemoveLayerCommand(int layergroupid, int layerid) : Command(LayergroupRemoveLayer), layergroupid(layergroupid), layerid(layerid){};
-	const int layergroupid;
-	const int layerid;
+	LayergroupRemoveLayerCommand(unsigned layergroupid, unsigned layerid) : Command(LayergroupRemoveLayer), layergroupid(layergroupid), layerid(layerid){};
+	const unsigned  layergroupid;
+	const unsigned  layerid;
 
-	virtual void execute(LayerList& layerlist){
+	virtual bool execute(LayerList& layerlist){
 			LayerGroup* lg = layerlist.getLayerGroup(layergroupid);
 			Layer* layer = layerlist.getLayer(layerid);
 			if ( lg != NULL && layer != NULL )
 			{
 				lg->removeElement(layer);
+			}else{
+				return false;
 			}
+			return true;
 		};
 };
 

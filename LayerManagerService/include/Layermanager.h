@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -38,8 +38,11 @@ class Layermanager : public CommandExecutor{
 public:
 	// the singleton reference
 	static Layermanager* instance;
-	void execute(Command* commandToBeExecuted);
+	bool execute(Command* commandToBeExecuted);
 	uint getLayerTypeCapabilities(LayerType layertype);
+	uint getNumberOfHardwareLayers(uint screenID);
+	uint* getScreenResolution(uint screenID);
+	uint* getScreenIDs(uint* length);
 
 	LayerList layerlist;
 

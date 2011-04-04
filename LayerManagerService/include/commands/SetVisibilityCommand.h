@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,7 +30,7 @@ public:
 	const ObjectType otype;
 	const bool visibility;
 
-	virtual void execute(LayerList& layerlist){
+	virtual bool execute(LayerList& layerlist){
 		GraphicalObject* go = NULL;
 		switch(otype){
 			case TypeSurface: go = layerlist.getSurface(idtoSet);
@@ -45,8 +45,12 @@ public:
 		}
 		if ( go != NULL )
 		{
+			LOG_DEBUG("SetVisibilityCommand", "setting visibility: " << visibility << " of id " << idtoSet);
 			go->setVisibility(visibility);
+		}else{
+			return false;
 		}
+		return true;
 	}
 };
 

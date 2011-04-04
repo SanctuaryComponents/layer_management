@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -51,10 +51,16 @@ private:
 #define LOG_INFO(module, message) { \
            LogMessageBuffer oss_; \
            Log::instance->info(module, oss_.str(oss_<< message)); }
+
+//#define LOG_DEBUG(module, message)
+
 #define LOG_DEBUG(module, message) { \
            LogMessageBuffer oss_; \
            Log::instance->debug(module, oss_.str(oss_<< message)); }
+
+//#define LOG_WARNING(module, message)
 #define LOG_WARNING(module, message) { \
            LogMessageBuffer oss_; \
            Log::instance->warning(module, oss_.str(oss_<< message)); }
+
 #endif /* _LOG_H_ */

@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,11 +26,11 @@
 class GetPositionCommand : public Command{
 public:
 	GetPositionCommand(int id, ObjectType type, uint* xRet, uint* yRet) : Command(GetPosition), id(id), type(type), x(xRet),y(yRet){};
-	const int id;
+	const unsigned  id;
 	const ObjectType type;
 	uint* x;
 	uint* y;
-	virtual void execute(LayerList& layerlist){
+	virtual bool execute(LayerList& layerlist){
 		GraphicalSurface* go = NULL;
 		switch(type){
 			case TypeSurface: {go = layerlist.getSurface(id); break;}
@@ -47,7 +47,9 @@ public:
 		} else {
 			*x = 0;
 			*y = 0;
+			return false;
 		}
+		return true;
 	}
 };
 

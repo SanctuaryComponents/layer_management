@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,13 +26,13 @@
 
 class SetPositionCommand : public Command{
 public:
-	SetPositionCommand(int id, ObjectType typeToSetOn, int x, int y ) : Command(SetPosition),  id(id), typeToSet(typeToSetOn), x(x),y(y){};
-	const int id;
+	SetPositionCommand(unsigned int id, ObjectType typeToSetOn, unsigned int x, unsigned int y ) : Command(SetPosition),  id(id), typeToSet(typeToSetOn), x(x),y(y){};
+	const unsigned int id;
 	const ObjectType typeToSet;
-	const int x;
-	const int y;
+	const unsigned int x;
+	const unsigned int y;
 
-	virtual void execute(LayerList& layerlist){
+	virtual bool execute(LayerList& layerlist){
 		GraphicalSurface* graphicalSurface = NULL;
 		switch(typeToSet){
 			case TypeSurface: {graphicalSurface = layerlist.getSurface(id); break;}
@@ -44,7 +44,10 @@ public:
 		if (NULL != graphicalSurface)
 		{
 			graphicalSurface->setPosition(x,y);
+		}else{
+			return false;
 		}
+		return true;
 	}
 };
 

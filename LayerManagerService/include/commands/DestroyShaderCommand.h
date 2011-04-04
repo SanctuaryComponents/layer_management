@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,17 +26,17 @@
 class DestroyShaderCommand : public Command
 {
 public:
-	DestroyShaderCommand(int shaderid)
+	DestroyShaderCommand(unsigned int shaderid)
 		: Command(DestroyShader)
 		, _id(shaderid)
 	{
 		// void
 	};
 
-	const int getShaderID(){ return _id; }
+	const unsigned int getShaderID(){ return _id; }
 
-	void execute(LayerList& layerlist){
-		std::map<int,Shader*>::iterator it;
+	bool execute(LayerList& layerlist){
+		std::map<unsigned int,Shader*>::iterator it;
 
 		// get shader by its ID
 		it = layerlist.shaderList.find(_id);
@@ -47,7 +47,7 @@ public:
 			{
 				// detach shader from all surfaces, surface groups, etc...
 				// from surfaces
-				for (std::map<int,Surface*>::const_iterator surfit = layerlist.getAllSurfaces().begin();surfit!=layerlist.getAllSurfaces().end();surfit++)
+				for (std::map<unsigned int,Surface*>::const_iterator surfit = layerlist.getAllSurfaces().begin();surfit!=layerlist.getAllSurfaces().end();surfit++)
 				{
 					GraphicalObject* obj = surfit->second;
 					if (obj && obj->getShader()==shader)
@@ -56,7 +56,7 @@ public:
 					}
 				}
 				// from layers
-				for (std::map<int,Layer*>::const_iterator layerit = layerlist.getAllLayers().begin();layerit!=layerlist.getAllLayers().end();layerit++)
+				for (std::map<unsigned int,Layer*>::const_iterator layerit = layerlist.getAllLayers().begin();layerit!=layerlist.getAllLayers().end();layerit++)
 				{
 					GraphicalObject* obj = layerit->second;
 					if (obj && obj->getShader()==shader)
@@ -76,11 +76,13 @@ public:
 		{
 			// shader not found
 			LOG_ERROR("Layermanager", "shader ID "<<_id<<" not found");
+			return false;
 		}
+		return true;
 	}
 
 private:
-	const int _id;
+	const unsigned _id;
 };
 
 #endif /* _DESTROYSHADERCOMMAND_H_ */

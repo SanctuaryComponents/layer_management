@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,11 +26,11 @@
 class GetOpacityCommand : public Command{
 public:
 	GetOpacityCommand(int id, ObjectType type, double* returnOpacity) : Command(GetOpacity), id(id), type(type), returnOpacity(returnOpacity){};
-	const int id;
+	const unsigned  id;
 	const ObjectType type;
 	double* returnOpacity;
 
-	virtual void execute(LayerList& layerlist){
+	virtual bool execute(LayerList& layerlist){
 		GraphicalObject* go;
 		switch(type){
 			case TypeSurface: {go = layerlist.getSurface(id); break;}
@@ -42,7 +42,10 @@ public:
 		if ( go!= NULL )
 		{
 			*returnOpacity = go->getOpacity();
+		}else{
+			return false;
 		}
+		return true;
 	}
 };
 

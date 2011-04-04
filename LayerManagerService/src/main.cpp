@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,22 +28,25 @@
 #include <string.h>
 #include "Log.h"
 #include <getopt.h>
-const char* displayName = "Tegra:VGA0";
+
+const char* displayName = ":0";
 int displayWidth = 1280;
 int displayHeight = 480;
+
 const char* USAGE_DESCRIPTION =
-		"Usage:\t layerManager [options]\n"
+		"Usage:\t LayerManagerService [options]\n"
 		"Option:\t\n\n"
 		"\t-w: Window Width\t\n"
 		"\t-h: Window Height\t\n"
 		"\t-d: displayName \t\n";
+
 template<class T>
 T* getCreateFunction(std::string libname)
 {
 	void *libraryHandle;
 	libraryHandle = dlopen (libname.c_str(), RTLD_LAZY);
 	if (NULL == libraryHandle) {
-		LOG_ERROR("Main", dlerror());
+		LOG_ERROR("LayerManagerService", dlerror());
 	}
 	// cut off directories
 	int lastSlashPosition = libname.rfind('/')+1;
@@ -58,7 +61,7 @@ T* getCreateFunction(std::string libname)
 	const char* dlsym_error = dlerror();
 	if (dlsym_error)
 	{
-			LOG_ERROR("Main", "Cannot load symbol create: " << dlsym_error);
+			LOG_ERROR("LayerManagerService", "Cannot load symbol create: " << dlsym_error);
 	}
 	return createFunction;
 }
@@ -91,7 +94,7 @@ std::string getfirstFileFromDirectory(std::string dirName){
 	std::string returnValue;
 	struct dirent *dirp;
 	if((dp  = opendir(dirName.c_str())) == NULL) {
-		LOG_ERROR("Main", "Error(" << errno << ") opening " << dirName);
+		LOG_ERROR("LayerManagerService", "Error(" << errno << ") opening " << dirName);
 		returnValue = "";
 	}else{
 
@@ -102,7 +105,7 @@ std::string getfirstFileFromDirectory(std::string dirName){
 				continue;
 			if (strstr (dirp->d_name, ".so")==0)
 				continue;
-			LOG_INFO("Main", "loading file " << dirName << "/" << dirp->d_name);
+			LOG_INFO("LayerManagerService", "loading file " << dirName << "/" << dirp->d_name);
 			returnValue = std::string(dirName + "/" + dirp->d_name);
 			break;
 		}
@@ -113,34 +116,58 @@ std::string getfirstFileFromDirectory(std::string dirName){
 }
 
 BaseCommunicator* loadCommunicator(Layermanager* executor, ILayerList* layerList){
+	BaseCommunicator* ret = NULL;
+	LOG_DEBUG("LayerManagerService", "Searching for communicator.");
 	std::string sharedLibraryName = getfirstFileFromDirectory("/usr/lib/layermanager/communicator");
-	BaseCommunicator* (*createFunc)(Layermanager*, ILayerList*)  = getCreateFunction<BaseCommunicator*(Layermanager*, ILayerList*)>(sharedLibraryName);
-	LOG_DEBUG("Main", "instantiating communicator");
-	BaseCommunicator* ret = createFunc(executor, layerList);
-	LOG_DEBUG("Main", "found communicator");
+	if (sharedLibraryName==""){
+		sharedLibraryName = getfirstFileFromDirectory("/usr/local/lib/layermanager/communicator");
+		if (sharedLibraryName==""){
+			LOG_ERROR("LayerManagerService","No communicator found!");
+			return NULL;
+		}
+	}
+
+	LOG_DEBUG("LayerManagerService", "Shared Communicator library " << sharedLibraryName << " found !");
+	BaseCommunicator* (*createFunc)(Layermanager*,ILayerList*)  = getCreateFunction<BaseCommunicator*(Layermanager*, ILayerList*)>(sharedLibraryName);
+	if ( NULL != createFunc )
+	{
+		LOG_DEBUG("LayerManagerService", "Entry point of Communicator found !");
+		ret = createFunc(executor,layerList);
+		if ( NULL == ret )
+		{
+			LOG_ERROR("LayerManagerService","Communicator could not initiliazed. Entry Function not callable !");
+		}
+	} else {
+		LOG_ERROR("LayerManagerService","Communicator could not initiliazed. Entry Function not found !");
+	}
 	return ret;
 }
 
 IRenderer* loadRenderer(LayerList* list)
-{	IRenderer* ret = NULL;
-	LOG_DEBUG("Main", "Searching for renderer.");
+{
+	IRenderer* ret = NULL;
+	LOG_DEBUG("LayerManagerService", "Searching for renderer.");
 	std::string sharedLibraryName = getfirstFileFromDirectory("/usr/lib/layermanager/renderer");
 	if (sharedLibraryName==""){
-		LOG_ERROR("Main","No renderer found!");
-	}else{
-		LOG_DEBUG("Main", "Shared Renderer library " << sharedLibraryName << " found !");
-		IRenderer* (*createFunc)(LayerList*)  = getCreateFunction<IRenderer*(LayerList*)>(sharedLibraryName);
-		if ( NULL != createFunc )
-		{
-			LOG_DEBUG("Main", "Entry point of Renderer found !");
-			ret = createFunc(list);
-			if ( NULL == ret )
-			{
-				LOG_ERROR("Main","Render could not initiliazed. Entry Function not callable !");
-			}
-		} else {
-			LOG_ERROR("Main","Render could not initiliazed. Entry Function not found !");
+		sharedLibraryName = getfirstFileFromDirectory("/usr/local/lib/layermanager/renderer");
+		if (sharedLibraryName==""){
+			LOG_ERROR("LayerManagerService","No renderer found!");
+			return NULL;
 		}
+	}
+
+	LOG_DEBUG("LayerManagerService", "Shared Renderer library " << sharedLibraryName << " found !");
+	IRenderer* (*createFunc)(LayerList*)  = getCreateFunction<IRenderer*(LayerList*)>(sharedLibraryName);
+	if ( NULL != createFunc )
+	{
+		LOG_DEBUG("LayerManagerService", "Entry point of Renderer found !");
+		ret = createFunc(list);
+		if ( NULL == ret )
+		{
+			LOG_ERROR("LayerManagerService","Render could not initiliazed. Entry Function not callable !");
+		}
+	} else {
+		LOG_ERROR("LayerManagerService","Render could not initiliazed. Entry Function not found !");
 	}
 	return ret;
 }
@@ -150,16 +177,16 @@ int main(int argc, char **argv)
 {
 
 	parsecommandline(argc,(char**)argv);
-	LOG_INFO("Main", "Starting Layermanager.");
+	LOG_INFO("LayerManagerService", "Starting Layermanager.");
 
 	// Create Singleton Instance of Layermanager
 	Layermanager *manager = Layermanager::instance;
 
-	LOG_INFO("Main", "Loading communicator.");
+	LOG_INFO("LayerManagerService", "Loading communicator.");
 	// Create a communication mechanism to use
 	BaseCommunicator* comm = loadCommunicator(manager,&manager->layerlist);
 
-	LOG_INFO("Main", "Loading renderer.");
+	LOG_INFO("LayerManagerService", "Loading renderer.");
 	// Create graphic controller to use
 	IRenderer* renderer = loadRenderer(&manager->layerlist);
 
@@ -171,16 +198,16 @@ int main(int argc, char **argv)
 	if ( true == manager->startManagement(displayWidth,displayHeight,displayName) )
 	{
 		// must stay within main method or else application would completely exit
-		LOG_INFO("Main", "Enter Mainloop.");
+		LOG_INFO("LayerManagerService", "Startup complete. EnterMainloop");
 		while(true)
 		{
 			sleep(2000);
 		}
 	} else {
-		LOG_ERROR("Main", "Exiting Application.");
+		LOG_ERROR("LayerManagerService", "Exiting Application.");
 		return -1;
 	}
-	LOG_INFO("Main", "Exiting Application.");
+	LOG_INFO("LayerManagerService", "Exiting Application.");
 	// cleanup
 	manager->stopManagement();
 	delete renderer;

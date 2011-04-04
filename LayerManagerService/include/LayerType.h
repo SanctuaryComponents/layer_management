@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,9 +24,10 @@
  * Enumeration of possible LayerTypes
  */
 enum LayerType{
-	Hardware = 0,
-	Software_2D = 1,
-	Software_2_5D = 2
+	Unknown = 0,
+	Hardware = 1,
+	Software_2D = 2,
+	Software_2_5D = 3
 };
 
 #endif /* _LAYERTYPE_H_ */

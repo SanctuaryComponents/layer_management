@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,7 +25,7 @@
 class SetShaderCommand : public Command
 {
 public:
-	SetShaderCommand(int id, int shaderid)
+	SetShaderCommand(unsigned int id,unsigned  int shaderid)
 		: Command(SetShader)
 		, _id(id)
 		, _shaderid(shaderid)
@@ -33,11 +33,11 @@ public:
 		// void
 	};
 
-	const int getID(){ return _id; }
-	const int getShaderID(){ return _shaderid; }
+	const unsigned int getID(){ return _id; }
+	const unsigned int getShaderID(){ return _shaderid; }
 
-	void execute(LayerList& layerlist){
-		std::map<int,Shader*>::iterator it;
+	bool execute(LayerList& layerlist){
+		std::map<unsigned int,Shader*>::iterator it;
 		GraphicalObject* object = layerlist.getSurface(_id);
 		Shader* shader = NULL;
 
@@ -67,12 +67,14 @@ public:
 		{
 			// object not found
 			LOG_ERROR("Layermanager", "object ID "<<_id<<" not found");
+			return false;
 		}
+		return true;
 	}
 
 private:
-	const int _id;
-	const int _shaderid;
+	const unsigned int _id;
+	const unsigned int _shaderid;
 };
 
 #endif /* _SETSHADERCOMMAND_H_ */

@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,18 +25,22 @@
 
 class LayerAddSurfaceCommand : public Command{
 public:
-	LayerAddSurfaceCommand(int layerid, int surfaceid) : Command(LayerAddSurface), layerid(layerid), surfaceid(surfaceid){};
-	const int layerid;
-	const int surfaceid;
+	LayerAddSurfaceCommand(unsigned int layerid, unsigned  int surfaceid) : Command(LayerAddSurface), layerid(layerid), surfaceid(surfaceid){};
+	const unsigned int layerid;
+	const unsigned int surfaceid;
 
-	virtual void execute(LayerList& layerlist){
+	virtual bool execute(LayerList& layerlist){
 		Layer* l = layerlist.getLayer(layerid);
 		Surface* s = layerlist.getSurface(surfaceid);
 		if (l != NULL && s != NULL )
 		{
-			LOG_DEBUG("LayerAddSurfaceCommand","add surface " << surfaceid << " to layer "<< layerid);
+			LOG_DEBUG("LayerAddSurfaceCommand","add surface(" <<surfaceid << ")"<<s->getID()  << " to layer("<< layerid << ") " << l->getID());
 			l->addSurface(s);
+			LOG_DEBUG("LayerAddSurfaceCommand", "Layer now has #surfaces:" << l->getAllSurfaces().size());
+		}else{
+			return false;
 		}
+		return true;
 	};
 };
 

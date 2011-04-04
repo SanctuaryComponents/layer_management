@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -39,7 +39,7 @@ public:
 	const std::string getVertName(){return _vertName;}
 	const std::string getFragName(){return _fragName;}
 
-	void execute(LayerList& layerlist){
+	bool execute(LayerList& layerlist){
 		Shader* shader;
 			int id=0;
 
@@ -51,9 +51,12 @@ public:
 				// insert shader to shader map
 				id = shader->getId();
 				layerlist.shaderList.insert(std::pair<int,Shader*>(id, shader));
+				*returnID = id;
+			}else{
+				return false;
 			}
+			return true;
 
-			*returnID = id;
 	}
 private:
 	const std::string _vertName;

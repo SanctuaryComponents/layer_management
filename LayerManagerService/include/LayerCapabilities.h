@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,11 +24,11 @@
  * Enumeration of possible PixelFormats
  */
 enum LayerCapabilities{
-	LayerPosition,
-	LayerScalable,
-	LayerOrientable,
-	Layer3D,
-	LayerComposedByAlpha
+	LayerPosition=1,
+	LayerScalable=2,
+	LayerOrientable=4,
+	Layer3D=8,
+	LayerComposedByAlpha=16
 };
 
 #endif /* _LAYERCAPABILITIES_H_ */

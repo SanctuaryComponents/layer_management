@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,26 +27,27 @@
 class GetPixelformatCommand : public Command{
 public:
 	GetPixelformatCommand(int id, ObjectType type, PixelFormat* f) : Command(GetPixelformat), id(id), type(type), formatreturn(f){};
-	const int id;
+	const unsigned  id;
 	const ObjectType type;
 	PixelFormat* formatreturn;
-	virtual void execute(LayerList& layerlist){
+	virtual bool execute(LayerList& layerlist){
 		switch(type){
 			case TypeSurface: {
 				Surface* s = layerlist.getSurface(id);
-				if ( s==NULL ) break;
+				if ( s==NULL ) return false;
 				*formatreturn = s->getPixelFormat();
 				break;
 				}
 			case TypeLayer:{
 				//Layer* l = layerlist.getLayer(id);
 				//*formatreturn = l->getPixelFormat();
-				break;
+				return false;
 				}
-			case TypeSurfaceGroup: break;
-			case TypeLayerGroup: break;
-                        default : { break; }
+			case TypeSurfaceGroup: return false;
+			case TypeLayerGroup: return false;
+                        default : { return false; }
 		}
+		return true;
 	}
 };
 

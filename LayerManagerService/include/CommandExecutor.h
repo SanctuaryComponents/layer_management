@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -59,15 +59,21 @@
  *
  * Implementation detail: This interface is used to reduce dependency of communicators on the main layermanagement component
  */
-class CommandExecutor{
+class CommandExecutor {
 public:
 	/**
 	 * Have a command processed.
 	 * @param commandToBeExecuted The command to be processed
 	 */
-	virtual void execute(Command* commandToBeExecuted)=0;
+	virtual bool execute(Command* commandToBeExecuted)=0;
 
 	virtual uint getLayerTypeCapabilities(LayerType layertype)=0;
+
+	virtual uint getNumberOfHardwareLayers(uint screenID)=0;
+
+	virtual uint* getScreenResolution(uint screenID)=0;
+
+	virtual uint* getScreenIDs(uint* length)=0;
 
 };
 

@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,11 +25,11 @@
 class Rectangle {
 public:
 	Rectangle(){};
-	Rectangle(int x, int y, int width, int height) : x(x),y(y),width(width),height(height){};
-	int x;
-	int y;
-	int width;
-	int height;
+	Rectangle(unsigned int x,unsigned  int y,unsigned int width, unsigned int height) : x(x),y(y),width(width),height(height){};
+	unsigned int x;
+	unsigned int y;
+	unsigned int width;
+	unsigned int height;
 
 	bool operator ==(const Rectangle rhs) const{
 		return (x==rhs.x && y == rhs.y && width==rhs.width && height==rhs.height);

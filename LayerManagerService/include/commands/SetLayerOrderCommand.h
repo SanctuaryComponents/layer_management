@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,19 +25,42 @@
 
 class SetLayerOrderCommand : public Command{
 public:
-	SetLayerOrderCommand(int* array, int length) : Command(SetLayerRenderOrder), array(array), length(length){};
-	int* array;
-	const int length;
+	SetLayerOrderCommand(unsigned int* array, unsigned int length) : Command(SetLayerRenderOrder), array(array), length(length){};
+	unsigned int* array;
+	const unsigned int length;
 
-	virtual void execute(LayerList& layerlist){
+	virtual bool execute(LayerList& layerlist){
+		// check for doubles
+		for (int i=0;i<length;i++)
+			for (int c=0;c<length;c++)
+				if (array[i] == array[c] && i!=c) // doubles not allowed here
+					return false;
+
+// taken out because other software currently expects partial execution of command,
+// i.e. the layers that exist are added to the render order
+
+//		// check that all layers to be added exist
+//		for (unsigned int i=0;i<length;i++){
+//			Layer* l = layerlist.getLayer(array[i]);
+//			if (NULL==l)
+//				return false;
+//		} // TODO insert again later
+
 		layerlist.getCurrentRenderOrder().clear();
-		for (int i=0;i<length;i++){
+		LOG_DEBUG("SetLayerOrderCommand", "Length to set: " << length);
+		bool status = true;
+		for (unsigned int i=0;i<length;i++){
+			LOG_DEBUG("SetLayerOrderCommand", "Trying to add layer: " << array[i] << " to current render order");
 			Layer* l = layerlist.getLayer(array[i]);
 			if ( l != NULL )
 			{
+				LOG_DEBUG("SetLayerOrderCommand", "Adding Layer: " << array[i] << " to current render order");
 				layerlist.getCurrentRenderOrder().push_back(l);
+			}else{
+				status = false;
 			}
 		}
+		return status;
 	};
 };
 

@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,7 +26,7 @@
 class ExitCommand : public Command{
 public:
 	ExitCommand() : Command(Exit){};
-	virtual void execute(LayerList&){};
+	virtual bool execute(LayerList&){return false;};
 };
 
 

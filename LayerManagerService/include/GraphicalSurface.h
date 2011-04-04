@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -61,9 +61,9 @@ public:
 		 */
 		void setDestinationRegion(const Rectangle& newDestination){DestinationViewport = newDestination;};
 
-		void setPosition(const int& x, const int& y){DestinationViewport.x = x; DestinationViewport.y = y;};
+		void setPosition(const unsigned int& x, const unsigned int& y){DestinationViewport.x = x; DestinationViewport.y = y;};
 		Vector2 getPosition(){ return Vector2(DestinationViewport.x,DestinationViewport.y);}
-		void setDimension(const int& width, const int& height){DestinationViewport.width = width; DestinationViewport.height = height;};
+		void setDimension(const unsigned int& width, const unsigned int& height){DestinationViewport.width = width; DestinationViewport.height = height;};
 		const Rectangle& getDestinationRegion(){ return DestinationViewport;};
 		Vector2 getDimension(){ return Vector2(DestinationViewport.width, DestinationViewport.height);};
 private:

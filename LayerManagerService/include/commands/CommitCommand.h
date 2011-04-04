@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,16 +27,20 @@
 class CommitCommand : public Command{
 public:
 	CommitCommand() : Command(CommitChanges){};
-	virtual void execute(LayerList& layerlist){
+	virtual bool execute(LayerList& layerlist){
+		bool statusreturn = true;
 		for (std::list<Command*>::iterator it = layerlist.toBeCommittedList.begin();it!=layerlist.toBeCommittedList.end();it++){
 			Command* c = (*it);
 			if ( c!=NULL )
 			{
-				c->execute(layerlist);
+				bool status = c->execute(layerlist);
+				if (!status)
+					statusreturn = false;
 				delete c;
 			}
 		}
 		layerlist.toBeCommittedList.clear();
+		return statusreturn;
 	};
 };
 

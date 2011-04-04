@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,11 +25,11 @@
 
 class SetOpacityCommand : public Command{
 public:
-	SetOpacityCommand(int id, ObjectType type, double Opacity) : Command(SetOpacity), id(id), type(type), Opacity(Opacity){};
-	const int id;
+	SetOpacityCommand(unsigned int id, ObjectType type, double Opacity) : Command(SetOpacity), id(id), type(type), Opacity(Opacity){};
+	const unsigned int id;
 	const ObjectType type;
 	const double Opacity;
-	virtual void execute(LayerList& layerlist){
+	virtual bool execute(LayerList& layerlist){
 		GraphicalObject* gs;
 			switch(type){
 				case TypeSurface: gs = layerlist.getSurface(id); break;
@@ -42,7 +42,10 @@ public:
 			{
 				LOG_DEBUG("SetOpacityCommand","new opacity " << Opacity << " for id: " <<id);
 				gs->setOpacity(Opacity);
+			}else{
+				return false;
 			}
+			return true;
 		}
 };
 

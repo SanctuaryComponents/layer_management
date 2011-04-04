@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,11 +26,11 @@
 class GetDimensionCommand : public Command{
 public:
 	GetDimensionCommand(int id, ObjectType type, uint* widthRet, uint* heightRet) : Command(GetDimension), id(id), type(type), width(widthRet), height(heightRet){};
-	const int id;
+	const unsigned  id;
 	const ObjectType type;
 	uint* width;
 	uint* height;
-	virtual void execute(LayerList& layerlist){
+	virtual bool execute(LayerList& layerlist){
 			GraphicalSurface* go = NULL;
 			switch(type){
 				case TypeSurface: {go = layerlist.getSurface(id); break;}
@@ -48,7 +48,9 @@ public:
 			} else {
 				*width = 0;
 				*height = 0;
+				return false;
 			}
+			return true;
 		}
 };
 

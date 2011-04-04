@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,13 +25,14 @@
  */
 enum PixelFormat
 {
-	PIXELFORMAT_R8,
-	PIXELFORMAT_RGB888,
-	PIXELFORMAT_RGBA8888,
-	PIXELFORMAT_RGB565,
-	PIXELFORMAT_RGBA5551,
-	PIXELFORMAT_RGBA6661,
-	PIXELFORMAT_RGBA4444
+	PIXELFORMAT_R8=0,
+	PIXELFORMAT_RGB888=1,
+	PIXELFORMAT_RGBA8888=2,
+	PIXELFORMAT_RGB565=3,
+	PIXELFORMAT_RGBA5551=4,
+	PIXELFORMAT_RGBA6661=5,
+	PIXELFORMAT_RGBA4444=6,
+	PIXELFORMAT_UNKNOWN=7
 };
 
 #endif /* _PIXELFORMAT_H_ */
