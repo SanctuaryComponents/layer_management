@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,18 +20,20 @@
 #ifndef _BASEWINDOWSYSTEM_H_
 #define _BASEWINDOWSYSTEM_H_
 
-#include "GraphicSystems/BaseGraphicSystem.h"
 #include "LayerList.h"
 
 class BaseWindowSystem {
 public:
-	BaseWindowSystem(LayerList* layerlist, BaseGraphicSystem* graphicSystem) : graphicSystem(graphicSystem), layerlist(layerlist){};
+	BaseWindowSystem(LayerList* layerlist) : layerlist(layerlist){};
 	virtual ~BaseWindowSystem(){};
-	virtual bool start(int, int, const char*)=0;
+	virtual bool start()=0;
 	virtual void stop()=0;
+	virtual void allocatePlatformSurface(Surface *surface) = 0;
+	virtual void doScreenShot(std::string fileName)=0;
+	virtual void doScreenShotOfLayer(std::string fileName, const uint id)=0;
+	virtual void doScreenShotOfSurface(std::string fileName, const uint id)=0;
 
 protected:
-	BaseGraphicSystem* graphicSystem;
 	LayerList* layerlist;
 };
 

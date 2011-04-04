@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,16 +31,16 @@
 
 int		X11WindowSystem::composite_opcode;
 const char X11WindowSystem::CompositorWindowTitle[] = "LayerManager";
-bool X11WindowSystem::m_success = false;
-bool X11WindowSystem::m_initialized = false;
 
-X11WindowSystem::X11WindowSystem(LayerList* layerlist, BaseGraphicSystem* graphicSystem,GetVisualInfoFunction func) : BaseWindowSystem(layerlist, graphicSystem), getVisualFunc(func), windowWidth(1280), windowHeight(480),resolutionWidth(1280),resolutionHeight(480),debugMode(false){
+X11WindowSystem::X11WindowSystem(const char* displayname, int width, int height, LayerList* layerlist,GetVisualInfoFunction func) : BaseWindowSystem(layerlist), displayname(displayname), getVisualFunc(func), windowWidth(width), windowHeight(height),resolutionWidth(width),resolutionHeight(height),debugMode(false), m_initialized(false), m_success(false), takeScreenshot(ScreenShotNone){
 		LOG_DEBUG("X11WindowSystem", "creating X11WindowSystem");
 
+		// init and take mutex, so windowsystem only does init phase until mutex is released again
+		pthread_mutex_init(&run_lock, NULL);
+		pthread_mutex_lock(&run_lock);
 	};
 
 X11WindowSystem::~X11WindowSystem(){
-	delete graphicSystem;
 }
 
 XVisualInfo* X11WindowSystem::getDefaultVisual(Display *dpy)
@@ -55,24 +55,29 @@ XVisualInfo* X11WindowSystem::getDefaultVisual(Display *dpy)
 		return windowVis;
 	};
 
-void X11WindowSystem::OpenDisplayConnection(){
-	x11Display = XOpenDisplay(NULL);
+bool X11WindowSystem::OpenDisplayConnection(){
+	x11Display = XOpenDisplay(":0");
 	if (!x11Display)
 	{
 		LOG_ERROR("X11WindowSystem", "Couldn't open default display!");
+		return false;
 	}
+	LOG_DEBUG("X11WindowSystem", "Display connection: " << x11Display);
+	return true;
 }
 
-void X11WindowSystem::checkForCompositeExtension(){
+bool X11WindowSystem::checkForCompositeExtension(){
 	if (!XQueryExtension (x11Display, COMPOSITE_NAME, &composite_opcode,
 				&composite_event, &composite_error))
 	{
 		LOG_ERROR("X11WindowSystem", "No composite extension");
+		return false;
 	}
 	XCompositeQueryVersion (x11Display, &composite_major, &composite_minor);
 	LOG_DEBUG("X11WindowSystem", "Found composite extension: composite opcode: " << composite_opcode);
 	LOG_DEBUG("X11WindowSystem", "composite_major: " << composite_major);
 	LOG_DEBUG("X11WindowSystem", "composite_minor: " << composite_minor);
+	return true;
 }
 
 void X11WindowSystem::printDebug(int posx,int posy){
@@ -120,8 +125,8 @@ bool X11WindowSystem::isWindowValid(Window w){
 Surface* X11WindowSystem::getSurfaceForWindow(Window w){
 	LOG_DEBUG("X11WindowSystem", "finding surface for window " << w);
 	// go though all surfaces
-	const std::map<int,Surface*> surfaces = layerlist->getAllSurfaces();
-	for(std::map<int, Surface*>::const_iterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++){
+	const std::map<unsigned int,Surface*> surfaces = layerlist->getAllSurfaces();
+	for(std::map<unsigned int, Surface*>::const_iterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++){
 		Surface* currentSurface = (*currentS).second;
 		LOG_DEBUG("X11WindowSystem", "CurrentSurface surface for window " << currentSurface->getID());
                 LOG_DEBUG("X11WindowSystem", "CurrentSurface nativeHandle " << currentSurface->nativeHandle);
@@ -141,7 +146,6 @@ void X11WindowSystem::configureSurfaceWindow(Window w){
 		LOG_DEBUG("X11WindowSystem", "Updating window " << w);
 		UnMapWindow(w);
 		MapWindow(w);
-		LOG_INFO("X11WindowSystem","after map 1");
 		XWindowAttributes att;
 		status = XGetWindowAttributes (x11Display, w, &att);
 		int winWidth = att.width;
@@ -385,6 +389,13 @@ bool X11WindowSystem::CreateCompositorWindow()
 				0, windowVis->depth, InputOutput,
 				windowVis->visual, CWBorderPixel | CWColormap | CWEventMask | CWOverrideRedirect, &attr);
 
+	//	Screen* s = ScreenOfDisplay( x11Display, 0 );
+	//	CompositorWindow = XCreateSimpleWindow( x11Display,
+	//	                                                         RootWindowOfScreen(s),
+	//	                                                         0, 0, windowWidth, windowHeight, 0,
+	//	                                                         BlackPixelOfScreen(s),
+	//	                                                         WhitePixelOfScreen(s) );
+	//
 	if (!CompositorWindow)
 	{
 		LOG_ERROR("X11WindowSystem", "Could not create window");
@@ -406,6 +417,7 @@ bool X11WindowSystem::CreateCompositorWindow()
 	XSetStandardProperties(x11Display, CompositorWindow, CompositorWindowTitle, CompositorWindowTitle,
 			None, (char **)NULL, 0, &sizehints);
 	XMapRaised(x11Display, CompositorWindow);
+	XFlush(x11Display);
 	return result;
 }
 
@@ -427,41 +439,65 @@ void CalculateFPS() {
 		prevTime = TimeCounter; } }
 
 void
+X11WindowSystem::RedrawAllLayers()
+{
+	std::list<Layer*> layers = layerlist->getCurrentRenderOrder();
+	for(std::list<Layer*>::const_iterator current = layers.begin(); current != layers.end(); current++)
+	  {
+		Layer* currentLayer = (Layer*)*current;
+		graphicSystem->beginLayer(currentLayer);
+		graphicSystem->renderLayer();
+		graphicSystem->endLayer();
+	  }
+}
+
+void
 X11WindowSystem::Redraw()
 {
 	// draw all the layers
 	graphicSystem->clearBackground();
 	/*LOG_INFO("X11WindowSystem","Locking List");*/
 	layerlist->lockList();
-	std::list<Layer*> layers = layerlist->getCurrentRenderOrder();
-	for(std::list<Layer*>::const_iterator current = layers.begin(); current != layers.end(); current++)
-	  {
-		Layer* currentLayer = (Layer*)*current;
-		if ((*currentLayer).visibility && (*currentLayer).opacity>0.0f)
-		  {
-                        /*LOG_INFO("X11WindowSystem","Draw Layer " << currentLayer->getID());*/
-			std::list<Surface*> surfaces = currentLayer->surfaces;
-			for(std::list<Surface*>::const_iterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++)
-			  {
-                                /*LOG_INFO("X11WindowSystem","Surface to draw " << (*currentS)->getID());*/
-                                if ((*currentS)->visibility && (*currentS)->opacity>0.0f)
-                                  {
-					Surface* currentSurface = (Surface*)*currentS;
-					XPlatformSurface* nativeSurface = (XPlatformSurface*)currentSurface->platform;
-					if (NULL==nativeSurface)
-					{
-						/*LOG_INFO("X11WindowSystem","creating native surface for new window");*/
-						// this surface does not have a native platform surface attached yet!
-						NewWindow(currentSurface,currentSurface->nativeHandle);
-						MapWindow(currentSurface->nativeHandle);
-					}
-					/*LOG_INFO("X11WindowSystem","Drawing Layer begin");*/
-					graphicSystem->drawSurface(currentLayer,currentSurface);
-					/*LOG_INFO("X11WindowSystem","Drawing Layer end");*/
-                                  }
-			  }
-		  }
-	  }
+
+	// check if we are supposed to take screenshot
+	if (takeScreenshot!=ScreenShotNone){
+		if (takeScreenshot==ScreenshotOfDisplay){
+		LOG_DEBUG("X11WindowSystem", "Taking screenshot");
+			RedrawAllLayers();
+		}else if(takeScreenshot==ScreenshotOfLayer){
+			LOG_DEBUG("X11WindowSystem", "Taking screenshot of layer");
+			Layer* currentLayer = layerlist->getLayer(screenShotID);
+			if (currentLayer!=NULL){
+				graphicSystem->beginLayer(currentLayer);
+				graphicSystem->renderLayer();
+				graphicSystem->endLayer();
+			}
+		}else if(takeScreenshot==ScreenshotOfSurface){
+			LOG_DEBUG("X11WindowSystem", "Taking screenshot of surface");
+			Surface* currentSurface = layerlist->getSurface(screenShotID);
+			if (NULL!=currentSurface){
+				Layer* l = layerlist->createLayer(GraphicalObject::INVALID_ID);
+				l->setOpacity(1.0);
+				l->setDestinationRegion(currentSurface->getDestinationRegion());
+				l->setSourceRegion(currentSurface->getSourceRegion());
+				graphicSystem->beginLayer(l);
+				graphicSystem->renderSurface(currentSurface);
+				graphicSystem->endLayer();
+				layerlist->removeLayer(l);
+				// layer is deleted in removeLayer.
+			}else{
+				LOG_ERROR("X11WindowSystem", "Could not take screenshot of non existing surface");
+			}
+		}
+
+		graphicSystem->saveScreenShotOfFramebuffer(screenShotFile);
+//		graphicSystem->swapBuffers();
+		takeScreenshot = ScreenShotNone;
+		LOG_DEBUG("X11WindowSystem", "Done taking screenshot");
+	}
+
+	RedrawAllLayers();
+
 	if (debugMode)
 	{
 		printDebug(200,windowHeight-40);
@@ -472,7 +508,7 @@ X11WindowSystem::Redraw()
 	sprintf(floatStringBuffer, "FPS: %f", FPS);
 	if ((Frame % 1000 ) == 0)
 	{
-		LOG_INFO("X11WindowSystem",floatStringBuffer);
+		LOG_DEBUG("X11WindowSystem",floatStringBuffer);
 	}
        layerlist->unlockList();
        /*LOG_INFO("X11WindowSystem","UnLocking List");*/
@@ -488,7 +524,7 @@ X11WindowSystem::error (Display *dpy, XErrorEvent *ev)
 	if (ev->request_code == composite_opcode &&
 			ev->minor_code == X_CompositeRedirectWindow)
 	{
-		LOG_ERROR("X11WindowSystem", "Another composite manager is already running!");
+		LOG_ERROR("X11WindowSystem", "Maybe another composite manager is already running");
 	}
 
 	if (name == NULL)
@@ -501,46 +537,6 @@ X11WindowSystem::error (Display *dpy, XErrorEvent *ev)
 	LOG_ERROR("X11WindowSystem", "X Error: " << (int)ev->error_code << " " << name << " request : " << (int)ev->request_code << " minor: " <<  (int)ev->minor_code << " serial: " << (int)ev->serial);
 	return 0;
 }
-
-//void X11WindowSystem::setDisplayMode(){
-//	XF86VidModeModeInfo **modes;
-//	int modeNum;
-//	int bestMode = -1;
-//	LOG_DEBUG("X11WindowSystem", "trying for fullscreen mode " << resolutionWidth << "  " << resolutionHeight);
-//	XF86VidModeGetAllModeLines(x11Display, 0, &modeNum, &modes);
-//	LOG_DEBUG("X11WindowSystem", "found " << modeNum << " modes");
-//	/* look for mode with requested resolution */
-//	for (int i = 0; i < modeNum; i++)
-//		if ((modes[i]->hdisplay == resolutionWidth) && (modes[i]->vdisplay == resolutionHeight))
-//			bestMode = i;
-//	if (bestMode==-1){
-//		int bestHeight = 0;
-//		for (int i = 0; i < modeNum; i++)
-//			if (modes[i]->hdisplay == resolutionWidth && modes[i]->vdisplay >= bestHeight){
-//				bestMode = i;
-//				bestHeight = modes[i]->vdisplay;
-//			}
-//	}
-//	if (bestMode>=0){
-//		LOG_DEBUG("X11WindowSystem", "changing mode to "<< modes[bestMode]->hdisplay << "  " << modes[bestMode]->vdisplay );
-//		XF86VidModeSwitchToMode(x11Display, 0, modes[bestMode]);
-//		XF86VidModeSetViewPort(x11Display, 0, 0, 0);
-//
-//	}else{
-//		LOG_ERROR("X11WindowSystem", "could not find appropriate mode!");
-//		// take last mode, its probably the highest resolution
-//		resolutionWidth = modes[modeNum-1]->hdisplay;
-//		resolutionHeight = modes[modeNum-1]->vdisplay;
-//		windowWidth = resolutionWidth;
-//		if (windowHeight>resolutionHeight)
-//			windowHeight = resolutionHeight;
-//		XF86VidModeSwitchToMode(x11Display, 0, modes[modeNum-1]);
-//		XF86VidModeSetViewPort(x11Display, 0, 0, 0);
-//	}
-//	LOG_DEBUG("X11WindowSystem", "Set the mode");
-//	LOG_DEBUG("X11WindowSystem", "mode: " << resolutionWidth << "x" << resolutionHeight);
-//	LOG_DEBUG("X11WindowSystem", "renderwindow: " << windowWidth << "x" << windowHeight);
-//}
 
 bool X11WindowSystem::initXServer()
 {
@@ -556,72 +552,53 @@ bool X11WindowSystem::initXServer()
 
 	LOG_DEBUG("X11WindowSystem", "Compositor Window ID: " << CompositorWindow);
 
-	//	LOG_DEBUG("X11WindowSystem", "Allocate Pixmaps for all the offscreen windows");
 	CreatePixmapsForAllWindows();
-	//	LOG_DEBUG("X11WindowSystem", "Allocated Pixmaps");
-
 	//unredirect our window
 #ifdef FULLSCREEN
 	XCompositeUnredirectWindow(x11Display,background,CompositeRedirectManual);
 #endif
 	XCompositeUnredirectWindow(x11Display,CompositorWindow,CompositeRedirectManual);
 
-	//unredirect special windows if present
-	/*XGrabServer (x11Display);
-	unsigned int numberOfWindows = 0;
-	Window *children = getListOfAllTopLevelWindows(x11Display,&numberOfWindows);
-	LOG_DEBUG("X11WindowSystem", "unredirecting special windows");
-	for (unsigned int i=0;i<numberOfWindows;i++){
-		Window w = (Window) children[i];
-		char* name;
-		int status = XFetchName(x11Display, w, &name);
-		if (status >= Success)
-		{
-			char GuiTitle[]  = "Layermanager Remote GUI\0";
-			char DFEETTITLE[] = "D-Feet D-Bus debugger\0";
-			if (name != NULL && (strcmp(name,GuiTitle)==0 || strcmp(name,DFEETTITLE)==0 ) ){
-				LOG_DEBUG("X11WindowSystem", "Found gui window: repositioning it");
-				XCompositeUnredirectWindow(x11Display,w,CompositeRedirectManual);
-				XCompositeUnredirectSubwindows(x11Display,w,CompositeRedirectAutomatic);
-				XMoveWindow(x11Display, w, 50,	500);
-				XMapRaised(x11Display, w);
-			}
-		}
-		XFree(name);
-	}
-	XFree(children);
-	XUngrabServer (x11Display);
-	XSync(x11Display, 0);
-*/
 	LOG_DEBUG("X11WindowSystem", "Initialised XServer connection");
 	return result;
 }
 
 void* X11WindowSystem::EventLoop(void * ptr)
 {
+	// INITALIZATION
 	LOG_DEBUG("X11WindowSystem", "Enter thread");
+
+	bool status = true;
+
 	X11WindowSystem *windowsys = (X11WindowSystem *) ptr;
-
+	XSetErrorHandler(error);
 	// init own stuff
-	m_success = false;
+	LOG_DEBUG("X11WindowSystem", "open display connection");
+	status &= windowsys->OpenDisplayConnection();
 
-	windowsys->OpenDisplayConnection();
-	windowsys->checkForCompositeExtension();
-	windowsys->initXServer();
+	LOG_DEBUG("X11WindowSystem", "check for composite extension");
+	status &= windowsys->checkForCompositeExtension();
 
-	// then init graphiclib
-	m_success = windowsys->graphicSystem->init(&windowsys->x11Display,&windowsys->CompositorWindow,windowsys->windowHeight,windowsys->windowWidth);
-	m_initialized = true;
+	LOG_DEBUG("X11WindowSystem", "init xserver");
+	status &= windowsys->initXServer();
 
+	status &= windowsys->graphicSystem->init(windowsys->x11Display,windowsys->CompositorWindow);
+
+	windowsys->m_success = status;
+	windowsys->m_initialized = true;
+
+	// Done with init, wait for lock to actually run (ie start/stop method called)
+	pthread_mutex_lock(&windowsys->run_lock);
+
+	LOG_DEBUG("X11WindowSystem", "Starting Event loop");
 	Layer* defaultLayer;
 
 	// run the main event loop while rendering
-	windowsys->m_running = m_success;
 	gettimeofday(&tv0, NULL);
 	FramesPerFPS = 30;
 	if (windowsys->debugMode)
 	{
-		defaultLayer = windowsys->layerlist->createLayer(-1);
+		defaultLayer = windowsys->layerlist->createLayer(0);
 		defaultLayer->setOpacity(1.0);
 		defaultLayer->setDestinationRegion(Rectangle(0,0,windowsys->resolutionWidth,windowsys->resolutionHeight));
 		defaultLayer->setSourceRegion(Rectangle(0,0,windowsys->resolutionWidth,windowsys->resolutionHeight));
@@ -639,7 +616,7 @@ void* X11WindowSystem::EventLoop(void * ptr)
 				if (windowsys->debugMode)
 				{
 					LOG_DEBUG("X11WindowSystem", "CreateNotify Event");
-					Surface* s = windowsys->layerlist->createSurface(-1);
+					Surface* s = windowsys->layerlist->createSurface(0);
 					s->setOpacity(1.0);
 					windowsys->NewWindow(s, event.xcreatewindow.window);
 					defaultLayer->addSurface(s);
@@ -696,33 +673,68 @@ void X11WindowSystem::cleanup(){
 	XCompositeUnredirectSubwindows(x11Display,root,CompositeRedirectManual);
 	XDestroyWindow(x11Display,CompositorWindow);
 	XCloseDisplay(x11Display);
-	m_initialized = false;
 	m_running = false;
 }
 
-
-bool X11WindowSystem::start(int displayWidth, int displayHeight, const char* DisplayName){
-	LOG_INFO("X11WindowSystem", "Starting / Creating thread");
+bool X11WindowSystem::init(BaseGraphicSystem<Display*,Window>* base){
 	X11WindowSystem *renderer = this;
-	resolutionWidth = displayWidth;
-	resolutionHeight = displayHeight;
+	graphicSystem = base;
 	int status = pthread_create( &renderThread, NULL, X11WindowSystem::EventLoop, (void*) renderer);
 	if (0 != status )
 	{
 		return false;
 	}
+
 	while ( m_initialized == false )
 	{
-		usleep(50000);
+		usleep(10000);
 		LOG_INFO("X11WindowSystem","Waiting start complete " << m_initialized);
 	}
 	LOG_INFO("X11WindowSystem","Start complete " << m_initialized << " success " << m_success);
 	return m_success;
 }
 
+bool X11WindowSystem::start(){
+	LOG_INFO("X11WindowSystem", "Starting / Creating thread");
+	// let thread actually run
+	this->m_running = true;
+	pthread_mutex_unlock(&run_lock);
+	return true;
+}
+
 void X11WindowSystem::stop(){
 	LOG_INFO("X11WindowSystem","Stopping..");
 	this->m_running = false;
+	// needed if start was never called, we wake up thread, so it can immediatly finish
+	pthread_mutex_unlock(&run_lock);
 	pthread_join(renderThread,NULL);
 }
 
+void X11WindowSystem::allocatePlatformSurface(Surface* surface)
+{
+	XPlatformSurface* nativeSurface = (XPlatformSurface*)surface->platform;
+	if (NULL == nativeSurface)
+	{
+		/*LOG_INFO("X11WindowSystem","creating native surface for new window");*/
+		// this surface does not have a native platform surface attached yet!
+		NewWindow(surface,surface->nativeHandle);
+		MapWindow(surface->nativeHandle);
+	}
+}
+
+void X11WindowSystem::doScreenShot(std::string fileName){
+	takeScreenshot = ScreenshotOfDisplay;
+	screenShotFile = fileName;
+}
+
+void X11WindowSystem::doScreenShotOfLayer(std::string fileName, const uint id){
+	takeScreenshot = ScreenshotOfLayer;
+	screenShotFile = fileName;
+	screenShotID = id;
+}
+
+void X11WindowSystem::doScreenShotOfSurface(std::string fileName, const uint id){
+	takeScreenshot = ScreenshotOfSurface;
+	screenShotFile = fileName;
+	screenShotID = id;
+}

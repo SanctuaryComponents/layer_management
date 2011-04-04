@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,18 +27,6 @@
 #include <string.h>
 #include <unistd.h>
 #include <iomanip>
-
-
-int NullWindowSystem::windowWidth= 1280;
-
-
-int NullWindowSystem::windowHeight= 480;
-
-
-int NullWindowSystem::resolutionWidth= 1280;
-
-
-int NullWindowSystem::resolutionHeight= 480;
 
 
 bool NullWindowSystem::m_initialized= false;

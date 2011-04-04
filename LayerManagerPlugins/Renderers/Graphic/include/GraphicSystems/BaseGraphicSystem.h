@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,20 +21,29 @@
 #define _BASEGRAPHICSYSTEM_H_
 
 #include "TextureBinders/ITextureBinder.h"
+#include "WindowSystems/BaseWindowSystem.h"
 #include "PlatformSurface.h"
 #include "Surface.h"
 #include "Layer.h"
 
+template <class DisplayType, class WindowType>
 class BaseGraphicSystem {
 public:
+	virtual bool init(DisplayType display, WindowType window)=0;
 	virtual ~BaseGraphicSystem(){};
-	virtual bool init(void* display, void* WindowID,int WindowHeight, int WindowWidth)=0;
-	virtual void drawSurface(Layer*,Surface*)=0;
+	virtual void setBaseWindowSystem(BaseWindowSystem* windowSystem){m_baseWindowSystem = windowSystem;};
+	virtual void beginLayer(Layer* layer) = 0;
+	virtual void renderLayer() = 0;
+	virtual void endLayer() = 0;
+
 	virtual void clearBackground()=0;
 	virtual void swapBuffers()=0;
-	virtual void doScreenShot(std::string fileToSave)=0;
+	virtual void saveScreenShotOfFramebuffer(std::string fileToSave)=0;
+	void setTextureBinder(ITextureBinder* binder){m_binder=binder;};
 	ITextureBinder* m_binder;
-
+	virtual void renderSurface(Surface*)=0;
+protected:
+	BaseWindowSystem* m_baseWindowSystem;
 };
 
 #endif /* _BASEGRAPHICSYSTEM_H_ */

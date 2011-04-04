@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,26 +24,29 @@
 #include "PlatformSurfaces/GLXPlatformSurface.h"
 #include "Log.h"
 
-class GLXGraphicsystem : public BaseGraphicSystem {
+class GLXGraphicsystem : public BaseGraphicSystem<Display*, Window> {
 public:
-	GLXGraphicsystem();
+	GLXGraphicsystem( int WindowHeight, int WindowWidth);
 	virtual ~GLXGraphicsystem();
 	static XVisualInfo* ChooseWindowVisual(Display *dpy);
-	bool init(void* display, void* WindowID,int WindowHeight, int WindowWidth);
+	bool init(Display* x11Display, Window x11Window);
+
+	void beginLayer(Layer* layer);
+	void renderLayer();
+	void endLayer();
+
 	void clearBackground();
 	void swapBuffers();
-	void drawSurface(Layer* currentLayer, Surface* currentSurface);
-	void doScreenShot(std::string fileToSave);
+	void saveScreenShotOfFramebuffer(std::string fileToSave);
+	static GLXFBConfig ChoosePixmapFBConfig(Display *display);
+	void renderSurface(Surface* currentSurface);
 
 private:
-	void saveScreenShot();
-	std::string screenShotFile;
-	bool takescreenshot;
-	static GLXFBConfig ChoosePixmapFBConfig(Display *display);
 	int windowWidth;
 	int windowHeight;
 	Display* x11disp;
-	Window window;
+	Window 	window;
+	Layer*	m_currentLayer;
 };
 
 #endif /* _GLXGRAPHICSYSTEM_H_ */

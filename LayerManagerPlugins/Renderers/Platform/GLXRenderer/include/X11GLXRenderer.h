@@ -22,15 +22,26 @@
 
 #include "LayerList.h"
 #include "BaseRenderer.h"
-#include "GraphicSystems/BaseGraphicSystem.h"
+#include "GraphicSystems/GLXGraphicsystem.h"
+#include "WindowSystems/X11WindowSystem.h"
 
 class X11GLXRenderer : public BaseRenderer {
 public:
 	X11GLXRenderer(LayerList* layerlist);
 	virtual ~X11GLXRenderer();
 	void doScreenShot(std::string fileToSave);
+	void doScreenShotOfLayer(std::string fileToSave, uint id);
+	void doScreenShotOfSurface(std::string fileToSave, uint id);
+	uint getNumberOfHardwareLayers(uint screenID);
+	uint* getScreenResolution(uint screenID);
+	uint* getScreenIDs(uint* length);
+	bool start(int, int, const char*);
+	void stop();
 private:
-	BaseGraphicSystem* graphicSys;
+	X11WindowSystem*  m_windowSystem;
+	GLXGraphicsystem* m_graphicSystem;
+	uint m_width;
+	uint m_height;
 };
 
 #endif /* X11GLXRENDERER_H_ */

@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,8 +25,9 @@
 #include "PlatformSurfaces/EglXPlatformSurface.h"
 #include "Log.h"
 
-	X11EglImage::X11EglImage(Display* x11display) : m_x11display(x11display){
-		LOG_INFO("X11EglImage", "Query EGL Extensions ...");
+	X11EglImage::X11EglImage(EGLDisplay eglDisplay, Display* x11display) : m_eglDisplay(eglDisplay), m_x11display(x11display){
+		// pseudo require EGL to have been initialised
+		// we dont really need the EGL handle as such
 
 		m_pfGLEglImageTargetTexture2DOES = (PFNGLEGLIMAGETARGETTEXTURE2DOESPROC)
 			eglGetProcAddress("glEGLImageTargetTexture2DOES");
@@ -40,17 +41,18 @@
 			LOG_ERROR("X11EglImage", "Query EGL Extensions failed");
 		}
 
-		m_eglDisplay = eglGetDisplay((EGLNativeDisplayType)m_x11display);
 	}
 	void X11EglImage::bindSurfaceTexture(Surface*s){
 		EglXPlatformSurface* nativeSurface = (EglXPlatformSurface*)s->platform;
-		glBindTexture(GL_TEXTURE_2D, nativeSurface->texture);
-		if (nativeSurface->eglImage != NULL){
-			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,     GL_CLAMP_TO_EDGE);
-			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,     GL_CLAMP_TO_EDGE);
-			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			m_pfGLEglImageTargetTexture2DOES(GL_TEXTURE_2D, nativeSurface->eglImage);
+		if (NULL!=nativeSurface){
+			glBindTexture(GL_TEXTURE_2D, nativeSurface->texture);
+			if (nativeSurface->eglImage != NULL){
+				glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,     GL_CLAMP_TO_EDGE);
+				glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,     GL_CLAMP_TO_EDGE);
+				glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+				glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+				m_pfGLEglImageTargetTexture2DOES(GL_TEXTURE_2D, nativeSurface->eglImage);
+			}
 		}
 	}
 
@@ -59,31 +61,33 @@
 	}
 
 	void X11EglImage::createClientBuffer(Surface* surface){
-		LOG_DEBUG("X11EglImage", "creating client buffer");
+		LOG_DEBUG("X11EglImage", "creating client buffer with native display: " << m_x11display << " for native handle: " << surface->nativeHandle);
 		EglXPlatformSurface* nativeSurface = (EglXPlatformSurface*)surface->platform;
-		Pixmap windowPixmap = 0;
-		windowPixmap= XCompositeNameWindowPixmap (m_x11display, surface->nativeHandle);
-		if (windowPixmap==0)
-			LOG_ERROR("X11EglImage", "didnt create pixmap!");
+		if (NULL!=nativeSurface){
+			Pixmap windowPixmap = 0;
+			windowPixmap= XCompositeNameWindowPixmap (m_x11display, surface->nativeHandle);
+			if (windowPixmap==0)
+				LOG_ERROR("X11EglImage", "didnt create pixmap!");
 
-		EGLImageKHR eglImage = 0;
-		LOG_DEBUG("X11EglImage", "creating EGL Image from client buffer");
-		if (nativeSurface->eglImage != NULL)
-		{
-			m_pfEglDestroyImageKHR(m_eglDisplay, nativeSurface->eglImage);
-			glDeleteTextures(1,&nativeSurface->texture);
-		}
-		eglImage = m_pfEglCreateImageKHR(m_eglDisplay,
-									 EGL_NO_CONTEXT,
-									 EGL_NATIVE_PIXMAP_KHR,
-									 (EGLClientBuffer)windowPixmap,
-									 NULL);
-		if (eglImage == 0)
-		{
-			LOG_DEBUG("X11EglImage", "could not allocate EGL Image for window");
-		} else {
-			nativeSurface->eglImage = eglImage;
-			glGenTextures(1,&nativeSurface->texture);
+			EGLImageKHR eglImage = 0;
+			LOG_DEBUG("X11EglImage", "creating EGL Image from client buffer");
+			if (nativeSurface->eglImage != NULL)
+			{
+				m_pfEglDestroyImageKHR(m_eglDisplay, nativeSurface->eglImage);
+				glDeleteTextures(1,&nativeSurface->texture);
+			}
+			eglImage = m_pfEglCreateImageKHR(m_eglDisplay,
+										 EGL_NO_CONTEXT,
+										 EGL_NATIVE_PIXMAP_KHR,
+										 (EGLClientBuffer)windowPixmap,
+										 NULL);
+			if (eglImage == 0)
+			{
+				LOG_DEBUG("X11EglImage", "could not allocate EGL Image for window");
+			} else {
+				nativeSurface->eglImage = eglImage;
+				glGenTextures(1,&nativeSurface->texture);
+			}
 		}
 	}
 
@@ -96,7 +100,6 @@
 		if (nativeSurface != NULL && nativeSurface->eglImage != NULL )
 		{
 		      m_pfEglDestroyImageKHR(m_eglDisplay, nativeSurface->eglImage);
-	              glDeleteTextures(1,&nativeSurface->texture);
+			  glDeleteTextures(1,&nativeSurface->texture);
 		}
-		glDeleteTextures(1,&nativeSurface->texture);
 	}

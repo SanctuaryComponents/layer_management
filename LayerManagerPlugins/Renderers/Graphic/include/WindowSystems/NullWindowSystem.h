@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,7 +26,7 @@
 
 class NullWindowSystem : public BaseWindowSystem {
 public:
-	NullWindowSystem(LayerList* layerlist, BaseGraphicSystem* graphicSystem) : BaseWindowSystem(layerlist, graphicSystem){
+	NullWindowSystem(LayerList* layerlist,int width, int height) : BaseWindowSystem(layerlist), windowWidth(width), windowHeight(height),resolutionWidth(width),resolutionHeight(height){
 		LOG_DEBUG("NullWindowSystem", "creating BeagleWindowSystem");
 	};
 	bool start(int, int, const char*);
@@ -45,8 +45,8 @@ private:
 	void Redraw();
 	void printDebug(int posx,int posy);
 	static bool debugMode;
-	static int resolutionWidth;
-	static int resolutionHeight;
+	int resolutionWidth;
+	int resolutionHeight;
 };
 
 #endif /* _NULLWINDOWSYSTEM_H_ */

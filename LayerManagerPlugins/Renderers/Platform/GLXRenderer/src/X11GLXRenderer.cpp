@@ -21,25 +21,81 @@
 #include "GraphicSystems/GLXGraphicsystem.h"
 #include "WindowSystems/X11WindowSystem.h"
 #include "Log.h"
+#include <string.h>
 
-X11GLXRenderer::X11GLXRenderer(LayerList* layerlist) : BaseRenderer(layerlist), graphicSys(NULL){
-	LOG_DEBUG("X11GLXRenderer", "creating X11GLXRenderer");
-	graphicSys = new GLXGraphicsystem();
-	m_windowSystem = new X11WindowSystem(layerlist, graphicSys, GLXGraphicsystem::ChooseWindowVisual);
+X11GLXRenderer::X11GLXRenderer(LayerList* layerlist) : BaseRenderer(layerlist){
 };
+
+bool X11GLXRenderer::start(int width, int height, const char* displayname){
+	LOG_DEBUG("X11GLXRenderer", "creating X11GLXRenderer");
+	m_width = width;
+	m_height = height;
+
+	// create X11 windows, register as composite manager etc
+	m_windowSystem  = new X11WindowSystem(displayname, width, height, m_layerlist, GLXGraphicsystem::ChooseWindowVisual);
+	m_graphicSystem = new GLXGraphicsystem(width, height);
+	m_graphicSystem->setBaseWindowSystem(m_windowSystem);
+
+	LOG_DEBUG("X11GLXRenderer", "init windowsystem");
+	m_windowSystem->init(m_graphicSystem );
+
+	Display* x11Display = m_windowSystem->getNativeDisplayHandle();
+	if (NULL==x11Display)
+		LOG_ERROR("GLXGraphicsystem", "Display from windowsystem is null");
+
+	m_windowSystem->start();
+}
+
+void X11GLXRenderer::stop(){
+	m_windowSystem->stop();
+}
 
 X11GLXRenderer::~X11GLXRenderer() {
 	delete m_windowSystem;
 };
 
 void X11GLXRenderer::doScreenShot(std::string fileToSave){
-	graphicSys->doScreenShot(fileToSave);
+	m_windowSystem->doScreenShot(fileToSave);
 }
 
-extern "C" IRenderer* createX11Renderer(LayerList* layerlist) {
+void X11GLXRenderer::doScreenShotOfLayer(std::string fileToSave,uint id){
+	m_windowSystem->doScreenShotOfLayer(fileToSave,id);
+}
+
+void X11GLXRenderer::doScreenShotOfSurface(std::string fileToSave, uint id){
+	m_windowSystem->doScreenShotOfSurface(fileToSave,id);
+}
+
+uint X11GLXRenderer::getNumberOfHardwareLayers(uint screenID){
+	return 0;
+	// TODO
+}
+
+uint* X11GLXRenderer::getScreenResolution(uint screenID){
+	uint * resolution = new uint[2];
+	resolution[0] = m_width;
+	resolution[1] = m_height;
+	return resolution;
+}
+
+uint* X11GLXRenderer::getScreenIDs(uint* length){
+	Display* x11Display = m_windowSystem->getNativeDisplayHandle();
+	if (!x11Display)
+		return NULL;
+	// Screens in X11 can be addresses/accessed by just the number - we must only know how many there are
+	uint numberOfScreens = ScreenCount(x11Display);
+	uint* screenIDS = new uint[numberOfScreens];
+	for (int i = 0;i<numberOfScreens;i++){
+		screenIDS[i] = i;
+	}
+	*length = numberOfScreens;
+	return screenIDS;
+}
+
+extern "C" IRenderer* createX11GLXRenderer(LayerList* layerlist) {
 	return new X11GLXRenderer(layerlist);
 }
 
-extern "C" void destroyX11Renderer(X11GLXRenderer* p) {
+extern "C" void destroyX11GLXRenderer(X11GLXRenderer* p) {
 	delete p;
 }

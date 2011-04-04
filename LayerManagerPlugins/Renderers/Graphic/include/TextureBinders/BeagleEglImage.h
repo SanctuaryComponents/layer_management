@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,7 +30,7 @@
 
 class BeagleEglImage : public ITextureBinder {
 public:
-	BeagleEglImage(){
+	BeagleEglImage(EGLDisplay eglDisplay) : m_eglDisplay(eglDisplay){
 		LOG_INFO("BeagleEglImage", "Query EGL Extensions ...");
 		CMEM_init();
 		m_pfGLEglImageTargetTexture2DOES = (PFNGLEGLIMAGETARGETTEXTURE2DOESPROC)
@@ -45,7 +45,6 @@ public:
 			LOG_ERROR("BeagleEglImage", "Query EGL Extensions failed");
 		}
 
-		m_eglDisplay = eglGetDisplay(0);
 	}
 	void bindSurfaceTexture(Surface*s){
 		//		LOG_INFO("BeagleEglImage", "bindSurfaceTexture");

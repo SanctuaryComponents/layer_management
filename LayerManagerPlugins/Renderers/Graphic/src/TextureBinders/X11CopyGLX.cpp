@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,17 +27,30 @@
 void X11CopyGLX::bindSurfaceTexture(Surface* surface){
 	XPlatformSurface* nativeSurface = (XPlatformSurface*)surface->platform;
 	Pixmap p = 0;
-	p= XCompositeNameWindowPixmap (dpy, surface->nativeHandle);
+	GLenum targetType = GL_BGRA;
+	GLenum sourceType = GL_RGBA;
+
+	p = XCompositeNameWindowPixmap (dpy, surface->nativeHandle);
 	if (p==0)
+	{
 		LOG_ERROR("X11CopyGLX", "didnt create pixmap!");
+		return;
+	}
 	nativeSurface->pixmap = p;
 	XImage * xim = XGetImage(dpy, nativeSurface->pixmap, 0, 0, surface->OriginalSourceWidth, surface->OriginalSourceHeight, AllPlanes, ZPixmap);
-	glBindTexture(GL_TEXTURE_2D, nativeSurface->texture);
-	 glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	 glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	 glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 320,240, 0, GL_RGBA, GL_UNSIGNED_BYTE, xim->data);
-	 XDestroyImage(xim);
+	if ( xim != NULL )
+	{
+		glBindTexture(GL_TEXTURE_2D, nativeSurface->texture);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		if ( xim->depth == 24 )
+		{
+			targetType = GL_BGR;
+			sourceType = GL_RGB;
+		}
+		glTexImage2D(GL_TEXTURE_2D, 0, sourceType, surface->OriginalSourceWidth, surface->OriginalSourceHeight, 0, targetType, GL_UNSIGNED_BYTE, xim->data);
+		XDestroyImage(xim);
+	}
 }
 
 void X11CopyGLX::createClientBuffer(Surface*s){

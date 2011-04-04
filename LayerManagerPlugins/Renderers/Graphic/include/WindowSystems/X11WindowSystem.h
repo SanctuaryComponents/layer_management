@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,29 +19,43 @@
 
 #ifndef _X11WINDOWSYSTEM_H_
 #define _X11WINDOWSYSTEM_H_
-
 #include "WindowSystems/BaseWindowSystem.h"
+#include "GraphicSystems/BaseGraphicSystem.h"
 #include "X11/Xlib.h"
 #include "Surface.h"
 #include "PlatformSurfaces/XPlatformSurface.h"
 #include <X11/Xutil.h>
 #include "Log.h"
+#include "ScreenShotType.h"
 
 typedef XVisualInfo* (*GetVisualInfoFunction)(Display *dpy);
 
 class X11WindowSystem : public BaseWindowSystem {
 public:
-	X11WindowSystem(LayerList* layerlist, BaseGraphicSystem* graphicSystem,GetVisualInfoFunction func=X11WindowSystem::getDefaultVisual );
+	X11WindowSystem(const char* displayname, int width, int height, LayerList* layerlist, GetVisualInfoFunction func=X11WindowSystem::getDefaultVisual );
 	virtual ~X11WindowSystem();
-	bool start(int, int, const char*);
+	bool init(BaseGraphicSystem<Display*,Window>* sys);
+	bool start();
 	void stop();
 	static XVisualInfo *
 	getDefaultVisual(Display *dpy);
+	Display* getNativeDisplayHandle(){return x11Display;};
+	Window getCompositorNativeWindowHandle(){return CompositorWindow;};
+	virtual void allocatePlatformSurface(Surface *surface);
+	void doScreenShot(std::string fileName);
+	void doScreenShotOfLayer(std::string fileName, const uint id);
+	void doScreenShotOfSurface(std::string fileName, const uint id);
 
 private:
+	ScreenShotType takeScreenshot;
+	std::string screenShotFile;
+	uint screenShotID;
+	void RedrawAllLayers();
 	static void* EventLoop(void * ptr);
 	static int error (Display *dpy, XErrorEvent *ev);
+	const char* displayname;
 	GetVisualInfoFunction getVisualFunc;
+	BaseGraphicSystem<Display*,Window>* graphicSystem;
 
 protected:
 	Display* x11Display;
@@ -53,14 +67,13 @@ protected:
 	//	Window background;
 	Window CompositorWindow;
 	XVisualInfo* windowVis;
-	static bool m_success;
-	static bool m_initialized;
+	pthread_mutex_t run_lock;
 
 private:
 	void cleanup();
 	void Redraw();
-	void OpenDisplayConnection();
-	void checkForCompositeExtension();
+	bool OpenDisplayConnection();
+	bool checkForCompositeExtension();
 	void createSurfaceForWindow(Window w);
 	void configureSurfaceWindow(Window w);
 	Surface* getSurfaceForWindow(Window w);
@@ -83,6 +96,8 @@ private:
 	int composite_major, composite_minor;
 	static const char CompositorWindowTitle[];
 	bool m_running;
+	bool m_initialized;
+	bool m_success;
 };
 
 #endif /* _X11WINDOWSYSTEM_H_ */

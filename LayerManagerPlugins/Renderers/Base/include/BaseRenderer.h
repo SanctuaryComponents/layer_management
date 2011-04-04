@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,14 +30,13 @@ public:
 	BaseRenderer(LayerList* layerlist);
 	virtual ~BaseRenderer();
 
-	bool start(int, int, const char*);
-	void stop();
+	bool start(int, int, const char*)=0;
+	void stop()=0;
 	void setdebug(bool onoff){debugMode = onoff;};
 	virtual void doScreenShot(std::string fileToSave)=0;
 	uint getLayerTypeCapabilities(LayerType layerType);
 
 protected:
-	BaseWindowSystem* m_windowSystem;
 	LayerList* m_layerlist;
 
 private:

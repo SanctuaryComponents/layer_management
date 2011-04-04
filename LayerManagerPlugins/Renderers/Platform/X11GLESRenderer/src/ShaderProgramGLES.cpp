@@ -30,7 +30,10 @@ ShaderProgram* ShaderProgramGLES::createProgram(const std::string& vertName, con
 	if (vertName=="default" && fragName=="default")
 	{
 		// load default shader from binary data
-		progHandle = RenderUtilLoadShaderSources("renderer_vert.glslv", "renderer_frag.glslf", GL_TRUE);
+		progHandle = RenderUtilLoadShaderSources("/usr/lib/layermanager/renderer/renderer_vert.glslv", "/usr/lib/layermanager/renderer/renderer_frag.glslf", GL_TRUE);
+		if (progHandle==0){
+			progHandle = RenderUtilLoadShaderSources("/usr/local/lib/layermanager/renderer/renderer_vert.glslv", "/usr/local/lib/layermanager/renderer/renderer_frag.glslf", GL_TRUE);
+		}
 	}
 	else
 	{

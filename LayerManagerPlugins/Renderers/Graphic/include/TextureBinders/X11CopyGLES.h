@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,7 +28,10 @@
 
 class X11CopyGLES : public X11Copy {
 public:
-	X11CopyGLES(Display* display) : X11Copy(display){};
+	X11CopyGLES(EGLDisplay eglDisplay, Display* display) : X11Copy(display){
+		// pseudo require EGL to have been initialised
+		// we dont really need the handle
+	};
 	void bindSurfaceTexture(Surface* surface);
 	void createClientBuffer(Surface*s);
 

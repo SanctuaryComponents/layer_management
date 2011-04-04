@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -35,12 +35,12 @@ uint BaseRenderer::getLayerTypeCapabilities(LayerType layerType){
 	{
 		case Software_2D:
 		{
-			result = LayerPosition & LayerScalable & LayerOrientable;
+			result = LayerPosition | LayerScalable | LayerOrientable | LayerComposedByAlpha;
 		}
 		break;
 		case Software_2_5D:
 		{
-			result = LayerPosition & LayerScalable & LayerOrientable & Layer3D;
+			result = LayerPosition | LayerScalable | LayerOrientable | LayerComposedByAlpha;
 		}
 		break;
 		default :
@@ -51,10 +51,3 @@ uint BaseRenderer::getLayerTypeCapabilities(LayerType layerType){
 	return result;
 }
 
-bool BaseRenderer::start(int displayWidth, int displayHeight, const char* DisplayName){
-	bool windowSystemStatus = m_windowSystem->start(displayWidth,displayHeight,DisplayName);
-	return windowSystemStatus;
-}
-void BaseRenderer::stop(){
-		m_windowSystem->stop();
-}

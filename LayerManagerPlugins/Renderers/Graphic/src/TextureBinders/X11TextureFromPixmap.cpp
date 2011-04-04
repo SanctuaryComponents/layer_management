@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -40,32 +40,37 @@ const int X11TextureFromPixmap::pixmapAttribs[] = {
 
 	void X11TextureFromPixmap::bindSurfaceTexture(Surface*s){
 		GLXPlatformSurface* nativeSurface = (GLXPlatformSurface*)s->platform;
-		glXBindTexImageEXT_func(dpy, nativeSurface->glxPixmap, GLX_FRONT_LEFT_EXT, NULL);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		if (NULL!=nativeSurface){
+			glXBindTexImageEXT_func(dpy, nativeSurface->glxPixmap, GLX_FRONT_LEFT_EXT, NULL);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		}
 	}
 	void X11TextureFromPixmap::unbindSurfaceTexture(Surface*s){
 		GLXPlatformSurface* nativeSurface = (GLXPlatformSurface*)s->platform;
-		glXReleaseTexImageEXT_func(dpy, nativeSurface->glxPixmap, GLX_FRONT_LEFT_EXT);
+		if (NULL!=nativeSurface)
+			glXReleaseTexImageEXT_func(dpy, nativeSurface->glxPixmap, GLX_FRONT_LEFT_EXT);
 	}
 
 	void X11TextureFromPixmap::createClientBuffer(Surface* surface){
 		LOG_DEBUG("X11TextureFromPixmap", "creating clientBuffer for window: " << surface->nativeHandle);
 		GLXPlatformSurface* platformSurface = (GLXPlatformSurface*)surface->platform;
-		Pixmap p = 0;
-		LOG_DEBUG("X11TextureFromPixmap", "get X Pixmap");
-		p= XCompositeNameWindowPixmap (dpy, surface->nativeHandle);
-		if (p==0)
-			LOG_ERROR("X11TextureFromPixmap", "didnt create pixmap!");
-		XSync(dpy, 0);
+		if (NULL!=platformSurface){
+			Pixmap p = 0;
+			LOG_DEBUG("X11TextureFromPixmap", "get X Pixmap");
+			p= XCompositeNameWindowPixmap (dpy, surface->nativeHandle);
+			if (p==0)
+				LOG_ERROR("X11TextureFromPixmap", "didnt create pixmap!");
+			XSync(dpy, 0);
 
-		GLXPixmap pm = 0;
-		LOG_DEBUG("X11TextureFromPixmap", "creating glx pixmap from xpixmap");
-		pm = glXCreatePixmap(dpy, pixmapConfig, p, pixmapAttribs);
-		if (pm ==0)
-			LOG_DEBUG("X11TextureFromPixmap", "could not allocate glxpixmap for window");
-		platformSurface->glxPixmap = pm;
-		platformSurface->pixmap = p;
+			GLXPixmap pm = 0;
+			LOG_DEBUG("X11TextureFromPixmap", "creating glx pixmap from xpixmap");
+			pm = glXCreatePixmap(dpy, pixmapConfig, p, pixmapAttribs);
+			if (pm ==0)
+				LOG_DEBUG("X11TextureFromPixmap", "could not allocate glxpixmap for window");
+			platformSurface->glxPixmap = pm;
+			platformSurface->pixmap = p;
+		}
 	}
 
 	PlatformSurface* X11TextureFromPixmap::createPlatformSurface(Surface* s){
@@ -76,7 +81,7 @@ const int X11TextureFromPixmap::pixmapAttribs[] = {
 		LOG_ERROR("X11TextureFromPixmap", "destroying clientBuffer");
 		GLXPlatformSurface* platformSurface = (GLXPlatformSurface*)surface->platform;
 		LOG_DEBUG("X11TextureFromPixmap", "removing GLX Pixmap");
-		if (platformSurface->glxPixmap){
+		if (NULL!=platformSurface){
 			//glXReleaseTexImageEXT_func(dpy, x11surf->glxPixmap, GLX_FRONT_LEFT_EXT);
 			glXDestroyPixmap(dpy,platformSurface->glxPixmap);
 			platformSurface->glxPixmap = 0;
@@ -84,7 +89,7 @@ const int X11TextureFromPixmap::pixmapAttribs[] = {
 		XSync(dpy, 0);
 
 		LOG_DEBUG("X11TextureFromPixmap", "removing X Pixmap");
-		if (platformSurface->pixmap){
+		if (NULL!=platformSurface){
 			XFreePixmap(dpy,platformSurface->pixmap);
 			platformSurface->pixmap = 0;
 		}

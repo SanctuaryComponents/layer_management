@@ -19,33 +19,83 @@
 
 #include "X11GLESRenderer.h"
 #include "ShaderProgramGLES.h"
-#include "WindowSystems/X11WindowSystem.h"
 #include "X11/Xlib.h"
 #include "TextureBinders/X11CopyGLES.h"
 #include "TextureBinders/X11EglImage.h"
 
-X11GLESRenderer::X11GLESRenderer(LayerList* layerlist) : BaseRenderer(layerlist), graphicSystem(NULL)
+X11GLESRenderer::X11GLESRenderer(LayerList* layerlist) : BaseRenderer(layerlist)
 {
 	LOG_DEBUG("X11GLESRenderer", "Creating Renderer");
 
-	// if no binder has been set yet
-	Display* display = XOpenDisplay(0);
-	EGLDisplay m_eglDisplay = eglGetDisplay(display);
-	ITextureBinder* binder=NULL;
-	const char* query = eglQueryString(m_eglDisplay, EGL_EXTENSIONS);
-	LOG_DEBUG("X11GLESRenderer", "EGL_EXTENSIONS: " << query);
-	#ifdef EGL_NATIVE_PIXMAP_KHR
-			binder = new X11EglImage((Display*)display);
-	#else
-			binder = new X11CopyGLES((Display*)display);
-	#endif
-
-	graphicSystem = new GLESGraphicsystem( ShaderProgramGLES::createProgram, binder);
-	m_windowSystem = new X11WindowSystem(layerlist, graphicSystem);
 };
 
+bool X11GLESRenderer::start(int width, int height, const char* displayname){
+	m_width = width;
+	m_height = height;
+	// create X11 windows, register as composite manager etc
+	m_windowSystem = new X11WindowSystem(displayname, width, height, m_layerlist);
+	m_graphicSystem = new GLESGraphicsystem(width,height, ShaderProgramGLES::createProgram);
+
+	m_windowSystem->init(m_graphicSystem);
+	m_graphicSystem->setBaseWindowSystem(m_windowSystem);
+
+	// create graphic context from window, init egl etc
+	Display* nativeDisplayHandle = m_windowSystem->getNativeDisplayHandle();
+
+	LOG_DEBUG("X11GLESRenderer", "Got nativedisplay handle: " << nativeDisplayHandle << " from windowsystem");
+
+	EGLDisplay eglDisplayhandle = m_graphicSystem->getEGLDisplay();
+
+	#ifdef EGL_NATIVE_PIXMAP_KHR
+			ITextureBinder* binder = new X11EglImage(eglDisplayhandle, nativeDisplayHandle);
+	#else
+			ITextureBinder* binder = new X11CopyGLES(eglDisplayhandle, nativeDisplayHandle);
+	#endif
+	m_graphicSystem->setTextureBinder(binder);
+
+	m_windowSystem->start();
+}
+
+void X11GLESRenderer::stop(){
+	m_windowSystem->stop();
+}
+
 void X11GLESRenderer::doScreenShot(std::string fileToSave){
-	graphicSystem->doScreenShot(fileToSave);
+	m_windowSystem->doScreenShot(fileToSave);
+}
+
+void X11GLESRenderer::doScreenShotOfLayer(std::string fileToSave,uint id){
+	m_windowSystem->doScreenShotOfLayer(fileToSave,id);
+}
+
+void X11GLESRenderer::doScreenShotOfSurface(std::string fileToSave, uint id){
+	m_windowSystem->doScreenShotOfSurface(fileToSave,id);
+}
+
+uint X11GLESRenderer::getNumberOfHardwareLayers(uint screenID){
+	return 0;
+	// TODO
+}
+
+uint* X11GLESRenderer::getScreenResolution(uint screenID){
+	uint * resolution = new uint[2];
+	resolution[0] = m_width;
+	resolution[1] = m_height;
+	return resolution;
+}
+
+uint* X11GLESRenderer::getScreenIDs(uint* length){
+	Display* x11Display = m_windowSystem->getNativeDisplayHandle();
+	if (!x11Display)
+		return NULL;
+	// Screens in X11 can be addresses/accessed by just the number - we must only know how many there are
+	uint numberOfScreens = ScreenCount(x11Display);
+	uint* screenIDS = new uint[numberOfScreens];
+	for (int i = 0;i<numberOfScreens;i++){
+		screenIDS[i] = i;
+	}
+	*length = numberOfScreens;
+	return screenIDS;
 }
 
 extern "C" BaseRenderer* createX11GLESRenderer(LayerList* layerlist){

@@ -23,14 +23,26 @@
 #include "BaseRenderer.h"
 #include "LayerList.h"
 #include "GraphicSystems/GLESGraphicSystem.h"
+#include "WindowSystems/X11WindowSystem.h"
 
 class X11GLESRenderer : public BaseRenderer
 {
 public:
 	X11GLESRenderer(LayerList* layerlist);
+	bool start(int, int, const char*);
+	void stop();
 	void doScreenShot(std::string fileToSave);
+	void doScreenShotOfLayer(std::string fileToSave, uint id);
+	void doScreenShotOfSurface(std::string fileToSave, uint id);
+	uint getNumberOfHardwareLayers(uint screenID);
+	uint* getScreenResolution(uint screenID);
+	uint* getScreenIDs(uint* length);
+
 private:
-	BaseGraphicSystem* graphicSystem;
+	X11WindowSystem* m_windowSystem;
+	GLESGraphicsystem* m_graphicSystem;
+	uint m_width;
+	uint m_height;
 };
 
 #endif /* _X11GLESRENDERER_H_*/

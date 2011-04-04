@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,18 +27,33 @@
 #include "Shader.h"
 /* uncomment if layer drawing needed */
 /* #define DRAW_LAYER_DEBUG */
-class GLESGraphicsystem : public BaseGraphicSystem {
+class GLESGraphicsystem : public BaseGraphicSystem<EGLNativeDisplayType, EGLNativeWindowType> {
 public:
-	GLESGraphicsystem(PfnShaderProgramCreator shaderProgram, ITextureBinder* binder);
 
-	bool init(void* display, void* WindowID,int WindowHeight, int WindowWidth);
+	GLESGraphicsystem(int windowHeight, int windowWidth, PfnShaderProgramCreator shaderProgram);
+
+	bool init(EGLNativeDisplayType display, EGLNativeWindowType window);
+
 	void clearBackground();
+
 	void swapBuffers();
-	void drawSurface(Layer* currentLayer, Surface* surface);
+
+	void beginLayer(Layer* layer);
+	void renderLayer();
+	void endLayer();
+
 	bool initOpenGLES(EGLint displayWidth, EGLint displayHeight);
 	void resize(EGLint displayWidth, EGLint displayHeight);
 	void doScreenShot(std::string fileToSave);
 
+	void saveScreenShotOfFramebuffer(std::string fileToSave);
+
+	EGLDisplay getEGLDisplay(){return m_eglDisplay;};
+
+	int 								m_windowWidth;
+	int 								m_windowHeight;
+	EGLNativeDisplayType 				m_nativeDisplay;
+	EGLNativeWindowType 				m_nativeWindow;
 	PfnShaderProgramCreator 			m_shaderCreatorFunc;
 	EGLConfig 							m_eglConfig;
 	EGLContext							m_eglContext;
@@ -49,13 +64,14 @@ public:
 	EGLint								m_displayHeight;
 	EGLBoolean							m_blendingStatus;
 	Shader* 							m_defaultShader;
+	Layer*								m_currentLayer;
+	void renderSurface(Surface* surface);
 #ifdef DRAW_LAYER_DEBUG
 	Shader* 							m_layerShader;
 #endif
+protected:
 private:
 	void saveScreenShot();
-	std::string screenShotFile;
-	bool takescreenshot;
 };
 
 #endif /* _GLESGRAPHICSYSTEM_H_ */
