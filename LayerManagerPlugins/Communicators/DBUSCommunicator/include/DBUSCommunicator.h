@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010 BMW Car IT GmbH
+* Copyright 2010,2011 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,15 +34,21 @@ public:
 
 	void Debug(DBusConnection* conn,DBusMessage* msg );
 	void ScreenShot(DBusConnection* conn,DBusMessage* msg );
+	void ScreenShotOfLayer(DBusConnection* conn,DBusMessage* msg );
+	void ScreenShotOfSurface(DBusConnection* conn,DBusMessage* msg );
+	void GetScreenResolution(DBusConnection* conn,DBusMessage* msg );
+	void GetNumberOfHardwareLayers(DBusConnection* conn,DBusMessage* msg );
+	void GetScreenIDs(DBusConnection* conn,DBusMessage* msg );
 	void ListAllLayerIDS(DBusConnection* conn,DBusMessage* msg );
+	void ListAllLayerIDsOnScreen(DBusConnection* conn,DBusMessage* msg );
 	void ListAllSurfaceIDS(DBusConnection* conn,DBusMessage* msg );
 	void ListAllLayerGroupIDS(DBusConnection* conn,DBusMessage* msg );
 	void ListAllSurfaceGroupIDS(DBusConnection* conn,DBusMessage* msg );
 	void ListSurfacesOfSurfacegroup(DBusConnection* conn,DBusMessage* msg );
 	void ListLayersOfLayergroup(DBusConnection* conn,DBusMessage* msg );
 	void ListSurfaceofLayer(DBusConnection* conn,DBusMessage* msg );
-	void getPropertiesOfSurface(DBusConnection* conn,DBusMessage* msg );
-	void getPropertiesOfLayer(DBusConnection* conn,DBusMessage* msg );
+	void GetPropertiesOfSurface(DBusConnection* conn,DBusMessage* msg );
+	void GetPropertiesOfLayer(DBusConnection* conn,DBusMessage* msg );
 	void CreateSurface(DBusConnection* conn,DBusMessage* msg );
 	void CreateSurfaceFromId(DBusConnection* conn,DBusMessage* msg );
 	void RemoveSurface(DBusConnection* conn,DBusMessage* msg );
@@ -82,7 +88,9 @@ public:
 	void GetSurfacegroupOpacity(DBusConnection* conn,DBusMessage* msg );
 	void GetLayergroupOpacity(DBusConnection* conn,DBusMessage* msg );
 	void SetSurfaceOrientation(DBusConnection* conn,DBusMessage* msg );
+	void GetSurfaceOrientation(DBusConnection* conn,DBusMessage* msg );
 	void SetLayerOrientation(DBusConnection* conn,DBusMessage* msg );
+	void GetLayerOrientation(DBusConnection* conn,DBusMessage* msg );
 	void GetSurfacePixelformat(DBusConnection* conn,DBusMessage* msg );
 	void SetSurfaceVisibility(DBusConnection* conn,DBusMessage* msg );
 	void SetLayerVisibility(DBusConnection* conn,DBusMessage* msg );

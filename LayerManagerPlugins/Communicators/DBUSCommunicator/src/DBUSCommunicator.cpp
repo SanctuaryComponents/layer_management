@@ -1,6 +1,6 @@
 /***************************************************************************
  *
- * Copyright 2010 BMW Car IT GmbH
+ * Copyright 2010,2011 BMW Car IT GmbH
  *
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,6 +29,8 @@
 
 typedef void (DBUSCommunicator::*CallBackMethod) (DBusConnection *connection, DBusMessage *message);
 
+const char* ID_UNKNOWN = "id not known to layermanager";
+
 typedef struct {
   const char *name;
   const char *signature;
@@ -38,16 +40,22 @@ typedef struct {
 
 static MethodTable manager_methods[] = {
     { "Debug",     		"b",  	"", 	&DBUSCommunicator::Debug },
-    { "ScreenShot",		"s",  	"", 	&DBUSCommunicator::ScreenShot },
+    { "ScreenShot",		"us",  	"", 	&DBUSCommunicator::ScreenShot },
+    { "ScreenShotOfLayer",		"su",  	"", 	&DBUSCommunicator::ScreenShotOfLayer },
+    { "ScreenShotOfSurface",		"su",  	"", 	&DBUSCommunicator::ScreenShotOfSurface },
+    { "GetScreenResolution", "u",    "uu",   &DBUSCommunicator::GetScreenResolution},
+    { "GetNumberOfHardwareLayers", "u",    "u",   &DBUSCommunicator::GetNumberOfHardwareLayers},
+    { "GetScreenIDs", "",    "au",   &DBUSCommunicator::GetScreenIDs},
     { "ListAllLayerIDS", "",    "au",   &DBUSCommunicator::ListAllLayerIDS},
+    { "ListAllLayerIDsOnScreen", "u",    "au",   &DBUSCommunicator::ListAllLayerIDsOnScreen},
     { "ListAllSurfaceIDS", "",    "au",   &DBUSCommunicator::ListAllSurfaceIDS},
     { "ListAllLayerGroupIDS", "",    "au",   &DBUSCommunicator::ListAllLayerGroupIDS},
     { "ListAllSurfaceGroupIDS", "",    "au",   &DBUSCommunicator::ListAllSurfaceGroupIDS},
     { "ListSurfacesOfSurfacegroup", "u",    "au",   &DBUSCommunicator::ListSurfacesOfSurfacegroup},
     { "ListLayersOfLayergroup", "u",    "au",   &DBUSCommunicator::ListLayersOfLayergroup},
     { "ListSurfaceofLayer", "u",    "au",   &DBUSCommunicator::ListSurfaceofLayer},
-    { "getPropertiesOfSurface", "u",    "duuuuuuuuyb",   &DBUSCommunicator::getPropertiesOfSurface},
-    { "getPropertiesOfLayer", "u",    "duuuuuuuuyb",  &DBUSCommunicator::getPropertiesOfLayer },
+    { "GetPropertiesOfSurface", "u",    "duuuuuuuuyb",   &DBUSCommunicator::GetPropertiesOfSurface},
+    { "GetPropertiesOfLayer", "u",    "duuuuuuuuyb",  &DBUSCommunicator::GetPropertiesOfLayer },
     { "CreateSurface", "uuuu",    "u",   &DBUSCommunicator::CreateSurface},
     { "CreateSurfaceFromId", "uuuuu",    "u",   &DBUSCommunicator::CreateSurfaceFromId},
     { "RemoveSurface", "u",    "",  &DBUSCommunicator::RemoveSurface },
@@ -61,10 +69,10 @@ static MethodTable manager_methods[] = {
     { "AddSurfaceToLayer", "uu",    "", &DBUSCommunicator::AddSurfaceToLayer  },
     { "RemoveSurfaceFromLayer", "uu",    "",   &DBUSCommunicator::RemoveSurfaceFromLayer},
     { "CreateSurfaceGroup", "",    "u",  &DBUSCommunicator::CreateSurfaceGroup },
-    { "CreateSurfaceGroupFromId", "u",    "u",  &DBUSCommunicator::CreateSurfaceGroup },
+    { "CreateSurfaceGroupFromId", "u",    "u",  &DBUSCommunicator::CreateSurfaceGroupFromId },
     { "RemoveSurfaceGroup", "u",    "",   &DBUSCommunicator::RemoveSurfaceGroup},
     { "CreateLayerGroup", "",    "u",  &DBUSCommunicator::CreateLayerGroup },
-    { "CreateLayerGroupFromId", "u",    "u",  &DBUSCommunicator::CreateLayerGroup },
+    { "CreateLayerGroupFromId", "u",    "u",  &DBUSCommunicator::CreateLayerGroupFromId },
     { "RemoveLayerGroup", "u",    "",  &DBUSCommunicator::RemoveLayerGroup },
     { "SetSurfaceSourceRegion", "uuuuu",    "",  &DBUSCommunicator::SetSurfaceSourceRegion },
     { "SetLayerSourceRegion", "uuuuu",    "",   &DBUSCommunicator::SetLayerSourceRegion},
@@ -87,7 +95,9 @@ static MethodTable manager_methods[] = {
     { "GetSurfacegroupOpacity", "u",    "d",  &DBUSCommunicator::GetSurfacegroupOpacity },
     { "GetLayergroupOpacity", "u",    "d",  &DBUSCommunicator::GetLayergroupOpacity },
     { "SetSurfaceOrientation", "uu",    "",  &DBUSCommunicator::SetSurfaceOrientation },
+    { "GetSurfaceOrientation", "uu",    "",  &DBUSCommunicator::GetSurfaceOrientation },
     { "SetLayerOrientation", "uu",    "",  &DBUSCommunicator::SetLayerOrientation },
+    { "GetLayerOrientation", "uu",    "",  &DBUSCommunicator::GetLayerOrientation },
     { "GetSurfacePixelformat", "u",    "u",  &DBUSCommunicator::GetSurfacePixelformat },
     { "SetSurfaceVisibility", "ub",    "",  &DBUSCommunicator::SetSurfaceVisibility },
     { "SetLayerVisibility", "ub",    "",  &DBUSCommunicator::SetLayerVisibility },
@@ -128,7 +138,7 @@ char* getStringFromMessage(){
   return param;
 }
 
-bool getBoolFromMessage(){
+dbus_bool_t getBoolFromMessage(){
   dbus_bool_t boolparam;
 
   if (DBUS_TYPE_BOOLEAN != dbus_message_iter_get_arg_type(&iter)){
@@ -136,12 +146,8 @@ bool getBoolFromMessage(){
   }else{
     dbus_message_iter_get_basic(&iter, &boolparam);
   }
-  bool b;
-  if (boolparam==0)
-    b = false;
-  else
-    b = true;
-  return b;
+  LOG_DEBUG("DBUSCommunicator", "Bool Argument is "<<boolparam);
+  return boolparam;
 }
 
 char getByteFromMessage(){
@@ -155,8 +161,8 @@ char getByteFromMessage(){
   return param;
 }
 
-uint getUIntFromMessage(){
-  uint param;
+dbus_uint32_t getUIntFromMessage(){
+	dbus_uint32_t param;
 
   if (DBUS_TYPE_UINT32 != dbus_message_iter_get_arg_type(&iter)){
     LOG_ERROR("DBUSCommunicator", "Argument is not uint32!");
@@ -165,8 +171,6 @@ uint getUIntFromMessage(){
   }
   return param;
 }
-
-
 
 double getDoubleFromMessage(){
   double param;
@@ -180,14 +184,14 @@ double getDoubleFromMessage(){
 }
 
 
-void appendBool(bool toAppend){
+void appendBool(dbus_bool_t toAppend){
   if (!dbus_message_iter_append_basic(&iter, DBUS_TYPE_BOOLEAN, &toAppend)) {
     LOG_ERROR("DBUSCommunicator", "Out Of Memory!");
     exit(1);
   }
 }
 
-void appendUint(uint toAppend){
+void appendUint(dbus_uint32_t toAppend){
   if (!dbus_message_iter_append_basic(&iter, DBUS_TYPE_UINT32, &toAppend)) {
     LOG_ERROR("DBUSCommunicator", "Out Of Memory!");
     exit(1);
@@ -226,10 +230,25 @@ void closeReply(){
     LOG_ERROR("DBUSCommunicator", "Out Of Memory!");
     exit(1);
   }
+  LOG_DEBUG("DBUSCommunicator", "Send reply");
   dbus_connection_flush(conn);
 
   // free the reply
   dbus_message_unref(reply);
+}
+
+void ReplyError(const char* errorname, const char* errorMsg){
+	reply = dbus_message_new_error (currentMsg, errorname, errorMsg);
+	// send the reply && flush the connection
+	  if (!dbus_connection_send(conn, reply, &serial)) {
+	    LOG_ERROR("DBUSCommunicator", "Out Of Memory!");
+	    exit(1);
+	  }
+	  LOG_DEBUG("DBUSCommunicator", "Reply with error");
+	  dbus_connection_flush(conn);
+
+	  // free the reply
+	  dbus_message_unref(reply);
 }
 
 
@@ -413,51 +432,152 @@ void DBUSCommunicator::Debug(DBusConnection* conn,DBusMessage* msg )
   initReceive(msg);
   bool param = getBoolFromMessage();
 
-  m_reference->m_executor->execute(new DebugCommand(param));
+  bool status = m_reference->m_executor->execute(new DebugCommand(param));
+  if (status){
+	  initReply();
+	  closeReply();
+  }else{
+	  ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+  }
+}
 
-  initReply();
-  closeReply();
+void DBUSCommunicator::GetScreenResolution(DBusConnection* conn,DBusMessage* msg )
+{
+	initReceive(msg);
+	uint screenid = getUIntFromMessage();
+	uint x;
+	uint y;
+	uint* resolution = m_reference->m_executor->getScreenResolution(screenid);
+	initReply();
+	appendUint(resolution[0]);
+	appendUint(resolution[1]);
+	closeReply();
+}
+
+void DBUSCommunicator::GetNumberOfHardwareLayers(DBusConnection* conn,DBusMessage* msg )
+{
+	initReceive(msg);
+	uint screenid = getUIntFromMessage();
+	uint numberOfHardwareLayers = m_reference->m_executor->getNumberOfHardwareLayers(screenid);
+	initReply();
+	appendUint(numberOfHardwareLayers);
+	closeReply();
+}
+
+void DBUSCommunicator::GetScreenIDs(DBusConnection* conn,DBusMessage* msg )
+{
+	initReceive(msg);
+	uint length = 0;
+	uint* IDs = m_reference->m_executor->getScreenIDs(&length);
+	initReply();
+
+	DBusMessageIter arrayIter;
+	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY, "u", &arrayIter);
+	for ( uint i = 0; i< length;i++)
+		dbus_message_iter_append_basic(&arrayIter,DBUS_TYPE_UINT32,&IDs[i]);
+	dbus_message_iter_close_container(&iter,&arrayIter);
+	closeReply();
 }
 
 void DBUSCommunicator::ScreenShot(DBusConnection* conn,DBusMessage* msg )
 {
 	initReceive(msg);
+	uint screenid = getUIntFromMessage();
+	dbus_message_iter_next(&iter);
 	char* filename = getStringFromMessage();
 
-	m_reference->m_executor->execute(new ScreenShotCommand(filename));
-
+	bool status = m_reference->m_executor->execute(new ScreenShotCommand(filename,ScreenshotOfDisplay,screenid));
+	if (status){
 	initReply();
 	closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
+}
+
+void DBUSCommunicator::ScreenShotOfLayer(DBusConnection* conn,DBusMessage* msg )
+{
+	initReceive(msg);
+	char* filename = getStringFromMessage();
+	dbus_message_iter_next(&iter);
+	uint layerid = getUIntFromMessage();
+
+	bool status = m_reference->m_executor->execute(new ScreenShotCommand(filename,ScreenshotOfLayer,layerid));
+	if (status){
+		initReply();
+		closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
+}
+
+void DBUSCommunicator::ScreenShotOfSurface(DBusConnection* conn,DBusMessage* msg )
+{
+	initReceive(msg);
+	char* filename = getStringFromMessage();
+	dbus_message_iter_next(&iter);
+	uint id = getUIntFromMessage();
+	bool status = m_reference->m_executor->execute(new ScreenShotCommand(filename,ScreenshotOfSurface,id));
+	if (status){
+	initReply();
+	closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::ListAllLayerIDS(DBusConnection* conn,DBusMessage* msg )
 {
   currentMsg = msg;
-  int* array = NULL;
-  int length = 0;
+  uint* array = NULL;
+  uint length = 0;
   m_reference->m_layerlist->lockList();
   m_reference->m_layerlist->getLayerIDs(&length,&array);
   initReply();
   DBusMessageIter arrayIter;
   dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY, "u", &arrayIter);
-  for ( int i = 0; i< length;i++)
+  for ( uint i = 0; i< length;i++)
     dbus_message_iter_append_basic(&arrayIter,DBUS_TYPE_UINT32,&array[i]);
   dbus_message_iter_close_container(&iter,&arrayIter);
   closeReply();
   m_reference->m_layerlist->unlockList();
 }
 
+void DBUSCommunicator::ListAllLayerIDsOnScreen(DBusConnection* conn,DBusMessage* msg )
+{
+  initReceive(msg);
+  uint screenID = getUIntFromMessage();
+
+  uint* array = NULL;
+  uint length = 0;
+  m_reference->m_layerlist->lockList();
+  bool status = m_reference->m_layerlist->getLayerIDsOfScreen(screenID,&length,&array);
+  if (status){
+	  initReply();
+	  DBusMessageIter arrayIter;
+	  dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY, "u", &arrayIter);
+	  for ( uint i = 0; i< length;i++)
+		  dbus_message_iter_append_basic(&arrayIter,DBUS_TYPE_UINT32,&array[i]);
+	  dbus_message_iter_close_container(&iter,&arrayIter);
+	  closeReply();
+  }else{
+		 ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+  }
+  m_reference->m_layerlist->unlockList();
+
+}
+
 void DBUSCommunicator::ListAllSurfaceIDS(DBusConnection* conn,DBusMessage* msg )
 {
   currentMsg = msg;
-  int* array = NULL;
-  int length = 0;
+  uint* array = NULL;
+  uint length = 0;
   m_reference->m_layerlist->lockList();
   m_reference->m_layerlist->getSurfaceIDs(&length,&array);
   initReply();
   DBusMessageIter arrayIter;
   dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY, "u", &arrayIter);
-  for ( int i = 0; i< length;i++)
+  for ( uint i = 0; i< length;i++)
     dbus_message_iter_append_basic(&arrayIter,DBUS_TYPE_UINT32,&array[i]);
   dbus_message_iter_close_container(&iter,&arrayIter);
   closeReply();
@@ -467,14 +587,14 @@ void DBUSCommunicator::ListAllSurfaceIDS(DBusConnection* conn,DBusMessage* msg )
 void DBUSCommunicator::ListAllLayerGroupIDS(DBusConnection* conn,DBusMessage* msg )
 {
   currentMsg = msg;
-  int* array = NULL;
-  int length = 0;
+  uint* array = NULL;
+  uint length = 0;
   m_reference->m_layerlist->lockList();
   m_reference->m_layerlist->getLayerGroupIDs(&length,&array);
   initReply();
   DBusMessageIter arrayIter;
   dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY, "u", &arrayIter);
-  for ( int i = 0; i< length;i++)
+  for ( uint i = 0; i< length;i++)
     dbus_message_iter_append_basic(&arrayIter,DBUS_TYPE_UINT32,&array[i]);
   dbus_message_iter_close_container(&iter,&arrayIter);
   closeReply();
@@ -484,14 +604,14 @@ void DBUSCommunicator::ListAllLayerGroupIDS(DBusConnection* conn,DBusMessage* ms
 void DBUSCommunicator::ListAllSurfaceGroupIDS(DBusConnection* conn,DBusMessage* msg )
 {
   currentMsg = msg;
-  int* array = NULL;
-  int length = 0;
+  uint* array = NULL;
+  uint length = 0;
   m_reference->m_layerlist->lockList();
   m_reference->m_layerlist->getSurfaceGroupIDs(&length,&array);
   initReply();
   DBusMessageIter arrayIter;
   dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY, "u", &arrayIter);
-  for ( int i = 0; i< length;i++)
+  for ( uint i = 0; i< length;i++)
     dbus_message_iter_append_basic(&arrayIter,DBUS_TYPE_UINT32,&array[i]);
   dbus_message_iter_close_container(&iter,&arrayIter);
   closeReply();
@@ -504,18 +624,22 @@ void DBUSCommunicator::ListSurfacesOfSurfacegroup(DBusConnection* conn,DBusMessa
   uint id = getUIntFromMessage();
   m_reference->m_layerlist->lockList();
   SurfaceGroup* sg = m_reference->m_layerlist->getSurfaceGroup(id);
-  std::list<Surface*> surfaces = sg->getList();
-  initReply();
-  DBusMessageIter arrayIter;
-  dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY, "u", &arrayIter);
-  for ( std::list<Surface*>::const_iterator it=surfaces.begin();it!=surfaces.end();it++){
-    Surface* s = *it;
-    int id = s->getID();
-    dbus_message_iter_append_basic(&arrayIter,DBUS_TYPE_UINT32,&id);
+  if (NULL!=sg){
+	  std::list<Surface*> surfaces = sg->getList();
+	  initReply();
+	  DBusMessageIter arrayIter;
+	  dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY, "u", &arrayIter);
+	  for ( std::list<Surface*>::const_iterator it=surfaces.begin();it!=surfaces.end();it++){
+		Surface* s = *it;
+		uint id = s->getID();
+		dbus_message_iter_append_basic(&arrayIter,DBUS_TYPE_UINT32,&id);
+	  }
+	  dbus_message_iter_close_container(&iter,&arrayIter);
+	  closeReply();
+	  m_reference->m_layerlist->unlockList();
+  }else{
+	  ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
   }
-  dbus_message_iter_close_container(&iter,&arrayIter);
-  closeReply();
-  m_reference->m_layerlist->unlockList();
 }
 
 void DBUSCommunicator::ListLayersOfLayergroup(DBusConnection* conn,DBusMessage* msg )
@@ -524,18 +648,22 @@ void DBUSCommunicator::ListLayersOfLayergroup(DBusConnection* conn,DBusMessage* 
   uint id = getUIntFromMessage();
   m_reference->m_layerlist->lockList();
   LayerGroup* sg = m_reference->m_layerlist->getLayerGroup(id);
-  std::list<Layer*> layers = sg->getList();
-  initReply();
-  DBusMessageIter arrayIter;
-  dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY, "u", &arrayIter);
-  for ( std::list<Layer*>::const_iterator it=layers.begin();it!=layers.end();it++){
-    Layer* l = *it;
-    int id = l->getID();
-    dbus_message_iter_append_basic(&arrayIter,DBUS_TYPE_UINT32,&id);
+  if (NULL!=sg){
+	  std::list<Layer*> layers = sg->getList();
+	  initReply();
+	  DBusMessageIter arrayIter;
+	  dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY, "u", &arrayIter);
+	  for ( std::list<Layer*>::const_iterator it=layers.begin();it!=layers.end();it++){
+		  Layer* l = *it;
+		  uint id = l->getID();
+		  dbus_message_iter_append_basic(&arrayIter,DBUS_TYPE_UINT32,&id);
+	  }
+	  dbus_message_iter_close_container(&iter,&arrayIter);
+	  closeReply();
+	  m_reference->m_layerlist->unlockList();
+  }else{
+	  ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
   }
-  dbus_message_iter_close_container(&iter,&arrayIter);
-  closeReply();
-  m_reference->m_layerlist->unlockList();
 }
 
 void DBUSCommunicator::ListSurfaceofLayer(DBusConnection* conn,DBusMessage* msg )
@@ -544,112 +672,135 @@ void DBUSCommunicator::ListSurfaceofLayer(DBusConnection* conn,DBusMessage* msg 
   uint id = getUIntFromMessage();
   m_reference->m_layerlist->lockList();
   Layer* layer = m_reference->m_layerlist->getLayer(id);
-  std::list<Surface*> surfaces = layer->getAllSurfaces();
-  initReply();
-  DBusMessageIter arrayIter;
-  dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY, "u", &arrayIter);
-  for ( std::list<Surface*>::const_iterator it=surfaces.begin();it!=surfaces.end();it++){
-    Surface* s = *it;
-    int id = s->getID();
-    dbus_message_iter_append_basic(&arrayIter,DBUS_TYPE_UINT32,&id);
+  if (layer!=NULL){
+	  std::list<Surface*> surfaces = layer->getAllSurfaces();
+	  initReply();
+	  DBusMessageIter arrayIter;
+	  dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY, "u", &arrayIter);
+	  for ( std::list<Surface*>::const_iterator it=surfaces.begin();it!=surfaces.end();it++){
+		Surface* s = *it;
+		uint id = s->getID();
+		dbus_message_iter_append_basic(&arrayIter,DBUS_TYPE_UINT32,&id);
+	  }
+	  dbus_message_iter_close_container(&iter,&arrayIter);
+	  closeReply();
+  }else{
+	  ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
   }
-  dbus_message_iter_close_container(&iter,&arrayIter);
-  closeReply();
   m_reference->m_layerlist->unlockList();
 }
 
-void DBUSCommunicator::getPropertiesOfSurface(DBusConnection* conn,DBusMessage* msg )
+void DBUSCommunicator::GetPropertiesOfSurface(DBusConnection* conn,DBusMessage* msg )
 {
   initReceive(msg);
   uint id = getUIntFromMessage();
 
   Surface* surface = m_reference->m_layerlist->getSurface(id);
-
-  initReply();
-  appendDouble(surface->getOpacity());
-  Rectangle dest = surface->getDestinationRegion();
-  Rectangle src = surface->getSourceRegion();
-  appendUint(src.x);
-  appendUint(src.y);
-  appendUint(src.width);
-  appendUint(src.height);
-  appendUint(dest.x);
-  appendUint(dest.y);
-  appendUint(dest.width);
-  appendUint(dest.height);
-  OrientationType orientation = surface->getOrientation();
-  appendbyte((char)orientation);
-  appendBool(surface->getVisibility());
-  closeReply();
+  if (surface!=NULL){
+		initReply();
+		appendDouble(surface->getOpacity());
+		Rectangle dest = surface->getDestinationRegion();
+		Rectangle src = surface->getSourceRegion();
+		appendUint(src.x);
+		appendUint(src.y);
+		appendUint(src.width);
+		appendUint(src.height);
+		appendUint(dest.x);
+		appendUint(dest.y);
+		appendUint(dest.width);
+		appendUint(dest.height);
+		OrientationType orientation = surface->getOrientation();
+		appendUint(orientation);
+		appendBool(surface->getVisibility());
+		closeReply();
+  }else{
+	  ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+  }
 }
 
-void DBUSCommunicator::getPropertiesOfLayer(DBusConnection* conn,DBusMessage* msg )
+void DBUSCommunicator::GetPropertiesOfLayer(DBusConnection* conn,DBusMessage* msg )
 {
   initReceive(msg);
   uint id = getUIntFromMessage();
 
   Layer* layer = m_reference->m_layerlist->getLayer(id);
-
-  initReply();
-  appendDouble(layer->getOpacity());
-  Rectangle dest = layer->getDestinationRegion();
-  Rectangle src = layer->getSourceRegion();
-  appendUint(src.x);
-  appendUint(src.y);
-  appendUint(src.width);
-  appendUint(src.height);
-  appendUint(dest.x);
-  appendUint(dest.y);
-  appendUint(dest.width);
-  appendUint(dest.height);
-  OrientationType orientation = layer->getOrientation();
-  appendbyte((char)orientation);
-  appendBool(layer->getVisibility());
-  closeReply();
+  if (layer!=NULL){
+	  initReply();
+	  appendDouble(layer->getOpacity());
+	  Rectangle dest = layer->getDestinationRegion();
+	  Rectangle src = layer->getSourceRegion();
+	  appendUint(src.x);
+	  appendUint(src.y);
+	  appendUint(src.width);
+	  appendUint(src.height);
+	  appendUint(dest.x);
+	  appendUint(dest.y);
+	  appendUint(dest.width);
+	  appendUint(dest.height);
+	  OrientationType orientation = layer->getOrientation();
+	  appendUint(orientation);
+	  appendBool(layer->getVisibility());
+	  closeReply();
+  }else{
+  	  ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+  }
 }
 
 void DBUSCommunicator::CreateSurface(DBusConnection* conn,DBusMessage* msg )
 {
   initReceive(msg);
   uint handle = getUIntFromMessage();
-  dbus_message_iter_next(&iter);
-  uint pixelformat = getUIntFromMessage();
-  PixelFormat pf = (PixelFormat)pixelformat;
 
   dbus_message_iter_next(&iter);
   uint width = getUIntFromMessage();
 
   dbus_message_iter_next(&iter);
   uint height = getUIntFromMessage();
-  int id = -1;
-  m_reference->m_executor->execute(new CreateCommand(handle,TypeSurface,pf, width, height,&id));
-  initReply();
-  appendUint(id);
-  closeReply();
+
+  dbus_message_iter_next(&iter);
+  uint pixelformat = getUIntFromMessage();
+  PixelFormat pf = (PixelFormat)pixelformat;
+
+  LOG_DEBUG("DBUSCommunicator::CreateSurface","pixelformat: " << pixelformat);
+  dbus_message_iter_next(&iter);
+  uint id = GraphicalObject::INVALID_ID;
+  bool status = m_reference->m_executor->execute(new CreateCommand(handle,TypeSurface,pf, width, height,&id));
+  if (status){
+	  initReply();
+	  appendUint(id);
+	  closeReply();
+  }else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::CreateSurfaceFromId(DBusConnection* conn,DBusMessage* msg )
 {
   initReceive(msg);
-  int id = 0;
-
   uint handle = getUIntFromMessage();
-  dbus_message_iter_next(&iter);
-  uint pixelformat = getUIntFromMessage();
-  PixelFormat pf = (PixelFormat)pixelformat;
 
   dbus_message_iter_next(&iter);
   uint width = getUIntFromMessage();
 
   dbus_message_iter_next(&iter);
   uint height = getUIntFromMessage();
-  dbus_message_iter_next(&iter);
-  id = (int) getUIntFromMessage();
 
-  m_reference->m_executor->execute(new CreateCommand(handle,TypeSurface,pf, width, height,&id));
-  initReply();
-  appendUint(id);
-  closeReply();
+  dbus_message_iter_next(&iter);
+  uint pixelformat = getUIntFromMessage();
+  PixelFormat pf = (PixelFormat)pixelformat;
+
+  LOG_DEBUG("DBUSCommunicator::CreateSurface","pixelformat: " << pixelformat);
+  dbus_message_iter_next(&iter);
+  uint id = getUIntFromMessage();
+
+  bool status = m_reference->m_executor->execute(new CreateCommand(handle,TypeSurface,pf, width, height,&id));
+  if (status){
+	  initReply();
+	  appendUint(id);
+	  closeReply();
+  }else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 
@@ -658,31 +809,43 @@ void DBUSCommunicator::RemoveSurface(DBusConnection* conn,DBusMessage* msg )
 {
   initReceive(msg);
   uint param = getUIntFromMessage();
-  m_reference->m_executor->execute(new RemoveCommand(param,TypeSurface));
+  bool status = m_reference->m_executor->execute(new RemoveCommand(param,TypeSurface));
+	if (status){
   initReply();
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::CreateLayer(DBusConnection* conn,DBusMessage* msg )
 {
   currentMsg = msg;
-  int id = -1;
-  m_reference->m_executor->execute(new CreateCommand(-1,TypeLayer,PIXELFORMAT_R8,0,0,&id));
+  uint id = GraphicalObject::INVALID_ID;
+  bool status = m_reference->m_executor->execute(new CreateCommand(0,TypeLayer,PIXELFORMAT_R8,0,0,&id));
+	if (status){
   initReply();
   appendUint(id);
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::CreateLayerFromId(DBusConnection* conn,DBusMessage* msg )
 {
   currentMsg = msg;
-  int id = -1;
+  uint id = GraphicalObject::INVALID_ID;
   initReceive(msg);
-  id = (int)getUIntFromMessage();
-  m_reference->m_executor->execute(new CreateCommand(-1,TypeLayer,PIXELFORMAT_R8,0,0,&id));
+  id = getUIntFromMessage();
+  bool status = m_reference->m_executor->execute(new CreateCommand(0,TypeLayer,PIXELFORMAT_R8,0,0,&id));
+	if (status){
   initReply();
   appendUint(id);
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 
@@ -690,9 +853,13 @@ void DBUSCommunicator::RemoveLayer(DBusConnection* conn,DBusMessage* msg )
 {
   initReceive(msg);
   uint param = getUIntFromMessage();
-  m_reference->m_executor->execute(new RemoveCommand(param,TypeLayer));
+  bool status = m_reference->m_executor->execute(new RemoveCommand(param,TypeLayer));
+	if (status){
   initReply();
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::AddSurfaceToSurfaceGroup(DBusConnection* conn,DBusMessage* msg )
@@ -701,9 +868,13 @@ void DBUSCommunicator::AddSurfaceToSurfaceGroup(DBusConnection* conn,DBusMessage
   uint surfaceid = getUIntFromMessage();
   dbus_message_iter_next(&iter);
   uint surfacegroupid = getUIntFromMessage();
-  m_reference->m_executor->execute(new SurfacegroupAddSurfaceCommand(surfacegroupid,surfaceid));
+  bool status = m_reference->m_executor->execute(new SurfacegroupAddSurfaceCommand(surfacegroupid,surfaceid));
+	if (status){
   initReply();
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::RemoveSurfaceFromSurfaceGroup(DBusConnection* conn,DBusMessage* msg )
@@ -712,9 +883,13 @@ void DBUSCommunicator::RemoveSurfaceFromSurfaceGroup(DBusConnection* conn,DBusMe
   uint surfaceid = getUIntFromMessage();
   dbus_message_iter_next(&iter);
   uint surfacegroupid = getUIntFromMessage();
-  m_reference->m_executor->execute(new SurfacegroupRemoveSurfaceCommand(surfacegroupid,surfaceid));
+  bool status = m_reference->m_executor->execute(new SurfacegroupRemoveSurfaceCommand(surfacegroupid,surfaceid));
+	if (status){
   initReply();
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::AddLayerToLayerGroup(DBusConnection* conn,DBusMessage* msg )
@@ -723,9 +898,13 @@ void DBUSCommunicator::AddLayerToLayerGroup(DBusConnection* conn,DBusMessage* ms
   uint layerid = getUIntFromMessage();
   dbus_message_iter_next(&iter);
   uint layergroupid = getUIntFromMessage();
-  m_reference->m_executor->execute(new LayergroupAddLayerCommand(layergroupid,layerid));
+  bool status = m_reference->m_executor->execute(new LayergroupAddLayerCommand(layergroupid,layerid));
+	if (status){
   initReply();
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::RemoveLayerFromLayerGroup(DBusConnection* conn,DBusMessage* msg )
@@ -734,9 +913,13 @@ void DBUSCommunicator::RemoveLayerFromLayerGroup(DBusConnection* conn,DBusMessag
   uint layerid = getUIntFromMessage();
   dbus_message_iter_next(&iter);
   uint layergroupid = getUIntFromMessage();
-  m_reference->m_executor->execute(new LayergroupRemoveLayerCommand(layergroupid,layerid));
+  bool status = m_reference->m_executor->execute(new LayergroupRemoveLayerCommand(layergroupid,layerid));
+	if (status){
   initReply();
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::AddSurfaceToLayer(DBusConnection* conn,DBusMessage* msg )
@@ -745,9 +928,13 @@ void DBUSCommunicator::AddSurfaceToLayer(DBusConnection* conn,DBusMessage* msg )
   uint surfaceid = getUIntFromMessage();
   dbus_message_iter_next(&iter);
   uint layer = getUIntFromMessage();
-  m_reference->m_executor->execute(new LayerAddSurfaceCommand(layer,surfaceid));
+  bool status = m_reference->m_executor->execute(new LayerAddSurfaceCommand(layer,surfaceid));
+	if (status){
   initReply();
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::RemoveSurfaceFromLayer(DBusConnection* conn,DBusMessage* msg )
@@ -756,31 +943,43 @@ void DBUSCommunicator::RemoveSurfaceFromLayer(DBusConnection* conn,DBusMessage* 
   uint surfaceid = getUIntFromMessage();
   dbus_message_iter_next(&iter);
   uint layerid = getUIntFromMessage();
-  m_reference->m_executor->execute(new LayerRemoveSurfaceCommand(layerid,surfaceid));
+  bool status = m_reference->m_executor->execute(new LayerRemoveSurfaceCommand(layerid,surfaceid));
+	if (status){
   initReply();
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::CreateSurfaceGroup(DBusConnection* conn,DBusMessage* msg )
 {
   currentMsg = msg;
-  int newID = -1;
-  m_reference->m_executor->execute(new CreateCommand(-1,TypeSurfaceGroup,PIXELFORMAT_R8,0,0,&newID));
+  uint newID = GraphicalObject::INVALID_ID;
+  bool status = m_reference->m_executor->execute(new CreateCommand(0,TypeSurfaceGroup,PIXELFORMAT_R8,0,0,&newID));
+	if (status){
   initReply();
   appendUint(newID);
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::CreateSurfaceGroupFromId(DBusConnection* conn,DBusMessage* msg )
 {
   currentMsg = msg;
-  int newID = -1;
+  uint newID = GraphicalObject::INVALID_ID;
   initReceive(msg);
-  newID = (int)getUIntFromMessage();
-  m_reference->m_executor->execute(new CreateCommand(-1,TypeSurfaceGroup,PIXELFORMAT_R8,0,0,&newID));
+  newID = getUIntFromMessage();
+  bool status = m_reference->m_executor->execute(new CreateCommand(0,TypeSurfaceGroup,PIXELFORMAT_R8,0,0,&newID));
+	if (status){
   initReply();
   appendUint(newID);
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 
@@ -789,31 +988,43 @@ void DBUSCommunicator::RemoveSurfaceGroup(DBusConnection* conn,DBusMessage* msg 
 {
   initReceive(msg);
   uint param = getUIntFromMessage();
-  m_reference->m_executor->execute(new RemoveCommand(param,TypeSurfaceGroup));
+  bool status = m_reference->m_executor->execute(new RemoveCommand(param,TypeSurfaceGroup));
+	if (status){
   initReply();
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::CreateLayerGroup(DBusConnection* conn,DBusMessage* msg )
 {
   currentMsg = msg;
-  int newID = -1;
-  m_reference->m_executor->execute(new CreateCommand(-1,TypeLayerGroup,PIXELFORMAT_R8,0,0,&newID));
+  uint newID = GraphicalObject::INVALID_ID;
+  bool status = m_reference->m_executor->execute(new CreateCommand(0,TypeLayerGroup,PIXELFORMAT_R8,0,0,&newID));
+	if (status){
   initReply();
   appendUint(newID);
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::CreateLayerGroupFromId(DBusConnection* conn,DBusMessage* msg )
 {
   currentMsg = msg;
-  int newID = 0;
+  uint newID = GraphicalObject::INVALID_ID;
   initReceive(msg);
-  newID = (int)getUIntFromMessage();
-  m_reference->m_executor->execute(new CreateCommand(-1,TypeLayerGroup,PIXELFORMAT_R8,0,0,&newID));
+  newID = getUIntFromMessage();
+  bool status = m_reference->m_executor->execute(new CreateCommand(0,TypeLayerGroup,PIXELFORMAT_R8,0,0,&newID));
+	if (status){
   initReply();
   appendUint(newID);
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 
@@ -821,9 +1032,13 @@ void DBUSCommunicator::RemoveLayerGroup(DBusConnection* conn,DBusMessage* msg )
 {
   initReceive(msg);
   uint param = getUIntFromMessage();
-  m_reference->m_executor->execute(new RemoveCommand(param,TypeLayerGroup));
+  bool status = m_reference->m_executor->execute(new RemoveCommand(param,TypeLayerGroup));
+	if (status){
   initReply();
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::SetSurfaceSourceRegion(DBusConnection* conn,DBusMessage* msg )
@@ -838,9 +1053,13 @@ void DBUSCommunicator::SetSurfaceSourceRegion(DBusConnection* conn,DBusMessage* 
   uint width = getUIntFromMessage();
   dbus_message_iter_next(&iter);
   uint height = getUIntFromMessage();
-  m_reference->m_executor->execute(new SetSourceRectangleCommand(id,TypeSurface,x,y,width,height));
+  bool status = m_reference->m_executor->execute(new SetSourceRectangleCommand(id,TypeSurface,x,y,width,height));
+	if (status){
   initReply();
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::SetLayerSourceRegion(DBusConnection* conn,DBusMessage* msg )
@@ -855,9 +1074,14 @@ void DBUSCommunicator::SetLayerSourceRegion(DBusConnection* conn,DBusMessage* ms
   uint width = getUIntFromMessage();
   dbus_message_iter_next(&iter);
   uint height = getUIntFromMessage();
-  m_reference->m_executor->execute(new SetSourceRectangleCommand(id,TypeLayer,x,y,width,height));
+  LOG_DEBUG("DBUSC","new SetSourceRectangleCommand with arguments: " <<id <<" " << x <<" "<< y <<" "<< width <<" "<< height );
+  bool status = m_reference->m_executor->execute(new SetSourceRectangleCommand(id,TypeLayer,x,y,width,height));
+	if (status){
   initReply();
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::SetSurfaceDestinationRegion(DBusConnection* conn,DBusMessage* msg )
@@ -872,9 +1096,13 @@ void DBUSCommunicator::SetSurfaceDestinationRegion(DBusConnection* conn,DBusMess
   uint width = getUIntFromMessage();
   dbus_message_iter_next(&iter);
   uint height = getUIntFromMessage();
-  m_reference->m_executor->execute(new SetDestinationRectangleCommand(id,TypeSurface,x,y,width,height));
+  bool status = m_reference->m_executor->execute(new SetDestinationRectangleCommand(id,TypeSurface,x,y,width,height));
+	if (status){
   initReply();
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::SetSurfacePosition(DBusConnection* conn,DBusMessage* msg )
@@ -885,9 +1113,13 @@ void DBUSCommunicator::SetSurfacePosition(DBusConnection* conn,DBusMessage* msg 
   uint x = getUIntFromMessage();
   dbus_message_iter_next(&iter);
   uint y = getUIntFromMessage();
-  m_reference->m_executor->execute(new SetPositionCommand(id,TypeSurface,x,y));
+  bool status = m_reference->m_executor->execute(new SetPositionCommand(id,TypeSurface,x,y));
+	if (status){
   initReply();
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::GetSurfacePosition(DBusConnection* conn,DBusMessage* msg )
@@ -896,11 +1128,15 @@ void DBUSCommunicator::GetSurfacePosition(DBusConnection* conn,DBusMessage* msg 
   uint id = getUIntFromMessage();
   uint x;
   uint y;
-  m_reference->m_executor->execute(new GetPositionCommand(id,TypeSurface,&x,&y));
+  bool status = m_reference->m_executor->execute(new GetPositionCommand(id,TypeSurface,&x,&y));
+	if (status){
   initReply();
   appendUint(x);
   appendUint(y);
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::SetSurfaceDimension(DBusConnection* conn,DBusMessage* msg )
@@ -911,9 +1147,13 @@ void DBUSCommunicator::SetSurfaceDimension(DBusConnection* conn,DBusMessage* msg
   uint width = getUIntFromMessage();
   dbus_message_iter_next(&iter);
   uint height = getUIntFromMessage();
-  m_reference->m_executor->execute(new SetDimensionCommand(id,TypeSurface,width,height));
+  bool status = m_reference->m_executor->execute(new SetDimensionCommand(id,TypeSurface,width,height));
+	if (status){
   initReply();
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::SetLayerDestinationRegion(DBusConnection* conn,DBusMessage* msg )
@@ -928,9 +1168,14 @@ void DBUSCommunicator::SetLayerDestinationRegion(DBusConnection* conn,DBusMessag
   uint width = getUIntFromMessage();
   dbus_message_iter_next(&iter);
   uint height = getUIntFromMessage();
-  m_reference->m_executor->execute(new SetDestinationRectangleCommand(id,TypeLayer,x,y,width,height));
+  LOG_DEBUG("DBUSCommunicator","new SetDestinationRectangleCommand with arguments: " <<id <<" " << x <<" "<< y <<" "<< width <<" "<< height );
+  bool status = m_reference->m_executor->execute(new SetDestinationRectangleCommand(id,TypeLayer,x,y,width,height));
+	if (status){
   initReply();
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::SetLayerPosition(DBusConnection* conn,DBusMessage* msg )
@@ -941,9 +1186,13 @@ void DBUSCommunicator::SetLayerPosition(DBusConnection* conn,DBusMessage* msg )
   uint x = getUIntFromMessage();
   dbus_message_iter_next(&iter);
   uint y = getUIntFromMessage();
-  m_reference->m_executor->execute(new SetPositionCommand(id,TypeLayer,x,y));
+  bool status = m_reference->m_executor->execute(new SetPositionCommand(id,TypeLayer,x,y));
+	if (status){
   initReply();
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::GetLayerPosition(DBusConnection* conn,DBusMessage* msg )
@@ -952,11 +1201,15 @@ void DBUSCommunicator::GetLayerPosition(DBusConnection* conn,DBusMessage* msg )
   uint id = getUIntFromMessage();
   uint x;
   uint y;
-  m_reference->m_executor->execute(new GetPositionCommand(id,TypeLayer,&x,&y));
+  bool status = m_reference->m_executor->execute(new GetPositionCommand(id,TypeLayer,&x,&y));
+	if (status){
   initReply();
   appendUint(x);
   appendUint(y);
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::SetLayerDimension(DBusConnection* conn,DBusMessage* msg )
@@ -967,9 +1220,13 @@ void DBUSCommunicator::SetLayerDimension(DBusConnection* conn,DBusMessage* msg )
   uint width = getUIntFromMessage();
   dbus_message_iter_next(&iter);
   uint height = getUIntFromMessage();
-  m_reference->m_executor->execute(new SetDimensionCommand(id,TypeLayer,width,height));
+  bool status = m_reference->m_executor->execute(new SetDimensionCommand(id,TypeLayer,width,height));
+	if (status){
   initReply();
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::GetLayerDimension(DBusConnection* conn,DBusMessage* msg )
@@ -978,11 +1235,15 @@ void DBUSCommunicator::GetLayerDimension(DBusConnection* conn,DBusMessage* msg )
   uint id = getUIntFromMessage();
   uint width;
   uint height;
-  m_reference->m_executor->execute(new GetDimensionCommand(id,TypeLayer,&width,&height));
+  bool status = m_reference->m_executor->execute(new GetDimensionCommand(id,TypeLayer,&width,&height));
+	if (status){
   initReply();
   appendUint(width);
   appendUint(height);
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::GetSurfaceDimension(DBusConnection* conn,DBusMessage* msg )
@@ -991,11 +1252,15 @@ void DBUSCommunicator::GetSurfaceDimension(DBusConnection* conn,DBusMessage* msg
   uint id = getUIntFromMessage();
   uint width;
   uint height;
-  m_reference->m_executor->execute(new GetDimensionCommand(id,TypeSurface,&width,&height));
+  bool status = m_reference->m_executor->execute(new GetDimensionCommand(id,TypeSurface,&width,&height));
+	if (status){
   initReply();
   appendUint(width);
   appendUint(height);
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::SetSurfaceOpacity(DBusConnection* conn,DBusMessage* msg )
@@ -1004,9 +1269,13 @@ void DBUSCommunicator::SetSurfaceOpacity(DBusConnection* conn,DBusMessage* msg )
   uint id = getUIntFromMessage();
   dbus_message_iter_next(&iter);
   double param = getDoubleFromMessage();
-  m_reference->m_executor->execute(new SetOpacityCommand(id,TypeSurface,param));
+  bool status = m_reference->m_executor->execute(new SetOpacityCommand(id,TypeSurface,param));
+	if (status){
   initReply();
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::SetLayerOpacity(DBusConnection* conn,DBusMessage* msg )
@@ -1015,9 +1284,13 @@ void DBUSCommunicator::SetLayerOpacity(DBusConnection* conn,DBusMessage* msg )
   uint id = getUIntFromMessage();
   dbus_message_iter_next(&iter);
   double param = getDoubleFromMessage();
-  m_reference->m_executor->execute(new SetOpacityCommand(id,TypeLayer,param));
+  bool status = m_reference->m_executor->execute(new SetOpacityCommand(id,TypeLayer,param));
+	if (status){
   initReply();
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::SetSurfacegroupOpacity(DBusConnection* conn,DBusMessage* msg )
@@ -1026,9 +1299,13 @@ void DBUSCommunicator::SetSurfacegroupOpacity(DBusConnection* conn,DBusMessage* 
   uint id = getUIntFromMessage();
   dbus_message_iter_next(&iter);
   double param = getDoubleFromMessage();
-  m_reference->m_executor->execute(new SetOpacityCommand(id,TypeSurfaceGroup,param));
+  bool status = m_reference->m_executor->execute(new SetOpacityCommand(id,TypeSurfaceGroup,param));
+	if (status){
   initReply();
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::SetLayergroupOpacity(DBusConnection* conn,DBusMessage* msg )
@@ -1037,9 +1314,13 @@ void DBUSCommunicator::SetLayergroupOpacity(DBusConnection* conn,DBusMessage* ms
   uint id = getUIntFromMessage();
   dbus_message_iter_next(&iter);
   double param = getDoubleFromMessage();
-  m_reference->m_executor->execute(new SetOpacityCommand(id,TypeLayerGroup,param));
+  bool status = m_reference->m_executor->execute(new SetOpacityCommand(id,TypeLayerGroup,param));
+	if (status){
   initReply();
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::GetSurfaceOpacity(DBusConnection* conn,DBusMessage* msg )
@@ -1047,10 +1328,14 @@ void DBUSCommunicator::GetSurfaceOpacity(DBusConnection* conn,DBusMessage* msg )
   initReceive(msg);
   uint id = getUIntFromMessage();
   double param;
-  m_reference->m_executor->execute(new GetOpacityCommand(id,TypeSurface,&param));
+  bool status = m_reference->m_executor->execute(new GetOpacityCommand(id,TypeSurface,&param));
+	if (status){
   initReply();
   appendDouble(param);
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::GetLayerOpacity(DBusConnection* conn,DBusMessage* msg )
@@ -1058,10 +1343,14 @@ void DBUSCommunicator::GetLayerOpacity(DBusConnection* conn,DBusMessage* msg )
   initReceive(msg);
   uint id = getUIntFromMessage();
   double param;
-  m_reference->m_executor->execute(new GetOpacityCommand(id,TypeLayer,&param));
+  bool status = m_reference->m_executor->execute(new GetOpacityCommand(id,TypeLayer,&param));
+	if (status){
   initReply();
   appendDouble(param);
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::GetSurfacegroupOpacity(DBusConnection* conn,DBusMessage* msg )
@@ -1069,10 +1358,14 @@ void DBUSCommunicator::GetSurfacegroupOpacity(DBusConnection* conn,DBusMessage* 
   initReceive(msg);
   uint id = getUIntFromMessage();
   double param;
-  m_reference->m_executor->execute(new GetOpacityCommand(id,TypeSurfaceGroup,&param));
+  bool status = m_reference->m_executor->execute(new GetOpacityCommand(id,TypeSurfaceGroup,&param));
+	if (status){
   initReply();
   appendDouble(param);
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::GetLayergroupOpacity(DBusConnection* conn,DBusMessage* msg )
@@ -1080,10 +1373,14 @@ void DBUSCommunicator::GetLayergroupOpacity(DBusConnection* conn,DBusMessage* ms
   initReceive(msg);
   uint id = getUIntFromMessage();
   double param;
-  m_reference->m_executor->execute(new GetOpacityCommand(id,TypeLayerGroup,&param));
+  bool status = m_reference->m_executor->execute(new GetOpacityCommand(id,TypeLayerGroup,&param));
+	if (status){
   initReply();
   appendDouble(param);
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::SetSurfaceOrientation(DBusConnection* conn,DBusMessage* msg )
@@ -1093,9 +1390,29 @@ void DBUSCommunicator::SetSurfaceOrientation(DBusConnection* conn,DBusMessage* m
   dbus_message_iter_next(&iter);
   uint param = getUIntFromMessage();
   OrientationType o = (OrientationType) param;
-  m_reference->m_executor->execute(new SetOrientationCommand(id,TypeSurface,o));
+  bool status = m_reference->m_executor->execute(new SetOrientationCommand(id,TypeSurface,o));
+	if (status){
   initReply();
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
+}
+
+
+void DBUSCommunicator::GetSurfaceOrientation(DBusConnection* conn,DBusMessage* msg )
+{
+  initReceive(msg);
+  uint id = getUIntFromMessage();
+  OrientationType o;
+  bool status = m_reference->m_executor->execute(new GetOrientationCommand(id,TypeSurface,&o));
+	if (status){
+  initReply();
+  appendUint(o);
+  closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::SetLayerOrientation(DBusConnection* conn,DBusMessage* msg )
@@ -1105,9 +1422,28 @@ void DBUSCommunicator::SetLayerOrientation(DBusConnection* conn,DBusMessage* msg
   dbus_message_iter_next(&iter);
   uint param = getUIntFromMessage();
   OrientationType o = (OrientationType) param;
-  m_reference->m_executor->execute(new SetOrientationCommand(id,TypeLayer,o));
+  bool status = m_reference->m_executor->execute(new SetOrientationCommand(id,TypeLayer,o));
+	if (status){
   initReply();
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
+}
+
+void DBUSCommunicator::GetLayerOrientation(DBusConnection* conn,DBusMessage* msg )
+{
+  initReceive(msg);
+  uint id = getUIntFromMessage();
+  OrientationType o;
+  bool status = m_reference->m_executor->execute(new GetOrientationCommand(id,TypeLayer,&o));
+	if (status){
+  initReply();
+  appendUint(o);
+  closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::GetSurfacePixelformat(DBusConnection* conn,DBusMessage* msg )
@@ -1115,10 +1451,14 @@ void DBUSCommunicator::GetSurfacePixelformat(DBusConnection* conn,DBusMessage* m
   initReceive(msg);
   uint id = getUIntFromMessage();
   PixelFormat param;
-  m_reference->m_executor->execute(new GetPixelformatCommand(id,TypeSurface,&param));
+  bool status = m_reference->m_executor->execute(new GetPixelformatCommand(id,TypeSurface,&param));
+	if (status){
   initReply();
-  appendbyte(param);
+  appendUint(param);
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::SetSurfaceVisibility(DBusConnection* conn,DBusMessage* msg )
@@ -1127,20 +1467,28 @@ void DBUSCommunicator::SetSurfaceVisibility(DBusConnection* conn,DBusMessage* ms
   const uint surfaceid = getUIntFromMessage();
   dbus_message_iter_next(&iter);
   bool newVis= getBoolFromMessage();
-  m_reference->m_executor->execute(new SetVisibilityCommand(surfaceid,TypeSurface,newVis));
+  bool status = m_reference->m_executor->execute(new SetVisibilityCommand(surfaceid,TypeSurface,newVis));
+	if (status){
   initReply();
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::SetLayerVisibility(DBusConnection* conn,DBusMessage* msg )
 {
   initReceive(msg);
-  uint layerid = getUIntFromMessage();
+  const uint layerid = getUIntFromMessage();
   dbus_message_iter_next(&iter);
   bool myparam = getBoolFromMessage();
-  m_reference->m_executor->execute(new SetVisibilityCommand(layerid,TypeLayer,myparam));
+  bool status = m_reference->m_executor->execute(new SetVisibilityCommand(layerid,TypeLayer,myparam));
+	if (status){
   initReply();
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::GetSurfaceVisibility(DBusConnection* conn,DBusMessage* msg )
@@ -1148,10 +1496,15 @@ void DBUSCommunicator::GetSurfaceVisibility(DBusConnection* conn,DBusMessage* ms
   initReceive(msg);
   uint id = getUIntFromMessage();
   bool param;
-  m_reference->m_executor->execute(new GetVisibilityCommand(id,TypeSurface,&param));
+  bool status = m_reference->m_executor->execute(new GetVisibilityCommand(id,TypeSurface,&param));
+	if (status){
   initReply();
+LOG_DEBUG("DBUSCommunicator", "returning surfacevisibility: " << param);
   appendBool(param);
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::GetLayerVisibility(DBusConnection* conn,DBusMessage* msg )
@@ -1159,10 +1512,15 @@ void DBUSCommunicator::GetLayerVisibility(DBusConnection* conn,DBusMessage* msg 
   initReceive(msg);
   uint id = getUIntFromMessage();
   bool param;
-  m_reference->m_executor->execute(new GetVisibilityCommand(id,TypeLayer,&param));
+  bool status = m_reference->m_executor->execute(new GetVisibilityCommand(id,TypeLayer,&param));
+	if (status){
   initReply();
   appendBool(param);
+  LOG_DEBUG("DBUSCommunicator", "returning layervisibility: " << param);
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::SetSurfacegroupVisibility(DBusConnection* conn,DBusMessage* msg )
@@ -1171,9 +1529,13 @@ void DBUSCommunicator::SetSurfacegroupVisibility(DBusConnection* conn,DBusMessag
   uint groupid = getUIntFromMessage();
   dbus_message_iter_next(&iter);
   bool myparam = getBoolFromMessage();
-  m_reference->m_executor->execute(new SetVisibilityCommand(groupid,TypeSurfaceGroup,myparam));
+  bool status = m_reference->m_executor->execute(new SetVisibilityCommand(groupid,TypeSurfaceGroup,myparam));
+	if (status){
   initReply();
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::SetLayergroupVisibility(DBusConnection* conn,DBusMessage* msg )
@@ -1182,9 +1544,13 @@ void DBUSCommunicator::SetLayergroupVisibility(DBusConnection* conn,DBusMessage*
   uint groupid = getUIntFromMessage();
   dbus_message_iter_next(&iter);
   bool myparam = getBoolFromMessage();
-  m_reference->m_executor->execute(new SetVisibilityCommand(groupid,TypeLayerGroup,myparam));
+  bool status = m_reference->m_executor->execute(new SetVisibilityCommand(groupid,TypeLayerGroup,myparam));
+	if (status){
   initReply();
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::SetRenderOrderOfLayers(DBusConnection* conn,DBusMessage* msg )
@@ -1194,14 +1560,23 @@ void DBUSCommunicator::SetRenderOrderOfLayers(DBusConnection* conn,DBusMessage* 
     LOG_ERROR("DBUSCommunicator","Argument is not an array!");
   DBusMessageIter arrayIter;
   dbus_message_iter_recurse(&iter,&arrayIter);
-  int* arr;
+  uint* arr;
   int length;
   dbus_message_iter_get_fixed_array(&arrayIter,&arr,&length);
 
-  m_reference->m_executor->execute(new SetLayerOrderCommand(arr,length));
-
-  initReply();
-  closeReply();
+  uint* uArray = new uint[length];
+  LOG_DEBUG("DBUSCommunicator","Renderorder: Got " << length << " ids..");
+  for (int i=0;i<length;i++){
+	  uArray[i] = arr[i];
+	  LOG_DEBUG("DBUSCommunicator","Renderorder: Got layer id" << arr[i]);
+  }
+  bool status = m_reference->m_executor->execute(new SetLayerOrderCommand(uArray,length));
+  if (status){
+	  initReply();
+	  closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::SetSurfaceRenderOrderWithinLayer(DBusConnection* conn,DBusMessage* msg )
@@ -1214,14 +1589,22 @@ void DBUSCommunicator::SetSurfaceRenderOrderWithinLayer(DBusConnection* conn,DBu
     LOG_ERROR("DBUSCommunicator", "Argument is not an array!");
   DBusMessageIter arrayIter;
   dbus_message_iter_recurse(&iter,&arrayIter);
-  int* arr;
+  uint* arr;
   int length;
   dbus_message_iter_get_fixed_array(&arrayIter,&arr,&length);
 
-  m_reference->m_executor->execute(new SetOrderWithinLayerCommand(layerid,arr,length));
-
+  uint* uArray = new uint[length];
+  for (int i=0;i<length;i++){
+	  uArray[i] = arr[i];
+	  LOG_DEBUG("DBUSCommunicator", "SetSurfaceRenderOrderWithinLayer: add surface "<<uArray[i] << " to layer " << layerid);
+  }
+  bool status = m_reference->m_executor->execute(new SetOrderWithinLayerCommand(layerid,uArray,length));
+	if (status){
   initReply();
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::GetLayerType(DBusConnection* conn,DBusMessage* msg )
@@ -1229,9 +1612,13 @@ void DBUSCommunicator::GetLayerType(DBusConnection* conn,DBusMessage* msg )
   initReceive(msg);
   uint id = getUIntFromMessage();
   Layer* l = m_reference->m_layerlist->getLayer(id);
-  initReply();
-  appendUint(l->getLayerType());
-  closeReply();
+  if (l!=NULL){
+	  initReply();
+	  appendUint(l->getLayerType());
+	  closeReply();
+  }else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::GetLayertypeCapabilities(DBusConnection* conn,DBusMessage* msg )
@@ -1241,6 +1628,7 @@ void DBUSCommunicator::GetLayertypeCapabilities(DBusConnection* conn,DBusMessage
   uint id = getUIntFromMessage();
   LayerType type = (LayerType)id;
   uint capabilities = m_reference->m_executor->getLayerTypeCapabilities(type);
+  LOG_DEBUG("DBUSCommunicator", "GetLayertypeCapabilities: returning capabilities:" << capabilities);
   initReply();
   appendUint(capabilities);
   closeReply();
@@ -1251,9 +1639,13 @@ void DBUSCommunicator::GetLayerCapabilities(DBusConnection* conn,DBusMessage* ms
   initReceive(msg);
   uint id = getUIntFromMessage();
   Layer* l = m_reference->m_layerlist->getLayer(id);
-  initReply();
-  appendUint(l->getCapabilities());
-  closeReply();
+  if (l!=NULL){
+	  initReply();
+	  appendUint(l->getCapabilities());
+	  closeReply();
+  }else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::FadeIn(DBusConnection* conn,DBusMessage* msg )
@@ -1280,17 +1672,25 @@ void DBUSCommunicator::FadeOut(DBusConnection* conn,DBusMessage* msg )
 void DBUSCommunicator::Exit(DBusConnection* conn,DBusMessage* msg )
 {
   currentMsg = msg;
-  m_reference->m_executor->execute(new ExitCommand());
+  bool status = m_reference->m_executor->execute(new ExitCommand());
+	if (status){
   initReply();
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::CommitChanges(DBusConnection* conn,DBusMessage* msg )
 {
   currentMsg = msg;
-  m_reference->m_executor->execute(new CommitCommand());
+  bool status = m_reference->m_executor->execute(new CommitCommand());
+	if (status){
   initReply();
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::CreateShader(DBusConnection* conn,DBusMessage* msg )
@@ -1300,19 +1700,27 @@ void DBUSCommunicator::CreateShader(DBusConnection* conn,DBusMessage* msg )
   dbus_message_iter_next(&iter);
   char* fragname = getStringFromMessage();
   uint id;
-  m_reference->m_executor->execute(new CreateShaderCommand(vertname,fragname,&id));
+  bool status = m_reference->m_executor->execute(new CreateShaderCommand(vertname,fragname,&id));
+	if (status){
   initReply();
   appendUint(id);
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::DestroyShader(DBusConnection* conn,DBusMessage* msg )
 {
   initReceive(msg);
   uint shaderid = getUIntFromMessage();
-  m_reference->m_executor->execute(new DestroyShaderCommand(shaderid));
+  bool status = m_reference->m_executor->execute(new DestroyShaderCommand(shaderid));
+	if (status){
   initReply();
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::SetShader(DBusConnection* conn,DBusMessage* msg )
@@ -1321,9 +1729,13 @@ void DBUSCommunicator::SetShader(DBusConnection* conn,DBusMessage* msg )
   uint objectid = getUIntFromMessage();
   dbus_message_iter_next(&iter);
   uint shaderid = getUIntFromMessage();
-  m_reference->m_executor->execute(new SetShaderCommand(objectid,shaderid));
+  bool status = m_reference->m_executor->execute(new SetShaderCommand(objectid,shaderid));
+	if (status){
   initReply();
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void DBUSCommunicator::SetUniforms(DBusConnection* conn,DBusMessage* msg )
@@ -1350,9 +1762,13 @@ void DBUSCommunicator::SetUniforms(DBusConnection* conn,DBusMessage* msg )
       hasNext = false;
   }
 
-  m_reference->m_executor->execute(new SetUniformsCommand(id,uniforms));
+  bool status = m_reference->m_executor->execute(new SetUniformsCommand(id,uniforms));
+	if (status){
   initReply();
   closeReply();
+	}else{
+		ReplyError(DBUS_ERROR_INVALID_ARGS,ID_UNKNOWN);
+	}
 }
 
 void* DBUSCommunicator::run(void * arg){
@@ -1372,7 +1788,7 @@ void* DBUSCommunicator::run(void * arg){
       while(!found && strcmp(manager_methods[i].name,"")!=0){
         if (n && strcmp(manager_methods[i].name,n) == 0){
           MethodTable entry =  manager_methods[i];
-          LOG_DEBUG("DBUSC","called methodname:" << entry.name);
+          LOG_DEBUG("DBUSCommunicator","got call for method:" << entry.name);
           CallBackMethod m = entry.function;
           (m_reference->*m)(conn,msg);
           found = true;
