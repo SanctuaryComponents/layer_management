@@ -140,17 +140,13 @@ These preconditions have to be met in order to build the LayerManager component:
 
 Building the LayerManager breaks down to the following steps:
 
-1. Store IVILayerManagement_0_8_0.tar.gz in local path [referred to as <package-path>]
+1. Pull the current codebase from the git repository to your target source directory [referred to as <source-dir>]
 
-2. Extract the file IVILayerManagement_0_8_0.tar.gz to your target source directory [referred to as <source-dir>]
-
-   Example: tar -xf <package-path>/IVILayerManagement_0_8_0.tar.gz
-
-3. Create a build directory, e.g. IVILayerManagement_build [referred to as <build-dir>]
+2. Create a build directory, e.g. IVILayerManagement_build [referred to as <build-dir>]
 
    Example: mkdir IVILayerManagement_build
 
-4. In <build-dir> Generate build system for your platform using CMake.
+3. In <build-dir> Generate build system for your platform using CMake.
    This step provides some customization options to configure build options.
 
    Example: cd <build-dir>
@@ -158,11 +154,11 @@ Building the LayerManager breaks down to the following steps:
    
    For a full list of available build options in [optional_build_options] see "Supported Build Options"   
 
-5. Start the build.
+4. Start the build.
 
    Example: make
 
-6. Install LayerManager on local system.
+5. Install LayerManager on local system.
    Not: This steps will require root rights on most systems.
 
    Example: sudo make install
@@ -197,4 +193,5 @@ Supported Build Options
   Option: -DWITH_TESTS=ON or
           -DWITH_TESTS=OFF
 
+  Remark: Test File are currently not upstreamed.	
 
