@@ -1,14 +1,13 @@
-#!/bin/bash
 ############################################################################
 # 
-# Copyright 2010 BMW Car IT GmbH  
+# Copyright 2010, 2011 BMW Car IT GmbH
 # 
 # 
 # Licensed under the Apache License, Version 2.0 (the "License"); 
 # you may not use this file except in compliance with the License. 
 # You may obtain a copy of the License at 
 #
-#       http://www.apache.org/licenses/LICENSE-2.0 
+#		http://www.apache.org/licenses/LICENSE-2.0 
 #
 # Unless required by applicable law or agreed to in writing, software 
 # distributed under the License is distributed on an "AS IS" BASIS, 
@@ -18,8 +17,23 @@
 #
 ############################################################################
 
-# call binding tool to generate server stubs and marshallers
-dbus-binding-tool --mode=glib-server --prefix=compositeService --output=./include/compositeServiceBinding.h compositeServiceDescription.xml
-dbus-binding-tool --mode=glib-client --prefix=compositeService --output=./include/compositeServiceClient.h compositeServiceDescription.xml
-# output java binding files to console:
-CreateInterface compositeServiceDescription.xml
+FIND_PATH(GLX_INCLUDE_DIR GL/glx.h
+/usr/include
+)
+
+FIND_LIBRARY(GLX_LIBRARIES
+NAMES GL
+PATHS /usr/lib /usr/local/lib
+)
+
+SET( GLX_FOUND "NO" )
+IF(GLX_LIBRARIES)
+    SET( GLX_FOUND "YES" )
+    message(STATUS "Found GLX libs: ${GLX_LIBRARIES}")
+    message(STATUS "Found GLX includes: ${GLX_INCLUDE_DIR}")
+ENDIF(GLX_LIBRARIES)
+
+MARK_AS_ADVANCED(
+  GLX_INCLUDE_DIR
+  GLX_LIBRARIES
+)

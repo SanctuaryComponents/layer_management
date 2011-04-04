@@ -1,13 +1,13 @@
 ############################################################################
 # 
-# Copyright 2010 BMW Car IT GmbH  
+# Copyright 2010, 2011 BMW Car IT GmbH
 # 
 # 
 # Licensed under the Apache License, Version 2.0 (the "License"); 
 # you may not use this file except in compliance with the License. 
 # You may obtain a copy of the License at 
 #
-#       http://www.apache.org/licenses/LICENSE-2.0 
+#		http://www.apache.org/licenses/LICENSE-2.0 
 #
 # Unless required by applicable law or agreed to in writing, software 
 # distributed under the License is distributed on an "AS IS" BASIS, 
@@ -16,16 +16,12 @@
 # limitations under the License.
 #
 ############################################################################
-RENDERER=BeagleRenderer
-COMMUNICATOR=DBUSCommunicator
 
-CXXFLAGS = -Wall -fPIC -O2
+cmake_minimum_required (VERSION 2.6)
 
-ADD_INCLUDE_DIR+=/home/carit/beagleIncludes
+include_directories ("include")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+add_library(LayerManagerUtils STATIC src/Bitmap.cpp src/IlmMatrix.cpp src/Log.cpp src/LogMessageBuffer.cpp)
 
-ADD_LIB_DIR+= /home/carit/beagleIncludes
-
-LINKFLAGS = -Xlinker -export-dynamic
-
-CXX = /home/carit/toolchain/arm-2009q1/bin/arm-none-linux-gnueabi-g++
+install (FILES include/Log.h include/LogMessageBuffer.h include/IlmMatrix.h include/Bitmap.h DESTINATION include/layermanager)
 

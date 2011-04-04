@@ -1,7 +1,7 @@
 #!/bin/sh
 ############################################################################
 # 
-# Copyright 2010 BMW Car IT GmbH  
+# Copyright 2010, 2011 BMW Car IT GmbH
 # 
 # 
 # Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -20,30 +20,31 @@
 
 export LD_LIBRARY_PATH=/usr/lib:/usr/local/lib
 export DISPLAY=:0.0
+export DBUS_SESSION_BUS_ADDRESS=tcp:host=0.0.0.0,port=12434
 PIDSURFACE1=/var/run/surface1.pid
 PIDSURFACE2=/var/run/surface2.pid
 
 init_scene()
 {
-	./LayerManagerExamples/LayerManagerClientExample/build/LayermanagerClientTest
+	LayerManagerClientExample
 }
 
 deinit_scene()
 {
-	./LayerManagerExamples/LayerManagerClientExample/build/LayermanagerClientTest 2
+	LayerManagerClientExample 2
 }
 
 start_egl_example_application()
 {
-	./LayerManagerExamples/EGLX11ApplicationExample/build/eglX11_application &
-	pidofdlt=`ps aux | grep eglX11_application | grep -v grep | awk '{print $2}'`
+	EGLX11ApplicationExample &
+	pidofdlt=`ps aux | grep EGLX11ApplicationExample | grep -v grep | awk '{print $2}'`
 	echo $pidofdlt > $PIDSURFACE1
 }
 
 start_glx_example_application()
 {
-	./LayerManagerExamples/GLXApplicationExample/build/glxX11_application &
-	pidofdlt=`ps aux | grep glxX11_application | grep -v grep | awk '{print $2}'`
+	GLXApplicationExample &
+	pidofdlt=`ps aux | GLXApplicationExample | grep -v grep | awk '{print $2}'`
 	echo $pidofdlt > $PIDSURFACE2
 }
 

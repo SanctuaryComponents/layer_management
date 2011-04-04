@@ -1,0 +1,10 @@
+LayerManagerClient/.*
+LayerManagerExamples/.*
+LayerManagerUtils/.*
+LayerManagerService/.*
+LayerManagerPlugins/Communicators/DBUSCommunicator/.*
+LayerManagerPlugins/Renderers/.*
+cmake/.*
+configure
+CMakeLists.txt
+LayerManager.spec.in
