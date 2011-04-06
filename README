@@ -165,6 +165,32 @@ Building the LayerManager breaks down to the following steps:
 
 The LayerManager may now be started call calling "LayerManagerService".
 
+Needed Libraries
+===
+
+You need both development packages and libraries for
+
+LayerManagerService
+--
+libdbus
+
+X11GLESRenderer:
+--
+Core X11 libraries
+X11 Composite libraries
+
+Vendor specific EGL 1.4 Libraries, which are support the EGL_IMAGE_KHR Extension including
+build an EGL Image from X11Pixmap
+Vendor specific OpenGL ES 2.0 Libraries, with JIT compiler to support shader which are
+delivered as source code
+
+X11Renderer:
+---
+Core X11 libraries
+X11 Composite libraries
+
+OpenGL 1.1
+GLX
 
 Supported Build Options
 ===
@@ -194,4 +220,17 @@ Supported Build Options
           -DWITH_TESTS=OFF
 
   Remark: Test File are currently not upstreamed.	
+
+- Build for diferent Platforms
+
+  You have the choice to use GLXRenderer or X11GLESRenderer.
+
+  GLXRenderer (X11Renderer.so) which is normaly used for a Desktop, VMWare Image and GMA500 based Headunits
+
+  cmake <source-dir>/ -DWITH_DESKTOP=ON -DWITH_GLX_EXAMPLE=ON -DWITH_TESTS=OFF -DWITH_EGL_EXAMPLE=OFF -DWITH_X11_GLES=OFF
+
+  X11GLESRenderer which is used on more embedded device which are supporting EGL and OpenGL ES 2.0
+
+  cmake <source-dir>/ -DWITH_DESKTOP=OFF -DWITH_GLX_EXAMPLE=OFF -DWITH_TESTS=OFF -DWITH_EGL_EXAMPLE=ON -DWITH_X11_GLES=ON
+
 
