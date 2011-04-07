@@ -41,10 +41,10 @@ file(GLOB SOURCES
 add_library(X11GLXRenderer SHARED ${SOURCES})
 
 find_package(X11 REQUIRED)
-include_directories(X11_Xcomposite_INCLUDE_PATH)
+include_directories(${X11_Xcomposite_INCLUDE_PATH})
 
 find_package(GLX REQUIRED)
-include_directories(GLX_INCLUDE_DIR)
+include_directories(${GLX_INCLUDE_DIR})
 
 find_package (Threads)
 set(LIBS ${LIBS} ${CMAKE_THREAD_LIBS_INIT} ${X11_X11_LIB} ${X11_Xcomposite_LIB} ${GLX_LIBRARIES} LayerManagerUtils) 

@@ -41,13 +41,13 @@ file(GLOB SOURCES
 add_library(X11GLESRenderer SHARED ${SOURCES})
 
 find_package(X11 REQUIRED)
-include_directories(X11_Xcomposite_INCLUDE_PATH)
+include_directories(${X11_Xcomposite_INCLUDE_PATH})
 
 find_package(EGL REQUIRED)
-include_directories(EGL_INCLUDE_DIR)
+include_directories(${EGL_INCLUDE_DIR})
 
 find_package(GLESv2 REQUIRED)
-include_directories(GLESv2_INCLUDE_DIR)
+include_directories(${GLESv2_INCLUDE_DIR})
 
 find_package (Threads)
 set(LIBS ${LIBS} ${CMAKE_THREAD_LIBS_INIT} ${EGL_LIBRARIES} ${GLESv2_LIBRARIES} ${X11_Xcomposite_LIB} LayerManagerUtils )
