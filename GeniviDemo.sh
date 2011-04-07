@@ -43,8 +43,8 @@ start_egl_example_application()
 
 start_glx_example_application()
 {
-	GLXApplicationExample &
-	pidofdlt=`ps aux | GLXApplicationExample | grep -v grep | awk '{print $2}'`
+	GLX11ApplicationExample &
+	pidofdlt=`ps aux | GLX11ApplicationExample | grep -v grep | awk '{print $2}'`
 	echo $pidofdlt > $PIDSURFACE2
 }
 
