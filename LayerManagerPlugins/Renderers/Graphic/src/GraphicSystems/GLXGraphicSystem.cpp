@@ -29,6 +29,11 @@ GLXGraphicsystem::GLXGraphicsystem( int WindowWidth,int WindowHeight)
 	LOG_DEBUG("GLXGraphicsystem", "creating GLXGraphicsystem");
 	this->windowHeight = WindowHeight;
 	this->windowWidth = WindowWidth;
+#ifdef GLX_GRAPHICSYSTEM_FORCE_COPY
+	m_forcecopy = true;
+#else
+	m_forcecopy = false;
+#endif
 }
 
 GLXGraphicsystem::~GLXGraphicsystem()
@@ -37,7 +42,7 @@ GLXGraphicsystem::~GLXGraphicsystem()
 		delete m_binder;
 }
 
-XVisualInfo* GLXGraphicsystem::ChooseWindowVisual(Display *dpy)
+XVisualInfo* GLXGraphicsystem::GetMatchingVisual(Display *dpy)
 {
 	int screen = DefaultScreen(dpy);
 	XVisualInfo *visinfo;
@@ -60,52 +65,91 @@ XVisualInfo* GLXGraphicsystem::ChooseWindowVisual(Display *dpy)
 	}
 	return visinfo;
 }
-
-GLXFBConfig GLXGraphicsystem::ChoosePixmapFBConfig(Display *display)
+bool GLXGraphicsystem::CheckConfigMask(Display *curDisplay,GLXFBConfig currentConfig, int attribute, int expectedValue)
 {
+ 	bool result = true;
+	int returnedValue = 0;
+
+	glXGetFBConfigAttrib(curDisplay,currentConfig,attribute,&returnedValue);
+	if (!(returnedValue & expectedValue)) 
+	{
+		result = false;
+	}
+	return result;
+}
+
+bool GLXGraphicsystem::CheckConfigValue(Display *curDisplay,GLXFBConfig currentConfig, int attribute, int expectedValue)
+{
+ 	bool result = true;
+	int returnedValue = 0;
+
+	glXGetFBConfigAttrib(curDisplay,currentConfig,attribute,&returnedValue);
+	if ((returnedValue != expectedValue)) 
+	{
+		result = false;
+	}
+	return result;
+}
+
+
+GLXFBConfig GLXGraphicsystem::GetMatchingPixmapConfig(Display *curDisplay)
+{
+	int neededMaskAttribute[] = 
+	{
+		GLX_DRAWABLE_TYPE,GLX_PIXMAP_BIT,
+		GLX_DRAWABLE_TYPE,GLX_WINDOW_BIT,
+		GLX_BIND_TO_TEXTURE_TARGETS_EXT,GLX_TEXTURE_2D_BIT_EXT,
+		None
+	};
+	int neededValueAttribute[] = 
+	{
+		GLX_BUFFER_SIZE,32,
+		GLX_ALPHA_SIZE,8,
+		GLX_BIND_TO_TEXTURE_RGBA_EXT,True,
+		None
+	};
 	LOG_DEBUG("GLXGraphicsystem", "Choose pixmap GL configuration");
-	int screen = DefaultScreen(display);
-	GLXFBConfig *fbconfigs;
-	int i, nfbconfigs = 0, value;
+	int screen = DefaultScreen(curDisplay);
+	GLXFBConfig *currentFBconfigs;
+	int i,j,nConfigs = 0;
 
-	fbconfigs = glXGetFBConfigs(display, screen, &nfbconfigs);
-	for (i = 0; i < nfbconfigs; i++) {
-
-		glXGetFBConfigAttrib(display, fbconfigs[i], GLX_DRAWABLE_TYPE, &value);
-		if (!(value & GLX_PIXMAP_BIT))
-			continue;
-
-		glXGetFBConfigAttrib(display, fbconfigs[i], GLX_DRAWABLE_TYPE, &value);
-		if (!(value & GLX_WINDOW_BIT))
-			continue;
-
-		glXGetFBConfigAttrib(display, fbconfigs[i], GLX_BIND_TO_TEXTURE_TARGETS_EXT, &value);
-		if (!(value & GLX_TEXTURE_2D_BIT_EXT))
-			continue;
-
-		glXGetFBConfigAttrib(display, fbconfigs[i], GLX_BUFFER_SIZE, &value);
-		if (value != 32)
-			continue;
-
-		glXGetFBConfigAttrib(display, fbconfigs[i], GLX_ALPHA_SIZE, &value);
-		if (value <8)
-			continue;
-
-		glXGetFBConfigAttrib(display, fbconfigs[i],  GLX_BIND_TO_TEXTURE_RGBA_EXT, &value);
-		if (value == False) {
-			continue;
+	currentFBconfigs = glXGetFBConfigs(curDisplay, screen, &nConfigs);
+	for (i = 0; i < nConfigs; i++) 
+	{
+		GLXFBConfig config = currentFBconfigs[i];
+		bool result = true;
+		/* check first all mask values */		
+		j = 0;
+		while ( neededMaskAttribute[j] != None && result == true ) 
+		{
+		   result = CheckConfigMask(curDisplay,config, neededMaskAttribute[j], neededMaskAttribute[j+1]);		   
+		   j += 2;
 		}
+		/* no matching found in needed mask attribute, skip config take next */
+		if (result == false ) continue;
+		/* check all fixed values */
 
+		/* reset attribute counter */
+		j = 0;
+		/* check all fixed values */
+		while ( neededValueAttribute[j] != None && result == true ) 
+		{
+		   result = CheckConfigValue(curDisplay,config, neededValueAttribute[j], neededValueAttribute[j+1]);		   
+		   j += 2;
+		}
+		/* no matching found in needed fixed value attribute, skip config take next */
+
+		if (result == false ) continue;
 		break;
 	}
 
-	if (i == nfbconfigs) {
+	if (i == nConfigs) {
 		LOG_ERROR("GLXGraphicsystem", "Unable to find FBconfig for texturing");
 		exit(1);
 	}
 
 	LOG_DEBUG("GLXGraphicsystem", "Done choosing GL Pixmap configuration");
-	return fbconfigs[i];
+	return currentFBconfigs[i];
 }
 
 bool GLXGraphicsystem::init(Display* x11Display, Window x11Window)
@@ -119,7 +163,7 @@ bool GLXGraphicsystem::init(Display* x11Display, Window x11Window)
 
 	if (!window)
 		LOG_ERROR("GLXGraphicsystem", "given windowid is 0");
-	XVisualInfo* windowVis = ChooseWindowVisual(x11disp);
+	XVisualInfo* windowVis = GetMatchingVisual(x11disp);
 
 	LOG_DEBUG("X11GLXRenderer", "Initialising opengl");
 	GLXContext ctx = glXCreateContext(x11disp, windowVis, 0, GL_TRUE);
@@ -133,18 +177,18 @@ bool GLXGraphicsystem::init(Display* x11Display, Window x11Window)
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	glEnable(GL_TEXTURE_2D);
-
+	glMatrixMode(GL_MODELVIEW);
 	ITextureBinder * binder;
 	const char *ext;
 	ext = glXQueryExtensionsString(x11disp, 0);
-	if (!strstr(ext, "GLX_EXT_texture_from_pixmap"))
+	if (!strstr(ext, "GLX_EXT_texture_from_pixmap") || true == m_forcecopy )
 	{
-		LOG_WARNING("GLXGraphicsystem", "GLX_EXT_texture_from_pixmap not supported! Fallback to copy!");
+		LOG_DEBUG("GLXGraphicsystem", "GLX_EXT_texture_from_pixmap not supported or copy is forced! Fallback to copy!");
 		binder = new X11CopyGLX(x11disp);
 	}
 	else
 	{
-		GLXFBConfig pixmapConfig = GLXGraphicsystem::ChoosePixmapFBConfig(x11disp);
+		GLXFBConfig pixmapConfig = GetMatchingPixmapConfig(x11disp);
 		binder = new X11TextureFromPixmap(x11disp,pixmapConfig);
 	}
 
@@ -167,13 +211,21 @@ void GLXGraphicsystem::swapBuffers()
 void GLXGraphicsystem::beginLayer(Layer* currentLayer)
 {
 	m_currentLayer = currentLayer;
-	// TODO layer destination / source
+	/* Load Identity Matrix for each Layer */
+	glLoadIdentity();
+	/* set layer Transformations */
+	const Rectangle& layerDestination = m_currentLayer->getDestinationRegion();
+	const Rectangle& layerSource = m_currentLayer->getSourceRegion();
+
+	glTranslatef(layerDestination.x,layerDestination.y,0.0);
+
 }
 
 void GLXGraphicsystem::renderLayer()
 {
 	if ((m_currentLayer)->visibility && (m_currentLayer)->opacity > 0.0)
 	{
+//		LOG_DEBUG("GLXGraphicsystem", "renderLayer " << m_currentLayer->getID() );
 		std::list<Surface*> surfaces = m_currentLayer->surfaces;
 		for(std::list<Surface*>::const_iterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++)
 		{
@@ -194,8 +246,10 @@ void GLXGraphicsystem::endLayer()
 
 void GLXGraphicsystem::renderSurface(Surface* currentSurface)
 {
-	m_binder->bindSurfaceTexture(currentSurface);
+//	LOG_DEBUG("GLXGraphicsystem", "renderSurface " << currentSurface->getID() );
 	glPushMatrix();
+	m_binder->bindSurfaceTexture(currentSurface);
+//	glPushMatrix();
 	glColor4f(1.0f,1.0f,1.0f,currentSurface->opacity*(m_currentLayer)->opacity);
 	glBegin(GL_QUADS);
 	const Rectangle& src = currentSurface->getSourceRegion();
@@ -204,7 +258,7 @@ void GLXGraphicsystem::renderSurface(Surface* currentSurface)
 //	LOG_DEBUG("GLXGraphicsystem","rendersurface: src" << src.x << " " << src.y << " " << src.width << " " << src.height );
 //	LOG_DEBUG("GLXGraphicsystem","rendersurface: dest" << dest.x << " " << dest.y << " " << dest.width << " " << dest.height );
 //	LOG_DEBUG("GLXGraphicsystem","orig: " << currentSurface->OriginalSourceWidth << " " << currentSurface->OriginalSourceHeight  );
-//	LOG_DEBUG("GLXGraphicsystem","window" << windowWidth << " " << windowHeight  );
+//	LOG_DEBUG("GLXGraphicsystem","window: " << windowWidth << " " << windowHeight  );
 
 	//bottom left
 	glTexCoord2d((float)src.x/currentSurface->OriginalSourceWidth, (float)(src.y+src.height)/currentSurface->OriginalSourceHeight);

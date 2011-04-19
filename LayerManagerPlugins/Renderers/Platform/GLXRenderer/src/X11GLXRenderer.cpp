@@ -32,7 +32,7 @@ bool X11GLXRenderer::start(int width, int height, const char* displayname){
 	m_height = height;
 
 	// create X11 windows, register as composite manager etc
-	m_windowSystem  = new X11WindowSystem(displayname, width, height, m_layerlist, GLXGraphicsystem::ChooseWindowVisual);
+	m_windowSystem  = new X11WindowSystem(displayname, width, height, m_layerlist, GLXGraphicsystem::GetMatchingVisual);
 	m_graphicSystem = new GLXGraphicsystem(width, height);
 	m_graphicSystem->setBaseWindowSystem(m_windowSystem);
 
