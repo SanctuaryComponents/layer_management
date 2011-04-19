@@ -69,7 +69,7 @@ t_ilm_bool createX11Context(t_ilm_int width, t_ilm_int height)
 
   /* Get the root window parameters */
   rootWindow = RootWindow(g_x11ContextStruct.x11Display, g_x11ContextStruct.x11Screen);
-  colorDepth = DefaultDepth(g_x11ContextStruct.x11Display, g_x11ContextStruct.x11Screen);
+  colorDepth = 32;//DefaultDepth(g_x11ContextStruct.x11Display, g_x11ContextStruct.x11Screen);
   /* Alloc memory for the visual info */
   g_x11ContextStruct.x11Visual = (XVisualInfo*) malloc(sizeof(XVisualInfo));
   /* Try to find a visual which is matching the needed parameters */
@@ -98,7 +98,7 @@ t_ilm_bool createX11Context(t_ilm_int width, t_ilm_int height)
 
   /* Creates the X11 window */
   g_x11ContextStruct.x11Window = XCreateWindow( g_x11ContextStruct.x11Display, RootWindow(g_x11ContextStruct.x11Display, g_x11ContextStruct.x11Screen), 0, 0, widthCorrected, heightCorrected,
-                                                           0, CopyFromParent, InputOutput, CopyFromParent, windowMask, &windowAttributes);
+                                                           0, g_x11ContextStruct.x11Visual->depth, InputOutput, g_x11ContextStruct.x11Visual->visual, windowMask, &windowAttributes);
 
   /* map the window */
   XMapWindow(g_x11ContextStruct.x11Display, g_x11ContextStruct.x11Window);
