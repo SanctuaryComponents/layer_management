@@ -56,7 +56,10 @@ option (WITH_GLX_EXAMPLE
 option (WITH_TESTS
         "Build Available Tests " OFF)
 
-
+option (WITH_FORCE_COPY OFF)
+if (WITH_FORCE_COPY)
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DGLX_GRAPHICSYSTEM_FORCE_COPY" CACHE STRING "" FORCE)
+endif(WITH_FORCE_COPY)
 
 add_subdirectory (LayerManagerPlugins/Communicators/DBUSCommunicator)
 add_subdirectory (LayerManagerClient/ilmClient)
