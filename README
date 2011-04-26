@@ -134,13 +134,17 @@ by the following steps:
 How to build on different platforms
 ====================================
 
-These preconditions have to be met in order to build the LayerManager component:
+These conditions need to be met in order to build the LayerManager component:
 
 - CMake required (version 2.6 or higher)
 
 Building the LayerManager breaks down to the following steps:
 
 1. Pull the current codebase from the git repository to your target source directory [referred to as <source-dir>]
+
+   Example: git clone https://git.genivi.org/srv/git/layer_management
+
+   This should give you a directory called "layer_management" in your current directory.
 
 2. Create a build directory, e.g. IVILayerManagement_build [referred to as <build-dir>]
 
@@ -159,11 +163,11 @@ Building the LayerManager breaks down to the following steps:
    Example: make
 
 5. Install LayerManager on local system.
-   Not: This steps will require root rights on most systems.
+   Note: This step will require root priviledges on most systems.
 
    Example: sudo make install
 
-The LayerManager may now be started call calling "LayerManagerService".
+The LayerManager may now be started by calling "LayerManagerService".
 
 Needed Libraries
 ===
