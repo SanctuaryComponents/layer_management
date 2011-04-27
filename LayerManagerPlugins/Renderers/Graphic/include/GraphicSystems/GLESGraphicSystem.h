@@ -64,8 +64,10 @@ public:
 	EGLint								m_displayHeight;
 	EGLBoolean							m_blendingStatus;
 	Shader* 							m_defaultShader;
+    Shader*                             m_defaultShaderNoUniformAlpha;
 	Layer*								m_currentLayer;
 	void renderSurface(Surface* surface);
+	Shader *pickOptimizedShader(Shader* currentShader, const ShaderProgram::CommonUniforms curUniforms);
 #ifdef DRAW_LAYER_DEBUG
 	Shader* 							m_layerShader;
 #endif

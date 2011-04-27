@@ -59,6 +59,7 @@ add_dependencies(X11GLESRenderer LayerManagerUtils)
 
 install (TARGETS X11GLESRenderer DESTINATION lib/layermanager/renderer)
 install (FILES renderer_frag.glslf DESTINATION lib/layermanager/renderer)
+install (FILES renderer_frag_no_ualpha.glslf DESTINATION lib/layermanager/renderer)
 install (FILES renderer_layer.glslf DESTINATION lib/layermanager/renderer)
 install (FILES renderer_layer.glslv DESTINATION lib/layermanager/renderer)
 install (FILES renderer_vert.glslv DESTINATION lib/layermanager/renderer)

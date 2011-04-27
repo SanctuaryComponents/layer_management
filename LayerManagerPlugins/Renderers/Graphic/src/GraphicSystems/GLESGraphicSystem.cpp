@@ -206,6 +206,21 @@ void GLESGraphicsystem::endLayer()
 	m_currentLayer = NULL;
 }
 
+//this is a particularly simple function currently, but it will likely be expanded as more shaders and effects are implemented.
+Shader *GLESGraphicsystem::pickOptimizedShader(Shader* currentShader, const ShaderProgram::CommonUniforms curUniforms)
+{
+    Shader * retShader = currentShader;
+
+    if (currentShader == m_defaultShader && curUniforms.opacity == 1.0f)
+    {
+      //no need for multiply in shader, just use texture
+      retShader = m_defaultShaderNoUniformAlpha;
+    }
+
+    return retShader;
+
+}
+
 void GLESGraphicsystem::renderSurface(Surface* surface)
 {
 //	LOG_DEBUG("GLESGraphicsystem", "renderSurface " << surface->getID());
@@ -262,6 +277,29 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
   uniforms.texUnit = 0;
   uniforms.matrix = &layerMatrix.f[0];
 
+    //We only know about specific Shaders, only do this if we start with the defaultShader
+  if (shader == m_defaultShader && uniforms.opacity == 1.0f)
+  {
+    if(!PixelFormatHasAlpha((surface)->getPixelFormat()))
+	{
+        //disable alpha blend completely
+	    glDisable (GL_BLEND);
+	}
+	else
+	{
+      //make sure alpha blend is enabled
+        glEnable (GL_BLEND);
+	}
+  }
+  else
+  {
+      //make sure alpha blend is enabled
+      glEnable (GL_BLEND);
+  }
+
+  shader = pickOptimizedShader(shader, uniforms);
+
+
 #ifdef DRAW_LAYER_DEBUG
   layeruniforms.x = (float) layerdest.x / m_displayWidth;
   layeruniforms.y = (float) layerdest.y / m_displayHeight;
@@ -295,7 +333,6 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
   index = orientation * 12;
 
   glDrawArrays(GL_TRIANGLES, index, 6);
-
   glBindBuffer(GL_ARRAY_BUFFER,NULL);
 
   GLenum status = glGetError();
@@ -307,11 +344,13 @@ bool GLESGraphicsystem::initOpenGLES(EGLint displayWidth,EGLint displayHeight)
   bool result = true;
   ShaderProgramFactory::setCreatorFunc(m_shaderCreatorFunc);
   m_defaultShader = Shader::createShader("default", "default");
+  m_defaultShaderNoUniformAlpha = Shader::createShader("default", "default_no_uniform_alpha");
+
 #ifdef DRAW_LAYER_DEBUG
   m_layerShader = Shader::createShader("/usr/lib/layermanager/renderer/renderer_layer.glslv", "/usr/lib/layermanager/renderer/renderer_layer.glslf");
 #endif
   if (
-      !m_defaultShader
+      !m_defaultShader || !m_defaultShaderNoUniformAlpha
 #ifdef DRAW_LAYER_DEBUG
      || !m_layerShader
 #endif
