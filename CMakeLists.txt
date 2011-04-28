@@ -51,13 +51,13 @@ option (WITH_EGL_EXAMPLE
         "Build EGL_EXAMPLE " ON)
 
 option (WITH_GLX_EXAMPLE 
-        "Build GLX_EXAMPLE " ON)
+        "Build GLX_EXAMPLE " OFF)
         
 option (WITH_TESTS
         "Build Available Tests " OFF)
 
 option (WITH_FORCE_COPY 
-	"Force Software Copy from X11 pixmaps" ON)
+	"Force Software Copy from X11 pixmaps" OFF)
 
 if (WITH_FORCE_COPY)
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DGLX_GRAPHICSYSTEM_FORCE_COPY -DGLES_FORCE_COPY" CACHE STRING "" FORCE)
