@@ -33,6 +33,7 @@ public:
 		// pseudo require EGL to have been initialised
 		// we dont really need the handle
 	};
+	void swapPixmap(unsigned char* src,unsigned char* dest,unsigned int width,unsigned int height,bool swaprgb);
 	void bindSurfaceTexture(Surface* surface);
 	void createClientBuffer(Surface*s);
 

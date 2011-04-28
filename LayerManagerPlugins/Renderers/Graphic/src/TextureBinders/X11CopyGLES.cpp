@@ -29,6 +29,8 @@ void X11CopyGLES::bindSurfaceTexture(Surface* surface){
 	Pixmap p = 0;
 	GLenum targetType = GL_RGBA;
 	GLenum sourceType = GL_RGBA;
+	unsigned char* swapedData = NULL;
+	bool swaprgb = false;
 
 	p = XCompositeNameWindowPixmap (dpy, surface->nativeHandle);
 	if (p==0)
@@ -47,9 +49,37 @@ void X11CopyGLES::bindSurfaceTexture(Surface* surface){
 		{
 			targetType = GL_RGB;
 			sourceType = GL_RGB;
+			swaprgb = true;
+			swapedData = new unsigned char[surface->OriginalSourceWidth*surface->OriginalSourceHeight*3];
+		} else {
+			swapedData = new unsigned char[surface->OriginalSourceWidth*surface->OriginalSourceHeight*4];
 		}
-		glTexImage2D(GL_TEXTURE_2D, 0, sourceType, surface->OriginalSourceWidth, surface->OriginalSourceHeight, 0, targetType, GL_UNSIGNED_BYTE, xim->data);
+		swapPixmap((unsigned char*)xim->data, swapedData, surface->OriginalSourceWidth, surface->OriginalSourceHeight,swaprgb);
+		glTexImage2D(GL_TEXTURE_2D, 0, sourceType, surface->OriginalSourceWidth, surface->OriginalSourceHeight, 0, targetType, GL_UNSIGNED_BYTE, swapedData);
 		XDestroyImage(xim);
+		delete[] swapedData;
+	}
+}
+void X11CopyGLES::swapPixmap(unsigned char* src,unsigned char* dest, unsigned int width,unsigned int height,bool swaprgb) 
+{
+	unsigned int count = 0; 
+	if (swaprgb == false)
+	{	
+		count = width*height;
+		for (int j=0;j<count; j++) {
+			dest[j*4]=src[j*4+2];
+			dest[j*4+1]=src[j*4+1];
+			dest[j*4+2]=src[j*4];
+			dest[j*4+3]=src[j*4+3];
+		}
+	} else {
+		count = width*height;
+		for (int j=0;j<count; j++) 
+		{
+			dest[j*3]=src[j*3+2];
+			dest[j*3+1]=src[j*3+1];
+			dest[j*3+2]=src[j*3];
+		}
 	}
 }
 
