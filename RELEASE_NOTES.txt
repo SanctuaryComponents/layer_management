@@ -1,3 +1,12 @@
+Version 0.8.1
+-------------
+
+This version includes the following enhancements.
+
+- bug fixes in X11GLESRenderer to get a clean shutdown on failure
+- force copy introduced for X11 Pixmaps in Open GL ES 2.0 Environments
+- CMakeLists.txt files fixed 
+
 Version 0.8.0
 -------------
 

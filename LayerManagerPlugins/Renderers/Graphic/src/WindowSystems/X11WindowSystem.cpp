@@ -46,7 +46,7 @@ X11WindowSystem::~X11WindowSystem(){
 XVisualInfo* X11WindowSystem::getDefaultVisual(Display *dpy)
 	{
 		XVisualInfo* windowVis = new XVisualInfo();
-		windowVis->depth = DefaultDepth(dpy, 0);;
+		windowVis->depth = 32;//DefaultDepth(dpy, 0);
 		XMatchVisualInfo( dpy, 0, windowVis->depth, TrueColor, windowVis);
 		if (!windowVis)
 		{

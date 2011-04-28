@@ -30,30 +30,50 @@ X11GLESRenderer::X11GLESRenderer(LayerList* layerlist) : BaseRenderer(layerlist)
 };
 
 bool X11GLESRenderer::start(int width, int height, const char* displayname){
+	Display* nativeDisplayHandle = NULL;
+	EGLDisplay eglDisplayhandle = NULL;
+	ITextureBinder* binder = NULL;
 	m_width = width;
 	m_height = height;
 	// create X11 windows, register as composite manager etc
 	m_windowSystem = new X11WindowSystem(displayname, width, height, m_layerlist);
 	m_graphicSystem = new GLESGraphicsystem(width,height, ShaderProgramGLES::createProgram);
 
-	m_windowSystem->init(m_graphicSystem);
+	if ( !m_windowSystem->init(m_graphicSystem) ) goto fail;
+
 	m_graphicSystem->setBaseWindowSystem(m_windowSystem);
 
 	// create graphic context from window, init egl etc
-	Display* nativeDisplayHandle = m_windowSystem->getNativeDisplayHandle();
+	nativeDisplayHandle = m_windowSystem->getNativeDisplayHandle();
 
 	LOG_DEBUG("X11GLESRenderer", "Got nativedisplay handle: " << nativeDisplayHandle << " from windowsystem");
 
-	EGLDisplay eglDisplayhandle = m_graphicSystem->getEGLDisplay();
+	eglDisplayhandle = m_graphicSystem->getEGLDisplay();
 
-	#ifdef EGL_NATIVE_PIXMAP_KHR
-			ITextureBinder* binder = new X11EglImage(eglDisplayhandle, nativeDisplayHandle);
-	#else
-			ITextureBinder* binder = new X11CopyGLES(eglDisplayhandle, nativeDisplayHandle);
-	#endif
-	m_graphicSystem->setTextureBinder(binder);
+#ifdef GLES_FORCE_COPY
+	binder = new X11CopyGLES(eglDisplayhandle, nativeDisplayHandle);
+#else
+#ifdef EGL_NATIVE_PIXMAP_KHR
+	binder = new X11EglImage(eglDisplayhandle, nativeDisplayHandle);
+#else
+	binder = new X11CopyGLES(eglDisplayhandle, nativeDisplayHandle);
+#endif
+#endif
+	if ( (binder != NULL) && (nativeDisplayHandle != NULL) && (eglDisplayhandle!= NULL) )
+	{
+		m_graphicSystem->setTextureBinder(binder);
 
-	m_windowSystem->start();
+		if ( !m_windowSystem->start() )
+		{
+			goto fail;
+		}
+	} else {
+		goto fail;
+	}
+	return true;
+	fail:
+	LOG_ERROR("X11GLESRenderer", "Initialization failed !");
+	return false;
 }
 
 void X11GLESRenderer::stop(){

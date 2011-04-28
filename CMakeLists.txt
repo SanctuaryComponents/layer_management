@@ -1,4 +1,4 @@
-############################################################################
+###########################################################################
 # 
 # Copyright 2010, 2011 BMW Car IT GmbH  
 # 
@@ -56,9 +56,11 @@ option (WITH_GLX_EXAMPLE
 option (WITH_TESTS
         "Build Available Tests " OFF)
 
-option (WITH_FORCE_COPY OFF)
+option (WITH_FORCE_COPY 
+	"Force Software Copy from X11 pixmaps" OFF)
+
 if (WITH_FORCE_COPY)
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DGLX_GRAPHICSYSTEM_FORCE_COPY" CACHE STRING "" FORCE)
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DGLX_GRAPHICSYSTEM_FORCE_COPY -DGLES_FORCE_COPY" CACHE STRING "" FORCE)
 endif(WITH_FORCE_COPY)
 
 add_subdirectory (LayerManagerPlugins/Communicators/DBUSCommunicator)

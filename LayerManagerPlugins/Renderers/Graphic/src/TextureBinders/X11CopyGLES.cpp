@@ -27,17 +27,60 @@
 void X11CopyGLES::bindSurfaceTexture(Surface* surface){
 	XPlatformSurface* nativeSurface = (XPlatformSurface*)surface->platform;
 	Pixmap p = 0;
-	p= XCompositeNameWindowPixmap (dpy, surface->nativeHandle);
+	GLenum targetType = GL_RGBA;
+	GLenum sourceType = GL_RGBA;
+	unsigned char* swapedData = NULL;
+	bool swaprgb = false;
+
+	p = XCompositeNameWindowPixmap (dpy, surface->nativeHandle);
 	if (p==0)
+	{
 		LOG_ERROR("X11CopyGLES", "didnt create pixmap!");
+		return;
+	}
 	nativeSurface->pixmap = p;
 	XImage * xim = XGetImage(dpy, nativeSurface->pixmap, 0, 0, surface->OriginalSourceWidth, surface->OriginalSourceHeight, AllPlanes, ZPixmap);
-	glBindTexture(GL_TEXTURE_2D, nativeSurface->texture);
-	 glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	 glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	 glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface->OriginalSourceWidth,surface->OriginalSourceHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, xim->data);
-	 XDestroyImage(xim);
+	if ( xim != NULL )
+	{
+		glBindTexture(GL_TEXTURE_2D, nativeSurface->texture);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		if ( xim->depth == 24 )
+		{
+			targetType = GL_RGB;
+			sourceType = GL_RGB;
+			swaprgb = true;
+			swapedData = new unsigned char[surface->OriginalSourceWidth*surface->OriginalSourceHeight*3];
+		} else {
+			swapedData = new unsigned char[surface->OriginalSourceWidth*surface->OriginalSourceHeight*4];
+		}
+		swapPixmap((unsigned char*)xim->data, swapedData, surface->OriginalSourceWidth, surface->OriginalSourceHeight,swaprgb);
+		glTexImage2D(GL_TEXTURE_2D, 0, sourceType, surface->OriginalSourceWidth, surface->OriginalSourceHeight, 0, targetType, GL_UNSIGNED_BYTE, swapedData);
+		XDestroyImage(xim);
+		delete[] swapedData;
+	}
+}
+void X11CopyGLES::swapPixmap(unsigned char* src,unsigned char* dest, unsigned int width,unsigned int height,bool swaprgb) 
+{
+	unsigned int count = 0; 
+	if (swaprgb == false)
+	{	
+		count = width*height;
+		for (int j=0;j<count; j++) {
+			dest[j*4]=src[j*4+2];
+			dest[j*4+1]=src[j*4+1];
+			dest[j*4+2]=src[j*4];
+			dest[j*4+3]=src[j*4+3];
+		}
+	} else {
+		count = width*height;
+		for (int j=0;j<count; j++) 
+		{
+			dest[j*3]=src[j*3+2];
+			dest[j*3+1]=src[j*3+1];
+			dest[j*3+2]=src[j*3];
+		}
+	}
 }
 
 void X11CopyGLES::createClientBuffer(Surface*s){

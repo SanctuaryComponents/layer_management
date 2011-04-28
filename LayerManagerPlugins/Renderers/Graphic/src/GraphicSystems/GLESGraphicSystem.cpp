@@ -108,10 +108,11 @@ bool GLESGraphicsystem::init(EGLNativeDisplayType display, EGLNativeWindowType N
   eglBindAPI(EGL_OPENGL_ES_API);
 
   EGLint pi32ConfigAttribs[]={
-      EGL_SURFACE_TYPE,EGL_WINDOW_BIT | EGL_PIXMAP_BIT,
-      EGL_RENDERABLE_TYPE,EGL_OPENGL_ES2_BIT,
-      EGL_ALPHA_SIZE,8,
-      EGL_NONE
+          EGL_SURFACE_TYPE,EGL_WINDOW_BIT | EGL_PIXMAP_BIT,
+          EGL_RENDERABLE_TYPE,EGL_OPENGL_ES2_BIT,
+          EGL_RED_SIZE,8,
+          EGL_ALPHA_SIZE,8,
+          EGL_NONE
   };
 
   LOG_DEBUG("GLESGraphicsystem", "EGLChooseConfig");

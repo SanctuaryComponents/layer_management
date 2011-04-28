@@ -25,6 +25,7 @@
 #include <X11/Xutil.h>
 #include "PlatformSurfaces/XPlatformSurface.h"
 #include <X11/extensions/Xcomposite.h>
+#include <EGL/egl.h>
 
 class X11CopyGLES : public X11Copy {
 public:
@@ -32,6 +33,7 @@ public:
 		// pseudo require EGL to have been initialised
 		// we dont really need the handle
 	};
+	void swapPixmap(unsigned char* src,unsigned char* dest,unsigned int width,unsigned int height,bool swaprgb);
 	void bindSurfaceTexture(Surface* surface);
 	void createClientBuffer(Surface*s);
 

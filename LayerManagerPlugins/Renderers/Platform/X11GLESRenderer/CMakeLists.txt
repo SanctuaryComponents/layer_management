@@ -34,6 +34,7 @@ file(GLOB SOURCES
 		../../Graphic/src/GraphicSystems/GLESGraphicSystem.cpp
 		../../Graphic/src/WindowSystems/X11WindowSystem.cpp  
 		../../Graphic/src/TextureBinders/X11Copy.cpp
+		../../Graphic/src/TextureBinders/X11CopyGLES.cpp
 		../../Graphic/src/TextureBinders/X11EglImage.cpp
 		src/ShaderProgramGLES.cpp
 		)
@@ -50,7 +51,7 @@ find_package(GLESv2 REQUIRED)
 include_directories(${GLESv2_INCLUDE_DIR})
 
 find_package (Threads)
-set(LIBS ${LIBS} ${CMAKE_THREAD_LIBS_INIT} ${EGL_LIBRARIES} ${GLESv2_LIBRARIES} ${X11_Xcomposite_LIB} LayerManagerUtils )
+set(LIBS ${LIBS} ${CMAKE_THREAD_LIBS_INIT} ${EGL_LIBRARY} ${GLESv2_LIBRARIES} ${X11_Xcomposite_LIB} LayerManagerUtils )
 target_link_libraries(X11GLESRenderer ${LIBS})
 
 add_dependencies(X11GLESRenderer LayerManagerService)
