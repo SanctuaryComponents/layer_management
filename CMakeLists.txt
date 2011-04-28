@@ -51,14 +51,14 @@ option (WITH_EGL_EXAMPLE
         "Build EGL_EXAMPLE " ON)
 
 option (WITH_GLX_EXAMPLE 
-        "Build GLX_EXAMPLE " OFF)
+        "Build GLX_EXAMPLE " ON)
         
 option (WITH_TESTS
         "Build Available Tests " OFF)
 
-option (WITH_FORCE_COPY OFF)
+option (WITH_FORCE_COPY ON)
 if (WITH_FORCE_COPY)
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DGLX_GRAPHICSYSTEM_FORCE_COPY" CACHE STRING "" FORCE)
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DGLX_GRAPHICSYSTEM_FORCE_COPY -DGLES_FORCE_COPY" CACHE STRING "" FORCE)
 endif(WITH_FORCE_COPY)
 
 add_subdirectory (LayerManagerPlugins/Communicators/DBUSCommunicator)

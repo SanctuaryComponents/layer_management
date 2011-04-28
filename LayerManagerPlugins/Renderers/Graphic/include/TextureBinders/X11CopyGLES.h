@@ -25,6 +25,7 @@
 #include <X11/Xutil.h>
 #include "PlatformSurfaces/XPlatformSurface.h"
 #include <X11/extensions/Xcomposite.h>
+#include <EGL/egl.h>
 
 class X11CopyGLES : public X11Copy {
 public:
