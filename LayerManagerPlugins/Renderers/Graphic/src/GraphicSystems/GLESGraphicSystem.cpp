@@ -254,6 +254,7 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
         // use layer shader if no custom shader is assigned to this surface
         shader = layerShader;
     }
+
     Rectangle dest = (surface)->getDestinationRegion();
     Rectangle src = (surface)->getSourceRegion();
 
@@ -283,26 +284,26 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
     uniforms.matrix = &layerMatrix.f[0];
 
     //We only know about specific Shaders, only do this if we start with the defaultShader
-  if (shader == m_defaultShader && uniforms.opacity == 1.0f)
-  {
-    if(!PixelFormatHasAlpha((surface)->getPixelFormat()))
-	{
-        //disable alpha blend completely
-	    glDisable (GL_BLEND);
-	}
-	else
-	{
-      //make sure alpha blend is enabled
+    if (shader == m_defaultShader && uniforms.opacity == 1.0f)
+    {
+        if(!PixelFormatHasAlpha((surface)->getPixelFormat()))
+        {
+            //disable alpha blend completely
+            glDisable (GL_BLEND);
+        }
+        else
+        {
+            //make sure alpha blend is enabled
+            glEnable (GL_BLEND);
+        }
+    }
+    else
+    {
+        //make sure alpha blend is enabled
         glEnable (GL_BLEND);
-	}
-  }
-  else
-  {
-      //make sure alpha blend is enabled
-      glEnable (GL_BLEND);
-  }
+    }
 
-  shader = pickOptimizedShader(shader, uniforms);
+    shader = pickOptimizedShader(shader, uniforms);
 
 
 #ifdef DRAW_LAYER_DEBUG
@@ -310,7 +311,7 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
     layeruniforms.y = (float) layerdest.y / m_displayHeight;
     layeruniforms.width = (float)layerdest.width / m_displayWidth;
     layeruniforms.height = (float)layerdest.height / m_displayHeight;
-    layeruniforms.opacity = currentLayer->getOpacity();
+    layeruniforms.opacity = m_currentLayer->getOpacity();
     layeruniforms.matrix = &layerMatrix.f[0];
     m_layerShader->use();
     m_layerShader->loadCommonUniforms(layeruniforms);
@@ -352,12 +353,16 @@ bool GLESGraphicsystem::initOpenGLES(EGLint displayWidth, EGLint displayHeight)
     bool result = true;
     ShaderProgramFactory::setCreatorFunc(m_shaderCreatorFunc);
     m_defaultShader = Shader::createShader("default", "default");
-  m_defaultShaderNoUniformAlpha = Shader::createShader("default", "default_no_uniform_alpha");
+    m_defaultShaderNoUniformAlpha = Shader::createShader("default", "default_no_uniform_alpha");
 
 #ifdef DRAW_LAYER_DEBUG
     m_layerShader = Shader::createShader("/usr/lib/layermanager/renderer/renderer_layer.glslv", "/usr/lib/layermanager/renderer/renderer_layer.glslf");
+    if (m_layerShader==0)
+    {
+        m_layerShader = Shader::createShader("/usr/local/lib/layermanager/renderer/renderer_layer.glslv", "/usr/local/lib/layermanager/renderer/renderer_layer.glslf");
+    }
 #endif
-  if (
+    if (
       !m_defaultShader || !m_defaultShaderNoUniformAlpha
 #ifdef DRAW_LAYER_DEBUG
     || !m_layerShader
