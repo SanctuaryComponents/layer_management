@@ -230,6 +230,8 @@ void draw(t_ilm_uint animTime)
         float currentAngle = 0;
         int i = 0;
         glClear(GL_COLOR_BUFFER_BIT);
+        glUseProgram(shader.shaderProgramId);
+        attachVertexBuffer();
         for (i = 10; i > 0; i--)
         {
             currentAngle = angle - ((float) i) * 10.0f;
@@ -237,14 +239,11 @@ void draw(t_ilm_uint animTime)
             IlmMatrixRotateZ(matrix, currentAngle);
             float color[4] = { 0.0, 1.0, 1.0, 0.5 + (0.3 / (float) i) };
             float lineColor[4] = { 0.0, 0.0, 0.0, 0.5 + (0.4 / (float) i) };
-            glUseProgram(shader.shaderProgramId);
-            attachVertexBuffer();
 
             glUniformMatrix4fv(shader.matrixLocation, 1, GL_FALSE, &matrix.f[0]);
             glUniform4fv(shader.colorLocation, 1, &color[0]);
             glDrawArrays(GL_TRIANGLES, 0, 27); // TODO: remove hard coded values
 
-            glUniformMatrix4fv(shader.matrixLocation, 1, GL_FALSE, &matrix.f[0]);
             glUniform4fv(shader.colorLocation, 1, &lineColor[0]);
             int j = 0;
             for (j = 0; j < 9; j++) // TODO: remove hard coded values
@@ -257,6 +256,7 @@ void draw(t_ilm_uint animTime)
         swapBuffers();
         startTime = currentTime;
     }
+
 }
 
 void destroyGlApplication()
