@@ -84,10 +84,12 @@ void X11EglImage::createClientBuffer(Surface* surface)
 
         EGLImageKHR eglImage = 0;
         LOG_DEBUG("X11EglImage", "creating EGL Image from client buffer");
-        if (nativeSurface->eglImage != NULL)
+        if (nativeSurface->eglImage)
         {
             m_pfEglDestroyImageKHR(m_eglDisplay, nativeSurface->eglImage);
             glDeleteTextures(1,&nativeSurface->texture);
+            nativeSurface->eglImage = 0;
+            nativeSurface->texture = 0;
         }
         eglImage = m_pfEglCreateImageKHR(m_eglDisplay,
                                      EGL_NO_CONTEXT,
@@ -101,7 +103,7 @@ void X11EglImage::createClientBuffer(Surface* surface)
         else
         {
             nativeSurface->eglImage = eglImage;
-            glGenTextures(1,&nativeSurface->texture);            
+            glGenTextures(1,&nativeSurface->texture);
         }
     }
 }
@@ -114,9 +116,11 @@ PlatformSurface* X11EglImage::createPlatformSurface(Surface* surface)
 void X11EglImage::destroyClientBuffer(Surface* surface)
 {
     EglXPlatformSurface* nativeSurface = (EglXPlatformSurface*)surface->platform;
-    if (nativeSurface && nativeSurface->eglImage )
+    if (nativeSurface && nativeSurface->eglImage)
     {
-          m_pfEglDestroyImageKHR(m_eglDisplay, nativeSurface->eglImage);
-          glDeleteTextures(1,&nativeSurface->texture);
+        m_pfEglDestroyImageKHR(m_eglDisplay, nativeSurface->eglImage);
+        glDeleteTextures(1,&nativeSurface->texture);
+        nativeSurface->eglImage = 0;
+        nativeSurface->texture = 0;
     }
 }
