@@ -32,6 +32,7 @@ public:
 	bool init(Display* x11Display, Window x11Window);
 
 	void beginLayer(Layer* layer);
+	void checkRenderLayer();
 	void renderLayer();
 	void endLayer();
 

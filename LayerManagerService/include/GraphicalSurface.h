@@ -39,7 +39,14 @@ public:
 		 * Set Orientation value
 		 * @param orientation the new value. Multiples of 90 degrees. (0->0°, 1->90°, 2->180°,3->279°)
 		 */
-		void setOrientation(OrientationType newOrientation){orientation = newOrientation;};
+		void setOrientation(OrientationType newOrientation)
+		{
+			if (orientation != newOrientation)
+			{
+				renderPropertyChanged = true;
+			}
+			orientation = newOrientation;
+		}
 		const OrientationType getOrientation(){return orientation;};
 
 		/**
@@ -49,7 +56,14 @@ public:
 		 * @param width Width within source (can be used to clip from the right)
 		 * @param height Height within source (can be used to clip fromt he bottom)
 		 */
-		void setSourceRegion(const Rectangle& newSource){SourceViewport = newSource;};
+		void setSourceRegion(const Rectangle& newSource)
+		{
+			if (!(SourceViewport == newSource))
+			{
+				renderPropertyChanged = true;
+			}
+			SourceViewport = newSource;
+		}
 		const Rectangle& getSourceRegion(){ return SourceViewport;};
 
 		/**
@@ -59,11 +73,32 @@ public:
 		 * @param width Width of destination
 		 * @param height Height of destination
 		 */
-		void setDestinationRegion(const Rectangle& newDestination){DestinationViewport = newDestination;};
+		void setDestinationRegion(const Rectangle& newDestination)
+		{
+			if (!(DestinationViewport == newDestination))
+			{
+				renderPropertyChanged = true;
+			}
+			DestinationViewport = newDestination;
+		}
 
-		void setPosition(const unsigned int& x, const unsigned int& y){DestinationViewport.x = x; DestinationViewport.y = y;};
+		void setPosition(const unsigned int& x, const unsigned int& y)
+		{
+			if (DestinationViewport.x != x || DestinationViewport.y != y)
+			{
+				renderPropertyChanged = true;
+			}
+			DestinationViewport.x = x; DestinationViewport.y = y;
+		}
 		Vector2 getPosition(){ return Vector2(DestinationViewport.x,DestinationViewport.y);}
-		void setDimension(const unsigned int& width, const unsigned int& height){DestinationViewport.width = width; DestinationViewport.height = height;};
+		void setDimension(const unsigned int& width, const unsigned int& height)
+		{
+			if (DestinationViewport.width != width || DestinationViewport.height != height)
+			{
+				renderPropertyChanged = true;
+			}
+			DestinationViewport.width = width; DestinationViewport.height = height;
+		}
 		const Rectangle& getDestinationRegion(){ return DestinationViewport;};
 		Vector2 getDimension(){ return Vector2(DestinationViewport.width, DestinationViewport.height);};
 private:

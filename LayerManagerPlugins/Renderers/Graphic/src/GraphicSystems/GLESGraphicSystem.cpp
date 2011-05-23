@@ -182,20 +182,59 @@ void GLESGraphicsystem::beginLayer(Layer* currentLayer)
 	// TODO layer destination / source
 }
 
+void GLESGraphicsystem::checkRenderLayer()
+{
+	std::list<Surface*> surfaces = m_currentLayer->surfaces;
+
+	m_currentLayer->damaged = false;
+
+	if (!m_baseWindowSystem->m_damaged)
+	{
+		if (m_currentLayer->renderPropertyChanged)
+		{
+			m_currentLayer->damaged = true;
+		}
+		else if ((m_currentLayer)->visibility && (m_currentLayer)->opacity > 0.0)
+		{
+			for(std::list<Surface*>::const_iterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++)
+			{
+				if ((*currentS)->renderPropertyChanged)
+				{
+					m_currentLayer->damaged = true;
+					break;
+				}
+				else if ((*currentS)->damaged && (*currentS)->visibility && (*currentS)->opacity>0.0f)
+				{
+					m_currentLayer->damaged = true;
+					break;
+				}
+			}
+		}
+	}
+
+	for(std::list<Surface*>::const_iterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++)
+	{
+		(*currentS)->damaged = false;
+		(*currentS)->renderPropertyChanged = false;
+	}
+
+	m_currentLayer->renderPropertyChanged = false;
+
+	if (m_currentLayer->damaged)
+	{
+		m_baseWindowSystem->m_damaged = true;
+	}
+}
+
 void GLESGraphicsystem::renderLayer()
 {
-	if ((m_currentLayer)->visibility && (m_currentLayer)->opacity > 0.0)
+	std::list<Surface*> surfaces = m_currentLayer->surfaces;
+	for(std::list<Surface*>::const_iterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++)
 	{
-		std::list<Surface*> surfaces = m_currentLayer->surfaces;
-		for(std::list<Surface*>::const_iterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++)
+		if ((*currentS)->visibility && (*currentS)->opacity>0.0f)
 		{
-			//LOG_DEBUG("GLESGraphicsystem", "Testing if going to render surface: " << (*currentS)->getID());
-			if ((*currentS)->visibility && (*currentS)->opacity>0.0f)
-			{
-				Surface* currentSurface = (Surface*)*currentS;
-				m_baseWindowSystem->allocatePlatformSurface(currentSurface);
-				renderSurface(currentSurface);
-			}
+			Surface* currentSurface = (Surface*)*currentS;
+			renderSurface(currentSurface);
 		}
 	}
 }

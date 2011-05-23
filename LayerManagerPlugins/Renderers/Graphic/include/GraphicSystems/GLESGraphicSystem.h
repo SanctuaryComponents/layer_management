@@ -39,6 +39,7 @@ public:
 	void swapBuffers();
 
 	void beginLayer(Layer* layer);
+	void checkRenderLayer();
 	void renderLayer();
 	void endLayer();
 

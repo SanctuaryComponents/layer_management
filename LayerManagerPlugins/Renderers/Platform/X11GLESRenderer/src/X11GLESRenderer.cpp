@@ -118,6 +118,11 @@ uint* X11GLESRenderer::getScreenIDs(uint* length){
 	return screenIDS;
 }
 
+void X11GLESRenderer::signalWindowSystemRedraw()
+{
+	m_windowSystem->signalRedrawEvent();
+}
+
 extern "C" BaseRenderer* createX11GLESRenderer(LayerList* layerlist){
     return new X11GLESRenderer(layerlist);
 }

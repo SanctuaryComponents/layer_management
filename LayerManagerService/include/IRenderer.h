@@ -59,5 +59,7 @@ public:
 
 	virtual uint* getScreenIDs(uint* length)=0;
 
+	virtual void signalWindowSystemRedraw()=0;
+
 };
 #endif /* _IRENDERER_H_ */

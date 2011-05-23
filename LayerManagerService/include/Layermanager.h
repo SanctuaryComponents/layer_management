@@ -43,6 +43,7 @@ public:
 	uint getNumberOfHardwareLayers(uint screenID);
 	uint* getScreenResolution(uint screenID);
 	uint* getScreenIDs(uint* length);
+	void signalRendererRedraw();
 
 	LayerList layerlist;
 

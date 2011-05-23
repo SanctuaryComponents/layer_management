@@ -92,6 +92,11 @@ uint* X11GLXRenderer::getScreenIDs(uint* length){
 	return screenIDS;
 }
 
+void X11GLXRenderer::signalWindowSystemRedraw()
+{
+	m_windowSystem->signalRedrawEvent();
+}
+
 extern "C" IRenderer* createX11GLXRenderer(LayerList* layerlist) {
 	return new X11GLXRenderer(layerlist);
 }

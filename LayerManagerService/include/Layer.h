@@ -31,13 +31,35 @@ class Layer : public GraphicalSurface{
 public:
 
 	LayerType getLayerType(){	return layerType; 	};
-	void setLayerType(LayerType lt){	layerType = lt; }
+	void setLayerType(LayerType lt)
+	{
+		if (layerType != lt)
+		{
+			renderPropertyChanged = true;
+		}
+		layerType = lt;
+	}
 
-	void setLayerCapabilities(uint newCapabilities){ capabilities = newCapabilities; };
+	void setLayerCapabilities(uint newCapabilities)
+	{
+		if (capabilities != newCapabilities)
+		{
+			renderPropertyChanged = true;
+		}
+		capabilities = newCapabilities;
+	}
 	uint getCapabilities(){	return capabilities;	};
 
-	void addSurface(Surface* s)	{	surfaces.push_back(s);	};
-	void removeSurface(Surface* s){	surfaces.remove(s);		};
+	void addSurface(Surface* s)
+	{
+		renderPropertyChanged = true;
+		surfaces.push_back(s);
+	}
+	void removeSurface(Surface* s)
+	{
+		renderPropertyChanged = true;
+		surfaces.remove(s);
+	}
 
 	std::list<Surface*>& getAllSurfaces(){return surfaces;}
 	std::list<Surface*> surfaces;

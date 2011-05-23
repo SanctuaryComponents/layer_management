@@ -37,6 +37,7 @@ public:
 	uint getNumberOfHardwareLayers(uint screenID);
 	uint* getScreenResolution(uint screenID);
 	uint* getScreenIDs(uint* length);
+	void signalWindowSystemRedraw();
 
 private:
 	X11WindowSystem* m_windowSystem;

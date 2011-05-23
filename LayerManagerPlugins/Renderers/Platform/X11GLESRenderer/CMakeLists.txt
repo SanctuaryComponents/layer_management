@@ -51,7 +51,7 @@ find_package(GLESv2 REQUIRED)
 include_directories(${GLESv2_INCLUDE_DIR})
 
 find_package (Threads)
-set(LIBS ${LIBS} ${CMAKE_THREAD_LIBS_INIT} ${EGL_LIBRARY} ${GLESv2_LIBRARIES} ${X11_Xcomposite_LIB} LayerManagerUtils )
+set(LIBS ${LIBS} ${CMAKE_THREAD_LIBS_INIT} ${EGL_LIBRARY} ${GLESv2_LIBRARIES} ${X11_Xcomposite_LIB} ${X11_Xdamage_LIB} LayerManagerUtils )
 target_link_libraries(X11GLESRenderer ${LIBS})
 
 add_dependencies(X11GLESRenderer LayerManagerService)

@@ -29,12 +29,12 @@ class Shader;
 class GraphicalObject{
 public:
 
-	GraphicalObject(ObjectType type, double opacity, bool visibility) : type(type),graphicInternalId(nextGraphicId[type]++),shader(0),opacity(opacity),visibility(visibility)
+	GraphicalObject(ObjectType type, double opacity, bool visibility) : type(type),graphicInternalId(nextGraphicId[type]++),shader(0),opacity(opacity),visibility(visibility),renderPropertyChanged(false),damaged(false)
 	{
 	  graphicExternalId = graphicInternalId;
 	};
 
-	GraphicalObject(int externalId,ObjectType type, double opacity, bool visibility) : type(type),graphicInternalId(nextGraphicId[type]++),graphicExternalId(externalId),shader(0),opacity(opacity),visibility(visibility)
+	GraphicalObject(int externalId,ObjectType type, double opacity, bool visibility) : type(type),graphicInternalId(nextGraphicId[type]++),graphicExternalId(externalId),shader(0),opacity(opacity),visibility(visibility),renderPropertyChanged(false),damaged(false)
 	{
 	};
 
@@ -45,14 +45,28 @@ public:
 	 * Set alpha value
 	 * @param alpha The new Alpha Value between 0.0 (full transparency) and 1.0 (fully visible)
 	 */
-	virtual void setOpacity(double newOpacity){opacity = newOpacity;};
+	virtual void setOpacity(double newOpacity)
+	{
+		if (opacity != newOpacity)
+		{
+			renderPropertyChanged = true;
+		}
+		opacity = newOpacity;
+	};
 	double getOpacity(){return opacity;};
 
 	/**
 	 * Set the visibility
 	 * @param visible set this object visible (true) or invisible (false)
 	 */
-	virtual void setVisibility(bool newVisibility){visibility = newVisibility;};
+	virtual void setVisibility(bool newVisibility)
+	{
+		if (visibility != newVisibility)
+		{
+			renderPropertyChanged = true;
+		}
+		visibility = newVisibility;
+	}
 	bool getVisibility(){ return visibility;};
 
 	virtual unsigned int getID() {return graphicExternalId;};
@@ -64,6 +78,7 @@ public:
 	 */
 	void setShader(Shader* s)
 	{
+		renderPropertyChanged = true;
 		shader = s;
 	}
 
@@ -84,6 +99,8 @@ public:
 	Shader* shader;
 	double opacity;
 	bool visibility;
+	bool renderPropertyChanged;
+	bool damaged;
 
 protected:
 	unsigned int graphicInternalId;

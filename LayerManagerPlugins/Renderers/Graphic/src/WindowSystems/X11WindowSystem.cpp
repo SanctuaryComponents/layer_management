@@ -23,6 +23,7 @@
 #include <time.h>
 #include <sys/time.h>
 #include <X11/extensions/Xcomposite.h>
+#include <X11/extensions/Xdamage.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -30,9 +31,10 @@
 #include <iomanip>
 
 int		X11WindowSystem::composite_opcode;
+int		X11WindowSystem::damage_opcode;
 const char X11WindowSystem::CompositorWindowTitle[] = "LayerManager";
 
-X11WindowSystem::X11WindowSystem(const char* displayname, int width, int height, LayerList* layerlist,GetVisualInfoFunction func) : BaseWindowSystem(layerlist), displayname(displayname), getVisualFunc(func), windowWidth(width), windowHeight(height),resolutionWidth(width),resolutionHeight(height),debugMode(false), m_initialized(false), m_success(false), takeScreenshot(ScreenShotNone){
+X11WindowSystem::X11WindowSystem(const char* displayname, int width, int height, LayerList* layerlist,GetVisualInfoFunction func) : BaseWindowSystem(layerlist), displayname(displayname), getVisualFunc(func), windowWidth(width), windowHeight(height),resolutionWidth(width),resolutionHeight(height),debugMode(false), m_initialized(false), m_success(false), takeScreenshot(ScreenShotNone), redrawEvent(false){
 		LOG_DEBUG("X11WindowSystem", "creating X11WindowSystem");
 
 		// init and take mutex, so windowsystem only does init phase until mutex is released again
@@ -77,6 +79,20 @@ bool X11WindowSystem::checkForCompositeExtension(){
 	LOG_DEBUG("X11WindowSystem", "Found composite extension: composite opcode: " << composite_opcode);
 	LOG_DEBUG("X11WindowSystem", "composite_major: " << composite_major);
 	LOG_DEBUG("X11WindowSystem", "composite_minor: " << composite_minor);
+	return true;
+}
+
+bool X11WindowSystem::checkForDamageExtension(){
+	if (!XQueryExtension (x11Display, DAMAGE_NAME, &damage_opcode,
+				&damage_event, &damage_error))
+	{
+		LOG_ERROR("X11WindowSystem", "No damage extension");
+		return false;
+	}
+	XDamageQueryVersion (x11Display, &damage_major, &damage_minor);
+	LOG_DEBUG("X11WindowSystem", "Found damage extension: damage opcode: " << damage_opcode);
+	LOG_DEBUG("X11WindowSystem", "damage_major: " << damage_major);
+	LOG_DEBUG("X11WindowSystem", "damage_minor: " << damage_minor);
 	return true;
 }
 
@@ -131,7 +147,7 @@ Surface* X11WindowSystem::getSurfaceForWindow(Window w){
 		LOG_DEBUG("X11WindowSystem", "CurrentSurface surface for window " << currentSurface->getID());
                 LOG_DEBUG("X11WindowSystem", "CurrentSurface nativeHandle " << currentSurface->nativeHandle);
                 if (currentSurface->nativeHandle == w){
-                        LOG_DEBUG("X11WindowSystem", "surface " << currentSurface->getID() << " corresponds to window" << w);
+                        LOG_DEBUG("X11WindowSystem", "surface " << currentSurface->getID() << " corresponds to window " << w);
                         return currentSurface;
                 }
 	}
@@ -139,6 +155,15 @@ Surface* X11WindowSystem::getSurfaceForWindow(Window w){
 	return NULL;
 }
 
+void X11WindowSystem::checkForNewSurface()
+{
+	const std::map<unsigned int,Surface*> surfaces = layerlist->getAllSurfaces();
+	for(std::map<unsigned int, Surface*>::const_iterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++)
+	{
+		Surface* currentSurface = (*currentS).second;
+		allocatePlatformSurface(currentSurface);
+	}
+}
 
 void X11WindowSystem::configureSurfaceWindow(Window w){
 	int status = 0;
@@ -284,6 +309,8 @@ void X11WindowSystem::NewWindow(Surface* surface, Window window)
 		}else {
 			LOG_DEBUG("X11WindowSystem", "Error fetching window name");
 		}
+		LOG_DEBUG("X11WindowSystem","Creating New Damage for window - " << window);
+		XDamageCreate(x11Display,window,XDamageReportNonEmpty);
 		XFree(name);
 XLowerWindow(x11Display,window);
 //XMoveWindow(x11Display,window,-1000,-1000);
@@ -441,60 +468,34 @@ void CalculateFPS() {
 void
 X11WindowSystem::RedrawAllLayers()
 {
+	m_damaged = false;
+
 	std::list<Layer*> layers = layerlist->getCurrentRenderOrder();
 	for(std::list<Layer*>::const_iterator current = layers.begin(); current != layers.end(); current++)
-	  {
+	{
 		Layer* currentLayer = (Layer*)*current;
 		graphicSystem->beginLayer(currentLayer);
-		graphicSystem->renderLayer();
+		graphicSystem->checkRenderLayer();
 		graphicSystem->endLayer();
-	  }
+	}
+
+	if (m_damaged)
+	{
+		graphicSystem->clearBackground();
+		for(std::list<Layer*>::const_iterator current = layers.begin(); current != layers.end(); current++)
+		{
+			graphicSystem->beginLayer(*current);
+			graphicSystem->renderLayer();
+			graphicSystem->endLayer();
+		}
+	}
 }
 
 void
 X11WindowSystem::Redraw()
 {
-	// draw all the layers
-	graphicSystem->clearBackground();
 	/*LOG_INFO("X11WindowSystem","Locking List");*/
 	layerlist->lockList();
-
-	// check if we are supposed to take screenshot
-	if (takeScreenshot!=ScreenShotNone){
-		if (takeScreenshot==ScreenshotOfDisplay){
-		LOG_DEBUG("X11WindowSystem", "Taking screenshot");
-			RedrawAllLayers();
-		}else if(takeScreenshot==ScreenshotOfLayer){
-			LOG_DEBUG("X11WindowSystem", "Taking screenshot of layer");
-			Layer* currentLayer = layerlist->getLayer(screenShotID);
-			if (currentLayer!=NULL){
-				graphicSystem->beginLayer(currentLayer);
-				graphicSystem->renderLayer();
-				graphicSystem->endLayer();
-			}
-		}else if(takeScreenshot==ScreenshotOfSurface){
-			LOG_DEBUG("X11WindowSystem", "Taking screenshot of surface");
-			Surface* currentSurface = layerlist->getSurface(screenShotID);
-			if (NULL!=currentSurface){
-				Layer* l = layerlist->createLayer(GraphicalObject::INVALID_ID);
-				l->setOpacity(1.0);
-				l->setDestinationRegion(currentSurface->getDestinationRegion());
-				l->setSourceRegion(currentSurface->getSourceRegion());
-				graphicSystem->beginLayer(l);
-				graphicSystem->renderSurface(currentSurface);
-				graphicSystem->endLayer();
-				layerlist->removeLayer(l);
-				// layer is deleted in removeLayer.
-			}else{
-				LOG_ERROR("X11WindowSystem", "Could not take screenshot of non existing surface");
-			}
-		}
-
-		graphicSystem->saveScreenShotOfFramebuffer(screenShotFile);
-//		graphicSystem->swapBuffers();
-		takeScreenshot = ScreenShotNone;
-		LOG_DEBUG("X11WindowSystem", "Done taking screenshot");
-	}
 
 	RedrawAllLayers();
 
@@ -502,6 +503,7 @@ X11WindowSystem::Redraw()
 	{
 		printDebug(200,windowHeight-40);
 	}
+
 	UpdateTimeCounter();
 	CalculateFPS();
 	char floatStringBuffer[256];
@@ -510,9 +512,56 @@ X11WindowSystem::Redraw()
 	{
 		LOG_DEBUG("X11WindowSystem",floatStringBuffer);
 	}
-       layerlist->unlockList();
-       /*LOG_INFO("X11WindowSystem","UnLocking List");*/
-       graphicSystem->swapBuffers();
+
+	layerlist->unlockList();
+	/*LOG_INFO("X11WindowSystem","UnLocking List");*/
+
+	graphicSystem->swapBuffers();
+}
+
+void X11WindowSystem::Screenshot()
+{
+	graphicSystem->clearBackground();
+
+	/*LOG_INFO("X11WindowSystem","Locking List");*/
+	layerlist->lockList();
+
+	if (takeScreenshot==ScreenshotOfDisplay){
+	LOG_DEBUG("X11WindowSystem", "Taking screenshot");
+		RedrawAllLayers();
+	}else if(takeScreenshot==ScreenshotOfLayer){
+		LOG_DEBUG("X11WindowSystem", "Taking screenshot of layer");
+		Layer* currentLayer = layerlist->getLayer(screenShotID);
+		if (currentLayer!=NULL){
+			graphicSystem->beginLayer(currentLayer);
+			graphicSystem->renderLayer();
+			graphicSystem->endLayer();
+		}
+	}else if(takeScreenshot==ScreenshotOfSurface){
+		LOG_DEBUG("X11WindowSystem", "Taking screenshot of surface");
+		Surface* currentSurface = layerlist->getSurface(screenShotID);
+		if (NULL!=currentSurface){
+			Layer* l = layerlist->createLayer(GraphicalObject::INVALID_ID);
+			l->setOpacity(1.0);
+			l->setDestinationRegion(currentSurface->getDestinationRegion());
+			l->setSourceRegion(currentSurface->getSourceRegion());
+			graphicSystem->beginLayer(l);
+			graphicSystem->renderSurface(currentSurface);
+			graphicSystem->endLayer();
+			layerlist->removeLayer(l);
+			// layer is deleted in removeLayer.
+		}else{
+			LOG_ERROR("X11WindowSystem", "Could not take screenshot of non existing surface");
+		}
+	}
+
+	graphicSystem->saveScreenShotOfFramebuffer(screenShotFile);
+//		graphicSystem->swapBuffers();
+	takeScreenshot = ScreenShotNone;
+	LOG_DEBUG("X11WindowSystem", "Done taking screenshot");
+
+	layerlist->unlockList();
+	/*LOG_INFO("X11WindowSystem","UnLocking List");*/
 }
 
 int
@@ -569,6 +618,7 @@ void* X11WindowSystem::EventLoop(void * ptr)
 	LOG_DEBUG("X11WindowSystem", "Enter thread");
 
 	bool status = true;
+	bool checkRedraw = false;
 
 	X11WindowSystem *windowsys = (X11WindowSystem *) ptr;
 	XSetErrorHandler(error);
@@ -578,6 +628,9 @@ void* X11WindowSystem::EventLoop(void * ptr)
 
 	LOG_DEBUG("X11WindowSystem", "check for composite extension");
 	status &= windowsys->checkForCompositeExtension();
+
+	LOG_DEBUG("X11WindowSystem", "check for damage extension");
+	status &= windowsys->checkForDamageExtension();
 
 	LOG_DEBUG("X11WindowSystem", "init xserver");
 	status &= windowsys->initXServer();
@@ -605,6 +658,11 @@ void* X11WindowSystem::EventLoop(void * ptr)
 		windowsys->layerlist->getCurrentRenderOrder().push_back(defaultLayer);
 	}
 	LOG_DEBUG("X11WindowSystem", "Enter render loop");
+
+	// clear screen to avoid garbage on startup
+	windowsys->graphicSystem->clearBackground();
+	windowsys->graphicSystem->swapBuffers();
+
 	while (windowsys->m_running)
 	{
 		if ( XPending(windowsys->x11Display) > 0) {
@@ -626,15 +684,17 @@ void* X11WindowSystem::EventLoop(void * ptr)
 			case ConfigureNotify:
 				LOG_DEBUG("X11WindowSystem", "Configure notify Event");
 				windowsys->configureSurfaceWindow( event.xconfigure.window);
+				checkRedraw = true;
 				break;
 
 			case DestroyNotify:
 				LOG_DEBUG("X11WindowSystem", "Destroy  Event");
 				windowsys->DestroyWindow(event.xdestroywindow.window);
+				checkRedraw = true;
 				break;
 			case Expose:
 				LOG_DEBUG("X11WindowSystem", "Expose Event");
-				windowsys->Redraw();
+				checkRedraw = true;
 				break;
 			case ButtonPress:
 				LOG_DEBUG("X11WindowSystem", "Button press Event");
@@ -643,10 +703,12 @@ void* X11WindowSystem::EventLoop(void * ptr)
 			case MapNotify:
 				LOG_DEBUG("X11WindowSystem", "Map Event");
 				windowsys->MapWindow(event.xmap.window);
+				checkRedraw = true;
 				break;
 			case UnmapNotify:
 				LOG_DEBUG("X11WindowSystem", "Unmap Event");
 				windowsys->UnMapWindow(event.xunmap.window);
+				checkRedraw = true;
 				break;
 			case ReparentNotify:
 				LOG_DEBUG("X11WindowSystem", "Reparent Event");
@@ -657,14 +719,52 @@ void* X11WindowSystem::EventLoop(void * ptr)
 				break;
 
 			default:
-				; /*no-op*/
+				if (event.type == windowsys->damage_event + XDamageNotify)
+				{
+					XDamageSubtract(windowsys->x11Display, ((XDamageNotifyEvent*)(&event))->damage, None, None);
+					Surface* currentSurface = windowsys->getSurfaceForWindow(((XDamageNotifyEvent*)(&event))->drawable);
+					if (currentSurface==NULL)
+					{
+						LOG_ERROR("X11WindowSystem", "surface empty");
+						break;
+					}
+					currentSurface->damaged = true;
+					checkRedraw = true;
+				}
+				break;
 			}
 		}
-		windowsys->Redraw();
+		if (windowsys->redrawEvent)
+		{
+			windowsys->redrawEvent = false;
+
+			// check if we are supposed to take screenshot
+			if (windowsys->takeScreenshot!=ScreenShotNone)
+			{
+				windowsys->Screenshot();
+			}
+			else
+			{
+				windowsys->checkForNewSurface();
+				checkRedraw = true;
+			}
+
+		}
+
+		if (checkRedraw)
+		{
+			windowsys->Redraw();
+			checkRedraw = false;
+		}
 	}
 	windowsys->cleanup();
 	LOG_INFO("X11WindowSystem", "Renderer thread finished");
 	return NULL;
+}
+
+void X11WindowSystem::signalRedrawEvent()
+{
+	redrawEvent = true;
 }
 
 void X11WindowSystem::cleanup(){

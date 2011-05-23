@@ -47,7 +47,7 @@ find_package(GLX REQUIRED)
 include_directories(${GLX_INCLUDE_DIR})
 
 find_package (Threads)
-set(LIBS ${LIBS} ${CMAKE_THREAD_LIBS_INIT} ${X11_X11_LIB} ${X11_Xcomposite_LIB} ${GLX_LIBRARIES} LayerManagerUtils) 
+set(LIBS ${LIBS} ${CMAKE_THREAD_LIBS_INIT} ${X11_X11_LIB} ${X11_Xcomposite_LIB} ${X11_Xdamage_LIB} ${GLX_LIBRARIES} LayerManagerUtils)
 target_link_libraries(X11GLXRenderer ${LIBS})
 
 add_dependencies(X11GLXRenderer LayerManagerService)

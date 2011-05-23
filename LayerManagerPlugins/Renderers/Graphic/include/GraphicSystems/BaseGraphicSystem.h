@@ -33,6 +33,7 @@ public:
 	virtual ~BaseGraphicSystem(){};
 	virtual void setBaseWindowSystem(BaseWindowSystem* windowSystem){m_baseWindowSystem = windowSystem;};
 	virtual void beginLayer(Layer* layer) = 0;
+	virtual void checkRenderLayer() = 0;
 	virtual void renderLayer() = 0;
 	virtual void endLayer() = 0;
 

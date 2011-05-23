@@ -73,6 +73,7 @@ Extensions have to be supported by the TargetPlatform :
 X11 Extensions:
 
 x-composite : This extension should support redirecting of egl Surfaces to x11 pixmaps too.
+x-damage
 
 EGL / OpenGL ES 2.0:
 
@@ -92,6 +93,7 @@ Extensions have to be supported by the TargetPlatform :
 X11 Extensions:
 
 x-composite : This extension should support redirecting of egl Surfaces to x11 pixmaps too.
+x-damage
 
 GLX / OpenGL :
 

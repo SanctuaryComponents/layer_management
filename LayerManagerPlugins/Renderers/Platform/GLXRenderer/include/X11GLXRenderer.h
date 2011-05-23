@@ -37,6 +37,7 @@ public:
 	uint* getScreenIDs(uint* length);
 	bool start(int, int, const char*);
 	void stop();
+	void signalWindowSystemRedraw();
 private:
 	X11WindowSystem*  m_windowSystem;
 	GLXGraphicsystem* m_graphicSystem;

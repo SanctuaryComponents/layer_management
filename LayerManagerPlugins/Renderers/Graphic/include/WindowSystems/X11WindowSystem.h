@@ -45,6 +45,7 @@ public:
 	void doScreenShot(std::string fileName);
 	void doScreenShotOfLayer(std::string fileName, const uint id);
 	void doScreenShotOfSurface(std::string fileName, const uint id);
+	void signalRedrawEvent();
 
 private:
 	ScreenShotType takeScreenshot;
@@ -71,12 +72,15 @@ protected:
 
 private:
 	void cleanup();
+	void Screenshot();
 	void Redraw();
 	bool OpenDisplayConnection();
 	bool checkForCompositeExtension();
+	bool checkForDamageExtension();
 	void createSurfaceForWindow(Window w);
 	void configureSurfaceWindow(Window w);
 	Surface* getSurfaceForWindow(Window w);
+	void checkForNewSurface();
 	void destroy_surface(Window w);
 	void updateSurface(Surface* s, Window w, XPlatformSurface* x11surf);
 	void MapWindow(Window w);
@@ -94,10 +98,14 @@ private:
 	static int composite_opcode;
 	int composite_event, composite_error;
 	int composite_major, composite_minor;
+	static int damage_opcode;
+	int damage_event, damage_error;
+	int damage_major, damage_minor;
 	static const char CompositorWindowTitle[];
 	bool m_running;
 	bool m_initialized;
 	bool m_success;
+	bool redrawEvent;
 };
 
 #endif /* _X11WINDOWSYSTEM_H_ */

@@ -24,7 +24,7 @@
 
 class BaseWindowSystem {
 public:
-	BaseWindowSystem(LayerList* layerlist) : layerlist(layerlist){};
+	BaseWindowSystem(LayerList* layerlist) : layerlist(layerlist), m_damaged(false){};
 	virtual ~BaseWindowSystem(){};
 	virtual bool start()=0;
 	virtual void stop()=0;
@@ -32,6 +32,7 @@ public:
 	virtual void doScreenShot(std::string fileName)=0;
 	virtual void doScreenShotOfLayer(std::string fileName, const uint id)=0;
 	virtual void doScreenShotOfSurface(std::string fileName, const uint id)=0;
+	bool m_damaged;
 
 protected:
 	LayerList* layerlist;

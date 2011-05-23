@@ -70,6 +70,15 @@ uint* Layermanager::getScreenIDs(uint* length){
 		return 0;
 }
 
+// This function is used to propagate a signal to the window system
+// via the renderer for a redraw because of a rendering property change
+void Layermanager::signalRendererRedraw()
+{
+	IRenderer* renderer = *compositingControllers.begin();
+	if (NULL!=renderer)
+		renderer->signalWindowSystemRedraw();
+}
+
 void Layermanager::addRenderer(IRenderer* renderer){
 	compositingControllers.push_back(renderer);
 }
@@ -106,6 +115,8 @@ void Layermanager::printDebugInformation(){
 
 bool Layermanager::execute(Command*  commandToBeExecuted){
 	bool status=false;
+	bool signalRenderer = false;
+	static bool signalRendererAfterCommit = false;
 	LOG_DEBUG("Layermanager", "executing a command, locking list");
         layerlist.lockList();
         /*LOG_DEBUG("Layermanager", "executing a command, locking list success");*/
@@ -119,12 +130,13 @@ bool Layermanager::execute(Command*  commandToBeExecuted){
 		case Command::SetOrientation:
 		case Command::LayerAddSurface:
 		case Command::LayerRemoveSurface:
+		case Command::SetLayerRenderOrder:
+		case Command::SetSurfaceRenderOrderWithinLayer:
+			signalRendererAfterCommit = true;
 		case Command::LayergroupAddLayer:
 		case Command::LayergroupRemoveLayer:
 		case Command::SurfacegroupAddSurface:
 		case Command::SurfacegroupRemoveSurface:
-		case Command::SetLayerRenderOrder:
-		case Command::SetSurfaceRenderOrderWithinLayer:
                 {
                         layerlist.toBeCommittedList.push_back(commandToBeExecuted);
                         status = true;
@@ -169,12 +181,28 @@ bool Layermanager::execute(Command*  commandToBeExecuted){
 					  }
 			  }
 			status = true;
+			signalRendererRedraw();
 			break;
 		}
+		// TODO: Theoretically both SetShader and SetUniforms should be considered for signaling the window system
+		// But currently there is no mechanism for doing this for SetUniforms, as surface/layer doesn't
+		// keep track of uniform in its shader
+		case Command::SetShader:
+//		case Command::SetUniforms:
+			signalRenderer = true;
 		case Command::Create:
 		default:
 		  {
                         status = commandToBeExecuted->execute(layerlist);
+						if (commandToBeExecuted->commandType == Command::CommitChanges && signalRendererAfterCommit)
+						{
+							signalRendererRedraw();
+							signalRendererAfterCommit = false;
+						}
+						else if (signalRenderer)
+						{
+							signalRendererRedraw();
+						}
                         delete commandToBeExecuted;
                         break;
 		  }
