@@ -76,7 +76,7 @@ int main(int argc, char **argv)
 
           printf("Calling ilm_destroy ... \n");
           error = ilm_destroy();
-          if (error = ILM_SUCCESS)
+          if (error == ILM_SUCCESS)
           {
                   printf("Calling ilm_destroy successful, close\n");
           }

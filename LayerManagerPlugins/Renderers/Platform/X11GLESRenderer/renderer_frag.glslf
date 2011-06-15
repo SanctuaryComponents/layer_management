@@ -17,7 +17,7 @@
 *
 ****************************************************************************/
 // alpha value of the surfaces 
-uniform float uAlphaVal;
+uniform mediump float uAlphaVal;
 // textureunit which is accessed
 uniform mediump sampler2D uTexUnit;
 

@@ -184,11 +184,20 @@ double getDoubleFromMessage(){
 }
 
 
-void appendBool(dbus_bool_t toAppend){
-  if (!dbus_message_iter_append_basic(&iter, DBUS_TYPE_BOOLEAN, &toAppend)) {
-    LOG_ERROR("DBUSCommunicator", "Out Of Memory!");
-    exit(1);
-  }
+void appendBool(bool toAppend)
+{
+    dbus_bool_t dbusBool = TRUE;
+    if (true == toAppend)  
+    {
+        dbusBool = TRUE;
+    } else {
+        dbusBool = FALSE;
+    }
+    if (!dbus_message_iter_append_basic(&iter, DBUS_TYPE_BOOLEAN, &dbusBool)) 
+    {
+        LOG_ERROR("DBUSCommunicator", "Out Of Memory!");
+        exit(1);
+    }
 }
 
 void appendUint(dbus_uint32_t toAppend){

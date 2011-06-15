@@ -17,7 +17,7 @@
 *
 ****************************************************************************/
 // alpha value of the surfaces 
-uniform float uAlphaVal;
+uniform mediump float uAlphaVal;
 
 void main()
 {	

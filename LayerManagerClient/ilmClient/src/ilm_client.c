@@ -92,7 +92,7 @@ ilmErrorTypes ilm_getPropertiesOfSurface(t_ilm_uint surfaceID, struct ilmSurface
 
 	/* Setup message to send */
 	DBusMessage *message;
-	message = _ilm_dbus_method_call(g_ilm_client->dbus_connection,"GetPropertiesOfSurface",param,12);
+	message = _ilm_dbus_method_call(g_ilm_client->dbus_connection,"GetPropertiesOfSurface",param,1);
 	if (!message)
 	{
 		  ILM_ERROR("ilm_getPropertiesOfSurface","IPC Method call not possible can't setup remote message\n");
@@ -132,7 +132,7 @@ ilmErrorTypes ilm_getPropertiesOfLayer(t_ilm_uint layerID, struct ilmLayerProper
 
 	/* Setup message to send */
 	DBusMessage *message;
-	message = _ilm_dbus_method_call(g_ilm_client->dbus_connection,"GetPropertiesOfLayer", param, 12);
+	message = _ilm_dbus_method_call(g_ilm_client->dbus_connection,"GetPropertiesOfLayer", param, 1);
 	if (!message)
 	{
 		  ILM_ERROR("ilm_getPropertiesOfLayer","IPC Method call not possible can't setup remote message\n");
