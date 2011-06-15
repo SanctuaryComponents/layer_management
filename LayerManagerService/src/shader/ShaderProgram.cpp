@@ -1,126 +1,168 @@
 /***************************************************************************
-*
-* Copyright 2010,2011 BMW Car IT GmbH
-*
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*		http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*
-****************************************************************************/
+ *
+ * Copyright 2010,2011 BMW Car IT GmbH
+ *
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ ****************************************************************************/
 
 #include <ShaderProgram.h>
 #include <ShaderProgramFactory.h>
+#include "ShaderProgramList.h"
 
 // global program list
-std::list<ShaderProgram*> ShaderProgram::_programList;
+ShaderProgramList ShaderProgram::m_programList;
 
-ShaderProgram* ShaderProgram::obtain(const std::string& vertName, const std::string& fragName)
+ShaderProgram* ShaderProgram::obtain(const string& vertFileName,
+        const string& fragFileName)
 {
-	std::list<ShaderProgram*>::iterator it;
-	ShaderProgram* program = 0;
+    ShaderProgram* program = 0;
 
-	// search for a matching shader program in the global list
-	for (it=_programList.begin(); it!=_programList.end(); ++it)
-	{
-		ShaderProgram* p = *it;
-		if (p && p->getVertexName()==vertName && p->getFragmentName()==fragName)
-		{
-			program = p;
-			break;
-		}
-	}
+    ShaderProgramListIterator iter = m_programList.begin();
+    ShaderProgramListIterator iterEnd = m_programList.end();
 
-	if (!program)
-	{
-		// no matching program object found in global list -> create a new one
+    // search for a matching shader program in the global list
+    for (; iter != iterEnd; ++iter)
+    {
+        ShaderProgram* currentProgram = *iter;
 
-		// we are using a factory approach to create platform specific shader programs:
-		program = ShaderProgramFactory::createProgram(vertName, fragName);
+        if (!currentProgram)
+        {
+            continue;
+        }
 
-		if (program)
-		{
-			// add program to global list
-			_programList.push_back(program);
-		}
-	}
+        bool vertexFileNameMatch = (currentProgram->getVertexName()
+                == vertFileName);
+        bool fragFileNameMatch = (currentProgram->getFragmentName()
+                == fragFileName);
 
-	return program;
+        if (vertexFileNameMatch && fragFileNameMatch)
+        {
+            program = currentProgram;
+            break;
+        }
+    }
+
+    if (!program)
+    {
+        // no matching program object found in global list -> create a new one
+
+        // we are using a factory approach to create platform specific shader programs:
+        program = ShaderProgramFactory::createProgram(vertFileName,
+                fragFileName);
+
+        if (program)
+        {
+            // add program to global list
+            m_programList.push_back(program);
+        }
+    }
+
+    return program;
 }
 
-ShaderProgram::ShaderProgram(const std::string& vertName, const std::string& fragName)
-	: _refCounter(0)
-	, _vertName(vertName)
-	, _fragName(fragName)
+ShaderProgram::ShaderProgram(const string& vertFileName, const string& fragFileName)
+: m_referenceCounter(0)
+, m_vertFileName(vertFileName)
+, m_fragFileName(fragFileName)
+, m_xLoc(0)
+, m_yLoc(0)
+, m_widthLoc(0)
+, m_heightLoc(0)
+, m_opacityLoc(0)
+, m_texRangeLoc(0)
+, m_texOffsetLoc(0)
+, m_texUnitLoc(0)
+, m_matrixLoc(0)
 {
-	// void
+    // void
 }
 
 ShaderProgram::~ShaderProgram()
 {
-	// void
+    // void
 }
 
 void ShaderProgram::ref(void)
 {
-	_refCounter++;
+    m_referenceCounter++;
 }
 
 void ShaderProgram::unref(void)
 {
-	_refCounter--;
-	if (_refCounter<=0)
-	{
-		// remove program from global list
-		_programList.remove(this);
+    m_referenceCounter--;
+    if (m_referenceCounter <= 0)
+    {
+        // remove program from global list
+        m_programList.remove(this);
 
-		// destroy object
-		delete this;
-	}
+        // destroy object
+        delete this; // TODO: always safe?
+    }
 }
 
 void ShaderProgram::loadCommonUniforms(const CommonUniforms& uniforms) const
 {
-	if (_xLoc>=0)
-		uniform1fv(_xLoc, 1, &uniforms.x);
-	if (_yLoc>=0)
-		uniform1fv(_yLoc, 1, &uniforms.y);
-	if (_widthLoc>=0)
-		uniform1fv(_widthLoc, 1, &uniforms.width);
-	if (_heightLoc>=0)
-		uniform1fv(_heightLoc, 1, &uniforms.height);
-	if (_opacityLoc>=0)
-		uniform1fv(_opacityLoc, 1, &uniforms.opacity);
-	if (_texRangeLoc>=0)
-		uniform2fv(_texRangeLoc, 1, uniforms.texRange);
-	if (_texOffsetLoc>=0)
-		uniform2fv(_texOffsetLoc, 1, uniforms.texOffset);
-	if (_texUnitLoc>=0)
-		uniform1iv(_texUnitLoc, 1, &uniforms.texUnit);
-       if (_matrixLoc>=0)
-                uniformMatrix4fv(_matrixLoc, 1,false, uniforms.matrix);
-
+    if (m_xLoc >= 0)
+    {
+        uniform1fv(m_xLoc, 1, &uniforms.x);
+    }
+    if (m_yLoc >= 0)
+    {
+        uniform1fv(m_yLoc, 1, &uniforms.y);
+    }
+    if (m_widthLoc >= 0)
+    {
+        uniform1fv(m_widthLoc, 1, &uniforms.width);
+    }
+    if (m_heightLoc >= 0)
+    {
+        uniform1fv(m_heightLoc, 1, &uniforms.height);
+    }
+    if (m_opacityLoc >= 0)
+    {
+        uniform1fv(m_opacityLoc, 1, &uniforms.opacity);
+    }
+    if (m_texRangeLoc >= 0)
+    {
+        uniform2fv(m_texRangeLoc, 1, uniforms.texRange);
+    }
+    if (m_texOffsetLoc >= 0)
+    {
+        uniform2fv(m_texOffsetLoc, 1, uniforms.texOffset);
+    }
+    if (m_texUnitLoc >= 0)
+    {
+        uniform1iv(m_texUnitLoc, 1, &uniforms.texUnit);
+    }
+    if (m_matrixLoc >= 0)
+    {
+        uniformMatrix4fv(m_matrixLoc, 1, false, uniforms.matrix);
+    }
 }
 
 void ShaderProgram::updateCommonUniformLocations(void)
 {
-	// get uniform locations for common surface properties
-	_xLoc = getUniformLocation("uX");
-	_yLoc = getUniformLocation("uY");
-	_widthLoc = getUniformLocation("uWidth");
-	_heightLoc = getUniformLocation("uHeight");
-	_opacityLoc = getUniformLocation("uAlphaVal");
-	_texRangeLoc = getUniformLocation("uTexRange");
-	_texOffsetLoc = getUniformLocation("uTexOffset");
-	_texUnitLoc = getUniformLocation("uTexUnit");
-	_matrixLoc = getUniformLocation("uMatrix");
+    // get uniform locations for common surface properties
+    m_xLoc = getUniformLocation("uX");
+    m_yLoc = getUniformLocation("uY");
+    m_widthLoc = getUniformLocation("uWidth");
+    m_heightLoc = getUniformLocation("uHeight");
+    m_opacityLoc = getUniformLocation("uAlphaVal");
+    m_texRangeLoc = getUniformLocation("uTexRange");
+    m_texOffsetLoc = getUniformLocation("uTexOffset");
+    m_texUnitLoc = getUniformLocation("uTexUnit");
+    m_matrixLoc = getUniformLocation("uMatrix");
 }
 

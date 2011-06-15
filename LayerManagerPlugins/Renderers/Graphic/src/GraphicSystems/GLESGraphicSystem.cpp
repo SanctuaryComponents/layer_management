@@ -7,7 +7,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *		http://www.apache.org/licenses/LICENSE-2.0
+ *        http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,167 +24,133 @@
 #include "GLES2/gl2.h"
 #include "Bitmap.h"
 
-static const float vertices[8*12] = {
-    0.0, 0.0,
-    1.0, 0.0,
-    1.0, 1.0,
-    1.0, 1.0,
-    0.0, 1.0,
-    0.0, 0.0,
+static const float vertices[8 * 12] =
+{ 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0,
 
-    0.0, 0.0,
-    1.0, 0.0,
-    1.0, 1.0,
-    1.0, 1.0,
-    0.0, 1.0,
-    0.0, 0.0,
+0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0,
 
-    0.0, 0.0,
-    1.0, 0.0,
-    1.0, 1.0,
-    1.0, 1.0,
-    0.0, 1.0,
-    0.0, 0.0,
+0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0,
 
-    1.0, 0.0,
-    1.0, 1.0,
-    0.0, 1.0,
-    0.0, 1.0,
-    0.0, 0.0,
-    1.0, 0.0,
+1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0,
 
-    0.0, 0.0,
-    1.0, 0.0,
-    1.0, 1.0,
-    1.0, 1.0,
-    0.0, 1.0,
-    0.0, 0.0,
+0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0,
 
-    1.0, 1.0,
-    0.0, 1.0,
-    0.0, 0.0,
-    0.0, 0.0,
-    1.0, 0.0,
-    1.0, 1.0,
+1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0,
 
-    0.0, 0.0,
-    1.0, 0.0,
-    1.0, 1.0,
-    1.0, 1.0,
-    0.0, 1.0,
-    0.0, 0.0,
+0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0,
 
-    0.0, 1.0,
-    0.0, 0.0,
-    1.0, 0.0,
-    1.0, 0.0,
-    1.0, 1.0,
-    0.0, 1.0
+0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0
 
 };
 
-GLESGraphicsystem::GLESGraphicsystem(int windowWidth, int windowHeight, PfnShaderProgramCreator shaderProgram) : m_shaderCreatorFunc(shaderProgram),
-								m_windowHeight(windowHeight),
-								m_windowWidth(windowWidth){
-  LOG_DEBUG("GLESGraphicsystem", "creating GLESGraphicsystem");
-};
+GLESGraphicsystem::GLESGraphicsystem(int windowWidth, int windowHeight, PfnShaderProgramCreator shaderProgram)
+: m_windowWidth(windowWidth)
+, m_windowHeight(windowHeight)
+, m_shaderCreatorFunc(shaderProgram)
+{
+    LOG_DEBUG("GLESGraphicsystem", "creating GLESGraphicsystem");
+}
 
-bool GLESGraphicsystem::init(EGLNativeDisplayType display, EGLNativeWindowType NativeWindow){
-	m_nativeDisplay = display;
-	m_nativeWindow = NativeWindow;
+bool GLESGraphicsystem::init(EGLNativeDisplayType display, EGLNativeWindowType NativeWindow)
+{
+    m_nativeDisplay = display;
+    m_nativeWindow = NativeWindow;
 
-  EGLint iMajorVersion, iMinorVersion;
-  LOG_DEBUG("GLESGraphicsystem", "Getting EGL Display with native display " << m_nativeDisplay);
-  m_eglDisplay = eglGetDisplay(m_nativeDisplay);
+    EGLint iMajorVersion, iMinorVersion;
+    LOG_DEBUG("GLESGraphicsystem", "Getting EGL Display with native display " << m_nativeDisplay);
+    m_eglDisplay = eglGetDisplay(m_nativeDisplay);
 
-  LOG_DEBUG("GLESGraphicsystem", "Initialising EGL");
-  if (!eglInitialize(m_eglDisplay, &iMajorVersion, &iMinorVersion))
-  {
-	LOG_ERROR("GLESGraphicsystem", "Initialising EGL failed");
-    return false;
-  }
-
-  LOG_DEBUG("GLESGraphicsystem", "Binding GLES API");
-  eglBindAPI(EGL_OPENGL_ES_API);
-
-  EGLint pi32ConfigAttribs[]={
-          EGL_SURFACE_TYPE,EGL_WINDOW_BIT | EGL_PIXMAP_BIT,
-          EGL_RENDERABLE_TYPE,EGL_OPENGL_ES2_BIT,
-          EGL_RED_SIZE,8,
-          EGL_ALPHA_SIZE,8,
-          EGL_NONE
-  };
-
-  LOG_DEBUG("GLESGraphicsystem", "EGLChooseConfig");
-  int iConfigs;
-  if (!eglChooseConfig(m_eglDisplay, pi32ConfigAttribs, &m_eglConfig, 1, &iConfigs) || (iConfigs != 1))
+    LOG_DEBUG("GLESGraphicsystem", "Initialising EGL");
+    if (!eglInitialize(m_eglDisplay, &iMajorVersion, &iMinorVersion))
     {
-      LOG_DEBUG("GLESGraphicsystem", "Error: eglChooseConfig() failed.");
-      return false;
+        LOG_ERROR("GLESGraphicsystem", "Initialising EGL failed");
+        return false;
     }
-  EGLint id =0;
-  eglGetConfigAttrib(m_eglDisplay, m_eglConfig, EGL_CONFIG_ID, &id);
 
-  EGLint windowsAttr[]={EGL_RENDER_BUFFER,EGL_BACK_BUFFER,
-  	  	  	  	  	  	  EGL_NONE};
+    LOG_DEBUG("GLESGraphicsystem", "Binding GLES API");
+    eglBindAPI(EGL_OPENGL_ES_API);
 
-  LOG_DEBUG("GLESGraphicsystem", "Config chosen:" << id);
-  LOG_DEBUG("GLESGraphicsystem", "Create Window surface");
+    EGLint pi32ConfigAttribs[] = {
+            EGL_SURFACE_TYPE, EGL_WINDOW_BIT, EGL_RENDERABLE_TYPE,
+            EGL_OPENGL_ES2_BIT,
+            EGL_RED_SIZE,
+            8,
+            EGL_ALPHA_SIZE,
+            8,
+            EGL_NONE
+    };
 
-  m_eglSurface = eglCreateWindowSurface(m_eglDisplay, m_eglConfig, m_nativeWindow, windowsAttr);
-  if (!m_eglSurface)
-  {
-    EGLenum status = eglGetError();
-    LOG_ERROR("GLESGraphicsystem", "Window Surface creation failed with EGL Error Code: "<< status);
-    return false;
-  }
-  LOG_DEBUG("GLESGraphicsystem", "Window Surface creation successfull");
-
-  EGLint contextAttrs[] = { EGL_CONTEXT_CLIENT_VERSION, 2, EGL_NONE };
-  m_eglContext = eglCreateContext(m_eglDisplay,
-      m_eglConfig,
-      NULL,
-      contextAttrs);
-  if (!m_eglContext)
+    LOG_DEBUG("GLESGraphicsystem", "EGLChooseConfig");
+    int iConfigs;
+    if (!eglChooseConfig(m_eglDisplay, pi32ConfigAttribs, &m_eglConfig, 1, &iConfigs) || (iConfigs != 1))
     {
-      LOG_ERROR("GLESGraphicsystem","EGL couldn't create context\n");
-      return false;
+        LOG_DEBUG("GLESGraphicsystem", "Error: eglChooseConfig() failed.");
+        return false;
     }
-  LOG_INFO("GLESGraphicsystem", "EGL make current ...");
-  // Make the context and surface current for rendering
-  EGLBoolean eglStatus = false;
-  eglStatus = eglMakeCurrent(m_eglDisplay,
-      m_eglSurface, m_eglSurface,
-      m_eglContext);
-  LOG_INFO("GLESGraphicsystem", "made current");
+    EGLint id = 0;
+    eglGetConfigAttrib(m_eglDisplay, m_eglConfig, EGL_CONFIG_ID, &id);
 
+    EGLint windowsAttr[] = { EGL_RENDER_BUFFER, EGL_BACK_BUFFER, EGL_NONE };
 
-  if (!initOpenGLES(m_windowWidth,m_windowHeight) )
+    LOG_DEBUG("GLESGraphicsystem", "Config chosen:" << id);
+    LOG_DEBUG("GLESGraphicsystem", "Create Window surface");
+
+    m_eglSurface = eglCreateWindowSurface(m_eglDisplay, m_eglConfig, m_nativeWindow, windowsAttr);
+    if (!m_eglSurface)
     {
-      return false;
+        EGLenum status = eglGetError();
+        LOG_ERROR("GLESGraphicsystem", "Window Surface creation failed with EGL Error Code: "<< status);
+        return false;
     }
-  return true;
+    LOG_DEBUG("GLESGraphicsystem", "Window Surface creation successfull");
+
+    EGLint contextAttrs[] = {
+            EGL_CONTEXT_CLIENT_VERSION,
+            2,
+            EGL_NONE
+    };
+
+    m_eglContext = eglCreateContext(m_eglDisplay, m_eglConfig, NULL, contextAttrs);
+    if (!m_eglContext)
+    {
+        LOG_ERROR("GLESGraphicsystem","EGL couldn't create context\n");
+        return false;
+    }
+    LOG_INFO("GLESGraphicsystem", "EGL make current ...");
+    // Make the context and surface current for rendering
+    EGLBoolean eglStatus = false;
+    eglStatus = eglMakeCurrent(m_eglDisplay, m_eglSurface, m_eglSurface, m_eglContext);
+    LOG_INFO("GLESGraphicsystem", "made current");
+
+    eglSwapInterval(m_eglDisplay, 1); // TODO: does not seem to work
+
+    if (!initOpenGLES(m_windowWidth, m_windowHeight))
+    {
+        return false;
+    }
+    return true;
 }
 
 void GLESGraphicsystem::clearBackground()
 {
-  glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT);
 }
+
 void GLESGraphicsystem::swapBuffers()
 {
-  eglSwapBuffers(m_eglDisplay,m_eglSurface);
+    eglSwapBuffers(m_eglDisplay, m_eglSurface);
 }
 
 void GLESGraphicsystem::beginLayer(Layer* currentLayer)
 {
-	//LOG_DEBUG("GLESGraphicsystem", "Beginning to draw layer: " << currentLayer->getID());
-	m_currentLayer = currentLayer;
-	// TODO layer destination / source
+    //LOG_DEBUG("GLESGraphicsystem", "Beginning to draw layer: " << currentLayer->getID());
+    m_currentLayer = currentLayer;
+    // TODO layer destination / source
 }
 
 void GLESGraphicsystem::checkRenderLayer()
 {
-	std::list<Surface*> surfaces = m_currentLayer->surfaces;
+	SurfaceList surfaces = m_currentLayer->getAllSurfaces();
 
 	m_currentLayer->damaged = false;
 
@@ -228,7 +194,7 @@ void GLESGraphicsystem::checkRenderLayer()
 
 void GLESGraphicsystem::renderLayer()
 {
-	std::list<Surface*> surfaces = m_currentLayer->surfaces;
+	SurfaceList surfaces = m_currentLayer->getAllSurfaces();
 	for(std::list<Surface*>::const_iterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++)
 	{
 		if ((*currentS)->visibility && (*currentS)->opacity>0.0f)
@@ -241,8 +207,8 @@ void GLESGraphicsystem::renderLayer()
 
 void GLESGraphicsystem::endLayer()
 {
-	//LOG_DEBUG("GLESGraphicsystem", "Done with rendering layer: " << m_currentLayer->getID());
-	m_currentLayer = NULL;
+    //LOG_DEBUG("GLESGraphicsystem", "Done with rendering layer: " << m_currentLayer->getID());
+    m_currentLayer = NULL;
 }
 
 //this is a particularly simple function currently, but it will likely be expanded as more shaders and effects are implemented.
@@ -262,59 +228,59 @@ Shader *GLESGraphicsystem::pickOptimizedShader(Shader* currentShader, const Shad
 
 void GLESGraphicsystem::renderSurface(Surface* surface)
 {
-//	LOG_DEBUG("GLESGraphicsystem", "renderSurface " << surface->getID());
-  GLint index = 0;
-  IlmMatrix layerMatrix;
-  IlmMatrixIdentity(layerMatrix);
-  Rectangle layerdest = (m_currentLayer)->getDestinationRegion();
-  Rectangle layersrc = (m_currentLayer)->getSourceRegion();
+//  LOG_DEBUG("GLESGraphicsystem", "renderSurface " << surface->getID());
 
-  float scalex = (float)layerdest.width / (float) m_displayWidth;
-  float scaley = (float)layerdest.height / (float) m_displayHeight;
-  ShaderProgram::CommonUniforms uniforms;
+    GLint index = 0;
+    IlmMatrix layerMatrix;
+    IlmMatrixIdentity(layerMatrix);
+    Rectangle layerdest = (m_currentLayer)->getDestinationRegion();
+    Rectangle layersrc = (m_currentLayer)->getSourceRegion();
+
+    float scalex = (float) layerdest.width / (float) m_displayWidth;
+    float scaley = (float) layerdest.height / (float) m_displayHeight;
+    ShaderProgram::CommonUniforms uniforms;
 #ifdef DRAW_LAYER_DEBUG
-  ShaderProgram::CommonUniforms layeruniforms;
+    ShaderProgram::CommonUniforms layeruniforms;
 #endif
-  Shader* layerShader = m_currentLayer->getShader();
-  if (!layerShader)
+    Shader* layerShader = m_currentLayer->getShader();
+    if (!layerShader)
     {
-      // use default shader if no custom shader is assigned to this layer
-      layerShader = m_defaultShader;
+        // use default shader if no custom shader is assigned to this layer
+        layerShader = m_defaultShader;
     }
-  Shader* shader = (surface)->getShader();
-  if (!shader)
+    Shader* shader = (surface)->getShader();
+    if (!shader)
     {
-      // use layer shader if no custom shader is assigned to this surface
-      shader = layerShader;
+        // use layer shader if no custom shader is assigned to this surface
+        shader = layerShader;
     }
-  Rectangle dest = (surface)->getDestinationRegion();
-  Rectangle src = (surface)->getSourceRegion();
+    Rectangle dest = (surface)->getDestinationRegion();
+    Rectangle src = (surface)->getSourceRegion();
 
+    float surfaceXOfScreen = (float) dest.x / (float) layerdest.width + (float) layerdest.x / m_displayWidth;
+    float surfaceYOfScreen = (float) dest.y / (float) layerdest.height + (float) layerdest.y / m_displayHeight;
+    float surfaceWidthOfScreen = ((float) dest.width / m_displayWidth) * scalex;
+    float surfaceHeightOfScreen = ((float) dest.height / m_displayHeight) * scaley;
 
-  float surfaceXOfScreen = 	 (float) dest.x / (float) layerdest.width + (float) layerdest.x / m_displayWidth ;
-  float surfaceYOfScreen =	(float) dest.y / (float) layerdest.height + (float) layerdest.y / m_displayHeight ;
-  float surfaceWidthOfScreen = ((float) dest.width / m_displayWidth ) * scalex;
-  float surfaceHeightOfScreen = ((float) dest.height / m_displayHeight ) * scaley;
+    float sourceViewportWidthPercent = (float) src.width / (surface)->OriginalSourceWidth;
+    float sourceViewportHeightpercent = (float) src.height / (surface)->OriginalSourceHeight;
+    float sourceViewportXPercent = (float) src.x / (surface)->OriginalSourceWidth;
+    float sourceViewportYPercent = (float) src.y / (surface)->OriginalSourceHeight;
 
-  float sourceViewportWidthPercent = (float)src.width/(surface)->OriginalSourceWidth;
-  float sourceViewportHeightpercent = (float)src.height/(surface)->OriginalSourceHeight;
-  float sourceViewportXPercent = (float)src.x/(surface)->OriginalSourceWidth;
-  float sourceViewportYPercent = (float)src.y/(surface)->OriginalSourceHeight;
-
-  glBindBuffer(GL_ARRAY_BUFFER,m_vbo);
-  IlmMatrixRotateZ(layerMatrix,m_currentLayer->getOrientation()*90.0f);
-  /* update all common uniforms */
-  uniforms.x = surfaceXOfScreen;
-  uniforms.y = surfaceYOfScreen;
-  uniforms.width = surfaceWidthOfScreen;
-  uniforms.height = surfaceHeightOfScreen;
-  uniforms.opacity = (surface)->getOpacity() * m_currentLayer->getOpacity();
-  uniforms.texRange[0] = sourceViewportWidthPercent;
-  uniforms.texRange[1] = sourceViewportHeightpercent;
-  uniforms.texOffset[0] = sourceViewportXPercent;
-  uniforms.texOffset[1] = -sourceViewportYPercent;
-  uniforms.texUnit = 0;
-  uniforms.matrix = &layerMatrix.f[0];
+    glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+    IlmMatrixRotateZ(layerMatrix, m_currentLayer->getOrientation() * 90.0f);
+    /* update all common uniforms */
+    uniforms.x = surfaceXOfScreen;
+    uniforms.y = surfaceYOfScreen;
+    uniforms.width = surfaceWidthOfScreen;
+    uniforms.height = surfaceHeightOfScreen;
+    uniforms.opacity = (surface)->getOpacity() * m_currentLayer->getOpacity();
+    uniforms.texRange[0] = sourceViewportWidthPercent;
+    uniforms.texRange[1] = sourceViewportHeightpercent;
+    uniforms.texOffset[0] = sourceViewportXPercent;
+    uniforms.texOffset[1] = -sourceViewportYPercent;
+    uniforms.texUnit = 0;
+    uniforms.matrix = &layerMatrix.f[0];
 
     //We only know about specific Shaders, only do this if we start with the defaultShader
   if (shader == m_defaultShader && uniforms.opacity == 1.0f)
@@ -340,123 +306,129 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
 
 
 #ifdef DRAW_LAYER_DEBUG
-  layeruniforms.x = (float) layerdest.x / m_displayWidth;
-  layeruniforms.y = (float) layerdest.y / m_displayHeight;
-  layeruniforms.width = (float)layerdest.width / m_displayWidth;
-  layeruniforms.height = (float)layerdest.height / m_displayHeight;
-  layeruniforms.opacity = currentLayer->getOpacity();
-  layeruniforms.matrix = &layerMatrix.f[0];
-  m_layerShader->use();
-  m_layerShader->loadCommonUniforms(layeruniforms);
-  m_layerShader->loadUniforms();
+    layeruniforms.x = (float) layerdest.x / m_displayWidth;
+    layeruniforms.y = (float) layerdest.y / m_displayHeight;
+    layeruniforms.width = (float)layerdest.width / m_displayWidth;
+    layeruniforms.height = (float)layerdest.height / m_displayHeight;
+    layeruniforms.opacity = currentLayer->getOpacity();
+    layeruniforms.matrix = &layerMatrix.f[0];
+    m_layerShader->use();
+    m_layerShader->loadCommonUniforms(layeruniforms);
+    m_layerShader->loadUniforms();
 
-  glDrawArrays(GL_TRIANGLES, 0, 6);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 #endif
-  shader->use();
+    shader->use();
 
-  /* load common uniforms */
-  shader->loadCommonUniforms(uniforms);
+    /* load common uniforms */
+    shader->loadCommonUniforms(uniforms);
 
+    /* update all custom defined uniforms */
+    shader->loadUniforms();
+    /* Bind texture and set section */
+    glActiveTexture(GL_TEXTURE0);
+    m_binder->bindSurfaceTexture(surface);
 
-  /* update all custom defined uniforms */
-  shader->loadUniforms();
-  /* Bind texture and set section */
-  glActiveTexture(GL_TEXTURE0);
-  m_binder->bindSurfaceTexture(surface);
+    /* rotated positions are saved sequentially in vbo
+     offset in multiples of 12 decide rotation */
+    /* Draw two triangles */
+    int orientation = (surface)->getOrientation();
+    orientation %= 4;
+    index = orientation * 12;
 
-  /* rotated positions are saved sequentially in vbo
-           offset in multiples of 12 decide rotation */
-  /* Draw two triangles */
-  int orientation = (surface)->getOrientation();
-  orientation %= 4;
-  index = orientation * 12;
+    glDrawArrays(GL_TRIANGLES, index, 6);
 
-  glDrawArrays(GL_TRIANGLES, index, 6);
-  glBindBuffer(GL_ARRAY_BUFFER,NULL);
-
-  GLenum status = glGetError();
+    glBindBuffer(GL_ARRAY_BUFFER, NULL);
+    glGetError(); // TODO
 }
 
-bool GLESGraphicsystem::initOpenGLES(EGLint displayWidth,EGLint displayHeight)
+bool GLESGraphicsystem::initOpenGLES(EGLint displayWidth, EGLint displayHeight)
 {
-  LOG_DEBUG("GLESGraphicsystem", "initEGL");
-  bool result = true;
-  ShaderProgramFactory::setCreatorFunc(m_shaderCreatorFunc);
-  m_defaultShader = Shader::createShader("default", "default");
+    LOG_DEBUG("GLESGraphicsystem", "initEGL");
+    bool result = true;
+    ShaderProgramFactory::setCreatorFunc(m_shaderCreatorFunc);
+    m_defaultShader = Shader::createShader("default", "default");
   m_defaultShaderNoUniformAlpha = Shader::createShader("default", "default_no_uniform_alpha");
 
 #ifdef DRAW_LAYER_DEBUG
-  m_layerShader = Shader::createShader("/usr/lib/layermanager/renderer/renderer_layer.glslv", "/usr/lib/layermanager/renderer/renderer_layer.glslf");
+    m_layerShader = Shader::createShader("/usr/lib/layermanager/renderer/renderer_layer.glslv", "/usr/lib/layermanager/renderer/renderer_layer.glslf");
 #endif
   if (
       !m_defaultShader || !m_defaultShaderNoUniformAlpha
 #ifdef DRAW_LAYER_DEBUG
-     || !m_layerShader
+    || !m_layerShader
 #endif
-  )
+    )
     {
-      LOG_ERROR("GLESGraphicsystem", "Failed to create and link default shader program");
-      delete m_defaultShader;
-      result = false;
+        LOG_ERROR("GLESGraphicsystem", "Failed to create and link default shader program");
+        delete m_defaultShader;
+        result = false;
     }
-  else
+    else
     {
-      LOG_INFO("GLESGraphicsystem", "Default Shader successfully applied");
-      glGenBuffers(1,&m_vbo);
-      glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-      glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-      glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
-      glEnableVertexAttribArray(0);
-      glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)(sizeof(float) *12));
-      glEnableVertexAttribArray(1);
+        LOG_INFO("GLESGraphicsystem", "Default Shader successfully applied");
+        glGenBuffers(1, &m_vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*) (sizeof(float) * 12));
+        glEnableVertexAttribArray(1);
 
-      glEnable (GL_BLEND);
-      glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-      m_blendingStatus = true;
-      glClearColor(0.0, 0.0, 0.0, 1.0);
-      resize(displayWidth,displayHeight);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        m_blendingStatus = true;
+        glClearColor(0.0, 0.0, 0.0, 1.0);
+        resize(displayWidth, displayHeight);
     }
-  return result;
+    return result;
 }
-void GLESGraphicsystem::resize(EGLint displayWidth,EGLint displayHeight)
+
+void GLESGraphicsystem::resize(EGLint displayWidth, EGLint displayHeight)
 {
-  m_displayWidth = displayWidth;
-  m_displayHeight = displayHeight;
-  glViewport(0, 0, m_displayWidth, m_displayHeight);
+    m_displayWidth = displayWidth;
+    m_displayHeight = displayHeight;
+    glViewport(0, 0, m_displayWidth, m_displayHeight);
 }
 
 void GLESGraphicsystem::saveScreenShotOfFramebuffer(std::string fileToSave)
-	{
-		// clear error if any
-		int error = glGetError();
-		LOG_DEBUG("BaseGraphicSystem","taking screenshot and saving it to:" << fileToSave);
+{
+    // clear error if any
+    int error = glGetError();
+    LOG_DEBUG("BaseGraphicSystem","taking screenshot and saving it to:" << fileToSave);
 
-		GLint viewport[4];
-		glGetIntegerv(GL_VIEWPORT,viewport); // x,y,width,height
-		error = glGetError();
-		if (error != GL_NO_ERROR)
-			LOG_DEBUG("BaseGraphicSystem","error getting dimensions");
-		int WINDOW_WIDTH= viewport[2];
-		int WINDOW_HEIGHT= viewport[3];
-		LOG_DEBUG("BaseGraphicSystem","Screenshot: " << WINDOW_WIDTH << " * " << WINDOW_HEIGHT);
-		char *buffer = (char *)malloc(WINDOW_WIDTH * WINDOW_HEIGHT * 4 * sizeof(char));
-		glReadPixels(0,0,WINDOW_WIDTH,WINDOW_HEIGHT,GL_RGBA,GL_UNSIGNED_BYTE, buffer);
-		error = glGetError();
-		if (error != GL_NO_ERROR)
-			LOG_DEBUG("BaseGraphicSystem","error reading pixels for screenshot: " << error);
-		// convert to RGB for bitmap
-		int pixelcount = WINDOW_WIDTH * WINDOW_HEIGHT;
-		char *rgbbuffer = (char *)malloc(pixelcount*3 * sizeof(char));
-		for (int row=0;row<WINDOW_HEIGHT;row++ ){
-			for (int col=0;col<WINDOW_WIDTH;col++){
-				int offset = row*WINDOW_WIDTH+col;
-				rgbbuffer[offset*3]   = buffer[offset*4+2];
-				rgbbuffer[offset*3+1] = buffer[offset*4+1];
-				rgbbuffer[offset*3+2] = buffer[offset*4];
-			}
-		}
+    GLint viewport[4];
+    glGetIntegerv(GL_VIEWPORT, viewport); // x,y,width,height
+    error = glGetError();
+    if (error != GL_NO_ERROR)
+    {
+        LOG_DEBUG("BaseGraphicSystem","error getting dimensions");
+    }
+    int WINDOW_WIDTH = viewport[2];
+    int WINDOW_HEIGHT = viewport[3];
+    LOG_DEBUG("BaseGraphicSystem","Screenshot: " << WINDOW_WIDTH << " * " << WINDOW_HEIGHT);
+    char *buffer = (char *) malloc( WINDOW_WIDTH * WINDOW_HEIGHT * 4 * sizeof(char));
+    glReadPixels(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+    error = glGetError();
+    if (error != GL_NO_ERROR)
+    {
+        LOG_DEBUG("BaseGraphicSystem","error reading pixels for screenshot: " << error);
+    }
+    // convert to RGB for bitmap
+    int pixelcount = WINDOW_WIDTH * WINDOW_HEIGHT;
+    char *rgbbuffer = (char *) malloc(pixelcount * 3 * sizeof(char));
+    for (int row = 0; row < WINDOW_HEIGHT; row++)
+    {
+        for (int col = 0; col < WINDOW_WIDTH; col++)
+        {
+            int offset = row * WINDOW_WIDTH + col;
+            rgbbuffer[offset * 3] = buffer[offset * 4 + 2];
+            rgbbuffer[offset * 3 + 1] = buffer[offset * 4 + 1];
+            rgbbuffer[offset * 3 + 2] = buffer[offset * 4];
+        }
+    }
 
-		writeBitmap(fileToSave,rgbbuffer,WINDOW_WIDTH,WINDOW_HEIGHT);
-		free(buffer);
+    writeBitmap(fileToSave, rgbbuffer, WINDOW_WIDTH, WINDOW_HEIGHT);
+    free(buffer);
 }
 

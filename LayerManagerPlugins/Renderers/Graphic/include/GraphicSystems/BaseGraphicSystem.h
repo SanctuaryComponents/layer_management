@@ -1,21 +1,21 @@
 /***************************************************************************
-*
-* Copyright 2010,2011 BMW Car IT GmbH
-*
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*		http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*
-****************************************************************************/
+ *
+ * Copyright 2010,2011 BMW Car IT GmbH
+ *
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ ****************************************************************************/
 
 #ifndef _BASEGRAPHICSYSTEM_H_
 #define _BASEGRAPHICSYSTEM_H_
@@ -26,25 +26,39 @@
 #include "Surface.h"
 #include "Layer.h"
 
-template <class DisplayType, class WindowType>
-class BaseGraphicSystem {
+template<class DisplayType, class WindowType>
+class BaseGraphicSystem
+{
 public:
 	virtual bool init(DisplayType display, WindowType window)=0;
-	virtual ~BaseGraphicSystem(){};
-	virtual void setBaseWindowSystem(BaseWindowSystem* windowSystem){m_baseWindowSystem = windowSystem;};
+	virtual ~BaseGraphicSystem()
+	{
+	};
 	virtual void beginLayer(Layer* layer) = 0;
 	virtual void checkRenderLayer() = 0;
 	virtual void renderLayer() = 0;
 	virtual void endLayer() = 0;
 
-	virtual void clearBackground()=0;
-	virtual void swapBuffers()=0;
-	virtual void saveScreenShotOfFramebuffer(std::string fileToSave)=0;
-	void setTextureBinder(ITextureBinder* binder){m_binder=binder;};
-	ITextureBinder* m_binder;
-	virtual void renderSurface(Surface*)=0;
+    virtual void setBaseWindowSystem(BaseWindowSystem* windowSystem)
+    {
+        m_baseWindowSystem = windowSystem;
+    }
+
+    virtual void clearBackground() = 0;
+    virtual void swapBuffers() = 0;
+    virtual void saveScreenShotOfFramebuffer(std::string fileToSave) = 0;
+    void setTextureBinder(ITextureBinder* binder)
+    {
+        m_binder = binder;
+    }
+
+    virtual void renderSurface(Surface*)=0;
+
+    // TODO: should be protected
+    ITextureBinder* m_binder;
+
 protected:
-	BaseWindowSystem* m_baseWindowSystem;
+    BaseWindowSystem* m_baseWindowSystem;
 };
 
 #endif /* _BASEGRAPHICSYSTEM_H_ */

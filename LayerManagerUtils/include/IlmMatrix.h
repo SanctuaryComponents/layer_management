@@ -37,85 +37,68 @@
 
 #ifndef _ILM_MATRIX_H_
 #define _ILM_MATRIX_H_
-#define MAT00 	0
-#define MAT01 	1
-#define MAT02 	2
-#define MAT03 	3
-#define MAT10 	4
-#define MAT11 	5
-#define MAT12 	6
-#define MAT13 	7
-#define MAT20 	8
-#define MAT21 	9
-#define MAT22 	10
-#define MAT23 	11
-#define MAT30 	12
-#define MAT31 	13
-#define MAT32 	14
-#define MAT33 	15
 
-
+#define MAT00     0
+#define MAT01     1
+#define MAT02     2
+#define MAT03     3
+#define MAT10     4
+#define MAT11     5
+#define MAT12     6
+#define MAT13     7
+#define MAT20     8
+#define MAT21     9
+#define MAT22     10
+#define MAT23     11
+#define MAT30     12
+#define MAT31     13
+#define MAT32     14
+#define MAT33     15
 
 typedef struct
 {
-	float x;
-	float y;
+    float x;
+    float y;
 } IlmVector2f;
 
 typedef struct
 {
-	float x;
-	float y;
-	float z;
+    float x;
+    float y;
+    float z;
 } IlmVector3f;
 
 typedef struct
 {
-	float x;
-	float y;
-	float z;
-	float w;
+    float x;
+    float y;
+    float z;
+    float w;
 } IlmVector4f;
 
-
-class IlmMatrix {
+class IlmMatrix
+{
 public:
-	float * operator [] (const int row)
-	{
-		return &f[row<<2];
-	}
-	float f[16];
+    float* operator [] (const int row)
+    {
+        return &f[row<<2];
+    }
+
+    float f[16];
 };
 
-void IlmMatrixIdentity(	IlmMatrix &mOut		);
+void IlmMatrixIdentity(IlmMatrix &mOut);
 
-void IlmMatrixMultiply(	IlmMatrix &mOut,
-		const IlmMatrix &mA,
-		const IlmMatrix &mB );
+void IlmMatrixMultiply(IlmMatrix &mOut, const IlmMatrix &mA, const IlmMatrix &mB);
 
-void IlmMatrixTranslation( IlmMatrix &mOut,
-		const float X,
-		const float Y,
-		const float Z
-);
+void IlmMatrixTranslation(IlmMatrix &mOut, const float X, const float Y, const float Z);
 
-void IlmMatrixScaling( IlmMatrix &mOut,
-		const float X,
-		const float Y,
-		const float Z
-);
+void IlmMatrixScaling(IlmMatrix &mOut, const float X, const float Y, const float Z);
 
-void IlmMatrixRotateX( IlmMatrix &mOut,
-		const float angle
-);
+void IlmMatrixRotateX(IlmMatrix &mOut, const float angle);
 
-void IlmMatrixRotateY( IlmMatrix &mOut,
-		const float angle
-);
+void IlmMatrixRotateY(IlmMatrix &mOut, const float angle);
 
-void IlmMatrixRotateZ( IlmMatrix &mOut,
-		const float angle
-);
-
+void IlmMatrixRotateZ(IlmMatrix &mOut, const float angle);
 
 #endif /* _ILMMATRIX_H*/

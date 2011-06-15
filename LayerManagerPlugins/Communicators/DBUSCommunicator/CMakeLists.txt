@@ -21,9 +21,11 @@ cmake_minimum_required (VERSION 2.6)
 
 include_directories ("include")
 include_directories ("${PROJECT_SOURCE_DIR}/LayerManagerService/include")
-link_directories ("${PROJECT_SOURCE_DIR}/LayerManagerService/bin")
 include_directories ("${PROJECT_SOURCE_DIR}/LayerManagerUtils/include")
+include_directories ("${PROJECT_SOURCE_DIR}/LayerManagerCommands/include")
+
 link_directories ("${PROJECT_SOURCE_DIR}/LayerManagerUtils/bin")
+link_directories ("${PROJECT_SOURCE_DIR}/LayerManagerCommands")
 
 find_package(DBUS REQUIRED)
 include_directories(${DBUS_INCLUDE_DIR})
@@ -32,12 +34,15 @@ include_directories(${DBUS_ARCH_INCLUDE_DIR})
 find_package (Threads)
 set(LIBS ${LIBS} ${DBUS_LIBRARY} ${CMAKE_THREAD_LIBS_INIT})
 
-add_library(DBUSCommunicator SHARED src/DBUSCommunicator.cpp)
+add_library(DBUSCommunicator SHARED src/DBUSCommunicator.cpp
+                                    src/DBUSIntrospection.cpp
+                                    src/DBUSMessageHandler.cpp)
 
-target_link_libraries(DBUSCommunicator ${LIBS})
+target_link_libraries(DBUSCommunicator LayerManagerCommands ${LIBS})
 
 add_dependencies(DBUSCommunicator LayerManagerService)
 add_dependencies(DBUSCommunicator LayerManagerUtils)
+add_dependencies(DBUSCommunicator LayerManagerCommands)
 
 install (TARGETS DBUSCommunicator LIBRARY DESTINATION lib/layermanager/communicator)
 

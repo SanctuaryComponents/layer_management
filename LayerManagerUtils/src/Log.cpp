@@ -36,66 +36,91 @@
 */
 
 #include "Log.h"
+#include <iomanip>
 
 Log* Log::instance = new Log();
 
-Log::~Log() {
-	// TODO Auto-generated destructor stub
-	m_fileStream->close();
-	Log::instance = NULL;
-}
-Log::Log() {
-	// TODO Auto-generated constructor stub
-	m_fileStream = new std::ofstream("/tmp/LayerManagerService.log");
+Log::Log()
+{
+    // TODO Auto-generated constructor stub
+    m_fileStream = new std::ofstream("/tmp/LayerManagerService.log");
 
 }
 
-void Log::warning (const std::string moduleName,const std::basic_string<char>& output )
+Log::~Log()
 {
-	log(LOG_WARNING,moduleName,output);
-}
-void Log::info (const std::string moduleName,const std::basic_string<char>& output )
-{
-	log(LOG_INFO,moduleName,output);
-}
-void Log::error (const std::string moduleName,const std::basic_string<char>& output )
-{
-	log(LOG_ERROR,moduleName,output);
-}
-void Log::debug (const std::string moduleName,const std::basic_string<char>& output )
-{
-	log(LOG_DEBUG,moduleName,output);
+    // TODO Auto-generated destructor stub
+    m_fileStream->close();
+    Log::instance = NULL;
 }
 
-void Log::log(LOG_MODES logMode, const std::string moduleName,const std::basic_string<char>& output )
+void Log::warning (const std::string& moduleName, const std::basic_string<char>& output)
 {
-
-	if (logMode == LOG_ERROR)
-	{
-		LogToConsole("ERROR",moduleName,output);
-	}
-	else if (logMode == LOG_DEBUG)
-	{
-		LogToConsole("DEBUG",moduleName,output);
-	}
-	else if (logMode == LOG_INFO)
-	{
-		LogToConsole("INFO",moduleName,output);
-	}
-	switch (logMode )
-	{
-			case LOG_ERROR : LogToFile("ERROR",moduleName,output); break;
-			case LOG_WARNING : LogToFile("WARNING",moduleName,output); break;
-			case LOG_INFO : LogToFile("INFO",moduleName,output); break;
-			case LOG_DEBUG : LogToFile("DEBUG",moduleName,output); break;
-	}
-
+    log(LOG_WARNING, moduleName, output);
 }
-void Log::LogToFile(std::string logMode,const std::string moduleName,const std::basic_string<char>& output)
+
+void Log::info (const std::string& moduleName, const std::basic_string<char>& output)
 {
-	*m_fileStream << "[" << moduleName << "][" << logMode << "] " << output << std::endl;
+    log(LOG_INFO, moduleName, output);
 }
-void Log::LogToConsole(std::string logMode,const std::string moduleName,const std::basic_string<char>& output)
+
+void Log::error (const std::string& moduleName, const std::basic_string<char>& output)
 {
-	std::cout << "[" << moduleName << "][" << logMode << "] " <<  output << std::endl;
+    log(LOG_ERROR, moduleName, output);
+}
+
+void Log::debug (const std::string& moduleName, const std::basic_string<char>& output)
+{
+    log(LOG_DEBUG, moduleName, output);
+}
+
+void Log::log(LOG_MODES logMode, const std::string& moduleName, const std::basic_string<char>& output)
+{
+    switch (logMode)
+    {
+        case LOG_ERROR:
+            LogToConsole("ERROR", moduleName, output);
+            LogToFile("ERROR", moduleName, output);
+            break;
+
+        case LOG_WARNING:
+            LogToConsole("WARNING", moduleName, output);
+            LogToFile("WARNING", moduleName, output);
+            break;
+
+        case LOG_INFO:
+            LogToConsole("INFO", moduleName, output);
+            LogToFile("INFO", moduleName, output);
+            break;
+
+        case LOG_DEBUG:
+            LogToConsole("DEBUG", moduleName, output);
+            LogToFile("DEBUG", moduleName, output);
+            break;
+    }
+}
+
+void Log::LogToFile(std::string logMode, const std::string& moduleName,const std::basic_string<char>& output)
+{
+    *m_fileStream << "[" << moduleName << "][" << logMode << "] " << output << std::endl;
+}
+
+void Log::LogToConsole(std::string logMode, const std::string& moduleName, const std::basic_string<char>& output)
+{
+    static unsigned int maxLengthModuleName = 0;
+    static unsigned int maxLengthLogModeName = 0;
+
+    if (moduleName.length() > maxLengthModuleName)
+    {
+        maxLengthModuleName = moduleName.length();
+    }
+
+    if (logMode.length() > maxLengthLogModeName)
+    {
+        maxLengthLogModeName = logMode.length();
+    }
+
+    std::cout << std::setw(maxLengthModuleName)  << std::left << moduleName << " | "
+              << std::setw(maxLengthLogModeName) << std::left << logMode    << " | "
+              << output << std::endl;
 }

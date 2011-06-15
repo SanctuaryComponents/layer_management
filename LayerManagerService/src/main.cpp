@@ -1,218 +1,326 @@
 /***************************************************************************
-*
-* Copyright 2010,2011 BMW Car IT GmbH
-*
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*		http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*
-****************************************************************************/
+ *
+ * Copyright 2010,2011 BMW Car IT GmbH
+ *
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ ****************************************************************************/
 
 #include "Layermanager.h"
 #include "IRenderer.h"
-#include "BaseCommunicator.h"
+#include "ICommunicator.h"
+#include "ICommandExecutor.h"
 #include <iostream>
 #include <sys/types.h>
 #include <dirent.h>
 #include <errno.h>
 #include <dlfcn.h>
-#include <string.h>
 #include "Log.h"
 #include <getopt.h>
+#include <libgen.h> // basename
+
+#include <list>
+using std::list;
+
+#include <string.h>
+using std::string;
+
+typedef list<string> tFileList;
+typedef list<string>::iterator tFileListIterator;
+
 
 const char* displayName = ":0";
-int displayWidth = 1280;
-int displayHeight = 480;
+int displayWidth = 1280; // default value, override with -w argument
+int displayHeight = 480; // default value, override with -h argument
 
-const char* USAGE_DESCRIPTION =
-		"Usage:\t LayerManagerService [options]\n"
-		"Option:\t\n\n"
-		"\t-w: Window Width\t\n"
-		"\t-h: Window Height\t\n"
-		"\t-d: displayName \t\n";
+const char* gRendererPluginDirectories[] = { "/usr/lib/layermanager/renderer",
+                                             "/usr/local/lib/layermanager/renderer"};
+uint gRendererPluginDirectoriesCount = sizeof(gRendererPluginDirectories) / sizeof(gRendererPluginDirectories[0]);
+
+const char* gCommunicatorPluginDirectories[] = { "/usr/lib/layermanager/communicator",
+                                                 "/usr/local/lib/layermanager/communicator" };
+uint gCommunicatorPluginDirectoriesCount = sizeof(gCommunicatorPluginDirectories) / sizeof(gCommunicatorPluginDirectories[0]);
+
+const char* USAGE_DESCRIPTION = "Usage:\t LayerManagerService [options]\n"
+                                "options:\t\n\n"
+                                "\t-w: Window Width\t\n"
+                                "\t-h: Window Height\t\n"
+                                "\t-d: displayName \t\n"
+                                "\nexample: LayerManagerService -w800 -h480 -d:0\n";
 
 template<class T>
-T* getCreateFunction(std::string libname)
+T* getCreateFunction(string libname)
 {
-	void *libraryHandle;
-	libraryHandle = dlopen (libname.c_str(), RTLD_LAZY);
-	if (NULL == libraryHandle) {
-		LOG_ERROR("LayerManagerService", dlerror());
-	}
-	// cut off directories
-	int lastSlashPosition = libname.rfind('/')+1;
-	int lengthOfFilenameWithoutDirectories = libname.length()-lastSlashPosition;
-	std::string createfunctionname = libname.substr(lastSlashPosition,lengthOfFilenameWithoutDirectories);
-	LOG_DEBUG("without directory:", createfunctionname);
-	// cut off "lib" in front and cut off .so end"
-	createfunctionname = "create" + createfunctionname.substr(3, createfunctionname.length()-6);
-	dlerror();    /* Clear any existing error */
-	LOG_DEBUG("loading external function with name:", createfunctionname);
-	T* createFunction = (T*)  dlsym(libraryHandle, createfunctionname.c_str());
-	const char* dlsym_error = dlerror();
-	if (dlsym_error)
-	{
-			LOG_ERROR("LayerManagerService", "Cannot load symbol create: " << dlsym_error);
-	}
-	return createFunction;
+    // cut off directories
+    char* fileWithPath = const_cast<char*>(libname.c_str());
+    string libFileName = basename(fileWithPath);
+    LOG_DEBUG("LayerManagerService", "lib name without directory: " << libFileName);
+
+    // cut off "lib" in front and cut off .so end"
+    string createFunctionName = "create" + libFileName.substr(3, libFileName.length() - 6);
+    LOG_DEBUG("LayerManagerService", "lib entry point name: " << createFunctionName);
+
+    // open library
+    void *libraryHandle;
+    dlerror(); // Clear any existing error
+    libraryHandle = dlopen(libname.c_str(), RTLD_NOW /*LAZY*/);
+    const char* dlopen_error = dlerror();
+    if (!libraryHandle || dlopen_error)
+    {
+        LOG_ERROR("LayerManagerService", "dlopen failed: " << dlopen_error);
+        return 0;
+    }
+
+    // get entry point from shared lib
+    dlerror(); // Clear any existing error
+    LOG_DEBUG("LayerManagerService", "loading external function with name: " << createFunctionName);
+
+    union
+    {
+        void* voidPointer;
+        T* typedPointer;
+    } functionPointer;
+
+    // Note: direct cast is not allowed by ISO C++. e.g.
+    // T* createFunction = reinterpret_cast<T*>(dlsym(libraryHandle, createFunctionName.c_str()));
+    // compiler warning: "forbids casting between pointer-to-function and pointer-to-object"
+
+    functionPointer.voidPointer = dlsym(libraryHandle, createFunctionName.c_str());
+    T* createFunction = functionPointer.typedPointer;
+
+    const char* dlsym_error = dlerror();
+    if (!createFunction || dlsym_error)
+    {
+        LOG_ERROR("LayerManagerService", "Failed to load shared lib entry point: " << dlsym_error);
+    }
+
+    return createFunction;
 }
-void parsecommandline(int argc, char **argv)
+
+void parseCommandLine(int argc, char **argv)
 {
-	while (optind < argc)
-	{
-		int option = getopt(argc,argv,"w::h::d::?::");
-		switch (option)
-		{
-			case 'd' :
-				displayName = optarg;
-				break;
-			case 'w':
-				displayWidth = atoi(optarg);
-				break;
-			case 'h':
-				displayHeight = atoi(optarg);
-				break;
-			case '?':
-			default:
-				exit(-1);
-		}
-	}
+    while (optind < argc)
+    {
+        int option = getopt(argc, argv, "w::h::d::?::");
+        switch (option)
+        {
+        case 'd':
+            displayName = optarg;
+            break;
+        case 'w':
+            displayWidth = atoi(optarg);
+            break;
+        case 'h':
+            displayHeight = atoi(optarg);
+            break;
+        case '?':
+        default:
+            puts(USAGE_DESCRIPTION);
+            exit(-1);
+        }
+    }
 }
 
-
-std::string getfirstFileFromDirectory(std::string dirName){
-	DIR *dp;
-	std::string returnValue;
-	struct dirent *dirp;
-	if((dp  = opendir(dirName.c_str())) == NULL) {
-		LOG_ERROR("LayerManagerService", "Error(" << errno << ") opening " << dirName);
-		returnValue = "";
-	}else{
-
-		while ((dirp = readdir(dp)) != NULL) {
-			if (strcmp(dirp->d_name,".")==0)
-				continue;
-			if (strcmp(dirp->d_name,"..")==0)
-				continue;
-			if (strstr (dirp->d_name, ".so")==0)
-				continue;
-			LOG_INFO("LayerManagerService", "loading file " << dirName << "/" << dirp->d_name);
-			returnValue = std::string(dirName + "/" + dirp->d_name);
-			break;
-		}
-		closedir(dp);
-	}
-	return returnValue;
-	//error
-}
-
-BaseCommunicator* loadCommunicator(Layermanager* executor, ILayerList* layerList){
-	BaseCommunicator* ret = NULL;
-	LOG_DEBUG("LayerManagerService", "Searching for communicator.");
-	std::string sharedLibraryName = getfirstFileFromDirectory("/usr/lib/layermanager/communicator");
-	if (sharedLibraryName==""){
-		sharedLibraryName = getfirstFileFromDirectory("/usr/local/lib/layermanager/communicator");
-		if (sharedLibraryName==""){
-			LOG_ERROR("LayerManagerService","No communicator found!");
-			return NULL;
-		}
-	}
-
-	LOG_DEBUG("LayerManagerService", "Shared Communicator library " << sharedLibraryName << " found !");
-	BaseCommunicator* (*createFunc)(Layermanager*,ILayerList*)  = getCreateFunction<BaseCommunicator*(Layermanager*, ILayerList*)>(sharedLibraryName);
-	if ( NULL != createFunc )
-	{
-		LOG_DEBUG("LayerManagerService", "Entry point of Communicator found !");
-		ret = createFunc(executor,layerList);
-		if ( NULL == ret )
-		{
-			LOG_ERROR("LayerManagerService","Communicator could not initiliazed. Entry Function not callable !");
-		}
-	} else {
-		LOG_ERROR("LayerManagerService","Communicator could not initiliazed. Entry Function not found !");
-	}
-	return ret;
-}
-
-IRenderer* loadRenderer(LayerList* list)
+void getSharedLibrariesFromDirectory(tFileList& fileList, string dirName)
 {
-	IRenderer* ret = NULL;
-	LOG_DEBUG("LayerManagerService", "Searching for renderer.");
-	std::string sharedLibraryName = getfirstFileFromDirectory("/usr/lib/layermanager/renderer");
-	if (sharedLibraryName==""){
-		sharedLibraryName = getfirstFileFromDirectory("/usr/local/lib/layermanager/renderer");
-		if (sharedLibraryName==""){
-			LOG_ERROR("LayerManagerService","No renderer found!");
-			return NULL;
-		}
-	}
+    // open directory
+    DIR *directory = opendir(dirName.c_str());
+    if (!directory)
+    {
+        LOG_ERROR("LayerManagerService", "Error(" << errno << ") opening " << dirName);
+        return;
+    }
 
-	LOG_DEBUG("LayerManagerService", "Shared Renderer library " << sharedLibraryName << " found !");
-	IRenderer* (*createFunc)(LayerList*)  = getCreateFunction<IRenderer*(LayerList*)>(sharedLibraryName);
-	if ( NULL != createFunc )
-	{
-		LOG_DEBUG("LayerManagerService", "Entry point of Renderer found !");
-		ret = createFunc(list);
-		if ( NULL == ret )
-		{
-			LOG_ERROR("LayerManagerService","Render could not initiliazed. Entry Function not callable !");
-		}
-	} else {
-		LOG_ERROR("LayerManagerService","Render could not initiliazed. Entry Function not found !");
-	}
-	return ret;
+    // iterate content of directory
+    struct dirent *itemInDirectory = 0;
+    while ((itemInDirectory = readdir(directory)))
+    {
+        unsigned char entryType = itemInDirectory->d_type;
+        string entryName = itemInDirectory->d_name;
+
+        bool regularFile = (entryType == DT_REG);
+        bool sharedLibExtension = ("so" == entryName.substr(entryName.find_last_of(".") + 1));
+
+        if (regularFile && sharedLibExtension)
+        {
+            LOG_INFO("LayerManagerService", "adding file " << entryName);
+            fileList.push_back(dirName + "/" + entryName);
+        }
+        else
+        {
+            LOG_INFO("LayerManagerService", "ignoring file " << entryName);
+        }
+    }
+
+    closedir(directory);
 }
 
+void loadCommunicatorPlugins(CommunicatorList& communicatorList, ICommandExecutor* executor)
+{
+    tFileList sharedLibraryNameList;
+
+    // search communicator plugins in configured directories
+    for (uint dirIndex = 0; dirIndex < gCommunicatorPluginDirectoriesCount; ++dirIndex)
+    {
+        const char* directoryName = gCommunicatorPluginDirectories[dirIndex];
+        LOG_DEBUG("LayerManagerService", "Searching for communicator in: " << directoryName);
+        getSharedLibrariesFromDirectory(sharedLibraryNameList, directoryName);
+    }
+
+    LOG_INFO("LayerManagerService", sharedLibraryNameList.size() << " Communicator plugins found");
+
+    // iterate all communicator plugins and start them
+    tFileListIterator iter = sharedLibraryNameList.begin();
+    tFileListIterator iterEnd = sharedLibraryNameList.end();
+
+    for (; iter != iterEnd; ++iter)
+    {
+        LOG_DEBUG("LayerManagerService", "Loading Communicator library " << *iter);
+
+        ICommunicator* (*createFunc)(ICommandExecutor*);
+        createFunc = getCreateFunction<ICommunicator*(ICommandExecutor*)>(*iter);
+
+        if (!createFunc)
+        {
+            LOG_DEBUG("LayerManagerService", "Entry point of Communicator not found");
+            continue;
+        }
+
+        LOG_DEBUG("LayerManagerService", "Creating Communicator instance");
+        ICommunicator* newCommunicator = createFunc(executor);
+
+        if (!newCommunicator)
+        {
+            LOG_ERROR("LayerManagerService","Communicator initialization failed. Entry Function not callable");
+            continue;
+        }
+
+        communicatorList.push_back(newCommunicator);
+    }
+}
+
+void loadRendererPlugins(RendererList& rendererList, IScene* pScene)
+{
+    tFileList sharedLibraryNameList;
+
+    // search communicator plugins in configured directories
+    for (uint dirIndex = 0; dirIndex < gRendererPluginDirectoriesCount; ++dirIndex)
+    {
+        const char* directoryName = gRendererPluginDirectories[dirIndex];
+        LOG_DEBUG("LayerManagerService", "Searching for renderer in: " << directoryName);
+        getSharedLibrariesFromDirectory(sharedLibraryNameList, directoryName);
+    }
+
+    LOG_INFO("LayerManagerService", sharedLibraryNameList.size() << " Renderer plugins found");
+
+    // currently the use of only one renderer is enforced
+    if (sharedLibraryNameList.size() > 1)
+    {
+        LOG_WARNING("LayerManagerService", "more than 1 Renderer plugin found. using only " << sharedLibraryNameList.front());
+        while (sharedLibraryNameList.size() > 1)
+        {
+            sharedLibraryNameList.pop_back();
+        }
+    }
+
+    // iterate all renderer plugins and start them
+    tFileListIterator iter = sharedLibraryNameList.begin();
+    tFileListIterator iterEnd = sharedLibraryNameList.end();
+
+    for (; iter != iterEnd; ++iter)
+    {
+        LOG_DEBUG("LayerManagerService", "Loading Renderer library " << *iter);
+        IRenderer* (*createFunc)(IScene*);
+        createFunc = getCreateFunction<IRenderer*(IScene*)>(*iter);
+        if (!createFunc)
+        {
+            LOG_DEBUG("LayerManagerService", "Entry point of Renderer not found");
+            continue;
+        }
+
+        LOG_DEBUG("LayerManagerService", "Creating Renderer instance");
+        IRenderer* newRenderer = createFunc(pScene);
+        if (!newRenderer)
+        {
+            LOG_ERROR("LayerManagerService","Renderer initialization failed. Entry Function not callable");
+            continue;
+        }
+
+        rendererList.push_back(newRenderer);
+    }
+}
 
 int main(int argc, char **argv)
 {
+    parseCommandLine(argc, (char**) argv);
 
-	parsecommandline(argc,(char**)argv);
-	LOG_INFO("LayerManagerService", "Starting Layermanager.");
+    LOG_INFO("LayerManagerService", "Starting Layermanager.");
 
-	// Create Singleton Instance of Layermanager
-	Layermanager *manager = Layermanager::instance;
+    LOG_INFO("LayerManagerService", "Creating Layermanager.");
+    ICommandExecutor* pManager = new Layermanager();
+    IScene* pScene = pManager->getScene();
 
-	LOG_INFO("LayerManagerService", "Loading communicator.");
-	// Create a communication mechanism to use
-	BaseCommunicator* comm = loadCommunicator(manager,&manager->layerlist);
+    // Create and load Renderer plugins
+    LOG_INFO("LayerManagerService", "Loading renderer plugins.");
+    RendererList rendererList;
+    loadRendererPlugins(rendererList, pScene);
 
-	LOG_INFO("LayerManagerService", "Loading renderer.");
-	// Create graphic controller to use
-	IRenderer* renderer = loadRenderer(&manager->layerlist);
+    // register renderer plugins at layermanager
+    LOG_INFO("LayerManagerService", "Adding " << rendererList.size() << " Renderer plugins to Layermanager.");
+    RendererListIterator rendererIter = rendererList.begin();
+    RendererListIterator rendererIterEnd = rendererList.end();
+    for (; rendererIter != rendererIterEnd; ++rendererIter)
+    {
+        pManager->addRenderer(*rendererIter);
+    }
 
-	// inform the layermanager about the renderer
-	manager->addRenderer(renderer);
+    // Create and load communicator plugins
+    LOG_INFO("LayerManagerService", "Loading communicator plugins.");
+    CommunicatorList communicatorList;
+    loadCommunicatorPlugins(communicatorList, pManager);
 
-	// inform the layermanager about the communication class
-	manager->addCommunicator(comm);
-	if ( true == manager->startManagement(displayWidth,displayHeight,displayName) )
-	{
-		// must stay within main method or else application would completely exit
-		LOG_INFO("LayerManagerService", "Startup complete. EnterMainloop");
-		while(true)
-		{
-			sleep(2000);
-		}
-	} else {
-		LOG_ERROR("LayerManagerService", "Exiting Application.");
-		return -1;
-	}
-	LOG_INFO("LayerManagerService", "Exiting Application.");
-	// cleanup
-	manager->stopManagement();
-	delete renderer;
-	delete comm;
-	delete manager;
+    // register communicator plugins at layermanager
+    LOG_INFO("LayerManagerService", "Adding " << communicatorList.size() << " Communicator plugin(s) to Layermanager.");
+    CommunicatorListIterator commIter = communicatorList.begin();
+    CommunicatorListIterator commIterEnd = communicatorList.end();
+    for (; commIter != commIterEnd; ++commIter)
+    {
+        pManager->addCommunicator(*commIter);
+    }
 
-	return 0;
+    bool started = pManager->startManagement(displayWidth, displayHeight, displayName);
+
+    if (!started)
+    {
+        LOG_ERROR("LayerManagerService", "Exiting Application.");
+        return -1;
+    }
+
+    // must stay within main method or else application would completely exit
+    LOG_INFO("LayerManagerService", "Startup complete. EnterMainloop");
+    while (true)
+    {
+        sleep(2000);
+    }
+
+    LOG_INFO("LayerManagerService", "Exiting Application.");
+
+    // cleanup
+    pManager->stopManagement();
+    //delete pRenderer; TODO
+    //delete pCommunicator; TODO
+    delete pManager;
+
+    return 0;
 }

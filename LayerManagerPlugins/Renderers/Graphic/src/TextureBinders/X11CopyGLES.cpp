@@ -7,7 +7,7 @@
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
 *
-*		http://www.apache.org/licenses/LICENSE-2.0
+*        http://www.apache.org/licenses/LICENSE-2.0
 *
 * Unless required by applicable law or agreed to in writing, software
 * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,21 +24,22 @@
 
 #include "GLES2/gl2.h"
 
-void X11CopyGLES::bindSurfaceTexture(Surface* surface){
-	XPlatformSurface* nativeSurface = (XPlatformSurface*)surface->platform;
-	Pixmap p = 0;
-	GLenum targetType = GL_RGBA;
-	GLenum sourceType = GL_RGBA;
+void X11CopyGLES::bindSurfaceTexture(Surface* surface)
+{
+    XPlatformSurface* nativeSurface = (XPlatformSurface*)surface->platform;
+    Pixmap pixmap = 0;
+    GLenum targetType = GL_RGBA;
+    GLenum sourceType = GL_RGBA;
 	unsigned char* swapedData = NULL;
 	bool swaprgb = false;
 
-	p = XCompositeNameWindowPixmap (dpy, surface->nativeHandle);
-	if (p==0)
+	pixmap = XCompositeNameWindowPixmap (dpy, surface->nativeHandle);
+	if (!pixmap)
 	{
 		LOG_ERROR("X11CopyGLES", "didnt create pixmap!");
 		return;
 	}
-	nativeSurface->pixmap = p;
+	nativeSurface->pixmap = pixmap;
 	XImage * xim = XGetImage(dpy, nativeSurface->pixmap, 0, 0, surface->OriginalSourceWidth, surface->OriginalSourceHeight, AllPlanes, ZPixmap);
 	if ( xim != NULL )
 	{
@@ -83,7 +84,8 @@ void X11CopyGLES::swapPixmap(unsigned char* src,unsigned char* dest, unsigned in
 	}
 }
 
-void X11CopyGLES::createClientBuffer(Surface*s){
-	XPlatformSurface* nativeSurface = (XPlatformSurface*)s->platform;
-	glGenTextures(1,&nativeSurface->texture);
+void X11CopyGLES::createClientBuffer(Surface* surface)
+{
+    XPlatformSurface* nativeSurface = (XPlatformSurface*)surface->platform;
+    glGenTextures(1,&nativeSurface->texture);
 }

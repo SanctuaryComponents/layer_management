@@ -37,84 +37,89 @@
 
 #ifndef _LOGMESSAGEBUFFER_H_
 #define _LOGMESSAGEBUFFER_H_
+
 #include <sstream>
 
-class LogMessageBuffer {
-	typedef std::ios_base& (*ios_base_manip)(std::ios_base&);
+typedef std::ios_base& (*ios_base_manip)(std::ios_base&);
+
+class LogMessageBuffer
+{
 public:
-        /**
-         *  Creates a new instance.
-         */
-       LogMessageBuffer();
-        /**
-         *  Destructor.
-         */
-        ~LogMessageBuffer();
+   /**
+    *  Creates a new instance.
+    */
+   LogMessageBuffer();
+   /**
+    *  Destructor.
+    */
+   ~LogMessageBuffer();
 
+   LogMessageBuffer& operator<<(const std::basic_string<char>& msg);
 
-        LogMessageBuffer& operator<<(const std::basic_string<char>& msg);
+   LogMessageBuffer& operator<<(const char* msg);
 
-        LogMessageBuffer& operator<<(const char* msg);
+   LogMessageBuffer& operator<<(char* msg);
 
-        LogMessageBuffer& operator<<(char* msg);
+   LogMessageBuffer& operator<<(const char msg);
 
-        LogMessageBuffer& operator<<(const char msg);
+   std::ostream& operator<<(ios_base_manip manip);
 
-        std::ostream& operator<<(ios_base_manip manip);
+   std::ostream& operator<<(bool val);
 
-        std::ostream& operator<<(bool val);
+   std::ostream& operator<<(short val);
 
-        std::ostream& operator<<(short val);
+   std::ostream& operator<<(int val);
 
-        std::ostream& operator<<(int val);
+   std::ostream& operator<<(unsigned int val);
 
-        std::ostream& operator<<(unsigned int val);
+   std::ostream& operator<<(long val);
 
-        std::ostream& operator<<(long val);
+   std::ostream& operator<<(unsigned long val);
 
-        std::ostream& operator<<(unsigned long val);
+   std::ostream& operator<<(float val);
 
-        std::ostream& operator<<(float val);
+   std::ostream& operator<<(double val);
 
-        std::ostream& operator<<(double val);
+   std::ostream& operator<<(long double val);
 
-        std::ostream& operator<<(long double val);
+   std::ostream& operator<<(void* val);
 
-        std::ostream& operator<<(void* val);
+   /**
+    *  Cast to ostream.
+    */
+   operator std::basic_ostream<char>&();
 
-      /**
-       *  Cast to ostream.
-       */
-      operator std::basic_ostream<char>&();
+   const std::basic_string<char>& str(std::basic_ostream<char>& os);
 
-      const std::basic_string<char>& str(std::basic_ostream<char>& os);
+   const std::basic_string<char>& str() const;
 
-      const std::basic_string<char>& str();
+   bool hasStream() const;
 
-      bool hasStream() const;
+private:
+   /**
+    * No default copy constructor.
+    */
+   LogMessageBuffer(const LogMessageBuffer&);
 
-   private:
-        /**
-         * No default copy constructor.
-         */
-      LogMessageBuffer(const LogMessageBuffer&);
-        /**
-         *  No assignment operator.
-         */
-      LogMessageBuffer& operator=(const LogMessageBuffer&);
+   /**
+    *  No assignment operator.
+    */
+   LogMessageBuffer& operator=(const LogMessageBuffer&);
 
-		/**
-         * Encapsulated std::string.
-         */
-        std::basic_string<char> buf;
+   /**
+    * Encapsulated std::string.
+    */
+   std::basic_string<char> buf;
 
-        /**
-         *  Encapsulated stream, created on demand.
-         */
-        std::basic_ostringstream<char>* stream;
-   };
+   /**
+    *  Encapsulated stream, created on demand.
+    */
+   std::basic_ostringstream<char>* stream;
+};
+
 template<class V>
-std::basic_ostream<char>& operator<<(LogMessageBuffer& os, const V& val) {
+std::basic_ostream<char>& operator<<(LogMessageBuffer& os, const V& val)
+{
    return ((std::basic_ostream<char>&) os) << val;
 }
 

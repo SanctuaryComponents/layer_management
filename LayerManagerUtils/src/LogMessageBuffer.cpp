@@ -37,83 +37,158 @@
 
 #include "LogMessageBuffer.h"
 
-LogMessageBuffer::LogMessageBuffer() : stream(0) {}
-
-LogMessageBuffer::~LogMessageBuffer() {
-   delete stream;
+LogMessageBuffer::LogMessageBuffer()
+: stream(0)
+{
 }
 
-LogMessageBuffer& LogMessageBuffer::operator<<(const std::basic_string<char>& msg) {
-   if (stream == 0) {
-      buf.append(msg);
-   } else {
-      *stream << msg;
-   }
-   return *this;
+LogMessageBuffer::~LogMessageBuffer()
+{
+    if (stream)
+    {
+        delete stream;
+    }
 }
 
-LogMessageBuffer& LogMessageBuffer::operator<<(const char* msg) {
-   const char* actualMsg = msg;
-   if (actualMsg == 0) {
-      actualMsg = "null";
-   }
-   if (stream == 0) {
-      buf.append(actualMsg);
-   } else {
-      *stream << actualMsg;
-   }
-   return *this;
-}
-LogMessageBuffer& LogMessageBuffer::operator<<(char* msg) {
-   return operator<<((const char*) msg);
+LogMessageBuffer& LogMessageBuffer::operator<<(const std::basic_string<char>& msg)
+{
+    if (stream)
+    {
+        *stream << msg;
+    }
+    else
+    {
+        buf.append(msg);
+    }
+
+    return *this;
 }
 
-LogMessageBuffer& LogMessageBuffer::operator<<(const char msg) {
-   if (stream == 0) {
-      buf.append(1, msg);
-   } else {
-      buf.assign(1, msg);
-      *stream << buf;
-   }
-   return *this;
+LogMessageBuffer& LogMessageBuffer::operator<<(const char* msg)
+{
+    const char* actualMsg = msg;
+
+    if (!actualMsg)
+    {
+        actualMsg = "null";
+    }
+
+    if (stream)
+    {
+        *stream << actualMsg;
+    }
+    else
+    {
+        buf.append(actualMsg);
+    }
+
+    return *this;
 }
 
-LogMessageBuffer::operator std::basic_ostream<char>&() {
-   if (stream == 0) {
-     stream = new std::basic_ostringstream<char>();
-     if (!buf.empty()) {
+LogMessageBuffer& LogMessageBuffer::operator<<(char* msg)
+{
+    return operator<<((const char*) msg);
+}
+
+LogMessageBuffer& LogMessageBuffer::operator<<(const char msg)
+{
+    if (stream)
+    {
+        buf.assign(1, msg);
         *stream << buf;
-     }
-   }
-   return *stream;
+    }
+    else
+    {
+        buf.append(1, msg);
+    }
+
+    return *this;
 }
 
-const std::basic_string<char>& LogMessageBuffer::str(std::basic_ostream<char>&) {
-   buf = stream->str();
-   return buf;
+LogMessageBuffer::operator std::basic_ostream<char>&()
+{
+    if (!stream)
+    {
+        stream = new std::basic_ostringstream<char>();
+
+        if (!buf.empty())
+        {
+            *stream << buf;
+        }
+    }
+    return *stream;
 }
 
-const std::basic_string<char>& LogMessageBuffer::str() {
-   return buf;
+const std::basic_string<char>& LogMessageBuffer::str(std::basic_ostream<char>&)
+{
+    buf = stream->str();
+    return buf;
 }
 
-bool LogMessageBuffer::hasStream() const {
+const std::basic_string<char>& LogMessageBuffer::str() const
+{
+    return buf;
+}
+
+bool LogMessageBuffer::hasStream() const
+{
     return (stream != 0);
 }
 
-std::ostream& LogMessageBuffer::operator<<(ios_base_manip manip) {
-   std::ostream& s = *this;
-   (*manip)(s);
-   return s;
+std::ostream& LogMessageBuffer::operator<<(ios_base_manip manip)
+{
+    std::ostream& s = *this;
+    (*manip)(s);
+    return s;
 }
 
-std::ostream& LogMessageBuffer::operator<<(bool val) { return ((std::ostream&) *this).operator<<(val); }
-std::ostream& LogMessageBuffer::operator<<(short val) { return ((std::ostream&) *this).operator<<(val); }
-std::ostream& LogMessageBuffer::operator<<(int val) { return ((std::ostream&) *this).operator<<(val); }
-std::ostream& LogMessageBuffer::operator<<(unsigned int val) { return ((std::ostream&) *this).operator<<(val); }
-std::ostream& LogMessageBuffer::operator<<(long val) { return ((std::ostream&) *this).operator<<(val); }
-std::ostream& LogMessageBuffer::operator<<(unsigned long val) { return ((std::ostream&) *this).operator<<(val); }
-std::ostream& LogMessageBuffer::operator<<(float val) { return ((std::ostream&) *this).operator<<(val); }
-std::ostream& LogMessageBuffer::operator<<(double val) { return ((std::ostream&) *this).operator<<(val); }
-std::ostream& LogMessageBuffer::operator<<(long double val) { return ((std::ostream&) *this).operator<<(val); }
-std::ostream& LogMessageBuffer::operator<<(void* val) { return ((std::ostream&) *this).operator<<(val); }
+std::ostream& LogMessageBuffer::operator<<(bool val)
+{
+    return ((std::ostream&) *this).operator<<(val);
+}
+
+std::ostream& LogMessageBuffer::operator<<(short val)
+{
+    return ((std::ostream&) *this).operator<<(val);
+}
+
+std::ostream& LogMessageBuffer::operator<<(int val)
+{
+    return ((std::ostream&) *this).operator<<(val);
+}
+
+std::ostream& LogMessageBuffer::operator<<(unsigned int val)
+{
+    return ((std::ostream&) *this).operator<<(val);
+}
+
+std::ostream& LogMessageBuffer::operator<<(long val)
+{
+    return ((std::ostream&) *this).operator<<(val);
+}
+
+std::ostream& LogMessageBuffer::operator<<(unsigned long val)
+{
+    return ((std::ostream&) *this).operator<<(val);
+}
+
+std::ostream& LogMessageBuffer::operator<<(float val)
+{
+    return ((std::ostream&) *this).operator<<(val);
+}
+
+std::ostream& LogMessageBuffer::operator<<(double val)
+{
+    return ((std::ostream&) *this).operator<<(val);
+}
+
+std::ostream& LogMessageBuffer::operator<<(long double val)
+{
+    return ((std::ostream&) *this).operator<<(val);
+}
+
+std::ostream& LogMessageBuffer::operator<<(void* val)
+{
+    return ((std::ostream&) *this).operator<<(val);
+}
+

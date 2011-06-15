@@ -7,7 +7,7 @@
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
 *
-*		http://www.apache.org/licenses/LICENSE-2.0
+*        http://www.apache.org/licenses/LICENSE-2.0
 *
 * Unless required by applicable law or agreed to in writing, software
 * distributed under the License is distributed on an "AS IS" BASIS,
@@ -22,7 +22,7 @@
 
 #include <list>
 #include <gmock/gmock.h>  // Brings in Google Mock.
-class MockLayerList : public ILayerList{
+class MockLayerList : public IScene{
  public:
   MOCK_METHOD1(createLayer, Layer*(unsigned int));
   MOCK_METHOD1(createSurface, Surface*(unsigned int));
@@ -30,17 +30,17 @@ class MockLayerList : public ILayerList{
   MOCK_METHOD1(createSurfaceGroup, SurfaceGroup*(unsigned int));
   MOCK_METHOD1(removeLayer, void(Layer*));
   MOCK_METHOD1(removeSurface, void(Surface*));
-  MOCK_METHOD1(getLayer, Layer*(unsigned int));
-  MOCK_METHOD1(getSurface, Surface*(unsigned int));
-  MOCK_METHOD1(getSurfaceGroup, SurfaceGroup*(unsigned int));
-  MOCK_METHOD1(getLayerGroup, LayerGroup*(unsigned int id));
-  MOCK_METHOD2(getLayerIDs, void(unsigned int*,unsigned int**));
-  MOCK_METHOD3(getLayerIDsOfScreen, bool(unsigned int,unsigned int*,unsigned int**));
-  MOCK_METHOD2(getSurfaceIDs, void(unsigned int*,unsigned int**));
-  MOCK_METHOD2(getLayerGroupIDs, void(unsigned int*,unsigned int**));
-  MOCK_METHOD2(getSurfaceGroupIDs, void(unsigned int*,unsigned int**));
-  MOCK_METHOD0(lockList, void());
-  MOCK_METHOD0(unlockList, void());
+  MOCK_CONST_METHOD1(getLayer, Layer*(unsigned int));
+  MOCK_CONST_METHOD1(getSurface, Surface*(unsigned int));
+  MOCK_CONST_METHOD1(getSurfaceGroup, SurfaceGroup*(unsigned int));
+  MOCK_CONST_METHOD1(getLayerGroup, LayerGroup*(unsigned int id));
+  MOCK_CONST_METHOD2(getLayerIDs, void(unsigned int*,unsigned int**));
+  MOCK_CONST_METHOD3(getLayerIDsOfScreen, bool(unsigned int,unsigned int*,unsigned int**));
+  MOCK_CONST_METHOD2(getSurfaceIDs, void(unsigned int*,unsigned int**));
+  MOCK_CONST_METHOD2(getLayerGroupIDs, void(unsigned int*,unsigned int**));
+  MOCK_CONST_METHOD2(getSurfaceGroupIDs, void(unsigned int*,unsigned int**));
+  MOCK_METHOD0(lockScene, void());
+  MOCK_METHOD0(unlockScene, void());
 
 
 };

@@ -7,7 +7,7 @@
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
 *
-*		http://www.apache.org/licenses/LICENSE-2.0
+*        http://www.apache.org/licenses/LICENSE-2.0
 *
 * Unless required by applicable law or agreed to in writing, software
 * distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,72 +25,91 @@
 #include "Log.h"
 
 const int X11TextureFromPixmap::pixmapAttribs[] = {
-		GLX_TEXTURE_TARGET_EXT, GLX_TEXTURE_2D_EXT,
-		GLX_TEXTURE_FORMAT_EXT, GLX_TEXTURE_FORMAT_RGBA_EXT, None
+        GLX_TEXTURE_TARGET_EXT, GLX_TEXTURE_2D_EXT,
+        GLX_TEXTURE_FORMAT_EXT, GLX_TEXTURE_FORMAT_RGBA_EXT, None
 };
 
-	X11TextureFromPixmap::X11TextureFromPixmap(Display* display, GLXFBConfig pixmapConfig) : dpy(display), pixmapConfig(pixmapConfig){
-		glXBindTexImageEXT_func = (PFNGLXBINDTEXIMAGEEXTPROC) glXGetProcAddress((GLubyte *) "glXBindTexImageEXT");
-		glXReleaseTexImageEXT_func = (PFNGLXRELEASETEXIMAGEEXTPROC)	glXGetProcAddress((GLubyte*) "glXReleaseTexImageEXT");
+X11TextureFromPixmap::X11TextureFromPixmap(Display* display, GLXFBConfig pixmapConfig)
+: dpy(display)
+, pixmapConfig(pixmapConfig)
+{
+    glXBindTexImageEXT_func = (PFNGLXBINDTEXIMAGEEXTPROC) glXGetProcAddress((GLubyte *) "glXBindTexImageEXT");
+    glXReleaseTexImageEXT_func = (PFNGLXRELEASETEXIMAGEEXTPROC)    glXGetProcAddress((GLubyte*) "glXReleaseTexImageEXT");
 
-		if (!glXBindTexImageEXT_func || !glXReleaseTexImageEXT_func) {
-			LOG_ERROR("X11TextureFromPixmap", "glXGetProcAddress failed");
-		}
-	};
+    if (!glXBindTexImageEXT_func || !glXReleaseTexImageEXT_func)
+    {
+        LOG_ERROR("X11TextureFromPixmap", "glXGetProcAddress failed");
+    }
+}
 
-	void X11TextureFromPixmap::bindSurfaceTexture(Surface*s){
-		GLXPlatformSurface* nativeSurface = (GLXPlatformSurface*)s->platform;
-		if (NULL!=nativeSurface){
-			glXBindTexImageEXT_func(dpy, nativeSurface->glxPixmap, GLX_FRONT_LEFT_EXT, NULL);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		}
-	}
-	void X11TextureFromPixmap::unbindSurfaceTexture(Surface*s){
-		GLXPlatformSurface* nativeSurface = (GLXPlatformSurface*)s->platform;
-		if (NULL!=nativeSurface)
-			glXReleaseTexImageEXT_func(dpy, nativeSurface->glxPixmap, GLX_FRONT_LEFT_EXT);
-	}
+void X11TextureFromPixmap::bindSurfaceTexture(Surface* surface)
+{
+    GLXPlatformSurface* nativeSurface = (GLXPlatformSurface*)surface->platform;
+    if (nativeSurface)
+    {
+        glXBindTexImageEXT_func(dpy, nativeSurface->glxPixmap, GLX_FRONT_LEFT_EXT, NULL);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    }
+}
 
-	void X11TextureFromPixmap::createClientBuffer(Surface* surface){
-		LOG_DEBUG("X11TextureFromPixmap", "creating clientBuffer for window: " << surface->nativeHandle);
-		GLXPlatformSurface* platformSurface = (GLXPlatformSurface*)surface->platform;
-		if (NULL!=platformSurface){
-			Pixmap p = 0;
-			LOG_DEBUG("X11TextureFromPixmap", "get X Pixmap");
-			p= XCompositeNameWindowPixmap (dpy, surface->nativeHandle);
-			if (p==0)
-				LOG_ERROR("X11TextureFromPixmap", "didnt create pixmap!");
-			XSync(dpy, 0);
+void X11TextureFromPixmap::unbindSurfaceTexture(Surface* surface)
+{
+    GLXPlatformSurface* nativeSurface = (GLXPlatformSurface*)surface->platform;
+    if (nativeSurface)
+    {
+        glXReleaseTexImageEXT_func(dpy, nativeSurface->glxPixmap, GLX_FRONT_LEFT_EXT);
+    }
+}
 
-			GLXPixmap pm = 0;
-			LOG_DEBUG("X11TextureFromPixmap", "creating glx pixmap from xpixmap");
-			pm = glXCreatePixmap(dpy, pixmapConfig, p, pixmapAttribs);
-			if (pm ==0)
-				LOG_DEBUG("X11TextureFromPixmap", "could not allocate glxpixmap for window");
-			platformSurface->glxPixmap = pm;
-			platformSurface->pixmap = p;
-		}
-	}
+void X11TextureFromPixmap::createClientBuffer(Surface* surface){
+    LOG_DEBUG("X11TextureFromPixmap", "creating clientBuffer for window: " << surface->nativeHandle);
+    GLXPlatformSurface* platformSurface = (GLXPlatformSurface*)surface->platform;
+    if (NULL!=platformSurface)
+    {
+        Pixmap pixmap = 0;
+        LOG_DEBUG("X11TextureFromPixmap", "get X Pixmap");
+        pixmap= XCompositeNameWindowPixmap (dpy, surface->nativeHandle);
+        if (pixmap==0)
+        {
+            LOG_ERROR("X11TextureFromPixmap", "didnt create pixmap!");
+        }
+        XSync(dpy, 0);
 
-	PlatformSurface* X11TextureFromPixmap::createPlatformSurface(Surface* s){
-		return new GLXPlatformSurface(s);
-	}
+        GLXPixmap glxPixmap = 0;
+        LOG_DEBUG("X11TextureFromPixmap", "creating glx pixmap from xpixmap");
+        glxPixmap = glXCreatePixmap(dpy, pixmapConfig, pixmap, pixmapAttribs);
+        if (glxPixmap ==0)
+        {
+            LOG_DEBUG("X11TextureFromPixmap", "could not allocate glxpixmap for window");
+        }
+        platformSurface->glxPixmap = glxPixmap;
+        platformSurface->pixmap = pixmap;
+    }
+}
 
-	void X11TextureFromPixmap::destroyClientBuffer(Surface* surface){
-		LOG_ERROR("X11TextureFromPixmap", "destroying clientBuffer");
-		GLXPlatformSurface* platformSurface = (GLXPlatformSurface*)surface->platform;
-		LOG_DEBUG("X11TextureFromPixmap", "removing GLX Pixmap");
-		if (NULL!=platformSurface){
-			//glXReleaseTexImageEXT_func(dpy, x11surf->glxPixmap, GLX_FRONT_LEFT_EXT);
-			glXDestroyPixmap(dpy,platformSurface->glxPixmap);
-			platformSurface->glxPixmap = 0;
-		}
-		XSync(dpy, 0);
+PlatformSurface* X11TextureFromPixmap::createPlatformSurface(Surface* surface)
+{
+    return new GLXPlatformSurface(surface);
+}
 
-		LOG_DEBUG("X11TextureFromPixmap", "removing X Pixmap");
-		if (NULL!=platformSurface){
-			XFreePixmap(dpy,platformSurface->pixmap);
-			platformSurface->pixmap = 0;
-		}
-	}
+void X11TextureFromPixmap::destroyClientBuffer(Surface* surface)
+{
+    LOG_ERROR("X11TextureFromPixmap", "destroying clientBuffer");
+    GLXPlatformSurface* platformSurface = (GLXPlatformSurface*)surface->platform;
+    LOG_DEBUG("X11TextureFromPixmap", "removing GLX Pixmap");
+    if (NULL!=platformSurface)
+    {
+        //glXReleaseTexImageEXT_func(dpy, x11surf->glxPixmap, GLX_FRONT_LEFT_EXT);
+        glXDestroyPixmap(dpy, platformSurface->glxPixmap);
+        platformSurface->glxPixmap = 0;
+    }
+    XSync(dpy, 0);
+
+    LOG_DEBUG("X11TextureFromPixmap", "removing X Pixmap");
+    if (NULL!=platformSurface)
+    {
+        XFreePixmap(dpy, platformSurface->pixmap);
+        platformSurface->pixmap = 0;
+    }
+}

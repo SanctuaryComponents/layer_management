@@ -7,7 +7,7 @@
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
 *
-*		http://www.apache.org/licenses/LICENSE-2.0
+*        http://www.apache.org/licenses/LICENSE-2.0
 *
 * Unless required by applicable law or agreed to in writing, software
 * distributed under the License is distributed on an "AS IS" BASIS,
@@ -29,21 +29,22 @@
 class BeagleRenderer : public BaseRenderer
 {
 public:
-	BeagleRenderer(LayerList* layerlist) : BaseRenderer(layerlist)
-	{
-		LOG_DEBUG("BeagleRenderer", "Creating Renderer");
-		ITextureBinder* binder = new BeagleEglImage();
-		BaseGraphicSystem* graphicSystem = new GLESGraphicsystem( ShaderProgramBeagle::createProgram, binder);
-		m_windowSystem = new NullWindowSystem(layerlist, graphicSystem);
-	};
+    BeagleRenderer(Scene* pScene)
+    : BaseRenderer(pScene)
+    {
+        LOG_DEBUG("BeagleRenderer", "Creating Renderer");
+        ITextureBinder* binder = new BeagleEglImage();
+        BaseGraphicSystem* graphicSystem = new GLESGraphicsystem( ShaderProgramBeagle::createProgram, binder);
+        m_windowSystem = new NullWindowSystem(pScene, graphicSystem);
+    }
 };
 
-extern "C" BaseRenderer* createBeagleRenderer(LayerList* layerlist) {
-	return new BeagleRenderer(layerlist);
+extern "C" BaseRenderer* createBeagleRenderer(Scene* pScene) {
+    return new BeagleRenderer(pScene);
 }
 
 extern "C" void destroyBeagleRenderer(BeagleRenderer* p) {
-	delete p;
+    delete p;
 }
 
 #endif /* BEAGLERENDERER_H_ */

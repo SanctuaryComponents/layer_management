@@ -1,6 +1,4 @@
-Table of Contents
-===================================
-
+Sections in this file describe:
 - Introduction
 - Component Overview
 - Required platform capabilities
@@ -9,8 +7,8 @@ Table of Contents
 
 Introduction
 ====================================
-In the automotive domain most HMI systems use their own window manager implementation. 
-Many applications (e.g. navigation, rear view camera) are implemented standalone and 
+In the automotive domain, the most HMI systems are using their own window manager implementation. 
+Many applications (e.g. navigation, reversing camera) are implemented standalone and 
 therefore one service is used to composite all applications to the final image on the screen. This Service
 is also know as LayerManagement. 
 This Component provides a common API and a proof-of-concept implementation for the Layer Management Service. 
@@ -19,7 +17,7 @@ which have the following features :
 
     * Fixed number of hardware layers
     * Hardware accelerated compositing
-    * Platform dependencies
+    * Platform dependent
     * Number of layers not extensible during runtime
     * Vendor-specific implementation
     * No standardized interface
@@ -32,8 +30,8 @@ The IVI Layer Management have the following enhancements :
     * Standardized compositing
     * Convenient and consistent access to hardware accelerated modules
     * Separation of HMI and Layer Management
-    * Dynamic extensions during runtime
-    * Simplified integration
+    * Dynamically Extensions during runtime
+    * Low integration complexity
     * Reduced dependency on hardware 
 
 Component Overview
@@ -93,7 +91,6 @@ Extensions have to be supported by the TargetPlatform :
 X11 Extensions:
 
 x-composite : This extension should support redirecting of egl Surfaces to x11 pixmaps too.
-x-damage
 
 GLX / OpenGL :
 

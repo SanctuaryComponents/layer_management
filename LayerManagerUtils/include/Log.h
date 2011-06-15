@@ -34,38 +34,44 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-
 #ifndef _LOG_H_
 #define _LOG_H_
+
 #include "LogMessageBuffer.h"
 #include <iostream>
 #include <fstream>
+
 typedef enum {
-	LOG_INFO = 1,
-	LOG_WARNING = 2,
-	LOG_ERROR = 4,
-	LOG_DEBUG = 8
+    LOG_INFO = 1,
+    LOG_WARNING = 2,
+    LOG_ERROR = 4,
+    LOG_DEBUG = 8
 } LOG_MODES;
 
-class Log {
-
+class Log
+{
 public:
-	virtual ~Log();
-	static Log* instance;
-	void warning (const std::string moduleName, const std::basic_string<char>& output );
-	void info (const std::string moduleName, const std::basic_string<char>& output );
-	void error (const std::string moduleName, const std::basic_string<char>& output );
-	void debug (const std::string moduleName, const std::basic_string<char>& output );
-	void log(LOG_MODES logMode, const std::string moduleName, const std::basic_string<char>& output );
+    virtual ~Log();
+    static Log* instance;
+    void warning (const std::string& moduleName, const std::basic_string<char>& output);
+    void info (const std::string& moduleName, const std::basic_string<char>& output);
+    void error (const std::string& moduleName, const std::basic_string<char>& output);
+    void debug (const std::string& moduleName, const std::basic_string<char>& output);
+    void log(LOG_MODES logMode, const std::string& moduleName, const std::basic_string<char>& output);
+
 private:
-	void LogToFile(std::string logMode, const std::string moduleName, const std::basic_string<char>& output);
-	void LogToConsole(std::string logMode,const std::string moduleName,const std::basic_string<char>& output);
-	Log();
-	std::ofstream* m_fileStream;
+    Log();
+    void LogToFile(std::string logMode, const std::string& moduleName, const std::basic_string<char>& output);
+    void LogToConsole(std::string logMode,const std::string& moduleName,const std::basic_string<char>& output);
+
+private:
+    std::ofstream* m_fileStream;
 };
+
 #define LOG_ERROR(module, message) { \
            LogMessageBuffer oss_; \
            Log::instance->error(module, oss_.str(oss_<< message)); }
+
 #define LOG_INFO(module, message) { \
            LogMessageBuffer oss_; \
            Log::instance->info(module, oss_.str(oss_<< message)); }
@@ -77,6 +83,7 @@ private:
            Log::instance->debug(module, oss_.str(oss_<< message)); }
 
 //#define LOG_WARNING(module, message)
+
 #define LOG_WARNING(module, message) { \
            LogMessageBuffer oss_; \
            Log::instance->warning(module, oss_.str(oss_<< message)); }

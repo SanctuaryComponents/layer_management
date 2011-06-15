@@ -25,3 +25,4 @@ add_library(LayerManagerUtils STATIC src/Bitmap.cpp src/IlmMatrix.cpp src/Log.cp
 
 install (FILES include/Log.h include/LogMessageBuffer.h include/IlmMatrix.h include/Bitmap.h DESTINATION include/layermanager)
 
+install (TARGETS LayerManagerUtils ARCHIVE DESTINATION lib/layermanager/static)

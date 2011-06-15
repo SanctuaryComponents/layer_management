@@ -1,6 +1,7 @@
 LayerManagerClient/.*
 LayerManagerExamples/.*
 LayerManagerUtils/.*
+LayerManagerCommands/.*
 LayerManagerService/.*
 LayerManagerPlugins/Communicators/DBUSCommunicator/.*
 LayerManagerPlugins/Renderers/.*

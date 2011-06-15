@@ -18,6 +18,9 @@
 ****************************************************************************/
 #ifndef _BITMAP_H_
 #define _BITMAP_H_
+
 #include <string>
+
 void writeBitmap(std::string FileName, char* imagedataRGB, int width, int height);
+
 #endif /*_BITMAP_H_ */

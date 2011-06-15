@@ -1,4 +1,4 @@
-###########################################################################
+############################################################################
 # 
 # Copyright 2010, 2011 BMW Car IT GmbH  
 # 
@@ -7,7 +7,7 @@
 # you may not use this file except in compliance with the License. 
 # You may obtain a copy of the License at 
 #
-#		http://www.apache.org/licenses/LICENSE-2.0 
+#       http://www.apache.org/licenses/LICENSE-2.0 
 #
 # Unless required by applicable law or agreed to in writing, software 
 # distributed under the License is distributed on an "AS IS" BASIS, 
@@ -56,9 +56,10 @@ option (WITH_GLX_EXAMPLE
 option (WITH_TESTS
         "Build Available Tests " OFF)
 
-option (WITH_FORCE_COPY 
-	"Force Software Copy from X11 pixmaps" OFF)
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic")
 
+option (WITH_FORCE_COPY 
+        "Force Software Copy of Pixmaps" OFF)
 if (WITH_FORCE_COPY)
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DGLX_GRAPHICSYSTEM_FORCE_COPY -DGLES_FORCE_COPY" CACHE STRING "" FORCE)
 endif(WITH_FORCE_COPY)
@@ -66,24 +67,25 @@ endif(WITH_FORCE_COPY)
 add_subdirectory (LayerManagerPlugins/Communicators/DBUSCommunicator)
 add_subdirectory (LayerManagerClient/ilmClient)
 add_subdirectory (LayerManagerUtils)
+add_subdirectory (LayerManagerCommands)
 add_subdirectory (LayerManagerService)
 add_subdirectory (LayerManagerExamples/LayerManagerClientExample)
 
-	
+    
 if (WITH_DESKTOP)
-	add_subdirectory (LayerManagerPlugins/Renderers/Platform/GLXRenderer)
+    add_subdirectory (LayerManagerPlugins/Renderers/Platform/GLXRenderer)
 endif(WITH_DESKTOP)     
 
 if (WITH_X11_GLES)
-  	add_subdirectory (LayerManagerPlugins/Renderers/Platform/X11GLESRenderer)
+    add_subdirectory (LayerManagerPlugins/Renderers/Platform/X11GLESRenderer)
 endif(WITH_X11_GLES)   
 
 if (WITH_EGL_EXAMPLE)
-  	add_subdirectory (LayerManagerExamples/EGLX11ApplicationExample)
+    add_subdirectory (LayerManagerExamples/EGLX11ApplicationExample)
 endif(WITH_EGL_EXAMPLE)
 
 if (WITH_GLX_EXAMPLE)
-  	add_subdirectory (LayerManagerExamples/GLXApplicationExample)
+    add_subdirectory (LayerManagerExamples/GLXApplicationExample)
 endif(WITH_GLX_EXAMPLE)
 
 

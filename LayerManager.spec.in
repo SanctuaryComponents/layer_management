@@ -49,12 +49,16 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/layermanager/*
 %dir %_libdir/layermanager/communicator
 %{_libdir}/layermanager/communicator/libDBUSCommunicator.so
+%{_libdir}/libLayerManagerCommands.so
 %dir %_libdir/layermanager/renderer
 %{_libdir}/layermanager/renderer/libX11GLESRenderer.so
 %{_libdir}/layermanager/renderer/renderer_frag.glslf
+%{_libdir}/layermanager/renderer/renderer_frag_no_ualpha.glslf
 %{_libdir}/layermanager/renderer/renderer_layer.glslf
 %{_libdir}/layermanager/renderer/renderer_vert.glslv
 %{_libdir}/layermanager/renderer/renderer_layer.glslv
+%dir %_libdir/layermanager/static
+%{_libdir}/layermanager/static/libLayerManagerUtils.a
 
 %dir %_includedir/ilm
 %{_includedir}/ilm/*
@@ -64,6 +68,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/LayerManagerClientExample
 
 %changelog
+* Fri Jun 10 2011 Michael Schuldt <Michael.Schuldt@bmw-carit.de> 0.8.1
+- Missing install target for renderer_frag_no_ualpha.glslf added
+* Tue May 24 2011 Timo LOTTERBACH <timo.lotterbach@bmw-carit.de> 0.8.1
+- Added new library LayerManagerCommands
+- Added new shader for optimization
+
 * Tue Mar 3 2011 Jonathan CONRAD <jonathan.conrad@bmw-carit.de> 0.3.0
 - Creation
-

@@ -7,7 +7,7 @@
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
 *
-*		http://www.apache.org/licenses/LICENSE-2.0
+*        http://www.apache.org/licenses/LICENSE-2.0
 *
 * Unless required by applicable law or agreed to in writing, software
 * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,33 +24,34 @@
 #include "PlatformSurfaces/GLXPlatformSurface.h"
 #include "Log.h"
 
-class GLXGraphicsystem : public BaseGraphicSystem<Display*, Window> {
+class GLXGraphicsystem : public BaseGraphicSystem<Display*, Window>
+{
 public:
-	GLXGraphicsystem( int windowWidth, int windowHeight);
-	virtual ~GLXGraphicsystem();
-	static XVisualInfo* GetMatchingVisual(Display *dpy);
-	bool init(Display* x11Display, Window x11Window);
+    GLXGraphicsystem( int windowWidth, int windowHeight);
+    virtual ~GLXGraphicsystem();
+    static XVisualInfo* GetMatchingVisual(Display *dpy);
+    bool init(Display* x11Display, Window x11Window);
 
 	void beginLayer(Layer* layer);
 	void checkRenderLayer();
 	void renderLayer();
 	void endLayer();
 
-	void clearBackground();
-	void swapBuffers();
-	void saveScreenShotOfFramebuffer(std::string fileToSave);
-	GLXFBConfig GetMatchingPixmapConfig(Display *curDisplay);
-	bool CheckConfigValue(Display *curDisplay,GLXFBConfig currentConfig, int attribute, int expectedValue);
-	bool CheckConfigMask(Display *curDisplay,GLXFBConfig currentConfig, int attribute, int expectedValue);
-	void renderSurface(Surface* currentSurface);
+    void clearBackground();
+    void swapBuffers();
+    void saveScreenShotOfFramebuffer(std::string fileToSave);
+    GLXFBConfig GetMatchingPixmapConfig(Display *curDisplay);
+    bool CheckConfigValue(Display *curDisplay,GLXFBConfig currentConfig, int attribute, int expectedValue);
+    bool CheckConfigMask(Display *curDisplay,GLXFBConfig currentConfig, int attribute, int expectedValue);
+    void renderSurface(Surface* currentSurface);
 
 private:
-	int windowWidth;
-	int windowHeight;
-	Display* x11disp;
-	Window 	window;
-	Layer*	m_currentLayer;
-	bool 	m_forcecopy;
+    int windowWidth;
+    int windowHeight;
+    Display* x11disp;
+    Window     window;
+    Layer*    m_currentLayer;
+    bool     m_forcecopy;
 };
 
 #endif /* _GLXGRAPHICSYSTEM_H_ */

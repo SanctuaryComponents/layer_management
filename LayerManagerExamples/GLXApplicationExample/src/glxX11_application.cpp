@@ -7,7 +7,7 @@
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
 *
-*		http://www.apache.org/licenses/LICENSE-2.0
+*        http://www.apache.org/licenses/LICENSE-2.0
 *
 * Unless required by applicable law or agreed to in writing, software
 * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,24 +16,20 @@
 * limitations under the License.
 *
 ****************************************************************************/
-#include <stdio.h>
-
-#include <unistd.h>
-
-extern "C" {
 #include "ilm_client.h"
-}
-
 #include "glx_helper.h"
 #include "gl2application.h"
+#include <stdio.h>
+#include <unistd.h>
 
 /********************* DEFINES **********************************************/
-/* Max width and height of the window	*/
-#define SURFACE_WIDTH	320
-#define SURFACE_HEIGHT	240
+/* Max width and height of the window    */
+#define SURFACE_WIDTH  320
+#define SURFACE_HEIGHT 240
 
-#define LAYER_WIDTH	1280
-#define LAYER_HEIGHT	480
+#define LAYER_WIDTH    1280
+#define LAYER_HEIGHT   480
+
 /****************************************************************************/
 
 /********************* TYPEDEFS **********************************************/
@@ -43,40 +39,42 @@ extern "C" {
 
 int main(int argc, char **argv)
 {
-	printf("Starting demo GLX X11 Application Example\n");
+    printf("Starting demo GLX X11 Application Example\n");
 
-	if (ilm_init()==ILM_FAILED)
-	  {
-            printf("Can't Init LayerManagement Communication\n");
-            return -1;
-	  }
+    if (ilm_init() == ILM_FAILED)
+    {
+        printf("Can't Init LayerManagement Communication\n");
+        return -1;
+    }
 
+    if (!createX11Context(SURFACE_WIDTH, SURFACE_HEIGHT))
+    {
+        printf("Can't Create X11 Context\n");
+        return -1;
+    }
 
-	if ( !createX11Context(SURFACE_WIDTH,SURFACE_HEIGHT) )
-	  {
-	    printf("Can't Create X11 Context\n");
-	    return -1;
-	  }
-	if (!createGLXContext(SURFACE_WIDTH,SURFACE_HEIGHT,LAYER_WIDTH,LAYER_HEIGHT))
-          {
-            printf("Can't Create EGL Context\n");
-            return -1;
-          }
-	if (!initGlApplication(SURFACE_WIDTH,SURFACE_HEIGHT))
-	  {
-            printf("Can't Init GL Application\n");
-            return -1;
-	  }
+    if (!createGLXContext(SURFACE_WIDTH, SURFACE_HEIGHT, LAYER_WIDTH, LAYER_HEIGHT))
+    {
+        printf("Can't Create EGL Context\n");
+        return -1;
+    }
 
-	while(ILM_TRUE)
-	{
-	  draw(33);
-	  //sleep(1);
-	}
+    if (!initGlApplication(SURFACE_WIDTH, SURFACE_HEIGHT))
+    {
+        printf("Can't Init GL Application\n");
+        return -1;
+    }
 
-	destroyGLXContext();
-	destroyX11Context();
-	destroyGlApplication();
-	ilm_destroy();
-	return 0;
+    while (ILM_TRUE)
+    {
+        draw(33);
+        //sleep(1);
+    }
+
+    destroyGLXContext();
+    destroyX11Context();
+    destroyGlApplication();
+    ilm_destroy();
+
+    return 0;
 }

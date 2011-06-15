@@ -7,7 +7,7 @@
 * you may not use this file except in compliance with the License.
 * You may obtain a copy of the License at
 *
-*		http://www.apache.org/licenses/LICENSE-2.0
+*        http://www.apache.org/licenses/LICENSE-2.0
 *
 * Unless required by applicable law or agreed to in writing, software
 * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,18 +20,22 @@
 #include <ShaderProgramFactory.h>
 
 // pointer to shader program creator function
-PfnShaderProgramCreator ShaderProgramFactory::_creator = 0;
+PfnShaderProgramCreator ShaderProgramFactory::m_creatorFunctionPointer = 0;
 
-ShaderProgram* ShaderProgramFactory::createProgram(const std::string& vertName, const std::string& fragName)
+ShaderProgram* ShaderProgramFactory::createProgram(const string& vertFileName, const string& fragFileName)
 {
-	if (_creator!=0)
-		return _creator(vertName, fragName);
-	else
-		return 0;
+    ShaderProgram* shaderProgram = 0;
+
+    if (m_creatorFunctionPointer)
+    {
+        shaderProgram = m_creatorFunctionPointer(vertFileName, fragFileName);
+    }
+
+    return shaderProgram;
 }
 
 void ShaderProgramFactory::setCreatorFunc(PfnShaderProgramCreator creatorFunc)
 {
-	_creator = creatorFunc;
+    m_creatorFunctionPointer = creatorFunc;
 }
 

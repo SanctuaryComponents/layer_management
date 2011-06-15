@@ -23,7 +23,10 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Xlinker -export-dynamic")
 
 include_directories ("include")
 include_directories ("${PROJECT_SOURCE_DIR}/LayerManagerUtils/include")
+include_directories ("${PROJECT_SOURCE_DIR}/LayerManagerCommands/include")
+
 link_directories ("${PROJECT_SOURCE_DIR}/LayerManagerUtils/bin")
+link_directories ("${PROJECT_SOURCE_DIR}/LayerManagerCommands")
 
 file(GLOB LM_SOURCES src/*.cpp src/shader/*.cpp)
 file(GLOB LM_INCLUDES include/*.h)
@@ -31,10 +34,15 @@ file(GLOB LM_INCLUDES include/*.h)
 add_executable(LayerManagerService ${LM_SOURCES})
 
 add_dependencies(LayerManagerService LayerManagerUtils)
+add_dependencies(LayerManagerService LayerManagerCommands)
 
 
 find_package (Threads)
-set(LIBS ${LIBS} LayerManagerUtils dl ${CMAKE_THREAD_LIBS_INIT}) 
+set(LIBS ${LIBS}
+         LayerManagerUtils 
+         LayerManagerCommands
+         dl
+         ${CMAKE_THREAD_LIBS_INIT}) 
 target_link_libraries(LayerManagerService ${LIBS})
 
 install (TARGETS LayerManagerService DESTINATION bin)
