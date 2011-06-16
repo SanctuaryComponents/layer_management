@@ -57,8 +57,8 @@ const char* USAGE_DESCRIPTION = "Usage:\t LayerManagerService [options]\n"
                                 "\t-w: Window Width\t\n"
                                 "\t-h: Window Height\t\n"
                                 "\t-d: displayName \t\n"
-                                "\t-f: loglevel file [0=disabled,1=error,2=info,3=warning,4=debug; 0 default]\n"
-                                "\t-c: loglevel console [0=disabled,1=error,2=info,3=warning,4=debug; 2 default]\n"
+                                "\t-f: loglevel file \t 0 [default] \n\t\t\t\t[0=disabled,1=error,2=info,3=warning,4=debug]\n"
+                                "\t-c: loglevel console \t 2 [default] \n\t\t\t\t[0=disabled,1=error,2=info,3=warning,4=debug]\n"
                                 "\nexample: LayerManagerService -w800 -h480 -d:0\n";
 
 template<class T>
