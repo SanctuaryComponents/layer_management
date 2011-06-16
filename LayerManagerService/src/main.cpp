@@ -57,6 +57,8 @@ const char* USAGE_DESCRIPTION = "Usage:\t LayerManagerService [options]\n"
                                 "\t-w: Window Width\t\n"
                                 "\t-h: Window Height\t\n"
                                 "\t-d: displayName \t\n"
+                                "\t-f: loglevel file [0=disabled,1=error,2=info,3=warning,4=debug; 0 default]\n"
+                                "\t-c: loglevel console [0=disabled,1=error,2=info,3=warning,4=debug; 2 default]\n"
                                 "\nexample: LayerManagerService -w800 -h480 -d:0\n";
 
 template<class T>
@@ -112,7 +114,7 @@ void parseCommandLine(int argc, char **argv)
 {
     while (optind < argc)
     {
-        int option = getopt(argc, argv, "w::h::d::?::");
+        int option = getopt(argc, argv, "w::h::d::?::c::f::");
         switch (option)
         {
         case 'd':
@@ -124,7 +126,19 @@ void parseCommandLine(int argc, char **argv)
         case 'h':
             displayHeight = atoi(optarg);
             break;
-        case '?':
+        case 'c':
+            if ( atoi(optarg) < LOG_MAX_LEVEL ) 
+            {
+                Log::consoleLogLevel = (LOG_MODES) atoi(optarg);
+            }
+            break;
+        case 'f':
+            if ( atoi(optarg) < LOG_MAX_LEVEL ) 
+            {
+                Log::fileLogLevel = (LOG_MODES) atoi(optarg);
+            }
+            break;
+        case '?':   
         default:
             puts(USAGE_DESCRIPTION);
             exit(-1);

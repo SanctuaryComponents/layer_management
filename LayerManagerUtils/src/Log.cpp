@@ -39,6 +39,8 @@
 #include <iomanip>
 
 Log* Log::instance = new Log();
+LOG_MODES Log::fileLogLevel = LOG_DISABLED;
+LOG_MODES Log::consoleLogLevel = LOG_INFO;
 
 Log::Log()
 {
@@ -76,33 +78,40 @@ void Log::debug (const std::string& moduleName, const std::basic_string<char>& o
 
 void Log::log(LOG_MODES logMode, const std::string& moduleName, const std::basic_string<char>& output)
 {
-    switch (logMode)
+    std::string logString[LOG_MAX_LEVEL] = {"","ERROR","INFO","WARNING","DEBUG"};
+    std::string logOutLevelString = logString[LOG_INFO];
+    if ( logMode < LOG_MAX_LEVEL ) 
     {
-        case LOG_ERROR:
-            LogToConsole("ERROR", moduleName, output);
-            LogToFile("ERROR", moduleName, output);
-            break;
-
-        case LOG_WARNING:
-            LogToConsole("WARNING", moduleName, output);
-            LogToFile("WARNING", moduleName, output);
-            break;
-
-        case LOG_INFO:
-            LogToConsole("INFO", moduleName, output);
-            LogToFile("INFO", moduleName, output);
-            break;
-
-        case LOG_DEBUG:
-            LogToConsole("DEBUG", moduleName, output);
-            LogToFile("DEBUG", moduleName, output);
-            break;
+        logOutLevelString = logString[logMode];
+    }
+    if ( consoleLogLevel >= logMode ) 
+    { 
+        LogToConsole(logOutLevelString, moduleName, output);
+    }
+    if ( fileLogLevel >= logMode ) 
+    {
+        LogToFile(logOutLevelString, moduleName, output);
     }
 }
 
 void Log::LogToFile(std::string logMode, const std::string& moduleName,const std::basic_string<char>& output)
 {
-    *m_fileStream << "[" << moduleName << "][" << logMode << "] " << output << std::endl;
+    static unsigned int maxLengthModuleName = 0;
+    static unsigned int maxLengthLogModeName = 0;
+
+    if (moduleName.length() > maxLengthModuleName)
+    {
+        maxLengthModuleName = moduleName.length();
+    }
+
+    if (logMode.length() > maxLengthLogModeName)
+    {
+        maxLengthLogModeName = logMode.length();
+    }
+
+    *m_fileStream << std::setw(maxLengthModuleName)  << std::left << moduleName << " | "
+              << std::setw(maxLengthLogModeName) << std::left << logMode    << " | "
+              << output << std::endl;
 }
 
 void Log::LogToConsole(std::string logMode, const std::string& moduleName, const std::basic_string<char>& output)
@@ -124,3 +133,4 @@ void Log::LogToConsole(std::string logMode, const std::string& moduleName, const
               << std::setw(maxLengthLogModeName) << std::left << logMode    << " | "
               << output << std::endl;
 }
+

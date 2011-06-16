@@ -42,10 +42,12 @@
 #include <fstream>
 
 typedef enum {
-    LOG_INFO = 1,
-    LOG_WARNING = 2,
-    LOG_ERROR = 4,
-    LOG_DEBUG = 8
+    LOG_DISABLED = 0,
+    LOG_ERROR = 1,
+    LOG_INFO = 2,
+    LOG_WARNING = 3,
+    LOG_DEBUG = 4,
+    LOG_MAX_LEVEL
 } LOG_MODES;
 
 class Log
@@ -53,6 +55,8 @@ class Log
 public:
     virtual ~Log();
     static Log* instance;
+    static LOG_MODES fileLogLevel;
+    static LOG_MODES consoleLogLevel;
     void warning (const std::string& moduleName, const std::basic_string<char>& output);
     void info (const std::string& moduleName, const std::basic_string<char>& output);
     void error (const std::string& moduleName, const std::basic_string<char>& output);
