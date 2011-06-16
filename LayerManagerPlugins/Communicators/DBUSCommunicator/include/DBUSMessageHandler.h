@@ -36,7 +36,7 @@ public:
     void initReceive(DBusMessage* msg);
     void initReply(DBusMessage* msg);
     void closeReply();
-    void ReplyError(const char* errorname, const char* errorMsg);
+    void ReplyError(DBusMessage* msg, const char* errorname, const char* errorMsg);
 
 
     dbus_uint32_t getUInt();
@@ -49,7 +49,7 @@ public:
 
     void appendUInt(dbus_uint32_t toAppend);
     void appendByte(char toAppend);
-    void appendBool(bool toAppend);
+    void appendBool(dbus_bool_t toAppend);
     void appendDouble(double toAppend);
     void appendArrayOfUInt(unsigned int length, unsigned int *IDs);
 

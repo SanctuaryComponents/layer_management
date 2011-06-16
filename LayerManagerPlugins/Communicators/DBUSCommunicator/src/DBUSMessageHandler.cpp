@@ -90,9 +90,9 @@ void DBUSMessageHandler::closeReply()
     dbus_message_unref(m_pReply);
 }
 
-void DBUSMessageHandler::ReplyError(const char* errorname, const char* errorMsg)
+void DBUSMessageHandler::ReplyError(DBusMessage* msg, const char* errorname, const char* errorMsg)
 {
-    m_pReply = dbus_message_new_error(m_pCurrentMsg, errorname, errorMsg);
+    m_pReply = dbus_message_new_error(msg, errorname, errorMsg);
     // send the reply && flush the connection
     if (!dbus_connection_send(m_pConnection, m_pReply, &m_serial))
     {
@@ -240,16 +240,9 @@ void DBUSMessageHandler::getArrayOfString(std::vector<std::string>* stringVector
     }
 }
 
-void DBUSMessageHandler::appendBool(bool toAppend)
+void DBUSMessageHandler::appendBool(dbus_bool_t toAppend)
 {
-    dbus_bool_t dbusBool = TRUE;
-    if (true == toAppend)
-    {
-        dbusBool = TRUE;
-    } else {
-        dbusBool = FALSE;
-    }
-    if (!dbus_message_iter_append_basic(&m_MessageIter, DBUS_TYPE_BOOLEAN, &dbusBool))
+    if (!dbus_message_iter_append_basic(&m_MessageIter, DBUS_TYPE_BOOLEAN, &toAppend))
     {
         LOG_ERROR("DBUSCommunicator", "Out Of Memory!");
         exit(1);

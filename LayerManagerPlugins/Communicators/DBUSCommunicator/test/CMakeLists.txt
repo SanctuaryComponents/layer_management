@@ -23,6 +23,7 @@ include_directories ("${PROJECT_SOURCE_DIR}/LayerManagerService/include")
 #link_directories ("${PROJECT_SOURCE_DIR}/LayerManagerService/bin")
 include_directories ("${PROJECT_SOURCE_DIR}/LayerManagerUtils/include")
 #link_directories ("${PROJECT_SOURCE_DIR}/LayerManagerUtils/bin")
+link_directories ("${PROJECT_SOURCE_DIR}/LayerManagerCommands")
 
 find_package(DBUS REQUIRED)
 include_directories(${DBUS_INCLUDE_DIR})

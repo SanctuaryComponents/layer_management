@@ -175,7 +175,7 @@ void DBUSCommunicator::Debug(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -232,7 +232,7 @@ void DBUSCommunicator::ScreenShot(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -252,7 +252,7 @@ void DBUSCommunicator::ScreenShotOfLayer(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -271,7 +271,7 @@ void DBUSCommunicator::ScreenShotOfSurface(DBusConnection* conn, DBusMessage* ms
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -308,7 +308,7 @@ void DBUSCommunicator::ListAllLayerIDsOnScreen(DBusConnection* conn, DBusMessage
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
     m_reference->m_executor->getScene()->unlockScene();
 
@@ -386,7 +386,7 @@ void DBUSCommunicator::ListSurfacesOfSurfacegroup(DBusConnection* conn, DBusMess
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -421,7 +421,7 @@ void DBUSCommunicator::ListLayersOfLayergroup(DBusConnection* conn, DBusMessage*
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -456,7 +456,7 @@ void DBUSCommunicator::ListSurfaceofLayer(DBusConnection* conn, DBusMessage* msg
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
     m_reference->m_executor->getScene()->unlockScene();
 }
@@ -491,7 +491,7 @@ void DBUSCommunicator::GetPropertiesOfSurface(DBusConnection* conn, DBusMessage*
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -525,7 +525,7 @@ void DBUSCommunicator::GetPropertiesOfLayer(DBusConnection* conn, DBusMessage* m
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -551,7 +551,7 @@ void DBUSCommunicator::CreateSurface(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -578,7 +578,7 @@ void DBUSCommunicator::CreateSurfaceFromId(DBusConnection* conn, DBusMessage* ms
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -596,7 +596,7 @@ void DBUSCommunicator::RemoveSurface(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -614,7 +614,7 @@ void DBUSCommunicator::CreateLayer(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -634,7 +634,7 @@ void DBUSCommunicator::CreateLayerFromId(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -652,7 +652,7 @@ void DBUSCommunicator::RemoveLayer(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -672,7 +672,7 @@ void DBUSCommunicator::AddSurfaceToSurfaceGroup(DBusConnection* conn, DBusMessag
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -692,7 +692,7 @@ void DBUSCommunicator::RemoveSurfaceFromSurfaceGroup(DBusConnection* conn, DBusM
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -712,7 +712,7 @@ void DBUSCommunicator::AddLayerToLayerGroup(DBusConnection* conn, DBusMessage* m
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -732,7 +732,7 @@ void DBUSCommunicator::RemoveLayerFromLayerGroup(DBusConnection* conn, DBusMessa
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -752,7 +752,7 @@ void DBUSCommunicator::AddSurfaceToLayer(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -772,7 +772,7 @@ void DBUSCommunicator::RemoveSurfaceFromLayer(DBusConnection* conn, DBusMessage*
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -791,7 +791,7 @@ void DBUSCommunicator::CreateSurfaceGroup(DBusConnection* conn, DBusMessage* msg
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -812,7 +812,7 @@ void DBUSCommunicator::CreateSurfaceGroupFromId(DBusConnection* conn, DBusMessag
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -831,7 +831,7 @@ void DBUSCommunicator::RemoveSurfaceGroup(DBusConnection* conn, DBusMessage* msg
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -850,7 +850,7 @@ void DBUSCommunicator::CreateLayerGroup(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -871,7 +871,7 @@ void DBUSCommunicator::CreateLayerGroupFromId(DBusConnection* conn, DBusMessage*
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -890,7 +890,7 @@ void DBUSCommunicator::RemoveLayerGroup(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -913,7 +913,7 @@ void DBUSCommunicator::SetSurfaceSourceRegion(DBusConnection* conn, DBusMessage*
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -937,7 +937,7 @@ void DBUSCommunicator::SetLayerSourceRegion(DBusConnection* conn, DBusMessage* m
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -960,7 +960,7 @@ void DBUSCommunicator::SetSurfaceDestinationRegion(DBusConnection* conn, DBusMes
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -981,7 +981,7 @@ void DBUSCommunicator::SetSurfacePosition(DBusConnection* conn, DBusMessage* msg
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -1004,7 +1004,7 @@ void DBUSCommunicator::GetSurfacePosition(DBusConnection* conn, DBusMessage* msg
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -1025,7 +1025,7 @@ void DBUSCommunicator::SetSurfaceDimension(DBusConnection* conn, DBusMessage* ms
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -1049,7 +1049,7 @@ void DBUSCommunicator::SetLayerDestinationRegion(DBusConnection* conn, DBusMessa
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -1070,7 +1070,7 @@ void DBUSCommunicator::SetLayerPosition(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -1093,7 +1093,7 @@ void DBUSCommunicator::GetLayerPosition(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -1114,7 +1114,7 @@ void DBUSCommunicator::SetLayerDimension(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -1137,7 +1137,7 @@ void DBUSCommunicator::GetLayerDimension(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -1160,7 +1160,7 @@ void DBUSCommunicator::GetSurfaceDimension(DBusConnection* conn, DBusMessage* ms
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -1180,7 +1180,7 @@ void DBUSCommunicator::SetSurfaceOpacity(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -1200,7 +1200,7 @@ void DBUSCommunicator::SetLayerOpacity(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -1220,7 +1220,7 @@ void DBUSCommunicator::SetSurfacegroupOpacity(DBusConnection* conn, DBusMessage*
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -1240,7 +1240,7 @@ void DBUSCommunicator::SetLayergroupOpacity(DBusConnection* conn, DBusMessage* m
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -1261,7 +1261,7 @@ void DBUSCommunicator::GetSurfaceOpacity(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -1282,7 +1282,7 @@ void DBUSCommunicator::GetLayerOpacity(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -1303,7 +1303,7 @@ void DBUSCommunicator::GetSurfacegroupOpacity(DBusConnection* conn, DBusMessage*
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -1324,7 +1324,7 @@ void DBUSCommunicator::GetLayergroupOpacity(DBusConnection* conn, DBusMessage* m
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -1345,7 +1345,7 @@ void DBUSCommunicator::SetSurfaceOrientation(DBusConnection* conn, DBusMessage* 
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -1366,7 +1366,7 @@ void DBUSCommunicator::GetSurfaceOrientation(DBusConnection* conn, DBusMessage* 
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -1387,7 +1387,7 @@ void DBUSCommunicator::SetLayerOrientation(DBusConnection* conn, DBusMessage* ms
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -1408,7 +1408,7 @@ void DBUSCommunicator::GetLayerOrientation(DBusConnection* conn, DBusMessage* ms
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -1429,7 +1429,7 @@ void DBUSCommunicator::GetSurfacePixelformat(DBusConnection* conn, DBusMessage* 
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -1449,7 +1449,7 @@ void DBUSCommunicator::SetSurfaceVisibility(DBusConnection* conn, DBusMessage* m
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -1469,7 +1469,7 @@ void DBUSCommunicator::SetLayerVisibility(DBusConnection* conn, DBusMessage* msg
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -1491,7 +1491,7 @@ void DBUSCommunicator::GetSurfaceVisibility(DBusConnection* conn, DBusMessage* m
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -1513,7 +1513,7 @@ void DBUSCommunicator::GetLayerVisibility(DBusConnection* conn, DBusMessage* msg
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -1533,7 +1533,7 @@ void DBUSCommunicator::SetSurfacegroupVisibility(DBusConnection* conn, DBusMessa
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -1553,7 +1553,7 @@ void DBUSCommunicator::SetLayergroupVisibility(DBusConnection* conn, DBusMessage
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -1578,7 +1578,7 @@ void DBUSCommunicator::SetRenderOrderOfLayers(DBusConnection* conn, DBusMessage*
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -1603,7 +1603,7 @@ void DBUSCommunicator::SetSurfaceRenderOrderWithinLayer(DBusConnection* conn, DB
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -1622,7 +1622,7 @@ void DBUSCommunicator::GetLayerType(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -1655,7 +1655,7 @@ void DBUSCommunicator::GetLayerCapabilities(DBusConnection* conn, DBusMessage* m
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -1698,7 +1698,7 @@ void DBUSCommunicator::Exit(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -1714,7 +1714,7 @@ void DBUSCommunicator::CommitChanges(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -1736,7 +1736,7 @@ void DBUSCommunicator::CreateShader(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -1755,7 +1755,7 @@ void DBUSCommunicator::DestroyShader(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -1775,7 +1775,7 @@ void DBUSCommunicator::SetShader(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
@@ -1798,7 +1798,7 @@ void DBUSCommunicator::SetUniforms(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
 
