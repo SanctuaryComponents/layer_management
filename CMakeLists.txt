@@ -55,11 +55,19 @@ option (WITH_GLX_EXAMPLE
         
 option (WITH_TESTS
         "Build Available Tests " OFF)
+        
+option (WITH_XTHREADS
+        "Build with usage of X11 Threading" ON)
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic")
 
 option (WITH_FORCE_COPY 
         "Force Software Copy of Pixmaps" OFF)
+        
+if (WITH_XTHREADS)
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DUSE_XTHREADS" CACHE STRING "" FORCE)
+endif(WITH_XTHREADS)
+        
 if (WITH_FORCE_COPY)
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DGLX_GRAPHICSYSTEM_FORCE_COPY -DGLES_FORCE_COPY" CACHE STRING "" FORCE)
 endif(WITH_FORCE_COPY)

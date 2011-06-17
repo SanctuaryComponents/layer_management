@@ -721,10 +721,14 @@ void* X11WindowSystem::EventLoop(void * ptr)
 
 	while (windowsys->m_running)
 	{
+#ifndef USE_XTHREADS
 		if ( XPending(windowsys->x11Display) > 0) {
+#endif //USE_XTHREADS
 			XEvent event;
+			// blocking wait for event
 			XNextEvent(windowsys->x11Display, &event);
-			switch (event.type) {
+			switch (event.type)
+			{
 			case CreateNotify:
 			{
 				if (windowsys->debugMode)
@@ -791,7 +795,10 @@ void* X11WindowSystem::EventLoop(void * ptr)
 				}
 				break;
 			}
+#ifndef USE_XTHREADS
 		}
+#endif //USE_XTHREADS
+		
 		if (windowsys->redrawEvent)
 		{
 			windowsys->redrawEvent = false;
@@ -826,7 +833,21 @@ void* X11WindowSystem::EventLoop(void * ptr)
 
 void X11WindowSystem::signalRedrawEvent()
 {
+	// set flag that redraw is needed
 	redrawEvent = true;
+#ifdef USE_XTHREADS
+	// send dummy expose event, to wake up blocking x11 event loop (XNextEvent)
+	LOG_DEBUG("X11WindowSystem", "Sending dummy event to wake up renderer thread");
+
+	Display* temp = XOpenDisplay(":0");
+	XExposeEvent ev = { Expose, 0, 1, temp, CompositorWindow, 0, 0, 100, 100, 0 };
+	XLockDisplay(temp);
+	XSendEvent(temp, CompositorWindow, False, ExposureMask, (XEvent *) &ev);
+	XUnlockDisplay(temp);
+	XFlush(temp);
+	XCloseDisplay(temp);
+	LOG_DEBUG("X11WindowSystem", "Event successfully sent to renderer");
+#endif //USE_XTHREADS
 }
 
 void X11WindowSystem::cleanup(){
@@ -840,6 +861,9 @@ void X11WindowSystem::cleanup(){
 
 bool X11WindowSystem::init(BaseGraphicSystem<Display*,Window>* base)
 {
+#ifdef USE_XTHREADS
+	XInitThreads();
+#endif //USE_XTHREADS
     X11WindowSystem *renderer = this;
     graphicSystem = base;
     int status = pthread_create( &renderThread, NULL, X11WindowSystem::EventLoop, (void*) renderer);
