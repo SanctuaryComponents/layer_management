@@ -24,7 +24,7 @@
 
 #include "GLES2/gl2.h"
 
-void X11CopyGLES::bindSurfaceTexture(Surface* surface)
+bool X11CopyGLES::bindSurfaceTexture(Surface* surface)
 {
     XPlatformSurface* nativeSurface = (XPlatformSurface*)surface->platform;
     Pixmap pixmap = 0;
@@ -37,7 +37,7 @@ void X11CopyGLES::bindSurfaceTexture(Surface* surface)
 	if (!pixmap)
 	{
 		LOG_ERROR("X11CopyGLES", "didnt create pixmap!");
-		return;
+		return false;
 	}
 	nativeSurface->pixmap = pixmap;
 	XImage * xim = XGetImage(dpy, nativeSurface->pixmap, 0, 0, surface->OriginalSourceWidth, surface->OriginalSourceHeight, AllPlanes, ZPixmap);
@@ -59,7 +59,9 @@ void X11CopyGLES::bindSurfaceTexture(Surface* surface)
 		glTexImage2D(GL_TEXTURE_2D, 0, sourceType, surface->OriginalSourceWidth, surface->OriginalSourceHeight, 0, targetType, GL_UNSIGNED_BYTE, swapedData);
 		XDestroyImage(xim);
 		delete[] swapedData;
+        return true;
 	}
+    return false;
 }
 void X11CopyGLES::swapPixmap(unsigned char* src,unsigned char* dest, unsigned int width,unsigned int height,bool swaprgb) 
 {
@@ -88,4 +90,14 @@ void X11CopyGLES::createClientBuffer(Surface* surface)
 {
     XPlatformSurface* nativeSurface = (XPlatformSurface*)surface->platform;
     glGenTextures(1,&nativeSurface->texture);
+}
+
+void X11CopyGLES::destroyClientBuffer(Surface* surface)
+{
+    XPlatformSurface* nativeSurface = (XPlatformSurface*) surface->platform;
+    if (nativeSurface && nativeSurface->pixmap)
+    {
+          glDeleteTextures(1,&nativeSurface->texture);
+          XFreePixmap(dpy, nativeSurface->pixmap);
+    }
 }

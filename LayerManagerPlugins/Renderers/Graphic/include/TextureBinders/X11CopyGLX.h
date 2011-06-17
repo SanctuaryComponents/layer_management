@@ -34,8 +34,10 @@ public:
     {
     }
 
-    void bindSurfaceTexture(Surface* surface);
+    bool bindSurfaceTexture(Surface* surface);
     void createClientBuffer(Surface* surface);
+    void destroyClientBuffer(Surface* surface);
+
 };
 
 #endif /* _X11COPYGLX_H_ */

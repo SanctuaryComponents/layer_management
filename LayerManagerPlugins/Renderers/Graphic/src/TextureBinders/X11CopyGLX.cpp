@@ -24,7 +24,7 @@
 
 #include "GL/glx.h"
 
-void X11CopyGLX::bindSurfaceTexture(Surface* surface)
+bool X11CopyGLX::bindSurfaceTexture(Surface* surface)
 {
     XPlatformSurface* nativeSurface = (XPlatformSurface*)surface->platform;
     Pixmap pixmap = 0;
@@ -52,11 +52,23 @@ void X11CopyGLX::bindSurfaceTexture(Surface* surface)
         }
         glTexImage2D(GL_TEXTURE_2D, 0, sourceType, surface->OriginalSourceWidth, surface->OriginalSourceHeight, 0, targetType, GL_UNSIGNED_BYTE, xim->data);
         XDestroyImage(xim);
+        return true;
     }
+    return false
 }
 
 void X11CopyGLX::createClientBuffer(Surface* surface)
 {
     XPlatformSurface* nativeSurface = (XPlatformSurface*)surface->platform;
     glGenTextures(1,&nativeSurface->texture);
+}
+
+void X11CopyGLX::destroyClientBuffer(Surface* surface)
+{
+    XPlatformSurface* nativeSurface = (XPlatformSurface*) surface->platform;
+    if (nativeSurface && nativeSurface->pixmap)
+    {
+          glDeleteTextures(1,&nativeSurface->texture);
+          XFreePixmap(dpy, nativeSurface->pixmap);
+    }
 }

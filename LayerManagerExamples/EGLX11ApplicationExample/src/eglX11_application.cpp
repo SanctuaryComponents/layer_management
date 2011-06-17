@@ -65,7 +65,7 @@ int main(void)
     while (ILM_TRUE)
     {
         draw(33);
-        //sleep(1);
+        usleep(1000);
     }
 
     destroyEglContext();

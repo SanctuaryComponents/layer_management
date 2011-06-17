@@ -796,6 +796,7 @@ void* X11WindowSystem::EventLoop(void * ptr)
 						break;
 					}
 					currentSurface->damaged = true;
+                    currentSurface->frameCounter++;
 					checkRedraw = true;
 				}
 				break;
@@ -822,7 +823,11 @@ void* X11WindowSystem::EventLoop(void * ptr)
 		{
 			windowsys->Redraw();
 			checkRedraw = false;
-		}
+        } else {
+            /* put thread in sleep mode for 500 useconds due to safe cpu performance */
+
+            usleep(500);
+        }
 	}
 	windowsys->cleanup();
 	LOG_INFO("X11WindowSystem", "Renderer thread finished");

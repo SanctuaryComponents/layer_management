@@ -42,7 +42,7 @@ X11TextureFromPixmap::X11TextureFromPixmap(Display* display, GLXFBConfig pixmapC
     }
 }
 
-void X11TextureFromPixmap::bindSurfaceTexture(Surface* surface)
+bool X11TextureFromPixmap::bindSurfaceTexture(Surface* surface)
 {
     GLXPlatformSurface* nativeSurface = (GLXPlatformSurface*)surface->platform;
     if (nativeSurface)
@@ -50,16 +50,20 @@ void X11TextureFromPixmap::bindSurfaceTexture(Surface* surface)
         glXBindTexImageEXT_func(dpy, nativeSurface->glxPixmap, GLX_FRONT_LEFT_EXT, NULL);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        return true;
     }
+   return false;
 }
 
-void X11TextureFromPixmap::unbindSurfaceTexture(Surface* surface)
+bool X11TextureFromPixmap::unbindSurfaceTexture(Surface* surface)
 {
     GLXPlatformSurface* nativeSurface = (GLXPlatformSurface*)surface->platform;
     if (nativeSurface)
     {
         glXReleaseTexImageEXT_func(dpy, nativeSurface->glxPixmap, GLX_FRONT_LEFT_EXT);
+        return true;
     }
+    return false;
 }
 
 void X11TextureFromPixmap::createClientBuffer(Surface* surface){

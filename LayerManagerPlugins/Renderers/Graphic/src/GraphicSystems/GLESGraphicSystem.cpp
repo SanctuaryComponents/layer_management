@@ -327,7 +327,11 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
     shader->loadUniforms();
     /* Bind texture and set section */
     glActiveTexture(GL_TEXTURE0);
-    m_binder->bindSurfaceTexture(surface);
+    if (false == m_binder->bindSurfaceTexture(surface)) 
+    {   
+        /* skip render surface if not bind successfully */        
+        return;
+    }
 
     /* rotated positions are saved sequentially in vbo
      offset in multiples of 12 decide rotation */

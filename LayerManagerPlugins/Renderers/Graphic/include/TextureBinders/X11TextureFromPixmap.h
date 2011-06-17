@@ -32,8 +32,8 @@ class X11TextureFromPixmap: public ITextureBinder
 public:
     X11TextureFromPixmap(Display* display, GLXFBConfig pixmapConfig);
 
-    void bindSurfaceTexture(Surface* surface);
-    void unbindSurfaceTexture(Surface* surface);
+    bool bindSurfaceTexture(Surface* surface);
+    bool unbindSurfaceTexture(Surface* surface);
     void createClientBuffer(Surface* surface);
     void destroyClientBuffer(Surface* surface);
     virtual PlatformSurface* createPlatformSurface(Surface* s);

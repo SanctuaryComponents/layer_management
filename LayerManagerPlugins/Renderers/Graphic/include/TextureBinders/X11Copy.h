@@ -30,11 +30,11 @@ class X11Copy: public ITextureBinder
 {
 public:
     X11Copy(Display* display);
-    virtual void bindSurfaceTexture(Surface* surface) = 0;
+    virtual bool bindSurfaceTexture(Surface* surface) = 0;
     virtual void createClientBuffer(Surface* surface) = 0;
 
-    void unbindSurfaceTexture(Surface* surface);
-    void destroyClientBuffer(Surface* surface);
+    bool unbindSurfaceTexture(Surface* surface);
+    virtual void destroyClientBuffer(Surface* surface) = 0;
     virtual PlatformSurface* createPlatformSurface(Surface* surface);
 
 protected:

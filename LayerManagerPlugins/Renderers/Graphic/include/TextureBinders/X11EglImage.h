@@ -33,8 +33,8 @@ public:
     virtual PlatformSurface* createPlatformSurface(Surface* surface);
 
     X11EglImage(EGLDisplay eglDisplay, Display* x11display);
-    void bindSurfaceTexture(Surface* surface);
-    void unbindSurfaceTexture(Surface* surface);
+    bool bindSurfaceTexture(Surface* surface);
+    bool unbindSurfaceTexture(Surface* surface);
     void createClientBuffer(Surface* surface);
     void destroyClientBuffer(Surface* surface);
 

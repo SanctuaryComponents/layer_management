@@ -42,7 +42,7 @@ X11EglImage::X11EglImage(EGLDisplay eglDisplay, Display* x11display)
     }
 }
 
-void X11EglImage::bindSurfaceTexture(Surface* surface)
+bool X11EglImage::bindSurfaceTexture(Surface* surface)
 {
     EglXPlatformSurface* nativeSurface = (EglXPlatformSurface*)surface->platform;
     if (nativeSurface)
@@ -55,15 +55,18 @@ void X11EglImage::bindSurfaceTexture(Surface* surface)
             glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             m_pfGLEglImageTargetTexture2DOES(GL_TEXTURE_2D, nativeSurface->eglImage);
+            return true;
         }
     }
+    return false;
 }
 
-void X11EglImage::unbindSurfaceTexture(Surface* surface)
+bool X11EglImage::unbindSurfaceTexture(Surface* surface)
 {
     (void)surface; // TODO: remove, only prevents warning
 
     // TODO
+    return true;
 }
 
 void X11EglImage::createClientBuffer(Surface* surface)
@@ -98,7 +101,7 @@ void X11EglImage::createClientBuffer(Surface* surface)
         else
         {
             nativeSurface->eglImage = eglImage;
-            glGenTextures(1,&nativeSurface->texture);
+            glGenTextures(1,&nativeSurface->texture);            
         }
     }
 }

@@ -1863,6 +1863,9 @@ void* DBUSCommunicator::run(void * arg)
                 dbus_message_unref(reply);
             }
 
+        } else {
+            /* put thread in sleep mode for 500 useconds due to safe cpu performance */
+            usleep(500);
         }
     }
 

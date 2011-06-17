@@ -33,15 +33,12 @@ PlatformSurface* X11Copy::createPlatformSurface(Surface* surface)
     return new XPlatformSurface(surface);
 }
 
-void X11Copy::unbindSurfaceTexture(Surface* surface)
+bool X11Copy::unbindSurfaceTexture(Surface* surface)
 {
     (void)surface; // TODO: remove, only prevents warning
-
+    return true;
     // TODO
 }
 
-void X11Copy::destroyClientBuffer(Surface* surface)
-{
-    // TODO
-    (void)surface;
-}
+
+

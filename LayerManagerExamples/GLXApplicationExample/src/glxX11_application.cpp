@@ -68,7 +68,7 @@ int main(int argc, char **argv)
     while (ILM_TRUE)
     {
         draw(33);
-        //sleep(1);
+        usleep(1000);
     }
 
     destroyGLXContext();

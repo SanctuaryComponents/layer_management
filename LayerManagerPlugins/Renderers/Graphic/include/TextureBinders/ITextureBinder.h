@@ -29,8 +29,8 @@ public:
     {
     }
 
-    virtual void bindSurfaceTexture(Surface*s) = 0;
-    virtual void unbindSurfaceTexture(Surface*s) = 0;
+    virtual bool bindSurfaceTexture(Surface*s) = 0;
+    virtual bool unbindSurfaceTexture(Surface*s) = 0;
     virtual void createClientBuffer(Surface*s) = 0;
     virtual void destroyClientBuffer(Surface*s) = 0;
     virtual PlatformSurface* createPlatformSurface(Surface* s) = 0;

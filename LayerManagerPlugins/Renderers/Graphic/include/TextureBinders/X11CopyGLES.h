@@ -36,8 +36,10 @@ public:
 		// we dont really need the handle
 	};
 	void swapPixmap(unsigned char* src,unsigned char* dest,unsigned int width,unsigned int height,bool swaprgb);
-	void bindSurfaceTexture(Surface* surface);
+	bool bindSurfaceTexture(Surface* surface);
     void createClientBuffer(Surface* surface);
+    void destroyClientBuffer(Surface* surface);
+
 };
 
 #endif /* _X11COPYGLES_H_ */

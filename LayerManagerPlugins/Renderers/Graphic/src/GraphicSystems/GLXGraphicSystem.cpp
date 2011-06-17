@@ -306,7 +306,11 @@ void GLXGraphicsystem::renderSurface(Surface* currentSurface)
 {
 //    LOG_DEBUG("GLXGraphicsystem", "renderSurface " << currentSurface->getID() );
     glPushMatrix();
-    m_binder->bindSurfaceTexture(currentSurface);
+    if (false == m_binder->bindSurfaceTexture(surface)) 
+    {   
+        /* skip render surface if not bind successfully */        
+        return;
+    }
 //    glPushMatrix();
     glColor4f(1.0f,1.0f,1.0f,currentSurface->opacity*(m_currentLayer)->opacity);
     glBegin(GL_QUADS);
