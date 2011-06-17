@@ -62,26 +62,29 @@ void NullWindowSystem::printDebug(int posx, int posy)
     LOG_INFO("NullWindowSystem",debugmessage.str());
 }
 
-float            TimeCounter, LastFrameTimeCounter, DT, prevTime = 0.0, FPS;
-struct timeval        tv, tv0;
-int            Frame = 1, FramesPerFPS;
-
-void UpdateTimeCounter()
-{
-    LastFrameTimeCounter = TimeCounter;
-    gettimeofday(&tv, NULL);
-    TimeCounter = (float)(tv.tv_sec-tv0.tv_sec) + 0.000001*((float)(tv.tv_usec-tv0.tv_usec));
-    DT = TimeCounter - LastFrameTimeCounter;
-}
+float timeSinceLastCalc = 0.0;
+float FPS = 0.0;
+struct timeval tv;
+struct timeval tv0;
+int Frame = 0;
 
 void CalculateFPS()
 {
+	// we have rendered a frame
     Frame ++;
 
-    if((Frame%FramesPerFPS) == 0)
+    // every 3 seconds, calculate & print fps
+    gettimeofday(&tv, NULL);
+    timeSinceLastCalc = (float)(tv.tv_sec-tv0.tv_sec) + 0.000001*((float)(tv.tv_usec-tv0.tv_usec));
+
+    if (timeSinceLastCalc > 3.0f)
     {
-        FPS = ((float)(FramesPerFPS)) / (TimeCounter-prevTime);
-        prevTime = TimeCounter;
+    	FPS = ((float)(Frame)) / timeSinceLastCalc;
+    	char floatStringBuffer[256];
+    	sprintf(floatStringBuffer, "FPS: %f", FPS);
+    	LOG_INFO("NullWindowSystem", floatStringBuffer);
+    	tv0 = tv;
+    	Frame = 0;
     }
 }
 
@@ -127,14 +130,7 @@ void NullWindowSystem::Redraw()
     {
         printDebug(200, windowHeight - 40);
     }
-    UpdateTimeCounter();
     CalculateFPS();
-    char floatStringBuffer[256];
-    sprintf(floatStringBuffer, "FPS: %f", FPS);
-    if ((Frame % 1000 ) == 0)
-    {
-        LOG_INFO("NullWindowSystem", floatStringBuffer);
-    }
 
     graphicSystem->swapBuffers();
 }
@@ -167,7 +163,6 @@ void* NullWindowSystem::EventLoop(void * ptr)
 //    // run the main event loop while rendering
     bool running = windowsys->m_success;
     gettimeofday(&tv0, NULL);
-    FramesPerFPS = 30;
     if (debugMode)
     {
         defaultLayer = windowsys->layerlist->createLayer();

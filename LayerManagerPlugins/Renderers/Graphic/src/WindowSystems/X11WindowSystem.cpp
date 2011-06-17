@@ -505,32 +505,29 @@ bool X11WindowSystem::CreateCompositorWindow()
     return result;
 }
 
-float TimeCounter = 0.0;
-float LastFrameTimeCounter = 0.0;
-float DT = 0.0;
-float prevTime = 0.0;
+float timeSinceLastCalc = 0.0;
 float FPS = 0.0;
 struct timeval tv;
 struct timeval tv0;
-int Frame = 1;
-int FramesPerFPS = 0;
-
-void UpdateTimeCounter()
-{
-    LastFrameTimeCounter = TimeCounter;
-    gettimeofday(&tv, NULL);
-    TimeCounter = (float)(tv.tv_sec-tv0.tv_sec) + 0.000001*((float)(tv.tv_usec-tv0.tv_usec));
-    DT = TimeCounter - LastFrameTimeCounter;
-}
+int Frame = 0;
 
 void CalculateFPS()
 {
+	// we have rendered a frame
     Frame ++;
 
-    if((Frame%FramesPerFPS) == 0)
+    // every 3 seconds, calculate & print fps
+    gettimeofday(&tv, NULL);
+    timeSinceLastCalc = (float)(tv.tv_sec-tv0.tv_sec) + 0.000001*((float)(tv.tv_usec-tv0.tv_usec));
+
+    if (timeSinceLastCalc > 3.0f)
     {
-        FPS = ((float)(FramesPerFPS)) / (TimeCounter-prevTime);
-        prevTime = TimeCounter;
+    	FPS = ((float)(Frame)) / timeSinceLastCalc;
+    	char floatStringBuffer[256];
+    	sprintf(floatStringBuffer, "FPS: %f", FPS);
+    	LOG_INFO("X11WindowSystem", floatStringBuffer);
+    	tv0 = tv;
+    	Frame = 0;
     }
 }
 
@@ -573,14 +570,8 @@ void X11WindowSystem::Redraw()
     {
         printDebug();
     }
-    UpdateTimeCounter();
     CalculateFPS();
-    char floatStringBuffer[256];
-    sprintf(floatStringBuffer, "FPS: %f", FPS);
-    if ((Frame % 1000 ) == 0)
-    {
-        LOG_DEBUG("X11WindowSystem",floatStringBuffer);
-    }
+
     m_pScene->unlockScene();
     /*LOG_INFO("X11WindowSystem","UnLocking List");*/
     graphicSystem->swapBuffers();
@@ -714,7 +705,6 @@ void* X11WindowSystem::EventLoop(void * ptr)
 
 	// run the main event loop while rendering
 	gettimeofday(&tv0, NULL);
-	FramesPerFPS = 30;
 	if (windowsys->debugMode)
 	{
 		defaultLayer = windowsys->m_pScene->createLayer(0);
