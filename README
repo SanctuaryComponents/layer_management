@@ -91,6 +91,7 @@ Extensions have to be supported by the TargetPlatform :
 X11 Extensions:
 
 x-composite : This extension should support redirecting of egl Surfaces to x11 pixmaps too.
+x-damage    : This extension is required to render surfaces only, if there content has changed.
 
 GLX / OpenGL :
 

@@ -9,7 +9,6 @@ DBUSMessageHandler::DBUSMessageHandler()
 , m_pReply(0)
 , m_serial(0)
 , m_pConnection(0)
-, m_pCurrentMsg(0)
 {
     dbus_error_init(&m_err);
 
@@ -60,8 +59,7 @@ DBUSMessageHandler::~DBUSMessageHandler()
 
 void DBUSMessageHandler::initReceive(DBusMessage* msg)
 {
-    m_pCurrentMsg = msg;
-    if (!dbus_message_iter_init(m_pCurrentMsg, &m_MessageIter))
+    if (!dbus_message_iter_init(msg, &m_MessageIter))
     {
         LOG_ERROR("DBUSCommunicator", "Message has no arguments!");
     }
@@ -69,9 +67,8 @@ void DBUSMessageHandler::initReceive(DBusMessage* msg)
 
 void DBUSMessageHandler::initReply(DBusMessage* msg)
 {
-    m_pCurrentMsg = msg;
     // create a reply from the message
-    m_pReply = dbus_message_new_method_return(m_pCurrentMsg);
+    m_pReply = dbus_message_new_method_return(msg);
     dbus_message_iter_init_append(m_pReply, &m_MessageIter);
 }
 
@@ -88,6 +85,7 @@ void DBUSMessageHandler::closeReply()
 
     // free the reply
     dbus_message_unref(m_pReply);
+    m_pReply = NULL;
 }
 
 void DBUSMessageHandler::ReplyError(DBusMessage* msg, const char* errorname, const char* errorMsg)

@@ -39,7 +39,7 @@
 #define _LOGMESSAGEBUFFER_H_
 
 #include <sstream>
-
+#include <pthread.h>
 typedef std::ios_base& (*ios_base_manip)(std::ios_base&);
 
 class LogMessageBuffer

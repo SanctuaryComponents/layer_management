@@ -46,6 +46,7 @@ Log::Log()
 {
     // TODO Auto-generated constructor stub
     m_fileStream = new std::ofstream("/tmp/LayerManagerService.log");
+    pthread_mutex_init(&m_LogBufferMutex, NULL);
 
 }
 
@@ -53,6 +54,7 @@ Log::~Log()
 {
     // TODO Auto-generated destructor stub
     m_fileStream->close();
+    pthread_mutex_destroy(&m_LogBufferMutex);
     Log::instance = NULL;
 }
 
@@ -80,6 +82,7 @@ void Log::log(LOG_MODES logMode, const std::string& moduleName, const std::basic
 {
     std::string logString[LOG_MAX_LEVEL] = {"","ERROR","INFO","WARNING","DEBUG"};
     std::string logOutLevelString = logString[LOG_INFO];
+    pthread_mutex_lock(&m_LogBufferMutex);
     if ( logMode < LOG_MAX_LEVEL ) 
     {
         logOutLevelString = logString[logMode];
@@ -91,7 +94,8 @@ void Log::log(LOG_MODES logMode, const std::string& moduleName, const std::basic
     if ( fileLogLevel >= logMode ) 
     {
         LogToFile(logOutLevelString, moduleName, output);
-    }
+    }   
+    pthread_mutex_unlock(&m_LogBufferMutex);
 }
 
 void Log::LogToFile(std::string logMode, const std::string& moduleName,const std::basic_string<char>& output)

@@ -1813,15 +1813,12 @@ void* DBUSCommunicator::run(void * arg)
         //        pthread_testcancel();
         DBusMessage* msg = 0;
         DBusConnection* conn = g_pDbusMessage->getConnection();
-
         dbus_connection_read_write(conn, 50);
         msg = dbus_connection_pop_message(conn);
-
         if (msg)
         {
             LOG_INFO("DBUSCommunicator","message received");
             const char *n = dbus_message_get_member(msg);
-
             bool found = false;
             int i = 0;
 
@@ -1832,6 +1829,7 @@ void* DBUSCommunicator::run(void * arg)
                     MethodTable entry = manager_methods[i];
                     LOG_INFO("DBUSCommunicator","got call for method:" << entry.name);
                     CallBackMethod m = entry.function;
+                    LOG_INFO("DBUSCommunicator","enter method");
                     (m_reference->*m)(conn, msg);
                     found = true;
                 }
@@ -1858,14 +1856,19 @@ void* DBUSCommunicator::run(void * arg)
                     exit(1);
                 }
                 dbus_connection_flush(conn);
-
                 // free the reply
                 dbus_message_unref(reply);
+                reply = NULL;
             }
-
+            if (msg) 
+            {
+                dbus_connection_flush(conn);
+                dbus_message_unref(msg);
+                msg = NULL;
+            }
         } else {
             /* put thread in sleep mode for 500 useconds due to safe cpu performance */
-            usleep(500);
+            //usleep(500);
         }
     }
 

@@ -44,7 +44,7 @@ LogMessageBuffer::LogMessageBuffer()
 
 LogMessageBuffer::~LogMessageBuffer()
 {
-    if (stream)
+    if (stream) 
     {
         delete stream;
     }
@@ -60,14 +60,12 @@ LogMessageBuffer& LogMessageBuffer::operator<<(const std::basic_string<char>& ms
     {
         buf.append(msg);
     }
-
     return *this;
 }
 
 LogMessageBuffer& LogMessageBuffer::operator<<(const char* msg)
 {
     const char* actualMsg = msg;
-
     if (!actualMsg)
     {
         actualMsg = "null";
@@ -81,7 +79,6 @@ LogMessageBuffer& LogMessageBuffer::operator<<(const char* msg)
     {
         buf.append(actualMsg);
     }
-
     return *this;
 }
 
@@ -101,7 +98,6 @@ LogMessageBuffer& LogMessageBuffer::operator<<(const char msg)
     {
         buf.append(1, msg);
     }
-
     return *this;
 }
 

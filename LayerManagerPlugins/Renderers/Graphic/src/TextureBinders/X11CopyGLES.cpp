@@ -25,42 +25,48 @@
 #include "GLES2/gl2.h"
 
 bool X11CopyGLES::bindSurfaceTexture(Surface* surface)
-{
-    XPlatformSurface* nativeSurface = (XPlatformSurface*)surface->platform;
+{   
+    XPlatformSurface* nativeSurface = NULL;
     Pixmap pixmap = 0;
     GLenum targetType = GL_RGBA;
     GLenum sourceType = GL_RGBA;
 	unsigned char* swapedData = NULL;
 	bool swaprgb = false;
-
-	pixmap = XCompositeNameWindowPixmap (dpy, surface->nativeHandle);
-	if (!pixmap)
-	{
-		LOG_ERROR("X11CopyGLES", "didnt create pixmap!");
-		return false;
-	}
-	nativeSurface->pixmap = pixmap;
-	XImage * xim = XGetImage(dpy, nativeSurface->pixmap, 0, 0, surface->OriginalSourceWidth, surface->OriginalSourceHeight, AllPlanes, ZPixmap);
-	if ( xim != NULL )
-	{
-		glBindTexture(GL_TEXTURE_2D, nativeSurface->texture);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		if ( xim->depth == 24 )
-		{
-			targetType = GL_RGB;
-			sourceType = GL_RGB;
-			swaprgb = true;
-			swapedData = new unsigned char[surface->OriginalSourceWidth*surface->OriginalSourceHeight*3];
-		} else {
-			swapedData = new unsigned char[surface->OriginalSourceWidth*surface->OriginalSourceHeight*4];
-		}
-		swapPixmap((unsigned char*)xim->data, swapedData, surface->OriginalSourceWidth, surface->OriginalSourceHeight,swaprgb);
-		glTexImage2D(GL_TEXTURE_2D, 0, sourceType, surface->OriginalSourceWidth, surface->OriginalSourceHeight, 0, targetType, GL_UNSIGNED_BYTE, swapedData);
-		XDestroyImage(xim);
-		delete[] swapedData;
-        return true;
-	}
+    if (surface != NULL ) 
+    {
+        nativeSurface = (XPlatformSurface*)surface->platform;
+    } 
+    else if( nativeSurface != NULL && surface->nativeHandle != 0 ) 
+    {
+	    pixmap = XCompositeNameWindowPixmap (dpy, surface->nativeHandle);
+	    if (!pixmap)
+	    {
+		    LOG_ERROR("X11CopyGLES", "didnt create pixmap!");
+		    return false;
+	    }
+	    nativeSurface->pixmap = pixmap;
+	    XImage * xim = XGetImage(dpy, nativeSurface->pixmap, 0, 0, surface->OriginalSourceWidth, surface->OriginalSourceHeight, AllPlanes, ZPixmap);
+	    if ( xim != NULL )
+	    {
+		    glBindTexture(GL_TEXTURE_2D, nativeSurface->texture);
+		    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		    if ( xim->depth == 24 )
+		    {
+			    targetType = GL_RGB;
+			    sourceType = GL_RGB;
+			    swaprgb = true;
+			    swapedData = new unsigned char[surface->OriginalSourceWidth*surface->OriginalSourceHeight*3];
+		    } else {
+			    swapedData = new unsigned char[surface->OriginalSourceWidth*surface->OriginalSourceHeight*4];
+		    }
+		    swapPixmap((unsigned char*)xim->data, swapedData, surface->OriginalSourceWidth, surface->OriginalSourceHeight,swaprgb);
+		    glTexImage2D(GL_TEXTURE_2D, 0, sourceType, surface->OriginalSourceWidth, surface->OriginalSourceHeight, 0, targetType, GL_UNSIGNED_BYTE, swapedData);
+		    XDestroyImage(xim);
+		    delete[] swapedData;
+            return true;
+	    }
+    }
     return false;
 }
 void X11CopyGLES::swapPixmap(unsigned char* src,unsigned char* dest, unsigned int width,unsigned int height,bool swaprgb) 

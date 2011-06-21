@@ -58,7 +58,6 @@ private:
     DBusMessage* m_pReply;
     dbus_uint32_t m_serial;
     DBusConnection* m_pConnection;
-    DBusMessage* m_pCurrentMsg;
     DBusError m_err;
 };
 

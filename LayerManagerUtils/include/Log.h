@@ -40,6 +40,7 @@
 #include "LogMessageBuffer.h"
 #include <iostream>
 #include <fstream>
+#include <pthread.h>
 
 typedef enum {
     LOG_DISABLED = 0,
@@ -70,11 +71,16 @@ private:
 
 private:
     std::ofstream* m_fileStream;
+    pthread_mutex_t m_LogBufferMutex;
 };
+
+//#define LOG_ERROR(module, message)
 
 #define LOG_ERROR(module, message) { \
            LogMessageBuffer oss_; \
            Log::instance->error(module, oss_.str(oss_<< message)); }
+
+//#define LOG_INFO(module, message)
 
 #define LOG_INFO(module, message) { \
            LogMessageBuffer oss_; \

@@ -411,9 +411,7 @@ void X11WindowSystem::DestroyWindow(Window window)
         LOG_DEBUG("X11WindowSystem", "Unmapping window " << window);
         UnMapWindow(window);
         LOG_DEBUG("X11WindowSystem", "Removed Surface " << surface->getID());
-        m_pScene->lockScene();
         m_pScene->removeSurface(surface);
-        m_pScene->unlockScene();
     }
 }
 
@@ -505,11 +503,11 @@ bool X11WindowSystem::CreateCompositorWindow()
     return result;
 }
 
-float timeSinceLastCalc = 0.0;
-float FPS = 0.0;
-struct timeval tv;
-struct timeval tv0;
-int Frame = 0;
+static float timeSinceLastCalc = 0.0;
+static float FPS = 0.0;
+static struct timeval tv;
+static struct timeval tv0;
+static int Frame = 0;
 
 void CalculateFPS()
 {
@@ -727,6 +725,7 @@ void* X11WindowSystem::EventLoop(void * ptr)
 			XEvent event;
 			// blocking wait for event
 			XNextEvent(windowsys->x11Display, &event);
+            windowsys->m_pScene->lockScene();
 			switch (event.type)
 			{
 			case CreateNotify:
@@ -795,10 +794,10 @@ void* X11WindowSystem::EventLoop(void * ptr)
 				}
 				break;
 			}
+            windowsys->m_pScene->unlockScene();
 #ifndef USE_XTHREADS
 		}
 #endif //USE_XTHREADS
-		
 		if (windowsys->redrawEvent)
 		{
 			windowsys->redrawEvent = false;
@@ -820,17 +819,22 @@ void* X11WindowSystem::EventLoop(void * ptr)
 		{
 			windowsys->Redraw();
 			checkRedraw = false;
-        } else {
+        } 
+#ifndef USE_XTHREADS        
+        else {
             /* put thread in sleep mode for 500 useconds due to safe cpu performance */
 
             usleep(500);
         }
+#endif
 	}
 	windowsys->cleanup();
 	LOG_INFO("X11WindowSystem", "Renderer thread finished");
 	return NULL;
 }
-
+#ifdef USE_XTHREADS
+static Display* displaySignal = NULL;
+#endif //USE_XTHREADS
 void X11WindowSystem::signalRedrawEvent()
 {
 	// set flag that redraw is needed
@@ -838,14 +842,15 @@ void X11WindowSystem::signalRedrawEvent()
 #ifdef USE_XTHREADS
 	// send dummy expose event, to wake up blocking x11 event loop (XNextEvent)
 	LOG_DEBUG("X11WindowSystem", "Sending dummy event to wake up renderer thread");
-
-	Display* temp = XOpenDisplay(":0");
-	XExposeEvent ev = { Expose, 0, 1, temp, CompositorWindow, 0, 0, 100, 100, 0 };
-	XLockDisplay(temp);
-	XSendEvent(temp, CompositorWindow, False, ExposureMask, (XEvent *) &ev);
-	XUnlockDisplay(temp);
-	XFlush(temp);
-	XCloseDisplay(temp);
+    if (NULL == displaySignal ) 
+    {
+        displaySignal = XOpenDisplay(":0");
+    }   
+	XExposeEvent ev = { Expose, 0, 1, displaySignal, CompositorWindow, 0, 0, 100, 100, 0 };
+	XLockDisplay(displaySignal);
+	XSendEvent(displaySignal, CompositorWindow, False, ExposureMask, (XEvent *) &ev);
+	XUnlockDisplay(displaySignal);
+	XFlush(displaySignal);
 	LOG_DEBUG("X11WindowSystem", "Event successfully sent to renderer");
 #endif //USE_XTHREADS
 }
@@ -855,6 +860,12 @@ void X11WindowSystem::cleanup(){
 	Window root = RootWindow(x11Display, 0);
 	XCompositeUnredirectSubwindows(x11Display,root,CompositeRedirectManual);
 	XDestroyWindow(x11Display,CompositorWindow);
+#ifdef USE_XTHREADS
+    if ( NULL  != displaySignal ) 
+    {
+    	XCloseDisplay(displaySignal);        
+    }
+#endif //USE_XTHREADS
 	XCloseDisplay(x11Display);
 	m_running = false;
 }

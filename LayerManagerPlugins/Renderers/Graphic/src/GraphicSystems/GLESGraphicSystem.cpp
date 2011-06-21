@@ -434,5 +434,6 @@ void GLESGraphicsystem::saveScreenShotOfFramebuffer(std::string fileToSave)
 
     writeBitmap(fileToSave, rgbbuffer, WINDOW_WIDTH, WINDOW_HEIGHT);
     free(buffer);
+    free(rgbbuffer);
 }
 
