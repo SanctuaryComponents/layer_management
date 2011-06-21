@@ -306,7 +306,7 @@ void GLXGraphicsystem::renderSurface(Surface* currentSurface)
 {
 //    LOG_DEBUG("GLXGraphicsystem", "renderSurface " << currentSurface->getID() );
     glPushMatrix();
-    if (false == m_binder->bindSurfaceTexture(surface)) 
+    if (false == m_binder->bindSurfaceTexture(currentSurface)) 
     {   
         /* skip render surface if not bind successfully */        
         return;

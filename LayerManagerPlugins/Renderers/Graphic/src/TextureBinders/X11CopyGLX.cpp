@@ -35,7 +35,7 @@ bool X11CopyGLX::bindSurfaceTexture(Surface* surface)
     if (!pixmap)
     {
         LOG_ERROR("X11CopyGLX", "didnt create pixmap!");
-        return;
+        return false;
     }
 
     nativeSurface->pixmap = pixmap;
@@ -54,7 +54,7 @@ bool X11CopyGLX::bindSurfaceTexture(Surface* surface)
         XDestroyImage(xim);
         return true;
     }
-    return false
+    return false;
 }
 
 void X11CopyGLX::createClientBuffer(Surface* surface)
