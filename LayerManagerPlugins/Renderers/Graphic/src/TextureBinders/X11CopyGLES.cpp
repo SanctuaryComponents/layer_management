@@ -36,7 +36,7 @@ bool X11CopyGLES::bindSurfaceTexture(Surface* surface)
     {
         nativeSurface = (XPlatformSurface*)surface->platform;
     } 
-    else if( nativeSurface != NULL && surface->nativeHandle != 0 ) 
+    if( nativeSurface != NULL && surface->nativeHandle != 0 ) 
     {
 	    pixmap = XCompositeNameWindowPixmap (dpy, surface->nativeHandle);
 	    if (!pixmap)
