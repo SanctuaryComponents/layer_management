@@ -244,6 +244,9 @@ void X11WindowSystem::MapWindow(Window window)
     {
         XWindowAttributes att;
         XGetWindowAttributes (x11Display, window, &att);
+/*      LOG_DEBUG("X11WindowSystem", "XCompositeRedirectWindow()");
+        XCompositeRedirectWindow(x11Display, window, CompositeRedirectManual);
+        XSync(x11Display, 0);*/
         if (att.map_state == IsViewable && att.override_redirect==0)
         {
             LOG_DEBUG("X11WindowSystem", "Mapping window " << window);
@@ -333,10 +336,10 @@ void X11WindowSystem::UnMapWindow(Window window)
             LOG_DEBUG("X11WindowSystem", "XFreePixmap() returned " << result);
         }
 
-        LOG_DEBUG("X11WindowSystem", "XCompositeUnredirectWindow()");
+/*        LOG_DEBUG("X11WindowSystem", "XCompositeUnredirectWindow()");
         XCompositeUnredirectWindow(x11Display, window, CompositeRedirectManual);
 
-        XSync(x11Display, 0);
+        XSync(x11Display, 0);*/
     }
     LOG_DEBUG("X11WindowSystem", "Unmap finished");
 }
@@ -719,7 +722,7 @@ void* X11WindowSystem::EventLoop(void * ptr)
 	// clear screen to avoid garbage on startup
 	windowsys->graphicSystem->clearBackground();
 	windowsys->graphicSystem->swapBuffers();
-
+    XFlush(windowsys->x11Display);
 	while (windowsys->m_running)
 	{
 #ifndef USE_XTHREADS

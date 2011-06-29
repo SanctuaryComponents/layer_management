@@ -78,8 +78,11 @@ bool X11CopyGLES::bindSurfaceTexture(Surface* surface)
 		    XDestroyImage(xim);
 		    delete[] swapedData;
             return true;
-	    }
-    }
+	    } else {
+    	    LOG_ERROR("X11CopyGLES", "X image data empty");
+		    return false;
+        }
+    }   
     return false;
 }
 void X11CopyGLES::swapPixmap(unsigned char* src,unsigned char* dest, unsigned int width,unsigned int height,bool swaprgb,bool includeAlpha) 
@@ -122,5 +125,6 @@ void X11CopyGLES::destroyClientBuffer(Surface* surface)
     {
           glDeleteTextures(1,&nativeSurface->texture);
           XFreePixmap(dpy, nativeSurface->pixmap);
+          nativeSurface->pixmap = NULL;
     }
 }
