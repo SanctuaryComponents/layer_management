@@ -66,8 +66,11 @@ rm -rf $RPM_BUILD_ROOT
 
 %{_bindir}/EGLX11ApplicationExample
 %{_bindir}/LayerManagerClientExample
+%{_bindir}/LayerManagerToolBox
 
 %changelog
+* Fri Jun 10 2011 Michael Schuldt <Michael.Schuldt@bmw-carit.de> 0.9.0
+- Missing install target for LayerManagerToolBox added
 * Fri Jun 10 2011 Michael Schuldt <Michael.Schuldt@bmw-carit.de> 0.8.1
 - Missing install target for renderer_frag_no_ualpha.glslf added
 * Tue May 24 2011 Timo LOTTERBACH <timo.lotterbach@bmw-carit.de> 0.8.1
