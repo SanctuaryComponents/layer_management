@@ -770,7 +770,7 @@ void* X11WindowSystem::EventLoop(void * ptr)
 			case UnmapNotify:
 				LOG_DEBUG("X11WindowSystem", "Unmap Event");
 				windowsys->UnMapWindow(event.xunmap.window);
-				checkRedraw = true;
+				checkRedraw = true;  
 				break;
 			case ReparentNotify:
 				LOG_DEBUG("X11WindowSystem", "Reparent Event");

@@ -32,6 +32,7 @@ bool X11CopyGLES::bindSurfaceTexture(Surface* surface)
     GLenum sourceType = GL_RGBA;
 	unsigned char* swapedData = NULL;
 	bool swaprgb = false;
+    bool includeAlpha = false;
     if (surface != NULL ) 
     {
         nativeSurface = (XPlatformSurface*)surface->platform;
@@ -51,16 +52,28 @@ bool X11CopyGLES::bindSurfaceTexture(Surface* surface)
 		    glBindTexture(GL_TEXTURE_2D, nativeSurface->texture);
 		    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		    if ( xim->depth == 24 )
+		    if ( surface->getPixelFormat() == PIXELFORMAT_RGB888)
 		    {
 			    targetType = GL_RGB;
 			    sourceType = GL_RGB;
-			    swaprgb = true;
+			    swaprgb = true;                
 			    swapedData = new unsigned char[surface->OriginalSourceWidth*surface->OriginalSourceHeight*3];
-		    } else {
-			    swapedData = new unsigned char[surface->OriginalSourceWidth*surface->OriginalSourceHeight*4];
-		    }
-		    swapPixmap((unsigned char*)xim->data, swapedData, surface->OriginalSourceWidth, surface->OriginalSourceHeight,swaprgb);
+		    } 
+            else if ( surface->getPixelFormat() == PIXELFORMAT_RGBA8888)
+            {
+                if (xim->depth == 24) 
+                {
+			        includeAlpha = true;
+                }
+                swapedData = new unsigned char[surface->OriginalSourceWidth*surface->OriginalSourceHeight*4];
+		    } 
+            else 
+            {
+                LOG_ERROR("X11CopyGLES","Pixelformat currently not supported : " << surface->getPixelFormat());
+    		    XDestroyImage(xim);
+                return false;
+            }
+		    swapPixmap((unsigned char*)xim->data, swapedData, surface->OriginalSourceWidth, surface->OriginalSourceHeight,swaprgb,includeAlpha);
 		    glTexImage2D(GL_TEXTURE_2D, 0, sourceType, surface->OriginalSourceWidth, surface->OriginalSourceHeight, 0, targetType, GL_UNSIGNED_BYTE, swapedData);
 		    XDestroyImage(xim);
 		    delete[] swapedData;
@@ -69,7 +82,7 @@ bool X11CopyGLES::bindSurfaceTexture(Surface* surface)
     }
     return false;
 }
-void X11CopyGLES::swapPixmap(unsigned char* src,unsigned char* dest, unsigned int width,unsigned int height,bool swaprgb) 
+void X11CopyGLES::swapPixmap(unsigned char* src,unsigned char* dest, unsigned int width,unsigned int height,bool swaprgb,bool includeAlpha) 
 {
 	unsigned int count = 0; 
 	if (swaprgb == false)
@@ -79,10 +92,14 @@ void X11CopyGLES::swapPixmap(unsigned char* src,unsigned char* dest, unsigned in
 			dest[j*4]=src[j*4+2];
 			dest[j*4+1]=src[j*4+1];
 			dest[j*4+2]=src[j*4];
-			dest[j*4+3]=src[j*4+3];
+            dest[j*4+3]=src[j*4+3];
+            if (includeAlpha) 
+            {    
+    			dest[j*4+3]=255;
+            } 
 		}
 	} else {
-		count = width*height;
+		count = width*height;        
 		for (int j=0;j<count; j++) 
 		{
 			dest[j*3]=src[j*3+2];
