@@ -21,6 +21,8 @@
 #define _X11EGLIMAGE_H_
 
 #include "TextureBinders/ITextureBinder.h"
+#include "X11/Xlib.h"
+#include "X11/Xutil.h"
 #include "X11/extensions/Xcomposite.h"
 #include <EGL/egl.h>
 #include <EGL/eglext.h>

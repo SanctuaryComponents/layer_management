@@ -41,7 +41,7 @@ file(GLOB SOURCES
 add_library(X11GLXRenderer SHARED ${SOURCES})
 
 find_package(X11 REQUIRED)
-include_directories(${X11_Xcomposite_INCLUDE_PATH})
+include_directories(${X11_INCLUDE_DIR})
 
 find_package(GLX REQUIRED)
 include_directories(${GLX_INCLUDE_DIR})

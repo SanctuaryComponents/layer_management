@@ -42,7 +42,7 @@ file(GLOB SOURCES
 add_library(X11GLESRenderer SHARED ${SOURCES})
 
 find_package(X11 REQUIRED)
-include_directories(${X11_Xcomposite_INCLUDE_PATH})
+include_directories(${X11_INCLUDE_DIR})
 
 find_package(EGL REQUIRED)
 include_directories(${EGL_INCLUDE_DIR})
