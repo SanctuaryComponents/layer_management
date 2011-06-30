@@ -165,7 +165,6 @@ bool X11WindowSystem::isWindowValid(Window w)
 
 Surface* X11WindowSystem::getSurfaceForWindow(Window w)
 {
-    LOG_DEBUG("X11WindowSystem", "finding surface for window " << w);
     // go though all surfaces
     const std::map<unsigned int,Surface*> surfaces = m_pScene->getAllSurfaces();
     for(std::map<unsigned int, Surface*>::const_iterator currentS = surfaces.begin(); currentS != surfaces.end(); ++currentS)
@@ -175,11 +174,8 @@ Surface* X11WindowSystem::getSurfaceForWindow(Window w)
         {
             continue;
         }
-        LOG_DEBUG("X11WindowSystem", "CurrentSurface surface for window " << currentSurface->getID());
-        LOG_DEBUG("X11WindowSystem", "CurrentSurface nativeHandle " << currentSurface->nativeHandle);
         if (currentSurface->nativeHandle == static_cast<int>(w))
         {
-                LOG_DEBUG("X11WindowSystem", "surface " << currentSurface->getID() << " corresponds to window" << w);
                 return currentSurface;
         }
     }
@@ -780,7 +776,6 @@ void* X11WindowSystem::EventLoop(void * ptr)
 			default:
 				if (event.type == windowsys->damage_event + XDamageNotify)
 				{
-					LOG_DEBUG("X11WindowSystem", "Damage Event");
 					XDamageSubtract(windowsys->x11Display, ((XDamageNotifyEvent*)(&event))->damage, None, None);
 					Surface* currentSurface = windowsys->getSurfaceForWindow(((XDamageNotifyEvent*)(&event))->drawable);
 					if (currentSurface==NULL)
