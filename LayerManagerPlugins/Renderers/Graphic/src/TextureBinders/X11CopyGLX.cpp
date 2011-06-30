@@ -30,29 +30,35 @@ bool X11CopyGLX::bindSurfaceTexture(Surface* surface)
     Pixmap pixmap = 0;
     GLenum targetType = GL_BGRA;
     GLenum sourceType = GL_RGBA;
-
-    pixmap = XCompositeNameWindowPixmap (dpy, surface->nativeHandle);
-    if (!pixmap)
+    if (surface != NULL ) 
     {
-        LOG_ERROR("X11CopyGLX", "didnt create pixmap!");
-        return false;
-    }
-
-    nativeSurface->pixmap = pixmap;
-    XImage * xim = XGetImage(dpy, nativeSurface->pixmap, 0, 0, surface->OriginalSourceWidth, surface->OriginalSourceHeight, AllPlanes, ZPixmap);
-    if (xim)
+        nativeSurface = (XPlatformSurface*)surface->platform;
+    } 
+    if( nativeSurface != NULL && surface->nativeHandle != 0 ) 
     {
-        glBindTexture(GL_TEXTURE_2D, nativeSurface->texture);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        if (xim->depth == 24)
+        pixmap = XCompositeNameWindowPixmap (dpy, surface->nativeHandle);
+        if (!pixmap)
         {
-            targetType = GL_BGR;
-            sourceType = GL_RGB;
+            LOG_ERROR("X11CopyGLX", "didnt create pixmap!");
+            return false;
         }
-        glTexImage2D(GL_TEXTURE_2D, 0, sourceType, surface->OriginalSourceWidth, surface->OriginalSourceHeight, 0, targetType, GL_UNSIGNED_BYTE, xim->data);
-        XDestroyImage(xim);
-        return true;
+
+        nativeSurface->pixmap = pixmap;
+        XImage * xim = XGetImage(dpy, nativeSurface->pixmap, 0, 0, surface->OriginalSourceWidth, surface->OriginalSourceHeight, AllPlanes, ZPixmap);
+        if (xim)
+        {
+            glBindTexture(GL_TEXTURE_2D, nativeSurface->texture);
+            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            if (xim->depth == 24)
+            {
+                targetType = GL_BGR;
+                sourceType = GL_RGB;
+            }
+            glTexImage2D(GL_TEXTURE_2D, 0, sourceType, surface->OriginalSourceWidth, surface->OriginalSourceHeight, 0, targetType, GL_UNSIGNED_BYTE, xim->data);
+            XDestroyImage(xim);
+            return true;
+        }
     }
     return false;
 }
