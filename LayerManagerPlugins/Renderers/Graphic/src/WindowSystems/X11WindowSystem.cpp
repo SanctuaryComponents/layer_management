@@ -185,12 +185,15 @@ Surface* X11WindowSystem::getSurfaceForWindow(Window w)
 
 void X11WindowSystem::checkForNewSurface()
 {
-	const std::map<unsigned int,Surface*> surfaces = m_pScene->getAllSurfaces();
-	for(std::map<unsigned int, Surface*>::const_iterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++)
-	{
-		Surface* currentSurface = (*currentS).second;
-		allocatePlatformSurface(currentSurface);
-	}
+    LayerList layers = m_pScene->getCurrentRenderOrder();
+    for(LayerListConstIterator current = layers.begin(); current != layers.end(); current++)
+    {
+        SurfaceList surfaces = (*current)->getAllSurfaces();
+        for(SurfaceListConstIterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++)
+        {
+            allocatePlatformSurface(*currentS);
+        }
+    }
 }
 
 void X11WindowSystem::configureSurfaceWindow(Window window)
