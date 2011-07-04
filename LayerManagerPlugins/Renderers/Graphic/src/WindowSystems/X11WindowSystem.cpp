@@ -22,6 +22,9 @@
 #include "Layer.h"
 #include <time.h>
 #include <sys/time.h>
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+#include <X11/Xatom.h>
 #include <X11/extensions/Xcomposite.h>
 #include <X11/extensions/Xdamage.h>
 #include <stdio.h>
@@ -30,9 +33,10 @@
 #include <unistd.h>
 #include <iomanip>
 
-int        X11WindowSystem::composite_opcode;
+int     X11WindowSystem::composite_opcode;
 int		X11WindowSystem::damage_opcode;
 const char X11WindowSystem::CompositorWindowTitle[] = "LayerManager";
+bool    X11WindowSystem::m_xerror = false;
 
 X11WindowSystem::X11WindowSystem(const char* displayname, int width, int height, Scene* pScene,GetVisualInfoFunction func)
 : BaseWindowSystem(pScene)
@@ -237,6 +241,9 @@ void X11WindowSystem::MapWindow(Window window)
     {
         XWindowAttributes att;
         XGetWindowAttributes (x11Display, window, &att);
+/*      LOG_DEBUG("X11WindowSystem", "XCompositeRedirectWindow()");
+        XCompositeRedirectWindow(x11Display, window, CompositeRedirectManual);
+        XSync(x11Display, 0);*/
         if (att.map_state == IsViewable && att.override_redirect==0)
         {
             LOG_DEBUG("X11WindowSystem", "Mapping window " << window);
@@ -325,11 +332,6 @@ void X11WindowSystem::UnMapWindow(Window window)
             int result = XFreePixmap(x11Display, x11surf->pixmap);
             LOG_DEBUG("X11WindowSystem", "XFreePixmap() returned " << result);
         }
-
-        LOG_DEBUG("X11WindowSystem", "XCompositeUnredirectWindow()");
-        XCompositeUnredirectWindow(x11Display, window, CompositeRedirectManual);
-
-        XSync(x11Display, 0);
     }
     LOG_DEBUG("X11WindowSystem", "Unmap finished");
 }
@@ -419,23 +421,8 @@ bool X11WindowSystem::CreatePixmapsForAllWindows()
     bool result = true;
     LOG_DEBUG("X11WindowSystem", "redirecting all windows");
     Window root = RootWindow(x11Display, 0);
-//    XGrabServer (x11Display);
-//    unsigned int numberOfWindows = 0;
-//    Window *children = getListOfAllTopLevelWindows(x11Display,&numberOfWindows);
-
-//    LOG_DEBUG("X11WindowSystem", "Found " << numberOfWindows << " windows");
     XCompositeRedirectSubwindows(x11Display,root,CompositeRedirectManual);
-
-/*    for (unsigned int i=0;i< (numberOfWindows-1);i++)
-    {
-        Window w = (Window) children[i];
-        NewWindow(w);
-        MapWindow(w);
-    } */
-//    XFree(children);
-//    XUngrabServer (x11Display);
-//    XSync(x11Display, 0);
-
+    XSync(x11Display,0);
     return result;
 }
 
@@ -443,7 +430,7 @@ bool X11WindowSystem::CreateCompositorWindow()
 {
     LOG_DEBUG("X11WindowSystem", "Get root window");
     bool result = true;
-    Window root = XDefaultRootWindow(x11Display);
+    Window root = RootWindow(x11Display,0);
 
     LOG_DEBUG("X11WindowSystem", "Get default screen");
     // draw a black background the full size of the resolution
@@ -461,8 +448,14 @@ bool X11WindowSystem::CreateCompositorWindow()
     attr.border_pixel = 0;
     windowVis = getVisualFunc(x11Display);
     attr.colormap = XCreateColormap(x11Display, root, windowVis->visual, AllocNone);
-
     attr.override_redirect = True;
+
+    Window compManager = XGetSelectionOwner(x11Display,XInternAtom(x11Display,"_NET_WM_CM_S0",0));
+    if ( 0 != compManager )
+    {
+        LOG_ERROR("X11WindowSystem", "Could not create compositor window, annother compisite manager is already running");
+        return false;
+    }
 
 //    Window overlaywindow = XCompositeGetOverlayWindow(x11Display,root);
 
@@ -531,8 +524,6 @@ void CalculateFPS()
 void
 X11WindowSystem::RedrawAllLayers()
 {
-	m_damaged = false;
-
 	std::list<Layer*> layers = m_pScene->getCurrentRenderOrder();
 	for(std::list<Layer*>::const_iterator current = layers.begin(); current != layers.end(); current++)
 	{
@@ -552,6 +543,8 @@ X11WindowSystem::RedrawAllLayers()
 			graphicSystem->endLayer();
 		}
 	}
+    /* Reset the damage flag, all is up to date */
+	m_damaged = false;
 }
 
 void X11WindowSystem::Redraw()
@@ -625,7 +618,7 @@ X11WindowSystem::error (Display *dpy, XErrorEvent *ev)
     const char* name = NULL;
     static char buffer[256];
 
-    if (ev->request_code == composite_opcode && ev->minor_code == X_CompositeRedirectWindow)
+    if (ev->request_code == composite_opcode && ev->minor_code == X_CompositeRedirectSubwindows)
     {
         LOG_ERROR("X11WindowSystem", "Maybe another composite manager is already running");
     }
@@ -638,6 +631,7 @@ X11WindowSystem::error (Display *dpy, XErrorEvent *ev)
     }
     name = (strlen (name) > 0) ? name : "unknown";
     LOG_ERROR("X11WindowSystem", "X Error: " << (int)ev->error_code << " " << name << " request : " << (int)ev->request_code << " minor: " <<  (int)ev->minor_code << " serial: " << (int)ev->serial);
+    m_xerror = true;
     return 0;
 }
 
@@ -655,14 +649,19 @@ bool X11WindowSystem::initXServer()
 
     LOG_DEBUG("X11WindowSystem", "Compositor Window ID: " << CompositorWindow);
 
-    CreatePixmapsForAllWindows();
-    //unredirect our window
+    if ( CreatePixmapsForAllWindows() )
+    {
+            //unredirect our window
 #ifdef FULLSCREEN
-    XCompositeUnredirectWindow(x11Display, background, CompositeRedirectManual);
+        XCompositeUnredirectWindow(x11Display, background, CompositeRedirectManual);
 #endif
-    XCompositeUnredirectWindow(x11Display, CompositorWindow, CompositeRedirectManual);
+        XCompositeUnredirectWindow(x11Display, CompositorWindow, CompositeRedirectManual);
+        LOG_DEBUG("X11WindowSystem", "Initialised XServer connection complete");
+    } else {
+        LOG_ERROR("X11WindowSystem", "Initialised XServer connection failed");
+        result = false;        
+    }
 
-    LOG_DEBUG("X11WindowSystem", "Initialised XServer connection");
     return result;
 }
 
@@ -715,7 +714,7 @@ void* X11WindowSystem::EventLoop(void * ptr)
 	// clear screen to avoid garbage on startup
 	windowsys->graphicSystem->clearBackground();
 	windowsys->graphicSystem->swapBuffers();
-
+    XFlush(windowsys->x11Display);
 	while (windowsys->m_running)
 	{
 #ifndef USE_XTHREADS
@@ -766,7 +765,7 @@ void* X11WindowSystem::EventLoop(void * ptr)
 			case UnmapNotify:
 				LOG_DEBUG("X11WindowSystem", "Unmap Event");
 				windowsys->UnMapWindow(event.xunmap.window);
-				checkRedraw = true;
+				checkRedraw = true;  
 				break;
 			case ReparentNotify:
 				LOG_DEBUG("X11WindowSystem", "Reparent Event");
@@ -807,7 +806,7 @@ void* X11WindowSystem::EventLoop(void * ptr)
 			}
 			else
 			{
-				windowsys->checkForNewSurface();
+                windowsys->checkForNewSurface();
 				checkRedraw = true;
 			}
 
@@ -837,6 +836,7 @@ void X11WindowSystem::signalRedrawEvent()
 {
 	// set flag that redraw is needed
 	redrawEvent = true;
+    m_damaged = true;
 #ifdef USE_XTHREADS
 	// send dummy expose event, to wake up blocking x11 event loop (XNextEvent)
 	LOG_DEBUG("X11WindowSystem", "Sending dummy event to wake up renderer thread");
@@ -892,11 +892,19 @@ bool X11WindowSystem::init(BaseGraphicSystem<Display*,Window>* base)
 
 bool X11WindowSystem::start()
 {
+    bool result = true;
     LOG_INFO("X11WindowSystem", "Starting / Creating thread");
     // let thread actually run
-    this->m_running = true;
-    pthread_mutex_unlock(&run_lock);
-    return true;
+    if ( m_xerror == false ) 
+    {
+        this->m_running = true;
+        pthread_mutex_unlock(&run_lock);
+    } else {
+        this->m_running = false;
+        pthread_mutex_unlock(&run_lock);
+        result = false;
+    }
+    return result;
 }
 
 void X11WindowSystem::stop()
@@ -939,3 +947,4 @@ void X11WindowSystem::doScreenShotOfSurface(std::string fileName, const uint id)
     screenShotFile = fileName;
     screenShotID = id;
 }
+
