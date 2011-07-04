@@ -78,7 +78,7 @@ add_subdirectory (LayerManagerUtils)
 add_subdirectory (LayerManagerCommands)
 add_subdirectory (LayerManagerService)
 add_subdirectory (LayerManagerExamples/LayerManagerClientExample)
-
+add_subdirectory (LayerManagerExamples/LayerManagerToolBox)
     
 if (WITH_DESKTOP)
     add_subdirectory (LayerManagerPlugins/Renderers/Platform/GLXRenderer)
@@ -95,5 +95,6 @@ endif(WITH_EGL_EXAMPLE)
 if (WITH_GLX_EXAMPLE)
     add_subdirectory (LayerManagerExamples/GLXApplicationExample)
 endif(WITH_GLX_EXAMPLE)
+
 
 

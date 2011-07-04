@@ -115,6 +115,7 @@ private:
     static void* EventLoop(void * ptr);
     static int error(Display *dpy, XErrorEvent *ev);
 	bool redrawEvent;
+    static bool m_xerror;
 };
 
 #endif /* _X11WINDOWSYSTEM_H_ */

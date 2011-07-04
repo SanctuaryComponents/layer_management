@@ -106,6 +106,7 @@ ilmErrorTypes createLayers(t_ilm_int LayerWidth, t_ilm_int LayerHeight)
     }
 
     ilm_displaySetRenderOrder(0, &layer[0], 3);
+    ilm_commitChanges();
 
     return error;
 }

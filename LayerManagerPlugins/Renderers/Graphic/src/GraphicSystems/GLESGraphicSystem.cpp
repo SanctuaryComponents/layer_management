@@ -200,7 +200,8 @@ void GLESGraphicsystem::renderLayer()
 		if ((*currentS)->visibility && (*currentS)->opacity>0.0f)
 		{
 			Surface* currentSurface = (Surface*)*currentS;
-			renderSurface(currentSurface);
+            m_baseWindowSystem->allocatePlatformSurface(currentSurface);
+    		renderSurface(currentSurface);
 		}
 	}
 }
@@ -330,8 +331,10 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
     glActiveTexture(GL_TEXTURE0);
     if (false == m_binder->bindSurfaceTexture(surface)) 
     {   
-        /* skip render surface if not bind successfully */        
+//        LOG_DEBUG("GLESGraphicsystem", "renderSurface not successfully bind " << surface->getID());
         return;
+    } else {
+//        LOG_DEBUG("GLESGraphicsystem", "renderSurface " << surface->getID());
     }
 
     /* rotated positions are saved sequentially in vbo

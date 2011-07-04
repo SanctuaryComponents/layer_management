@@ -26,10 +26,10 @@ ExecutionResult CommitCommand::execute(ICommandExecutor* executor)
     bool success = true;
     bool redraw = false;
 
-    Scene& scene = *(executor->getScene());
+    Scene* scene = (executor->getScene());
 
-    CommandListIterator iter = scene.m_toBeCommittedList.begin();
-    CommandListIterator iterEnd = scene.m_toBeCommittedList.end();
+    CommandListIterator iter = scene->m_toBeCommittedList.begin();
+    CommandListIterator iterEnd = scene->m_toBeCommittedList.end();
 
     for (; iter != iterEnd; ++iter)
     {
@@ -51,7 +51,7 @@ ExecutionResult CommitCommand::execute(ICommandExecutor* executor)
             delete command;
         }
     }
-    scene.m_toBeCommittedList.clear();
+    scene->m_toBeCommittedList.clear();
 
     ExecutionResult returnValue = ExecutionFailed;
 
