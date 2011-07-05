@@ -101,7 +101,7 @@ ExecutionResult ScreenShotCommand::execute(ICommandExecutor* executor)
             }
         }
     }
-    return status ? ExecutionSuccess : ExecutionFailed;
+    return status ? ExecutionSuccessRedraw : ExecutionFailed;
 }
 
 const std::string ScreenShotCommand::getString()
