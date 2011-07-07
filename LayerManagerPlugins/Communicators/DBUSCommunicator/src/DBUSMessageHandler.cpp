@@ -102,6 +102,7 @@ void DBUSMessageHandler::ReplyError(DBusMessage* msg, const char* errorname, con
 
     // free the reply
     dbus_message_unref(m_pReply);
+    m_pReply = NULL;
 }
 
 char* DBUSMessageHandler::getString()
