@@ -80,7 +80,15 @@ XVisualInfo* X11WindowSystem::getDefaultVisual(Display *dpy)
 
 bool X11WindowSystem::OpenDisplayConnection()
 {
-    x11Display = XOpenDisplay(":0");
+    char* displayEnvironment = getenv("DISPLAY");
+    
+    if  (displayEnvironment == NULL ) 
+    {
+        displayEnvironment = ":0.0";
+        setenv("DISPLAY",displayEnvironment,1);
+    }
+    
+    x11Display = XOpenDisplay(displayEnvironment);
     if (!x11Display)
     {
         LOG_ERROR("X11WindowSystem", "Couldn't open default display!");
