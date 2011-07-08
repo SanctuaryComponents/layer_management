@@ -22,50 +22,393 @@
 #include <stdlib.h>
 #include <getopt.h>
 #include <string>
+#include <string.h>
 
 #define LAYERWIDTH 800
 #define LAYERHEIGHT 480
 
 
 const char* USAGE_DESCRIPTION = "Usage:\t LayerManagerToolBox [options]\n"
-                                "options:\t\n\n"
-                                "\t-w: Window id\t\n"
-                                "\t-s: surface id\t\n"
-                                "\t-o: opacity \t\n"
-                                "\t-v: visibility [0;1]\n"
-                                "\t-r: surface id to remove\n"
-                                "\t-x: window dimension x\n"
-                                "\t-y: window dimension y\n"
-                                "\t-p: 0..6\n"
-                                "\t\t  ILM_PIXELFORMAT_R_8 = 0\n"
-                                "\t\t  ILM_PIXELFORMAT_RGB_888 = 1\n"
-                                "\t\t  ILM_PIXELFORMAT_RGBA_8888 = 2\n"
-                                "\t\t  ILM_PIXELFORMAT_RGB_565 = 3\n"
-                                "\t\t  ILM_PIXELFORMAT_RGBA_5551 = 4\n"
-                                "\t\t  ILM_PIXELFORMAT_RGBA_6661 = 5\n"
-                                "\t\t  ILM_PIXELFORMAT_RGBA_4444 = 6\n"
-                                "\nexample: LayerManagerToolbox -w0x000 -s10 -x320 -y240 -v1 -o0.5 -p2\n";
+                                "options:\t\n\n";
 
 typedef enum e_toolbox_state 
 {
-    TOOLBOX_INIT_STATE = 0,    
-    TOOLBOX_ADD_WINDOW = 1,
-    TOOLBOX_CHANGE_SURFACE_VALUES = 2,
-    TOOLBOX_REMOVE_SURFACE= 3
+    TOOLBOX_ADD_LAYER = 0,
+    TOOLBOX_ADD_SURFACE,
+    TOOLBOX_LIST_LAYER,
+    TOOLBOX_LIST_SURFACE,
+    TOOLBOX_REMOVE_LAYER,
+    TOOLBOX_REMOVE_SURFACE,
+    TOOLBOX_PROPERTIES_LAYER,
+    TOOLBOX_PROPERTIES_SURFACE,
+    TOOLBOX_CHANGE_LAYER,
+    TOOLBOX_CHANGE_SURFACE,
+    TOOLBOX_SET_DISPLAY_RO,
+    TOOLBOX_SET_LAYER_RO,
+    TOOLBOX_INIT_STATE
 } toolbox_state;
+
+typedef enum e_arguments 
+{
+    ARGUMENT_NONE = 0,
+    ARGUMENT_SURFACEID,
+    ARGUMENT_LAYERID,
+    ARGUMENT_SCREENID,
+    ARGUMENT_WINDOW,
+    ARGUMENT_SOURCE,
+    ARGUMENT_DEST,
+    ARGUMENT_VISIBILITY,
+    ARGUMENT_OPACITY,
+    ARGUMENT_LAYER_RO,
+    ARGUMENT_SURFACE_RO
+} argumentType;
+
+typedef struct s_argument_params 
+{
+    bool required;
+    char* argument;
+    argumentType type;    
+} t_argument_params;
+
+typedef struct s_state_params 
+{
+    toolbox_state state;
+    int numberArguments;
+    t_argument_params params[10];
+} t_state_params;
+
+t_state_params state_params[] = 
+{
+    {   TOOLBOX_ADD_LAYER, 5, 
+        {
+            {true, "lid:",      ARGUMENT_LAYERID},
+            {false,"dest:",     ARGUMENT_DEST},
+            {false,"o:",        ARGUMENT_OPACITY},
+            {false,"v:",        ARGUMENT_VISIBILITY}
+        }
+    },
+    {   TOOLBOX_ADD_SURFACE, 7,
+        {
+            {true, "lid:",      ARGUMENT_LAYERID},
+            {true, "sid:",      ARGUMENT_SURFACEID},
+            {true, "wid:",      ARGUMENT_WINDOW},        
+            {false,"src:",      ARGUMENT_SOURCE},
+            {false,"dest:",     ARGUMENT_DEST},
+            {false,"o:",        ARGUMENT_OPACITY},
+            {false,"v:",        ARGUMENT_VISIBILITY}
+        }
+    },
+    {   TOOLBOX_LIST_LAYER, 1,
+        {
+            {true, "screen:",   ARGUMENT_SCREENID}
+        }
+    },
+    {   TOOLBOX_LIST_SURFACE, 1,
+        {
+            {true, "lid:",   ARGUMENT_LAYERID}
+        }
+    },
+    {   TOOLBOX_REMOVE_LAYER, 1,
+        {
+            {true, "lid:",   ARGUMENT_LAYERID}
+        }
+    },
+    {   TOOLBOX_REMOVE_SURFACE, 1,
+        {
+            {true, "sid:",   ARGUMENT_SURFACEID}
+        }
+    },
+    {   TOOLBOX_PROPERTIES_LAYER, 1,
+        {
+            {true, "lid:",   ARGUMENT_LAYERID}
+        }
+    },
+    {   TOOLBOX_PROPERTIES_SURFACE, 1,
+        {
+            {true, "sid:",   ARGUMENT_SURFACEID}
+        }
+    },
+    {   TOOLBOX_CHANGE_LAYER, 5,
+        {
+            {true, "lid:",     ARGUMENT_LAYERID},
+            {true,"src:",      ARGUMENT_SOURCE},
+            {true,"dest:",     ARGUMENT_DEST},
+            {true,"o:",        ARGUMENT_OPACITY},
+            {true,"v:",        ARGUMENT_VISIBILITY}
+        }
+    },
+    {   TOOLBOX_CHANGE_SURFACE, 5,
+        {
+            {true, "sid:",     ARGUMENT_SURFACEID},
+            {true,"src:",      ARGUMENT_SOURCE},
+            {true,"dest:",     ARGUMENT_DEST},
+            {true,"o:",        ARGUMENT_OPACITY},
+            {true,"v:",        ARGUMENT_VISIBILITY}
+        }
+    },
+    {   TOOLBOX_SET_DISPLAY_RO, 2,
+        {
+            {true,"screen:",   ARGUMENT_SCREENID},
+            {true,"ro:",       ARGUMENT_LAYER_RO}
+        }
+    }
+
+};
+
+static const struct option toolbox_options[] = 
+{
+    {"add-layer",           required_argument,      0,   0},
+    {"add-surface",         required_argument,      0,   1},
+    {"list-layer",          required_argument,      0,   2},
+    {"list-surface",        required_argument,      0,   3},
+    {"remove-layer",        required_argument,      0,   4},
+    {"remove-surface",      required_argument,      0,   5},
+    {"properties-layer",    required_argument,      0,   6},
+    {"properties-surface",  required_argument,      0,   7},
+    {"change-layer",        required_argument,      0,   8},
+    {"change-surface",      required_argument,      0,   9},
+    {"set-display-ro",      required_argument,      0,   10},
+    {"set-layer-ro",        required_argument,      0,   11},
+    {0,0,0,0}
+};
+
 
 typedef struct s_global_parameter 
 {
-    t_ilm_nativehandle windowid;
-    t_ilm_surface surfaceid;
-    t_ilm_int width;
-    t_ilm_int height;
-    t_ilm_bool visibility;
-    t_ilm_float opacity;
-    ilmPixelFormat pixelformat;
+    t_ilm_nativehandle  windowid;
+    t_ilm_surface       surfaceid;
+    t_ilm_layer         layerid;
+    t_ilm_int           screenid;    
+    t_ilm_int           src[4];
+    t_ilm_int           dest[4];
+    t_ilm_bool          visibility;
+    t_ilm_float         opacity;
+    ilmPixelFormat      pixelformat;
+    t_ilm_surface*      surfacero;
+    t_ilm_int           surfacero_length;
+    t_ilm_layer*        layerro;
+    t_ilm_int           layerro_length;
     toolbox_state state;
 } t_param_struct;
 
+
+const char* parseParameters(char* argv, const char* argument, const char* beginterm , const char* endterm) 
+{
+    const char* cresult = NULL;
+    std::string result = std::string(argv);
+    printf("Argument is %s\n",result.c_str());
+    size_t pos = result.find(std::string (argument));
+    if (pos != std::string::npos) 
+    {
+        size_t endpos = 0;
+        size_t beginpos = result.find( std::string (beginterm), pos + strlen(argument) );
+        if ( pos != std::string::npos ) 
+        {
+            beginpos += strlen(beginterm);
+            endpos = result.find( std::string (endterm), beginpos); 
+            if ( endpos != std::string::npos ) 
+            {
+                cresult = (result.substr(beginpos,endpos-beginpos)).c_str();
+                printf("Value is %s\n",cresult);
+            }
+        }
+    }
+    return cresult;
+}
+
+void setDisplayRenderOrder(t_param_struct *pStruct) 
+{
+    ilm_displaySetRenderOrder(pStruct->screenid, pStruct->layerro, pStruct->layerro_length);    
+    ilm_commitChanges();
+}
+
+
+
+
+bool fillLayerRenderOrder(const char * param, t_param_struct* pStruct) 
+{
+    bool result = true;
+    char * pRes = new char[strlen(param)+1];
+    strcpy(pRes,param);
+    int i = 0;
+    pRes = strtok (pRes,",");
+    while (pRes != NULL)
+    {
+        pRes = strtok (NULL, ",");
+        i++;
+    }
+    if (i ==  0) 
+    {
+        result = false;
+    } 
+    else 
+    {
+        delete[] pRes;
+        pRes = new char[strlen(param)+1];
+        strcpy(pRes,param);
+        pStruct->layerro = new t_ilm_layer[i];
+        pStruct->layerro_length = i;
+        i = 0;
+        pRes = strtok (pRes,",");
+        printf("Set Renderorder : [\n");
+        while (pRes != NULL)
+        {
+            sscanf(pRes,"%x",&pStruct->layerro[i]);
+            printf("\tLayer 0x%08x\n",pStruct->layerro[i]);
+            pRes = strtok (NULL, ",");
+            i++;
+        }
+        printf("]\n");
+    }
+    delete[] pRes;
+    return result;
+}
+
+bool fillDimension(const char * param, t_ilm_int *pArray) 
+{
+    t_ilm_int *tempArray = new t_ilm_int[4];
+    bool result = true;
+    char * pRes = new char[strlen(param)+1];
+    strcpy(pRes,param);
+    int i = 0;
+    pRes = strtok (pRes,",");
+    while (pRes != NULL)
+    {
+        tempArray[i++] = atoi(pRes);
+        pRes = strtok (NULL, ",");
+    }
+    if (i<4) 
+    {
+        result = false;
+    } 
+    else 
+    {
+        memcpy(pArray,tempArray,4*sizeof(t_ilm_int));
+        printf("Dimension Parameter successfully filled %i %i %i %i\n",pArray[0],pArray[1],pArray[2],pArray[3]);        
+    }
+    delete[] pRes;
+    delete[] tempArray;
+    return result;
+}
+
+bool initParamStruct(t_param_struct* pStruct,char* argv) 
+{
+    bool result = true;
+    toolbox_state activeState = pStruct->state;
+    int i = 0;
+    t_state_params curParam = state_params[activeState];
+    
+    while ( result && i < curParam.numberArguments ) 
+    {
+        bool found = false;
+        const char * param = NULL;
+        switch (curParam.params[i].type) 
+        {
+            case ARGUMENT_LAYERID :
+                param = parseParameters(argv,curParam.params[i].argument,"[","]");
+                if ( param != 0 ) 
+                {
+                    found = true;
+                    sscanf(param,"%x",&pStruct->layerid);
+                    printf("Layer ID is 0x%08x\n",pStruct->layerid);
+                }
+            break;
+            case ARGUMENT_SURFACEID :
+                param = parseParameters(argv,curParam.params[i].argument,"[","]");
+                if ( param != 0 ) 
+                {
+                    found = true;
+                    sscanf(param,"%x",&pStruct->surfaceid);
+                    printf("Surface id is 0x%08x\n",pStruct->surfaceid);
+                }
+            break;
+            case ARGUMENT_SCREENID:
+                param = parseParameters(argv,curParam.params[i].argument,"[","]");
+                if ( param != 0 ) 
+                {
+                    found = true;
+                    sscanf(param,"%x",&pStruct->screenid);
+                    printf("Surface id is 0x%08x\n",pStruct->screenid);
+                }
+            break;
+            case ARGUMENT_OPACITY:
+                param = parseParameters(argv,curParam.params[i].argument,"[","]");
+                if ( param != 0 ) 
+                {
+                    found = true;
+                    pStruct->opacity=atof(param);
+                    printf("Opacity is %1.2f\n",pStruct->opacity);
+                }            
+            break;
+            case ARGUMENT_WINDOW:
+                param = parseParameters(argv,curParam.params[i].argument,"[","]");
+                if ( param != 0 ) 
+                {
+                    found = true;
+                    sscanf(param,"%x",&pStruct->windowid);
+                    printf("Window id is 0x%08x\n",pStruct->windowid);
+                }
+            break;
+            case ARGUMENT_SURFACE_RO:
+            break;
+            case ARGUMENT_LAYER_RO:
+                param = parseParameters(argv,curParam.params[i].argument,"[","]");
+                if ( param != 0 ) 
+                {
+                    found = true;
+                    if ( !fillLayerRenderOrder(param,pStruct) ) 
+                    {
+                        found = false;
+                        printf("Dest Arguments not complete !\n");
+                    }
+                }
+            break;
+            case ARGUMENT_VISIBILITY:
+                param = parseParameters(argv,curParam.params[i].argument,"[","]");
+                if ( param != 0 ) 
+                {
+                    found = true;
+                    pStruct->visibility = atoi(param);
+                    printf("Visibility is %i\n",pStruct->visibility);
+                }            
+            break;
+            case ARGUMENT_DEST:
+                param = parseParameters(argv,curParam.params[i].argument,"[","]");
+                if ( param != 0 ) 
+                {
+                    found = true;
+                    if ( !fillDimension(param,&pStruct->dest[0]) ) 
+                    {
+                        found = false;
+                        printf("Dest Arguments not complete !\n");
+                    }
+                }
+            break;
+            case ARGUMENT_SOURCE:
+                param = parseParameters(argv,curParam.params[i].argument,"[","]");
+                if ( param != 0 ) 
+                {
+                    found = true;
+                    if ( !fillDimension(param,&pStruct->src[0]) ) 
+                    {
+                        found = false;
+                        printf("Src Arguments not complete !\n");
+                    }
+                }
+            break;            
+            default:
+                found = false;
+                printf("Argument not supported\n");
+        }
+        if ( (curParam.params[i].required==true) && (found==false) )
+        {
+            printf("Required Argument %s not found\n",curParam.params[i].argument);
+            result = false;
+        } 
+        i++;
+    }
+    return result;
+}
 ilmErrorTypes removeSurface(t_param_struct* param_struct) 
 {  
     ilmErrorTypes error;
@@ -73,15 +416,80 @@ ilmErrorTypes removeSurface(t_param_struct* param_struct)
     ilm_commitChanges();
     return error;
 }
+
+ilmErrorTypes removeLayer(t_param_struct* param_struct) 
+{  
+    ilmErrorTypes error;
+    ilm_layerRemove(param_struct->layerid);
+    ilm_commitChanges();
+    return error;
+}
+
+ilmErrorTypes listLayer(t_param_struct* param_struct) 
+{  
+    ilmErrorTypes error;
+    t_ilm_int   layerLength = 0;
+    t_ilm_layer* layerIds = NULL;
+    int i=0;
+    
+    ilm_getLayerIDsOnScreen(param_struct->screenid, &layerLength,&layerIds);
+    if (layerLength > 0 ) 
+    { 
+        printf("List Layer Ids for screen %i\n[\n",param_struct->screenid);
+        for (i=0;i<layerLength;i++) 
+        {   
+            t_ilm_int surfaceLength=0;
+            t_ilm_surface* surfaceIds = NULL;
+            int j=0;
+            printf("\tLayer : 0x%08x\n",layerIds[i]);
+            ilm_getSurfaceIDsOnLayer(layerIds[i], &surfaceLength,&surfaceIds);
+            if (surfaceLength > 0 ) 
+            {    
+                for (j=0;j<surfaceLength;j++) 
+                {   
+                    printf("\t\tSurface : 0x%08x\n",surfaceIds[j]);
+                }
+                delete[] surfaceIds;
+            }
+        }
+        printf("]\n");
+        delete [] layerIds;
+    }
+    return error;
+}
+
+ilmErrorTypes listSurface(t_param_struct* param_struct) 
+{  
+    ilmErrorTypes error;
+    t_ilm_int surfaceLength=0;
+    t_ilm_surface* surfaceIds = NULL;
+    int j=0;
+    printf("List Surface ids on Layer : 0x%08x\n[\n",param_struct->layerid);
+    ilm_getSurfaceIDsOnLayer(param_struct->layerid, &surfaceLength,&surfaceIds);
+    if (surfaceLength > 0 ) 
+    {    
+        for (j=0;j<surfaceLength;j++) 
+        {   
+            printf("\tSurface : 0x%08x\n",surfaceIds[j]);
+        }
+        delete[] surfaceIds;
+        printf("]\n");
+    }
+    return error;
+}
+
+
 ilmErrorTypes changeSurfaceValues(t_param_struct* param_struct) 
 {  
     ilmErrorTypes error;
-    error = ilm_surfaceSetDestinationRectangle(param_struct->surfaceid, 0, 0, param_struct->width,param_struct->height);
+    error = ilm_surfaceSetDestinationRectangle(param_struct->surfaceid, param_struct->dest[0],param_struct->dest[1], 
+                                                                        param_struct->dest[2],param_struct->dest[3]);
 
     // TODO: if (error == ILM_FAILED) return ILM_FALSE;
 
     printf("set surface src region\n");
-    error = ilm_surfaceSetSourceRectangle(param_struct->surfaceid, 0, 0, param_struct->width, param_struct->height);
+    error = ilm_surfaceSetSourceRectangle(param_struct->surfaceid, param_struct->src[0],param_struct->src[1], 
+                                                                        param_struct->src[2],param_struct->src[3]);
 
     // TODO: if (error == ILM_FAILED) return ILM_FALSE;
 
@@ -98,33 +506,72 @@ ilmErrorTypes changeSurfaceValues(t_param_struct* param_struct)
     return error;
 }
 
+ilmErrorTypes changeLayerValues(t_param_struct* param_struct) 
+{  
+    ilmErrorTypes error;
+    error = ilm_layerSetDestinationRectangle(param_struct->layerid, param_struct->dest[0],param_struct->dest[1], 
+                                                                    param_struct->dest[2],param_struct->dest[3]);
+
+    // TODO: if (error == ILM_FAILED) return ILM_FALSE;
+
+    printf("set layer src region\n");
+    error = ilm_layerSetSourceRectangle(param_struct->layerid, param_struct->src[0],param_struct->src[1], 
+                                                                        param_struct->src[2],param_struct->src[3]);
+
+    // TODO: if (error == ILM_FAILED) return ILM_FALSE;
+
+    printf("Set layer visible\n");
+    error = ilm_layerSetVisibility(param_struct->layerid, param_struct->visibility);
+    printf("Set layer opacity\n");
+    error = ilm_layerSetOpacity(param_struct->layerid, param_struct->opacity);
+
+    //if (error == ILM_FAILED) return ILM_FALSE;
+
+    printf("commit\n");
+    error = ilm_commitChanges();
+
+    return error;
+}
+
+ilmErrorTypes createLayer(t_param_struct* param_struct) 
+{   
+    ilmErrorTypes error;
+    // TODO: if (error == ILM_FAILED) return ILM_FALSE;
+
+    printf("create layer %lu\n", param_struct->layerid);
+    error = ilm_layerCreate( &param_struct->layerid );
+
+    // TODO: if (error == ILM_FAILED) return ILM_FALSE;
+
+    error = changeLayerValues(param_struct);
+
+   // TODO: if (error == ILM_FAILED) return ILM_FALSE;
+
+
+    printf("commit\n");
+    error = ilm_commitChanges();
+    return error;
+}
+
+
 ilmErrorTypes addWindowToLayer(t_param_struct* param_struct) 
 {   
     ilmErrorTypes error;
     // TODO: if (error == ILM_FAILED) return ILM_FALSE;
 
     printf("create a surface %lu\n", (t_ilm_nativehandle) param_struct->windowid);
-    error = ilm_surfaceCreate( (t_ilm_nativehandle) param_struct->windowid, param_struct->width,param_struct->height,
+    error = ilm_surfaceCreate( (t_ilm_nativehandle) param_struct->windowid, param_struct->src[3],param_struct->src[4],
             param_struct->pixelformat, &param_struct->surfaceid);
 
     // TODO: if (error == ILM_FAILED) return ILM_FALSE;
 
-    printf("set surface dest region\n");
-    error = ilm_surfaceSetDestinationRectangle(param_struct->surfaceid, 0, 0, param_struct->width,param_struct->height);
-
-    // TODO: if (error == ILM_FAILED) return ILM_FALSE;
-
-    printf("set surface src region\n");
-    error = ilm_surfaceSetSourceRectangle(param_struct->surfaceid, 0, 0, param_struct->width, param_struct->height);
+    error = changeSurfaceValues(param_struct);
 
     // TODO: if (error == ILM_FAILED) return ILM_FALSE;
 
     printf("add surface to layer\n");
-    error = ilm_layerAddSurface(LAYER_EXAMPLE_X_APPLICATIONS,param_struct->surfaceid);
-    printf("Set surface visible\n");
-    error = ilm_surfaceSetVisibility(param_struct->surfaceid, param_struct->visibility);
-    printf("Set surface opacity\n");
-    error = ilm_surfaceSetOpacity(param_struct->surfaceid, param_struct->opacity);
+    error = ilm_layerAddSurface(param_struct->layerid,param_struct->surfaceid);
+
 
     //if (error == ILM_FAILED) return ILM_FALSE;
 
@@ -147,9 +594,15 @@ ilmErrorTypes init_toolbox(t_param_struct* pStruct)
         pStruct->visibility = ILM_TRUE;
         pStruct->windowid = 0x0;
         pStruct->surfaceid =  SURFACE_EXAMPLE_GDTESTENV_APPLICATION_9;
-        pStruct->width = 320;
-        pStruct->height = 240;
+        pStruct->src = {0,0,320,240};
+        pStruct->dest = {0,0,320,240};
         pStruct->pixelformat = ILM_PIXELFORMAT_RGBA_8888;
+        pStruct->layerid = 2000;
+        pStruct->screenid = 0;
+        pStruct->surfacero = NULL;
+        pStruct->surfacero_length = 0;
+        pStruct->layerro = NULL;
+        pStruct->layerro_length = 0;
     }
     else
     {
@@ -177,89 +630,60 @@ void shutdown_toolbox()
 
 void parseCommandLine(t_param_struct* param_struct, int argc, char **argv)
 {   
-    while (optind < argc)
+    while (1)
     {
-        int option = getopt(argc, argv, "x::y::w::s::r::v::o::p::?");
-        switch (option)
+        int option = 0;        
+        int result = getopt_long(   argc, argv,"::?",
+                                    toolbox_options, &option);
+        char* param = 0;
+        bool success = true;
+        if ( result == -1 ) break;
+
+        switch (result)
         {
-        case 'w':
-            if (param_struct->state == TOOLBOX_INIT_STATE) 
-            {
-                sscanf(optarg, "%x", &param_struct->windowid);
-                param_struct->state = TOOLBOX_ADD_WINDOW;
-            } else {
-                printf("Warning ignoring parameter window\n");
-            }
+        case TOOLBOX_ADD_LAYER :
+            param_struct->state = TOOLBOX_ADD_LAYER;
+            success = initParamStruct(param_struct,optarg);                        
+            break;                     
+        case TOOLBOX_ADD_SURFACE :
+            param_struct->state = TOOLBOX_ADD_SURFACE;
+            success = initParamStruct(param_struct,optarg);                      
             break;
-        case 'x':
-            if (param_struct->state == TOOLBOX_ADD_WINDOW
-                 || param_struct->state == TOOLBOX_CHANGE_SURFACE_VALUES 
-                ) 
-            {
-                param_struct->width = atoi(optarg);
-            } else {
-                printf("Warning ignoring parameter x\n");
-            }
+        case TOOLBOX_CHANGE_SURFACE :
+            param_struct->state = TOOLBOX_CHANGE_SURFACE;
+            success = initParamStruct(param_struct,optarg);                      
             break;
-        case 'y':
-            if (param_struct->state == TOOLBOX_ADD_WINDOW
-                || param_struct->state == TOOLBOX_CHANGE_SURFACE_VALUES 
-                ) 
-            {
-                param_struct->height = atoi(optarg);
-            } else {
-                printf("Warning ignoring parameter y\n");
-            }
+        case TOOLBOX_CHANGE_LAYER :
+            param_struct->state = TOOLBOX_CHANGE_LAYER;
+            success = initParamStruct(param_struct,optarg);                      
             break;
-        case 's':
-            param_struct->surfaceid = atoi(optarg);
-            if (param_struct->state == TOOLBOX_INIT_STATE) 
-            {
-                param_struct->state = TOOLBOX_CHANGE_SURFACE_VALUES;
-            }
+        case TOOLBOX_REMOVE_SURFACE :
+            param_struct->state = TOOLBOX_REMOVE_SURFACE;
+            success = initParamStruct(param_struct,optarg);                      
             break;
-        case 'o':
-            if ( param_struct->state == TOOLBOX_ADD_WINDOW 
-                 || param_struct->state == TOOLBOX_CHANGE_SURFACE_VALUES 
-                ) 
-            {
-                param_struct->opacity = atof(optarg);
-            } else {
-                printf("Warning ignoring parameter o\n");
-            }
-            break;
-        case 'v':
-            if ( param_struct->state == TOOLBOX_ADD_WINDOW 
-                 || param_struct->state == TOOLBOX_CHANGE_SURFACE_VALUES 
-                ) 
-            {
-                param_struct->visibility = atoi(optarg);
-            } else {
-                printf("Warning ignoring parameter o\v");
-            }
-            break;
-        case 'r':
-            if ( param_struct->state == TOOLBOX_INIT_STATE
-                ) 
-            {
-                param_struct->surfaceid = atoi(optarg);
-                param_struct->state = TOOLBOX_REMOVE_SURFACE;
-            } else {
-                printf("Warning ignoring parameter r\v");
-            }
-            break;
-        case 'p':
-            if ( param_struct->state == TOOLBOX_ADD_WINDOW  
-              || param_struct->state == TOOLBOX_CHANGE_SURFACE_VALUES 
-               ) 
-            {
-                param_struct->pixelformat = (ilmPixelFormat)atoi(optarg);
-            } else {
-                printf("Warning ignoring parameter p\n");
-            }
-            break;
+        case TOOLBOX_REMOVE_LAYER :
+            param_struct->state = TOOLBOX_REMOVE_LAYER;
+            success = initParamStruct(param_struct,optarg);                      
+            break;            
+        case TOOLBOX_LIST_LAYER :
+            param_struct->state = TOOLBOX_LIST_LAYER;
+            success = initParamStruct(param_struct,optarg);                      
+            break;            
+        case TOOLBOX_LIST_SURFACE :
+            param_struct->state = TOOLBOX_LIST_SURFACE;
+            success = initParamStruct(param_struct,optarg);                      
+            break;  
+        case TOOLBOX_SET_DISPLAY_RO :
+            param_struct->state = TOOLBOX_SET_DISPLAY_RO;
+            success = initParamStruct(param_struct,optarg);                      
+            break;                          
         case '?':   
         default:
+            puts(USAGE_DESCRIPTION);
+            exit(-1);
+        }
+        if (!success) 
+        {
             puts(USAGE_DESCRIPTION);
             exit(-1);
         }
@@ -282,15 +706,34 @@ int main(int argc, char **argv)
     parseCommandLine(&pStruct,argc, (char**) argv);
     switch(pStruct.state) 
     {
-        case TOOLBOX_ADD_WINDOW :
+         case TOOLBOX_ADD_SURFACE :
             addWindowToLayer(&pStruct);
             break;
-        case TOOLBOX_CHANGE_SURFACE_VALUES :
+         case TOOLBOX_ADD_LAYER :
+            createLayer(&pStruct);
+            break;
+         case TOOLBOX_CHANGE_LAYER :
+            changeLayerValues(&pStruct);
+            break;
+         case TOOLBOX_CHANGE_SURFACE :
             changeSurfaceValues(&pStruct);
+            break;            
+         case TOOLBOX_LIST_LAYER :
+            listLayer(&pStruct);
             break;
-        case TOOLBOX_REMOVE_SURFACE :
+         case TOOLBOX_LIST_SURFACE :
+            listLayer(&pStruct);
+            break;
+         case TOOLBOX_REMOVE_LAYER :
+            removeLayer(&pStruct);
+            break;
+         case TOOLBOX_REMOVE_SURFACE :
             removeSurface(&pStruct);
-            break;
+            break;            
+         case TOOLBOX_SET_DISPLAY_RO :
+            setDisplayRenderOrder(&pStruct);
+            break;            
+            
         default:
          printf("Other options currently not implemented\n");
     }
