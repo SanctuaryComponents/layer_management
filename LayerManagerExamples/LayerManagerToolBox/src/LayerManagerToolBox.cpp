@@ -722,7 +722,7 @@ int main(int argc, char **argv)
             listLayer(&pStruct);
             break;
          case TOOLBOX_LIST_SURFACE :
-            listLayer(&pStruct);
+            listSurface(&pStruct);
             break;
          case TOOLBOX_REMOVE_LAYER :
             removeLayer(&pStruct);
