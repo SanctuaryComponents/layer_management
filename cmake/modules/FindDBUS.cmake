@@ -17,11 +17,20 @@
 #
 ############################################################################
 
+FIND_PACKAGE(PkgConfig)
+IF (PKG_CONFIG_FOUND)
+# added aditional pkg config check to find dbus dependend includes
+    pkg_check_modules(DBUS_PKG_PATHS QUIET dbus-1)
+ENDIF (PKG_CONFIG_FOUND)
+
+
 FIND_PATH(DBUS_INCLUDE_DIR dbus/dbus.h
+${DBUS_PKG_PATHS_INCLUDE_DIRS}
 /usr/include/dbus-1.0
 )
 
 FIND_PATH(DBUS_ARCH_INCLUDE_DIR dbus/dbus-arch-deps.h
+${DBUS_PKG_PATHS_INCLUDE_DIRS}
 /usr/lib/dbus-1.0/include
 )
 
