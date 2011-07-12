@@ -50,10 +50,28 @@ bool X11CopyGLX::bindSurfaceTexture(Surface* surface)
             glBindTexture(GL_TEXTURE_2D, nativeSurface->texture);
             glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            if (xim->depth == 24)
+            if ( surface->getPixelFormat() == PIXELFORMAT_RGB888 )
             {
                 targetType = GL_BGR;
                 sourceType = GL_RGB;
+            } 
+            else if ( surface->getPixelFormat() == PIXELFORMAT_RGBA8888 ) 
+            {
+                targetType = GL_BGRA;
+                sourceType = GL_RGBA;
+                if (xim->depth == 24) 
+                {
+                    /* Set alpha value */
+                    int count = surface->OriginalSourceWidth*surface->OriginalSourceHeight;
+                    for (int j=0;j<count; j++) 
+                    {
+                        xim->data[j*4+3]=255;
+                    } 
+                }
+            } else {
+                LOG_ERROR("X11CopyGLX","Pixelformat currently not supported : " << surface->getPixelFormat());
+    		    XDestroyImage(xim);
+                return false;
             }
             glTexImage2D(GL_TEXTURE_2D, 0, sourceType, surface->OriginalSourceWidth, surface->OriginalSourceHeight, 0, targetType, GL_UNSIGNED_BYTE, xim->data);
             XDestroyImage(xim);
