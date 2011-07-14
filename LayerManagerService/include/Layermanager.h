@@ -26,6 +26,7 @@
 class ICommand;
 class IRenderer;
 class ICommunicator;
+class ISceneProvider;
 
 class Layermanager: public ICommandExecutor
 {
@@ -44,17 +45,21 @@ public:
     virtual void removeRenderer(IRenderer* renderer);
     virtual void addCommunicator(ICommunicator* communicator);
     virtual void removeCommunicator(ICommunicator* communicator);
+    virtual void addSceneProvider(ISceneProvider* sceneProvider);
+    virtual void removeSceneProvider(ISceneProvider* sceneProvider);
     virtual bool startManagement(const int width, const int height, const char* displayName);
     virtual bool stopManagement();
 
     virtual Scene* getScene(void);
     virtual RendererList* getRendererList(void);
     virtual CommunicatorList* getCommunicatorList(void);
+    virtual SceneProviderList* getSceneProviderList(void);
 
 private:
     void printDebugInformation() const;
     bool startAllRenderers(const int width, const int height, const char *displayName);
     bool startAllCommunicators();
+    bool delegateScene();
     void stopAllRenderers();
     void stopAllCommunicators();
     bool executeCommand(ICommand* commandToBeExecuted);
@@ -64,6 +69,7 @@ private:
     Scene* m_pScene;
     RendererList* m_pRendererList;
     CommunicatorList* m_pCommunicatorList;
+    SceneProviderList* m_pSceneProviderList;
 };
 
 inline Scene* Layermanager::getScene(void)
@@ -79,6 +85,11 @@ inline RendererList* Layermanager::getRendererList(void)
 inline CommunicatorList* Layermanager::getCommunicatorList(void)
 {
     return m_pCommunicatorList;
+}
+
+inline SceneProviderList* Layermanager::getSceneProviderList(void)
+{
+    return m_pSceneProviderList;
 }
 
 

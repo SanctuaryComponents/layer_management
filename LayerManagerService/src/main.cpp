@@ -20,6 +20,7 @@
 #include "Layermanager.h"
 #include "IRenderer.h"
 #include "ICommunicator.h"
+#include "ISceneProvider.h"
 #include "ICommandExecutor.h"
 #include <iostream>
 #include <sys/types.h>
@@ -50,7 +51,15 @@ uint gRendererPluginDirectoriesCount = sizeof(gRendererPluginDirectories) / size
 
 const char* gCommunicatorPluginDirectories[] = { "/usr/lib/layermanager/communicator",
                                                  "/usr/local/lib/layermanager/communicator" };
+
 uint gCommunicatorPluginDirectoriesCount = sizeof(gCommunicatorPluginDirectories) / sizeof(gCommunicatorPluginDirectories[0]);
+                                                 
+const char* gScenePluginDirectories[] = { "/usr/lib/layermanager",
+                                          "/usr/local/lib/layermanager" };
+
+uint gScenePluginDirectoriesCount = sizeof(gScenePluginDirectories) / sizeof(gScenePluginDirectories[0]);                                                 
+                                                 
+
 
 const char* USAGE_DESCRIPTION = "Usage:\t LayerManagerService [options]\n"
                                 "options:\t\n\n"
@@ -179,6 +188,51 @@ void getSharedLibrariesFromDirectory(tFileList& fileList, string dirName)
 
     closedir(directory);
 }
+
+void loadScenePlugins(SceneProviderList& sceneProviderList, ICommandExecutor* executor)
+{
+    tFileList sharedLibraryNameList;
+
+    // search sceneprovider plugins in configured directories
+    for (uint dirIndex = 0; dirIndex < gScenePluginDirectoriesCount; ++dirIndex)
+    {
+        const char* directoryName = gScenePluginDirectories[dirIndex];
+        LOG_DEBUG("LayerManagerService", "Searching for SceneProviders in: " << directoryName);
+        getSharedLibrariesFromDirectory(sharedLibraryNameList, directoryName);
+    }
+
+    LOG_INFO("LayerManagerService", sharedLibraryNameList.size() << " SceneProvider plugins found");
+
+    // iterate all communicator plugins and start them
+    tFileListIterator iter = sharedLibraryNameList.begin();
+    tFileListIterator iterEnd = sharedLibraryNameList.end();
+
+    for (; iter != iterEnd; ++iter)
+    {
+        LOG_DEBUG("LayerManagerService", "Loading SceneProvider library " << *iter);
+
+        ISceneProvider* (*createFunc)(ICommandExecutor*);
+        createFunc = getCreateFunction<ISceneProvider*(ICommandExecutor*)>(*iter);
+
+        if (!createFunc)
+        {
+            LOG_DEBUG("LayerManagerService", "Entry point of SceneProvider not found");
+            continue;
+        }
+
+        LOG_DEBUG("LayerManagerService", "Creating SceneProvider instance");
+        ISceneProvider* newSceneProvider = createFunc(executor);
+
+        if (!newSceneProvider)
+        {
+            LOG_ERROR("LayerManagerService","SceneProvider initialization failed. Entry Function not callable");
+            continue;
+        }
+
+        sceneProviderList.push_back(newSceneProvider);
+    }
+}
+
 
 void loadCommunicatorPlugins(CommunicatorList& communicatorList, ICommandExecutor* executor)
 {
@@ -312,7 +366,18 @@ int main(int argc, char **argv)
     {
         pManager->addCommunicator(*commIter);
     }
+    LOG_INFO("LayerManagerService", "Loading scene provider plugins.");
+    SceneProviderList sceneProviderList;
+    loadScenePlugins(sceneProviderList, pManager);
 
+    // register communicator plugins at layermanager
+    LOG_INFO("LayerManagerService", "Adding " << sceneProviderList.size() << " SceneProvider plugin(s) to Layermanager.");
+    SceneProviderListIterator sceneProviderIter = sceneProviderList.begin();
+    SceneProviderListIterator sceneProviderIterEnd = sceneProviderList.end();
+    for (; sceneProviderIter != sceneProviderIterEnd; ++sceneProviderIter)
+    {
+        pManager->addSceneProvider(*sceneProviderIter);
+    }
     bool started = pManager->startManagement(displayWidth, displayHeight, displayName);
 
     if (!started)

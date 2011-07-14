@@ -24,12 +24,14 @@
 #include "ICommand.h"
 #include "ICommunicator.h"
 #include "IRenderer.h"
+#include "ISceneProvider.h"
 
 Layermanager::Layermanager()
 {
     m_pScene = new Scene();
     m_pRendererList = new RendererList();
     m_pCommunicatorList = new CommunicatorList();
+    m_pSceneProviderList = new SceneProviderList();
 }
 
 Layermanager::~Layermanager()
@@ -135,6 +137,23 @@ void Layermanager::removeRenderer(IRenderer* renderer)
     if (renderer)
     {
         m_pRendererList->remove(renderer);
+    }
+}
+
+void Layermanager::addSceneProvider(ISceneProvider* sceneProvider)
+{
+    if (sceneProvider)
+    {
+        m_pSceneProviderList->push_back(sceneProvider);
+    }
+
+}
+
+void Layermanager::removeSceneProvider(ISceneProvider* sceneProvider)
+{
+    if (sceneProvider)
+    {
+        m_pSceneProviderList->remove(sceneProvider);
     }
 }
 
@@ -263,6 +282,32 @@ bool Layermanager::startAllRenderers(const int width, const int height,
     return allStarted;
 }
 
+bool Layermanager::delegateScene()
+{
+    bool allStarted = true;
+
+    SceneProviderListIterator iter = m_pSceneProviderList->begin();
+    SceneProviderListIterator iterEnd = m_pSceneProviderList->end();
+
+    for (; iter != iterEnd; ++iter)
+    {
+        ISceneProvider* sceneProvider = *iter;
+        if (sceneProvider)
+        {
+            allStarted &= sceneProvider->delegateScene();
+        }
+        else
+        {
+            allStarted = false;
+        }
+    }
+    if (!allStarted)
+    {
+        LOG_WARNING("LayerManager","Could not start delegate Scenes, inital Scene is lost");
+    }
+    return allStarted;
+}
+
 bool Layermanager::startAllCommunicators()
 {
     bool allStarted = true;
@@ -294,7 +339,7 @@ bool Layermanager::startManagement(const int width, const int height,
 {
     bool renderersStarted = startAllRenderers(width, height, displayName);
     bool communicatorsStarted = startAllCommunicators();
-
+    delegateScene();
     return renderersStarted && communicatorsStarted;
 }
 
