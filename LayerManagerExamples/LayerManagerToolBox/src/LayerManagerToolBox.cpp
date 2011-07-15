@@ -29,7 +29,7 @@
 
 
 const char* USAGE_DESCRIPTION = "Usage:\t LayerManagerToolBox [options]\n"
-                                "options:\t\n\n";
+                                "options:\t\n\n";                              
 
 typedef enum e_toolbox_state 
 {
@@ -60,13 +60,15 @@ typedef enum e_arguments
     ARGUMENT_VISIBILITY,
     ARGUMENT_OPACITY,
     ARGUMENT_LAYER_RO,
-    ARGUMENT_SURFACE_RO
+    ARGUMENT_SURFACE_RO,
+    ARGUMENT_PIXELFORMAT
 } argumentType;
 
 typedef struct s_argument_params 
 {
     bool required;
     char* argument;
+    char* description;
     argumentType type;    
 } t_argument_params;
 
@@ -79,77 +81,78 @@ typedef struct s_state_params
 
 t_state_params state_params[] = 
 {
-    {   TOOLBOX_ADD_LAYER, 5, 
+    {   TOOLBOX_ADD_LAYER, 4, 
         {
-            {true, "lid:",      ARGUMENT_LAYERID},
-            {false,"dest:",     ARGUMENT_DEST},
-            {false,"o:",        ARGUMENT_OPACITY},
-            {false,"v:",        ARGUMENT_VISIBILITY}
+            {true, "lid:","par = layer id in hex", ARGUMENT_LAYERID},
+            {false,"dest:","par = dest rec in x,y,w,h",     ARGUMENT_DEST},
+            {false,"o:","par = opacity 0.0 .. 1.0",        ARGUMENT_OPACITY},
+            {false,"v:","par = visibility 0 / 1",        ARGUMENT_VISIBILITY}
         }
     },
-    {   TOOLBOX_ADD_SURFACE, 7,
+    {   TOOLBOX_ADD_SURFACE, 8,
         {
-            {true, "lid:",      ARGUMENT_LAYERID},
-            {true, "sid:",      ARGUMENT_SURFACEID},
-            {true, "wid:",      ARGUMENT_WINDOW},        
-            {false,"src:",      ARGUMENT_SOURCE},
-            {false,"dest:",     ARGUMENT_DEST},
-            {false,"o:",        ARGUMENT_OPACITY},
-            {false,"v:",        ARGUMENT_VISIBILITY}
+            {true, "lid:","par = layer id in hex",      ARGUMENT_LAYERID},
+            {true, "sid:","par = surface id in hex",      ARGUMENT_SURFACEID},
+            {true, "wid:","par = window id in hex",      ARGUMENT_WINDOW},        
+            {false,"src:","par = src rec in x,y,w,h",      ARGUMENT_SOURCE},
+            {false,"dest:","par = dest rec in x,y,w,h",     ARGUMENT_DEST},
+            {false,"o:","par = opacity 0.0 ... 1.0",       ARGUMENT_OPACITY},
+            {false,"v:","par = visibility 0 / 1",         ARGUMENT_VISIBILITY},
+            {false,"pf:","par = pixelformat 0 .. 6 ",        ARGUMENT_PIXELFORMAT}
         }
     },
     {   TOOLBOX_LIST_LAYER, 1,
         {
-            {true, "screen:",   ARGUMENT_SCREENID}
+            {false, "screen:","par = screen id",   ARGUMENT_SCREENID}
         }
     },
     {   TOOLBOX_LIST_SURFACE, 1,
         {
-            {true, "lid:",   ARGUMENT_LAYERID}
+            {true, "lid:","par = layer id in hex",   ARGUMENT_LAYERID}
         }
     },
     {   TOOLBOX_REMOVE_LAYER, 1,
         {
-            {true, "lid:",   ARGUMENT_LAYERID}
+            {true, "lid:","par = layer id in hex",   ARGUMENT_LAYERID}
         }
     },
     {   TOOLBOX_REMOVE_SURFACE, 1,
         {
-            {true, "sid:",   ARGUMENT_SURFACEID}
+            {true, "sid:","par = surface id in hex",   ARGUMENT_SURFACEID}
         }
     },
     {   TOOLBOX_PROPERTIES_LAYER, 1,
         {
-            {true, "lid:",   ARGUMENT_LAYERID}
+            {true, "lid:","par = layer id in hex",   ARGUMENT_LAYERID}
         }
     },
     {   TOOLBOX_PROPERTIES_SURFACE, 1,
         {
-            {true, "sid:",   ARGUMENT_SURFACEID}
+            {true, "sid:","par = surface id in hex",   ARGUMENT_SURFACEID}
         }
     },
-    {   TOOLBOX_CHANGE_LAYER, 5,
+    {   TOOLBOX_CHANGE_LAYER, 4,
         {
-            {true, "lid:",     ARGUMENT_LAYERID},
-            {true,"src:",      ARGUMENT_SOURCE},
-            {true,"dest:",     ARGUMENT_DEST},
-            {true,"o:",        ARGUMENT_OPACITY},
-            {true,"v:",        ARGUMENT_VISIBILITY}
+            {true, "lid:","par = layer id in hex",     ARGUMENT_LAYERID},
+            {true,"dest:","par = dest rec in x,y,w,h",     ARGUMENT_DEST},
+            {true,"o:","par = opacity 0.0 ... 1.0",        ARGUMENT_OPACITY},
+            {true,"v:","par = visibility 0 / 1",        ARGUMENT_VISIBILITY}
         }
     },
     {   TOOLBOX_CHANGE_SURFACE, 5,
         {
-            {true, "sid:",     ARGUMENT_SURFACEID},
-            {true,"src:",      ARGUMENT_SOURCE},
-            {true,"dest:",     ARGUMENT_DEST},
-            {true,"o:",        ARGUMENT_OPACITY},
-            {true,"v:",        ARGUMENT_VISIBILITY}
+            {true, "sid:","par = surface id in hex",     ARGUMENT_SURFACEID},
+            {true,"src:","par = src rec in x,y,w,h",      ARGUMENT_SOURCE},
+            {true,"dest:","par = dest rec in x,y,w,h",     ARGUMENT_DEST},
+            {true,"o:","par = opacity 0.0 ... 1.0",        ARGUMENT_OPACITY},
+            {true,"v:","par = visibility 0 / 1",        ARGUMENT_VISIBILITY}
         }
     },
-    {   TOOLBOX_SET_DISPLAY_RO, 2,
+    {   
+        TOOLBOX_SET_DISPLAY_RO, 2,
         {
-            {true,"screen:",   ARGUMENT_SCREENID},
-            {true,"ro:",       ARGUMENT_LAYER_RO}
+            {true,"screen:","par = screenid",   ARGUMENT_SCREENID},
+            {true,"ro:","par = renderorder in L_1,...,L_N",       ARGUMENT_LAYER_RO}
         }
     }
 
@@ -291,6 +294,36 @@ bool fillDimension(const char * param, t_ilm_int *pArray)
     return result;
 }
 
+void printUsage() 
+{
+    int i,j = 0;
+    puts(USAGE_DESCRIPTION);
+    for (j=0;j<TOOLBOX_INIT_STATE;j++)
+    {
+        t_state_params curParam = state_params[j];
+        i = 0;
+        printf("\t--%s\n\n",toolbox_options[j].name);       
+        while ( i < curParam.numberArguments ) 
+        {
+            if (curParam.params[i].required) 
+            {
+                printf("\t\t%s[par], \trequired\n",curParam.params[i].argument);
+            }
+            else 
+            {
+                printf("\t\t%s[par], \toptional\n",curParam.params[i].argument);
+            }
+            printf("\t\t%s\n\n",curParam.params[i].description);
+            i++;
+        }
+        printf("\n");
+    }
+    
+     printf("Example LayerManagerToolBox --change-surface sid:[0xa],src:[0,0,320,240],dest:[0,0,800,480],o:[1.0],v:[1]\n\n");
+}
+
+
+
 bool initParamStruct(t_param_struct* pStruct,char* argv) 
 {
     bool result = true;
@@ -310,8 +343,8 @@ bool initParamStruct(t_param_struct* pStruct,char* argv)
                 {
                     found = true;
                     sscanf(param,"%x",&pStruct->layerid);
-                    printf("Layer ID is 0x%08x\n",pStruct->layerid);
                 }
+                printf("Layer ID is 0x%08x\n",pStruct->layerid);                
             break;
             case ARGUMENT_SURFACEID :
                 param = parseParameters(argv,curParam.params[i].argument,"[","]");
@@ -319,17 +352,17 @@ bool initParamStruct(t_param_struct* pStruct,char* argv)
                 {
                     found = true;
                     sscanf(param,"%x",&pStruct->surfaceid);
-                    printf("Surface id is 0x%08x\n",pStruct->surfaceid);
                 }
+                printf("Surface id is 0x%08x\n",pStruct->surfaceid);                
             break;
             case ARGUMENT_SCREENID:
                 param = parseParameters(argv,curParam.params[i].argument,"[","]");
                 if ( param != 0 ) 
                 {
                     found = true;
-                    sscanf(param,"%x",&pStruct->screenid);
-                    printf("Surface id is 0x%08x\n",pStruct->screenid);
+                    pStruct->screenid = atoi(param);
                 }
+                printf("Screen id is 0x%08x\n",pStruct->screenid);                
             break;
             case ARGUMENT_OPACITY:
                 param = parseParameters(argv,curParam.params[i].argument,"[","]");
@@ -337,8 +370,8 @@ bool initParamStruct(t_param_struct* pStruct,char* argv)
                 {
                     found = true;
                     pStruct->opacity=atof(param);
-                    printf("Opacity is %1.2f\n",pStruct->opacity);
                 }            
+                printf("Opacity is %1.2f\n",pStruct->opacity);                
             break;
             case ARGUMENT_WINDOW:
                 param = parseParameters(argv,curParam.params[i].argument,"[","]");
@@ -346,8 +379,8 @@ bool initParamStruct(t_param_struct* pStruct,char* argv)
                 {
                     found = true;
                     sscanf(param,"%x",&pStruct->windowid);
-                    printf("Window id is 0x%08x\n",pStruct->windowid);
                 }
+                printf("Window id is 0x%08x\n",pStruct->windowid);                
             break;
             case ARGUMENT_SURFACE_RO:
             break;
@@ -359,7 +392,7 @@ bool initParamStruct(t_param_struct* pStruct,char* argv)
                     if ( !fillLayerRenderOrder(param,pStruct) ) 
                     {
                         found = false;
-                        printf("Dest Arguments not complete !\n");
+                        printf("Layer Render Order Arguments not complete !\n");
                     }
                 }
             break;
@@ -369,8 +402,8 @@ bool initParamStruct(t_param_struct* pStruct,char* argv)
                 {
                     found = true;
                     pStruct->visibility = atoi(param);
-                    printf("Visibility is %i\n",pStruct->visibility);
                 }            
+                printf("Visibility is %i\n",pStruct->visibility);                
             break;
             case ARGUMENT_DEST:
                 param = parseParameters(argv,curParam.params[i].argument,"[","]");
@@ -396,6 +429,16 @@ bool initParamStruct(t_param_struct* pStruct,char* argv)
                     }
                 }
             break;            
+            case ARGUMENT_PIXELFORMAT:
+                param = parseParameters(argv,curParam.params[i].argument,"[","]");
+                if ( param != 0 ) 
+                {
+                    found = true;
+                    pStruct->pixelformat = (ilmPixelFormat)atoi(param);
+                }
+                printf("Pixelformat is %i\n",pStruct->pixelformat);                                
+            break;            
+            
             default:
                 found = false;
                 printf("Argument not supported\n");
@@ -431,9 +474,13 @@ ilmErrorTypes listLayer(t_param_struct* param_struct)
     t_ilm_int   layerLength = 0;
     t_ilm_layer* layerIds = NULL;
     int i=0;
-    
-    ilm_getLayerIDsOnScreen(param_struct->screenid, &layerLength,&layerIds);
-    if (layerLength > 0 ) 
+    if ( param_struct->screenid != -1 )
+    {
+        error = ilm_getLayerIDsOnScreen(param_struct->screenid, &layerLength,&layerIds);
+    } else {
+        error = ilm_getLayerIDs(&layerLength,&layerIds);
+    }
+    if (layerLength > 0 && error == ILM_SUCCESS) 
     { 
         printf("List Layer Ids for screen %i\n[\n",param_struct->screenid);
         for (i=0;i<layerLength;i++) 
@@ -598,7 +645,7 @@ ilmErrorTypes init_toolbox(t_param_struct* pStruct)
         pStruct->dest = {0,0,320,240};
         pStruct->pixelformat = ILM_PIXELFORMAT_RGBA_8888;
         pStruct->layerid = 2000;
-        pStruct->screenid = 0;
+        pStruct->screenid = -1;
         pStruct->surfacero = NULL;
         pStruct->surfacero_length = 0;
         pStruct->layerro = NULL;
@@ -679,12 +726,12 @@ void parseCommandLine(t_param_struct* param_struct, int argc, char **argv)
             break;                          
         case '?':   
         default:
-            puts(USAGE_DESCRIPTION);
+            printUsage();
             exit(-1);
         }
         if (!success) 
         {
-            puts(USAGE_DESCRIPTION);
+            printUsage();
             exit(-1);
         }
     }
@@ -695,7 +742,7 @@ int main(int argc, char **argv)
     t_param_struct pStruct;
     if (argc == 1) 
     {
-        puts(USAGE_DESCRIPTION);
+        printUsage();
         return (-1);
     }
 

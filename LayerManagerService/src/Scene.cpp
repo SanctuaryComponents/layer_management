@@ -57,6 +57,7 @@ Layer* Scene::createLayer(const uint layerId)
         else
         {
             LOG_DEBUG("Scene","createLayer: Layer with id " << layerId << " already exists ");
+            newLayer = m_layerMap.at(layerId);
         }
     }
     return newLayer;
