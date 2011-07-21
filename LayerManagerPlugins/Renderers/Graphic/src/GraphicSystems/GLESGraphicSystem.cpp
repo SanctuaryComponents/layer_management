@@ -60,6 +60,11 @@ bool GLESGraphicsystem::init(EGLNativeDisplayType display, EGLNativeWindowType N
     LOG_DEBUG("GLESGraphicsystem", "Getting EGL Display with native display " << m_nativeDisplay);
     m_eglDisplay = eglGetDisplay(m_nativeDisplay);
 
+    if (m_eglDisplay == EGL_NO_DISPLAY){
+        LOG_ERROR("GLESGraphicsystem", "failed to Get EGL Display");
+        return false;
+    }
+
     LOG_DEBUG("GLESGraphicsystem", "Initialising EGL");
     if (!eglInitialize(m_eglDisplay, &iMajorVersion, &iMinorVersion))
     {

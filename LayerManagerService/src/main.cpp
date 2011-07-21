@@ -382,8 +382,7 @@ int main(int argc, char **argv)
 
     if (!started)
     {
-        LOG_ERROR("LayerManagerService", "Exiting Application.");
-        return -1;
+        goto cleanup;
     }
 
     // must stay within main method or else application would completely exit
@@ -393,13 +392,15 @@ int main(int argc, char **argv)
         sleep(2000);
     }
 
-    LOG_INFO("LayerManagerService", "Exiting Application.");
 
     // cleanup
+    cleanup:
+
+    LOG_INFO("LayerManagerService", "Exiting Application.");
     pManager->stopManagement();
     //delete pRenderer; TODO
     //delete pCommunicator; TODO
     delete pManager;
 
-    return 0;
+    return (int)started - 1;
 }
