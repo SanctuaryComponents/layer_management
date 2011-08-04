@@ -45,6 +45,7 @@ add_dependencies(DBUSCommunicator LayerManagerUtils)
 add_dependencies(DBUSCommunicator LayerManagerCommands)
 
 install (TARGETS DBUSCommunicator LIBRARY DESTINATION lib/layermanager/communicator)
+install (FILES include/LayerManagerService.conf DESTINATION /etc/dbus-1/system.d)
 
 if (WITH_TESTS)
 enable_testing()
