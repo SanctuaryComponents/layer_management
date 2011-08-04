@@ -39,7 +39,7 @@ ilmErrorTypes ilm_init()
             g_ilm_init = ILM_TRUE;
             // initialize the dbus connection
             dbus_error_init(&g_ilm_client->dbus_error);
-            g_ilm_client->dbus_type = DBUS_BUS_SESSION;
+            g_ilm_client->dbus_type = DBUS_BUS_SYSTEM;
             g_ilm_client->dbus_connection = dbus_bus_get(g_ilm_client->dbus_type, &g_ilm_client->dbus_error);
             if (!g_ilm_client->dbus_connection)
             {
@@ -48,7 +48,7 @@ ilmErrorTypes ilm_init()
             }
             else
             {
-                // request name on connection
+/*                // request name on connection
                 dbus_bus_request_name(g_ilm_client->dbus_connection,
                         ILM_INTERFACE_COMPOSITE_CLIENT,
                         DBUS_NAME_FLAG_REPLACE_EXISTING,
@@ -60,9 +60,9 @@ ilmErrorTypes ilm_init()
                     dbus_error_free(&g_ilm_client->dbus_error);
                 }
                 else
-                {
+                {*/
                     result = ILM_SUCCESS;
-                }
+/*                }*/
             }
         }
     }
