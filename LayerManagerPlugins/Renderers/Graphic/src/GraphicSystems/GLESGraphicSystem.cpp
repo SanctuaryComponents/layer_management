@@ -194,16 +194,19 @@ void GLESGraphicsystem::checkRenderLayer()
 
 void GLESGraphicsystem::renderLayer()
 {
-	SurfaceList surfaces = m_currentLayer->getAllSurfaces();
-	for(std::list<Surface*>::const_iterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++)
-	{
-		if ((*currentS)->visibility && (*currentS)->opacity>0.0f)
-		{
-			Surface* currentSurface = (Surface*)*currentS;
-            m_baseWindowSystem->allocatePlatformSurface(currentSurface);
-    		renderSurface(currentSurface);
-		}
-	}
+	if ( (m_currentLayer)->visibility && (m_currentLayer)->opacity > 0.0 ) 
+    {
+        SurfaceList surfaces = m_currentLayer->getAllSurfaces();
+        for(std::list<Surface*>::const_iterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++)
+        {
+            if ((*currentS)->visibility && (*currentS)->opacity>0.0f)
+            {
+                Surface* currentSurface = (Surface*)*currentS;
+                m_baseWindowSystem->allocatePlatformSurface(currentSurface);
+                renderSurface(currentSurface);
+            }
+        }
+    }
 }
 
 void GLESGraphicsystem::endLayer()
