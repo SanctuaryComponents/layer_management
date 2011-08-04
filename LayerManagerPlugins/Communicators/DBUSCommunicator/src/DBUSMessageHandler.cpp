@@ -13,23 +13,27 @@ DBUSMessageHandler::DBUSMessageHandler()
     dbus_error_init(&m_err);
 
     // connect to the bus and check for errors
-    m_pConnection = dbus_bus_get(DBUS_BUS_SESSION, &m_err);
+    m_pConnection = dbus_bus_get(DBUS_BUS_SYSTEM, &m_err);
     if (dbus_error_is_set(&m_err))
     {
         LOG_ERROR("DBUSCommunicator","Connection error");
         dbus_error_free(&m_err);
     }
+    
     if (NULL == m_pConnection)
     {
         LOG_ERROR("DBUSCommunicator","Connection is null");
         exit(1);
     }
+    
     int ret = dbus_bus_request_name(m_pConnection, DBUS_SERVICE_PREFIX, DBUS_NAME_FLAG_REPLACE_EXISTING, &m_err);
+    
     if (dbus_error_is_set(&m_err))
     {
         LOG_ERROR("DBUSCommunicator", "Name Error "<< m_err.message);
         dbus_error_free(&m_err);
     }
+    
     if (DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER != ret)
     {
         LOG_ERROR("DBUSCommunicator", "Not Primary Owner "<< ret);
@@ -55,6 +59,21 @@ DBUSMessageHandler::~DBUSMessageHandler()
     }
     dbus_error_init(&err);
     dbus_bus_release_name(m_pConnection, DBUS_SERVICE_PREFIX, &err);
+}
+
+bool DBUSMessageHandler::registerPathFunction(  DBusObjectPathMessageFunction fMessageFunc,
+                                                DBusObjectPathUnregisterFunction fUnregisterFunc, 
+                                                void* comInstance)
+{
+    bool result = true;
+    m_objectPathVTable.unregister_function = fUnregisterFunc;
+    m_objectPathVTable.message_function = fMessageFunc;        
+    
+    if (!dbus_connection_register_object_path(m_pConnection,DBUS_SERVICE_OBJECT_PATH,&m_objectPathVTable, comInstance) )
+    {
+        result = false;
+    }    
+    return result;
 }
 
 void DBUSMessageHandler::initReceive(DBusMessage* msg)

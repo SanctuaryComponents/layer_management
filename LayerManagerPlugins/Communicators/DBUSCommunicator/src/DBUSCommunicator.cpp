@@ -392,6 +392,14 @@ void DBUSCommunicator::ListSurfacesOfSurfacegroup(DBusConnection* conn, DBusMess
         g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
+DBusHandlerResult DBUSCommunicator::processMessageFunc(DBusConnection* conn,DBusMessage* msg, void *user_data)
+{
+    return ((DBUSCommunicator*)user_data)->delegateMessage(conn,msg);
+}
+
+void DBUSCommunicator::unregisterMessageFunc(DBusConnection* conn, void *user_data)
+{
+}
 
 void DBUSCommunicator::ListLayersOfLayergroup(DBusConnection* conn, DBusMessage* msg)
 {
@@ -1621,7 +1629,6 @@ void DBUSCommunicator::SetRenderOrderOfLayers(DBusConnection* conn, DBusMessage*
 
     uint* array;
     int length;
-
     g_pDbusMessage->initReceive(msg);
     g_pDbusMessage->getArrayOfUInt(&length, &array);
 
@@ -1859,74 +1866,75 @@ void DBUSCommunicator::SetUniforms(DBusConnection* conn, DBusMessage* msg)
     }
 }
 
+DBusHandlerResult DBUSCommunicator::delegateMessage(DBusConnection* conn, DBusMessage* msg) 
+{
+    DBusHandlerResult result = DBUS_HANDLER_RESULT_HANDLED;
+    LOG_INFO("DBUSCommunicator","message received");
+    const char *n = dbus_message_get_member(msg);
+    bool found = false;
+    int i = 0;
+
+    while (!found && strcmp(manager_methods[i].name, "") != 0)
+    {
+        if (n && strcmp(manager_methods[i].name, n) == 0)
+        {
+            MethodTable entry = manager_methods[i];
+            LOG_INFO("DBUSCommunicator","got call for method:" << entry.name);
+            CallBackMethod m = entry.function;
+            LOG_INFO("DBUSCommunicator","enter method");
+            (m_reference->*m)(conn, msg);
+            found = true;
+        }
+        i++;
+    }
+
+    if (dbus_message_is_method_call(msg, DBUS_INTERFACE_INTROSPECTABLE, "Introspect"))
+    {
+        LOG_INFO("DBUSCommunicator", "Introspection called");
+        DBUSIntrospection introspectionString(manager_methods);
+        introspectionString.process(conn, msg);
+        g_pDbusMessage->setConnection(conn);
+        found = true; // TODO: always true
+    }
+
+    if (!found)
+    {
+        result = DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+    }
+    return result;
+}
+
+
 void* DBUSCommunicator::run(void * arg)
 {
     LOG_INFO("DBUSCommunicator","Main loop running");
     //    pthread_setcancelstate (PTHREAD_CANCEL_ENABLE, NULL);
     //    pthread_setcanceltype (PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
     m_reference = (DBUSCommunicator*) arg;
-    while (m_reference->m_running)
+    if (! g_pDbusMessage->registerPathFunction(DBUSCommunicator::processMessageFunc, DBUSCommunicator::unregisterMessageFunc,m_reference) ) 
+    {            
+        LOG_ERROR("DBUSCommunicator","Register Message Callbacks failed");
+        exit(-1);
+    }
+
+    while (m_reference->m_running || dbus_connection_read_write_dispatch (g_pDbusMessage->getConnection(), -1) ) 
     {
         //        pthread_testcancel();
-        DBusMessage* msg = 0;
+/*        DBusMessage* msg = 0;
         DBusConnection* conn = g_pDbusMessage->getConnection();
         dbus_connection_read_write(conn, 50);
         msg = dbus_connection_pop_message(conn);
-        if (msg)
+        if (msg) 
         {
-            LOG_INFO("DBUSCommunicator","message received");
-            const char *n = dbus_message_get_member(msg);
-            bool found = false;
-            int i = 0;
-
-            while (!found && strcmp(manager_methods[i].name, "") != 0)
-            {
-                if (n && strcmp(manager_methods[i].name, n) == 0)
-                {
-                    MethodTable entry = manager_methods[i];
-                    LOG_INFO("DBUSCommunicator","got call for method:" << entry.name);
-                    CallBackMethod m = entry.function;
-                    LOG_INFO("DBUSCommunicator","enter method");
-                    (m_reference->*m)(conn, msg);
-                    found = true;
-                }
-                i++;
-            }
-
-            if (dbus_message_is_method_call(msg, DBUS_INTERFACE_INTROSPECTABLE, "Introspect"))
-            {
-                LOG_INFO("DBUSCommunicator", "Introspection called");
-                DBUSIntrospection introspectionString(manager_methods);
-                introspectionString.process(conn, msg);
-                g_pDbusMessage->setConnection(conn);
-                found = true; // TODO: always true
-            }
-
-            if (!found)
-            {
-                DBusMessage* reply = dbus_message_new_method_return(msg);
-                uint serial = 0;
-                // send the reply && flush the connection
-                if (!dbus_connection_send(conn, reply, &serial))
-                {
-                    LOG_ERROR("DBUSCommunicator", "Out Of Memory!");
-                    exit(1);
-                }
-                dbus_connection_flush(conn);
-                // free the reply
-                dbus_message_unref(reply);
-                reply = NULL;
-            }
-            if (msg) 
-            {
-                dbus_connection_flush(conn);
-                dbus_message_unref(msg);
-                msg = NULL;
-            }
-        } else {
-            /* put thread in sleep mode for 500 useconds due to safe cpu performance */
-            //usleep(500);
+            dbus_connection_flush(conn);
+            dbus_message_unref(msg);
+            msg = NULL;
         }
+        
+        } else {*/
+            /* put thread in sleep mode for 500 useconds due to safe cpu performance */
+            usleep(500);
+/*        }*/
     }
 
     LOG_DEBUG("DBUSCommunicator","ending thread");

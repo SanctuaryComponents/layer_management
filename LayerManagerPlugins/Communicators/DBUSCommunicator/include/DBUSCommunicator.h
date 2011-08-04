@@ -148,11 +148,13 @@ public:
     void DestroyShader(DBusConnection* conn, DBusMessage* msg);
     void SetShader(DBusConnection* conn, DBusMessage* msg);
     void SetUniforms(DBusConnection* conn, DBusMessage* msg);
-
+    DBusHandlerResult delegateMessage(DBusConnection* conn, DBusMessage* msg);
 private:
     static void* run(void * threadid);
     pthread_t m_currentThread;
     static DBUSCommunicator* m_reference;
+    static DBusHandlerResult processMessageFunc(DBusConnection* conn,DBusMessage* msg, void *user_data);
+    static void unregisterMessageFunc(DBusConnection* conn, void *user_data);
     bool m_running;
 };
 

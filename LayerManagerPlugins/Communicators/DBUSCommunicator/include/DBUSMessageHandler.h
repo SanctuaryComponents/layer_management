@@ -34,6 +34,9 @@ public:
     DBusConnection* getConnection();
 
     void initReceive(DBusMessage* msg);
+    bool registerPathFunction(  DBusObjectPathMessageFunction fMessageFunc, 
+                                DBusObjectPathUnregisterFunction fUnregisterFunc,
+                                void* comInstance);
     void initReply(DBusMessage* msg);
     void closeReply();
     void ReplyError(DBusMessage* msg, const char* errorname, const char* errorMsg);
@@ -59,6 +62,7 @@ private:
     dbus_uint32_t m_serial;
     DBusConnection* m_pConnection;
     DBusError m_err;
+    DBusObjectPathVTable m_objectPathVTable;
 };
 
 
