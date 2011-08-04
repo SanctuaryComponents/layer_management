@@ -237,7 +237,7 @@ void X11WindowSystem::configureSurfaceWindow(Window window)
         surface->OriginalSourceHeight = winHeight;
         surface->OriginalSourceWidth = winWidth;
 /*        surface->setDestinationRegion(Rectangle(0, 0, winWidth, winHeight));*/
-        surface->setSourceRegion(Rectangle(0, 0, winWidth, winHeight));
+/*        surface->setSourceRegion(Rectangle(0, 0, winWidth, winHeight));*/
 
         LOG_DEBUG("X11WindowSystem", "Done Updating window " << window);
     }
@@ -293,7 +293,7 @@ void X11WindowSystem::MapWindow(Window window)
             surface->OriginalSourceHeight = winHeight;
             surface->OriginalSourceWidth = winWidth;
 /*            surface->setDestinationRegion(Rectangle(0,0,winWidth,winHeight));*/
-            surface->setSourceRegion(Rectangle(0,0,winWidth,winHeight));
+/*            surface->setSourceRegion(Rectangle(0,0,winWidth,winHeight)); */
 
             graphicSystem->m_binder->createClientBuffer(surface);
             XSync(x11Display, 0);
@@ -394,7 +394,7 @@ XLowerWindow(x11Display,window);
         surface->OriginalSourceHeight =winHeight;
         surface->OriginalSourceWidth = winWidth;
 /*        surface->setDestinationRegion(Rectangle(0,0,winWidth,winHeight));*/
-        surface->setSourceRegion(Rectangle(0,0,winWidth,winHeight));
+/*        surface->setSourceRegion(Rectangle(0,0,winWidth,winHeight));*/
         LOG_DEBUG("X11WindowSystem", "orig width " << surface->OriginalSourceWidth);
         LOG_DEBUG("X11WindowSystem", "orig heigth " << surface->OriginalSourceHeight);
     }
