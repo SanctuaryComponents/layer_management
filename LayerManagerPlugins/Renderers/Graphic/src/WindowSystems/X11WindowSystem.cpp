@@ -236,7 +236,7 @@ void X11WindowSystem::configureSurfaceWindow(Window window)
 
         surface->OriginalSourceHeight = winHeight;
         surface->OriginalSourceWidth = winWidth;
-        surface->setDestinationRegion(Rectangle(0, 0, winWidth, winHeight));
+/*        surface->setDestinationRegion(Rectangle(0, 0, winWidth, winHeight));*/
         surface->setSourceRegion(Rectangle(0, 0, winWidth, winHeight));
 
         LOG_DEBUG("X11WindowSystem", "Done Updating window " << window);
@@ -292,14 +292,14 @@ void X11WindowSystem::MapWindow(Window window)
 
             surface->OriginalSourceHeight = winHeight;
             surface->OriginalSourceWidth = winWidth;
-            surface->setDestinationRegion(Rectangle(0,0,winWidth,winHeight));
+/*            surface->setDestinationRegion(Rectangle(0,0,winWidth,winHeight));*/
             surface->setSourceRegion(Rectangle(0,0,winWidth,winHeight));
 
             graphicSystem->m_binder->createClientBuffer(surface);
             XSync(x11Display, 0);
 
-            surface->visibility = true;
-            surface->setOpacity(1.0);
+/*          surface->visibility = true;
+            surface->setOpacity(1.0);*/
             LOG_DEBUG("X11WindowSystem", "Mapping Surface " << surface->getID());
             LOG_DEBUG("X11WindowSystem", "Done mapping");
         }
@@ -319,7 +319,7 @@ void X11WindowSystem::UnMapWindow(Window window)
             return;
         }
         // set invisible first, so it wont be used for rendering anymore
-        surface->visibility = false;
+/*      surface->visibility = false;*/
         if (!surface->platform)
         {
             LOG_ERROR("X11WindowSystem", "platform surface empty");
@@ -386,14 +386,14 @@ XLowerWindow(x11Display,window);
 
         surface->nativeHandle = window;
         surface->platform = platformSurface;
-        surface->visibility = false;
+/*      surface->visibility = false; */
 
         int winWidth = att.width;
         int winHeight = att.height;
 
         surface->OriginalSourceHeight =winHeight;
         surface->OriginalSourceWidth = winWidth;
-        surface->setDestinationRegion(Rectangle(0,0,winWidth,winHeight));
+/*        surface->setDestinationRegion(Rectangle(0,0,winWidth,winHeight));*/
         surface->setSourceRegion(Rectangle(0,0,winWidth,winHeight));
         LOG_DEBUG("X11WindowSystem", "orig width " << surface->OriginalSourceWidth);
         LOG_DEBUG("X11WindowSystem", "orig heigth " << surface->OriginalSourceHeight);
