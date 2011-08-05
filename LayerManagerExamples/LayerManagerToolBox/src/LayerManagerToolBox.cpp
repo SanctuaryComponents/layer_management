@@ -225,6 +225,41 @@ void setDisplayRenderOrder(t_param_struct *pStruct)
     ilm_commitChanges();
 }
 
+void showLayerProperties(t_param_struct *pStruct) 
+{
+    struct ilmLayerProperties layerProperties;
+    ilm_getPropertiesOfLayer(pStruct->layerid, &layerProperties);
+    printf("\n Properties of Layer : %08x\n\n",pStruct->layerid);
+    printf("\topacity \t: %3.2f\n",layerProperties.opacity);
+    printf("\tsourceX \t: %i\n",layerProperties.sourceX);
+    printf("\tsourceY \t: %i\n",layerProperties.sourceY);
+    printf("\tsourceWidth \t: %i\n",layerProperties.sourceWidth);
+    printf("\tsourceHeight \t: %i\n",layerProperties.sourceHeight);
+    printf("\tdestX \t\t: %i\n",layerProperties.destX);
+    printf("\tdestY \t\t: %i\n",layerProperties.destY);
+    printf("\tdestWidth \t: %i\n",layerProperties.destWidth);
+    printf("\tdestHeight \t: %i\n",layerProperties.destHeight);
+    printf("\torientation \t: %i\n",layerProperties.orientation);
+    printf("\tvisibility\t: %i\n",layerProperties.visibility);
+}
+
+void showSurfaceProperties(t_param_struct *pStruct) 
+{
+    struct ilmSurfaceProperties surfaceProperties;
+    ilm_getPropertiesOfSurface(pStruct->surfaceid, &surfaceProperties);
+    printf("\n Properties of Surface : %08x\n\n",pStruct->surfaceid);
+    printf("\topacity \t: %3.2f\n",surfaceProperties.opacity);
+    printf("\tsourceX \t: %i\n",surfaceProperties.sourceX);
+    printf("\tsourceY \t: %i\n",surfaceProperties.sourceY);
+    printf("\tsourceWidth \t: %i\n",surfaceProperties.sourceWidth);
+    printf("\tsourceHeight \t: %i\n",surfaceProperties.sourceHeight);
+    printf("\tdestX \t\t: %i\n",surfaceProperties.destX);
+    printf("\tdestY \t\t: %i\n",surfaceProperties.destY);
+    printf("\tdestWidth \t: %i\n",surfaceProperties.destWidth);
+    printf("\tdestHeight \t: %i\n",surfaceProperties.destHeight);
+    printf("\torientation \t: %i\n",surfaceProperties.orientation);
+    printf("\tvisibility\t: %i\n",surfaceProperties.visibility);
+}
 
 
 
@@ -724,6 +759,15 @@ void parseCommandLine(t_param_struct* param_struct, int argc, char **argv)
             param_struct->state = TOOLBOX_SET_DISPLAY_RO;
             success = initParamStruct(param_struct,optarg);                      
             break;                          
+        case TOOLBOX_PROPERTIES_LAYER :
+            param_struct->state = TOOLBOX_PROPERTIES_LAYER;
+            success = initParamStruct(param_struct,optarg);                      
+            break;              
+        case TOOLBOX_PROPERTIES_SURFACE:
+            param_struct->state = TOOLBOX_PROPERTIES_SURFACE;
+            success = initParamStruct(param_struct,optarg);                      
+            break;              
+
         case '?':   
         default:
             printUsage();
@@ -780,7 +824,12 @@ int main(int argc, char **argv)
          case TOOLBOX_SET_DISPLAY_RO :
             setDisplayRenderOrder(&pStruct);
             break;            
-            
+         case TOOLBOX_PROPERTIES_SURFACE:
+            showSurfaceProperties(&pStruct);
+            break;            
+         case TOOLBOX_PROPERTIES_LAYER :
+            showLayerProperties(&pStruct);
+            break;                        
         default:
          printf("Other options currently not implemented\n");
     }
