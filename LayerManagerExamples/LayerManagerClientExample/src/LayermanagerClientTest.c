@@ -93,8 +93,12 @@ ilmErrorTypes createLayers(t_ilm_int LayerWidth, t_ilm_int LayerHeight)
             printf("fail\n");
         }
 
-        printf("Setting Layer destination rectangle(0, 0, %d, %d)... ", LayerWidth, LayerHeight);
+        printf("Setting Layer destination rectangle(0, 0, %d, %d)... \n", LayerWidth, LayerHeight);
         error = ilm_layerSetDestinationRectangle(layer[index], 0, 0, LayerWidth, LayerHeight);
+        printf("Setting Layer source rectangle(0, 0, %d, %d)... \n", LayerWidth, LayerHeight);
+        error = ilm_layerSetSourceRectangle(layer[index], 0, 0, LayerWidth, LayerHeight);
+        printf("Setting Layer visibility(%d)... \n", 1);
+        error = ilm_layerSetVisibility(layer[index],1);
         if(ILM_SUCCESS == error)
         {
             printf("success\n");
