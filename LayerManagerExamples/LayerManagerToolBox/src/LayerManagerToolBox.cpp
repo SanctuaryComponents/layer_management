@@ -131,9 +131,10 @@ t_state_params state_params[] =
             {true, "sid:","par = surface id in hex",   ARGUMENT_SURFACEID}
         }
     },
-    {   TOOLBOX_CHANGE_LAYER, 4,
+    {   TOOLBOX_CHANGE_LAYER, 5,
         {
             {true, "lid:","par = layer id in hex",     ARGUMENT_LAYERID},
+            {true,"src:","par = src rec in x,y,w,h",      ARGUMENT_SOURCE},
             {true,"dest:","par = dest rec in x,y,w,h",     ARGUMENT_DEST},
             {true,"o:","par = opacity 0.0 ... 1.0",        ARGUMENT_OPACITY},
             {true,"v:","par = visibility 0 / 1",        ARGUMENT_VISIBILITY}
