@@ -1,3 +1,31 @@
+Version 0.9.1
+-------------
+
+This version includes the following enhancements.
+
+Bugfixes:
+- Remove spew introduced due to XDamage implementation
+- Allocate client buffer & damage only for surfaces that belong to a renderable layer
+- Compilation fix for DRAW_LAYER_DEBUG mode
+- Remove redundant GL calls in EGLX11ApplicationExample
+- Proper deinitilization of eglImage & texture handles
+- Texture will now bind correctly.
+- Race conditions and compositing startup fixed
+- Unmap Windows will no longer unredirected
+- Fixing wrong result value in ScreenshotCommand.
+- Reset unreferenced m_pReply message
+- Find of dbus architecture dependend files improved.
+- Layer Should only be rendered if visible
+- Remove apply of default values for Destination and Source Region
+- Initialize a graphical surface with non visible
+- Cleanup LayerManager Service at exit for a plugin initialization failure
+
+Improvements:
+- Improvement for handling, native X applications
+- LayerManagerToolBox introduced
+- Introducing default display environment, to avoid fail of service startup
+- SceneProvider feature added to load scenes on startup
+
 Version 0.9.0
 -------------
 

@@ -221,6 +221,15 @@ Supported Build Options
   Option: -DWITH_GLX_EXAMPLE=ON or
           -DWITH_GLX_EXAMPLE=OFF
 
+- Build with copy of textures for target platform which does not support the
+  GLX_TEXTURE_FROM_PIXMAP or EGL_IMAGE_KHR on X11 pixmaps Extensions
+  Option: -DWITH_FORCE_COPY=ON or
+          -DWITH_FORCE_COPY=OFF
+
+- Build with XTHREAD support, switches continous rendering to event based rendering
+  Option: -DWITH_XTHREADS=ON or
+          -DWITH_XTHREADS=OFF
+
 - Build available tests
   Option: -DWITH_TESTS=ON or
           -DWITH_TESTS=OFF
@@ -233,10 +242,10 @@ Supported Build Options
 
   GLXRenderer (X11Renderer.so) which is normaly used for a Desktop, VMWare Image and GMA500 based Headunits
 
-  cmake <source-dir>/ -DWITH_DESKTOP=ON -DWITH_GLX_EXAMPLE=ON -DWITH_TESTS=OFF -DWITH_EGL_EXAMPLE=OFF -DWITH_X11_GLES=OFF
+  cmake <source-dir>/ -DWITH_DESKTOP=ON -DWITH_GLX_EXAMPLE=ON -DWITH_XTHREADS=ON -DWITH_TESTS=OFF -DWITH_EGL_EXAMPLE=OFF -DWITH_X11_GLES=OFF
 
   X11GLESRenderer which is used on more embedded device which are supporting EGL and OpenGL ES 2.0
 
-  cmake <source-dir>/ -DWITH_DESKTOP=OFF -DWITH_GLX_EXAMPLE=OFF -DWITH_TESTS=OFF -DWITH_EGL_EXAMPLE=ON -DWITH_X11_GLES=ON
+  cmake <source-dir>/ -DWITH_DESKTOP=OFF -DWITH_GLX_EXAMPLE=OFF -DWITH_TESTS=OFF -DWITH_EGL_EXAMPLE=ON -DWITH_X11_GLES=ON -DWITH_XTHREADS=ON
 
 
