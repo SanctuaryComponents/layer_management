@@ -673,7 +673,17 @@ bool X11WindowSystem::initXServer()
     return result;
 }
 
-void* X11WindowSystem::EventLoop(void * ptr)
+/**
+ * Thread in charge of the CompositorWindow eventloop
+ * Friend function of class X11WindowSystem
+ */
+void * X11eventLoopCallback(void *ptr)
+{
+	X11WindowSystem *windowsys = static_cast<X11WindowSystem*>( (X11WindowSystem*) ptr);
+	return windowsys->EventLoop();
+}
+
+void* X11WindowSystem::EventLoop()
 {
     // INITALIZATION
     LOG_DEBUG("X11WindowSystem", "Enter thread");
@@ -681,80 +691,79 @@ void* X11WindowSystem::EventLoop(void * ptr)
     bool status = true;
 	bool checkRedraw = false;
 
-    X11WindowSystem *windowsys = (X11WindowSystem *) ptr;
     XSetErrorHandler(error);
     // init own stuff
     LOG_DEBUG("X11WindowSystem", "open display connection");
-    status &= windowsys->OpenDisplayConnection();
+    status &= this->OpenDisplayConnection();
 
     LOG_DEBUG("X11WindowSystem", "check for composite extension");
-    status &= windowsys->checkForCompositeExtension();
+    status &= this->checkForCompositeExtension();
 
 	LOG_DEBUG("X11WindowSystem", "check for damage extension");
-	status &= windowsys->checkForDamageExtension();
+	status &= this->checkForDamageExtension();
 
 	LOG_DEBUG("X11WindowSystem", "init xserver");
-	status &= windowsys->initXServer();
+	status &= this->initXServer();
 
-    status &= windowsys->graphicSystem->init(windowsys->x11Display,windowsys->CompositorWindow);
+    status &= this->graphicSystem->init(this->x11Display,this->CompositorWindow);
 
-    windowsys->m_success = status;
-    windowsys->m_initialized = true;
+    this->m_success = status;
+    this->m_initialized = true;
 
     // Done with init, wait for lock to actually run (ie start/stop method called)
-    pthread_mutex_lock(&windowsys->run_lock);
+    pthread_mutex_lock(&this->run_lock);
 
     LOG_DEBUG("X11WindowSystem", "Starting Event loop");
     Layer* defaultLayer = 0;
 
 	// run the main event loop while rendering
 	gettimeofday(&tv0, NULL);
-	if (windowsys->debugMode)
+	if (this->debugMode)
 	{
-		defaultLayer = windowsys->m_pScene->createLayer(0);
+		defaultLayer = this->m_pScene->createLayer(0);
 		defaultLayer->setOpacity(1.0);
-		defaultLayer->setDestinationRegion(Rectangle(0,0,windowsys->resolutionWidth,windowsys->resolutionHeight));
-		defaultLayer->setSourceRegion(Rectangle(0,0,windowsys->resolutionWidth,windowsys->resolutionHeight));
-		windowsys->m_pScene->getCurrentRenderOrder().push_back(defaultLayer);
+		defaultLayer->setDestinationRegion(Rectangle(0,0,this->resolutionWidth,this->resolutionHeight));
+		defaultLayer->setSourceRegion(Rectangle(0,0,this->resolutionWidth,this->resolutionHeight));
+		this->m_pScene->getCurrentRenderOrder().push_back(defaultLayer);
 	}
 	LOG_DEBUG("X11WindowSystem", "Enter render loop");
 
 	// clear screen to avoid garbage on startup
-	windowsys->graphicSystem->clearBackground();
-	windowsys->graphicSystem->swapBuffers();
-    XFlush(windowsys->x11Display);
-	while (windowsys->m_running)
+	this->graphicSystem->clearBackground();
+	this->graphicSystem->swapBuffers();
+    XFlush(this->x11Display);
+	while (this->m_running)
 	{
 #ifndef USE_XTHREADS
-		if ( XPending(windowsys->x11Display) > 0) {
+		if ( XPending(this->x11Display) > 0) {
 #endif //USE_XTHREADS
 			XEvent event;
 			// blocking wait for event
-			XNextEvent(windowsys->x11Display, &event);
-            windowsys->m_pScene->lockScene();
+			XNextEvent(this->x11Display, &event);
+            this->m_pScene->lockScene();
 			switch (event.type)
 			{
 			case CreateNotify:
 			{
-				if (windowsys->debugMode)
+				if (this->debugMode)
 				{
 					LOG_DEBUG("X11WindowSystem", "CreateNotify Event");
-					Surface* s = windowsys->m_pScene->createSurface(0);
+					Surface* s = this->m_pScene->createSurface(0);
 					s->setOpacity(1.0);
-					windowsys->NewWindow(s, event.xcreatewindow.window);
+					this->NewWindow(s, event.xcreatewindow.window);
 					defaultLayer->addSurface(s);
 				}
 				break;
 			}
 			case ConfigureNotify:
 				LOG_DEBUG("X11WindowSystem", "Configure notify Event");
-				windowsys->configureSurfaceWindow( event.xconfigure.window);
+				this->configureSurfaceWindow( event.xconfigure.window);
 				checkRedraw = true;
 				break;
 
 			case DestroyNotify:
 				LOG_DEBUG("X11WindowSystem", "Destroy  Event");
-				windowsys->DestroyWindow(event.xdestroywindow.window);
+				this->DestroyWindow(event.xdestroywindow.window);
 				checkRedraw = true;
 				break;
 			case Expose:
@@ -767,12 +776,12 @@ void* X11WindowSystem::EventLoop(void * ptr)
 				break;
 			case MapNotify:
 				LOG_DEBUG("X11WindowSystem", "Map Event");
-				windowsys->MapWindow(event.xmap.window);
+				this->MapWindow(event.xmap.window);
 				checkRedraw = true;
 				break;
 			case UnmapNotify:
 				LOG_DEBUG("X11WindowSystem", "Unmap Event");
-				windowsys->UnMapWindow(event.xunmap.window);
+				this->UnMapWindow(event.xunmap.window);
 				checkRedraw = true;  
 				break;
 			case ReparentNotify:
@@ -784,10 +793,10 @@ void* X11WindowSystem::EventLoop(void * ptr)
 				break;
 
 			default:
-				if (event.type == windowsys->damage_event + XDamageNotify)
+				if (event.type == this->damage_event + XDamageNotify)
 				{
-					XDamageSubtract(windowsys->x11Display, ((XDamageNotifyEvent*)(&event))->damage, None, None);
-					Surface* currentSurface = windowsys->getSurfaceForWindow(((XDamageNotifyEvent*)(&event))->drawable);
+					XDamageSubtract(this->x11Display, ((XDamageNotifyEvent*)(&event))->damage, None, None);
+					Surface* currentSurface = this->getSurfaceForWindow(((XDamageNotifyEvent*)(&event))->drawable);
 					if (currentSurface==NULL)
 					{
 						LOG_ERROR("X11WindowSystem", "surface empty");
@@ -799,22 +808,22 @@ void* X11WindowSystem::EventLoop(void * ptr)
 				}
 				break;
 			}
-            windowsys->m_pScene->unlockScene();
+            this->m_pScene->unlockScene();
 #ifndef USE_XTHREADS
 		}
 #endif //USE_XTHREADS
-		if (windowsys->redrawEvent)
+		if (this->redrawEvent)
 		{
-			windowsys->redrawEvent = false;
+			this->redrawEvent = false;
 
 			// check if we are supposed to take screenshot
-			if (windowsys->takeScreenshot!=ScreenShotNone)
+			if (this->takeScreenshot!=ScreenShotNone)
 			{
-				windowsys->Screenshot();
+				this->Screenshot();
 			}
 			else
 			{
-                windowsys->checkForNewSurface();
+                this->checkForNewSurface();
 				checkRedraw = true;
 			}
 
@@ -822,7 +831,7 @@ void* X11WindowSystem::EventLoop(void * ptr)
 
 		if (checkRedraw)
 		{
-			windowsys->Redraw();
+			this->Redraw();
 			checkRedraw = false;
         } 
 #ifndef USE_XTHREADS        
@@ -833,7 +842,7 @@ void* X11WindowSystem::EventLoop(void * ptr)
         }
 #endif
 	}
-	windowsys->cleanup();
+	this->cleanup();
 	LOG_INFO("X11WindowSystem", "Renderer thread finished");
 	return NULL;
 }
@@ -883,7 +892,7 @@ bool X11WindowSystem::init(BaseGraphicSystem<Display*,Window>* base)
 #endif //USE_XTHREADS
     X11WindowSystem *renderer = this;
     graphicSystem = base;
-    int status = pthread_create( &renderThread, NULL, X11WindowSystem::EventLoop, (void*) renderer);
+    int status = pthread_create( &renderThread, NULL, X11eventLoopCallback, (void*) renderer);
     if (0 != status )
     {
         return false;

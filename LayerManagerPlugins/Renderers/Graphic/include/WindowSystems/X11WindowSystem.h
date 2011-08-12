@@ -112,10 +112,12 @@ private:
 	void UnredirectSpecialWIndows(Window w);
 	void printDebug();
 	void RedrawAllLayers();
-    static void* EventLoop(void * ptr);
+	void* EventLoop();
     static int error(Display *dpy, XErrorEvent *ev);
 	bool redrawEvent;
     static bool m_xerror;
+    
+    friend void * X11eventLoopCallback(void *);
 };
 
 #endif /* _X11WINDOWSYSTEM_H_ */
