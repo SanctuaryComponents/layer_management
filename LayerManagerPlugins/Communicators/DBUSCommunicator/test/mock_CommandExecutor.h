@@ -25,6 +25,7 @@
 #include "ICommandExecutor.h"
 #include <list>
 #include <gmock/gmock.h>  // Brings in Google Mock.
+using ::testing::DefaultValue;
 class MockCommandExecutor : public ICommandExecutor {
  public:
   MOCK_METHOD1(execute, bool(ICommand* commandToBeExecuted));
@@ -41,6 +42,11 @@ class MockCommandExecutor : public ICommandExecutor {
   MOCK_METHOD0(getCommunicatorList, CommunicatorList*());
   MOCK_METHOD1(addCommunicator, void(ICommunicator* renderer));
   MOCK_METHOD1(removeCommunicator, void(ICommunicator* renderer));
+
+  MOCK_METHOD0(getSceneProviderList, SceneProviderList*());
+  MOCK_METHOD1(addSceneProvider, void(ISceneProvider* provider));
+  MOCK_METHOD1(removeSceneProvider, void(ISceneProvider* provider));
+
 
   MOCK_CONST_METHOD1(getLayerTypeCapabilities, uint(LayerType));
   MOCK_CONST_METHOD1(getNumberOfHardwareLayers, uint(uint));
