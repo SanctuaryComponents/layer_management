@@ -20,6 +20,8 @@
 #include "X11GLXRenderer.h"
 #include "GraphicSystems/GLXGraphicsystem.h"
 #include "WindowSystems/X11WindowSystem.h"
+#include "TextureBinders/X11CopyGLX.h"
+#include "TextureBinders/X11TextureFromPixmap.h"
 #include "Log.h"
 #include <string.h>
 
@@ -32,6 +34,8 @@ X11GLXRenderer::X11GLXRenderer(Scene* pScene)
 
 bool X11GLXRenderer::start(int width, int height, const char* displayname)
 {
+    bool result = false;
+    ITextureBinder *binder = NULL;
     LOG_DEBUG("X11GLXRenderer", "creating X11GLXRenderer");
     m_width = width;
     m_height = height;
@@ -42,15 +46,31 @@ bool X11GLXRenderer::start(int width, int height, const char* displayname)
     m_pGraphicSystem->setBaseWindowSystem(m_pWindowSystem);
 
     LOG_DEBUG("X11GLXRenderer", "init windowsystem");
-    m_pWindowSystem->init(m_pGraphicSystem );
-
-    Display* x11Display = m_pWindowSystem->getNativeDisplayHandle();
-    if (!x11Display)
+    if ( m_pWindowSystem->init(m_pGraphicSystem ) )
     {
-        LOG_ERROR("GLXGraphicsystem", "Display from windowsystem is null");
+        Display* x11Display = m_pWindowSystem->getNativeDisplayHandle();
+        GLXFBConfig *currentConfig = m_pGraphicSystem->GetMatchingPixmapConfig(x11Display);
+        if (x11Display != NULL && currentConfig != NULL )
+        {
+            LOG_INFO("X11GLXRenderer", "Initialization successfull.");
+#ifdef GLX_GRAPHICSYSTEM_FORCE_COPY
+            binder = new X11CopyGLX(x11Display);
+#else
+            if ( graphicSystem->isZeroCopyEnabled() == true ) 
+            {
+                binder = new X11TextureFromPixmap(x11Display,currentConfig*);
+            } else {
+                binder = new X11CopyGLX(x11Display);
+            }
+#endif
+            if ( binder != NULL ) 
+            {
+                m_pGraphicSystem->setTextureBinder(binder);
+                result = m_pWindowSystem->start();
+            } 
+        }
     }
-
-    m_pWindowSystem->start();
+    return result;
 }
 
 void X11GLXRenderer::stop()

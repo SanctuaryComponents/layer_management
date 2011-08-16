@@ -47,18 +47,20 @@ public:
     virtual void clearBackground() = 0;
     virtual void swapBuffers() = 0;
     virtual void saveScreenShotOfFramebuffer(std::string fileToSave) = 0;
-    void setTextureBinder(ITextureBinder* binder)
+    
+    virtual void setTextureBinder(ITextureBinder* binder)
     {
         m_binder = binder;
     }
-
+    virtual ITextureBinder* getTextureBinder()
+    {
+        return m_binder;
+    }
     virtual void renderSurface(Surface*)=0;
-
-    // TODO: should be protected
-    ITextureBinder* m_binder;
 
 protected:
     BaseWindowSystem* m_baseWindowSystem;
+    ITextureBinder* m_binder;    
 };
 
 #endif /* _BASEGRAPHICSYSTEM_H_ */

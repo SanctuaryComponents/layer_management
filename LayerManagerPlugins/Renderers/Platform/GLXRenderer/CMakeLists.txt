@@ -29,14 +29,8 @@ include_directories ("${PROJECT_SOURCE_DIR}/LayerManagerUtils/include")
 link_directories ("${PROJECT_SOURCE_DIR}/LayerManagerUtils/bin")
 
 file(GLOB SOURCES 
-		src/X11GLXRenderer.cpp 
-		../../Base/src/BaseRenderer.cpp 
-		../../Graphic/src/GraphicSystems/GLXGraphicSystem.cpp
-		../../Graphic/src/WindowSystems/X11WindowSystem.cpp  
-		../../Graphic/src/TextureBinders/X11TextureFromPixmap.cpp
-		../../Graphic/src/TextureBinders/X11CopyGLX.cpp
-		../../Graphic/src/TextureBinders/X11Copy.cpp
-		)
+    src/X11GLXRenderer.cpp 
+)
 
 add_library(X11GLXRenderer SHARED ${SOURCES})
 
@@ -47,10 +41,11 @@ find_package(GLX REQUIRED)
 include_directories(${GLX_INCLUDE_DIR})
 
 find_package (Threads)
-set(LIBS ${LIBS} ${CMAKE_THREAD_LIBS_INIT} ${X11_X11_LIB} ${X11_Xcomposite_LIB} ${X11_Xdamage_LIB} ${GLX_LIBRARIES} LayerManagerUtils)
+set(LIBS ${LIBS} ${CMAKE_THREAD_LIBS_INIT} ${X11_X11_LIB} ${X11_Xcomposite_LIB} ${X11_Xdamage_LIB} ${GLX_LIBRARIES} LayerManagerGraphicGLX LayerManagerUtils)
 target_link_libraries(X11GLXRenderer ${LIBS})
 
 add_dependencies(X11GLXRenderer LayerManagerService)
 add_dependencies(X11GLXRenderer LayerManagerUtils)
+add_dependencies(X11GLXRenderer LayerManagerGraphicGLX)
 
 install (TARGETS X11GLXRenderer DESTINATION lib/layermanager/renderer)

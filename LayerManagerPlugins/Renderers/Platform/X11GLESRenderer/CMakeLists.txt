@@ -30,13 +30,6 @@ link_directories ("${PROJECT_SOURCE_DIR}/LayerManagerUtils/bin")
 
 file(GLOB SOURCES 
 		src/X11GLESRenderer.cpp 
-		../../Base/src/BaseRenderer.cpp 
-		../../Graphic/src/GraphicSystems/GLESGraphicSystem.cpp
-		../../Graphic/src/WindowSystems/X11WindowSystem.cpp  
-		../../Graphic/src/TextureBinders/X11Copy.cpp
-		../../Graphic/src/TextureBinders/X11CopyGLES.cpp
-		../../Graphic/src/TextureBinders/X11EglImage.cpp
-		src/ShaderProgramGLES.cpp
 		)
 		
 add_library(X11GLESRenderer SHARED ${SOURCES})
@@ -51,11 +44,12 @@ find_package(GLESv2 REQUIRED)
 include_directories(${GLESv2_INCLUDE_DIR})
 
 find_package (Threads)
-set(LIBS ${LIBS} ${CMAKE_THREAD_LIBS_INIT} ${EGL_LIBRARY} ${GLESv2_LIBRARIES} ${X11_Xcomposite_LIB} ${X11_Xdamage_LIB} LayerManagerUtils )
+set(LIBS ${LIBS} ${CMAKE_THREAD_LIBS_INIT} ${EGL_LIBRARY} ${GLESv2_LIBRARIES} ${X11_Xcomposite_LIB} ${X11_Xdamage_LIB} LayerManagerGraphicGLESv2 LayerManagerUtils )
 target_link_libraries(X11GLESRenderer ${LIBS})
 
 add_dependencies(X11GLESRenderer LayerManagerService)
 add_dependencies(X11GLESRenderer LayerManagerUtils)
+add_dependencies(X11GLESRenderer LayerManagerGraphicGLESv2)
 
 install (TARGETS X11GLESRenderer DESTINATION lib/layermanager/renderer)
 install (FILES renderer_frag.glslf DESTINATION lib/layermanager/renderer)

@@ -295,7 +295,7 @@ void X11WindowSystem::MapWindow(Window window)
 /*            surface->setDestinationRegion(Rectangle(0,0,winWidth,winHeight));*/
 /*            surface->setSourceRegion(Rectangle(0,0,winWidth,winHeight)); */
 
-            graphicSystem->m_binder->createClientBuffer(surface);
+            graphicSystem->getTextureBinder()->createClientBuffer(surface);
             XSync(x11Display, 0);
 
 /*          surface->visibility = true;
@@ -331,7 +331,7 @@ void X11WindowSystem::UnMapWindow(Window window)
 
 
         LOG_DEBUG("X11WindowSystem", "Destroying ClientBuffer");
-        graphicSystem->m_binder->destroyClientBuffer(surface);
+        graphicSystem->getTextureBinder()->destroyClientBuffer(surface);
         XSync(x11Display, 0);
 
         LOG_DEBUG("X11WindowSystem", "Removing X Pixmap");
@@ -379,7 +379,7 @@ XLowerWindow(x11Display,window);
 		//		Surface* s = layerlist->createSurface();
 
         surface->nativeHandle = window;
-        XPlatformSurface * platformSurface = (XPlatformSurface*)graphicSystem->m_binder->createPlatformSurface(surface);
+        XPlatformSurface * platformSurface = (XPlatformSurface*)graphicSystem->getTextureBinder()->createPlatformSurface(surface);
         platformSurface->isMapped = false;
 
         LOG_DEBUG("X11WindowSystem", "Created native Surface for X11 Window id " << window);
@@ -416,7 +416,7 @@ void X11WindowSystem::DestroyWindow(Window window)
             LOG_ERROR("X11WindowSystem", "surface empty");
             return;
         }
-        graphicSystem->m_binder->destroyClientBuffer(surface);
+        graphicSystem->getTextureBinder()->destroyClientBuffer(surface);
         LOG_DEBUG("X11WindowSystem", "Unmapping window " << window);
         UnMapWindow(window);
         LOG_DEBUG("X11WindowSystem", "Removed Surface " << surface->getID());
