@@ -58,6 +58,13 @@ file(GLOB GRAPHIC_PLATFORM_INCLUDES
     include/PlatformSurfaces/XPlatformSurface.h
     include/PlatformSurfaces/EglXPlatformSurface.h
 )
+
+file(GLOB GRAPHIC_WINDOWSYSTEMS_INCLUDES 
+    include/WindowSystems/BaseWindowSystem.h
+    include/WindowSystems/X11WindowSystem.h
+)
+
+
 endif(WITH_GLESv2_LIB)
 
 if (WITH_GLX_LIB) 
@@ -74,6 +81,12 @@ file(GLOB SOURCES
 file(GLOB GRAPHIC_BASE_INCLUDES 
     ../Base/include/*.h
 )
+
+file(GLOB GRAPHIC_WINDOWSYSTEMS_INCLUDES 
+    include/WindowSystems/BaseWindowSystem.h
+    include/WindowSystems/X11WindowSystem.h
+)
+
 
 file(GLOB GRAPHIC_GRAPHICSYSTEM_INCLUDES 
     include/GraphicSystems/BaseGraphicSystem.h
@@ -117,4 +130,5 @@ install (FILES ${GRAPHIC_BASE_INCLUDES} DESTINATION include/layermanager/graphic
 install (FILES ${GRAPHIC_GRAPHICSYSTEM_INCLUDES} DESTINATION include/layermanager/graphic/GraphicSystems)
 install (FILES ${GRAPHIC_TEXTUREBINDERS_INCLUDES} DESTINATION include/layermanager/graphic/TextureBinders)
 install (FILES ${GRAPHIC_PLATFORM_INCLUDES} DESTINATION include/layermanager/graphic/PlatformSurfaces)
+install (FILES ${GRAPHIC_WINDOWSYSTEMS_INCLUDES} DESTINATION include/layermanager/graphic/WindowSystems)
 

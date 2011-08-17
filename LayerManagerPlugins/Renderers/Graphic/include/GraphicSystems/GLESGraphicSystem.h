@@ -47,7 +47,6 @@ public:
 
     virtual bool initOpenGLES(EGLint displayWidth, EGLint displayHeight);
     virtual void resize(EGLint displayWidth, EGLint displayHeight);
-    virtual void doScreenShot(std::string fileToSave);
 
     virtual void saveScreenShotOfFramebuffer(std::string fileToSave);
 
