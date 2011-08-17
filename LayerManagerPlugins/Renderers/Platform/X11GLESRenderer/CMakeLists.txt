@@ -29,7 +29,8 @@ include_directories ("${PROJECT_SOURCE_DIR}/LayerManagerUtils/include")
 link_directories ("${PROJECT_SOURCE_DIR}/LayerManagerUtils/bin")
 
 file(GLOB SOURCES 
-		src/X11GLESRenderer.cpp 
+		src/X11GLESRenderer.cpp
+        src/ShaderProgramGLES.cpp 
 		)
 		
 add_library(X11GLESRenderer SHARED ${SOURCES})
