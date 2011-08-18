@@ -56,9 +56,9 @@ bool X11GLXRenderer::start(int width, int height, const char* displayname)
 #ifdef GLX_GRAPHICSYSTEM_FORCE_COPY
             binder = new X11CopyGLX(x11Display);
 #else
-            if ( graphicSystem->isZeroCopyEnabled() == true ) 
+            if ( m_pGraphicSystem->isZeroCopyEnabled() == true ) 
             {
-                binder = new X11TextureFromPixmap(x11Display,currentConfig*);
+                binder = new X11TextureFromPixmap(x11Display, *currentConfig);
             } else {
                 binder = new X11CopyGLX(x11Display);
             }
