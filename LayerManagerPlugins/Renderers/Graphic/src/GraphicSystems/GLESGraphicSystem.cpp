@@ -23,6 +23,7 @@
 #include "EGL/egl.h"
 #include "GLES2/gl2.h"
 #include "Bitmap.h"
+#include "Transformation/ViewportTransform.h"
 
 static const float vertices[8 * 12] =
 { 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0,
@@ -244,9 +245,12 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
     IlmMatrixIdentity(layerMatrix);
     Rectangle layerdest = (m_currentLayer)->getDestinationRegion();
     Rectangle layersrc = (m_currentLayer)->getSourceRegion();
+    Rectangle newSurfacePos( 0,0,(surface)->OriginalSourceWidth,(surface)->OriginalSourceHeight);
+    float texX1=0.0f;
+    float texX2=1.0f;
+    float texY1=0.0f;
+    float texY2=1.0f;
 
-    float scalex = (float) layerdest.width / (float) m_displayWidth;
-    float scaley = (float) layerdest.height / (float) m_displayHeight;
     ShaderProgram::CommonUniforms uniforms;
 #ifdef DRAW_LAYER_DEBUG
     ShaderProgram::CommonUniforms layeruniforms;
@@ -264,31 +268,29 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
         shader = layerShader;
     }
 
-    Rectangle dest = (surface)->getDestinationRegion();
-    Rectangle src = (surface)->getSourceRegion();
+    ViewportTransform::applySurfaceSource(surface, &texX1,&texX2,&texY1,&texY2);
+    ViewportTransform::applySurfaceDest(surface,&newSurfacePos);
+    ViewportTransform::applyLayerSource(&newSurfacePos,m_currentLayer,&texX1,&texX2,&texY1,&texY2);
+    ViewportTransform::applyLayerDest(&newSurfacePos,m_currentLayer);
 
-    float surfaceXOfScreen = (float) dest.x / (float) layerdest.width + (float) layerdest.x / m_displayWidth;
-    float surfaceYOfScreen = (float) dest.y / (float) layerdest.height + (float) layerdest.y / m_displayHeight;
-    float surfaceWidthOfScreen = ((float) dest.width / m_displayWidth) * scalex;
-    float surfaceHeightOfScreen = ((float) dest.height / m_displayHeight) * scaley;
 
-    float sourceViewportWidthPercent = (float) src.width / (surface)->OriginalSourceWidth;
-    float sourceViewportHeightpercent = (float) src.height / (surface)->OriginalSourceHeight;
-    float sourceViewportXPercent = (float) src.x / (surface)->OriginalSourceWidth;
-    float sourceViewportYPercent = (float) src.y / (surface)->OriginalSourceHeight;
+    newSurfacePos.x = newSurfacePos.x * ((float)layerdest.width / layersrc.width);
+    newSurfacePos.width = newSurfacePos.width * ((float)layerdest.width / layersrc.width);
+    newSurfacePos.y = newSurfacePos.y * ((float)layerdest.height / layersrc.height);
+    newSurfacePos.height = newSurfacePos.height * ((float)layerdest.height / layersrc.height);
 
     glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
     IlmMatrixRotateZ(layerMatrix, m_currentLayer->getOrientation() * 90.0f);
     /* update all common uniforms */
-    uniforms.x = surfaceXOfScreen;
-    uniforms.y = surfaceYOfScreen;
-    uniforms.width = surfaceWidthOfScreen;
-    uniforms.height = surfaceHeightOfScreen;
+    uniforms.x = (float)newSurfacePos.x / m_displayWidth;
+    uniforms.y = (float)newSurfacePos.y / m_displayHeight;;
+    uniforms.width = (float)newSurfacePos.width / m_displayWidth;
+    uniforms.height = (float)newSurfacePos.height / m_displayHeight;
     uniforms.opacity = (surface)->getOpacity() * m_currentLayer->getOpacity();
-    uniforms.texRange[0] = sourceViewportWidthPercent;
-    uniforms.texRange[1] = sourceViewportHeightpercent;
-    uniforms.texOffset[0] = sourceViewportXPercent;
-    uniforms.texOffset[1] = -sourceViewportYPercent;
+    uniforms.texRange[0] = (texX2-texX1);
+    uniforms.texRange[1] = (texY2-texY1);
+    uniforms.texOffset[0] = texX1;
+    uniforms.texOffset[1] = -texY1;
     uniforms.texUnit = 0;
     uniforms.matrix = &layerMatrix.f[0];
 
@@ -354,7 +356,7 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
 
     glDrawArrays(GL_TRIANGLES, index, 6);
 
-    glBindBuffer(GL_ARRAY_BUFFER, NULL);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
     glGetError(); // TODO
 }
 

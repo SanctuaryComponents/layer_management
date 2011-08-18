@@ -46,6 +46,11 @@ public:
     void removeSurface(Surface* s);
     SurfaceList& getAllSurfaces();
 
+    // original dimensions
+    // needed for calculations when using a source viewport
+    int OriginalSourceWidth;
+    int OriginalSourceHeight;
+
 private:
     SurfaceList m_surfaces;
     LayerType m_layerType;
@@ -54,6 +59,8 @@ private:
 
 inline Layer::Layer()
 : GraphicalSurface(TypeLayer)
+, OriginalSourceWidth(0)
+, OriginalSourceHeight(0)
 , m_layerType(Software_2D)
 , m_capabilities(0)
 {
@@ -61,6 +68,8 @@ inline Layer::Layer()
 
 inline Layer::Layer(int id)
 : GraphicalSurface(id, TypeLayer)
+, OriginalSourceWidth(0)
+, OriginalSourceHeight(0)
 , m_layerType(Software_2D)
 , m_capabilities(0)
 {

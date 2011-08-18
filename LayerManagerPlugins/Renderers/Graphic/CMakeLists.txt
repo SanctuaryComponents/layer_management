@@ -36,6 +36,7 @@ file(GLOB SOURCES
 		src/TextureBinders/X11Copy.cpp
 		src/TextureBinders/X11CopyGLES.cpp
 		src/TextureBinders/X11EglImage.cpp
+        src/Transformation/ViewportTransform.cpp
 		)
 
 file(GLOB GRAPHIC_BASE_INCLUDES 
@@ -64,6 +65,13 @@ file(GLOB GRAPHIC_WINDOWSYSTEMS_INCLUDES
     include/WindowSystems/X11WindowSystem.h
 )
 
+file(GLOB GRAPHIC_TRANSFORM_INCLUDES 
+    include/Transformation/ViewportTransform.h
+)
+
+if (WITH_TESTS)
+    add_subdirectory (tests)
+endif(WITH_TESTS)
 
 endif(WITH_GLESv2_LIB)
 
@@ -76,6 +84,7 @@ file(GLOB SOURCES
     src/TextureBinders/X11TextureFromPixmap.cpp
     src/TextureBinders/X11CopyGLX.cpp
     src/TextureBinders/X11Copy.cpp
+    src/Transformation/ViewportTransform.cpp    
 )
 
 file(GLOB GRAPHIC_BASE_INCLUDES 
@@ -104,6 +113,10 @@ file(GLOB GRAPHIC_PLATFORM_INCLUDES
     include/PlatformSurfaces/XPlatformSurface.h
     include/PlatformSurfaces/GLXPlatformSurface.h
 )        
+file(GLOB GRAPHIC_TRANSFORM_INCLUDES 
+    include/Transformation/ViewportTransform.h
+)
+
 endif(WITH_GLX_LIB)
 
 		
@@ -128,7 +141,8 @@ add_dependencies(${GRAPHIC_LIB_NAME} LayerManagerUtils)
 install (TARGETS ${GRAPHIC_LIB_NAME} DESTINATION lib)
 install (FILES ${GRAPHIC_BASE_INCLUDES} DESTINATION include/layermanager/graphic/Base)
 install (FILES ${GRAPHIC_GRAPHICSYSTEM_INCLUDES} DESTINATION include/layermanager/graphic/GraphicSystems)
-install (FILES ${GRAPHIC_TEXTUREBINDERS_INCLUDES} DESTINATION include/layermanager/graphic/TextureBinders)
+install (FILES ${GRAPHIC_TRANSFORM_INCLUDES} DESTINATION include/layermanager/graphic/Tranformation)
 install (FILES ${GRAPHIC_PLATFORM_INCLUDES} DESTINATION include/layermanager/graphic/PlatformSurfaces)
+install (FILES ${GRAPHIC_WINDOWSYSTEMS_INCLUDES} DESTINATION include/layermanager/graphic/WindowSystems)
 install (FILES ${GRAPHIC_WINDOWSYSTEMS_INCLUDES} DESTINATION include/layermanager/graphic/WindowSystems)
 
