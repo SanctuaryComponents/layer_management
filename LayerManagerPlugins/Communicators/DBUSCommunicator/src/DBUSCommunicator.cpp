@@ -30,6 +30,7 @@
 
 #include "Log.h"
 
+#define DEFAULT_SCREEN 0
 
 const char* ID_UNKNOWN = "id not known to layermanager";
 
@@ -59,6 +60,8 @@ static MethodTable manager_methods[] =
     { "RemoveSurface",                    "u",     "",            &DBUSCommunicator::RemoveSurface },
     { "CreateLayer",                      "",      "u",           &DBUSCommunicator::CreateLayer },
     { "CreateLayerFromId",                "u",     "u",           &DBUSCommunicator::CreateLayerFromId },
+    { "CreateLayerWithDimension",         "uu",    "u",           &DBUSCommunicator::CreateLayerWithDimension },
+    { "CreateLayerFromIdWithDimension",   "uuu",   "u",           &DBUSCommunicator::CreateLayerFromIdWithDimension },
     { "RemoveLayer",                      "u",     "",            &DBUSCommunicator::RemoveLayer },
     { "AddSurfaceToSurfaceGroup",         "uu",    "",            &DBUSCommunicator::AddSurfaceToSurfaceGroup },
     { "RemoveSurfaceFromSurfaceGroup",    "uu",    "",            &DBUSCommunicator::RemoveSurfaceFromSurfaceGroup },
@@ -605,7 +608,9 @@ void DBUSCommunicator::CreateLayer(DBusConnection* conn, DBusMessage* msg)
     (void)conn; // TODO: remove, only prevents warning
 
     uint id = GraphicalObject::INVALID_ID;
-    bool status = m_reference->m_executor->execute(new CreateCommand(0, TypeLayer, PIXELFORMAT_R8, 0, 0, &id));
+	// use resolution of default screen as default width and height of layers
+    uint* resolution = m_reference->m_executor->getScreenResolution(DEFAULT_SCREEN);
+    bool status = m_reference->m_executor->execute(new CreateCommand(0, TypeLayer, PIXELFORMAT_R8, resolution[0], resolution[1], &id));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -625,7 +630,54 @@ void DBUSCommunicator::CreateLayerFromId(DBusConnection* conn, DBusMessage* msg)
     uint id = GraphicalObject::INVALID_ID;
     g_pDbusMessage->initReceive(msg);
     id = g_pDbusMessage->getUInt();
-    bool status = m_reference->m_executor->execute(new CreateCommand(0, TypeLayer, PIXELFORMAT_R8, 0, 0, &id));
+	// use resolution of default screen as default width and height of layers
+    uint* resolution = m_reference->m_executor->getScreenResolution(DEFAULT_SCREEN);
+    bool status = m_reference->m_executor->execute(new CreateCommand(0, TypeLayer, PIXELFORMAT_R8, resolution[0], resolution[1], &id));
+    if (status)
+    {
+        g_pDbusMessage->initReply(msg);
+        g_pDbusMessage->appendUInt(id);
+        g_pDbusMessage->closeReply();
+    }
+    else
+    {
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+    }
+}
+
+
+void DBUSCommunicator::CreateLayerWithDimension(DBusConnection* conn, DBusMessage* msg)
+{
+    (void)conn; // TODO: remove, only prevents warning
+
+    g_pDbusMessage->initReceive(msg);
+    uint width = g_pDbusMessage->getUInt();
+    uint height = g_pDbusMessage->getUInt();
+
+    uint id = GraphicalObject::INVALID_ID;
+    bool status = m_reference->m_executor->execute(new CreateCommand(0, TypeLayer, PIXELFORMAT_R8, width, height, &id));
+    if (status)
+    {
+        g_pDbusMessage->initReply(msg);
+        g_pDbusMessage->appendUInt(id);
+        g_pDbusMessage->closeReply();
+    }
+    else
+    {
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+    }
+}
+
+void DBUSCommunicator::CreateLayerFromIdWithDimension(DBusConnection* conn, DBusMessage* msg)
+{
+    (void)conn; // TODO: remove, only prevents warning
+
+    uint id = GraphicalObject::INVALID_ID;
+    g_pDbusMessage->initReceive(msg);
+    id = g_pDbusMessage->getUInt();
+    uint width = g_pDbusMessage->getUInt();
+    uint height = g_pDbusMessage->getUInt();
+    bool status = m_reference->m_executor->execute(new CreateCommand(0, TypeLayer, PIXELFORMAT_R8, width, height, &id));
     if (status)
     {
         g_pDbusMessage->initReply(msg);

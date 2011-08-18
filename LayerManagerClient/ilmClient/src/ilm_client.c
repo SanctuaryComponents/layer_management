@@ -443,6 +443,46 @@ ilmErrorTypes ilm_layerCreate(t_ilm_layer* pLayerId)
     return error;
 }
 
+ilmErrorTypes ilm_layerCreateWithDimension(t_ilm_layer* pLayerId, t_ilm_uint width, t_ilm_uint height)
+{
+    ilmErrorTypes error = ILM_FAILED;
+    DBusMessage *message;
+
+    // Setup Call
+    if (*pLayerId != INVALID_ID)
+    {
+        // Setup parameter to send
+        t_ilm_param layerParam[3];
+       _ilm_setup_param(&layerParam[0], DBUS_TYPE_UINT32, pLayerId);
+       _ilm_setup_param(&layerParam[1], DBUS_TYPE_UINT32, &width);
+       _ilm_setup_param(&layerParam[2], DBUS_TYPE_UINT32, &height);
+        message = _ilm_dbus_method_call(g_ilm_client->dbus_connection, "CreateLayerFromIdWithDimension", layerParam, 3);
+    }
+    else
+    {
+        t_ilm_param layerParam[2];
+       _ilm_setup_param(&layerParam[0], DBUS_TYPE_UINT32, &width);
+       _ilm_setup_param(&layerParam[1], DBUS_TYPE_UINT32, &height);
+        message = _ilm_dbus_method_call(g_ilm_client->dbus_connection, "CreateLayerWithDimension", layerParam, 2);
+    }
+
+    if (message)
+    {
+        ILM_CHECK_METHOD_ERROR(message);
+        t_ilm_param layerParam[1];
+       _ilm_setup_param(&layerParam[0], DBUS_TYPE_UINT32, pLayerId);
+        error = _ilm_get_dbus_basic_elements(message, 1, layerParam);
+       _ilm_close_dbus_method_call(message);
+    }
+    else
+    {
+        ILM_ERROR("ilm_layerCreate","IPC Method call not possible can't setup remote message\n");
+        return ILM_ERROR_ON_CONNECTION;
+    }
+
+    return error;
+}
+
 ilmErrorTypes ilm_layerRemove(t_ilm_layer layerId)
 {
     ilmErrorTypes error = ILM_FAILED;

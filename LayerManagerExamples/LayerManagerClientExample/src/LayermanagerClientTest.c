@@ -72,7 +72,7 @@ ilmErrorTypes init()
     return result;
 }
 
-ilmErrorTypes createLayers(t_ilm_int LayerWidth, t_ilm_int LayerHeight)
+ilmErrorTypes createLayers(t_ilm_uint LayerWidth, t_ilm_uint LayerHeight)
 {
     int index = 0;
     ilmErrorTypes error = ILM_FAILED;
@@ -83,7 +83,7 @@ ilmErrorTypes createLayers(t_ilm_int LayerWidth, t_ilm_int LayerHeight)
     for(index = 0; index < 3; ++index)
     {
         printf("Creating Layer... ");
-        error = ilm_layerCreate(&layer[index]);
+        error = ilm_layerCreateWithDimension(&layer[index],LayerWidth,LayerHeight);
         if(ILM_SUCCESS == error)
         {
             printf("success\n");

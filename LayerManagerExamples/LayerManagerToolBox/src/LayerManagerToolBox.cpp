@@ -492,7 +492,7 @@ ilmErrorTypes removeSurface(t_param_struct* param_struct)
 {  
     ilmErrorTypes error;
     ilm_surfaceRemove(param_struct->surfaceid);
-    ilm_commitChanges();
+    error = ilm_commitChanges();
     return error;
 }
 
@@ -500,7 +500,7 @@ ilmErrorTypes removeLayer(t_param_struct* param_struct)
 {  
     ilmErrorTypes error;
     ilm_layerRemove(param_struct->layerid);
-    ilm_commitChanges();
+    error = ilm_commitChanges();
     return error;
 }
 
@@ -548,7 +548,7 @@ ilmErrorTypes listSurface(t_param_struct* param_struct)
     t_ilm_surface* surfaceIds = NULL;
     int j=0;
     printf("List Surface ids on Layer : 0x%08x\n[\n",param_struct->layerid);
-    ilm_getSurfaceIDsOnLayer(param_struct->layerid, &surfaceLength,&surfaceIds);
+    error = ilm_getSurfaceIDsOnLayer(param_struct->layerid, &surfaceLength,&surfaceIds);
     if (surfaceLength > 0 ) 
     {    
         for (j=0;j<surfaceLength;j++) 

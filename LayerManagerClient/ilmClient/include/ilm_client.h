@@ -180,6 +180,16 @@ ilmErrorTypes ilm_getSurfaceIDsOnLayer(t_ilm_layer layer,t_ilm_int* pLength,t_il
 ilmErrorTypes ilm_layerCreate(t_ilm_layer* pLayerId);
 
 /**
+ * \brief Create a layer which should be managed by the service
+ * \ingroup Layer
+ * \param[out] pLayerId pointer where the id should be/is stored. It is possible
+ *                      to set a id from outside, 0 will create a new id.
+ * \return ILM_TRUE if the method call was successful
+ * \return ILM_FAILED if the client can not call the method on the service.
+ */
+ilmErrorTypes ilm_layerCreateWithDimension(t_ilm_layer* pLayerId, t_ilm_uint width, t_ilm_uint height);
+
+/**
  * \brief Removes a layer which is currently managed by the service
  * \ingroup Layer
  * \param[in] layerId Layer to be removed

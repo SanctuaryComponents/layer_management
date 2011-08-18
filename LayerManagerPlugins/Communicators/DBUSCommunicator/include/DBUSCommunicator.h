@@ -88,6 +88,8 @@ public:
     void RemoveSurface(DBusConnection* conn, DBusMessage* msg);
     void CreateLayer(DBusConnection* conn, DBusMessage* msg);
     void CreateLayerFromId(DBusConnection* conn, DBusMessage* msg);
+    void CreateLayerWithDimension(DBusConnection* conn, DBusMessage* msg);
+    void CreateLayerFromIdWithDimension(DBusConnection* conn, DBusMessage* msg);
     void RemoveLayer(DBusConnection* conn, DBusMessage* msg);
     void AddSurfaceToSurfaceGroup(DBusConnection* conn, DBusMessage* msg);
     void RemoveSurfaceFromSurfaceGroup(DBusConnection* conn, DBusMessage* msg);

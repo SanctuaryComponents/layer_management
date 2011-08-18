@@ -95,8 +95,10 @@ bool CreateCommand::createLayer(IScene& scene)
 
     l->setDestinationRegion(Rectangle(0, 0, m_originalWidth, m_originalHeight));
     l->setSourceRegion(Rectangle(0, 0, m_originalWidth, m_originalHeight));
+    l->OriginalSourceWidth = m_originalWidth;
+    l->OriginalSourceHeight = m_originalHeight;
 
-    LOG_DEBUG("CreateCommand", "created layer with id: " << l->getID());
+    LOG_DEBUG("CreateCommand", "created layer with id: " << l->getID() << "width: " << m_originalWidth << " height: " << m_originalHeight);
     return true;
 }
 
