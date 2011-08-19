@@ -274,10 +274,10 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
     ViewportTransform::applyLayerDest(&newSurfacePos,m_currentLayer);
 
 
-    newSurfacePos.x = newSurfacePos.x * ((float)layerdest.width / layersrc.width);
+/*    newSurfacePos.x = newSurfacePos.x * ((float)layerdest.width / layersrc.width);
     newSurfacePos.width = newSurfacePos.width * ((float)layerdest.width / layersrc.width);
     newSurfacePos.y = newSurfacePos.y * ((float)layerdest.height / layersrc.height);
-    newSurfacePos.height = newSurfacePos.height * ((float)layerdest.height / layersrc.height);
+    newSurfacePos.height = newSurfacePos.height * ((float)layerdest.height / layersrc.height); */
 
     glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
     IlmMatrixRotateZ(layerMatrix, m_currentLayer->getOrientation() * 90.0f);

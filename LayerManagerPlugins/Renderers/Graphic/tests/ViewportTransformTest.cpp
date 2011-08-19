@@ -291,6 +291,7 @@ TEST_F(ViewportTransformTest, doLayerDESTScaleUp){
     Layer *layer = new Layer();
     layer->OriginalSourceWidth = layerORIG.width;        
     layer->OriginalSourceHeight = layerORIG.height;        
+    layer->setSourceRegion(layerORIG);
     layer->setDestinationRegion(layerDest);
     float x1 = 0.0;
     float x2 = 1.0;
@@ -315,6 +316,7 @@ TEST_F(ViewportTransformTest, doLayerDESTScaleDown){
     Layer *layer = new Layer();
     layer->OriginalSourceWidth = layerORIG.width;        
     layer->OriginalSourceHeight = layerORIG.height;          
+    layer->setSourceRegion(layerORIG);
     layer->setDestinationRegion(layerDest);
     float x1 = 0.0;
     float x2 = 1.0;
@@ -353,7 +355,7 @@ TEST_F(ViewportTransformTest, doSurfaceSrcTransformationTest){
     
 }
 
-TEST_F(ViewportTransformTest, doSurfaceSrcTransformationTesx2){
+TEST_F(ViewportTransformTest, doSurfaceSrcTransformationTest2){
     int surfaceOriginalWidth =100;
     int surfaceOriginalHeight = 100;
     Rectangle surfaceSRC(50,50,25,25);
@@ -434,7 +436,7 @@ TEST_F(ViewportTransformTest, doSurfaceSrcTransformationTest5){
     
 }
 
-TEST_F(ViewportTransformTest, doSurfaceDESTTransformationTesx1){
+TEST_F(ViewportTransformTest, doSurfaceDESTTransformationTest1){
     Rectangle surfacePOS(0,0,100,100);
     Rectangle surfaceDEST(0,0,200,200);
     Surface* surface = m_scene->createSurface(0);
@@ -448,7 +450,7 @@ TEST_F(ViewportTransformTest, doSurfaceDESTTransformationTesx1){
     
 }
 
-TEST_F(ViewportTransformTest, doSurfaceDESTTransformationTesx2){
+TEST_F(ViewportTransformTest, doSurfaceDESTTransformationTest2){
     Rectangle surfacePOS(0,0,100,100);
     Rectangle surfaceDEST(25,25,50,50);
     Surface* surface = m_scene->createSurface(0);
@@ -462,7 +464,7 @@ TEST_F(ViewportTransformTest, doSurfaceDESTTransformationTesx2){
     
 }
 
-TEST_F(ViewportTransformTest, doLayerSRCTransformationTesx1){
+TEST_F(ViewportTransformTest, doLayerSRCTransformationTest1){
     Rectangle surfacePOS(20,20,10,10);
     Rectangle layerSRC(25,25,75,75);
     Layer *layer = new Layer();
@@ -483,7 +485,7 @@ TEST_F(ViewportTransformTest, doLayerSRCTransformationTesx1){
     delete layer;
 }
 
-TEST_F(ViewportTransformTest, doLayerSRCTransformationTesx2){
+TEST_F(ViewportTransformTest, doLayerSRCTransformationTest2){
     Rectangle surfacePOS(30,30,30,30); // from 30 to 60
     Rectangle layerSRC(25,25,75,75);	// from 25 to 75
     Layer *layer = new Layer();
@@ -571,13 +573,14 @@ TEST_F(ViewportTransformTest, doLayerSRCTransformationTest5){
     delete layer;
 }
 
-TEST_F(ViewportTransformTest, doLayerDESTTransformationTesx1){
+TEST_F(ViewportTransformTest, doLayerDESTTransformationTest1){
     Rectangle surfacePOS(0,0,100,100); //      from 20 to 75
     Rectangle layerORIG(0,0,100,100);
     Rectangle layerDest(0,0,100,100);
     Layer *layer = new Layer();
     layer->OriginalSourceWidth = layerORIG.width;
     layer->OriginalSourceHeight = layerORIG.height;
+    layer->setSourceRegion(layerORIG);
     layer->setDestinationRegion(layerDest);
     float x1 = 0.0;
     float x2 = 1.0;
@@ -595,13 +598,14 @@ TEST_F(ViewportTransformTest, doLayerDESTTransformationTesx1){
     delete layer;
 }
 
-TEST_F(ViewportTransformTest, doLayerDESTTransformationTesx2){
+TEST_F(ViewportTransformTest, doLayerDESTTransformationTest2){
     Rectangle surfacePOS(0,0,100,100); //      from 20 to 75
     Rectangle layerORIG(0,0,100,100);
     Rectangle layerDest(0,0,200,200);
     Layer *layer = new Layer();
     layer->OriginalSourceWidth = layerORIG.width;
     layer->OriginalSourceHeight = layerORIG.height;
+    layer->setSourceRegion(layerORIG);
     layer->setDestinationRegion(layerDest);
     float x1 = 0.0;
     float x2 = 1.0;
@@ -626,6 +630,7 @@ TEST_F(ViewportTransformTest, doLayerDESTTransformationTest3){
     Layer *layer = new Layer();
     layer->OriginalSourceWidth = layerORIG.width;
     layer->OriginalSourceHeight = layerORIG.height;
+    layer->setSourceRegion(layerORIG);
     layer->setDestinationRegion(layerDest);
     float x1 = 0.0;
     float x2 = 1.0;
@@ -651,6 +656,7 @@ TEST_F(ViewportTransformTest, doLayerDESTTransformationTest4){
     Layer *layer = new Layer();
     layer->OriginalSourceWidth = layerORIG.width;
     layer->OriginalSourceHeight = layerORIG.height;
+    layer->setSourceRegion(layerORIG);    
     layer->setDestinationRegion(layerDest);
     float x1 = 0.0;
     float x2 = 1.0;
@@ -672,7 +678,7 @@ TEST_F(ViewportTransformTest, completeExample1){
     int surfaceOriginalWidth =60;
     int surfaceOriginalHeight = 60;
     Rectangle surfacePOS(0,0,surfaceOriginalWidth,surfaceOriginalHeight);
-    Rectangle surfaceSRC(20,20,20,20); // cut half size piece from middle of surface
+    Rectangle surfaceSRC(20,20,20,20); 
     Rectangle surfaceDEST(20,20,60,60);
     Surface* surface = m_scene->createSurface(0);
     surface->setSourceRegion(surfaceSRC);
@@ -719,11 +725,11 @@ TEST_F(ViewportTransformTest, completeExample1){
     ASSERT_NEAR(0.66,y2,0.01);
 
     ViewportTransform::applyLayerDest(&surfacePOS,layer);
-    ASSERT_EQ(60u,surfacePOS.width);
+    ASSERT_EQ(120u,surfacePOS.width);
     ASSERT_EQ(0u,surfacePOS.x);
     ASSERT_NEAR(0.5,x1,0.01);
     ASSERT_NEAR(0.66,x2,0.01);
-    ASSERT_EQ(60u,surfacePOS.height);
+    ASSERT_EQ(120u,surfacePOS.height);
     ASSERT_EQ(0u,surfacePOS.y);
     ASSERT_NEAR(0.5,y1,0.01);
     ASSERT_NEAR(0.66,y2,0.01);
@@ -927,5 +933,43 @@ TEST_F(ViewportTransformTest, completeExample6){
     ASSERT_NEAR(1.0,y2,0.01);
     m_scene->removeSurface(surface);
     
+    delete layer;
+}
+TEST_F(ViewportTransformTest, completeExample7){
+    int surfaceOriginalWidth =320;
+    int surfaceOriginalHeight =240;
+    Rectangle surfacePOS(0,0,surfaceOriginalWidth,surfaceOriginalHeight);
+    Rectangle surfaceSRC(0,0,320,240);
+    Rectangle surfaceDEST(0,0,320,240);
+    float x1 = 0.0;
+    float x2 = 1.0;
+    float y1 = 0.0;
+    float y2 = 1.0;
+    Surface* surface = m_scene->createSurface(0);
+    surface->setSourceRegion(surfaceSRC);
+    surface->setDestinationRegion(surfaceDEST);
+    surface->OriginalSourceWidth = surfaceOriginalWidth;
+    surface->OriginalSourceHeight = surfaceOriginalHeight;
+    Rectangle layerDest(100,0,640,480);
+    Rectangle layerSRC(100,0,80,240);
+    Rectangle layerORIG(0,0,1280,480);
+    Layer *layer = new Layer();
+    layer->setSourceRegion(layerSRC);
+    layer->OriginalSourceWidth = layerORIG.width;
+    layer->OriginalSourceHeight = layerORIG.height;     
+    layer->setDestinationRegion(layerDest);
+    ViewportTransform::applySurfaceSource(surface,&x1,&x2,&y1,&y2);
+    ViewportTransform::applySurfaceDest(surface,&surfacePOS);
+    ViewportTransform::applyLayerSource(&surfacePOS,layer,&x1,&x2,&y1,&y2);
+    ViewportTransform::applyLayerDest(&surfacePOS,layer);
+    ASSERT_EQ(100u,surfacePOS.x);
+    ASSERT_EQ(640u,surfacePOS.width);
+    ASSERT_NEAR(0.3125,x1,0.01);
+    ASSERT_NEAR(0.5625,x2,0.01);
+    ASSERT_EQ(0,surfacePOS.y);
+    ASSERT_EQ(480,surfacePOS.height);
+    ASSERT_NEAR(0.0,y1,0.01);
+    ASSERT_NEAR(1.0,y2,0.01);
+    m_scene->removeSurface(surface);    
     delete layer;
 }

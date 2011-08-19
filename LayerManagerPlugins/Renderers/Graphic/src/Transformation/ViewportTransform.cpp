@@ -144,18 +144,19 @@ void ViewportTransform::applyLayerSource(Rectangle* newSurfacePos, Layer* layer,
 void ViewportTransform::applyLayerDest(Rectangle* newSurfacePos, Layer* layer) 
 {
         const Rectangle& layerDest = layer->getDestinationRegion();
+        const Rectangle& layerSrc = layer->getSourceRegion();
         
 		// scale position proportional to change in layer size
-		(*newSurfacePos).x *= (float)layerDest.width/layer->OriginalSourceWidth;
+		(*newSurfacePos).x *= (float)layerDest.width/layerSrc.width;
 		// scale width proportional to change in layer size
-		(*newSurfacePos).width *= (float)layerDest.width/layer->OriginalSourceWidth;
+		(*newSurfacePos).width *= (float)layerDest.width/layerSrc.width;
 		// after scaling, move surface because its position should be relative to moved layer
 		(*newSurfacePos).x+=layerDest.x;
 
 		// scale position proportional to change in layer size
-		(*newSurfacePos).y *= (float)layerDest.height/layer->OriginalSourceHeight;
+		(*newSurfacePos).y *= (float)layerDest.height/layerSrc.height;
 		// scale width proportional to change in layer size
-		(*newSurfacePos).height *= (float)layerDest.height/layer->OriginalSourceHeight;
+		(*newSurfacePos).height *= (float)layerDest.height/layerSrc.height;
 		// after scaling, move surface because its position should be relative to moved layer
 		(*newSurfacePos).y+=layerDest.y;    
     
