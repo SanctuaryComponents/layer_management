@@ -24,7 +24,7 @@ void ViewportTransform::applySurfaceSource(Surface *surface, float* u_left,float
     // move texture coordinate proportional to the cropped pixels
     const Rectangle& surfaceSource = surface->getSourceRegion();
     float percentageCroppedFromLowerSide_U = ((float)surfaceSource.x/surface->OriginalSourceWidth);
-    float textureRangeU = u_right-u_left;
+    float textureRangeU = *u_right-*u_left;
     *u_left += percentageCroppedFromLowerSide_U * textureRangeU;
 
     // move texture coordinate proportional to the cropped pixels
@@ -35,7 +35,7 @@ void ViewportTransform::applySurfaceSource(Surface *surface, float* u_left,float
     // the same for Y
     // move texture coordinate proportional to the cropped pixels
     float percentageCroppedFromTopSideV = ((float)surfaceSource.y/surface->OriginalSourceHeight);
-    float textureRangeV = v_left-v_right;
+    float textureRangeV = *v_right-*v_left;
     *v_left += percentageCroppedFromTopSideV * textureRangeV;
 
     // move texture coordinate proportional to the cropped pixels
