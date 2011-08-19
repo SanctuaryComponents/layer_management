@@ -33,71 +33,74 @@ class GraphicalSurface : public GraphicalObject
 public:
     GraphicalSurface(ObjectType type);
 
-	GraphicalSurface(int externalId,ObjectType type);
+    GraphicalSurface(int externalId,ObjectType type);
 
-		/**
-		 * Set Orientation value
-		 * @param orientation the new value. Multiples of 90 degrees. (0->0°, 1->90°, 2->180°,3->279°)
-		 */
-		void setOrientation(OrientationType newOrientation);
+    /**
+     * Set Orientation value
+     * @param orientation the new value. Multiples of 90 degrees. (0->0°, 1->90°, 2->180°,3->279°)
+     */
+    void setOrientation(OrientationType newOrientation);
 
-		OrientationType getOrientation() const;
+    OrientationType getOrientation() const;
 
-		/**
-		 * Set Source Viewport (only use portion of source graphics)
-		 * @param x Horizontal x position within source (clip from the left)
-		 * @param y Vertical y position within source (clip from the top)
-		 * @param width Width within source (can be used to clip from the right)
-		 * @param height Height within source (can be used to clip fromt he bottom)
-		 */
-		void setSourceRegion(const Rectangle& newSource);
+    /**
+     * Set Source Viewport (only use portion of source graphics)
+     * @param x Horizontal x position within source (clip from the left)
+     * @param y Vertical y position within source (clip from the top)
+     * @param width Width within source (can be used to clip from the right)
+     * @param height Height within source (can be used to clip fromt he bottom)
+     */
+    void setSourceRegion(const Rectangle& newSource);
 
-		const Rectangle& getSourceRegion() const;
+    const Rectangle& getSourceRegion() const;
 
-		/**
-		 * Set Destination Viewport (Scale output)
-		 * @param x Horizontal x position of destination
-		 * @param y Vertical y position of destination
-		 * @param width Width of destination
-		 * @param height Height of destination
-		 */
-		void setDestinationRegion(const Rectangle& newDestination);
+    /**
+     * Set Destination Viewport (Scale output)
+     * @param x Horizontal x position of destination
+     * @param y Vertical y position of destination
+     * @param width Width of destination
+     * @param height Height of destination
+     */
+    void setDestinationRegion(const Rectangle& newDestination);
 
-		void setPosition(const unsigned int& x, const unsigned int& y);
+    void setPosition(const unsigned int& x, const unsigned int& y);
 
-		Vector2 getPosition();
-		void setDimension(const unsigned int& width, const unsigned int& height);
+    Vector2 getPosition();
+    void setDimension(const unsigned int& width, const unsigned int& height);
 
-		const Rectangle& getDestinationRegion() const;
-		Vector2 getDimension();
+    const Rectangle& getDestinationRegion() const;
+    Vector2 getDimension();
 
-		/**
-		 * @Description Indicate if a x,y position is inside the destination region.
-		 *              Attention: Graphical Surface rotation is not yet supported.
-		 * @param x_DestCoordonateSyst x position in the destination coordonate system
-		 * @param y_DestCoordonateSyst y position in the destination coordonate system
-		 * @return TRUE if the position is inside the destination region
-		 */
-		bool isInside(unsigned int x_DestCoordonateSyst, unsigned int y_DestCoordonateSyst) const;
+    /**
+     * @Description Indicate if a x,y position is inside the destination region.
+     *              Attention: Graphical Surface rotation is not yet supported.
+     * @param x_DestCoordonateSyst x position in the destination coordonate system
+     * @param y_DestCoordonateSyst y position in the destination coordonate system
+     * @return TRUE if the position is inside the destination region
+     */
+    bool isInside(unsigned int x_DestCoordonateSyst, unsigned int y_DestCoordonateSyst) const;
 
-		/**
-		 * @Description Transform a x,y position from destination coordonate system to
-		 *              source coordonate system. Attention, to get valid result the x,y
-		 *              positions given in parameter must be located within the destination
-		 *              region of the GraphicalSurface
-		 *
-		 * @param x in/out : IN    x position in the destination coordonate system
-		 *                   OUT   x position in the source coordonate system
-		 * @param y in/out : IN    y position in the destination coordonate system
-		 *                   OUT   y position in the source coordonate system
-		 * @param check If TRUE, a test will be done to make sure the x,y positions
-		 *              given in parameter are located within the destination region.
-		 *
-		 * @return TRUE if the coordonates have been translated
-		 *         FALSE if an error occured, exp: The position is not in the destination region
-		 */
-		bool DestToSourceCoordonates(unsigned int *x, unsigned int *y, bool check) const;
+    /**
+     * @Description Transform a x,y position from destination coordonate system to
+     *              source coordonate system. Attention, to get valid result the x,y
+     *              positions given in parameter must be located within the destination
+     *              region of the GraphicalSurface
+     *
+     * @param x in/out : IN    x position in the destination coordonate system
+     *                   OUT   x position in the source coordonate system
+     * @param y in/out : IN    y position in the destination coordonate system
+     *                   OUT   y position in the source coordonate system
+     * @param check If TRUE, a test will be done to make sure the x,y positions
+     *              given in parameter are located within the destination region.
+     *
+     * @return TRUE if the coordonates have been translated
+     *         FALSE if an error occured, exp: The position is not in the destination region
+     */
+    bool DestToSourceCoordonates(unsigned int *x, unsigned int *y, bool check) const;
 
+    int OriginalSourceWidth;
+    int OriginalSourceHeight;    
+    
 private:
     OrientationType m_orientation; // Rotation of the graphical content
     Rectangle m_sourceViewport;
