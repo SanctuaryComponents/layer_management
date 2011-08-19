@@ -116,7 +116,10 @@ private:
     static int error(Display *dpy, XErrorEvent *ev);
 	bool redrawEvent;
     static bool m_xerror;
-    
+#ifdef ENABLE_INPUT_EVENTS
+	void ManageXInputEvent(XEvent *pevent);
+#endif
+
     friend void * X11eventLoopCallback(void *);
 };
 

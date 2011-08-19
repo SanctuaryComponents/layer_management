@@ -451,7 +451,11 @@ bool X11WindowSystem::CreateCompositorWindow()
     XSetWindowAttributes attr;
     // draw a black background the full size of the resolution
     attr.override_redirect = True;
-    attr.event_mask = ExposureMask | KeyPressMask | ButtonPressMask | StructureNotifyMask;
+#ifdef ENABLE_INPUT_EVENTS
+	attr.event_mask =  ExposureMask | StructureNotifyMask | ButtonPressMask | ButtonReleaseMask;
+#else
+	attr.event_mask = ExposureMask | StructureNotifyMask;
+#endif
     attr.background_pixel = 0;
     attr.border_pixel = 0;
     windowVis = getVisualFunc(x11Display);
@@ -770,10 +774,6 @@ void* X11WindowSystem::EventLoop()
 				LOG_DEBUG("X11WindowSystem", "Expose Event");
 				checkRedraw = true;
 				break;
-			case ButtonPress:
-				LOG_DEBUG("X11WindowSystem", "Button press Event");
-				//running = False;
-				break;
 			case MapNotify:
 				LOG_DEBUG("X11WindowSystem", "Map Event");
 				this->MapWindow(event.xmap.window);
@@ -791,7 +791,12 @@ void* X11WindowSystem::EventLoop()
 				//			 else
 				//				 renderer->DestroyWindow(event.xreparent.window);
 				break;
-
+#ifdef ENABLE_INPUT_EVENTS
+			case ButtonPress:
+			case ButtonRelease:
+				ManageXInputEvent(&event);
+				break;
+#endif
 			default:
 				if (event.type == this->damage_event + XDamageNotify)
 				{
@@ -846,6 +851,37 @@ void* X11WindowSystem::EventLoop()
 	LOG_INFO("X11WindowSystem", "Renderer thread finished");
 	return NULL;
 }
+
+
+#ifdef ENABLE_INPUT_EVENTS
+void X11WindowSystem::ManageXInputEvent(XEvent *pevent)
+{
+	Surface * surf;
+	unsigned int x, y;
+
+	switch (pevent->type)
+	{
+		case ButtonRelease:
+		case ButtonPress:
+			x = ((XButtonEvent*)pevent)->x;
+			y = ((XButtonEvent*)pevent)->y;
+
+			surf = m_pScene->getSurfaceAt(&x, &y, 0.1);
+			if (surf != NULL)
+			{
+				((XButtonEvent*)pevent)->x = x;
+				((XButtonEvent*)pevent)->y = y;
+				XSendEvent(x11Display, surf->nativeHandle, false, 0, pevent);
+			}
+			break;
+
+		default:
+			break;
+	}
+}
+#endif
+
+
 #ifdef USE_XTHREADS
 static Display* displaySignal = NULL;
 #endif //USE_XTHREADS

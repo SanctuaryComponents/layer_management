@@ -379,3 +379,64 @@ void Scene::getLayerGroupIDs(uint* length, uint** array) const
     }
 }
 
+/**
+ * @Description:
+ * Return the first Surface located below a specific coordinate, and for which
+ * the opacity is above a certain level. Also translate the input coordonates
+ * which are display wide into surface wide coordonates.
+ *
+ * This function is mainly used to dispatch mouse events to the underlying
+ * window. For this, we need to know to what is the layer / surface under the
+ * (x,y) mouse pointer.
+ *
+ *
+ *
+ * @param x in/out : IN    x position in the scene
+ *                   OUT   x position in the surface coordonate system
+ * @param y in/out : IN    y position in the scene
+ *                   OUT   y position in the surface coordonate system
+ * @param minOpacity Minimal opacity that a surface should have to be elected
+ */
+Surface* Scene::getSurfaceAt(unsigned int *x, unsigned int *y, double minOpacity)
+{
+	Surface* surf;
+	LayerListIterator currentLayer;
+	SurfaceListIterator currentSurf;
+	unsigned int x_SurfCoordonate, y_SurfCoordonate;
+
+	surf = NULL;
+
+	/* Need to browse for all layers */
+	for (currentLayer = m_currentRenderOrder.begin();
+	     currentLayer != m_currentRenderOrder.end() && surf == NULL;
+	     currentLayer++)
+	{
+		if ( ((*currentLayer)->visibility) && ((*currentLayer)->getOpacity() >= minOpacity) )
+		{
+			if ((*currentLayer)->isInside(*x, *y))
+			{
+				x_SurfCoordonate = *x;
+				y_SurfCoordonate = *y;
+				(*currentLayer)->DestToSourceCoordonates(&x_SurfCoordonate, &y_SurfCoordonate, false);
+				/* Need to browse for all surfaces */
+				for (currentSurf = (*currentLayer)->getAllSurfaces().begin();
+				     currentSurf != (*currentLayer)->getAllSurfaces().end() && surf == NULL;
+				     currentSurf++)
+				{
+					if ( ((*currentSurf)->visibility) && ((*currentSurf)->getOpacity() >= minOpacity) )
+					{
+						if ((*currentSurf)->isInside(x_SurfCoordonate, y_SurfCoordonate))
+						{
+							surf = *currentSurf;
+							(*currentSurf)->DestToSourceCoordonates(&x_SurfCoordonate, &y_SurfCoordonate, false);
+							*x = x_SurfCoordonate;
+							*y = y_SurfCoordonate;
+						}
+					}
+				}
+			}
+		}
+	}
+	return surf;
+}
+

@@ -70,6 +70,34 @@ public:
 
 		const Rectangle& getDestinationRegion() const;
 		Vector2 getDimension();
+
+		/**
+		 * @Description Indicate if a x,y position is inside the destination region.
+		 *              Attention: Graphical Surface rotation is not yet supported.
+		 * @param x_DestCoordonateSyst x position in the destination coordonate system
+		 * @param y_DestCoordonateSyst y position in the destination coordonate system
+		 * @return TRUE if the position is inside the destination region
+		 */
+		bool isInside(unsigned int x_DestCoordonateSyst, unsigned int y_DestCoordonateSyst) const;
+
+		/**
+		 * @Description Transform a x,y position from destination coordonate system to
+		 *              source coordonate system. Attention, to get valid result the x,y
+		 *              positions given in parameter must be located within the destination
+		 *              region of the GraphicalSurface
+		 *
+		 * @param x in/out : IN    x position in the destination coordonate system
+		 *                   OUT   x position in the source coordonate system
+		 * @param y in/out : IN    y position in the destination coordonate system
+		 *                   OUT   y position in the source coordonate system
+		 * @param check If TRUE, a test will be done to make sure the x,y positions
+		 *              given in parameter are located within the destination region.
+		 *
+		 * @return TRUE if the coordonates have been translated
+		 *         FALSE if an error occured, exp: The position is not in the destination region
+		 */
+		bool DestToSourceCoordonates(unsigned int *x, unsigned int *y, bool check) const;
+
 private:
     OrientationType m_orientation; // Rotation of the graphical content
     Rectangle m_sourceViewport;

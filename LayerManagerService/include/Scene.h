@@ -80,6 +80,7 @@ public:
     void removeSurfaceGroup(SurfaceGroup *surface);
     void removeLayerGroup(LayerGroup *layer);
     const SurfaceMap getAllSurfaces() const;
+    Surface* getSurfaceAt(unsigned int *x, unsigned int *y, double minOpacity);
 
 private:
     const LayerMap getAllLayers() const;
