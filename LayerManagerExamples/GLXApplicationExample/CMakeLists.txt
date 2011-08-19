@@ -26,7 +26,11 @@ include_directories ("../../LayerManagerUtils/include")
 
 link_directories ("${PROJECT_SOURCE_DIR}/LayerManagerUtils/bin")
 
+if (WITH_INPUT_EVENTS)
+add_executable(GLX11ApplicationExample src/glx_helper.cpp src/glxX11_application.cpp src/gl2application.cpp src/xevents.cpp)
+else (WITH_INPUT_EVENTS)
 add_executable(GLX11ApplicationExample src/glx_helper.cpp src/glxX11_application.cpp src/gl2application.cpp)
+endif (WITH_INPUT_EVENTS)
 
 add_dependencies(GLX11ApplicationExample ilmClient)
 add_dependencies(GLX11ApplicationExample LayerManagerUtils) 

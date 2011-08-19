@@ -19,6 +19,7 @@
 #include "ilm_client.h"
 #include "glx_helper.h"
 #include "gl2application.h"
+#include "xevents.h"
 #include <stdio.h>
 #include <unistd.h>
 
@@ -69,6 +70,9 @@ int main(int argc, char **argv)
     {
         draw(33);
         usleep(1000);
+#ifdef ENABLE_INPUT_EVENTS
+		parseXEventsNonBlocking();
+#endif
     }
 
     destroyGLXContext();
