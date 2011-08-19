@@ -25,24 +25,17 @@ include_directories ("${PROJECT_SOURCE_DIR}/LayerManagerService/include")
 include_directories ("${PROJECT_SOURCE_DIR}/LayerManagerUtils/include")
 
 enable_testing()
-
 find_package (Threads)
-set(LIBS ${LIBS} ${DBUS_LIBRARY} ${CMAKE_THREAD_LIBS_INIT})
+set(LIBS ${LIBS} ${CMAKE_THREAD_LIBS_INIT} LayerManagerUtils)
 
-file(GLOB LM_SOURCES "${PROJECT_SOURCE_DIR}/LayerManagerService/src/Scene.cpp"
-                     "${PROJECT_SOURCE_DIR}/LayerManagerService/src/Layermanager.cpp"
-		             "${PROJECT_SOURCE_DIR}/LayerManagerService/src/LogicalGraphicsObject.cpp"
-		             "${PROJECT_SOURCE_DIR}/LayerManagerService/src/shader/*.cpp"
-		             "${PROJECT_SOURCE_DIR}/LayerManagerService/src/commands/*.cpp")
-		             
-file(GLOB DBUSCommunicator_SOURCES "../src/*.cpp")
+file(GLOB LM_SOURCES ../../../../LayerManagerService/src/Scene.cpp ../../../../LayerManagerService/src/LogicalGraphicsObject.cpp)
 
-add_executable(GLESTransTest GLESGraphicsSystemTransformationTests.cpp gmock/gmock_main.cc gmock/gmock-gtest-all.cc)
-target_link_libraries(GLESTransTest ${LIBS})
+add_executable(ViewportTransformTest ${LM_SOURCES} ../src/Transformation/ViewportTransform.cpp ViewportTransformTest.cpp gmock/gmock_main.cc gmock/gmock-gtest-all.cc)
+target_link_libraries(ViewportTransformTest ${LIBS})
 
-add_test(AllTestsInGLESTransTest GLESTransTest)
+add_test(AllTestsInViewportTransformTest ViewportTransformTest)
 
-#ADD_CUSTOM_COMMAND(TARGET GLESTransTest
-#    COMMAND GLESTransTest
-#    WORKING_DIRECTORY ${CMAKE_BINARY_DIR} 
-#    )
+ADD_CUSTOM_COMMAND(TARGET ViewportTransformTest
+    COMMAND ViewportTransformTest
+    WORKING_DIRECTORY ${CMAKE_BINARY_DIR} 
+)
