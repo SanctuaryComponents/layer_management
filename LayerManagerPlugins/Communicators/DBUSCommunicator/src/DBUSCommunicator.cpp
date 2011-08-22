@@ -53,8 +53,8 @@ static MethodTable manager_methods[] =
     { "ListSurfacesOfSurfacegroup",       "u",     "au",          &DBUSCommunicator::ListSurfacesOfSurfacegroup },
     { "ListLayersOfLayergroup",           "u",     "au",          &DBUSCommunicator::ListLayersOfLayergroup },
     { "ListSurfaceofLayer",               "u",     "au",          &DBUSCommunicator::ListSurfaceofLayer },
-    { "GetPropertiesOfSurface",           "u",     "duuuuuuuuyb", &DBUSCommunicator::GetPropertiesOfSurface },
-    { "GetPropertiesOfLayer",             "u",     "duuuuuuuuyb", &DBUSCommunicator::GetPropertiesOfLayer },
+    { "GetPropertiesOfSurface",           "u",     "duuuuuuuuuuybu", &DBUSCommunicator::GetPropertiesOfSurface },
+    { "GetPropertiesOfLayer",             "u",     "duuuuuuuuuuyb", &DBUSCommunicator::GetPropertiesOfLayer },
     { "CreateSurface",                    "uuuu",  "u",           &DBUSCommunicator::CreateSurface },
     { "CreateSurfaceFromId",              "uuuuu", "u",           &DBUSCommunicator::CreateSurfaceFromId },
     { "RemoveSurface",                    "u",     "",            &DBUSCommunicator::RemoveSurface },
@@ -484,12 +484,15 @@ void DBUSCommunicator::GetPropertiesOfSurface(DBusConnection* conn, DBusMessage*
         g_pDbusMessage->appendUInt(src.y);
         g_pDbusMessage->appendUInt(src.width);
         g_pDbusMessage->appendUInt(src.height);
+        g_pDbusMessage->appendUInt(surface->OriginalSourceWidth);
+        g_pDbusMessage->appendUInt(surface->OriginalSourceHeight);        
         g_pDbusMessage->appendUInt(dest.x);
         g_pDbusMessage->appendUInt(dest.y);
         g_pDbusMessage->appendUInt(dest.width);
         g_pDbusMessage->appendUInt(dest.height);
         g_pDbusMessage->appendUInt(orientation);
         g_pDbusMessage->appendBool(surface->getVisibility());
+        g_pDbusMessage->appendUInt(surface->frameCounter);
         g_pDbusMessage->closeReply();
     }
     else
@@ -518,6 +521,8 @@ void DBUSCommunicator::GetPropertiesOfLayer(DBusConnection* conn, DBusMessage* m
         g_pDbusMessage->appendUInt(src.y);
         g_pDbusMessage->appendUInt(src.width);
         g_pDbusMessage->appendUInt(src.height);
+        g_pDbusMessage->appendUInt(layer->OriginalSourceWidth);
+        g_pDbusMessage->appendUInt(layer->OriginalSourceHeight);
         g_pDbusMessage->appendUInt(dest.x);
         g_pDbusMessage->appendUInt(dest.y);
         g_pDbusMessage->appendUInt(dest.width);

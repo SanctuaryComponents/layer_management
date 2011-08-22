@@ -236,12 +236,14 @@ void showLayerProperties(t_param_struct *pStruct)
     printf("\tsourceY \t: %i\n",layerProperties.sourceY);
     printf("\tsourceWidth \t: %i\n",layerProperties.sourceWidth);
     printf("\tsourceHeight \t: %i\n",layerProperties.sourceHeight);
+    printf("\torigSrcWidth \t: %i\n",layerProperties.origSourceWidth);
+    printf("\torigSrcHeight \t: %i\n",layerProperties.origSourceHeight);
     printf("\tdestX \t\t: %i\n",layerProperties.destX);
     printf("\tdestY \t\t: %i\n",layerProperties.destY);
     printf("\tdestWidth \t: %i\n",layerProperties.destWidth);
     printf("\tdestHeight \t: %i\n",layerProperties.destHeight);
     printf("\torientation \t: %i\n",layerProperties.orientation);
-    printf("\tvisibility\t: %i\n",layerProperties.visibility);
+    printf("\tvisibility\t: %i\n\n",layerProperties.visibility);
 }
 
 void showSurfaceProperties(t_param_struct *pStruct) 
@@ -254,12 +256,15 @@ void showSurfaceProperties(t_param_struct *pStruct)
     printf("\tsourceY \t: %i\n",surfaceProperties.sourceY);
     printf("\tsourceWidth \t: %i\n",surfaceProperties.sourceWidth);
     printf("\tsourceHeight \t: %i\n",surfaceProperties.sourceHeight);
+    printf("\torigSrcWidth \t: %i\n",surfaceProperties.origSourceWidth);
+    printf("\torigSrcHeight \t: %i\n",surfaceProperties.origSourceHeight);
     printf("\tdestX \t\t: %i\n",surfaceProperties.destX);
     printf("\tdestY \t\t: %i\n",surfaceProperties.destY);
     printf("\tdestWidth \t: %i\n",surfaceProperties.destWidth);
     printf("\tdestHeight \t: %i\n",surfaceProperties.destHeight);
     printf("\torientation \t: %i\n",surfaceProperties.orientation);
     printf("\tvisibility\t: %i\n",surfaceProperties.visibility);
+    printf("\tRendered frames\t: %i\n\n",surfaceProperties.frameCounter);    
 }
 
 

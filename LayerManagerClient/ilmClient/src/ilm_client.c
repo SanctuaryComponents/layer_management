@@ -79,7 +79,7 @@ ilmErrorTypes ilm_getPropertiesOfSurface(t_ilm_uint surfaceID, struct ilmSurface
     }
 
     // Setup parameter to send
-    t_ilm_param param[12];
+    t_ilm_param param[15];
     _ilm_setup_param(&param[0], DBUS_TYPE_UINT32, &surfaceID);
     _ilm_setup_param(&param[1], DBUS_TYPE_DOUBLE, &pSurfaceProperties->opacity);
     _ilm_setup_param(&param[2], DBUS_TYPE_UINT32, &pSurfaceProperties->sourceX);
@@ -88,15 +88,22 @@ ilmErrorTypes ilm_getPropertiesOfSurface(t_ilm_uint surfaceID, struct ilmSurface
             &pSurfaceProperties->sourceWidth);
     _ilm_setup_param(&param[5], DBUS_TYPE_UINT32,
             &pSurfaceProperties->sourceHeight);
-    _ilm_setup_param(&param[6], DBUS_TYPE_UINT32, &pSurfaceProperties->destX);
-    _ilm_setup_param(&param[7], DBUS_TYPE_UINT32, &pSurfaceProperties->destY);
-    _ilm_setup_param(&param[8], DBUS_TYPE_UINT32, &pSurfaceProperties->destWidth);
-    _ilm_setup_param(&param[9], DBUS_TYPE_UINT32,
+    _ilm_setup_param(&param[6], DBUS_TYPE_UINT32,
+            &pSurfaceProperties->origSourceWidth);
+    _ilm_setup_param(&param[7], DBUS_TYPE_UINT32,
+            &pSurfaceProperties->origSourceHeight);
+            
+    _ilm_setup_param(&param[8], DBUS_TYPE_UINT32, &pSurfaceProperties->destX);
+    _ilm_setup_param(&param[9], DBUS_TYPE_UINT32, &pSurfaceProperties->destY);
+    _ilm_setup_param(&param[10], DBUS_TYPE_UINT32, &pSurfaceProperties->destWidth);
+    _ilm_setup_param(&param[11], DBUS_TYPE_UINT32,
             &pSurfaceProperties->destHeight);
-    _ilm_setup_param(&param[10], DBUS_TYPE_UINT32,
+    _ilm_setup_param(&param[12], DBUS_TYPE_UINT32,
             &pSurfaceProperties->orientation);
-    _ilm_setup_param(&param[11], DBUS_TYPE_BOOLEAN,
+    _ilm_setup_param(&param[13], DBUS_TYPE_BOOLEAN,
             &pSurfaceProperties->visibility);
+    _ilm_setup_param(&param[14], DBUS_TYPE_UINT32,
+            &pSurfaceProperties->frameCounter);
 
 	/* Setup message to send */
 	DBusMessage *message;
@@ -109,7 +116,7 @@ ilmErrorTypes ilm_getPropertiesOfSurface(t_ilm_uint surfaceID, struct ilmSurface
 	ILM_CHECK_METHOD_ERROR(message);
 
     // read the parameters
-    returnValue = _ilm_get_dbus_basic_elements(message, 11, &param[1]);
+    returnValue = _ilm_get_dbus_basic_elements(message, 14, &param[1]);
     _ilm_close_dbus_method_call(message);
 
     return returnValue;
@@ -125,7 +132,7 @@ ilmErrorTypes ilm_getPropertiesOfLayer(t_ilm_uint layerID, struct ilmLayerProper
     }
 
     // Setup parameter to send
-    t_ilm_param param[12];
+    t_ilm_param param[14];
     _ilm_setup_param(&param[0], DBUS_TYPE_UINT32, &layerID);
     _ilm_setup_param(&param[1], DBUS_TYPE_DOUBLE, &pLayerProperties->opacity);
     _ilm_setup_param(&param[2], DBUS_TYPE_UINT32, &pLayerProperties->sourceX);
@@ -133,13 +140,17 @@ ilmErrorTypes ilm_getPropertiesOfLayer(t_ilm_uint layerID, struct ilmLayerProper
     _ilm_setup_param(&param[4], DBUS_TYPE_UINT32, &pLayerProperties->sourceWidth);
     _ilm_setup_param(&param[5], DBUS_TYPE_UINT32,
             &pLayerProperties->sourceHeight);
-    _ilm_setup_param(&param[6], DBUS_TYPE_UINT32, &pLayerProperties->destX);
-    _ilm_setup_param(&param[7], DBUS_TYPE_UINT32, &pLayerProperties->destY);
-    _ilm_setup_param(&param[8], DBUS_TYPE_UINT32, &pLayerProperties->destWidth);
-    _ilm_setup_param(&param[9], DBUS_TYPE_UINT32, &pLayerProperties->destHeight);
-    _ilm_setup_param(&param[10], DBUS_TYPE_UINT32,
+    _ilm_setup_param(&param[6], DBUS_TYPE_UINT32, &pLayerProperties->origSourceWidth);
+    _ilm_setup_param(&param[7], DBUS_TYPE_UINT32,
+            &pLayerProperties->origSourceHeight);
+            
+    _ilm_setup_param(&param[8], DBUS_TYPE_UINT32, &pLayerProperties->destX);
+    _ilm_setup_param(&param[9], DBUS_TYPE_UINT32, &pLayerProperties->destY);
+    _ilm_setup_param(&param[10], DBUS_TYPE_UINT32, &pLayerProperties->destWidth);
+    _ilm_setup_param(&param[11], DBUS_TYPE_UINT32, &pLayerProperties->destHeight);
+    _ilm_setup_param(&param[12], DBUS_TYPE_UINT32,
             &pLayerProperties->orientation);
-    _ilm_setup_param(&param[11], DBUS_TYPE_BOOLEAN,
+    _ilm_setup_param(&param[13], DBUS_TYPE_BOOLEAN,
             &pLayerProperties->visibility);
 
 	/* Setup message to send */
@@ -161,7 +172,7 @@ ilmErrorTypes ilm_getPropertiesOfLayer(t_ilm_uint layerID, struct ilmLayerProper
     ILM_CHECK_METHOD_ERROR(message);
 
     // read the parameters
-    returnValue = _ilm_get_dbus_basic_elements(message, 11, &param[1]);
+    returnValue = _ilm_get_dbus_basic_elements(message, 13, &param[1]);
     _ilm_close_dbus_method_call(message);
 
     return returnValue;

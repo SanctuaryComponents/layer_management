@@ -167,12 +167,15 @@ struct ilmSurfaceProperties
     t_ilm_uint sourceY;        /*!< y source position value of the surface */
     t_ilm_uint sourceWidth;        /*!< source width value of the surface */
     t_ilm_uint sourceHeight;    /*!< source height value of the surface */
+    t_ilm_uint origSourceWidth;        /*!< original source width value of the surface */
+    t_ilm_uint origSourceHeight;    /*!< original source height value of the surface */
     t_ilm_uint destX;        /*!< x destination position value of the surface */
     t_ilm_uint destY;        /*!< y desitination position value of the surface */
     t_ilm_uint destWidth;        /*!< destination width value of the surface */
     t_ilm_uint destHeight;        /*!< destination height value of the surface */
     ilmOrientation orientation;    /*!< orientation value of the surface */
     t_ilm_bool visibility;        /*!< visibility value of the surface */
+    t_ilm_uint frameCounter;      /*!< already rendered frames of surface */
 };
 
 /**
@@ -186,6 +189,8 @@ struct ilmLayerProperties
     t_ilm_uint sourceY;        /*!< y source position value of the layer */
     t_ilm_uint sourceWidth;        /*!< source width value of the layer */
     t_ilm_uint sourceHeight;    /*!< source height value of the layer */
+    t_ilm_uint origSourceWidth;        /*!< original source width value of the layer */
+    t_ilm_uint origSourceHeight;    /*!< original source height value of the layer */    
     t_ilm_uint destX;        /*!< x destination position value of the layer */
     t_ilm_uint destY;        /*!< y desitination position value of the layer */
     t_ilm_uint destWidth;        /*!< destination width value of the layer */
