@@ -58,6 +58,12 @@ option (WITH_TESTS
         
 option (WITH_XTHREADS
         "Build with usage of X11 Threading" ON)
+        
+option (WITH_GLX_LIB
+        "Build development library for GLX Based Renderers" OFF)
+        
+option (WITH_GLESv2_LIB
+        "Build development library for GLES2 Based Renderers" OFF)
 
 option (WITH_INPUT_EVENTS
         "Activate input events handling" OFF)
@@ -87,7 +93,18 @@ add_subdirectory (LayerManagerCommands)
 add_subdirectory (LayerManagerService)
 add_subdirectory (LayerManagerExamples/LayerManagerClientExample)
 add_subdirectory (LayerManagerExamples/LayerManagerToolBox)
-    
+
+if (WITH_DESKTOP)
+set (WITH_GLX_LIB ON CACHE STRING "" FORCE)
+endif(WITH_DESKTOP)     
+
+if (WITH_X11_GLES)
+set (WITH_GLESv2_LIB ON CACHE STRING "" FORCE)
+endif(WITH_X11_GLES)   
+if (WITH_GLESv2_LIB OR WITH_GLX_LIB )    
+    add_subdirectory (LayerManagerPlugins/Renderers/Graphic)
+endif(WITH_GLESv2_LIB OR WITH_GLX_LIB)
+
 if (WITH_DESKTOP)
     add_subdirectory (LayerManagerPlugins/Renderers/Platform/GLXRenderer)
 endif(WITH_DESKTOP)     

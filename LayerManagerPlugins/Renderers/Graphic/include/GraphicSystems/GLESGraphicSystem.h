@@ -34,29 +34,31 @@ public:
     GLESGraphicsystem(int windowHeight, int windowWidth,
             PfnShaderProgramCreator shaderProgram);
 
-    bool init(EGLNativeDisplayType display, EGLNativeWindowType window);
+    virtual bool init(EGLNativeDisplayType display, EGLNativeWindowType window);
 
-    void clearBackground();
+    virtual void clearBackground();
 
-    void swapBuffers();
+    virtual void swapBuffers();
 
-	void beginLayer(Layer* layer);
-	void checkRenderLayer();
-	void renderLayer();
-	void endLayer();
+	virtual void beginLayer(Layer* layer);
+	virtual void checkRenderLayer();
+	virtual void renderLayer();
+	virtual void endLayer();
 
-    bool initOpenGLES(EGLint displayWidth, EGLint displayHeight);
-    void resize(EGLint displayWidth, EGLint displayHeight);
-    void doScreenShot(std::string fileToSave);
+    virtual bool initOpenGLES(EGLint displayWidth, EGLint displayHeight);
+    virtual void resize(EGLint displayWidth, EGLint displayHeight);
 
-    void saveScreenShotOfFramebuffer(std::string fileToSave);
+    virtual void saveScreenShotOfFramebuffer(std::string fileToSave);
 
-    EGLDisplay getEGLDisplay()
+    virtual EGLDisplay getEGLDisplay()
     {
         return m_eglDisplay;
     }
 
-    // TODO: should be private/protected
+    virtual void renderSurface(Surface* surface);
+	virtual Shader *pickOptimizedShader(Shader* currentShader, const ShaderProgram::CommonUniforms curUniforms);
+
+protected:
     int m_windowWidth;
     int m_windowHeight;
     EGLNativeDisplayType m_nativeDisplay;
@@ -73,14 +75,9 @@ public:
     Shader* m_defaultShader;
     Shader* m_defaultShaderNoUniformAlpha;
     Layer* m_currentLayer;
-    void renderSurface(Surface* surface);
-	Shader *pickOptimizedShader(Shader* currentShader, const ShaderProgram::CommonUniforms curUniforms);
 #ifdef DRAW_LAYER_DEBUG
     Shader* m_layerShader;
 #endif
-
-protected:
-
 private:
     void saveScreenShot();
 };

@@ -30,28 +30,31 @@ public:
     GLXGraphicsystem( int windowWidth, int windowHeight);
     virtual ~GLXGraphicsystem();
     static XVisualInfo* GetMatchingVisual(Display *dpy);
-    bool init(Display* x11Display, Window x11Window);
+    virtual bool init(Display* x11Display, Window x11Window);
+    virtual bool isZeroCopyEnabled()
+    {
+        return m_zerocopy;
+    }
+    virtual void beginLayer(Layer* layer);
+    virtual void checkRenderLayer();
+    virtual void renderLayer();
+    virtual void endLayer();
 
-	void beginLayer(Layer* layer);
-	void checkRenderLayer();
-	void renderLayer();
-	void endLayer();
-
-    void clearBackground();
-    void swapBuffers();
-    void saveScreenShotOfFramebuffer(std::string fileToSave);
-    GLXFBConfig GetMatchingPixmapConfig(Display *curDisplay);
+    virtual void clearBackground();
+    virtual void swapBuffers();
+    virtual void saveScreenShotOfFramebuffer(std::string fileToSave);
+    GLXFBConfig* GetMatchingPixmapConfig(Display *curDisplay);
     bool CheckConfigValue(Display *curDisplay,GLXFBConfig currentConfig, int attribute, int expectedValue);
     bool CheckConfigMask(Display *curDisplay,GLXFBConfig currentConfig, int attribute, int expectedValue);
-    void renderSurface(Surface* currentSurface);
+    virtual void renderSurface(Surface* currentSurface);
 
 private:
-    int windowWidth;
-    int windowHeight;
-    Display* x11disp;
-    Window     window;
-    Layer*    m_currentLayer;
-    bool     m_forcecopy;
+    int         windowWidth;
+    int         windowHeight;
+    Display*    x11disp;
+    Window      window;
+    Layer*      m_currentLayer;
+    bool        m_zerocopy;
 };
 
 #endif /* _GLXGRAPHICSYSTEM_H_ */

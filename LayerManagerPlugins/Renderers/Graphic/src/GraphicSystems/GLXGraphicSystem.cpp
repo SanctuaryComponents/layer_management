@@ -29,11 +29,7 @@ GLXGraphicsystem::GLXGraphicsystem(int WindowWidth, int WindowHeight)
     LOG_DEBUG("GLXGraphicsystem", "creating GLXGraphicsystem");
     this->windowHeight = WindowHeight;
     this->windowWidth = WindowWidth;
-#ifdef GLX_GRAPHICSYSTEM_FORCE_COPY
-    m_forcecopy = true;
-#else
-    m_forcecopy = false;
-#endif
+    m_zerocopy = false;
 }
 
 GLXGraphicsystem::~GLXGraphicsystem()
@@ -95,7 +91,7 @@ bool GLXGraphicsystem::CheckConfigValue(Display *curDisplay,GLXFBConfig currentC
 }
 
 
-GLXFBConfig GLXGraphicsystem::GetMatchingPixmapConfig(Display *curDisplay)
+GLXFBConfig* GLXGraphicsystem::GetMatchingPixmapConfig(Display *curDisplay)
 {
     int neededMaskAttribute[] =
     {
@@ -157,11 +153,11 @@ GLXFBConfig GLXGraphicsystem::GetMatchingPixmapConfig(Display *curDisplay)
     if (i == nConfigs)
     {
         LOG_ERROR("GLXGraphicsystem", "Unable to find FBconfig for texturing");
-        exit(1);
+        return NULL;
     }
 
     LOG_DEBUG("GLXGraphicsystem", "Done choosing GL Pixmap configuration");
-    return currentFBconfigs[i];
+    return &currentFBconfigs[i];
 }
 
 bool GLXGraphicsystem::init(Display* x11Display, Window x11Window)
@@ -173,11 +169,13 @@ bool GLXGraphicsystem::init(Display* x11Display, Window x11Window)
     if (!x11disp)
     {
         LOG_ERROR("GLXGraphicsystem", "given display is null");
+        return false;
     }
 
     if (!window)
     {
         LOG_ERROR("GLXGraphicsystem", "given windowid is 0");
+        return false;
     }
 
     XVisualInfo* windowVis = GetMatchingVisual(x11disp);
@@ -187,7 +185,7 @@ bool GLXGraphicsystem::init(Display* x11Display, Window x11Window)
     if (!ctx)
     {
         LOG_ERROR("GLXGraphicsystem", "Couldn't create GLX context!");
-        exit(1);
+        return false;
     }
     LOG_DEBUG("GLXGraphicsystem", "Make GLX Context current");
     glXMakeCurrent(x11disp, window, ctx);
@@ -199,20 +197,17 @@ bool GLXGraphicsystem::init(Display* x11Display, Window x11Window)
     ITextureBinder * binder;
     const char *ext;
     ext = glXQueryExtensionsString(x11disp, 0);
-    if (!strstr(ext, "GLX_EXT_texture_from_pixmap") || true == m_forcecopy )
+    if (!strstr(ext, "GLX_EXT_texture_from_pixmap") )
     {
-        LOG_DEBUG("GLXGraphicsystem", "GLX_EXT_texture_from_pixmap not supported or copy is forced! Fallback to copy!");
-        binder = new X11CopyGLX(x11disp);
+        m_zerocopy = false;
     }
     else
     {
-        GLXFBConfig pixmapConfig = GetMatchingPixmapConfig(x11disp);
-        binder = new X11TextureFromPixmap(x11disp,pixmapConfig);
+        m_zerocopy = true;
     }
 
-    setTextureBinder(binder);
-
     LOG_DEBUG("GLXGraphicsystem", "Initialised");
+    return true;
 }
 
 

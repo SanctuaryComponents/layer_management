@@ -22,7 +22,7 @@
 
 #include <list>
 #include <gmock/gmock.h>  // Brings in Google Mock.
-class MockLayerList : public IScene{
+class MockLayerList : public Scene {
  public:
   MOCK_METHOD1(createLayer, Layer*(unsigned int));
   MOCK_METHOD1(createSurface, Surface*(unsigned int));
