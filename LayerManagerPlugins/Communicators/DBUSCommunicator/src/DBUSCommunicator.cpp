@@ -27,6 +27,7 @@
 #include "DBUSCommunicator.h"
 #include "DBUSIntrospection.h"
 #include "DBUSMessageHandler.h"
+#include "DBUSConfiguration.h"
 
 #include "Log.h"
 
@@ -126,9 +127,6 @@ using std::stringstream;
 #include <string>
 using std::string;
 
-
-DBUSCommunicator* DBUSCommunicator::m_reference = NULL;
-
 DBUSCommunicator::DBUSCommunicator(ICommandExecutor* executor)
 : ICommunicator(executor)
 , m_running(false)
@@ -138,7 +136,6 @@ DBUSCommunicator::DBUSCommunicator(ICommandExecutor* executor)
 void DBUSCommunicator::setdebug(bool onoff)
 {
     (void)onoff; // TODO: remove, only prevents warning
-    // TODO
 }
 
 bool DBUSCommunicator::start()
@@ -147,9 +144,16 @@ bool DBUSCommunicator::start()
 
     g_pDbusMessage = new DBUSMessageHandler();
 
-    LOG_INFO("DBUSCommunicator","create thread");
-    this->m_running = true;
-    pthread_create(&m_currentThread, NULL, DBUSCommunicator::run, this);
+    LOG_INFO("DBUSCommunicator","registering for dbus path " << DBUS_SERVICE_OBJECT_PATH);
+    bool registered = g_pDbusMessage->registerPathFunction(DBUSCommunicator::processMessageFunc,
+    		                                               DBUSCommunicator::unregisterMessageFunc,
+    		                                               this);
+    if (!registered)
+    {
+        LOG_ERROR("DBUSCommunicator","Register Message Callbacks failed");
+        exit(-1);
+    }
+
     LOG_INFO("DBUSCommunicator", "Started dbus connector");
     return true;
 }
@@ -157,9 +161,8 @@ bool DBUSCommunicator::start()
 void DBUSCommunicator::stop()
 {
     LOG_INFO("DBUSCommunicator","stopping");
-    this->m_running = false;
-    pthread_join(m_currentThread, NULL);
 
+    // deregister dbus messaging implicitly by deleting messageHandler
     delete g_pDbusMessage;
 }
 
@@ -170,7 +173,7 @@ void DBUSCommunicator::Debug(DBusConnection* conn, DBusMessage* msg)
     g_pDbusMessage->initReceive(msg);
     bool param = g_pDbusMessage->getBool();
 
-    bool status = m_reference->m_executor->execute(new DebugCommand(param));
+    bool status = m_executor->execute(new DebugCommand(param));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -188,7 +191,7 @@ void DBUSCommunicator::GetScreenResolution(DBusConnection* conn, DBusMessage* ms
 
     g_pDbusMessage->initReceive(msg);
     uint screenid = g_pDbusMessage->getUInt();
-    uint* resolution = m_reference->m_executor->getScreenResolution(screenid);
+    uint* resolution = m_executor->getScreenResolution(screenid);
     g_pDbusMessage->initReply(msg);
     g_pDbusMessage->appendUInt(resolution[0]);
     g_pDbusMessage->appendUInt(resolution[1]);
@@ -201,7 +204,7 @@ void DBUSCommunicator::GetNumberOfHardwareLayers(DBusConnection* conn, DBusMessa
 
     g_pDbusMessage->initReceive(msg);
     uint screenid = g_pDbusMessage->getUInt();
-    uint numberOfHardwareLayers = m_reference->m_executor->getNumberOfHardwareLayers(screenid);
+    uint numberOfHardwareLayers = m_executor->getNumberOfHardwareLayers(screenid);
     g_pDbusMessage->initReply(msg);
     g_pDbusMessage->appendUInt(numberOfHardwareLayers);
     g_pDbusMessage->closeReply();
@@ -213,7 +216,7 @@ void DBUSCommunicator::GetScreenIDs(DBusConnection* conn, DBusMessage* msg)
 
     g_pDbusMessage->initReceive(msg);
     uint length = 0;
-    uint* IDs = m_reference->m_executor->getScreenIDs(&length);
+    uint* IDs = m_executor->getScreenIDs(&length);
     g_pDbusMessage->initReply(msg);
     g_pDbusMessage->appendArrayOfUInt(length, IDs);
     g_pDbusMessage->closeReply();
@@ -227,7 +230,7 @@ void DBUSCommunicator::ScreenShot(DBusConnection* conn, DBusMessage* msg)
     uint screenid = g_pDbusMessage->getUInt();
     char* filename = g_pDbusMessage->getString();
 
-    bool status = m_reference->m_executor->execute(new ScreenShotCommand(filename, ScreenshotOfDisplay, screenid));
+    bool status = m_executor->execute(new ScreenShotCommand(filename, ScreenshotOfDisplay, screenid));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -247,7 +250,7 @@ void DBUSCommunicator::ScreenShotOfLayer(DBusConnection* conn, DBusMessage* msg)
     char* filename = g_pDbusMessage->getString();
     uint layerid = g_pDbusMessage->getUInt();
 
-    bool status = m_reference->m_executor->execute(new ScreenShotCommand(filename, ScreenshotOfLayer, layerid));
+    bool status = m_executor->execute(new ScreenShotCommand(filename, ScreenshotOfLayer, layerid));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -266,7 +269,7 @@ void DBUSCommunicator::ScreenShotOfSurface(DBusConnection* conn, DBusMessage* ms
     g_pDbusMessage->initReceive(msg);
     char* filename = g_pDbusMessage->getString();
     uint id = g_pDbusMessage->getUInt();
-    bool status = m_reference->m_executor->execute(new ScreenShotCommand(filename, ScreenshotOfSurface, id));
+    bool status = m_executor->execute(new ScreenShotCommand(filename, ScreenshotOfSurface, id));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -284,12 +287,12 @@ void DBUSCommunicator::ListAllLayerIDS(DBusConnection* conn, DBusMessage* msg)
 
     uint* array = NULL;
     uint length = 0;
-    m_reference->m_executor->getScene()->lockScene();
-    m_reference->m_executor->getScene()->getLayerIDs(&length, &array);
+    m_executor->getScene()->lockScene();
+    m_executor->getScene()->getLayerIDs(&length, &array);
     g_pDbusMessage->initReply(msg);
     g_pDbusMessage->appendArrayOfUInt(length, array);
     g_pDbusMessage->closeReply();
-    m_reference->m_executor->getScene()->unlockScene();
+    m_executor->getScene()->unlockScene();
 }
 
 void DBUSCommunicator::ListAllLayerIDsOnScreen(DBusConnection* conn, DBusMessage* msg)
@@ -301,8 +304,8 @@ void DBUSCommunicator::ListAllLayerIDsOnScreen(DBusConnection* conn, DBusMessage
 
     uint* array = NULL;
     uint length = 0;
-    m_reference->m_executor->getScene()->lockScene();
-    bool status = m_reference->m_executor->getScene()->getLayerIDsOfScreen(screenID, &length, &array);
+    m_executor->getScene()->lockScene();
+    bool status = m_executor->getScene()->getLayerIDsOfScreen(screenID, &length, &array);
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -313,7 +316,7 @@ void DBUSCommunicator::ListAllLayerIDsOnScreen(DBusConnection* conn, DBusMessage
     {
         g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
-    m_reference->m_executor->getScene()->unlockScene();
+    m_executor->getScene()->unlockScene();
 
 }
 
@@ -323,12 +326,12 @@ void DBUSCommunicator::ListAllSurfaceIDS(DBusConnection* conn, DBusMessage* msg)
 
     uint* array = NULL;
     uint length = 0;
-    m_reference->m_executor->getScene()->lockScene();
-    m_reference->m_executor->getScene()->getSurfaceIDs(&length, &array);
+    m_executor->getScene()->lockScene();
+    m_executor->getScene()->getSurfaceIDs(&length, &array);
     g_pDbusMessage->initReply(msg);
     g_pDbusMessage->appendArrayOfUInt(length, array);
     g_pDbusMessage->closeReply();
-    m_reference->m_executor->getScene()->unlockScene();
+    m_executor->getScene()->unlockScene();
 }
 
 void DBUSCommunicator::ListAllLayerGroupIDS(DBusConnection* conn, DBusMessage* msg)
@@ -337,12 +340,12 @@ void DBUSCommunicator::ListAllLayerGroupIDS(DBusConnection* conn, DBusMessage* m
 
     uint* array = NULL;
     uint length = 0;
-    m_reference->m_executor->getScene()->lockScene();
-    m_reference->m_executor->getScene()->getLayerGroupIDs(&length, &array);
+    m_executor->getScene()->lockScene();
+    m_executor->getScene()->getLayerGroupIDs(&length, &array);
     g_pDbusMessage->initReply(msg);
     g_pDbusMessage->appendArrayOfUInt(length, array);
     g_pDbusMessage->closeReply();
-    m_reference->m_executor->getScene()->unlockScene();
+    m_executor->getScene()->unlockScene();
 }
 
 void DBUSCommunicator::ListAllSurfaceGroupIDS(DBusConnection* conn, DBusMessage* msg)
@@ -351,12 +354,12 @@ void DBUSCommunicator::ListAllSurfaceGroupIDS(DBusConnection* conn, DBusMessage*
 
     uint* array = NULL;
     uint length = 0;
-    m_reference->m_executor->getScene()->lockScene();
-    m_reference->m_executor->getScene()->getSurfaceGroupIDs(&length, &array);
+    m_executor->getScene()->lockScene();
+    m_executor->getScene()->getSurfaceGroupIDs(&length, &array);
     g_pDbusMessage->initReply(msg);
     g_pDbusMessage->appendArrayOfUInt(length, array);
     g_pDbusMessage->closeReply();
-    m_reference->m_executor->getScene()->unlockScene();
+    m_executor->getScene()->unlockScene();
 }
 
 void DBUSCommunicator::ListSurfacesOfSurfacegroup(DBusConnection* conn, DBusMessage* msg)
@@ -365,8 +368,8 @@ void DBUSCommunicator::ListSurfacesOfSurfacegroup(DBusConnection* conn, DBusMess
 
     g_pDbusMessage->initReceive(msg);
     uint id = g_pDbusMessage->getUInt();
-    m_reference->m_executor->getScene()->lockScene();
-    SurfaceGroup* sg = m_reference->m_executor->getScene()->getSurfaceGroup(id);
+    m_executor->getScene()->lockScene();
+    SurfaceGroup* sg = m_executor->getScene()->getSurfaceGroup(id);
     if (NULL != sg)
     {
         std::list<Surface*> surfaces = sg->getList();
@@ -385,7 +388,7 @@ void DBUSCommunicator::ListSurfacesOfSurfacegroup(DBusConnection* conn, DBusMess
         g_pDbusMessage->appendArrayOfUInt(length, array);
 
         g_pDbusMessage->closeReply();
-        m_reference->m_executor->getScene()->unlockScene();
+        m_executor->getScene()->unlockScene();
     }
     else
     {
@@ -407,8 +410,8 @@ void DBUSCommunicator::ListLayersOfLayergroup(DBusConnection* conn, DBusMessage*
 
     g_pDbusMessage->initReceive(msg);
     uint id = g_pDbusMessage->getUInt();
-    m_reference->m_executor->getScene()->lockScene();
-    LayerGroup* sg = m_reference->m_executor->getScene()->getLayerGroup(id);
+    m_executor->getScene()->lockScene();
+    LayerGroup* sg = m_executor->getScene()->getLayerGroup(id);
     if (NULL != sg)
     {
         std::list<Layer*> layers = sg->getList();
@@ -428,7 +431,7 @@ void DBUSCommunicator::ListLayersOfLayergroup(DBusConnection* conn, DBusMessage*
         g_pDbusMessage->appendArrayOfUInt(length, array);
 
         g_pDbusMessage->closeReply();
-        m_reference->m_executor->getScene()->unlockScene();
+        m_executor->getScene()->unlockScene();
     }
     else
     {
@@ -442,8 +445,8 @@ void DBUSCommunicator::ListSurfaceofLayer(DBusConnection* conn, DBusMessage* msg
 
     g_pDbusMessage->initReceive(msg);
     uint id = g_pDbusMessage->getUInt();
-    m_reference->m_executor->getScene()->lockScene();
-    Layer* layer = m_reference->m_executor->getScene()->getLayer(id);
+    m_executor->getScene()->lockScene();
+    Layer* layer = m_executor->getScene()->getLayer(id);
     if (layer != NULL)
     {
         std::list<Surface*> surfaces = layer->getAllSurfaces();
@@ -469,7 +472,7 @@ void DBUSCommunicator::ListSurfaceofLayer(DBusConnection* conn, DBusMessage* msg
     {
         g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
-    m_reference->m_executor->getScene()->unlockScene();
+    m_executor->getScene()->unlockScene();
 }
 
 void DBUSCommunicator::GetPropertiesOfSurface(DBusConnection* conn, DBusMessage* msg)
@@ -479,7 +482,7 @@ void DBUSCommunicator::GetPropertiesOfSurface(DBusConnection* conn, DBusMessage*
     g_pDbusMessage->initReceive(msg);
     uint id = g_pDbusMessage->getUInt();
 
-    Surface* surface = m_reference->m_executor->getScene()->getSurface(id);
+    Surface* surface = m_executor->getScene()->getSurface(id);
     if (surface != NULL)
     {
         Rectangle dest = surface->getDestinationRegion();
@@ -516,7 +519,7 @@ void DBUSCommunicator::GetPropertiesOfLayer(DBusConnection* conn, DBusMessage* m
     g_pDbusMessage->initReceive(msg);
     uint id = g_pDbusMessage->getUInt();
 
-    Layer* layer = m_reference->m_executor->getScene()->getLayer(id);
+    Layer* layer = m_executor->getScene()->getLayer(id);
     if (layer != NULL)
     {
         Rectangle dest = layer->getDestinationRegion();
@@ -558,7 +561,7 @@ void DBUSCommunicator::CreateSurface(DBusConnection* conn, DBusMessage* msg)
 
     //LOG_DEBUG("DBUSCommunicator::CreateSurface","pixelformat: " << pixelformat);
     uint id = GraphicalObject::INVALID_ID;
-    bool status = m_reference->m_executor->execute(new CreateCommand(handle, TypeSurface, pf, width, height, &id));
+    bool status = m_executor->execute(new CreateCommand(handle, TypeSurface, pf, width, height, &id));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -585,7 +588,7 @@ void DBUSCommunicator::CreateSurfaceFromId(DBusConnection* conn, DBusMessage* ms
     //LOG_DEBUG("DBUSCommunicator::CreateSurface","pixelformat: " << pixelformat);
     uint id = g_pDbusMessage->getUInt();
 
-    bool status = m_reference->m_executor->execute(new CreateCommand(handle, TypeSurface, pf, width, height, &id));
+    bool status = m_executor->execute(new CreateCommand(handle, TypeSurface, pf, width, height, &id));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -604,7 +607,7 @@ void DBUSCommunicator::RemoveSurface(DBusConnection* conn, DBusMessage* msg)
 
     g_pDbusMessage->initReceive(msg);
     uint param = g_pDbusMessage->getUInt();
-    bool status = m_reference->m_executor->execute(new RemoveCommand(param, TypeSurface));
+    bool status = m_executor->execute(new RemoveCommand(param, TypeSurface));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -622,8 +625,8 @@ void DBUSCommunicator::CreateLayer(DBusConnection* conn, DBusMessage* msg)
 
     uint id = GraphicalObject::INVALID_ID;
 	// use resolution of default screen as default width and height of layers
-    uint* resolution = m_reference->m_executor->getScreenResolution(DEFAULT_SCREEN);
-    bool status = m_reference->m_executor->execute(new CreateCommand(0, TypeLayer, PIXELFORMAT_R8, resolution[0], resolution[1], &id));
+    uint* resolution = m_executor->getScreenResolution(DEFAULT_SCREEN);
+    bool status = m_executor->execute(new CreateCommand(0, TypeLayer, PIXELFORMAT_R8, resolution[0], resolution[1], &id));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -644,8 +647,8 @@ void DBUSCommunicator::CreateLayerFromId(DBusConnection* conn, DBusMessage* msg)
     g_pDbusMessage->initReceive(msg);
     id = g_pDbusMessage->getUInt();
 	// use resolution of default screen as default width and height of layers
-    uint* resolution = m_reference->m_executor->getScreenResolution(DEFAULT_SCREEN);
-    bool status = m_reference->m_executor->execute(new CreateCommand(0, TypeLayer, PIXELFORMAT_R8, resolution[0], resolution[1], &id));
+    uint* resolution = m_executor->getScreenResolution(DEFAULT_SCREEN);
+    bool status = m_executor->execute(new CreateCommand(0, TypeLayer, PIXELFORMAT_R8, resolution[0], resolution[1], &id));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -668,7 +671,7 @@ void DBUSCommunicator::CreateLayerWithDimension(DBusConnection* conn, DBusMessag
     uint height = g_pDbusMessage->getUInt();
 
     uint id = GraphicalObject::INVALID_ID;
-    bool status = m_reference->m_executor->execute(new CreateCommand(0, TypeLayer, PIXELFORMAT_R8, width, height, &id));
+    bool status = m_executor->execute(new CreateCommand(0, TypeLayer, PIXELFORMAT_R8, width, height, &id));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -690,7 +693,7 @@ void DBUSCommunicator::CreateLayerFromIdWithDimension(DBusConnection* conn, DBus
     id = g_pDbusMessage->getUInt();
     uint width = g_pDbusMessage->getUInt();
     uint height = g_pDbusMessage->getUInt();
-    bool status = m_reference->m_executor->execute(new CreateCommand(0, TypeLayer, PIXELFORMAT_R8, width, height, &id));
+    bool status = m_executor->execute(new CreateCommand(0, TypeLayer, PIXELFORMAT_R8, width, height, &id));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -709,7 +712,7 @@ void DBUSCommunicator::RemoveLayer(DBusConnection* conn, DBusMessage* msg)
 
     g_pDbusMessage->initReceive(msg);
     uint param = g_pDbusMessage->getUInt();
-    bool status = m_reference->m_executor->execute(new RemoveCommand(param, TypeLayer));
+    bool status = m_executor->execute(new RemoveCommand(param, TypeLayer));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -729,7 +732,7 @@ void DBUSCommunicator::AddSurfaceToSurfaceGroup(DBusConnection* conn, DBusMessag
     uint surfaceid = g_pDbusMessage->getUInt();
     uint surfacegroupid = g_pDbusMessage->getUInt();
 
-    bool status = m_reference->m_executor->execute(new SurfacegroupAddSurfaceCommand(surfacegroupid, surfaceid));
+    bool status = m_executor->execute(new SurfacegroupAddSurfaceCommand(surfacegroupid, surfaceid));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -749,7 +752,7 @@ void DBUSCommunicator::RemoveSurfaceFromSurfaceGroup(DBusConnection* conn, DBusM
     uint surfaceid = g_pDbusMessage->getUInt();
     uint surfacegroupid = g_pDbusMessage->getUInt();
 
-    bool status = m_reference->m_executor->execute(new SurfacegroupRemoveSurfaceCommand(surfacegroupid, surfaceid));
+    bool status = m_executor->execute(new SurfacegroupRemoveSurfaceCommand(surfacegroupid, surfaceid));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -769,7 +772,7 @@ void DBUSCommunicator::AddLayerToLayerGroup(DBusConnection* conn, DBusMessage* m
     uint layerid = g_pDbusMessage->getUInt();
     uint layergroupid = g_pDbusMessage->getUInt();
 
-    bool status = m_reference->m_executor->execute(new LayergroupAddLayerCommand(layergroupid, layerid));
+    bool status = m_executor->execute(new LayergroupAddLayerCommand(layergroupid, layerid));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -789,7 +792,7 @@ void DBUSCommunicator::RemoveLayerFromLayerGroup(DBusConnection* conn, DBusMessa
     uint layerid = g_pDbusMessage->getUInt();
     uint layergroupid = g_pDbusMessage->getUInt();
 
-    bool status = m_reference->m_executor->execute(new LayergroupRemoveLayerCommand(layergroupid, layerid));
+    bool status = m_executor->execute(new LayergroupRemoveLayerCommand(layergroupid, layerid));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -809,7 +812,7 @@ void DBUSCommunicator::AddSurfaceToLayer(DBusConnection* conn, DBusMessage* msg)
     uint surfaceid = g_pDbusMessage->getUInt();
     uint layer = g_pDbusMessage->getUInt();
 
-    bool status = m_reference->m_executor->execute(new LayerAddSurfaceCommand(layer, surfaceid));
+    bool status = m_executor->execute(new LayerAddSurfaceCommand(layer, surfaceid));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -829,7 +832,7 @@ void DBUSCommunicator::RemoveSurfaceFromLayer(DBusConnection* conn, DBusMessage*
     uint surfaceid = g_pDbusMessage->getUInt();
     uint layerid = g_pDbusMessage->getUInt();
 
-    bool status = m_reference->m_executor->execute(new LayerRemoveSurfaceCommand(layerid, surfaceid));
+    bool status = m_executor->execute(new LayerRemoveSurfaceCommand(layerid, surfaceid));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -847,7 +850,7 @@ void DBUSCommunicator::CreateSurfaceGroup(DBusConnection* conn, DBusMessage* msg
 
     uint newID = GraphicalObject::INVALID_ID;
 
-    bool status = m_reference->m_executor->execute(new CreateCommand(0, TypeSurfaceGroup, PIXELFORMAT_R8, 0, 0, &newID));
+    bool status = m_executor->execute(new CreateCommand(0, TypeSurfaceGroup, PIXELFORMAT_R8, 0, 0, &newID));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -868,7 +871,7 @@ void DBUSCommunicator::CreateSurfaceGroupFromId(DBusConnection* conn, DBusMessag
     g_pDbusMessage->initReceive(msg);
     newID = g_pDbusMessage->getUInt();
 
-    bool status = m_reference->m_executor->execute(new CreateCommand(0, TypeSurfaceGroup, PIXELFORMAT_R8, 0, 0, &newID));
+    bool status = m_executor->execute(new CreateCommand(0, TypeSurfaceGroup, PIXELFORMAT_R8, 0, 0, &newID));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -888,7 +891,7 @@ void DBUSCommunicator::RemoveSurfaceGroup(DBusConnection* conn, DBusMessage* msg
     g_pDbusMessage->initReceive(msg);
     uint param = g_pDbusMessage->getUInt();
 
-    bool status = m_reference->m_executor->execute(new RemoveCommand(param, TypeSurfaceGroup));
+    bool status = m_executor->execute(new RemoveCommand(param, TypeSurfaceGroup));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -906,7 +909,7 @@ void DBUSCommunicator::CreateLayerGroup(DBusConnection* conn, DBusMessage* msg)
 
     uint newID = GraphicalObject::INVALID_ID;
 
-    bool status = m_reference->m_executor->execute(new CreateCommand(0, TypeLayerGroup, PIXELFORMAT_R8, 0, 0, &newID));
+    bool status = m_executor->execute(new CreateCommand(0, TypeLayerGroup, PIXELFORMAT_R8, 0, 0, &newID));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -927,7 +930,7 @@ void DBUSCommunicator::CreateLayerGroupFromId(DBusConnection* conn, DBusMessage*
     g_pDbusMessage->initReceive(msg);
     newID = g_pDbusMessage->getUInt();
 
-    bool status = m_reference->m_executor->execute(new CreateCommand(0, TypeLayerGroup, PIXELFORMAT_R8, 0, 0, &newID));
+    bool status = m_executor->execute(new CreateCommand(0, TypeLayerGroup, PIXELFORMAT_R8, 0, 0, &newID));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -947,7 +950,7 @@ void DBUSCommunicator::RemoveLayerGroup(DBusConnection* conn, DBusMessage* msg)
     g_pDbusMessage->initReceive(msg);
     uint param = g_pDbusMessage->getUInt();
 
-    bool status = m_reference->m_executor->execute(new RemoveCommand(param, TypeLayerGroup));
+    bool status = m_executor->execute(new RemoveCommand(param, TypeLayerGroup));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -970,7 +973,7 @@ void DBUSCommunicator::SetSurfaceSourceRegion(DBusConnection* conn, DBusMessage*
     uint width = g_pDbusMessage->getUInt();
     uint height = g_pDbusMessage->getUInt();
 
-    bool status = m_reference->m_executor->execute(new SetSourceRectangleCommand(id, TypeSurface, x, y, width, height));
+    bool status = m_executor->execute(new SetSourceRectangleCommand(id, TypeSurface, x, y, width, height));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -994,7 +997,7 @@ void DBUSCommunicator::SetLayerSourceRegion(DBusConnection* conn, DBusMessage* m
     uint height = g_pDbusMessage->getUInt();
 
     //LOG_DEBUG("DBUSC","new SetSourceRectangleCommand with arguments: " <<id <<" " << x <<" "<< y <<" "<< width <<" "<< height );
-    bool status = m_reference->m_executor->execute(new SetSourceRectangleCommand(id, TypeLayer, x, y, width, height));
+    bool status = m_executor->execute(new SetSourceRectangleCommand(id, TypeLayer, x, y, width, height));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -1017,7 +1020,7 @@ void DBUSCommunicator::SetSurfaceDestinationRegion(DBusConnection* conn, DBusMes
     uint width = g_pDbusMessage->getUInt();
     uint height = g_pDbusMessage->getUInt();
 
-    bool status = m_reference->m_executor->execute(new SetDestinationRectangleCommand(id, TypeSurface, x, y, width, height));
+    bool status = m_executor->execute(new SetDestinationRectangleCommand(id, TypeSurface, x, y, width, height));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -1038,7 +1041,7 @@ void DBUSCommunicator::SetSurfacePosition(DBusConnection* conn, DBusMessage* msg
     uint x = g_pDbusMessage->getUInt();
     uint y = g_pDbusMessage->getUInt();
 
-    bool status = m_reference->m_executor->execute(new SetPositionCommand(id, TypeSurface, x, y));
+    bool status = m_executor->execute(new SetPositionCommand(id, TypeSurface, x, y));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -1059,7 +1062,7 @@ void DBUSCommunicator::GetSurfacePosition(DBusConnection* conn, DBusMessage* msg
     uint x = 0;
     uint y = 0;
 
-    bool status = m_reference->m_executor->execute(new GetPositionCommand(id, TypeSurface, &x, &y));
+    bool status = m_executor->execute(new GetPositionCommand(id, TypeSurface, &x, &y));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -1082,7 +1085,7 @@ void DBUSCommunicator::SetSurfaceDimension(DBusConnection* conn, DBusMessage* ms
     uint width = g_pDbusMessage->getUInt();
     uint height = g_pDbusMessage->getUInt();
 
-    bool status = m_reference->m_executor->execute(new SetDimensionCommand(id, TypeSurface, width, height));
+    bool status = m_executor->execute(new SetDimensionCommand(id, TypeSurface, width, height));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -1106,7 +1109,7 @@ void DBUSCommunicator::SetLayerDestinationRegion(DBusConnection* conn, DBusMessa
     uint height = g_pDbusMessage->getUInt();
 
     //LOG_DEBUG("DBUSCommunicator","new SetDestinationRectangleCommand with arguments: " <<id <<" " << x <<" "<< y <<" "<< width <<" "<< height );
-    bool status = m_reference->m_executor->execute(new SetDestinationRectangleCommand(id, TypeLayer, x, y, width, height));
+    bool status = m_executor->execute(new SetDestinationRectangleCommand(id, TypeLayer, x, y, width, height));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -1127,7 +1130,7 @@ void DBUSCommunicator::SetLayerPosition(DBusConnection* conn, DBusMessage* msg)
     uint x = g_pDbusMessage->getUInt();
     uint y = g_pDbusMessage->getUInt();
 
-    bool status = m_reference->m_executor->execute(new SetPositionCommand(id, TypeLayer, x, y));
+    bool status = m_executor->execute(new SetPositionCommand(id, TypeLayer, x, y));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -1148,7 +1151,7 @@ void DBUSCommunicator::GetLayerPosition(DBusConnection* conn, DBusMessage* msg)
     uint x = 0;
     uint y = 0;
 
-    bool status = m_reference->m_executor->execute(new GetPositionCommand(id, TypeLayer, &x, &y));
+    bool status = m_executor->execute(new GetPositionCommand(id, TypeLayer, &x, &y));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -1171,7 +1174,7 @@ void DBUSCommunicator::SetLayerDimension(DBusConnection* conn, DBusMessage* msg)
     uint width = g_pDbusMessage->getUInt();
     uint height = g_pDbusMessage->getUInt();
 
-    bool status = m_reference->m_executor->execute(new SetDimensionCommand(id, TypeLayer, width, height));
+    bool status = m_executor->execute(new SetDimensionCommand(id, TypeLayer, width, height));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -1192,7 +1195,7 @@ void DBUSCommunicator::GetLayerDimension(DBusConnection* conn, DBusMessage* msg)
     uint width = 0;
     uint height = 0;
 
-    bool status = m_reference->m_executor->execute(new GetDimensionCommand(id, TypeLayer, &width, &height));
+    bool status = m_executor->execute(new GetDimensionCommand(id, TypeLayer, &width, &height));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -1215,7 +1218,7 @@ void DBUSCommunicator::GetSurfaceDimension(DBusConnection* conn, DBusMessage* ms
     uint width = 0;
     uint height = 0;
 
-    bool status = m_reference->m_executor->execute(new GetDimensionCommand(id, TypeSurface, &width, &height));
+    bool status = m_executor->execute(new GetDimensionCommand(id, TypeSurface, &width, &height));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -1237,7 +1240,7 @@ void DBUSCommunicator::SetSurfaceOpacity(DBusConnection* conn, DBusMessage* msg)
     uint id = g_pDbusMessage->getUInt();
     double param = g_pDbusMessage->getDouble();
 
-    bool status = m_reference->m_executor->execute(new SetOpacityCommand(id, TypeSurface, param));
+    bool status = m_executor->execute(new SetOpacityCommand(id, TypeSurface, param));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -1257,7 +1260,7 @@ void DBUSCommunicator::SetLayerOpacity(DBusConnection* conn, DBusMessage* msg)
     uint id = g_pDbusMessage->getUInt();
     double param = g_pDbusMessage->getDouble();
 
-    bool status = m_reference->m_executor->execute(new SetOpacityCommand(id, TypeLayer, param));
+    bool status = m_executor->execute(new SetOpacityCommand(id, TypeLayer, param));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -1277,7 +1280,7 @@ void DBUSCommunicator::SetSurfacegroupOpacity(DBusConnection* conn, DBusMessage*
     uint id = g_pDbusMessage->getUInt();
     double param = g_pDbusMessage->getDouble();
 
-    bool status = m_reference->m_executor->execute(new SetOpacityCommand(id, TypeSurfaceGroup, param));
+    bool status = m_executor->execute(new SetOpacityCommand(id, TypeSurfaceGroup, param));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -1297,7 +1300,7 @@ void DBUSCommunicator::SetLayergroupOpacity(DBusConnection* conn, DBusMessage* m
     uint id = g_pDbusMessage->getUInt();
     double param = g_pDbusMessage->getDouble();
 
-    bool status = m_reference->m_executor->execute(new SetOpacityCommand(id, TypeLayerGroup, param));
+    bool status = m_executor->execute(new SetOpacityCommand(id, TypeLayerGroup, param));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -1317,7 +1320,7 @@ void DBUSCommunicator::GetSurfaceOpacity(DBusConnection* conn, DBusMessage* msg)
     uint id = g_pDbusMessage->getUInt();
     double param = 0.0;
 
-    bool status = m_reference->m_executor->execute(new GetOpacityCommand(id, TypeSurface, &param));
+    bool status = m_executor->execute(new GetOpacityCommand(id, TypeSurface, &param));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -1338,7 +1341,7 @@ void DBUSCommunicator::GetLayerOpacity(DBusConnection* conn, DBusMessage* msg)
     uint id = g_pDbusMessage->getUInt();
     double param = 0.0;
 
-    bool status = m_reference->m_executor->execute(new GetOpacityCommand(id, TypeLayer, &param));
+    bool status = m_executor->execute(new GetOpacityCommand(id, TypeLayer, &param));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -1359,7 +1362,7 @@ void DBUSCommunicator::GetSurfacegroupOpacity(DBusConnection* conn, DBusMessage*
     uint id = g_pDbusMessage->getUInt();
     double param = 0.0;
 
-    bool status = m_reference->m_executor->execute(new GetOpacityCommand(id, TypeSurfaceGroup, &param));
+    bool status = m_executor->execute(new GetOpacityCommand(id, TypeSurfaceGroup, &param));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -1380,7 +1383,7 @@ void DBUSCommunicator::GetLayergroupOpacity(DBusConnection* conn, DBusMessage* m
     uint id = g_pDbusMessage->getUInt();
     double param = 0.0;
 
-    bool status = m_reference->m_executor->execute(new GetOpacityCommand(id, TypeLayerGroup, &param));
+    bool status = m_executor->execute(new GetOpacityCommand(id, TypeLayerGroup, &param));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -1402,7 +1405,7 @@ void DBUSCommunicator::SetSurfaceOrientation(DBusConnection* conn, DBusMessage* 
     uint param = g_pDbusMessage->getUInt();
     OrientationType o = (OrientationType) param;
 
-    bool status = m_reference->m_executor->execute(new SetOrientationCommand(id, TypeSurface, o));
+    bool status = m_executor->execute(new SetOrientationCommand(id, TypeSurface, o));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -1422,7 +1425,7 @@ void DBUSCommunicator::GetSurfaceOrientation(DBusConnection* conn, DBusMessage* 
     uint id = g_pDbusMessage->getUInt();
     OrientationType o;
 
-    bool status = m_reference->m_executor->execute(new GetOrientationCommand(id, TypeSurface, &o));
+    bool status = m_executor->execute(new GetOrientationCommand(id, TypeSurface, &o));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -1444,7 +1447,7 @@ void DBUSCommunicator::SetLayerOrientation(DBusConnection* conn, DBusMessage* ms
     uint param = g_pDbusMessage->getUInt();
     OrientationType o = (OrientationType) param;
 
-    bool status = m_reference->m_executor->execute(new SetOrientationCommand(id, TypeLayer, o));
+    bool status = m_executor->execute(new SetOrientationCommand(id, TypeLayer, o));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -1464,7 +1467,7 @@ void DBUSCommunicator::GetLayerOrientation(DBusConnection* conn, DBusMessage* ms
     uint id = g_pDbusMessage->getUInt();
     OrientationType o;
 
-    bool status = m_reference->m_executor->execute(new GetOrientationCommand(id, TypeLayer, &o));
+    bool status = m_executor->execute(new GetOrientationCommand(id, TypeLayer, &o));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -1485,7 +1488,7 @@ void DBUSCommunicator::GetSurfacePixelformat(DBusConnection* conn, DBusMessage* 
     uint id = g_pDbusMessage->getUInt();
     PixelFormat param;
 
-    bool status = m_reference->m_executor->execute(new GetPixelformatCommand(id, TypeSurface, &param));
+    bool status = m_executor->execute(new GetPixelformatCommand(id, TypeSurface, &param));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -1506,7 +1509,7 @@ void DBUSCommunicator::SetSurfaceVisibility(DBusConnection* conn, DBusMessage* m
     const uint surfaceid = g_pDbusMessage->getUInt();
     bool newVis = g_pDbusMessage->getBool();
 
-    bool status = m_reference->m_executor->execute(new SetVisibilityCommand(surfaceid, TypeSurface, newVis));
+    bool status = m_executor->execute(new SetVisibilityCommand(surfaceid, TypeSurface, newVis));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -1526,7 +1529,7 @@ void DBUSCommunicator::SetLayerVisibility(DBusConnection* conn, DBusMessage* msg
     const uint layerid = g_pDbusMessage->getUInt();
     bool myparam = g_pDbusMessage->getBool();
 
-    bool status = m_reference->m_executor->execute(new SetVisibilityCommand(layerid, TypeLayer, myparam));
+    bool status = m_executor->execute(new SetVisibilityCommand(layerid, TypeLayer, myparam));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -1546,7 +1549,7 @@ void DBUSCommunicator::GetSurfaceVisibility(DBusConnection* conn, DBusMessage* m
     uint id = g_pDbusMessage->getUInt();
     bool param;
 
-    bool status = m_reference->m_executor->execute(new GetVisibilityCommand(id, TypeSurface, &param));
+    bool status = m_executor->execute(new GetVisibilityCommand(id, TypeSurface, &param));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -1568,7 +1571,7 @@ void DBUSCommunicator::GetLayerVisibility(DBusConnection* conn, DBusMessage* msg
     uint id = g_pDbusMessage->getUInt();
     bool param;
 
-    bool status = m_reference->m_executor->execute(new GetVisibilityCommand(id, TypeLayer, &param));
+    bool status = m_executor->execute(new GetVisibilityCommand(id, TypeLayer, &param));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -1590,7 +1593,7 @@ void DBUSCommunicator::SetSurfacegroupVisibility(DBusConnection* conn, DBusMessa
     uint groupid = g_pDbusMessage->getUInt();
     bool myparam = g_pDbusMessage->getBool();
 
-    bool status = m_reference->m_executor->execute(new SetVisibilityCommand(groupid, TypeSurfaceGroup, myparam));
+    bool status = m_executor->execute(new SetVisibilityCommand(groupid, TypeSurfaceGroup, myparam));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -1610,7 +1613,7 @@ void DBUSCommunicator::SetLayergroupVisibility(DBusConnection* conn, DBusMessage
     uint groupid = g_pDbusMessage->getUInt();
     bool myparam = g_pDbusMessage->getBool();
 
-    bool status = m_reference->m_executor->execute(new SetVisibilityCommand(groupid, TypeLayerGroup, myparam));
+    bool status = m_executor->execute(new SetVisibilityCommand(groupid, TypeLayerGroup, myparam));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -1634,7 +1637,7 @@ void DBUSCommunicator::SetRenderOrderOfLayers(DBusConnection* conn, DBusMessage*
 
     //LOG_DEBUG("DBUSCommunicator","Renderorder: Got " << length << " ids.");
 
-    bool status = m_reference->m_executor->execute(new SetLayerOrderCommand(array, length));
+    bool status = m_executor->execute(new SetLayerOrderCommand(array, length));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -1659,7 +1662,7 @@ void DBUSCommunicator::SetSurfaceRenderOrderWithinLayer(DBusConnection* conn, DB
     g_pDbusMessage->getArrayOfUInt(&length, &array);
 
 
-    bool status = m_reference->m_executor->execute(new SetOrderWithinLayerCommand(layerid, array, length));
+    bool status = m_executor->execute(new SetOrderWithinLayerCommand(layerid, array, length));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -1677,7 +1680,7 @@ void DBUSCommunicator::GetLayerType(DBusConnection* conn, DBusMessage* msg)
 
     g_pDbusMessage->initReceive(msg);
     uint id = g_pDbusMessage->getUInt();
-    Layer* l = m_reference->m_executor->getScene()->getLayer(id);
+    Layer* l = m_executor->getScene()->getLayer(id);
     if (l != NULL)
     {
         g_pDbusMessage->initReply(msg);
@@ -1697,7 +1700,7 @@ void DBUSCommunicator::GetLayertypeCapabilities(DBusConnection* conn, DBusMessag
     g_pDbusMessage->initReceive(msg);
     uint id = g_pDbusMessage->getUInt();
     LayerType type = (LayerType) id;
-    uint capabilities = m_reference->m_executor->getLayerTypeCapabilities(type);
+    uint capabilities = m_executor->getLayerTypeCapabilities(type);
     //LOG_DEBUG("DBUSCommunicator", "GetLayertypeCapabilities: returning capabilities:" << capabilities);
     g_pDbusMessage->initReply(msg);
     g_pDbusMessage->appendUInt(capabilities);
@@ -1710,7 +1713,7 @@ void DBUSCommunicator::GetLayerCapabilities(DBusConnection* conn, DBusMessage* m
 
     g_pDbusMessage->initReceive(msg);
     uint id = g_pDbusMessage->getUInt();
-    Layer* l = m_reference->m_executor->getScene()->getLayer(id);
+    Layer* l = m_executor->getScene()->getLayer(id);
     if (l != NULL)
     {
         g_pDbusMessage->initReply(msg);
@@ -1754,7 +1757,7 @@ void DBUSCommunicator::Exit(DBusConnection* conn, DBusMessage* msg)
 {
     (void)conn; // TODO: remove, only prevents warning
 
-    bool status = m_reference->m_executor->execute(new ExitCommand());
+    bool status = m_executor->execute(new ExitCommand());
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -1770,7 +1773,7 @@ void DBUSCommunicator::CommitChanges(DBusConnection* conn, DBusMessage* msg)
 {
     (void)conn; // TODO: remove, only prevents warning
 
-    bool status = m_reference->m_executor->execute(new CommitCommand());
+    bool status = m_executor->execute(new CommitCommand());
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -1791,7 +1794,7 @@ void DBUSCommunicator::CreateShader(DBusConnection* conn, DBusMessage* msg)
     char* fragname = g_pDbusMessage->getString();
     uint id = 0;
 
-    bool status = m_reference->m_executor->execute(new CreateShaderCommand(vertname, fragname, &id));
+    bool status = m_executor->execute(new CreateShaderCommand(vertname, fragname, &id));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -1811,7 +1814,7 @@ void DBUSCommunicator::DestroyShader(DBusConnection* conn, DBusMessage* msg)
     g_pDbusMessage->initReceive(msg);
     uint shaderid = g_pDbusMessage->getUInt();
 
-    bool status = m_reference->m_executor->execute(new DestroyShaderCommand(shaderid));
+    bool status = m_executor->execute(new DestroyShaderCommand(shaderid));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -1831,7 +1834,7 @@ void DBUSCommunicator::SetShader(DBusConnection* conn, DBusMessage* msg)
     uint objectid = g_pDbusMessage->getUInt();
     uint shaderid = g_pDbusMessage->getUInt();
 
-    bool status = m_reference->m_executor->execute(new SetShaderCommand(objectid, shaderid));
+    bool status = m_executor->execute(new SetShaderCommand(objectid, shaderid));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -1854,7 +1857,7 @@ void DBUSCommunicator::SetUniforms(DBusConnection* conn, DBusMessage* msg)
 
     g_pDbusMessage->getArrayOfString(&uniforms);
 
-    bool status = m_reference->m_executor->execute(new SetUniformsCommand(id, uniforms));
+    bool status = m_executor->execute(new SetUniformsCommand(id, uniforms));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -1882,7 +1885,7 @@ DBusHandlerResult DBUSCommunicator::delegateMessage(DBusConnection* conn, DBusMe
             LOG_INFO("DBUSCommunicator","got call for method:" << entry.name);
             CallBackMethod m = entry.function;
             LOG_INFO("DBUSCommunicator","enter method");
-            (m_reference->*m)(conn, msg);
+            (this->*m)(conn, msg);
             found = true;
         }
         i++;
@@ -1902,43 +1905,6 @@ DBusHandlerResult DBUSCommunicator::delegateMessage(DBusConnection* conn, DBusMe
         result = DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
     return result;
-}
-
-
-void* DBUSCommunicator::run(void * arg)
-{
-    LOG_INFO("DBUSCommunicator","Main loop running");
-    //    pthread_setcancelstate (PTHREAD_CANCEL_ENABLE, NULL);
-    //    pthread_setcanceltype (PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
-    m_reference = (DBUSCommunicator*) arg;
-    if (! g_pDbusMessage->registerPathFunction(DBUSCommunicator::processMessageFunc, DBUSCommunicator::unregisterMessageFunc,m_reference) ) 
-    {            
-        LOG_ERROR("DBUSCommunicator","Register Message Callbacks failed");
-        exit(-1);
-    }
-
-    while (m_reference->m_running || dbus_connection_read_write_dispatch (g_pDbusMessage->getConnection(), -1) ) 
-    {
-        //        pthread_testcancel();
-/*        DBusMessage* msg = 0;
-        DBusConnection* conn = g_pDbusMessage->getConnection();
-        dbus_connection_read_write(conn, 50);
-        msg = dbus_connection_pop_message(conn);
-        if (msg) 
-        {
-            dbus_connection_flush(conn);
-            dbus_message_unref(msg);
-            msg = NULL;
-        }
-        
-        } else {*/
-            /* put thread in sleep mode for 500 useconds due to safe cpu performance */
-            usleep(500);
-/*        }*/
-    }
-
-    LOG_DEBUG("DBUSCommunicator","ending thread");
-    return 0;
 }
 
 extern "C" ICommunicator* createDBUSCommunicator(ICommandExecutor* executor)
