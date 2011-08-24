@@ -28,7 +28,7 @@ enable_testing()
 find_package (Threads)
 set(LIBS ${LIBS} ${CMAKE_THREAD_LIBS_INIT} LayerManagerUtils)
 
-file(GLOB LM_SOURCES ../../../../LayerManagerService/src/Scene.cpp ../../../../LayerManagerService/src/LogicalGraphicsObject.cpp)
+file(GLOB LM_SOURCES ../../../../LayerManagerService/src/Scene.cpp ../../../../LayerManagerService/src/GraphicalSurface.cpp ../../../../LayerManagerService/src/LogicalGraphicsObject.cpp)
 
 add_executable(ViewportTransformTest ${LM_SOURCES} ../src/Transformation/ViewportTransform.cpp ViewportTransformTest.cpp gmock/gmock_main.cc gmock/gmock-gtest-all.cc)
 target_link_libraries(ViewportTransformTest ${LIBS})

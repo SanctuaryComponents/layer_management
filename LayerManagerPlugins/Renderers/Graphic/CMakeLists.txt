@@ -69,10 +69,6 @@ file(GLOB GRAPHIC_TRANSFORM_INCLUDES
     include/Transformation/ViewportTransform.h
 )
 
-if (WITH_TESTS)
-    add_subdirectory (tests)
-endif(WITH_TESTS)
-
 endif(WITH_GLESv2_LIB)
 
 if (WITH_GLX_LIB) 
@@ -119,7 +115,10 @@ file(GLOB GRAPHIC_TRANSFORM_INCLUDES
 
 endif(WITH_GLX_LIB)
 
-		
+if (WITH_TESTS)
+    add_subdirectory (tests)
+endif(WITH_TESTS)
+
 add_library(${GRAPHIC_LIB_NAME} SHARED ${SOURCES})
 
 find_package(X11 REQUIRED)
