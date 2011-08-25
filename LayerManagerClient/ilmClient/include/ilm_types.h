@@ -30,13 +30,13 @@
  * \brief Represent the logical true value
  * \ingroup Defines
  **/
-#define ILM_TRUE     1
+#define ILM_TRUE     1u
 
 /**
  * \brief Represent the logical false value
  * \ingroup Defines
  **/
-#define ILM_FALSE     0
+#define ILM_FALSE     0u
 
 /**
  * \brief Enumeration on possible error codes

@@ -67,8 +67,8 @@ typedef enum e_arguments
 typedef struct s_argument_params 
 {
     bool required;
-    char* argument;
-    char* description;
+    const char* argument;
+    const char* description;
     argumentType type;    
 } t_argument_params;
 
@@ -419,9 +419,9 @@ bool initParamStruct(t_param_struct* pStruct,char* argv)
                 if ( param != 0 ) 
                 {
                     found = true;
-                    sscanf(param,"%x",&pStruct->windowid);
+                    sscanf(param,"%lx",&pStruct->windowid);
                 }
-                printf("Window id is 0x%08x\n",pStruct->windowid);                
+                printf("Window id is 0x%08lx\n",pStruct->windowid);
             break;
             case ARGUMENT_SURFACE_RO:
             break;
@@ -626,7 +626,7 @@ ilmErrorTypes createLayer(t_param_struct* param_struct)
     ilmErrorTypes error;
     // TODO: if (error == ILM_FAILED) return ILM_FALSE;
 
-    printf("create layer %lu\n", param_struct->layerid);
+    printf("create layer %u\n", param_struct->layerid);
     error = ilm_layerCreate( &param_struct->layerid );
 
     // TODO: if (error == ILM_FAILED) return ILM_FALSE;
@@ -725,7 +725,6 @@ void parseCommandLine(t_param_struct* param_struct, int argc, char **argv)
         int option = 0;        
         int result = getopt_long(   argc, argv,"::?",
                                     toolbox_options, &option);
-        char* param = 0;
         bool success = true;
         if ( result == -1 ) break;
 

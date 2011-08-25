@@ -34,6 +34,8 @@ public:
 	    // TODO
 		// pseudo require EGL to have been initialised
 		// we dont really need the handle
+		// remove compiler Warning
+		eglDisplay = eglDisplay;
 	};
 	void swapPixmap(unsigned char* src,unsigned char* dest,unsigned int width,unsigned int height,bool swaprgb,bool includeAlpha);
 	bool bindSurfaceTexture(Surface* surface);

@@ -966,8 +966,8 @@ TEST_F(ViewportTransformTest, completeExample7){
     ASSERT_EQ(640u,surfacePOS.width);
     ASSERT_NEAR(0.3125,x1,0.01);
     ASSERT_NEAR(0.5625,x2,0.01);
-    ASSERT_EQ(0,surfacePOS.y);
-    ASSERT_EQ(480,surfacePOS.height);
+    ASSERT_EQ(0u,surfacePOS.y);
+    ASSERT_EQ(480u,surfacePOS.height);
     ASSERT_NEAR(0.0,y1,0.01);
     ASSERT_NEAR(1.0,y2,0.01);
     m_scene->removeSurface(surface);    

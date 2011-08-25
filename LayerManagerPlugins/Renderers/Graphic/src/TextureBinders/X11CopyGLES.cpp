@@ -91,7 +91,7 @@ void X11CopyGLES::swapPixmap(unsigned char* src,unsigned char* dest, unsigned in
 	if (swaprgb == false)
 	{	
 		count = width*height;
-		for (int j=0;j<count; j++) {
+		for (uint j=0;j<count; j++) {
 			dest[j*4]=src[j*4+2];
 			dest[j*4+1]=src[j*4+1];
 			dest[j*4+2]=src[j*4];
@@ -103,7 +103,7 @@ void X11CopyGLES::swapPixmap(unsigned char* src,unsigned char* dest, unsigned in
 		}
 	} else {
 		count = width*height;        
-		for (int j=0;j<count; j++) 
+		for (uint j=0;j<count; j++)
 		{
 			dest[j*3]=src[j*3+2];
 			dest[j*3+1]=src[j*3+1];

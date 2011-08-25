@@ -80,7 +80,7 @@ XVisualInfo* X11WindowSystem::getDefaultVisual(Display *dpy)
 
 bool X11WindowSystem::OpenDisplayConnection()
 {
-    char* displayEnvironment = getenv("DISPLAY");
+    const char* displayEnvironment = getenv("DISPLAY");
     
     if  (displayEnvironment == NULL ) 
     {
@@ -172,7 +172,7 @@ Window * getListOfAllTopLevelWindows (Display *disp, unsigned int *len)
 bool X11WindowSystem::isWindowValid(Window w)
 {
     // skip our own two windows
-    return (w!=NULL && w != CompositorWindow);
+    return (w!=None && w != CompositorWindow);
 }
 
 Surface* X11WindowSystem::getSurfaceForWindow(Window w)

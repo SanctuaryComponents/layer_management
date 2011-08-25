@@ -409,7 +409,7 @@ TEST_F(IlmCommandTest, ilm_getScreenIDs) {
     t_ilm_uint numberOfScreens;
     t_ilm_uint* screenIDs;
     ilm_getScreenIDs(&numberOfScreens,&screenIDs);
-    ASSERT_GT(numberOfScreens,0);
+    ASSERT_GT(numberOfScreens,0u);
 }
 
 TEST_F(IlmCommandTest, ilm_getScreenResolution) {
@@ -421,8 +421,8 @@ TEST_F(IlmCommandTest, ilm_getScreenResolution) {
     uint firstScreen = screenIDs[0];
     t_ilm_uint width,height;
     ilm_getScreenResolution(firstScreen, &width, &height);
-    ASSERT_GT(width,0);
-    ASSERT_GT(height,0);
+    ASSERT_GT(width,0u);
+    ASSERT_GT(height,0u);
 }
 
 TEST_F(IlmCommandTest, ilm_getLayerIDs) {
@@ -606,11 +606,6 @@ TEST_F(IlmCommandTest, ilm_getPropertiesOfSurface_ilm_surfaceSetSourceRectangle_
     ilm_surfaceCreate(0,0,0,ILM_PIXELFORMAT_RGBA_8888,&surface);
     ilm_commitChanges();
 
-    t_ilm_float opacity;
-    t_ilm_uint sourceX,sourceY, sourceWidth,sourceHeight, destX,destY,destWidth,destHeight;
-    ilmOrientation orientation;
-    t_ilm_bool visibility;
-
     ilm_surfaceSetOpacity(surface,0.8765);
     ilm_surfaceSetSourceRectangle(surface,89,6538,638,4);
     ilm_surfaceSetDestinationRectangle(surface,54,47,947,9);
@@ -621,14 +616,14 @@ TEST_F(IlmCommandTest, ilm_getPropertiesOfSurface_ilm_surfaceSetSourceRectangle_
     ilmSurfaceProperties surfaceProperties;
     ilm_getPropertiesOfSurface(surface, &surfaceProperties);
     ASSERT_EQ(0.8765, surfaceProperties.opacity);
-    ASSERT_EQ(89, surfaceProperties.sourceX);
-    ASSERT_EQ(6538, surfaceProperties.sourceY);
-    ASSERT_EQ(638, surfaceProperties.sourceWidth);
-    ASSERT_EQ(4, surfaceProperties.sourceHeight);
-    ASSERT_EQ(54, surfaceProperties.destX);
-    ASSERT_EQ(47, surfaceProperties.destY);
-    ASSERT_EQ(947, surfaceProperties.destWidth);
-    ASSERT_EQ(9, surfaceProperties.destHeight);
+    ASSERT_EQ(89u, surfaceProperties.sourceX);
+    ASSERT_EQ(6538u, surfaceProperties.sourceY);
+    ASSERT_EQ(638u, surfaceProperties.sourceWidth);
+    ASSERT_EQ(4u, surfaceProperties.sourceHeight);
+    ASSERT_EQ(54u, surfaceProperties.destX);
+    ASSERT_EQ(47u, surfaceProperties.destY);
+    ASSERT_EQ(947u, surfaceProperties.destWidth);
+    ASSERT_EQ(9u, surfaceProperties.destHeight);
     ASSERT_EQ(ILM_NINETY, surfaceProperties.orientation);
     ASSERT_TRUE( surfaceProperties.visibility);
 
@@ -642,14 +637,14 @@ TEST_F(IlmCommandTest, ilm_getPropertiesOfSurface_ilm_surfaceSetSourceRectangle_
     ilmSurfaceProperties surfaceProperties2;
     ilm_getPropertiesOfSurface(surface, &surfaceProperties2);
     ASSERT_EQ(0.436, surfaceProperties2.opacity);
-    ASSERT_EQ(784, surfaceProperties2.sourceX);
-    ASSERT_EQ(546, surfaceProperties2.sourceY);
-    ASSERT_EQ(235, surfaceProperties2.sourceWidth);
-    ASSERT_EQ(78, surfaceProperties2.sourceHeight);
-    ASSERT_EQ(536, surfaceProperties2.destX);
-    ASSERT_EQ(5372, surfaceProperties2.destY);
-    ASSERT_EQ(3, surfaceProperties2.destWidth);
-    ASSERT_EQ(4316, surfaceProperties2.destHeight);
+    ASSERT_EQ(784u, surfaceProperties2.sourceX);
+    ASSERT_EQ(546u, surfaceProperties2.sourceY);
+    ASSERT_EQ(235u, surfaceProperties2.sourceWidth);
+    ASSERT_EQ(78u, surfaceProperties2.sourceHeight);
+    ASSERT_EQ(536u, surfaceProperties2.destX);
+    ASSERT_EQ(5372u, surfaceProperties2.destY);
+    ASSERT_EQ(3u, surfaceProperties2.destWidth);
+    ASSERT_EQ(4316u, surfaceProperties2.destHeight);
     ASSERT_EQ(ILM_TWOHUNDREDSEVENTY, surfaceProperties2.orientation);
     ASSERT_FALSE(surfaceProperties2.visibility);
 }
@@ -658,11 +653,6 @@ TEST_F(IlmCommandTest, ilm_getPropertiesOfLayer_ilm_layerSetSourceRectangle_ilm_
     t_ilm_uint layer;
     ilm_layerCreate(&layer);
     ilm_commitChanges();
-
-    t_ilm_float opacity;
-    t_ilm_uint sourceX,sourceY, sourceWidth,sourceHeight, destX,destY,destWidth,destHeight;
-    ilmOrientation orientation;
-    t_ilm_bool visibility;
 
     ilm_layerSetOpacity(layer,0.8765);
     ilm_layerSetSourceRectangle(layer,89,6538,638,4);
@@ -674,14 +664,14 @@ TEST_F(IlmCommandTest, ilm_getPropertiesOfLayer_ilm_layerSetSourceRectangle_ilm_
     ilmLayerProperties layerProperties1;
     ilm_getPropertiesOfLayer(layer, &layerProperties1);
     ASSERT_EQ(0.8765, layerProperties1.opacity);
-    ASSERT_EQ(89, layerProperties1.sourceX);
-    ASSERT_EQ(6538, layerProperties1.sourceY);
-    ASSERT_EQ(638, layerProperties1.sourceWidth);
-    ASSERT_EQ(4, layerProperties1.sourceHeight);
-    ASSERT_EQ(54, layerProperties1.destX);
-    ASSERT_EQ(47, layerProperties1.destY);
-    ASSERT_EQ(947, layerProperties1.destWidth);
-    ASSERT_EQ(9, layerProperties1.destHeight);
+    ASSERT_EQ(89u, layerProperties1.sourceX);
+    ASSERT_EQ(6538u, layerProperties1.sourceY);
+    ASSERT_EQ(638u, layerProperties1.sourceWidth);
+    ASSERT_EQ(4u, layerProperties1.sourceHeight);
+    ASSERT_EQ(54u, layerProperties1.destX);
+    ASSERT_EQ(47u, layerProperties1.destY);
+    ASSERT_EQ(947u, layerProperties1.destWidth);
+    ASSERT_EQ(9u, layerProperties1.destHeight);
     ASSERT_EQ(ILM_NINETY, layerProperties1.orientation);
     ASSERT_TRUE( layerProperties1.visibility);
 
@@ -695,14 +685,14 @@ TEST_F(IlmCommandTest, ilm_getPropertiesOfLayer_ilm_layerSetSourceRectangle_ilm_
     ilmLayerProperties layerProperties2;
     ilm_getPropertiesOfLayer(layer, &layerProperties2);
     ASSERT_EQ(0.436, layerProperties2.opacity);
-    ASSERT_EQ(784, layerProperties2.sourceX);
-    ASSERT_EQ(546, layerProperties2.sourceY);
-    ASSERT_EQ(235, layerProperties2.sourceWidth);
-    ASSERT_EQ(78, layerProperties2.sourceHeight);
-    ASSERT_EQ(536, layerProperties2.destX);
-    ASSERT_EQ(5372, layerProperties2.destY);
-    ASSERT_EQ(3, layerProperties2.destWidth);
-    ASSERT_EQ(4316, layerProperties2.destHeight);
+    ASSERT_EQ(784u, layerProperties2.sourceX);
+    ASSERT_EQ(546u, layerProperties2.sourceY);
+    ASSERT_EQ(235u, layerProperties2.sourceWidth);
+    ASSERT_EQ(78u, layerProperties2.sourceHeight);
+    ASSERT_EQ(536u, layerProperties2.destX);
+    ASSERT_EQ(5372u, layerProperties2.destY);
+    ASSERT_EQ(3u, layerProperties2.destWidth);
+    ASSERT_EQ(4316u, layerProperties2.destHeight);
     ASSERT_EQ(ILM_TWOHUNDREDSEVENTY, layerProperties2.orientation);
     ASSERT_FALSE(layerProperties2.visibility);
 }
