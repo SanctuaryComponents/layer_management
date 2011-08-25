@@ -18,7 +18,6 @@
  ****************************************************************************/
 
 #include <gtest/gtest.h>
-#include <gmock/gmock.h>
 #include "Rectangle.h"
 #include "Surface.h"
 #include "Layer.h"

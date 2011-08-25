@@ -47,5 +47,6 @@ add_dependencies(DBUSCommunicator LayerManagerCommands)
 install (TARGETS DBUSCommunicator LIBRARY DESTINATION lib/layermanager/communicator)
 
 if (WITH_TESTS)
+enable_testing()
 add_subdirectory (test)
 endif(WITH_TESTS)

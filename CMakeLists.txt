@@ -68,7 +68,7 @@ option (WITH_GLESv2_LIB
 option (WITH_INPUT_EVENTS
         "Activate input events handling" OFF)
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 
 option (WITH_FORCE_COPY 
         "Force Software Copy of Pixmaps" OFF)
@@ -124,5 +124,11 @@ if (WITH_GLX_EXAMPLE)
     add_subdirectory (LayerManagerExamples/GLXApplicationExample)
 endif(WITH_GLX_EXAMPLE)
 
+# enable ctest if building with tests
+# run 'make test' after build to run all tests
+# be aware that some tests require a running layermanager
+if (WITH_TESTS)
+enable_testing()
+endif(WITH_TESTS)
 
 
