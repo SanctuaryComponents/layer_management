@@ -17,6 +17,7 @@
 #
 ############################################################################
 
+
 include_directories (".")
 include_directories ("../include")
 include_directories ("${PROJECT_SOURCE_DIR}/LayerManagerService/include")
@@ -28,8 +29,6 @@ link_directories ("${PROJECT_SOURCE_DIR}/LayerManagerCommands")
 find_package(DBUS REQUIRED)
 include_directories(${DBUS_INCLUDE_DIR})
 include_directories(${DBUS_ARCH_INCLUDE_DIR})
-
-enable_testing()
 
 find_package (Threads)
 set(LIBS ${LIBS} ${DBUS_LIBRARY} ${CMAKE_THREAD_LIBS_INIT} LayerManagerUtils)
@@ -43,8 +42,7 @@ file(GLOB LM_SOURCES "${PROJECT_SOURCE_DIR}/LayerManagerService/src/Scene.cpp"
 
 file(GLOB DBUSCommunicator_SOURCES "../src/*.cpp")
 
+add_executable(DBUSCommunicatorTest DBUSCommunicatorTest.cpp ${LM_SOURCES} ${DBUSCommunicator_SOURCES})
+target_link_libraries(DBUSCommunicatorTest gmock LayerManagerCommands ${LIBS})
 
-add_executable(DBUSCommunicatorTest DBUSCommunicatorTest.cpp gmock/gmock_main.cc gmock/gmock-gtest-all.cc ${LM_SOURCES} ${DBUSCommunicator_SOURCES})
-target_link_libraries(DBUSCommunicatorTest LayerManagerCommands ${LIBS})
-
-add_test(AllTestsInDBUSCommunicatorTest DBUSCommunicatorTest)
+add_test(DBUSCommunicatorTest DBUSCommunicatorTest)

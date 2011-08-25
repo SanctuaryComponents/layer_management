@@ -1,6 +1,6 @@
 ############################################################################
 # 
-# Copyright 2010, 2011 BMW Car IT GmbH
+# Copyright 2010, 2011 BMW Car IT GmbH  
 # 
 # 
 # Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -17,28 +17,10 @@
 #
 ############################################################################
 
-cmake_minimum_required (VERSION 2.6)
-
-include_directories ("include")
-
-add_library(ilmClient SHARED src/ilm_client_priv.c src/ilm_client.c)
-
-find_package(DBUS REQUIRED)
-include_directories(${DBUS_INCLUDE_DIR})
-include_directories(${DBUS_ARCH_INCLUDE_DIR})
-
-set(LIBS ${LIBS} ${DBUS_LIBRARY})
-target_link_libraries(ilmClient ${LIBS})
-
-install (TARGETS ilmClient LIBRARY DESTINATION lib)
-install (FILES include/ilm_client.h include/ilm_types.h include/ilm_client_platform.h DESTINATION include/ilm)
-
 if (WITH_TESTS)
-enable_testing()
 
-add_executable(ilmClient_Test tests/IlmCommandTest.cpp)
-target_link_libraries(ilmClient_Test ilmClient ${LIBS} gtest)
+include_directories (".")
+add_library(gtest gtest/gtest-all.cc gtest/gtest_main.cc)
+add_library(gmock gmock/gmock-gtest-all.cc gmock/gmock_main.cc)
 
-add_test(ilmClient ilmClient_Test )
-
-endif(WITH_TESTS) 
+endif(WITH_TESTS)

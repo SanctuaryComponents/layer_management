@@ -86,6 +86,9 @@ if (WITH_FORCE_COPY)
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DGLX_GRAPHICSYSTEM_FORCE_COPY -DGLES_FORCE_COPY" CACHE STRING "" FORCE)
 endif(WITH_FORCE_COPY)
 
+include_directories ("${PROJECT_SOURCE_DIR}/3rdParty/")
+add_subdirectory (3rdParty)
+
 add_subdirectory (LayerManagerPlugins/Communicators/DBUSCommunicator)
 add_subdirectory (LayerManagerClient/ilmClient)
 add_subdirectory (LayerManagerUtils)
