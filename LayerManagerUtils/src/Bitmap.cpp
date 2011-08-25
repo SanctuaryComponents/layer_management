@@ -74,12 +74,15 @@ void writeBitmap(std::string FileName, char* imagedataRGB, int width, int height
     header.color2 = 0;
 
     // make sure parent directory exists
-    uint lastPos = FileName.find_last_of("/");
-    if (lastPos != std::string::npos)
+    uint currentPos = 0;
+    uint lastPos = FileName.find_first_of("/",currentPos);
+    while (lastPos != std::string::npos)
     {
         std::string directory = FileName.substr(0,lastPos);
         LOG_DEBUG("Bitmap","Creating directory " << directory);
-        mkdir(directory.c_str(),0666);
+        mkdir(directory.c_str(),0755);
+        currentPos = lastPos;
+        lastPos = FileName.find_first_of("/",currentPos+1);
     }
 
     FILE* file = fopen(FileName.c_str(),"wb");
