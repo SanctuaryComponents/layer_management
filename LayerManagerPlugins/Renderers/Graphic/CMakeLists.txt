@@ -123,16 +123,26 @@ add_library(${GRAPHIC_LIB_NAME} SHARED ${SOURCES})
 
 find_package(X11 REQUIRED)
 include_directories(${X11_INCLUDE_DIR})
-
+find_package (Threads)
+if (WITH_GLESv2_LIB) 
 find_package(EGL REQUIRED)
 include_directories(${EGL_INCLUDE_DIR})
 
 find_package(GLESv2 REQUIRED)
 include_directories(${GLESv2_INCLUDE_DIR})
 
-find_package (Threads)
-set(LIBS ${LIBS} ${CMAKE_THREAD_LIBS_INIT} ${EGL_LIBRARY} ${GLESv2_LIBRARIES} ${X11_Xcomposite_LIB} ${X11_Xdamage_LIB} LayerManagerUtils )
+set(GRAPHIC_NATIVE_LIBS ${EGL_LIBRARY} ${GLESv2_LIBRARIES})
+endif (WITH_GLESv2_LIB)
+
+if (WITH_GLX_LIB) 
+find_package(GLX REQUIRED)
+include_directories(${GLX_INCLUDE_DIR})
+set(GRAPHIC_NATIVE_LIBS ${GLX_LIBRARIES})
+endif(WITH_GLX_LIB)
+
+set(LIBS ${LIBS} ${CMAKE_THREAD_LIBS_INIT} ${X11_X11_LIB} ${X11_Xcomposite_LIB} ${X11_Xdamage_LIB} ${GRAPHIC_NATIVE_LIBRARIES} LayerManagerUtils )
 target_link_libraries(${GRAPHIC_LIB_NAME} ${LIBS})
+
 
 add_dependencies(${GRAPHIC_LIB_NAME} LayerManagerService)
 add_dependencies(${GRAPHIC_LIB_NAME} LayerManagerUtils)
