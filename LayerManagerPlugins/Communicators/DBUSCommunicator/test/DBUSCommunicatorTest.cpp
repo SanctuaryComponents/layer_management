@@ -242,11 +242,15 @@ TEST_F(DBUSCommunicatorTest, CreateSurface) {
 }
 
 TEST_F(DBUSCommunicatorTest, Createlayer) {
- EXPECT_CALL(this->mockCommandExecutor, execute( CreateCommandEq(0u,0u,0u,TypeLayer,PIXELFORMAT_R8))).Times(1);
-  system((DBUSCOMMAND + std::string("CreateLayer")).c_str());
 
-  EXPECT_CALL(this->mockCommandExecutor, execute( CreateCommandEq(0u,0u,0u,TypeLayer,PIXELFORMAT_R8))).Times(1);
-  system((DBUSCOMMAND + std::string("CreateLayer")).c_str());
+    uint resolution[2] = {0,0};
+    DefaultValue<uint*>::Set(resolution);
+
+    EXPECT_CALL(this->mockCommandExecutor, execute( CreateCommandEq(0u,0u,0u,TypeLayer,PIXELFORMAT_R8))).Times(1);
+    system((DBUSCOMMAND + std::string("CreateLayer")).c_str());
+
+    EXPECT_CALL(this->mockCommandExecutor, execute( CreateCommandEq(0u,0u,0u,TypeLayer,PIXELFORMAT_R8))).Times(1);
+    system((DBUSCOMMAND + std::string("CreateLayer")).c_str());
 
 
 }

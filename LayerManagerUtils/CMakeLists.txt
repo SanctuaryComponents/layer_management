@@ -26,3 +26,12 @@ add_library(LayerManagerUtils STATIC src/Bitmap.cpp src/IlmMatrix.cpp src/Log.cp
 install (FILES include/Log.h include/LogMessageBuffer.h include/IlmMatrix.h include/Bitmap.h DESTINATION include/layermanager)
 
 install (TARGETS LayerManagerUtils ARCHIVE DESTINATION lib/layermanager/static)
+
+if (WITH_TESTS)
+
+add_executable(UtilsTest tests/BitmapTest.cpp tests/LogTest.cpp)
+target_link_libraries(UtilsTest LayerManagerUtils gtest pthread)
+enable_testing()
+add_test(Utilities UtilsTest)
+
+endif(WITH_TESTS) 
