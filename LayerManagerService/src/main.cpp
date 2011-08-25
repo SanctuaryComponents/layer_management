@@ -407,7 +407,12 @@ int main(int argc, char **argv)
     LOG_INFO("LayerManagerService", "Startup complete. EnterMainloop");
     while (true)
     {
-        sleep(2000);
+        CommunicatorListIterator commIter = communicatorList.begin();
+        CommunicatorListIterator commIterEnd = communicatorList.end();
+        for (; commIter != commIterEnd; ++commIter)
+        {
+            (*commIter)->process();
+        }
     }
 
 

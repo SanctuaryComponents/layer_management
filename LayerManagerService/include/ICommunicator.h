@@ -42,6 +42,11 @@ public:
     virtual void stop() = 0;
 
     /**
+     * Process communication. 
+     */
+    virtual void process() = 0;
+
+    /**
      * Switch debug mode of this component on or off
      * @param onoff Turn on debug mode (true) or off (false)
      */

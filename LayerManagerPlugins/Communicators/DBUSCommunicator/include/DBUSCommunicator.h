@@ -64,6 +64,7 @@ public:
     DBUSCommunicator(ICommandExecutor* executor);
     virtual bool start();
     virtual void stop();
+    virtual void process();
     virtual void setdebug(bool onoff);
 
     void Debug(DBusConnection* conn, DBusMessage* msg);

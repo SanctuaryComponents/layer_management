@@ -241,7 +241,10 @@ void DBUSCommunicator::ScreenShot(DBusConnection* conn, DBusMessage* msg)
         g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
-
+void DBUSCommunicator::process() 
+{
+    dbus_connection_read_write_dispatch (g_pDbusMessage->getConnection(), -1);
+}
 void DBUSCommunicator::ScreenShotOfLayer(DBusConnection* conn, DBusMessage* msg)
 {
     (void)conn; // TODO: remove, only prevents warning
