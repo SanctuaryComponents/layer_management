@@ -125,6 +125,6 @@ void X11CopyGLES::destroyClientBuffer(Surface* surface)
     {
           glDeleteTextures(1,&nativeSurface->texture);
           XFreePixmap(dpy, nativeSurface->pixmap);
-          nativeSurface->pixmap = NULL;
+          nativeSurface->pixmap = None;
     }
 }

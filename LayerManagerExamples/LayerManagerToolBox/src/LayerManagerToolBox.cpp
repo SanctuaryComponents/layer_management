@@ -183,8 +183,8 @@ typedef struct s_global_parameter
     t_ilm_surface       surfaceid;
     t_ilm_layer         layerid;
     t_ilm_int           screenid;    
-    t_ilm_int           src[4];
-    t_ilm_int           dest[4];
+    t_ilm_int*          src;
+    t_ilm_int*          dest;
     t_ilm_bool          visibility;
     t_ilm_float         opacity;
     ilmPixelFormat      pixelformat;
@@ -676,14 +676,16 @@ ilmErrorTypes init_toolbox(t_param_struct* pStruct)
 
     if(ILM_SUCCESS == result)
     {
+        t_ilm_int srcRegion[4] = {0,0,320,240};
+        t_ilm_int destRegion[4] = {0,0,320,240};
         printf("ilm_init success\n");
         pStruct->state = TOOLBOX_INIT_STATE;
         pStruct->opacity = 1.0f;
         pStruct->visibility = ILM_TRUE;
         pStruct->windowid = 0x0;
         pStruct->surfaceid =  SURFACE_EXAMPLE_GDTESTENV_APPLICATION_9;
-        pStruct->src = {0,0,320,240};
-        pStruct->dest = {0,0,320,240};
+        pStruct->src = &srcRegion[0];
+        pStruct->dest = &destRegion[0];
         pStruct->pixelformat = ILM_PIXELFORMAT_RGBA_8888;
         pStruct->layerid = 2000;
         pStruct->screenid = -1;

@@ -208,7 +208,7 @@ void attachVertexBuffer()
 
 void detachVertexBuffer()
 {
-    glBindBuffer(GL_ARRAY_BUFFER, NULL);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void destroyVertexBuffer()
