@@ -195,7 +195,6 @@ bool GLXGraphicsystem::init(Display* x11Display, Window x11Window)
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glEnable(GL_TEXTURE_2D);
     glMatrixMode(GL_MODELVIEW);
-    ITextureBinder * binder;
     const char *ext;
     ext = glXQueryExtensionsString(x11disp, 0);
     if (!strstr(ext, "GLX_EXT_texture_from_pixmap") )

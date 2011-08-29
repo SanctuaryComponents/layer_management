@@ -120,7 +120,7 @@ uint* X11GLXRenderer::getScreenIDs(uint* length)
     // Screens in X11 can be addresses/accessed by just the number - we must only know how many there are
     uint numberOfScreens = ScreenCount(x11Display);
     uint* screenIDS = new uint[numberOfScreens];
-    for (int i = 0; i < numberOfScreens; i++)
+    for (uint i = 0; i < numberOfScreens; i++)
     {
         screenIDS[i] = i;
     }
