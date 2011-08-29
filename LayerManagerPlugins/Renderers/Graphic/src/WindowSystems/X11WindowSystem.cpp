@@ -871,6 +871,7 @@ void X11WindowSystem::ManageXInputEvent(XEvent *pevent)
 			{
 				((XButtonEvent*)pevent)->x = x;
 				((XButtonEvent*)pevent)->y = y;
+				pevent->xany.window = surf->nativeHandle;
 				XSendEvent(x11Display, surf->nativeHandle, false, 0, pevent);
 			}
 			break;
