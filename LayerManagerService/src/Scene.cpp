@@ -400,15 +400,16 @@ void Scene::getLayerGroupIDs(uint* length, uint** array) const
 Surface* Scene::getSurfaceAt(unsigned int *x, unsigned int *y, double minOpacity)
 {
 	Surface* surf;
-	LayerListIterator currentLayer;
-	SurfaceListIterator currentSurf;
+	SurfaceListConstIterator currentSurf;
+	LayerListConstReverseIterator currentLayer;
 	unsigned int x_SurfCoordinate, y_SurfCoordinate;
 
 	surf = NULL;
 
-	/* Need to browse for all layers */
-	for (currentLayer = m_currentRenderOrder.begin();
-	     currentLayer != m_currentRenderOrder.end() && surf == NULL;
+	/* Need to browse for all layers. 1st layer of m_currentRenderOrder is rendered
+	 * on bottom, last one is rendrered on top. So we have to reverse iterate */
+	for (currentLayer = m_currentRenderOrder.rbegin();
+	     currentLayer != m_currentRenderOrder.rend() && surf == NULL;
 	     currentLayer++)
 	{
 		if ( ((*currentLayer)->visibility) && ((*currentLayer)->getOpacity() >= minOpacity) )

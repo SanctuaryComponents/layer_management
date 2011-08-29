@@ -26,5 +26,7 @@
 typedef std::list<Layer*> LayerList;
 typedef std::list<Layer*>::iterator LayerListIterator;
 typedef std::list<Layer*>::const_iterator LayerListConstIterator;
+typedef std::list<Layer*>::reverse_iterator LayerListReverseIterator;
+typedef std::list<Layer*>::const_reverse_iterator LayerListConstReverseIterator;
 
 #endif /* _LAYERLIST_H_ */
