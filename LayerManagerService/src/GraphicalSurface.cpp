@@ -20,7 +20,7 @@
 #include "GraphicalSurface.h"
 
 
-bool GraphicalSurface::isInside(unsigned int x_DestCoordonateSyst, unsigned int y_DestCoordonateSyst) const
+bool GraphicalSurface::isInside(unsigned int x_DestCoordinateSyst, unsigned int y_DestCoordinateSyst) const
 {
 	bool ret;
 
@@ -28,9 +28,9 @@ bool GraphicalSurface::isInside(unsigned int x_DestCoordonateSyst, unsigned int 
 	{
 		case Zero:
 			ret = (
-			           ((x_DestCoordonateSyst >= m_destinationViewport.x) && (x_DestCoordonateSyst < m_destinationViewport.x + m_destinationViewport.width))
+			           ((x_DestCoordinateSyst >= m_destinationViewport.x) && (x_DestCoordinateSyst < m_destinationViewport.x + m_destinationViewport.width))
 			        &&
-			           ((y_DestCoordonateSyst >= m_destinationViewport.y) && (y_DestCoordonateSyst < m_destinationViewport.y + m_destinationViewport.height))
+			           ((y_DestCoordinateSyst >= m_destinationViewport.y) && (y_DestCoordinateSyst < m_destinationViewport.y + m_destinationViewport.height))
 			      );
 			break;
 
@@ -52,8 +52,8 @@ bool GraphicalSurface::isInside(unsigned int x_DestCoordonateSyst, unsigned int 
 
 
 /**
- * We are going to change of coordonate system.
- * The input coordonates are in the Dest system, we have to change them to the Source system.
+ * We are going to change of coordinate system.
+ * The input coordinates are in the Dest system, we have to change them to the Source system.
  * For this, 4 operations have to be undone, in order :
  *  - translation in source system
  *  - scaling
@@ -61,7 +61,7 @@ bool GraphicalSurface::isInside(unsigned int x_DestCoordonateSyst, unsigned int 
  *  - rotation (not yet implemented)
  *
  */
-bool GraphicalSurface::DestToSourceCoordonates(unsigned int *x, unsigned int *y, bool check) const
+bool GraphicalSurface::DestToSourceCoordinates(unsigned int *x, unsigned int *y, bool check) const
 {
 	bool 	ret;
 	int   	TVxD, TVyD;  /* Translation vector x,y in destination system */	

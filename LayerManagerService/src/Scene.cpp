@@ -382,8 +382,8 @@ void Scene::getLayerGroupIDs(uint* length, uint** array) const
 /**
  * @Description:
  * Return the first Surface located below a specific coordinate, and for which
- * the opacity is above a certain level. Also translate the input coordonates
- * which are display wide into surface wide coordonates.
+ * the opacity is above a certain level. Also translate the input coordinates
+ * which are display wide into surface wide coordinates.
  *
  * This function is mainly used to dispatch mouse events to the underlying
  * window. For this, we need to know to what is the layer / surface under the
@@ -392,9 +392,9 @@ void Scene::getLayerGroupIDs(uint* length, uint** array) const
  *
  *
  * @param x in/out : IN    x position in the scene
- *                   OUT   x position in the surface coordonate system
+ *                   OUT   x position in the surface coordinate system
  * @param y in/out : IN    y position in the scene
- *                   OUT   y position in the surface coordonate system
+ *                   OUT   y position in the surface coordinate system
  * @param minOpacity Minimal opacity that a surface should have to be elected
  */
 Surface* Scene::getSurfaceAt(unsigned int *x, unsigned int *y, double minOpacity)
@@ -402,7 +402,7 @@ Surface* Scene::getSurfaceAt(unsigned int *x, unsigned int *y, double minOpacity
 	Surface* surf;
 	LayerListIterator currentLayer;
 	SurfaceListIterator currentSurf;
-	unsigned int x_SurfCoordonate, y_SurfCoordonate;
+	unsigned int x_SurfCoordinate, y_SurfCoordinate;
 
 	surf = NULL;
 
@@ -415,9 +415,9 @@ Surface* Scene::getSurfaceAt(unsigned int *x, unsigned int *y, double minOpacity
 		{
 			if ((*currentLayer)->isInside(*x, *y))
 			{
-				x_SurfCoordonate = *x;
-				y_SurfCoordonate = *y;
-				(*currentLayer)->DestToSourceCoordonates(&x_SurfCoordonate, &y_SurfCoordonate, false);
+				x_SurfCoordinate = *x;
+				y_SurfCoordinate = *y;
+				(*currentLayer)->DestToSourceCoordinates(&x_SurfCoordinate, &y_SurfCoordinate, false);
 				/* Need to browse for all surfaces */
 				for (currentSurf = (*currentLayer)->getAllSurfaces().begin();
 				     currentSurf != (*currentLayer)->getAllSurfaces().end() && surf == NULL;
@@ -425,12 +425,12 @@ Surface* Scene::getSurfaceAt(unsigned int *x, unsigned int *y, double minOpacity
 				{
 					if ( ((*currentSurf)->visibility) && ((*currentSurf)->getOpacity() >= minOpacity) )
 					{
-						if ((*currentSurf)->isInside(x_SurfCoordonate, y_SurfCoordonate))
+						if ((*currentSurf)->isInside(x_SurfCoordinate, y_SurfCoordinate))
 						{
 							surf = *currentSurf;
-							(*currentSurf)->DestToSourceCoordonates(&x_SurfCoordonate, &y_SurfCoordonate, false);
-							*x = x_SurfCoordonate;
-							*y = y_SurfCoordonate;
+							(*currentSurf)->DestToSourceCoordinates(&x_SurfCoordinate, &y_SurfCoordinate, false);
+							*x = x_SurfCoordinate;
+							*y = y_SurfCoordinate;
 						}
 					}
 				}
