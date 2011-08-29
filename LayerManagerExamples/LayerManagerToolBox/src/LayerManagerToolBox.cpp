@@ -676,16 +676,14 @@ ilmErrorTypes init_toolbox(t_param_struct* pStruct)
 
     if(ILM_SUCCESS == result)
     {
-        t_ilm_int srcRegion[4] = {0,0,320,240};
-        t_ilm_int destRegion[4] = {0,0,320,240};
         printf("ilm_init success\n");
         pStruct->state = TOOLBOX_INIT_STATE;
         pStruct->opacity = 1.0f;
         pStruct->visibility = ILM_TRUE;
         pStruct->windowid = 0x0;
         pStruct->surfaceid =  SURFACE_EXAMPLE_GDTESTENV_APPLICATION_9;
-        pStruct->src = &srcRegion[0];
-        pStruct->dest = &destRegion[0];
+        pStruct->src = new t_ilm_int[4];
+        pStruct->dest = new t_ilm_int[4];
         pStruct->pixelformat = ILM_PIXELFORMAT_RGBA_8888;
         pStruct->layerid = 2000;
         pStruct->screenid = -1;
@@ -790,52 +788,52 @@ void parseCommandLine(t_param_struct* param_struct, int argc, char **argv)
 
 int main(int argc, char **argv)
 {
-    t_param_struct pStruct;
+    t_param_struct* pStruct = new t_param_struct();
     if (argc == 1) 
     {
         printUsage();
         return (-1);
     }
 
-    if (ILM_SUCCESS != init_toolbox(&pStruct))
+    if (ILM_SUCCESS != init_toolbox(pStruct))
     {
         return -1;
     }
-    parseCommandLine(&pStruct,argc, (char**) argv);
-    switch(pStruct.state) 
+    parseCommandLine(pStruct,argc, (char**) argv);
+    switch(pStruct->state)
     {
          case TOOLBOX_ADD_SURFACE :
-            addWindowToLayer(&pStruct);
+            addWindowToLayer(pStruct);
             break;
          case TOOLBOX_ADD_LAYER :
-            createLayer(&pStruct);
+            createLayer(pStruct);
             break;
          case TOOLBOX_CHANGE_LAYER :
-            changeLayerValues(&pStruct);
+            changeLayerValues(pStruct);
             break;
          case TOOLBOX_CHANGE_SURFACE :
-            changeSurfaceValues(&pStruct);
+            changeSurfaceValues(pStruct);
             break;            
          case TOOLBOX_LIST_LAYER :
-            listLayer(&pStruct);
+            listLayer(pStruct);
             break;
          case TOOLBOX_LIST_SURFACE :
-            listSurface(&pStruct);
+            listSurface(pStruct);
             break;
          case TOOLBOX_REMOVE_LAYER :
-            removeLayer(&pStruct);
+            removeLayer(pStruct);
             break;
          case TOOLBOX_REMOVE_SURFACE :
-            removeSurface(&pStruct);
+            removeSurface(pStruct);
             break;            
          case TOOLBOX_SET_DISPLAY_RO :
-            setDisplayRenderOrder(&pStruct);
+            setDisplayRenderOrder(pStruct);
             break;            
          case TOOLBOX_PROPERTIES_SURFACE:
-            showSurfaceProperties(&pStruct);
+            showSurfaceProperties(pStruct);
             break;            
          case TOOLBOX_PROPERTIES_LAYER :
-            showLayerProperties(&pStruct);
+            showLayerProperties(pStruct);
             break;                        
         default:
          printf("Other options currently not implemented\n");
