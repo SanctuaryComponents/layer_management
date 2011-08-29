@@ -68,8 +68,10 @@ const char* USAGE_DESCRIPTION = "Usage:\t LayerManagerService [options]\n"
                                 "\t-d: displayName \t\n"
                                 "\t-f: loglevel file \t 0 [default] \n\t\t\t\t[0=disabled,1=error,2=info,3=warning,4=debug]\n"
                                 "\t-c: loglevel console \t 2 [default] \n\t\t\t\t[0=disabled,1=error,2=info,3=warning,4=debug]\n"
+                                "\t-v: show version info\t\n"
                                 "\nexample: LayerManagerService -w800 -h480 -d:0\n";
 
+const char* VERSION_STRING = ILM_VERSION;
 template<class T>
 T* getCreateFunction(string libname)
 {
@@ -123,7 +125,7 @@ void parseCommandLine(int argc, char **argv)
 {
     while (optind < argc)
     {
-        int option = getopt(argc, argv, "w::h::d::?::c::f::");
+        int option = getopt(argc, argv, "w::h::d::?::c::f::v::");
         switch (option)
         {
         case 'd':
@@ -147,8 +149,13 @@ void parseCommandLine(int argc, char **argv)
                 Log::fileLogLevel = (LOG_MODES) atoi(optarg);
             }
             break;
+        case 'v':
+            printf("LayerManagerService\nVersion: %s\n",VERSION_STRING);            
+            exit(-1);
+            break;
         case '?':   
         default:
+            printf("LayerManagerService\nVersion: %s\n",VERSION_STRING);
             puts(USAGE_DESCRIPTION);
             exit(-1);
         }
