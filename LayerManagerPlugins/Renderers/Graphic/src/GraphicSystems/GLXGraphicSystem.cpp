@@ -301,19 +301,16 @@ void GLXGraphicsystem::renderSurface(Surface* currentSurface)
 {
 //    LOG_DEBUG("GLXGraphicsystem", "renderSurface " << currentSurface->getID() );
     
-    float texX1=0.0f;
-    float texX2=1.0f;
-    float texY1=0.0f;
-    float texY2=1.0f;
-
-    const Rectangle &layerdest = (m_currentLayer)->getDestinationRegion();
-    const Rectangle &layersrc = (m_currentLayer)->getSourceRegion();
-    Rectangle newSurfacePos( 0,0,(currentSurface)->OriginalSourceWidth,(currentSurface)->OriginalSourceHeight);
+    const Rectangle &layerDestinationRegion = (m_currentLayer)->getDestinationRegion();
+    const Rectangle &layerSourceRegion = (m_currentLayer)->getSourceRegion();
     
-    ViewportTransform::applySurfaceSource(currentSurface, &texX1,&texX2,&texY1,&texY2);
-    ViewportTransform::applySurfaceDest(currentSurface,&newSurfacePos);
-    ViewportTransform::applyLayerSource(&newSurfacePos,m_currentLayer,&texX1,&texX2,&texY1,&texY2);
-    ViewportTransform::applyLayerDest(&newSurfacePos,m_currentLayer);
+    Rectangle targetSurfaceSource = currentSurface->getSourceRegion();
+    Rectangle targetSurfaceDestination = currentSurface->getDestinationRegion();
+
+    ViewportTransform::applyLayerSource(layerSourceRegion, targetSurfaceSource, targetSurfaceDestination);
+    ViewportTransform::applyLayerDestination(layerDestinationRegion, layerSourceRegion, targetSurfaceDestination);
+    float* textureCoordinates = new float[4];
+    ViewportTransform::transformRectangleToTextureCoordinates(targetSurfaceSource, currentSurface->OriginalSourceWidth, currentSurface->OriginalSourceHeight, textureCoordinates);
     
     glPushMatrix();
     if (false == m_binder->bindSurfaceTexture(currentSurface)) 
@@ -331,24 +328,25 @@ void GLXGraphicsystem::renderSurface(Surface* currentSurface)
 //    LOG_DEBUG("GLXGraphicsystem","window: " << windowWidth << " " << windowHeight  );
 
     //bottom left
-    glTexCoord2d(texX1,texY2);
-    glVertex2d((float)newSurfacePos.x/windowWidth*2-1,  1-(float)(newSurfacePos.y+newSurfacePos.height)/windowHeight*2);
+    glTexCoord2d(textureCoordinates[0],textureCoordinates[3]);
+    glVertex2d((float)targetSurfaceDestination.x/windowWidth*2-1,  1-(float)(targetSurfaceDestination.y+targetSurfaceDestination.height)/windowHeight*2);
 
     // bottom right
-    glTexCoord2f(texX2,texY2);
-    glVertex2d( (float)(newSurfacePos.x+newSurfacePos.width)/windowWidth*2-1, 1-(float)(newSurfacePos.y+newSurfacePos.height)/windowHeight*2);
+    glTexCoord2f(textureCoordinates[1],textureCoordinates[3]);
+    glVertex2d( (float)(targetSurfaceDestination.x+targetSurfaceDestination.width)/windowWidth*2-1, 1-(float)(targetSurfaceDestination.y+targetSurfaceDestination.height)/windowHeight*2);
 
     // top right
-    glTexCoord2f(texX2, texY1);
-    glVertex2d((float)(newSurfacePos.x+newSurfacePos.width)/windowWidth*2-1, 1-(float)newSurfacePos.y/windowHeight*2);
+    glTexCoord2f(textureCoordinates[1], textureCoordinates[2]);
+    glVertex2d((float)(targetSurfaceDestination.x+targetSurfaceDestination.width)/windowWidth*2-1, 1-(float)targetSurfaceDestination.y/windowHeight*2);
 
     // top left
-    glTexCoord2f(texX1, texY1);
-    glVertex2d((float)newSurfacePos.x/windowWidth*2-1 ,  1-(float)newSurfacePos.y/windowHeight*2);
+    glTexCoord2f(textureCoordinates[0], textureCoordinates[2]);
+    glVertex2d((float)targetSurfaceDestination.x/windowWidth*2-1 ,  1-(float)targetSurfaceDestination.y/windowHeight*2);
     glEnd();
 
     m_binder->unbindSurfaceTexture(currentSurface);
     glPopMatrix();
+    delete textureCoordinates;
 }
 
 void GLXGraphicsystem::saveScreenShotOfFramebuffer(std::string fileToSave)

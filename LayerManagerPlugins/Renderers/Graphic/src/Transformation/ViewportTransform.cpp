@@ -19,145 +19,127 @@
 
 #include "Transformation/ViewportTransform.h"
 
-void ViewportTransform::applySurfaceSource(Surface *surface, float* u_left,float* u_right,float* v_left,float* v_right) 
+void ViewportTransform::applyLayerSource(const Rectangle& layerSource, Rectangle& surfaceSource, Rectangle& surfaceDestination)
 {
-    // move texture coordinate proportional to the cropped pixels
-    const Rectangle& surfaceSource = surface->getSourceRegion();
-    float percentageCroppedFromLowerSide_U = ((float)surfaceSource.x/surface->OriginalSourceWidth);
-    float textureRangeU = *u_right-*u_left;
-    *u_left += percentageCroppedFromLowerSide_U * textureRangeU;
-
-    // move texture coordinate proportional to the cropped pixels
-    int newRightSide = surfaceSource.x+surfaceSource.width;    
-    float percentageCroppedFromRightSide = (float)(surface->OriginalSourceWidth-newRightSide)/surface->OriginalSourceWidth;
-    *u_right -= percentageCroppedFromRightSide * textureRangeU;
-
-    // the same for Y
-    // move texture coordinate proportional to the cropped pixels
-    float percentageCroppedFromTopSideV = ((float)surfaceSource.y/surface->OriginalSourceHeight);
-    float textureRangeV = *v_right-*v_left;
-    *v_left += percentageCroppedFromTopSideV * textureRangeV;
-
-    // move texture coordinate proportional to the cropped pixels
-    int newBottomSide = surfaceSource.y+surfaceSource.height;
-    float percentageCroppedFromBottomSide = (float)(surface->OriginalSourceHeight-newBottomSide)/surface->OriginalSourceHeight;
-    *v_right -= percentageCroppedFromBottomSide * textureRangeV;
-
-}
-    
-void ViewportTransform::applySurfaceDest(Surface *surface, Rectangle *newSurfacePos) 
-{
-    const Rectangle& surfaceDest = surface->getDestinationRegion();
-    (*newSurfacePos).x = surfaceDest.x;
-    (*newSurfacePos).width = surfaceDest.width;
-
-    (*newSurfacePos).y = surfaceDest.y;
-    (*newSurfacePos).height = surfaceDest.height;
-}
-    
-void ViewportTransform::applyLayerSource(Rectangle* newSurfacePos, Layer* layer, float* u_left, float* u_right, float* v_left, float* v_right) 
-{
-    Rectangle surfacePosOrig;
-    const Rectangle& layerSource = layer->getSourceRegion();
-    surfacePosOrig.x = newSurfacePos->x;
-    surfacePosOrig.width = newSurfacePos->width;
-    surfacePosOrig.y = newSurfacePos->y;
-    surfacePosOrig.height = newSurfacePos->height;
-    float u_leftOrig = *u_left;
-    float u_rightOrig = *u_right;
-    float v_leftOrig = *v_left;
-    float v_rightOrig = *v_right;
+    Rectangle regionBeforeTransformation = surfaceDestination;
 
     // X
 
     // crop surface from lower side if it is outside the cropregion of the layer
-    if (surfacePosOrig.x < layerSource.x)
+    if (regionBeforeTransformation.x < layerSource.x)
     { // partly outside lower end
-        // crop a proportional part of the texture
-        *u_left += (float)(layerSource.x-surfacePosOrig.x)/surfacePosOrig.width * (u_rightOrig-u_leftOrig);
-        // crop a part of the geometry
-        (*newSurfacePos).width -= layerSource.x-surfacePosOrig.x;
+        // crop a part of the destination region
+        surfaceDestination.width -= layerSource.x-regionBeforeTransformation.x;
 
-        if ( newSurfacePos->x < layerSource.x )
-            (*newSurfacePos).x = 0;
+        if ( surfaceDestination.x < layerSource.x )
+            surfaceDestination.x = 0;
         else
-            (*newSurfacePos).x -= layerSource.x;
+            surfaceDestination.x -= layerSource.x;
+
+        // crop a proportional part of the source region
+        surfaceSource.x += (float)(layerSource.x-regionBeforeTransformation.x)/regionBeforeTransformation.width * surfaceSource.width;
+        surfaceSource.width -= (float)(layerSource.x-regionBeforeTransformation.x)/regionBeforeTransformation.width * surfaceSource.width;
     }
     // crop surface from higher side if some part of surface lies beyond the cropregion of the layer
-    if(surfacePosOrig.x+surfacePosOrig.width > layerSource.x+layerSource.width)
+    if(regionBeforeTransformation.x+regionBeforeTransformation.width > layerSource.x+layerSource.width)
     { // partially outside higher end
-        // crop a part of the texture
-        *u_right -= (float)(surfacePosOrig.x+surfacePosOrig.width-layerSource.x-layerSource.width)/surfacePosOrig.width * (u_rightOrig-u_leftOrig);
         // crop a part of the surfaces geometry that extended beyond layer cropregion
-        (*newSurfacePos).width -= surfacePosOrig.x+surfacePosOrig.width-layerSource.x-layerSource.width;
-        if (newSurfacePos->x < layerSource.x )
-            (*newSurfacePos).x = 0;
+        surfaceDestination.width -= regionBeforeTransformation.x+regionBeforeTransformation.width-layerSource.x-layerSource.width;
+
+        if (surfaceDestination.x < layerSource.x )
+            surfaceDestination.x = 0;
         else
-            (*newSurfacePos).x -= layerSource.x;
+            surfaceDestination.x -= layerSource.x;
+
+        surfaceSource.width -= regionBeforeTransformation.x+regionBeforeTransformation.width-layerSource.x-layerSource.width;
     }
     // if surface is completely within the cropregion then just move it by the amount cropped from the lower end of the layer
-    if (surfacePosOrig.x >= layerSource.x && surfacePosOrig.x+surfacePosOrig.width <= layerSource.x+layerSource.width)
+    if (regionBeforeTransformation.x >= layerSource.x && regionBeforeTransformation.x+regionBeforeTransformation.width <= layerSource.x+layerSource.width)
     {
-        if (newSurfacePos->x < layerSource.x )
-            (*newSurfacePos).x = 0;
+        if (surfaceDestination.x < layerSource.x )
+            surfaceDestination.x = 0;
         else
-            (*newSurfacePos).x -= layerSource.x;
+            surfaceDestination.x -= layerSource.x;
     }
 
-    //Y
-    // crop surface from top side if it is outside the cropregion of the layer
-    if (surfacePosOrig.y < layerSource.y)
-    { // partly outside lower end
-        // crop a proportional part of the texture
-        *v_left += (float)(layerSource.y-surfacePosOrig.y)/surfacePosOrig.height * (v_rightOrig-v_leftOrig);
-        // crop a part of the geometry
-        (*newSurfacePos).height -= layerSource.y-surfacePosOrig.y;
+    // y
 
-        if ( newSurfacePos->y < layerSource.y )
-            (*newSurfacePos).y = 0;
+    // crop surface from lower side if it is outside the cropregion of the layer
+    if (regionBeforeTransformation.y < layerSource.y)
+    { // partly outside lower end
+        // crop a part of the destination region
+        surfaceDestination.height -= layerSource.y-regionBeforeTransformation.y;
+
+        if ( surfaceDestination.y < layerSource.y )
+            surfaceDestination.y = 0;
         else
-            (*newSurfacePos).y -= layerSource.y;
+            surfaceDestination.y -= layerSource.y;
+
+        // crop a proportional part of the source region
+        surfaceSource.y += (float)(layerSource.y-regionBeforeTransformation.y)/regionBeforeTransformation.height * surfaceSource.height;
+        surfaceSource.height -= (float)(layerSource.y-regionBeforeTransformation.y)/regionBeforeTransformation.height * surfaceSource.height;
     }
     // crop surface from higher side if some part of surface lies beyond the cropregion of the layer
-    if(surfacePosOrig.y+surfacePosOrig.height > layerSource.y+layerSource.height)
+    if(regionBeforeTransformation.y+regionBeforeTransformation.height > layerSource.y+layerSource.height)
     { // partially outside higher end
-        // crop a part of the texture
-        *v_right -= (float)(surfacePosOrig.y+surfacePosOrig.height-layerSource.y-layerSource.height)/surfacePosOrig.height * (v_rightOrig-v_leftOrig);
-        // crop a part of the surfaces geometry that extended beyond layer cropregion
-        (*newSurfacePos).height -= surfacePosOrig.y+surfacePosOrig.height-layerSource.y-layerSource.height;
-        if (newSurfacePos->y < layerSource.y )
-            (*newSurfacePos).y = 0;
+        // crop a part of the surfaces geometry that eytended beyond layer cropregion
+        surfaceDestination.height -= regionBeforeTransformation.y+regionBeforeTransformation.height-layerSource.y-layerSource.height;
+
+        if (surfaceDestination.y < layerSource.y )
+            surfaceDestination.y = 0;
         else
-            (*newSurfacePos).y -= layerSource.y;
+            surfaceDestination.y -= layerSource.y;
+
+        surfaceSource.height -= regionBeforeTransformation.y+regionBeforeTransformation.height-layerSource.y-layerSource.height;
     }
     // if surface is completely within the cropregion then just move it by the amount cropped from the lower end of the layer
-    if (surfacePosOrig.y >= layerSource.y && surfacePosOrig.y+surfacePosOrig.height <= layerSource.y+layerSource.height)
+    if (regionBeforeTransformation.y >= layerSource.y && regionBeforeTransformation.y+regionBeforeTransformation.height <= layerSource.y+layerSource.height)
     {
-        if (newSurfacePos->y < layerSource.y )
-            (*newSurfacePos).y = 0;
+        if (surfaceDestination.y < layerSource.y )
+            surfaceDestination.y = 0;
         else
-            (*newSurfacePos).y -= layerSource.y;
+            surfaceDestination.y -= layerSource.y;
     }
-
 }
-    
-void ViewportTransform::applyLayerDest(Rectangle* newSurfacePos, Layer* layer) 
-{
-        const Rectangle& layerDest = layer->getDestinationRegion();
-        const Rectangle& layerSrc = layer->getSourceRegion();
-        
-		// scale position proportional to change in layer size
-		(*newSurfacePos).x *= (float)layerDest.width/layerSrc.width;
-		// scale width proportional to change in layer size
-		(*newSurfacePos).width *= (float)layerDest.width/layerSrc.width;
-		// after scaling, move surface because its position should be relative to moved layer
-		(*newSurfacePos).x+=layerDest.x;
 
-		// scale position proportional to change in layer size
-		(*newSurfacePos).y *= (float)layerDest.height/layerSrc.height;
-		// scale width proportional to change in layer size
-		(*newSurfacePos).height *= (float)layerDest.height/layerSrc.height;
-		// after scaling, move surface because its position should be relative to moved layer
-		(*newSurfacePos).y+=layerDest.y;    
-    
+void ViewportTransform::applyLayerDestination(const Rectangle& layerDestination, const Rectangle& layerSource, Rectangle& regionToScale)
+{
+    // scale position proportional to change in layer size
+    regionToScale.x *= (float)layerDestination.width/layerSource.width;
+    // scale width proportional to change in layer size
+    regionToScale.width *= (float)layerDestination.width/layerSource.width;
+    // after scaling, move surface because its position should be relative to moved layer
+    regionToScale.x+=layerDestination.x;
+
+    // scale position proportional to change in layer size
+    regionToScale.y *= (float)layerDestination.height/layerSource.height;
+    // scale width proportional to change in layer size
+    regionToScale.height *= (float)layerDestination.height/layerSource.height;
+    // after scaling, move surface because its position should be relative to moved layer
+    regionToScale.y+=layerDestination.y;
+}
+
+void ViewportTransform::transformRectangleToTextureCoordinates(const Rectangle& rectangle, uint originalWidth, uint originalHeight, float* textureCoordinates)
+{
+    float originalWidthAsFloat = originalWidth;
+    float originalHeightAsFloat = originalHeight;
+
+    // move texture coordinate proportional to the cropped pixels
+    float percentageCroppedFromLowerSide_U = rectangle.x/originalWidthAsFloat;
+    textureCoordinates[0] = percentageCroppedFromLowerSide_U;
+
+    // move texture coordinate proportional to the cropped pixels
+    uint newRightSide = rectangle.x+rectangle.width;
+    float percentageCroppedFromRightSide = (originalWidthAsFloat-newRightSide)/originalWidthAsFloat;
+    textureCoordinates[1] = 1.0f-percentageCroppedFromRightSide ;
+
+    // the same for Y
+    // move texture coordinate proportional to the cropped pixels
+    float percentageCroppedFromTopSideV = ((float)rectangle.y/originalHeightAsFloat);
+    textureCoordinates[2] = percentageCroppedFromTopSideV;
+
+    // move texture coordinate proportional to the cropped pixels
+    int newBottomSide = rectangle.y+rectangle.height;
+    float percentageCroppedFromBottomSide = (float)(originalHeightAsFloat-newBottomSide)/originalHeightAsFloat;
+    textureCoordinates[3] = 1.0f-percentageCroppedFromBottomSide ;
 }

@@ -23,18 +23,26 @@
 #include "Layer.h"
 #include "Surface.h"
 
-
 class ViewportTransform
 {
 public:
-    static void applySurfaceSource(Surface *surface, float* u_left,float* u_right,float* v_left,float* v_right);
-    
-    static void applySurfaceDest(Surface *surface, Rectangle *newSurfacePos);
-    
-    static void applyLayerSource(Rectangle* newSurfacePos, Layer* layer, float* u_left, float* u_right, float* v_left, float* v_right);
-    
-    static void applyLayerDest(Rectangle* newSurfacePos, Layer* layer);
-};
 
+    /*
+     * Apply Source View of Layer to the given surface source and destination regions, ie cropping surface parts to layer source view
+     */
+    static void applyLayerSource(const Rectangle& layerSource, Rectangle& surfaceSource, Rectangle& surfaceDestination);
+
+    /*
+     * Apply Destination View of Layer to the given surface destination region, ie scale and movement relative to scaling and position of layer
+     */
+    static void applyLayerDestination(const Rectangle& layerDestination, const Rectangle& layerSource, Rectangle& regionToScale);
+
+    /*
+     * Calculate Texture Coordinates as relation of the given rectangle to original values.
+     * Example: x position of 10 with an original width of 40 will yield a texture coordinate of 10/40=0.25f.
+     * This function expects textureCoordinates to be an allocated float array of size 4, in which the texture coordinates will be returned.
+     */
+    static void transformRectangleToTextureCoordinates(const Rectangle& rectangle, uint originalWidth, uint originalHeight, float* textureCoordinates);
+};
 
 #endif /* _VIEWPORT_TRANSFORM_H_ */

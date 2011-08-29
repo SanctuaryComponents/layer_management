@@ -243,13 +243,6 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
     GLint index = 0;
     IlmMatrix layerMatrix;
     IlmMatrixIdentity(layerMatrix);
-    Rectangle layerdest = (m_currentLayer)->getDestinationRegion();
-    Rectangle layersrc = (m_currentLayer)->getSourceRegion();
-    Rectangle newSurfacePos( 0,0,(surface)->OriginalSourceWidth,(surface)->OriginalSourceHeight);
-    float texX1=0.0f;
-    float texX2=1.0f;
-    float texY1=0.0f;
-    float texY2=1.0f;
 
     ShaderProgram::CommonUniforms uniforms;
 #ifdef DRAW_LAYER_DEBUG
@@ -267,32 +260,33 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
         // use layer shader if no custom shader is assigned to this surface
         shader = layerShader;
     }
+    const Rectangle& layerDestinationRegion = (m_currentLayer)->getDestinationRegion();
+    const Rectangle& layerSourceRegion = (m_currentLayer)->getSourceRegion();
 
-    ViewportTransform::applySurfaceSource(surface, &texX1,&texX2,&texY1,&texY2);
-    ViewportTransform::applySurfaceDest(surface,&newSurfacePos);
-    ViewportTransform::applyLayerSource(&newSurfacePos,m_currentLayer,&texX1,&texX2,&texY1,&texY2);
-    ViewportTransform::applyLayerDest(&newSurfacePos,m_currentLayer);
+    // these variables contain the current calculated values of the surface
+    Rectangle targetSurfaceSource = surface->getSourceRegion();
+    Rectangle targetSurfaceDestination = surface->getDestinationRegion();
 
-
-/*    newSurfacePos.x = newSurfacePos.x * ((float)layerdest.width / layersrc.width);
-    newSurfacePos.width = newSurfacePos.width * ((float)layerdest.width / layersrc.width);
-    newSurfacePos.y = newSurfacePos.y * ((float)layerdest.height / layersrc.height);
-    newSurfacePos.height = newSurfacePos.height * ((float)layerdest.height / layersrc.height); */
+    ViewportTransform::applyLayerSource(layerSourceRegion, targetSurfaceSource, targetSurfaceDestination);
+    ViewportTransform::applyLayerDestination(layerDestinationRegion, layerSourceRegion, targetSurfaceDestination);
+    float* textureCoordinates = new float[4];
+    ViewportTransform::transformRectangleToTextureCoordinates(targetSurfaceSource, surface->OriginalSourceWidth, surface->OriginalSourceHeight, textureCoordinates);
 
     glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
     IlmMatrixRotateZ(layerMatrix, m_currentLayer->getOrientation() * 90.0f);
-    /* update all common uniforms */
-    uniforms.x = (float)newSurfacePos.x / m_displayWidth;
-    uniforms.y = (float)newSurfacePos.y / m_displayHeight;;
-    uniforms.width = (float)newSurfacePos.width / m_displayWidth;
-    uniforms.height = (float)newSurfacePos.height / m_displayHeight;
+    // update all common uniforms, scale values to display size
+    uniforms.x = (float)targetSurfaceDestination.x / m_displayWidth;
+    uniforms.y = (float)targetSurfaceDestination.y / m_displayHeight;;
+    uniforms.width = (float)targetSurfaceDestination.width / m_displayWidth;
+    uniforms.height = (float)targetSurfaceDestination.height / m_displayHeight;
     uniforms.opacity = (surface)->getOpacity() * m_currentLayer->getOpacity();
-    uniforms.texRange[0] = (texX2-texX1);
-    uniforms.texRange[1] = (texY2-texY1);
-    uniforms.texOffset[0] = texX1;
-    uniforms.texOffset[1] = -texY1;
+    uniforms.texRange[0] = (textureCoordinates[1]-textureCoordinates[0]);
+    uniforms.texRange[1] = (textureCoordinates[3]-textureCoordinates[2]);
+    uniforms.texOffset[0] = textureCoordinates[0];
+    uniforms.texOffset[1] = -textureCoordinates[2];
     uniforms.texUnit = 0;
     uniforms.matrix = &layerMatrix.f[0];
+
 
     //We only know about specific Shaders, only do this if we start with the defaultShader
     if (shader == m_defaultShader && uniforms.opacity == 1.0f)
@@ -318,10 +312,10 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
 
 
 #ifdef DRAW_LAYER_DEBUG
-    layeruniforms.x = (float) layerdest.x / m_displayWidth;
-    layeruniforms.y = (float) layerdest.y / m_displayHeight;
-    layeruniforms.width = (float)layerdest.width / m_displayWidth;
-    layeruniforms.height = (float)layerdest.height / m_displayHeight;
+    layeruniforms.x = (float) layerDestinationRegion.x / m_displayWidth;
+    layeruniforms.y = (float) layerDestinationRegion.y / m_displayHeight;
+    layeruniforms.width = (float)layerDestinationRegion.width / m_displayWidth;
+    layeruniforms.height = (float)layerDestinationRegion.height / m_displayHeight;
     layeruniforms.opacity = m_currentLayer->getOpacity();
     layeruniforms.matrix = &layerMatrix.f[0];
     m_layerShader->use();
@@ -358,6 +352,8 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glGetError(); // TODO
+
+    delete textureCoordinates;
 }
 
 bool GLESGraphicsystem::initOpenGLES(EGLint displayWidth, EGLint displayHeight)
