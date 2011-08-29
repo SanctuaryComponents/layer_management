@@ -258,21 +258,20 @@ bool Layermanager::execute(ICommand* commandToBeExecuted)
 bool Layermanager::startAllRenderers(const int width, const int height,
         const char *displayName)
 {
-    bool allStarted = true;
+    bool allStarted = false;
 
     RendererListIterator iter = m_pRendererList->begin();
     RendererListIterator iterEnd = m_pRendererList->end();
-
     for (; iter != iterEnd; ++iter)
     {
         IRenderer* renderer = *iter;
         if (renderer)
         {
-            allStarted &= renderer->start(width, height, displayName);
+            allStarted = renderer->start(width, height, displayName);
         }
-        else
+        if (renderer == NULL || allStarted == false)
         {
-            allStarted = false;
+          break;   
         }
     }
     if (!allStarted)
@@ -339,7 +338,13 @@ bool Layermanager::startManagement(const int width, const int height,
 {
     bool renderersStarted = startAllRenderers(width, height, displayName);
     bool communicatorsStarted = startAllCommunicators();
-    delegateScene();
+    /* only call the initial layerscenery if all needed plugins are 
+     * successfully started */
+     
+    if (renderersStarted && communicatorsStarted)
+    {
+        delegateScene();
+    }
     return renderersStarted && communicatorsStarted;
 }
 

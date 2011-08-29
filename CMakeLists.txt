@@ -47,6 +47,10 @@ option (WITH_X11_GLES
 option (WITH_DESKTOP 
         "Build for Desktop / GLX" OFF)
 
+option (WITH_CLIENTEXAMPLES 
+        "Build client examples " ON)
+
+
 option (WITH_EGL_EXAMPLE 
         "Build EGL_EXAMPLE " ON)
 
@@ -94,8 +98,6 @@ add_subdirectory (LayerManagerClient/ilmClient)
 add_subdirectory (LayerManagerUtils)
 add_subdirectory (LayerManagerCommands)
 add_subdirectory (LayerManagerService)
-add_subdirectory (LayerManagerExamples/LayerManagerClientExample)
-add_subdirectory (LayerManagerExamples/LayerManagerToolBox)
 
 if (WITH_DESKTOP)
 set (WITH_GLX_LIB ON CACHE STRING "" FORCE)
@@ -123,6 +125,12 @@ endif(WITH_EGL_EXAMPLE)
 if (WITH_GLX_EXAMPLE)
     add_subdirectory (LayerManagerExamples/GLXApplicationExample)
 endif(WITH_GLX_EXAMPLE)
+
+if (WITH_CLIENTEXAMPLES)
+add_subdirectory (LayerManagerExamples/LayerManagerClientExample)
+add_subdirectory (LayerManagerExamples/LayerManagerToolBox)
+add_subdirectory (LayerManagerExamples/LayerSceneDescriptionExample)
+endif(WITH_CLIENTEXAMPLES)
 
 # enable ctest if building with tests
 # run 'make test' after build to run all tests
