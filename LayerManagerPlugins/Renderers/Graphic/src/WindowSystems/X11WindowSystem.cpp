@@ -100,7 +100,7 @@ bool X11WindowSystem::OpenDisplayConnection()
 
 bool X11WindowSystem::checkForCompositeExtension()
 {
-    if (!XQueryExtension (x11Display, COMPOSITE_NAME, &composite_opcode, &composite_event, &composite_error))
+    if (x11Display == NULL || !XQueryExtension (x11Display, COMPOSITE_NAME, &composite_opcode, &composite_event, &composite_error))
     {
         LOG_ERROR("X11WindowSystem", "No composite extension");
         return false;
@@ -113,7 +113,7 @@ bool X11WindowSystem::checkForCompositeExtension()
 }
 
 bool X11WindowSystem::checkForDamageExtension(){
-	if (!XQueryExtension (x11Display, DAMAGE_NAME, &damage_opcode,
+	if (x11Display == NULL || !XQueryExtension (x11Display, DAMAGE_NAME, &damage_opcode,
 				&damage_event, &damage_error))
 	{
 		LOG_ERROR("X11WindowSystem", "No damage extension");
@@ -699,18 +699,19 @@ void* X11WindowSystem::EventLoop()
     // init own stuff
     LOG_DEBUG("X11WindowSystem", "open display connection");
     status &= this->OpenDisplayConnection();
-
+    if ( status == false ) goto init_complete;
     LOG_DEBUG("X11WindowSystem", "check for composite extension");
     status &= this->checkForCompositeExtension();
-
+    if ( status == false ) goto init_complete;
 	LOG_DEBUG("X11WindowSystem", "check for damage extension");
 	status &= this->checkForDamageExtension();
-
+    if ( status == false ) goto init_complete;
 	LOG_DEBUG("X11WindowSystem", "init xserver");
 	status &= this->initXServer();
-
+    if ( status == false ) goto init_complete;
     status &= this->graphicSystem->init(this->x11Display,this->CompositorWindow);
 
+init_complete:
     this->m_success = status;
     this->m_initialized = true;
 
