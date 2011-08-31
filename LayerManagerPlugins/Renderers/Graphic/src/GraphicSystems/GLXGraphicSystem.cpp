@@ -61,7 +61,6 @@ XVisualInfo* GLXGraphicsystem::GetMatchingVisual(Display *dpy)
     if (!visinfo)
     {
         LOG_ERROR("GLXGraphicsystem", "Unable to find RGB, double-buffered visual");
-        exit(1);
     }
     return visinfo;
 }

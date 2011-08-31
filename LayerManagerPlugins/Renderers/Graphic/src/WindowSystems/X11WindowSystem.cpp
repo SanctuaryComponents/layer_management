@@ -69,7 +69,12 @@ XVisualInfo* X11WindowSystem::getDefaultVisual(Display *dpy)
     if (windowVis)
     {
         windowVis->depth = 32;//DefaultDepth(dpy, 0);
-        XMatchVisualInfo( dpy, 0, windowVis->depth, TrueColor, windowVis);
+        if (!XMatchVisualInfo( dpy, 0, windowVis->depth, TrueColor, windowVis))
+        {
+            LOG_ERROR("X11WindowSystem", "Error: Required visual not found\n");
+            XFree(windowVis);
+            return NULL;
+        }
     }
     else
     {
@@ -438,6 +443,7 @@ bool X11WindowSystem::CreateCompositorWindow()
 {
     LOG_DEBUG("X11WindowSystem", "Get root window");
     bool result = true;
+    CompositorWindow = NULL;
     Window root = RootWindow(x11Display,0);
 
     LOG_DEBUG("X11WindowSystem", "Get default screen");
@@ -459,6 +465,10 @@ bool X11WindowSystem::CreateCompositorWindow()
     attr.background_pixel = 0;
     attr.border_pixel = 0;
     windowVis = getVisualFunc(x11Display);
+    if (!windowVis)
+    {
+        return false;
+    }
     attr.colormap = XCreateColormap(x11Display, root, windowVis->visual, AllocNone);
     attr.override_redirect = True;
 
@@ -911,18 +921,27 @@ void X11WindowSystem::signalRedrawEvent()
 }
 
 void X11WindowSystem::cleanup(){
-	LOG_INFO("X11WindowSystem", "Cleanup");
-	Window root = RootWindow(x11Display, 0);
-	XCompositeUnredirectSubwindows(x11Display,root,CompositeRedirectManual);
-	XDestroyWindow(x11Display,CompositorWindow);
+    LOG_INFO("X11WindowSystem", "Cleanup");
+    if (CompositorWindow)
+    {
+        Window root = RootWindow(x11Display, 0);
+        XCompositeUnredirectSubwindows(x11Display,root,CompositeRedirectManual);
+        XDestroyWindow(x11Display,CompositorWindow);
+    }
+
+    if (windowVis)
+    {
+        XFree(windowVis);
+    }
+
 #ifdef USE_XTHREADS
     if ( NULL  != displaySignal ) 
     {
-    	XCloseDisplay(displaySignal);        
+    	XCloseDisplay(displaySignal);
     }
 #endif //USE_XTHREADS
-	XCloseDisplay(x11Display);
-	m_running = false;
+    XCloseDisplay(x11Display);
+    m_running = false;
 }
 
 bool X11WindowSystem::init(BaseGraphicSystem<Display*,Window>* base)

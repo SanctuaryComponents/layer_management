@@ -74,10 +74,9 @@ t_ilm_bool createX11Context(t_ilm_int width, t_ilm_int height)
     g_x11ContextStruct.x11Visual = (XVisualInfo*) malloc(sizeof(XVisualInfo));
 
     // Try to find a visual which is matching the needed parameters
-    XMatchVisualInfo(g_x11ContextStruct.x11Display,
+    if (!XMatchVisualInfo(g_x11ContextStruct.x11Display,
             g_x11ContextStruct.x11Screen, colorDepth, TrueColor,
-            g_x11ContextStruct.x11Visual);
-    if (!g_x11ContextStruct.x11Visual)
+            g_x11ContextStruct.x11Visual))
     {
         printf("Error: Unable to acquire visual\n");
         destroyX11Context();
