@@ -602,9 +602,11 @@ void X11WindowSystem::Screenshot()
 		Surface* currentSurface = m_pScene->getSurface(screenShotID);
 		if (NULL!=currentSurface){
 			Layer* l = m_pScene->createLayer(GraphicalObject::INVALID_ID);
+            l->OriginalSourceWidth = windowWidth;
+            l->OriginalSourceHeight = windowHeight;
 			l->setOpacity(1.0);
-			l->setDestinationRegion(currentSurface->getDestinationRegion());
-			l->setSourceRegion(currentSurface->getSourceRegion());
+			l->setDestinationRegion(Rectangle(0,0,windowWidth,windowHeight));
+			l->setSourceRegion(Rectangle(0,0,windowWidth,windowHeight));
 			graphicSystem->beginLayer(l);
 			graphicSystem->renderSurface(currentSurface);
 			graphicSystem->endLayer();
