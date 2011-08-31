@@ -26,23 +26,35 @@ ShaderProgram* ShaderProgramGLES::createProgram(const std::string& vertName, con
 {
     GLuint progHandle;
     ShaderProgramGLES* program = 0;
+    char defaultShaderDir[1024];
+    char fragmentShaderLocation[1024];
+    char vertexShaderLocation[1024];
+    
+    const char* pluginLookupPath = getenv("LM_PLUGIN_DIR");
+    if  (pluginLookupPath != NULL ) 
+    {
+        strcpy(defaultShaderDir,pluginLookupPath);
+    } else {
+        strcpy(defaultShaderDir,"/usr/lib/layermanager");
+    }
+    strcat(defaultShaderDir,"/renderer");
 
-	if (vertName=="default" && fragName=="default")
-	{
-		// load default shader from binary data
-		progHandle = RenderUtilLoadShaderSources("/usr/lib/layermanager/renderer/renderer_vert.glslv", "/usr/lib/layermanager/renderer/renderer_frag.glslf", GL_TRUE);
-		if (progHandle==0){
-			progHandle = RenderUtilLoadShaderSources("/usr/local/lib/layermanager/renderer/renderer_vert.glslv", "/usr/local/lib/layermanager/renderer/renderer_frag.glslf", GL_TRUE);
-		}
-	}
+    if (vertName=="default" && fragName=="default")
+    {
+        strcpy(vertexShaderLocation,defaultShaderDir);
+        strcpy(fragmentShaderLocation,defaultShaderDir);
+        strcat(vertexShaderLocation,"/renderer_vert.glslv");
+        strcat(fragmentShaderLocation,"/renderer_frag.glslf");
+        // load default shader from binary data
+        progHandle = RenderUtilLoadShaderSources(vertexShaderLocation,fragmentShaderLocation, GL_TRUE);
+    }
 	else if (vertName=="default" && fragName=="default_no_uniform_alpha")
     {
-        // load default shader from binary data
-        progHandle = RenderUtilLoadShaderSources("/usr/lib/layermanager/renderer/renderer_vert.glslv", "/usr/lib/layermanager/renderer/renderer_frag_no_ualpha.glslf", GL_TRUE);
-        if (progHandle==0){
-            progHandle = RenderUtilLoadShaderSources("/usr/local/lib/layermanager/renderer/renderer_vert.glslv", "/usr/local/lib/layermanager/renderer/renderer_frag_no_ualpha.glslf", GL_TRUE);
-        }
-    }
+        strcpy(vertexShaderLocation,defaultShaderDir);
+        strcpy(fragmentShaderLocation,defaultShaderDir);
+        strcat(vertexShaderLocation,"/renderer_vert.glslv");
+        strcat(fragmentShaderLocation,"/renderer_frag_no_ualpha.glslf");
+        progHandle = RenderUtilLoadShaderSources(vertexShaderLocation,fragmentShaderLocation, GL_TRUE);    }
 	else
 	{
 		// load shader sources from file, compile and link them:

@@ -42,20 +42,19 @@ typedef list<string>::iterator tFileListIterator;
 
 
 const char* displayName = ":0";
+const char* gPluginLookupPath = "/usr/lib/layermanager";
 int displayWidth = 1280; // default value, override with -w argument
 int displayHeight = 480; // default value, override with -h argument
 
-const char* gRendererPluginDirectories[] = { "/usr/lib/layermanager/renderer",
-                                             "/usr/local/lib/layermanager/renderer"};
+const char* gRendererPluginDirectories[] = { "/renderer" };
+
 uint gRendererPluginDirectoriesCount = sizeof(gRendererPluginDirectories) / sizeof(gRendererPluginDirectories[0]);
 
-const char* gCommunicatorPluginDirectories[] = { "/usr/lib/layermanager/communicator",
-                                                 "/usr/local/lib/layermanager/communicator" };
+const char* gCommunicatorPluginDirectories[] = { "/communicator" };
 
 uint gCommunicatorPluginDirectoriesCount = sizeof(gCommunicatorPluginDirectories) / sizeof(gCommunicatorPluginDirectories[0]);
                                                  
-const char* gScenePluginDirectories[] = { "/usr/lib/layermanager",
-                                          "/usr/local/lib/layermanager" };
+const char* gScenePluginDirectories[] = { "/" };
 
 uint gScenePluginDirectoriesCount = sizeof(gScenePluginDirectories) / sizeof(gScenePluginDirectories[0]);                                                 
                                                  
@@ -203,7 +202,9 @@ void loadScenePlugins(SceneProviderList& sceneProviderList, ICommandExecutor* ex
     // search sceneprovider plugins in configured directories
     for (uint dirIndex = 0; dirIndex < gScenePluginDirectoriesCount; ++dirIndex)
     {
-        const char* directoryName = gScenePluginDirectories[dirIndex];
+        char directoryName[1024];
+        strcpy(directoryName,gPluginLookupPath);
+        strcat(directoryName,gScenePluginDirectories[dirIndex]);
         LOG_DEBUG("LayerManagerService", "Searching for SceneProviders in: " << directoryName);
         getSharedLibrariesFromDirectory(sharedLibraryNameList, directoryName);
     }
@@ -248,7 +249,9 @@ void loadCommunicatorPlugins(CommunicatorList& communicatorList, ICommandExecuto
     // search communicator plugins in configured directories
     for (uint dirIndex = 0; dirIndex < gCommunicatorPluginDirectoriesCount; ++dirIndex)
     {
-        const char* directoryName = gCommunicatorPluginDirectories[dirIndex];
+        char directoryName[1024];
+        strcpy(directoryName,gPluginLookupPath);
+        strcat(directoryName,gCommunicatorPluginDirectories[dirIndex]);
         LOG_DEBUG("LayerManagerService", "Searching for communicator in: " << directoryName);
         getSharedLibrariesFromDirectory(sharedLibraryNameList, directoryName);
     }
@@ -292,7 +295,9 @@ void loadRendererPlugins(RendererList& rendererList, IScene* pScene)
     // search communicator plugins in configured directories
     for (uint dirIndex = 0; dirIndex < gRendererPluginDirectoriesCount; ++dirIndex)
     {
-        const char* directoryName = gRendererPluginDirectories[dirIndex];
+        char directoryName[1024];
+        strcpy(directoryName,gPluginLookupPath);
+        strcat(directoryName,gRendererPluginDirectories[dirIndex]);        
         LOG_DEBUG("LayerManagerService", "Searching for renderer in: " << directoryName);
         getSharedLibrariesFromDirectory(sharedLibraryNameList, directoryName);
     }
@@ -339,8 +344,14 @@ void loadRendererPlugins(RendererList& rendererList, IScene* pScene)
 int main(int argc, char **argv)
 {
     parseCommandLine(argc, (char**) argv);
-
+    char* pluginLookupPath = getenv("LM_PLUGIN_DIR");
     LOG_INFO("LayerManagerService", "Starting Layermanager.");
+    
+    if  (pluginLookupPath != NULL ) 
+    {
+        gPluginLookupPath = pluginLookupPath;
+    }
+    LOG_INFO("LayerManagerService", "Used plugin Directory is " << gPluginLookupPath);
 
     LOG_INFO("LayerManagerService", "Creating Layermanager.");
     ICommandExecutor* pManager = new Layermanager();
