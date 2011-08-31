@@ -44,7 +44,9 @@ typedef enum e_toolbox_state
     TOOLBOX_CHANGE_LAYER,
     TOOLBOX_CHANGE_SURFACE,
     TOOLBOX_SET_DISPLAY_RO,
-    TOOLBOX_SET_LAYER_RO,
+    TOOLBOX_SCREENSHOT_DISPLAY,
+    TOOLBOX_SCREENSHOT_LAYER,
+    TOOLBOX_SCREENSHOT_SURFACE,
     TOOLBOX_INIT_STATE
 } toolbox_state;
 
@@ -61,7 +63,8 @@ typedef enum e_arguments
     ARGUMENT_OPACITY,
     ARGUMENT_LAYER_RO,
     ARGUMENT_SURFACE_RO,
-    ARGUMENT_PIXELFORMAT
+    ARGUMENT_PIXELFORMAT,
+    ARGUMENT_FILENAME
 } argumentType;
 
 typedef struct s_argument_params 
@@ -154,9 +157,29 @@ t_state_params state_params[] =
         {
             {true,"screen:","par = screenid",   ARGUMENT_SCREENID},
             {true,"ro:","par = renderorder in L_1,...,L_N",       ARGUMENT_LAYER_RO}
-        }
+        }        
+    },
+    {   
+        TOOLBOX_SCREENSHOT_DISPLAY, 2,
+        {
+            {true,"screen:","par = screenid",   ARGUMENT_SCREENID},
+            {true,"file:","par = filename",       ARGUMENT_FILENAME}
+        }        
+    },
+    {   
+        TOOLBOX_SCREENSHOT_LAYER, 2,
+        {
+            {true,"lid:","par = lid",   ARGUMENT_LAYERID},
+            {true,"file:","par = filename",       ARGUMENT_FILENAME}
+        }        
+    },
+    {   
+        TOOLBOX_SCREENSHOT_SURFACE, 2,
+        {
+            {true,"sid:","par = sid", ARGUMENT_SURFACEID},
+            {true,"file:","par = filename", ARGUMENT_FILENAME}
+        }        
     }
-
 };
 
 static const struct option toolbox_options[] = 
@@ -172,7 +195,9 @@ static const struct option toolbox_options[] =
     {"change-layer",        required_argument,      0,   8},
     {"change-surface",      required_argument,      0,   9},
     {"set-display-ro",      required_argument,      0,   10},
-    {"set-layer-ro",        required_argument,      0,   11},
+    {"dump-display",        required_argument,      0,   11},
+    {"dump-layer",          required_argument,      0,   12},
+    {"dump-surface",        required_argument,      0,   13},            
     {0,0,0,0}
 };
 
@@ -192,6 +217,7 @@ typedef struct s_global_parameter
     t_ilm_int           surfacero_length;
     t_ilm_layer*        layerro;
     t_ilm_int           layerro_length;
+    const char*         filename;
     toolbox_state state;
 } t_param_struct;
 
@@ -479,6 +505,15 @@ bool initParamStruct(t_param_struct* pStruct,char* argv)
                 }
                 printf("Pixelformat is %i\n",pStruct->pixelformat);                                
             break;            
+            case ARGUMENT_FILENAME:
+                param = parseParameters(argv,curParam.params[i].argument,"[","]");
+                if ( param != 0 ) 
+                {
+                    found = true;
+                    pStruct->filename = param;
+                }
+                printf("Filename is %s\n",pStruct->filename);                                
+            break;            
             
             default:
                 found = false;
@@ -505,6 +540,30 @@ ilmErrorTypes removeLayer(t_param_struct* param_struct)
 {  
     ilmErrorTypes error;
     ilm_layerRemove(param_struct->layerid);
+    error = ilm_commitChanges();
+    return error;
+}
+
+ilmErrorTypes dumpScreen(t_param_struct* param_struct) 
+{  
+    ilmErrorTypes error;
+    ilm_takeScreenshot(param_struct->screenid,param_struct->filename);
+    error = ilm_commitChanges();
+    return error;
+}
+
+ilmErrorTypes dumpLayer(t_param_struct* param_struct) 
+{  
+    ilmErrorTypes error;
+    ilm_takeLayerScreenshot(param_struct->filename,param_struct->layerid);
+    error = ilm_commitChanges();
+    return error;
+}
+
+ilmErrorTypes dumpSurface(t_param_struct* param_struct) 
+{  
+    ilmErrorTypes error;
+    ilm_takeSurfaceScreenshot(param_struct->filename,param_struct->surfaceid);
     error = ilm_commitChanges();
     return error;
 }
@@ -772,7 +831,18 @@ void parseCommandLine(t_param_struct* param_struct, int argc, char **argv)
             param_struct->state = TOOLBOX_PROPERTIES_SURFACE;
             success = initParamStruct(param_struct,optarg);                      
             break;              
-
+        case TOOLBOX_SCREENSHOT_DISPLAY:
+            param_struct->state = TOOLBOX_SCREENSHOT_DISPLAY;
+            success = initParamStruct(param_struct,optarg);                      
+            break;              
+        case TOOLBOX_SCREENSHOT_LAYER:
+            param_struct->state = TOOLBOX_SCREENSHOT_LAYER;
+            success = initParamStruct(param_struct,optarg);                      
+            break;              
+        case TOOLBOX_SCREENSHOT_SURFACE:
+            param_struct->state = TOOLBOX_SCREENSHOT_SURFACE;
+            success = initParamStruct(param_struct,optarg);                      
+            break;              
         case '?':   
         default:
             printUsage();
@@ -835,6 +905,15 @@ int main(int argc, char **argv)
          case TOOLBOX_PROPERTIES_LAYER :
             showLayerProperties(pStruct);
             break;                        
+         case TOOLBOX_SCREENSHOT_DISPLAY :
+            dumpScreen(pStruct);
+            break;                        
+         case TOOLBOX_SCREENSHOT_LAYER :
+            dumpLayer(pStruct);
+            break;                        
+         case TOOLBOX_SCREENSHOT_SURFACE :
+            dumpSurface(pStruct);
+            break;                                    
         default:
          printf("Other options currently not implemented\n");
     }
