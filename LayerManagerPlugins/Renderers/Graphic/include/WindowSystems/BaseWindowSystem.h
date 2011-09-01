@@ -40,7 +40,7 @@ public:
     virtual void allocatePlatformSurface(Surface *surface) = 0;
     virtual void doScreenShot(std::string fileName) = 0;
     virtual void doScreenShotOfLayer(std::string fileName, const uint id) = 0;
-    virtual void doScreenShotOfSurface(std::string fileName, const uint id) = 0;
+    virtual void doScreenShotOfSurface(std::string fileName, const uint id, const uint layer_id) = 0;
 
 protected:
     Scene* m_pScene;

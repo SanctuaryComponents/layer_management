@@ -54,12 +54,13 @@ public:
     virtual void allocatePlatformSurface(Surface *surface);
     void doScreenShot(std::string fileName);
     void doScreenShotOfLayer(std::string fileName, const uint id);
-    void doScreenShotOfSurface(std::string fileName, const uint id);
+    void doScreenShotOfSurface(std::string fileName, const uint id, const uint layer_id);
 
 private:
     ScreenShotType takeScreenshot;
     std::string screenShotFile;
-    uint screenShotID;
+    uint screenShotSurfaceID;
+    uint screenShotLayerID;
     const char* displayname;
     GetVisualInfoFunction getVisualFunc;
     BaseGraphicSystem<Display*, Window>* graphicSystem;

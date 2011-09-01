@@ -601,7 +601,7 @@ void X11WindowSystem::Screenshot()
 		RedrawAllLayers();
 	}else if(takeScreenshot==ScreenshotOfLayer){
 		LOG_DEBUG("X11WindowSystem", "Taking screenshot of layer");
-		Layer* currentLayer = m_pScene->getLayer(screenShotID);
+		Layer* currentLayer = m_pScene->getLayer(screenShotLayerID);
 		if (currentLayer!=NULL){
 			graphicSystem->beginLayer(currentLayer);
 			graphicSystem->renderLayer();
@@ -609,22 +609,13 @@ void X11WindowSystem::Screenshot()
 		}
 	}else if(takeScreenshot==ScreenshotOfSurface){
 		LOG_DEBUG("X11WindowSystem", "Taking screenshot of surface");
-		Surface* currentSurface = m_pScene->getSurface(screenShotID);
-		if (NULL!=currentSurface){
-			Layer* l = m_pScene->createLayer(GraphicalObject::INVALID_ID);
-            l->OriginalSourceWidth = windowWidth;
-            l->OriginalSourceHeight = windowHeight;
-			l->setOpacity(1.0);
-			l->setDestinationRegion(Rectangle(0,0,windowWidth,windowHeight));
-			l->setSourceRegion(Rectangle(0,0,windowWidth,windowHeight));
-			graphicSystem->beginLayer(l);
-			graphicSystem->renderSurface(currentSurface);
-			graphicSystem->endLayer();
-			m_pScene->removeLayer(l);
-			// layer is deleted in removeLayer.
-		}else{
-			LOG_ERROR("X11WindowSystem", "Could not take screenshot of non existing surface");
-		}
+        Layer* currentLayer = m_pScene->getLayer(screenShotLayerID);
+		Surface* currentSurface = m_pScene->getSurface(screenShotSurfaceID);
+		if (currentLayer!=NULL && currentSurface!=NULL){
+            graphicSystem->beginLayer(currentLayer);
+            graphicSystem->renderSurface(currentSurface);
+            graphicSystem->endLayer();
+        }
 	}
 
 	graphicSystem->saveScreenShotOfFramebuffer(screenShotFile);
@@ -1014,13 +1005,14 @@ void X11WindowSystem::doScreenShotOfLayer(std::string fileName, const uint id)
 {
     takeScreenshot = ScreenshotOfLayer;
     screenShotFile = fileName;
-    screenShotID = id;
+    screenShotLayerID = id;
 }
 
-void X11WindowSystem::doScreenShotOfSurface(std::string fileName, const uint id)
+void X11WindowSystem::doScreenShotOfSurface(std::string fileName, const uint id, const uint layer_id)
 {
     takeScreenshot = ScreenshotOfSurface;
     screenShotFile = fileName;
-    screenShotID = id;
+    screenShotSurfaceID = id;
+    screenShotLayerID = layer_id;
 }
 

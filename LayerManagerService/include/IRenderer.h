@@ -51,7 +51,7 @@ public:
 
     virtual void doScreenShot(std::string fileToSave) = 0;
     virtual void doScreenShotOfLayer(std::string fileToSave, const unsigned int id) = 0;
-    virtual void doScreenShotOfSurface(std::string fileToSave, const unsigned int id) = 0;
+    virtual void doScreenShotOfSurface(std::string fileToSave, const unsigned int id, const unsigned int layer_id) = 0;
 
     virtual unsigned int getLayerTypeCapabilities(LayerType layertype) = 0;
 

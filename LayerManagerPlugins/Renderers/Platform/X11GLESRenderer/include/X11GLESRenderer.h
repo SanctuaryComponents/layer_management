@@ -33,7 +33,7 @@ public:
     void stop();
     void doScreenShot(std::string fileToSave);
     void doScreenShotOfLayer(std::string fileToSave, uint id);
-    void doScreenShotOfSurface(std::string fileToSave, uint id);
+    void doScreenShotOfSurface(std::string fileToSave, uint id, uint layer_id);
     uint getNumberOfHardwareLayers(uint screenID);
     uint* getScreenResolution(uint screenID);
     uint* getScreenIDs(uint* length);

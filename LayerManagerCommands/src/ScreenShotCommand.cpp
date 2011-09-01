@@ -34,6 +34,7 @@ ExecutionResult ScreenShotCommand::execute(ICommandExecutor* executor)
     RendererList& m_rendererList = *(executor->getRendererList());
 
     bool status = false;
+    unsigned int layer_id = 0;
 
     LOG_INFO("LayerManager","making screenshot, output file: " << m_filename);
 
@@ -45,11 +46,53 @@ ExecutionResult ScreenShotCommand::execute(ICommandExecutor* executor)
             break;
 
         case ScreenshotOfLayer:
-            status = scene.getLayer(m_id);
+            if (scene.getLayer(m_id))
+            {
+                LayerListConstIterator iter = scene.getCurrentRenderOrder().begin();
+                LayerListConstIterator iterEnd = scene.getCurrentRenderOrder().end();
+                for (; iter != iterEnd; ++iter)
+                {
+                    if ((*iter)->getID() == m_id)
+                    {
+                        status = true;
+                        break;
+                    }
+                }
+                if (!status)
+                {
+                    LOG_WARNING("LayerManager","Requested layer: " << m_id << " does not belong to the current render order");
+                }
+            }
             break;
 
         case ScreenshotOfSurface:
-            status = scene.getSurface(m_id);
+            if (scene.getSurface(m_id))
+            {
+                LayerListConstIterator iter = scene.getCurrentRenderOrder().begin();
+                LayerListConstIterator iterEnd = scene.getCurrentRenderOrder().end();
+                for (; iter != iterEnd; ++iter)
+                {
+                    SurfaceListConstIterator s_iter = (*iter)->getAllSurfaces().begin();
+                    SurfaceListConstIterator s_iterEnd = (*iter)->getAllSurfaces().end();
+                    for (; s_iter != s_iterEnd; ++s_iter)
+                    {
+                        if ((*s_iter)->getID() == m_id)
+                        {
+                            layer_id = (*iter)->getID();
+                            status = true;
+                            break;
+                        }
+                    }
+                    if (status)
+                    {
+                        break;
+                    }
+                }
+                if (!status)
+                {
+                    LOG_WARNING("LayerManager","Requested surface: " << m_id << " does not belong to a layer which is part of the current render order");
+                }
+            }
             break;
 
         case ScreenShotNone:
@@ -88,7 +131,7 @@ ExecutionResult ScreenShotCommand::execute(ICommandExecutor* executor)
 
             case ScreenshotOfSurface:
             {
-                renderer->doScreenShotOfSurface(m_filename, m_id);
+                renderer->doScreenShotOfSurface(m_filename, m_id, layer_id);
                 break;
             }
 

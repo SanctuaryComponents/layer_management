@@ -103,9 +103,9 @@ void X11GLESRenderer::doScreenShotOfLayer(std::string fileToSave, uint id)
     m_pWindowSystem->doScreenShotOfLayer(fileToSave,id);
 }
 
-void X11GLESRenderer::doScreenShotOfSurface(std::string fileToSave, uint id)
+void X11GLESRenderer::doScreenShotOfSurface(std::string fileToSave, uint id, uint layer_id)
 {
-    m_pWindowSystem->doScreenShotOfSurface(fileToSave,id);
+    m_pWindowSystem->doScreenShotOfSurface(fileToSave,id,layer_id);
 }
 
 uint X11GLESRenderer::getNumberOfHardwareLayers(uint screenID)
