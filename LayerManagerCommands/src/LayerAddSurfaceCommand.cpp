@@ -41,7 +41,7 @@ ExecutionResult LayerAddSurfaceCommand::execute(ICommandExecutor* executor)
         LOG_DEBUG("LayerAddSurfaceCommand","add surface(" <<m_surfaceid << ")" << surface->getID() << " to layer(" << m_layerid << ") " << layer->getID());
         layer->addSurface(surface);
         LOG_DEBUG("LayerAddSurfaceCommand", "Layer now has #surfaces:" << layer->getAllSurfaces().size());
-        result = ExecutionSuccess;
+        result = ExecutionSuccessRedraw;
     }
 
     return result;

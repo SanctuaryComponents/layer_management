@@ -208,7 +208,6 @@ void GLESGraphicsystem::renderLayer()
             if ((*currentS)->visibility && (*currentS)->opacity>0.0f)
             {
                 Surface* currentSurface = (Surface*)*currentS;
-                m_baseWindowSystem->allocatePlatformSurface(currentSurface);
                 renderSurface(currentSurface);
             }
         }
