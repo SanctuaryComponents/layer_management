@@ -543,30 +543,27 @@ void CalculateFPS()
     }
 }
 
-void
-X11WindowSystem::RedrawAllLayers()
+void X11WindowSystem::CheckRedrawAllLayers()
 {
-	std::list<Layer*> layers = m_pScene->getCurrentRenderOrder();
-	for(std::list<Layer*>::const_iterator current = layers.begin(); current != layers.end(); current++)
-	{
-		Layer* currentLayer = (Layer*)*current;
-		graphicSystem->beginLayer(currentLayer);
-		graphicSystem->checkRenderLayer();
-		graphicSystem->endLayer();
-	}
+    std::list<Layer*> layers = m_pScene->getCurrentRenderOrder();
+    for(std::list<Layer*>::const_iterator current = layers.begin(); current != layers.end(); current++)
+    {
+        Layer* currentLayer = (Layer*)*current;
+        graphicSystem->beginLayer(currentLayer);
+        graphicSystem->checkRenderLayer();
+        graphicSystem->endLayer();
+    }
+}
 
-	if (m_damaged)
-	{
-		graphicSystem->clearBackground();
-		for(std::list<Layer*>::const_iterator current = layers.begin(); current != layers.end(); current++)
-		{
-			graphicSystem->beginLayer(*current);
-			graphicSystem->renderLayer();
-			graphicSystem->endLayer();
-		}
-	}
-    /* Reset the damage flag, all is up to date */
-	m_damaged = false;
+void X11WindowSystem::RedrawAllLayers()
+{
+    std::list<Layer*> layers = m_pScene->getCurrentRenderOrder();
+    for(std::list<Layer*>::const_iterator current = layers.begin(); current != layers.end(); current++)
+    {
+        graphicSystem->beginLayer(*current);
+        graphicSystem->renderLayer();
+        graphicSystem->endLayer();
+    }
 }
 
 void X11WindowSystem::Redraw()
@@ -576,17 +573,29 @@ void X11WindowSystem::Redraw()
     /*LOG_INFO("X11WindowSystem","Locking List");*/
     m_pScene->lockScene();
 
-    RedrawAllLayers();
-
-    if (debugMode)
+    CheckRedrawAllLayers();
+    if (m_damaged)
     {
-        printDebug();
-    }
-    CalculateFPS();
+        graphicSystem->clearBackground();
+        RedrawAllLayers();
+        m_pScene->unlockScene();
+        graphicSystem->swapBuffers();
 
-    m_pScene->unlockScene();
-    /*LOG_INFO("X11WindowSystem","UnLocking List");*/
-    graphicSystem->swapBuffers();
+        if (debugMode)
+        {
+            printDebug();
+        }
+
+        CalculateFPS();
+
+        /* Reset the damage flag, all is up to date */
+        m_damaged = false;
+    }
+    else
+    {
+        m_pScene->unlockScene();
+        /*LOG_INFO("X11WindowSystem","UnLocking List");*/
+    }
 }
 
 void X11WindowSystem::Screenshot()

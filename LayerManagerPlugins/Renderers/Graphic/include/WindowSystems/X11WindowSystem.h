@@ -112,7 +112,8 @@ private:
 	bool CreateCompositorWindow();
 	void UnredirectSpecialWIndows(Window w);
 	void printDebug();
-	void RedrawAllLayers();
+    void CheckRedrawAllLayers();
+    void RedrawAllLayers();
 	void* EventLoop();
     static int error(Display *dpy, XErrorEvent *ev);
 	bool redrawEvent;
