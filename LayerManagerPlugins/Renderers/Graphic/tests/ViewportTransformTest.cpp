@@ -606,3 +606,129 @@ TEST_F(ViewportTransformTest, completeExample8){
     ASSERT_NEAR(0.0,textureCoordinates[2],0.01);
     ASSERT_NEAR(1.0,textureCoordinates[3],0.01);
 }
+
+TEST_F(ViewportTransformTest, IsFullyCroppedLeft){
+    Rectangle surfaceDestination(5,30,5,50);
+    Rectangle layerSource(20,0,20,100);
+
+    bool result = ViewportTransform::isFullyCropped(surfaceDestination,layerSource);
+
+    ASSERT_TRUE(result);
+}
+
+TEST_F(ViewportTransformTest, IsFullyCroppedRight){
+    Rectangle surfaceDestination(30,30,50,50);
+    Rectangle layerSource(100,0,20,100);
+
+    bool result = ViewportTransform::isFullyCropped(surfaceDestination,layerSource);
+
+    ASSERT_TRUE(result);
+}
+
+TEST_F(ViewportTransformTest, IsFullyCroppedAbove){
+    Rectangle surfaceDestination(0,5,100,15);
+    Rectangle layerSource(0,25,100,80);
+
+    bool result = ViewportTransform::isFullyCropped(surfaceDestination,layerSource);
+
+    ASSERT_TRUE(result);
+}
+
+TEST_F(ViewportTransformTest, IsFullyCroppedBelow){
+    Rectangle surfaceDestination(0,110,100,50);
+    Rectangle layerSource(0,50,100,50);
+
+    bool result = ViewportTransform::isFullyCropped(surfaceDestination,layerSource);
+
+    ASSERT_TRUE(result);
+}
+
+TEST_F(ViewportTransformTest, IsFullyCroppedLeftBoundary){
+    Rectangle surfaceDestination(5,30,5,50);
+    Rectangle layerSource(10,0,20,100);
+
+    bool result = ViewportTransform::isFullyCropped(surfaceDestination,layerSource);
+
+    ASSERT_TRUE(result);
+}
+
+TEST_F(ViewportTransformTest, IsFullyCroppedRightBoundary){
+    Rectangle surfaceDestination(30,30,50,50);
+    Rectangle layerSource(80,0,20,100);
+
+    bool result = ViewportTransform::isFullyCropped(surfaceDestination,layerSource);
+
+    ASSERT_TRUE(result);
+}
+
+TEST_F(ViewportTransformTest, IsFullyCroppedAboveBoundary){
+    Rectangle surfaceDestination(0,5,100,15);
+    Rectangle layerSource(0,20,100,80);
+
+    bool result = ViewportTransform::isFullyCropped(surfaceDestination,layerSource);
+
+    ASSERT_TRUE(result);
+}
+
+TEST_F(ViewportTransformTest, IsFullyCroppedBelowBoundary){
+    Rectangle surfaceDestination(0,100,100,50);
+    Rectangle layerSource(0,50,100,50);
+
+    bool result = ViewportTransform::isFullyCropped(surfaceDestination,layerSource);
+
+    ASSERT_TRUE(result);
+}
+
+TEST_F(ViewportTransformTest, IsNotFullyCroppedLeft){
+    Rectangle surfaceDestination(0, 20, 20, 10);
+    Rectangle layerSource(10, 10, 30, 30);
+
+    bool result = ViewportTransform::isFullyCropped(surfaceDestination,layerSource);
+
+    ASSERT_FALSE(result);
+}
+
+TEST_F(ViewportTransformTest, IsNotFullyCroppedRight){
+    Rectangle surfaceDestination(30, 20, 20, 10);
+    Rectangle layerSource(10, 10, 30, 30);
+
+    bool result = ViewportTransform::isFullyCropped(surfaceDestination,layerSource);
+
+    ASSERT_FALSE(result);
+}
+
+TEST_F(ViewportTransformTest, IsNotFullyCroppedTop){
+    Rectangle surfaceDestination(20, 0, 10, 20);
+    Rectangle layerSource(10, 10, 30, 30);
+
+    bool result = ViewportTransform::isFullyCropped(surfaceDestination,layerSource);
+
+    ASSERT_FALSE(result);
+}
+
+TEST_F(ViewportTransformTest, IsNotFullyCroppedBottom){
+    Rectangle surfaceDestination(20, 30, 10, 20);
+    Rectangle layerSource(10, 10, 30, 30);
+
+    bool result = ViewportTransform::isFullyCropped(surfaceDestination,layerSource);
+
+    ASSERT_FALSE(result);
+}
+
+TEST_F(ViewportTransformTest, IsNotFullyCropped_SurfaceWithinLayerSource){
+    Rectangle surfaceDestination(12,12,5,5);
+    Rectangle layerSource(10, 10, 10, 10);
+
+    bool result = ViewportTransform::isFullyCropped(surfaceDestination,layerSource);
+
+    ASSERT_FALSE(result);
+}
+
+TEST_F(ViewportTransformTest, IsNotFullyCropped_SurfaceLargerThanLayersource){
+    Rectangle surfaceDestination(5,5,10,10);
+    Rectangle layerSource(10, 10, 10, 10);
+
+    bool result = ViewportTransform::isFullyCropped(surfaceDestination,layerSource);
+
+    ASSERT_FALSE(result);
+}
