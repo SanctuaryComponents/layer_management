@@ -30,7 +30,7 @@ ShaderProgram* ShaderProgramGLES::createProgram(const std::string& vertName, con
     char fragmentShaderLocation[1024];
     char vertexShaderLocation[1024];
     
-    const char* pluginLookupPath = getenv("LM_PLUGIN_DIR");
+    const char* pluginLookupPath = getenv("LM_PLUGIN_PATH");
     if  (pluginLookupPath != NULL ) 
     {
         strcpy(defaultShaderDir,pluginLookupPath);

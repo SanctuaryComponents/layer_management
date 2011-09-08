@@ -344,7 +344,7 @@ void loadRendererPlugins(RendererList& rendererList, IScene* pScene)
 int main(int argc, char **argv)
 {
     parseCommandLine(argc, (char**) argv);
-    char* pluginLookupPath = getenv("LM_PLUGIN_DIR");
+    char* pluginLookupPath = getenv("LM_PLUGIN_PATH");
     LOG_INFO("LayerManagerService", "Starting Layermanager - " << ILM_VERSION << " .");
     
     if  (pluginLookupPath != NULL ) 
