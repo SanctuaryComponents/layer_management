@@ -21,6 +21,6 @@
 #define _DBUSCONFIGURATION_H_
 
 // TODO: genivi.<componentname>.<interfacename> genivi.layermanagercommunicator.<interfacename>
-#define DBUS_SERVICE_PREFIX "de.bmw.CompositingService\0"
-#define  DBUS_SERVICE_OBJECT_PATH "/de/bmw/CompositingService\0"
+#define DBUS_SERVICE_PREFIX "org.genivi.layermanagementservice\0"
+#define  DBUS_SERVICE_OBJECT_PATH "/org/genivi/layermanagementservice\0"
 #endif // _DBUSCONFIGURATION_H_

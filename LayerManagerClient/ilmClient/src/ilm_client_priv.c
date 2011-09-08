@@ -25,9 +25,9 @@
 #include <stdlib.h>
 
 
-#define ILM_SERVICE_NAME "de.bmw.CompositingService" // TODO: genivi.<componentname>.<interfacename> genivi.layermanagercommunicator.<interfacename>
-#define ILM_PATH_COMPOSITE_SERVICE "/de/bmw/CompositingService" // TODO: genivi.<componentname>.<interfacename> genivi.layermanagercommunicator.<interfacename>
-#define ILM_INTERFACE_COMPOSITE_SERVICE "de.bmw.CompositingService" // TODO: genivi.<componentname>.<interfacename> genivi.layermanagercommunicator.<interfacename>
+#define ILM_SERVICE_NAME "org.genivi.layermanagementservice" 
+#define ILM_PATH_COMPOSITE_SERVICE "/org/genivi/layermanagementservice" 
+#define ILM_INTERFACE_COMPOSITE_SERVICE "org.genivi.layermanagementservice"
 
 
 void _ilm_setup_param(t_ilm_param* const paramStruc, t_ilm_int type, void* parameter)
