@@ -443,7 +443,7 @@ bool X11WindowSystem::CreateCompositorWindow()
 {
     LOG_DEBUG("X11WindowSystem", "Get root window");
     bool result = true;
-    CompositorWindow = NULL;
+    CompositorWindow = None;
     Window root = RootWindow(x11Display,0);
 
     LOG_DEBUG("X11WindowSystem", "Get default screen");
@@ -473,7 +473,7 @@ bool X11WindowSystem::CreateCompositorWindow()
     attr.override_redirect = True;
 
     Window compManager = XGetSelectionOwner(x11Display,XInternAtom(x11Display,"_NET_WM_CM_S0",0));
-    if ( 0 != compManager )
+    if ( None != compManager )
     {
         LOG_ERROR("X11WindowSystem", "Could not create compositor window, annother compisite manager is already running");
         return false;
@@ -492,7 +492,7 @@ bool X11WindowSystem::CreateCompositorWindow()
     //                                                             BlackPixelOfScreen(s),
     //                                                             WhitePixelOfScreen(s) );
     //
-    if (!CompositorWindow)
+    if (None == CompositorWindow)
     {
         LOG_ERROR("X11WindowSystem", "Could not create window");
         return false;

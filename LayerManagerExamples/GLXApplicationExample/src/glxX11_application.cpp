@@ -38,7 +38,7 @@
 /****************************************************************************/
 
 
-int main(int argc, char **argv)
+int main()
 {
     printf("Starting demo GLX X11 Application Example\n");
 
@@ -54,7 +54,7 @@ int main(int argc, char **argv)
         return -1;
     }
 
-    if (!createGLXContext(SURFACE_WIDTH, SURFACE_HEIGHT, LAYER_WIDTH, LAYER_HEIGHT))
+    if (!createGLXContext(SURFACE_WIDTH, SURFACE_HEIGHT))
     {
         printf("Can't Create EGL Context\n");
         return -1;

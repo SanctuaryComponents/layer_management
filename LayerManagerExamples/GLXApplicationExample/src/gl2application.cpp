@@ -65,8 +65,6 @@ t_ilm_bool initGlApplication(GLuint width, GLuint height)
 {
     t_ilm_bool result = ILM_TRUE;
     GLfloat aspectratio = (GLfloat) width / GLfloat(height);
-    GLfloat fWidth = (GLfloat) width;
-    GLfloat fHeight = (GLfloat) height;
 
     glViewport(0, 0, width, height);
     glMatrixMode(GL_PROJECTION);
@@ -96,7 +94,6 @@ void draw(t_ilm_uint animTime)
     static t_ilm_uint startTime = 0;
     static t_ilm_uint currentTime = 0;
     static float angle = 0;
-    t_ilm_bool result = ILM_TRUE;
     IlmMatrix matrix;
 
     currentTime = GetTickCount();

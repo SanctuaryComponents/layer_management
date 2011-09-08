@@ -27,7 +27,7 @@
 
 t_ilm_uint GetTickCount();
 t_ilm_bool createX11Context(t_ilm_int width, t_ilm_int height);
-t_ilm_bool createGLXContext(t_ilm_int width, t_ilm_int height, t_ilm_int layerwidth,t_ilm_int layerheight );
+t_ilm_bool createGLXContext(t_ilm_int width, t_ilm_int height);
 void destroyGLXContext();
 void destroyX11Context();
 void swapBuffers();

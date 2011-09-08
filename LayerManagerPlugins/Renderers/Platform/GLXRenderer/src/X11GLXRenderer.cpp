@@ -99,11 +99,16 @@ void X11GLXRenderer::doScreenShotOfSurface(std::string fileToSave, uint id, uint
 
 uint X11GLXRenderer::getNumberOfHardwareLayers(uint screenID)
 {
+    uint screen_id;
+    screen_id = screenID;
     return 0; // TODO
 }
 
 uint* X11GLXRenderer::getScreenResolution(uint screenID)
 {
+    uint screen_id;
+    screen_id = screenID;
+    
     uint * resolution = new uint[2];
     resolution[0] = m_width;
     resolution[1] = m_height;
