@@ -115,12 +115,13 @@ void DBUSIntrospection::addEntry(MethodTable entry)
     {
         switch (parameterArray.at(parameterIndex))
         {
+                     
             case 'a':
                 parameterIndex++;
-                addArgument("", "in", "a" + parameterArray.at(parameterIndex));
+                addArgument("", "in", "a" + parameterArray.substr(parameterIndex,1));
                 break;
             default:
-                addArgument("", "in", "i");
+                addArgument("", "in",parameterArray.substr(parameterIndex,1));
                 break;
         }
     }
@@ -131,10 +132,10 @@ void DBUSIntrospection::addEntry(MethodTable entry)
         {
             case 'a':
                 returnValueIndex++;
-                addArgument("", "out", "a" + returnValueArray.at(returnValueIndex));
+                addArgument("", "out", "a" + returnValueArray.substr(returnValueIndex,1));
                 break;
             default:
-                addArgument("", "out", "i");
+                addArgument("", "out",returnValueArray.substr(returnValueIndex,1));                
                 break;
         }
     }
