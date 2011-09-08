@@ -345,7 +345,7 @@ int main(int argc, char **argv)
 {
     parseCommandLine(argc, (char**) argv);
     char* pluginLookupPath = getenv("LM_PLUGIN_DIR");
-    LOG_INFO("LayerManagerService", "Starting Layermanager.");
+    LOG_INFO("LayerManagerService", "Starting Layermanager - " << ILM_VERSION << " .");
     
     if  (pluginLookupPath != NULL ) 
     {
@@ -411,7 +411,7 @@ int main(int argc, char **argv)
         CommunicatorListIterator commIterEnd = communicatorList.end();
         for (; commIter != commIterEnd; ++commIter)
         {
-            (*commIter)->process();
+            (*commIter)->process(100);
         }
     }
 

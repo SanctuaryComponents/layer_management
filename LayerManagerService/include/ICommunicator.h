@@ -44,7 +44,7 @@ public:
     /**
      * Process communication. 
      */
-    virtual void process() = 0;
+    virtual void process(int timeout_ms) = 0;
 
     /**
      * Switch debug mode of this component on or off

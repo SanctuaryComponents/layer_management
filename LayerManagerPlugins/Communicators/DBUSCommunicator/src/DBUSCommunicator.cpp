@@ -241,9 +241,9 @@ void DBUSCommunicator::ScreenShot(DBusConnection* conn, DBusMessage* msg)
         g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
     }
 }
-void DBUSCommunicator::process() 
+void DBUSCommunicator::process(int timeout_ms) 
 {
-    dbus_connection_read_write_dispatch (g_pDbusMessage->getConnection(), -1);
+    dbus_connection_read_write_dispatch (g_pDbusMessage->getConnection(), timeout_ms);
 }
 void DBUSCommunicator::ScreenShotOfLayer(DBusConnection* conn, DBusMessage* msg)
 {
@@ -405,6 +405,10 @@ DBusHandlerResult DBUSCommunicator::processMessageFunc(DBusConnection* conn,DBus
 
 void DBUSCommunicator::unregisterMessageFunc(DBusConnection* conn, void *user_data)
 {
+    DBusConnection* connection = NULL;
+    DBUSCommunicator* cominstance = NULL;
+    connection = conn;
+    cominstance = (DBUSCommunicator*)user_data;
 }
 
 void DBUSCommunicator::ListLayersOfLayergroup(DBusConnection* conn, DBusMessage* msg)
