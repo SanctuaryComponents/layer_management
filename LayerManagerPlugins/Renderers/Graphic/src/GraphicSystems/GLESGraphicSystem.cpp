@@ -346,7 +346,7 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
     int orientation = (surface)->getOrientation();
     orientation %= 4;
     index = orientation * 12;
-
+    surface->frameCounter++;
     glDrawArrays(GL_TRIANGLES, index, 6);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);

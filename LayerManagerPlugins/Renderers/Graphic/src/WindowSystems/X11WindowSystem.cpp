@@ -821,7 +821,6 @@ init_complete:
 						break;
 					}
 					currentSurface->damaged = true;
-                    currentSurface->frameCounter++;
 					checkRedraw = true;
 				}
 				break;
