@@ -2,6 +2,7 @@
 #include "DBUSMessageHandler.h"
 #include "DBUSConfiguration.h"
 #include <stdlib.h>
+#include <string.h>
 #include "Log.h"
 
 DBUSMessageHandler::DBUSMessageHandler()
@@ -13,7 +14,18 @@ DBUSMessageHandler::DBUSMessageHandler()
     dbus_error_init(&m_err);
 
     // connect to the bus and check for errors
-    m_pConnection = dbus_bus_get(DBUS_BUS_SYSTEM, &m_err);
+    char* useSessionBus = getenv("LM_USE_SESSION_BUS");
+    if ( NULL != useSessionBus && strcmp(useSessionBus,"enable") == 0 )
+    {
+        LOG_INFO("DBUSCommunicator", "Using Session Bus");
+        m_pConnection = dbus_bus_get(DBUS_BUS_SESSION, &m_err);
+    } 
+    else 
+    {
+        LOG_INFO("DBUSCommunicator", "Using System Bus");
+        m_pConnection = dbus_bus_get(DBUS_BUS_SYSTEM, &m_err);
+    }    
+
     if (dbus_error_is_set(&m_err))
     {
         LOG_ERROR("DBUSCommunicator","Connection error");
@@ -50,7 +62,8 @@ DBUSMessageHandler::~DBUSMessageHandler()
     {
         LOG_ERROR("DBUSCommunicator","there was an dbus error");
     }
-    LOG_INFO("ask about owner name",0);
+    dbus_connection_unregister_object_path(m_pConnection,DBUS_SERVICE_OBJECT_PATH);
+    LOG_INFO("DBUSCommunicator","Ask about owner name");
     dbus_bus_name_has_owner(m_pConnection, DBUS_SERVICE_PREFIX, &err);
     errorset = dbus_error_is_set(&err);
     if (errorset)
