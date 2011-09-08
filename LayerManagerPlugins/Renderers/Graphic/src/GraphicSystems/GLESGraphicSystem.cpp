@@ -239,6 +239,10 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
 {
 //  LOG_DEBUG("GLESGraphicsystem", "renderSurface " << surface->getID());
 
+    // check if surface is cropped completely, if so then skip rendering
+    if (ViewportTransform::isFullyCropped(surface->getDestinationRegion(), m_currentLayer->getSourceRegion() ) )
+        return; // skip rendering of this surface, because it is cropped by layer source region
+
     GLint index = 0;
     IlmMatrix layerMatrix;
     IlmMatrixIdentity(layerMatrix);

@@ -306,6 +306,10 @@ void GLXGraphicsystem::renderSurface(Surface* currentSurface)
     Rectangle targetSurfaceSource = currentSurface->getSourceRegion();
     Rectangle targetSurfaceDestination = currentSurface->getDestinationRegion();
 
+    // check if surface is cropped completely, if so then skip rendering
+    if (ViewportTransform::isFullyCropped(targetSurfaceDestination, layerSourceRegion ) )
+        return; // skip rendering of this surface, because it is cropped by layer source region
+
     ViewportTransform::applyLayerSource(layerSourceRegion, targetSurfaceSource, targetSurfaceDestination);
     ViewportTransform::applyLayerDestination(layerDestinationRegion, layerSourceRegion, targetSurfaceDestination);
     float* textureCoordinates = new float[4];

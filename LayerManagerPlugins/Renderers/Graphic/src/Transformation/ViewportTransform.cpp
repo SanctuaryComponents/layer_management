@@ -19,6 +19,23 @@
 
 #include "Transformation/ViewportTransform.h"
 
+bool ViewportTransform::isFullyCropped(const Rectangle& surfaceDestination, const Rectangle& layerSource)
+{
+    // is surface completely to the right of layer source region?
+    if (surfaceDestination.x >= layerSource.x + layerSource.width )
+        return true;
+    // is surface completely beneath layer source region?
+    if (surfaceDestination.y >= layerSource.y + layerSource.height )
+        return true;
+    // is surface completely to the left of layer source region?
+    if (surfaceDestination.x + surfaceDestination.width <= layerSource.x)
+        return true;
+    // is surface completely above layer source region?
+    if (surfaceDestination.y + surfaceDestination.height <= layerSource.y)
+        return true;
+    return false;
+}
+
 void ViewportTransform::applyLayerSource(const Rectangle& layerSource, Rectangle& surfaceSource, Rectangle& surfaceDestination)
 {
     Rectangle regionBeforeTransformation = surfaceDestination;

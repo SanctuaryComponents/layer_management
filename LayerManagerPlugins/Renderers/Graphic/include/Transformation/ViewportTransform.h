@@ -28,6 +28,11 @@ class ViewportTransform
 public:
 
     /*
+     * Returns true if surface is completely cropped by the given layer source region
+     */
+    static bool isFullyCropped(const Rectangle& surfaceDestination, const Rectangle& layerSource);
+
+    /*
      * Apply Source View of Layer to the given surface source and destination regions, ie cropping surface parts to layer source view
      */
     static void applyLayerSource(const Rectangle& layerSource, Rectangle& surfaceSource, Rectangle& surfaceDestination);
