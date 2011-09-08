@@ -28,6 +28,7 @@
 #include "mock_Layerlist.h"
 //#include "FieldMatcher.h"
 #include <vector>
+#include <pthread.h>
 
 using ::testing::Field;
 using ::testing::Property;
@@ -43,87 +44,58 @@ using ::testing::ElementsAreArray;
 using ::testing::ElementsAre;
 using ::testing::NotNull;
 
-// The names of the dbus service for compositing
-#define DBUS_COMPOSITE_SERVICE_PATH  "/de/bmw/CompositingService"
-#define DBUS_COMPOSITE_SERVICE       "de.bmw.CompositingService"
-
-const std::string DBUSCOMMAND = "dbus-send --type=method_call --print-reply --dest=de.bmw.CompositingService /de/bmw/CompositingService de.bmw.CompositingService.";
+std::string DBUSCOMMAND_SYSTEM = "dbus-send --system --type=method_call --print-reply --dest=org.genivi.layermanagementservice /org/genivi/layermanagementservice org.genivi.layermanagementservice.";
+std::string DBUSCOMMAND_SESSION = "dbus-send --type=method_call --print-reply --dest=org.genivi.layermanagementservice /org/genivi/layermanagementservice org.genivi.layermanagementservice.";
+std::string DBUSCOMMAND = DBUSCOMMAND_SYSTEM;
 
 class DBUSCommunicatorTest : public ::testing::Test {
 public:
-
+    pthread_t processThread;
+    bool running;
+    ICommunicator* communicatorUnderTest;
+    MockCommandExecutor mockCommandExecutor;
+    MockLayerList layerlist;
+    
     DBUSCommunicatorTest()
     {
-        communicatorUnderTest = new DBUSCommunicator(&mockCommandExecutor);
     }
 
     virtual ~DBUSCommunicatorTest()
     {
-        if (communicatorUnderTest)
-        {
-            delete communicatorUnderTest;
-        }
     }
-
+    static void *processLoop (void * ptr)
+    {
+         while ( ((DBUSCommunicatorTest*)ptr)->running ) 
+         {
+            ((DBUSCommunicatorTest*)ptr)->communicatorUnderTest->process(100);
+         }
+         return NULL;
+    }
     void SetUp()
     {
+        char* useSessionBus = getenv("LM_USE_SESSION_BUS");
+        if ( NULL != useSessionBus && strcmp(useSessionBus,"enable") == 0 )
+        {
+            DBUSCOMMAND = DBUSCOMMAND_SESSION;
+        } else {
+            DBUSCOMMAND = DBUSCOMMAND_SYSTEM;
+        }
+        communicatorUnderTest = new DBUSCommunicator(&mockCommandExecutor);
         this->communicatorUnderTest->start();
+        running = true;
+        pthread_create( &processThread, NULL, processLoop, (void*) this);        
     }
 
     void TearDown()
     {
-        // remove all pending commands
-        //          Layermanager* lm = Layermanager::m_instance;
-        //          lm->execute(new CommitCommand());
-        //
+        running = false;
         this->communicatorUnderTest->stop();
-        //          removeAll();
+        pthread_join( processThread, NULL);        
+        if (communicatorUnderTest)
+        {
+            delete communicatorUnderTest;
+        }        
     }
-    void removeAll()
-    {
-//          // remove all layers after each test
-//                Layermanager* lm = Layermanager::m_instance;
-//                int length;
-//                int * array;
-//                lm->layerlist.getLayerIDs(&length, &array);
-//                for (int i=0;i<length;i++){
-//                    Layer *l = lm->layerlist.getLayer(array[i]);
-//                    // remove all surface from all layers..
-//                    // l->surfaces.clear()
-//                    lm->layerlist.removeLayer(l);
-//                }
-//
-//              const std::map<int,Surface*> surfacelist = lm->layerlist.getAllSurfaces();
-//              for (std::map<int,Surface*>::const_iterator it = surfacelist.begin();it!=surfacelist.end();it++){
-//                  Surface *s = lm->layerlist.getSurface((*it).first);
-//                  // remove all surface from all layers..
-//                  // l->surfaces.clear()
-//                  lm->layerlist.removeSurface(s);
-//              }
-//
-//            lm->layerlist.getSurfaceGroupIDs(&length, &array);
-//            for (int i=0;i<length;i++){
-//              SurfaceGroup *sg = lm->layerlist.getSurfaceGroup(array[i]);
-//              // remove all surface from all layers..
-//              // l->surfaces.clear()
-//              lm->layerlist.removeSurfaceGroup(sg);
-//            }
-//
-//            lm->layerlist.getLayerGroupIDs(&length, &array);
-//            for (int i=0;i<length;i++){
-//                LayerGroup *lg = lm->layerlist.getLayerGroup(array[i]);
-//              // remove all surface from all layers..
-//              // l->surfaces.clear()
-//              lm->layerlist.removeLayerGroup(lg);
-//            }
-//
-//            lm->layerlist.getCurrentRenderOrder().clear();
-
-    }
-
-    ICommunicator* communicatorUnderTest;
-    MockCommandExecutor mockCommandExecutor;
-    MockLayerList layerlist;
 };
 
 MATCHER_P(DebugCommandEq, onoff, "DebugCommand has onoff set to %(onoff)s")
@@ -135,15 +107,10 @@ TEST_F(DBUSCommunicatorTest, TurnDebugOnAndOff)
 {
     EXPECT_CALL(this->mockCommandExecutor, execute(DebugCommandEq(false) ) ).Times(1);
   system((DBUSCOMMAND + std::string("Debug boolean:false")).c_str());
-
     EXPECT_CALL(this->mockCommandExecutor, execute(DebugCommandEq(true) ) ).Times(1);
   system((DBUSCOMMAND + std::string("Debug boolean:true")).c_str());
-
     EXPECT_CALL(this->mockCommandExecutor, execute(DebugCommandEq(false) ) ).Times(1);
   system((DBUSCOMMAND + std::string("Debug boolean:false")).c_str());
-}
-
-TEST_F(DBUSCommunicatorTest, StartStop) {
 }
 
 TEST_F(DBUSCommunicatorTest, ListAllLayerIDS) {
