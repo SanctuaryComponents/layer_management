@@ -1,3 +1,29 @@
+Version 0.9.3
+-------------
+This version includes the following enhancements.
+
+Bugfixes :
+- Bug fix in screenshot for layer & surface
+  Now a surface's screenshot will be exactly similar to the way it
+  appears on the screen currently (minus the effect of other surfaces
+  part of the same layer).
+- Multiple Bug fixes in X11WindowSystem
+  Use SwapBuffers only if something was drawn
+  Include SwapBuffers call while calculating FPS
+  ScreenshotOfDisplay should not check for any rendering changes
+  as it will not do a SwapBuffers after screenshot. 
+- Increase the framecounter only if the surface is rendered.
+- Removed several warnings
+- Fix to link the correct native graphic libraries.
+- skip rendering of fully cropped surfaces
+- adapt ilm client documentation
+
+Improvements:
+- Changing to LM_PLUGIN_DIR to LM_PLUGIN_PATH to be consitent
+- Changing dbus service name to be genivi compliant
+- DBUS Communicator could now run on System BUS too.
+
+
 Version 0.9.2
 -------------
 This version includes the following enhancements.
