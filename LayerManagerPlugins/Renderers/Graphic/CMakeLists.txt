@@ -141,7 +141,7 @@ include_directories(${GLX_INCLUDE_DIR})
 set(GRAPHIC_NATIVE_LIBS ${GLX_LIBRARIES})
 endif(WITH_GLX_LIB)
 
-set(LIBS ${LIBS} ${CMAKE_THREAD_LIBS_INIT} ${X11_X11_LIB} ${X11_Xcomposite_LIB} ${X11_Xdamage_LIB} ${GRAPHIC_NATIVE_LIBRARIES} LayerManagerUtils )
+set(LIBS ${LIBS} ${CMAKE_THREAD_LIBS_INIT} ${X11_X11_LIB} ${X11_Xcomposite_LIB} ${X11_Xdamage_LIB} ${GRAPHIC_NATIVE_LIBS} LayerManagerUtils )
 target_link_libraries(${GRAPHIC_LIB_NAME} ${LIBS})
 
 
