@@ -3,6 +3,8 @@ Sections in this file describe:
 - Component Overview
 - Required platform capabilities
 - How to build on different platforms
+- Change the environment during Runtime
+- Running Testapplications
 
 
 Introduction
@@ -100,39 +102,6 @@ The following functions should be supported by the vendor specific graphic drive
 Furthermore it should be supported to create an texture from an x11 pixmap.  
 
 
-Beagle board platform
-===
-
-If you have choosen the BeagleRenderer as rendering backend, than the following
-kernel module must be available too :
-
-CMEM Module is needed, it can be downloaded from
-
-http://software-dl.ti.com/dsps/dsps_public_sw/sdo_sb/targetcontent/linuxutils/index.html
-
-The EGL implementation on the beagle board should support the following egl config: 
-
-EGL_SURFACE_TYPE = EGL_WINDOW_BIT | EGL_PIXMAP_BIT
-EGL_RENDERABLE_TYPE = EGL_OPENGL_ES2_BIT,
-EGL_RED_SIZE = 8
-EGL_ALPHA_SIZE = 8 
-EGL_BIND_TO_TEXTURE_RGBA = EGL_TRUE
-
-Furthermore the application which should be rendered by the layermanagement, should initialize egl
-by the following steps:
-	
-1. Get EGL Display
-2. Initialize EGL
-3. Bind API
-4. Choose EGL Config
-5. Allocate native pixmap Structure 
-6. Allocate native pixmap space by CMEM_alloc
-7. Get physical address of native pixmap using the CMEM module, and assign the address to the native pixmap structure.
-8. Create egl pixmap surface using the allocated native pixmap.
-9. Create egl context.
-10. Make egl context with the surface as current.
-
-
 How to build on different platforms
 ====================================
 
@@ -178,7 +147,7 @@ You need both development packages and libraries for
 
 LayerManagerService
 --
-libdbus
+libdbus-1-dev
 
 X11GLESRenderer:
 --
@@ -202,10 +171,10 @@ Supported Build Options
 ===
 
 - Build configuration:
-  Option: -DCMAKE_BUILD_TYPE=DEBUG or
-          -DCMAKE_BUILD_TYPE=RELEASE
+  Option: -DCMAKE_BUILD_TYPE=Debug or
+          -DCMAKE_BUILD_TYPE=Release
 
-- Build for X11 Desktop with GLX Renderer
+- Build for X11 Desktop with OpenGL / GLX Renderer
   Option: -DWITH_DESKTOP=ON or
           -DWITH_DESKTOP=OFF
 
@@ -217,10 +186,14 @@ Supported Build Options
   Option: -DWITH_EGL_EXAMPLE=ON or
           -DWITH_EGL_EXAMPLE=OFF
 
-- Build GLX examples
+- Build OpenGL / GLX examples
   Option: -DWITH_GLX_EXAMPLE=ON or
           -DWITH_GLX_EXAMPLE=OFF
-
+          
+- Build Client examples
+  Option: -DWITH_CLIENT_EXAMPLES=ON or
+          -DWITH_CLIENT_EXAMPLES=OFF
+          
 - Build with copy of textures for target platform which does not support the
   GLX_TEXTURE_FROM_PIXMAP or EGL_IMAGE_KHR on X11 pixmaps Extensions
   Option: -DWITH_FORCE_COPY=ON or
@@ -230,13 +203,17 @@ Supported Build Options
   Option: -DWITH_XTHREADS=ON or
           -DWITH_XTHREADS=OFF
 
+- Build with INPUT EVENT support, switches input forwarding of events on
+  Option: -DWITH_INPUT_EVENTS=ON or
+          -DWITH_INPUT_EVENTS=OFF
+
 - Build available tests
   Option: -DWITH_TESTS=ON or
           -DWITH_TESTS=OFF
 
   Remark: Test File are currently not upstreamed.	
 
-- Build for diferent Platforms
+- Build for different Platforms
 
   You have the choice to use GLXRenderer or X11GLESRenderer.
 
@@ -248,4 +225,78 @@ Supported Build Options
 
   cmake <source-dir>/ -DWITH_DESKTOP=OFF -DWITH_GLX_EXAMPLE=OFF -DWITH_TESTS=OFF -DWITH_EGL_EXAMPLE=ON -DWITH_X11_GLES=ON -DWITH_XTHREADS=ON
 
+Change the Environment during Runtime
+=====================================
+The following environments can be set to change the runtime behaviour.
+
+LM_PLUGIN_PATH          set the path for the location of communicator and renderer PlugIns 
+                        default : /usr/lib/layermanager
+                        Example : export LM_PLUGIN_PATH= /usr/local/lib/layermanager
+
+LM_USE_SESSION_BUS      enables the DBUS communication to run on Session bus instead of Systembus
+                        default : disabled run on system bus
+                        Example : export LM_USE_SESSION_BUS=enable
+                        
+Commandline parameter :
+LayerManagerService : -w<horizontalresolution> - default 1280
+                      -h<verticalresolution> - default 480
+                      -c<console debug level> - default 2 (only errors and info)
+                      -f<file debug level> - default 0 (disabled) log file location is /tmp/LayerManagerService.log
+                      possible debug levels :   0 disabled
+                                                1 errors
+                                                2 info,errors
+                                                3 info,errors, warnings
+                                                4 info,errors, warnings,debug
+                      -v shows version of layermanager
+
+Running Testapplications
+=====================================
+
+1. Starting the service
+
+precondition : 
+
+install prefix is /usr/local
+no compositing manager is running like openbox xfce metacity, kill these if needed
+
+run:
+#> export DISPLAY=:0
+#> export LD_LIBRARY_PATH=/usr/local/lib:/usr/lib
+#> export LM_PLUGIN_PATH=/usr/local/lib/layermanager
+#> LayerManagerService &
+
+2. Running OpenGL / OpenGL ES 2.0 Example Applications
+
+precondition : 
+
+install prefix is /usr/local
+LayerManagerService Running
+
+run:
+#> export DISPLAY=:0
+#> export LD_LIBRARY_PATH=/usr/local/lib:/usr/lib
+OpenGL ES Example
+#> EGLX11ApplicationExample &
+OpenGL Example
+#> GLX11ApplicationExample &
+
+3. Running LayerManagerToolBox
+
+The LayerManagerToolbox can be used to change and debug 
+the runtime behaviour of the service.
+
+Please Call :
+LayerManagerToolBox -? to see the expected parameter
+
+Example LayerManagerToolBox --change-surface sid:[0xa],src:[0,0,320,240],dest:[0,0,800,480],o:[1.0],v:[1]
+
+precondition : 
+
+install prefix is /usr/local
+LayerManagerService Running
+
+run:
+#> export DISPLAY=:0
+#> export LD_LIBRARY_PATH=/usr/local/lib:/usr/lib
+#> LayerManagerToolbox [options]
 
