@@ -445,15 +445,9 @@ bool X11WindowSystem::CreateCompositorWindow()
     bool result = true;
     CompositorWindow = None;
     Window root = RootWindow(x11Display,0);
-
-    LOG_DEBUG("X11WindowSystem", "Get default screen");
-    // draw a black background the full size of the resolution
-    //long x11Screen = XDefaultScreen( x11Display );
-
+    
     LOG_DEBUG("X11WindowSystem", "Creating Compositor Window");
-    // create the actual content window
-//    CompositorWindow = XCreateSimpleWindow(  x11Display, root, 0, 0, windowWidth, windowHeight,
-//                                             0, BlackPixel(x11Display, x11Screen), WhitePixel(x11Display, x11Screen));
+
     XSetWindowAttributes attr;
     // draw a black background the full size of the resolution
     attr.override_redirect = True;
@@ -479,24 +473,16 @@ bool X11WindowSystem::CreateCompositorWindow()
         return false;
     }
 
-//    Window overlaywindow = XCompositeGetOverlayWindow(x11Display,root);
-
     CompositorWindow = XCreateWindow(x11Display, root, 0, 0, windowWidth, windowHeight,
             0, windowVis->depth, InputOutput,
             windowVis->visual, CWBorderPixel | CWColormap | CWEventMask | CWOverrideRedirect, &attr);
 
-    //    Screen* s = ScreenOfDisplay( x11Display, 0 );
-    //    CompositorWindow = XCreateSimpleWindow( x11Display,
-    //                                                             RootWindowOfScreen(s),
-    //                                                             0, 0, windowWidth, windowHeight, 0,
-    //                                                             BlackPixelOfScreen(s),
-    //                                                             WhitePixelOfScreen(s) );
-    //
     if (None == CompositorWindow)
     {
         LOG_ERROR("X11WindowSystem", "Could not create window");
         return false;
     }
+
     LOG_DEBUG("X11WindowSystem", "Created the Compositor Window");
     XSelectInput (x11Display, root,
             SubstructureNotifyMask|
@@ -921,7 +907,7 @@ void X11WindowSystem::signalRedrawEvent()
 
 void X11WindowSystem::cleanup(){
     LOG_INFO("X11WindowSystem", "Cleanup");
-    if (CompositorWindow)
+    if (None != CompositorWindow)
     {
         Window root = RootWindow(x11Display, 0);
         XCompositeUnredirectSubwindows(x11Display,root,CompositeRedirectManual);
