@@ -20,7 +20,7 @@
 FIND_PACKAGE(PkgConfig)
 IF (PKG_CONFIG_FOUND)
 # added aditional pkg config check to find dbus dependend includes
-    pkg_check_modules(DBUS_PKG_PATHS QUIET dbus-1)
+    pkg_check_modules(DBUS_PKG_PATHS dbus-1)
 ENDIF (PKG_CONFIG_FOUND)
 
 
