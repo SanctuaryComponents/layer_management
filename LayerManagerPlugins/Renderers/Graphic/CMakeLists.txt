@@ -30,14 +30,14 @@ link_directories ("${PROJECT_SOURCE_DIR}/LayerManagerUtils/bin")
 if (WITH_GLESv2_LIB) 
 set(GRAPHIC_LIB_NAME LayerManagerGraphicGLESv2)
 file(GLOB SOURCES 
-		../Base/src/BaseRenderer.cpp 
-		src/GraphicSystems/GLESGraphicSystem.cpp
-		src/WindowSystems/X11WindowSystem.cpp  
-		src/TextureBinders/X11Copy.cpp
-		src/TextureBinders/X11CopyGLES.cpp
-		src/TextureBinders/X11EglImage.cpp
+        ../Base/src/BaseRenderer.cpp 
+        src/GraphicSystems/GLESGraphicSystem.cpp
+        src/WindowSystems/X11WindowSystem.cpp  
+        src/TextureBinders/X11Copy.cpp
+        src/TextureBinders/X11CopyGLES.cpp
+        src/TextureBinders/X11EglImage.cpp
         src/Transformation/ViewportTransform.cpp
-		)
+        )
 
 file(GLOB GRAPHIC_BASE_INCLUDES 
     ../Base/include/*.h
@@ -152,7 +152,7 @@ install (TARGETS ${GRAPHIC_LIB_NAME} DESTINATION lib)
 install (FILES ${GRAPHIC_BASE_INCLUDES} DESTINATION include/layermanager/graphic/Base)
 install (FILES ${GRAPHIC_GRAPHICSYSTEM_INCLUDES} DESTINATION include/layermanager/graphic/GraphicSystems)
 install (FILES ${GRAPHIC_TEXTUREBINDERS_INCLUDES} DESTINATION include/layermanager/graphic/TextureBinders)
-install (FILES ${GRAPHIC_TRANSFORM_INCLUDES} DESTINATION include/layermanager/graphic/Tranformation)
+install (FILES ${GRAPHIC_TRANSFORM_INCLUDES} DESTINATION include/layermanager/graphic/Transformation)
 install (FILES ${GRAPHIC_PLATFORM_INCLUDES} DESTINATION include/layermanager/graphic/PlatformSurfaces)
 install (FILES ${GRAPHIC_WINDOWSYSTEMS_INCLUDES} DESTINATION include/layermanager/graphic/WindowSystems)
 
