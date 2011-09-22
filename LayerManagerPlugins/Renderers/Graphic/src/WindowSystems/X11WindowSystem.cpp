@@ -202,6 +202,7 @@ Surface* X11WindowSystem::getSurfaceForWindow(Window w)
 
 void X11WindowSystem::checkForNewSurface()
 {
+    m_pScene->lockScene();
     LayerList layers = m_pScene->getCurrentRenderOrder();
     for(LayerListConstIterator current = layers.begin(); current != layers.end(); current++)
     {
@@ -211,6 +212,7 @@ void X11WindowSystem::checkForNewSurface()
             allocatePlatformSurface(*currentS);
         }
     }
+    m_pScene->unlockScene();
 }
 
 void X11WindowSystem::configureSurfaceWindow(Window window)
