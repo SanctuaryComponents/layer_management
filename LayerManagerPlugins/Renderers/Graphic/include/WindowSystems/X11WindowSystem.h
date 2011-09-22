@@ -63,7 +63,6 @@ private:
     uint screenShotLayerID;
     const char* displayname;
     GetVisualInfoFunction getVisualFunc;
-    BaseGraphicSystem<Display*, Window>* graphicSystem;
     bool debugMode;
     int resolutionWidth;
     int resolutionHeight;
@@ -80,7 +79,7 @@ private:
 
 protected:
     Display* x11Display;
-    bool initXServer();
+
     pthread_t renderThread;
     //void setDisplayMode();
     int windowWidth;
@@ -89,38 +88,40 @@ protected:
     Window CompositorWindow;
     XVisualInfo* windowVis;
     pthread_mutex_t run_lock;
+    BaseGraphicSystem<Display*, Window>* graphicSystem;    
+    virtual bool initXServer(); 
+    virtual void CheckRedrawAllLayers();
+    virtual void RedrawAllLayers();
 
 private:
-	void cleanup();
-	void Screenshot();
-	void Redraw();
-	bool OpenDisplayConnection();
-	bool checkForCompositeExtension();
-	bool checkForDamageExtension();
-	void createSurfaceForWindow(Window w);
-	void configureSurfaceWindow(Window w);
-	Surface* getSurfaceForWindow(Window w);
-	void checkForNewSurface();
-	void destroy_surface(Window w);
-	void updateSurface(Surface* s, Window w, XPlatformSurface* x11surf);
-	void MapWindow(Window w);
-	void UnMapWindow(Window w);
-	void NewWindow(Surface* s, Window w);
-	void DestroyWindow(Window w);
-	bool isWindowValid(Window w);
-	bool CreatePixmapsForAllWindows();
-	bool CreateCompositorWindow();
-	void UnredirectSpecialWIndows(Window w);
-	void printDebug();
-    void CheckRedrawAllLayers();
-    void RedrawAllLayers();
-	void* EventLoop();
+    void cleanup();
+    void Screenshot();
+    void Redraw();
+    bool OpenDisplayConnection();
+    bool checkForCompositeExtension();
+    bool checkForDamageExtension();
+    void createSurfaceForWindow(Window w);
+    void configureSurfaceWindow(Window w);
+    Surface* getSurfaceForWindow(Window w);
+    void checkForNewSurface();
+    void destroy_surface(Window w);
+    void updateSurface(Surface* s, Window w, XPlatformSurface* x11surf);
+    void MapWindow(Window w);
+    void UnMapWindow(Window w);
+    void NewWindow(Surface* s, Window w);
+    void DestroyWindow(Window w);
+    bool isWindowValid(Window w);
+    bool CreatePixmapsForAllWindows();
+    bool CreateCompositorWindow();
+    void UnredirectSpecialWIndows(Window w);
+    void printDebug();
+    void* EventLoop();
     static int error(Display *dpy, XErrorEvent *ev);
-	bool redrawEvent;
+    bool redrawEvent;
     static bool m_xerror;
-#ifdef ENABLE_INPUT_EVENTS
-	void ManageXInputEvent(XEvent *pevent);
-#endif
+    #ifdef ENABLE_INPUT_EVENTS
+    void ManageXInputEvent(XEvent *pevent);
+    #endif
 
     friend void * X11eventLoopCallback(void *);
 };
