@@ -36,7 +36,7 @@ ExecutionResult ScreenShotCommand::execute(ICommandExecutor* executor)
     bool status = false;
     unsigned int layer_id = 0;
 
-    LOG_INFO("LayerManager","making screenshot, output file: " << m_filename);
+    LOG_INFO("ScreenShotCommand","making screenshot, output file: " << m_filename);
 
     // check for invalid screen, surface or layer ids
     switch (m_type)
@@ -48,19 +48,10 @@ ExecutionResult ScreenShotCommand::execute(ICommandExecutor* executor)
         case ScreenshotOfLayer:
             if (scene.getLayer(m_id))
             {
-                LayerListConstIterator iter = scene.getCurrentRenderOrder().begin();
-                LayerListConstIterator iterEnd = scene.getCurrentRenderOrder().end();
-                for (; iter != iterEnd; ++iter)
-                {
-                    if ((*iter)->getID() == m_id)
-                    {
-                        status = true;
-                        break;
-                    }
-                }
+                status = scene.isLayerInCurrentRenderOrder(m_id);
                 if (!status)
                 {
-                    LOG_WARNING("LayerManager","Requested layer: " << m_id << " does not belong to the current render order");
+                    LOG_WARNING("ScreenShotCommand","Requested layer: " << m_id << " does not belong to the current render order");
                 }
             }
             break;
@@ -68,29 +59,11 @@ ExecutionResult ScreenShotCommand::execute(ICommandExecutor* executor)
         case ScreenshotOfSurface:
             if (scene.getSurface(m_id))
             {
-                LayerListConstIterator iter = scene.getCurrentRenderOrder().begin();
-                LayerListConstIterator iterEnd = scene.getCurrentRenderOrder().end();
-                for (; iter != iterEnd; ++iter)
-                {
-                    SurfaceListConstIterator s_iter = (*iter)->getAllSurfaces().begin();
-                    SurfaceListConstIterator s_iterEnd = (*iter)->getAllSurfaces().end();
-                    for (; s_iter != s_iterEnd; ++s_iter)
-                    {
-                        if ((*s_iter)->getID() == m_id)
-                        {
-                            layer_id = (*iter)->getID();
-                            status = true;
-                            break;
-                        }
-                    }
-                    if (status)
-                    {
-                        break;
-                    }
-                }
+                layer_id = scene.getSurface(m_id)->getContainingLayerId();
+                status = scene.isLayerInCurrentRenderOrder(layer_id);
                 if (!status)
                 {
-                    LOG_WARNING("LayerManager","Requested surface: " << m_id << " does not belong to a layer which is part of the current render order");
+                    LOG_WARNING("ScreenShotCommand","Requested surface: " << m_id << " does not belong to a layer which is part of the current render order");
                 }
             }
             break;

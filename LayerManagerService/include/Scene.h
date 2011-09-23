@@ -81,11 +81,11 @@ public:
     void removeLayerGroup(LayerGroup *layer);
     const SurfaceMap getAllSurfaces() const;
     Surface* getSurfaceAt(unsigned int *x, unsigned int *y, double minOpacity);
+    bool isLayerInCurrentRenderOrder(const uint id);
 
 private:
     const LayerMap getAllLayers() const;
     void removeLayerFromAllLayerGroups(Layer* layer);
-    void removeSurfaceFromAllLayers(Surface* surface);
     void removeSurfaceFromAllSurfaceGroups(Surface* surface);
 
 private:

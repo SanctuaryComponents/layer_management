@@ -36,12 +36,20 @@ ExecutionResult LayerAddSurfaceCommand::execute(ICommandExecutor* executor)
     Layer* layer = scene.getLayer(m_layerid);
     Surface* surface = scene.getSurface(m_surfaceid);
 
-    if (layer != NULL && surface != NULL )
+    if (layer != NULL && surface != NULL)
     {
-        LOG_DEBUG("LayerAddSurfaceCommand","add surface(" <<m_surfaceid << ")" << surface->getID() << " to layer(" << m_layerid << ") " << layer->getID());
-        layer->addSurface(surface);
-        LOG_DEBUG("LayerAddSurfaceCommand", "Layer now has #surfaces:" << layer->getAllSurfaces().size());
-        result = ExecutionSuccessRedraw;
+        unsigned int layer_id = surface->getContainingLayerId();
+        if (layer_id != GraphicalObject::INVALID_ID)
+        {
+            LOG_WARNING("LayerAddSurfaceCommand","surface : id [ " << m_surfaceid << " ] already belongs to layer : id [ " << layer_id << " ]");
+        }
+        else
+        {
+            LOG_DEBUG("LayerAddSurfaceCommand","add surface(" << m_surfaceid << ")" << surface->getID() << " to layer(" << m_layerid << ") " << layer->getID());
+            layer->addSurface(surface);
+            LOG_DEBUG("LayerAddSurfaceCommand", "Layer now has #surfaces:" << layer->getAllSurfaces().size());
+            result = ExecutionSuccessRedraw;
+        }
     }
 
     return result;

@@ -45,6 +45,7 @@ public:
     void addSurface(Surface* s);
     void removeSurface(Surface* s);
     SurfaceList& getAllSurfaces();
+    void removeAllSurfaces();
 
 private:
     SurfaceList m_surfaces;
@@ -96,19 +97,39 @@ inline uint Layer::getCapabilities() const
 
 inline void Layer::addSurface(Surface* s)
 {
-	renderPropertyChanged = true;
-    m_surfaces.push_back(s);
+    if (s->getContainingLayerId() == INVALID_ID)
+    {
+        m_surfaces.push_back(s);
+        s->setContainingLayerId(getID());
+        renderPropertyChanged = true;
+    }
 }
 
 inline void Layer::removeSurface(Surface* s)
 {
-	renderPropertyChanged = true;
-    m_surfaces.remove(s);
+    if (s->getContainingLayerId() == getID())
+    {
+        m_surfaces.remove(s);
+        s->setContainingLayerId(INVALID_ID);
+        renderPropertyChanged = true;
+    }
 }
 
 inline SurfaceList& Layer::getAllSurfaces()
 {
     return m_surfaces;
+}
+
+inline void Layer::removeAllSurfaces()
+{
+    SurfaceListConstIterator iter = m_surfaces.begin();
+    SurfaceListConstIterator iterEnd = m_surfaces.end();
+    for (; iter != iterEnd; ++iter)
+    {
+        (*iter)->setContainingLayerId(GraphicalObject::INVALID_ID);
+    }
+    m_surfaces.clear();
+    renderPropertyChanged = true;
 }
 
 #endif /* _LAYER_H_ */

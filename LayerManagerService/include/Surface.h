@@ -42,6 +42,16 @@ public:
         pixformat = pf;
     }
 
+    unsigned int getContainingLayerId() const
+    {
+        return layerId;
+    }
+
+    void setContainingLayerId(unsigned int id)
+    {
+        layerId = id;
+    }
+
 
     /**
      * Platform specific Object containing surface information specific to a used platform.
@@ -56,13 +66,16 @@ private:
     Surface() :
         GraphicalSurface(TypeSurface), platform(NULL), frameCounter(0)
     {
+        layerId = INVALID_ID;
     }
     Surface(int id) :
         GraphicalSurface(id, TypeSurface), platform(NULL), frameCounter(0)
     {
+        layerId = INVALID_ID;
     }
     friend class Scene;
     PixelFormat pixformat;
+    unsigned int layerId;
 };
 
 #endif /* _SURFACE_H_ */

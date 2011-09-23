@@ -45,14 +45,14 @@ static t_ilm_bool g_ilm_init = ILM_FALSE;
 static t_ilm_client* g_ilm_client;
 
 #define ILM_ERROR(method,error) \
-    fprintf (stderr,"[ILM_CLIENT][%s] %s",method,error)
+    fprintf (stderr,"[ILM_CLIENT][%s] %s\n",method,error)
 
 #define ILM_CHECK_METHOD_ERROR(message) \
 if (message){ \
     t_ilm_int messageType = dbus_message_get_type(message); \
     if (messageType == DBUS_MESSAGE_TYPE_ERROR) \
     { \
-        fprintf (stderr,"[ILM_CLIENT][%s] DBUS ERROR: %s",__func__,dbus_message_get_error_name(message) ); \
+        fprintf (stderr,"[ILM_CLIENT][%s] DBUS ERROR: %s\n",__func__,dbus_message_get_error_name(message) ); \
         return ILM_FAILED; \
     } \
 }

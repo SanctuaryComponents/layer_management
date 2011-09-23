@@ -38,7 +38,8 @@ ExecutionResult SetOrderWithinLayerCommand::execute(ICommandExecutor* executor)
 
     if (layer)
     {
-        layer->getAllSurfaces().clear();
+        layer->removeAllSurfaces();
+        result = ExecutionSuccessRedraw;
 
         for (unsigned int surfaceIndex = 0; surfaceIndex < m_length; ++surfaceIndex)
         {
@@ -46,9 +47,17 @@ ExecutionResult SetOrderWithinLayerCommand::execute(ICommandExecutor* executor)
 
             if (surface)
             {
-                LOG_DEBUG("SetOrderWithinLayerCommand","add surface " << surface->getID() << " to renderorder of layer " << m_layerid);
-                layer->getAllSurfaces().push_back(surface);
-                result = ExecutionSuccessRedraw;
+                unsigned int layer_id = surface->getContainingLayerId();
+                if (layer_id != GraphicalObject::INVALID_ID)
+                {
+                    LOG_WARNING("SetOrderWithinLayerCommand","surface : id [ " << m_array[surfaceIndex] << " ] already belongs to layer : id [ " << layer_id << " ]");
+                }
+                else
+                {
+                    LOG_DEBUG("SetOrderWithinLayerCommand","add surface " << surface->getID() << " to renderorder of layer " << m_layerid);
+                    layer->addSurface(surface);
+                    result = ExecutionSuccessRedraw;
+                }
             }
         }
     }

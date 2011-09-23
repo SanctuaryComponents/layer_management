@@ -212,6 +212,7 @@ void Scene::removeLayer(Layer* layer)
 {
     if (layer != NULL)
     {
+        layer->removeAllSurfaces();
         m_currentRenderOrder.remove(layer);
         m_layerMap.erase(layer->getID());
         removeLayerFromAllLayerGroups(layer);
@@ -232,29 +233,24 @@ void Scene::removeSurfaceFromAllSurfaceGroups(Surface* surface)
     }
 }
 
-/// \brief remove surface from all layers it might be on
-void Scene::removeSurfaceFromAllLayers(Surface* surface)
-{
-    LayerMapIterator iter = m_layerMap.begin();
-    LayerMapIterator iterEnd = m_layerMap.end();
-
-    for (; iter != iterEnd; ++iter)
-    {
-        Layer *l = iter->second;
-        l->removeSurface(surface);
-    }
-}
-
 /// \brief take surface out of list of surfaces
 void Scene::removeSurface(Surface* surface)
 {
     if (surface != NULL)
     {
         uint surfaceId = surface->getID();
+        uint layerId = surface->getContainingLayerId();
+
+        if (layerId != GraphicalObject::INVALID_ID)
+        {
+            Layer* layer = getLayer(layerId);
+            if (layer != NULL)
+            {
+                layer->removeSurface(surface);
+            }
+        }
 
         m_surfaceMap.erase(surfaceId);
-
-        removeSurfaceFromAllLayers(surface);
         removeSurfaceFromAllSurfaceGroups(surface);
 
         delete surface;
@@ -441,3 +437,16 @@ Surface* Scene::getSurfaceAt(unsigned int *x, unsigned int *y, double minOpacity
 	return surf;
 }
 
+bool Scene::isLayerInCurrentRenderOrder(const uint id)
+{
+    LayerListConstIterator iter = m_currentRenderOrder.begin();
+    LayerListConstIterator iterEnd = m_currentRenderOrder.end();
+
+    for (; iter != iterEnd; ++iter)
+    {
+        if ((*iter)->getID() == id)
+            return true;
+    }
+
+    return false;
+}
