@@ -50,16 +50,14 @@ OpenGLES2App::OpenGLES2App(float fps, float animationSpeed)
     //glEnable(GL_BLEND);
     glDisable(GL_BLEND);
 
-    /*
     glClearDepthf(1.0f);
     glCullFace(GL_BACK);
-    glEnable(GL_CULL_FACE);
+    glDisable(GL_CULL_FACE);
     // Enable z-buffer test
     // We are using a projection matrix optimized for a floating point depth buffer,
     // so the depth test and clear value need to be inverted (1 becomes near, 0 becomes far).
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
-    */
 }
 
 OpenGLES2App::~OpenGLES2App()
@@ -198,7 +196,7 @@ bool OpenGLES2App::createEGLContext(int width, int height)
     }
 
     EGLint pi32ConfigAttribs[] = { EGL_SURFACE_TYPE, EGL_WINDOW_BIT, EGL_RENDERABLE_TYPE,
-                                   EGL_OPENGL_ES2_BIT, EGL_RED_SIZE, 8, EGL_ALPHA_SIZE, 8, EGL_NONE };
+                                   EGL_OPENGL_ES2_BIT, EGL_RED_SIZE, 8, EGL_ALPHA_SIZE, 8, EGL_DEPTH_SIZE, 1, EGL_NONE };
     int iConfigs;
 
     if (!eglChooseConfig(m_eglContextStruct.eglDisplay, pi32ConfigAttribs, &m_eglContextStruct.eglConfig, 1, &iConfigs) || (iConfigs != 1))
