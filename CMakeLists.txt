@@ -130,6 +130,7 @@ endif(WITH_X11_GLES)
 
 if (WITH_EGL_EXAMPLE)
     add_subdirectory (LayerManagerExamples/EGLX11ApplicationExample)
+    add_subdirectory (LayerManagerExamples/EGLX11MockNavigation)
 endif(WITH_EGL_EXAMPLE)
 
 if (WITH_GLX_EXAMPLE)
