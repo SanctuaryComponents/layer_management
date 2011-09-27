@@ -86,13 +86,13 @@ XVisualInfo* X11WindowSystem::getDefaultVisual(Display *dpy)
 bool X11WindowSystem::OpenDisplayConnection()
 {
     const char* displayEnvironment = getenv("DISPLAY");
-    
-    if  (displayEnvironment == NULL ) 
+
+    if  (displayEnvironment == NULL )
     {
         displayEnvironment = ":0.0";
         setenv("DISPLAY",displayEnvironment,1);
     }
-    
+
     x11Display = XOpenDisplay(displayEnvironment);
     if (!x11Display)
     {
@@ -447,16 +447,16 @@ bool X11WindowSystem::CreateCompositorWindow()
     bool result = true;
     CompositorWindow = None;
     Window root = RootWindow(x11Display,0);
-    
+
     LOG_DEBUG("X11WindowSystem", "Creating Compositor Window");
 
     XSetWindowAttributes attr;
     // draw a black background the full size of the resolution
     attr.override_redirect = True;
 #ifdef ENABLE_INPUT_EVENTS
-	attr.event_mask =  ExposureMask | StructureNotifyMask | ButtonPressMask | ButtonReleaseMask;
+    attr.event_mask =  ExposureMask | StructureNotifyMask | ButtonPressMask | ButtonReleaseMask | Button1MotionMask;
 #else
-	attr.event_mask = ExposureMask | StructureNotifyMask;
+    attr.event_mask = ExposureMask | StructureNotifyMask;
 #endif
     attr.background_pixel = 0;
     attr.border_pixel = 0;
@@ -671,7 +671,7 @@ bool X11WindowSystem::initXServer()
         LOG_DEBUG("X11WindowSystem", "Initialised XServer connection complete");
     } else {
         LOG_ERROR("X11WindowSystem", "Initialised XServer connection failed");
-        result = false;        
+        result = false;
     }
 
     return result;
@@ -783,7 +783,7 @@ init_complete:
 			case UnmapNotify:
 				LOG_DEBUG("X11WindowSystem", "Unmap Event");
 				this->UnMapWindow(event.xunmap.window);
-				checkRedraw = true;  
+				checkRedraw = true;
 				break;
 			case ReparentNotify:
 				LOG_DEBUG("X11WindowSystem", "Reparent Event");
@@ -795,6 +795,7 @@ init_complete:
 #ifdef ENABLE_INPUT_EVENTS
 			case ButtonPress:
 			case ButtonRelease:
+            case MotionNotify:
 				ManageXInputEvent(&event);
 				break;
 #endif
@@ -838,8 +839,8 @@ init_complete:
 		{
 			this->Redraw();
 			checkRedraw = false;
-        } 
-#ifndef USE_XTHREADS        
+        }
+#ifndef USE_XTHREADS
         else {
             /* put thread in sleep mode for 500 useconds due to safe cpu performance */
 
@@ -856,29 +857,31 @@ init_complete:
 #ifdef ENABLE_INPUT_EVENTS
 void X11WindowSystem::ManageXInputEvent(XEvent *pevent)
 {
-	Surface * surf;
-	unsigned int x, y;
+    Surface * surf;
+    int *pX, *pY;
 
-	switch (pevent->type)
-	{
-		case ButtonRelease:
-		case ButtonPress:
-			x = ((XButtonEvent*)pevent)->x;
-			y = ((XButtonEvent*)pevent)->y;
+    switch (pevent->type)
+    {
+        case ButtonRelease:
+        case ButtonPress:
+            pX = &(((XButtonEvent*)pevent)->x);
+            pY = &(((XButtonEvent*)pevent)->y);
+            break;
 
-			surf = m_pScene->getSurfaceAt(&x, &y, 0.1);
-			if (surf != NULL)
-			{
-				((XButtonEvent*)pevent)->x = x;
-				((XButtonEvent*)pevent)->y = y;
-				pevent->xany.window = surf->nativeHandle;
-				XSendEvent(x11Display, surf->nativeHandle, false, 0, pevent);
-			}
-			break;
+        case MotionNotify:
+            pX = &(((XMotionEvent*)pevent)->x);
+            pY = &(((XMotionEvent*)pevent)->y);
+            break;
+        default:
+            break;
+    }
 
-		default:
-			break;
-	}
+    surf = m_pScene->getSurfaceAt((unsigned int *) pX, (unsigned int *) pY, 0.1);
+    if (surf != NULL)
+    {
+        pevent->xany.window = surf->nativeHandle;
+        XSendEvent(x11Display, surf->nativeHandle, false, 0, pevent);
+    }
 }
 #endif
 
@@ -894,10 +897,10 @@ void X11WindowSystem::signalRedrawEvent()
 #ifdef USE_XTHREADS
 	// send dummy expose event, to wake up blocking x11 event loop (XNextEvent)
 	LOG_DEBUG("X11WindowSystem", "Sending dummy event to wake up renderer thread");
-    if (NULL == displaySignal ) 
+    if (NULL == displaySignal )
     {
         displaySignal = XOpenDisplay(":0");
-    }   
+    }
 	XExposeEvent ev = { Expose, 0, 1, displaySignal, CompositorWindow, 0, 0, 100, 100, 0 };
 	XLockDisplay(displaySignal);
 	XSendEvent(displaySignal, CompositorWindow, False, ExposureMask, (XEvent *) &ev);
@@ -922,7 +925,7 @@ void X11WindowSystem::cleanup(){
     }
 
 #ifdef USE_XTHREADS
-    if ( NULL  != displaySignal ) 
+    if ( NULL  != displaySignal )
     {
     	XCloseDisplay(displaySignal);
     }
@@ -958,7 +961,7 @@ bool X11WindowSystem::start()
     bool result = true;
     LOG_INFO("X11WindowSystem", "Starting / Creating thread");
     // let thread actually run
-    if ( m_xerror == false ) 
+    if ( m_xerror == false )
     {
         this->m_running = true;
         pthread_mutex_unlock(&run_lock);
