@@ -19,12 +19,23 @@
 
 cmake_minimum_required (VERSION 2.6)
 
-include_directories ("include")
-include_directories ("../../LayerManagerClient/ilmClient/include")
-include_directories ("../LayerSceneDescriptionExample/include")
-include_directories ("../../LayerManagerUtils/include")
+find_package(GLESv2 REQUIRED)
+find_package(EGL REQUIRED)
+find_package(X11 REQUIRED)
 
-link_directories ("${PROJECT_SOURCE_DIR}/LayerManagerUtils/bin")
+include_directories(
+    ${GLESv2_INCLUDE_DIR}
+    ${EGL_INCLUDE_DIR}
+    ${X11_INCLUDE_DIR}
+    "include"
+    "../../LayerManagerClient/ilmClient/include"
+    "../LayerSceneDescriptionExample/include"
+    "../../LayerManagerUtils/include"
+)
+
+link_directories(
+    "${PROJECT_SOURCE_DIR}/LayerManagerUtils/bin"
+)
 
 set (HEADER_FILES
 
@@ -40,7 +51,6 @@ set (HEADER_FILES
 	include/Street.h
 	include/ShaderBase.h
 	include/ShaderLighting.h
-	include/IlmMatrix.h
 )
 
 set (SRC_FILES
@@ -55,26 +65,28 @@ set (SRC_FILES
 	src/Street.cpp
 	src/ShaderBase.cpp
 	src/ShaderLighting.cpp
-	src/IlmMatrix.cpp
 	src/main.cpp
 )
 
-add_executable(EGLX11MockNavigation ${SRC_FILES} ${HEADER_FILES})
+add_executable(EGLX11MockNavigation
+    ${SRC_FILES}
+    ${HEADER_FILES}
+)
 
-add_dependencies(EGLX11MockNavigation ilmClient)
-#add_dependencies(EGLX11MockNavigation LayerManagerUtils)
+add_dependencies(EGLX11MockNavigation
+    ilmClient
+    EGLX11MockNavigation LayerManagerUtils
+)
 
-find_package (GLESv2 REQUIRED)
-include_directories(${GLESv2_INCLUDE_DIR})
+set(LIBS
+	${LIBS}
+	${GLESv2_LIBRARIES}
+	${X11_LIBRARIES}
+	${EGL_LIBRARY}
+	LayerManagerUtils
+	ilmClient
+)
 
-find_package (EGL REQUIRED)
-include_directories(${EGL_INCLUDE_DIR})
-
-find_package (X11 REQUIRED)
-include_directories(${X11_INCLUDE_DIR})
-
-set(LIBS ${LIBS} ${GLESv2_LIBRARIES} ${X11_LIBRARIES} ${EGL_LIBRARY})
-# LayerManagerUtils) 
-target_link_libraries(EGLX11MockNavigation ${LIBS} ilmClient)
+target_link_libraries(EGLX11MockNavigation ${LIBS})
 
 install (TARGETS EGLX11MockNavigation DESTINATION bin)

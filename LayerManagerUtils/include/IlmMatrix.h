@@ -101,4 +101,7 @@ void IlmMatrixRotateY(IlmMatrix &mOut, const float angle);
 
 void IlmMatrixRotateZ(IlmMatrix &mOut, const float angle);
 
+void IlmMatrixProjection(IlmMatrix &mOut, const float fov, const float near, const float far, const float aspectRatio);
+
+
 #endif /* _ILMMATRIX_H*/
