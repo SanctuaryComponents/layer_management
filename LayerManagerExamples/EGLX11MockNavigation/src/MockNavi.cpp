@@ -65,13 +65,12 @@ void MockNavi::render()
 
 void MockNavi::generateCity()
 {
-
 	IlmMatrix* projection = m_camera.getViewProjectionMatrix();
     ShaderLighting* pShader = new ShaderLighting(projection);
 
     // generate base plate
 	vec4f groundColor(0.8, 0.8, 0.6, 1.0);
-    vec3f position = vec3f(0.0, -0.1, 0.1);
+    vec3f position = vec3f(0.0, -0.001, 0.0);
     vec3f size = vec3f(CITY_GRID_SIZE * 3, 0.0, -CITY_GRID_SIZE * 2.0 * m_houseCount);
     Ground* ground = new Ground(position, size, groundColor, pShader);
     m_renderList.push_back(ground);
@@ -95,7 +94,7 @@ void MockNavi::generateCity()
     }
 
     // generate car
-    vec3f carPosition(1.4 * CITY_GRID_SIZE, 0.01, -0.3);
+    vec3f carPosition(1.4 * CITY_GRID_SIZE, 0.001, -0.3);
     vec3f carSize(0.2f, 0.2f, 0.3f);
     vec4f carColor(0.7, 0.3, 0.3, 1.0);
     Car* car = new Car(carPosition, carSize, carColor, pShader);
