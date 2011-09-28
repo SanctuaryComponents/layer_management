@@ -29,10 +29,10 @@
 
 #define CITY_GRID_SIZE 1.0f
 
-MockNavi::MockNavi(float fps, float animationSpeed, const int houseCount)
-: OpenGLES2App(fps, animationSpeed)
+MockNavi::MockNavi(float fps, float animationSpeed, SurfaceConfiguration* config)
+: OpenGLES2App(fps, animationSpeed, config)
 , m_camera(vec3f(-1.5 * CITY_GRID_SIZE, -0.1, 0.0), vec3f(0.0, 0.0, 0.0))
-, m_houseCount(houseCount)
+, m_houseCount(15)
 {
     generateCity();
 }

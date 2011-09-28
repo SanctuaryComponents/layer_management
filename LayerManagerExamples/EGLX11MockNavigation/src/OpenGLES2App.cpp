@@ -28,34 +28,28 @@ using std::endl;
 #include <math.h>
 #include <sys/time.h>
 
-// Max width and height of the window
-#define SURFACE_WIDTH  800
-#define SURFACE_HEIGHT 480
+#define RUNTIME_IN_MS() (GetTickCount() - startTimeInMS)
 
+// Max width and height of the window
 #define LAYER_WIDTH    800
 #define LAYER_HEIGHT   480
 
 
-OpenGLES2App::OpenGLES2App(float fps, float animationSpeed)
+OpenGLES2App::OpenGLES2App(float fps, float animationSpeed, SurfaceConfiguration* config)
 : m_framesPerSecond(fps)
 , m_animationSpeed(animationSpeed)
 , m_timerIntervalInMs(1000.0 / m_framesPerSecond)
 {
     ilm_init();
-    createX11Context(SURFACE_WIDTH, SURFACE_HEIGHT);
-    createEGLContext(SURFACE_WIDTH, SURFACE_HEIGHT);
+    createX11Context(config);
+    createEGLContext();
+    setupLayerMangement(config);
 
     glClearColor(0.2f, 0.2f, 0.5f, 1.0f);
-    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    //glEnable(GL_BLEND);
     glDisable(GL_BLEND);
 
     glClearDepthf(1.0f);
-    glCullFace(GL_BACK);
     glDisable(GL_CULL_FACE);
-    // Enable z-buffer test
-    // We are using a projection matrix optimized for a floating point depth buffer,
-    // so the depth test and clear value need to be inverted (1 becomes near, 0 becomes far).
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
 }
@@ -69,27 +63,37 @@ OpenGLES2App::~OpenGLES2App()
 
 void OpenGLES2App::mainloop()
 {
-	unsigned int startTime = GetTickCount();
-    unsigned int currentTime = 0;
-    unsigned int previousTime = 0;
-    unsigned int lastFrameTime = 0;
+	unsigned int startTimeInMS = GetTickCount();
+    unsigned int frameStartTimeInMS = 0;
+    unsigned int renderTimeInMS = 0;
+    unsigned int frameEndTimeInMS = 0;
+    unsigned int frameTimeInMS = 0;
 
     while (true)
     {
-        previousTime = currentTime;
-        currentTime = GetTickCount() - startTime;
-        lastFrameTime = currentTime - previousTime;
+        frameTimeInMS = frameEndTimeInMS - frameStartTimeInMS;
+        frameStartTimeInMS = RUNTIME_IN_MS();
 
-        update(m_animationSpeed * currentTime, m_animationSpeed * lastFrameTime);
-    	render();
-    	swapBuffers();
+        update(m_animationSpeed * frameStartTimeInMS, m_animationSpeed * frameTimeInMS);
+        render();
+        swapBuffers();
 
-        usleep(m_timerIntervalInMs * 1000);
+        renderTimeInMS = RUNTIME_IN_MS() - frameStartTimeInMS;
+
+        if (renderTimeInMS < m_timerIntervalInMs)
+        {
+            usleep((m_timerIntervalInMs - renderTimeInMS) * 1000);
+        }
+
+        frameEndTimeInMS = RUNTIME_IN_MS();
     }
 }
 
-bool OpenGLES2App::createX11Context(int width, int height)
+bool OpenGLES2App::createX11Context(SurfaceConfiguration* config)
 {
+    int width = config->surfaceWidth;
+    int height = config->surfaceHeight;
+
     t_ilm_bool result = ILM_TRUE;
     Window rootWindow;
     XSetWindowAttributes windowAttributes;
@@ -167,13 +171,12 @@ bool OpenGLES2App::createX11Context(int width, int height)
     return result;
 }
 
-bool OpenGLES2App::createEGLContext(int width, int height)
+bool OpenGLES2App::createEGLContext()
 {
     t_ilm_bool result = ILM_TRUE;
     m_eglContextStruct.eglDisplay = NULL;
     m_eglContextStruct.eglSurface = NULL;
     m_eglContextStruct.eglContext = NULL;
-    ilmErrorTypes error = ILM_FAILED;
 
     m_eglContextStruct.eglDisplay = eglGetDisplay((EGLNativeDisplayType) m_x11ContextStruct.x11Display); // TODO: remove all C style casts in C++ code; use C++ casts
     EGLint eglstatus = eglGetError();
@@ -236,43 +239,42 @@ bool OpenGLES2App::createEGLContext(int width, int height)
     	cout << "Error: eglMakeCurrent() failed.\n";
     }
 
+    return result;
+}
+
+bool OpenGLES2App::setupLayerMangement(SurfaceConfiguration* config)
+{
+    ilmErrorTypes error = ILM_FAILED;
+
     // register surfaces to layermanager
-    t_ilm_layer layerid = (t_ilm_layer)LAYER_EXAMPLE_GLES_APPLICATIONS;
-    t_ilm_surface surfaceid = (t_ilm_surface)SURFACE_EXAMPLE_EGLX11_APPLICATION;
+    t_ilm_layer layerid = (t_ilm_layer)config->layerId;//LAYER_EXAMPLE_GLES_APPLICATIONS;
+    t_ilm_surface surfaceid = (t_ilm_surface)config->surfaceId;//SURFACE_EXAMPLE_EGLX11_APPLICATION;
+    int width = config->surfaceWidth;
+    int height = config->surfaceHeight;
 
-    // TODO: if (error == ILM_FAILED) return ILM_FALSE;
-
-    cout << "create a surface " << (t_ilm_nativehandle) m_x11ContextStruct.x11Window << "\n";
+    cout << "creating surface " << surfaceid << "\n";
     error = ilm_surfaceCreate( (t_ilm_nativehandle) m_x11ContextStruct.x11Window, width, height,
             ILM_PIXELFORMAT_RGBA_8888, &surfaceid);
 
-    // TODO: if (error == ILM_FAILED) return ILM_FALSE;
-
-    cout << "set surface dest region\n";
+    cout << "set surface " << surfaceid << " dest region " << 0 << ", " << 0 << ", " << width << ", " << height << "\n";
     error = ilm_surfaceSetDestinationRectangle(surfaceid, 0, 0, width, height);
 
-    // TODO: if (error == ILM_FAILED) return ILM_FALSE;
-
-    cout << "set surface src region\n";
+    cout << "set surface " << surfaceid << " src region " << 0 << ", " << 0 << ", " << width << ", " << height << "\n";
     error = ilm_surfaceSetSourceRectangle(surfaceid, 0, 0, width, height);
 
-    // TODO: if (error == ILM_FAILED) return ILM_FALSE;
-
-    cout << "add surface to layer\n";
-    error = ilm_layerAddSurface(layerid, surfaceid);
-    cout << "Set surface visible\n";
+    cout << "Set surface " << surfaceid << " visible\n";
     error = ilm_surfaceSetVisibility(surfaceid, ILM_TRUE);
-    cout << "Set surface opacity\n";
-    error = ilm_surfaceSetOpacity(surfaceid, 0.75f);
 
-    //if (error == ILM_FAILED) return ILM_FALSE;
+    cout << "Set surface " << surfaceid << " opacity 1.0\n";
+    error = ilm_surfaceSetOpacity(surfaceid, 1.0f);
+
+    cout << "add surface " << surfaceid << " to layer " << layerid << "\n";
+    error = ilm_layerAddSurface(layerid, surfaceid);
 
     cout << "commit\n";
     error = ilm_commitChanges();
 
-    //if (error == ILM_FAILED) return ILM_FALSE;
-
-    return result;
+    return ILM_TRUE;
 }
 
 void OpenGLES2App::destroyEglContext()

@@ -25,10 +25,18 @@
 #include "X11/Xutil.h"
 #include <EGL/egl.h>
 
+struct SurfaceConfiguration
+{
+    unsigned int layerId;
+    unsigned int surfaceId;
+    unsigned int surfaceWidth;
+    unsigned int surfaceHeight;
+};
+
 class OpenGLES2App
 {
 public:
-    OpenGLES2App(float fps, float animationSpeed);
+    OpenGLES2App(float fps, float animationSpeed, SurfaceConfiguration* config);
     virtual ~OpenGLES2App();
 
     void mainloop();
@@ -39,11 +47,13 @@ protected:
 	void swapBuffers();
 
 private:
-	bool createX11Context(int width, int height);
+	bool createX11Context(SurfaceConfiguration* config);
 	void destroyX11Context();
 
-	bool createEGLContext(int width, int height);
+	bool createEGLContext();
 	void destroyEglContext();
+
+	bool setupLayerMangement(SurfaceConfiguration* config);
 
 	unsigned int GetTickCount();
 

@@ -32,7 +32,7 @@ class MockNaviHouse;
 class MockNavi : public OpenGLES2App
 {
 public:
-    MockNavi(float fps, float animationSpeed, const int houseCount);
+    MockNavi(float fps, float animationSpeed, SurfaceConfiguration* config);
     
     virtual void update(int currentTimeInMs, int lastFrameTime);
     virtual void render();
