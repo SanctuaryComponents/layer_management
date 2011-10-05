@@ -47,6 +47,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/LayerManagerService
 %dir %_includedir/layermanager
 %{_includedir}/layermanager/*
+%dir %_libdir/layermanager
+%{_libdir}/layermanager/libLayerScene.so
 %dir %_libdir/layermanager/communicator
 %{_libdir}/layermanager/communicator/libDBUSCommunicator.so
 %{_libdir}/libLayerManagerCommands.so
@@ -68,6 +70,11 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/EGLX11ApplicationExample
 %{_bindir}/LayerManagerClientExample
 %{_bindir}/LayerManagerToolBox
+%{_bindir}/EGLX11MockNavigation
+
+/etc/dbus-1/session.d/LayerManagerService.conf
+/etc/dbus-1/system.d/LayerManagerService.conf
+
 
 %changelog
 * Fri Aug 26 2011 Michael Schuldt <Michael.Schuldt@bmw-carit.de> 0.9.1
