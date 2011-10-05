@@ -39,6 +39,7 @@ bool ViewportTransform::isFullyCropped(const Rectangle& surfaceDestination, cons
 void ViewportTransform::applyLayerSource(const Rectangle& layerSource, Rectangle& surfaceSource, Rectangle& surfaceDestination)
 {
     Rectangle regionBeforeTransformation = surfaceDestination;
+    uint sourceRegionWidthBeforeTransformation = surfaceSource.width;
 
     // X
 
@@ -54,21 +55,22 @@ void ViewportTransform::applyLayerSource(const Rectangle& layerSource, Rectangle
             surfaceDestination.x -= layerSource.x;
 
         // crop a proportional part of the source region
-        surfaceSource.x += (float)(layerSource.x-regionBeforeTransformation.x)/regionBeforeTransformation.width * surfaceSource.width;
-        surfaceSource.width -= (float)(layerSource.x-regionBeforeTransformation.x)/regionBeforeTransformation.width * surfaceSource.width;
+        surfaceSource.x += (float)(layerSource.x-regionBeforeTransformation.x)/regionBeforeTransformation.width * sourceRegionWidthBeforeTransformation;
+        surfaceSource.width -= (float)(layerSource.x-regionBeforeTransformation.x)/regionBeforeTransformation.width * sourceRegionWidthBeforeTransformation;
     }
     // crop surface from higher side if some part of surface lies beyond the cropregion of the layer
     if(regionBeforeTransformation.x+regionBeforeTransformation.width > layerSource.x+layerSource.width)
     { // partially outside higher end
         // crop a part of the surfaces geometry that extended beyond layer cropregion
-        surfaceDestination.width -= regionBeforeTransformation.x+regionBeforeTransformation.width-layerSource.x-layerSource.width;
+        uint cropamount = regionBeforeTransformation.x+regionBeforeTransformation.width-layerSource.x-layerSource.width;
+        surfaceDestination.width -= cropamount;
 
         if (surfaceDestination.x < layerSource.x )
             surfaceDestination.x = 0;
         else
             surfaceDestination.x -= layerSource.x;
 
-        surfaceSource.width -= regionBeforeTransformation.x+regionBeforeTransformation.width-layerSource.x-layerSource.width;
+        surfaceSource.width -= (float)(cropamount)/(regionBeforeTransformation.width)*sourceRegionWidthBeforeTransformation;
     }
     // if surface is completely within the cropregion then just move it by the amount cropped from the lower end of the layer
     if (regionBeforeTransformation.x >= layerSource.x && regionBeforeTransformation.x+regionBeforeTransformation.width <= layerSource.x+layerSource.width)

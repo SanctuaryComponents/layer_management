@@ -607,6 +607,55 @@ TEST_F(ViewportTransformTest, completeExample8){
     ASSERT_NEAR(1.0,textureCoordinates[3],0.01);
 }
 
+TEST_F(ViewportTransformTest, layersourceZoomOnTwoSurfaces){
+    int surfaceOriginalWidth = 800;
+    int surfaceOriginalHeight = 480;
+    Rectangle layerSRC(100, 0, 600, 480);
+    Rectangle layerDest(0, 0, 800, 480);
+
+    Rectangle surface1SRC(0, 0, 800, 480);
+    Rectangle surface1DEST(0, 0, 400, 480);
+    Rectangle targetSurface1Src = surface1SRC;
+    Rectangle targetSurface1Dest = surface1DEST;
+
+    ViewportTransform::applyLayerSource(layerSRC,targetSurface1Src,targetSurface1Dest);
+    ViewportTransform::applyLayerDestination(layerDest,layerSRC,targetSurface1Dest);
+
+    ASSERT_EQ(200u, targetSurface1Src.x);
+    ASSERT_EQ(600u, targetSurface1Src.width);
+
+    ASSERT_EQ(0u,targetSurface1Dest.x);
+    ASSERT_EQ(400u,targetSurface1Dest.width);
+
+    float* textureCoordinates = new float[4];
+    ViewportTransform::transformRectangleToTextureCoordinates(targetSurface1Src, surfaceOriginalWidth, surfaceOriginalHeight, textureCoordinates);
+    ASSERT_NEAR(0.25,textureCoordinates[0],0.01);
+    ASSERT_NEAR(1.0,textureCoordinates[1],0.01);
+    ASSERT_NEAR(0.0,textureCoordinates[2],0.01);
+    ASSERT_NEAR(1.0,textureCoordinates[3],0.01);
+
+    Rectangle surface2SRC(0, 0, 800, 480);
+    Rectangle surface2DEST(400, 0, 400, 480);
+    Rectangle targetSurface2Src = surface2SRC;
+    Rectangle targetSurface2Dest = surface2DEST;
+
+    ViewportTransform::applyLayerSource(layerSRC,targetSurface2Src,targetSurface2Dest);
+    ViewportTransform::applyLayerDestination(layerDest,layerSRC,targetSurface2Dest);
+
+    ASSERT_EQ(0u, targetSurface2Src.x);
+    ASSERT_EQ(600u, targetSurface2Src.width);
+
+    ASSERT_EQ(400u,targetSurface2Dest.x);
+    ASSERT_EQ(400u,targetSurface2Dest.width);
+
+    float* textureCoordinates2 = new float[4];
+    ViewportTransform::transformRectangleToTextureCoordinates(targetSurface2Src, surfaceOriginalWidth, surfaceOriginalHeight, textureCoordinates2);
+    ASSERT_NEAR(0,textureCoordinates2[0],0.01);
+    ASSERT_NEAR(0.75,textureCoordinates2[1],0.01);
+    ASSERT_NEAR(0.0,textureCoordinates2[2],0.01);
+    ASSERT_NEAR(1.0,textureCoordinates2[3],0.01);
+}
+
 TEST_F(ViewportTransformTest, IsFullyCroppedLeft){
     Rectangle surfaceDestination(5,30,5,50);
     Rectangle layerSource(20,0,20,100);
