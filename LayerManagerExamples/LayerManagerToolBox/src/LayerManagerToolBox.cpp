@@ -217,14 +217,14 @@ typedef struct s_global_parameter
     t_ilm_int           surfacero_length;
     t_ilm_layer*        layerro;
     t_ilm_int           layerro_length;
-    const char*         filename;
+    char*         filename;
     toolbox_state state;
 } t_param_struct;
 
 
-const char* parseParameters(char* argv, const char* argument, const char* beginterm , const char* endterm) 
+char* parseParameters(char* argv, const char* argument, const char* beginterm , const char* endterm) 
 {
-    const char* cresult = NULL;
+    char* cresult = new char[2048];
     std::string result = std::string(argv);
     printf("Argument is %s\n",result.c_str());
     size_t pos = result.find(std::string (argument));
@@ -238,7 +238,7 @@ const char* parseParameters(char* argv, const char* argument, const char* begint
             endpos = result.find( std::string (endterm), beginpos); 
             if ( endpos != std::string::npos ) 
             {
-                cresult = (result.substr(beginpos,endpos-beginpos)).c_str();
+                strcpy(cresult,(result.substr(beginpos,endpos-beginpos)).c_str());
                 printf("Value is %s\n",cresult);
             }
         }
@@ -338,14 +338,23 @@ bool fillDimension(const char * param, t_ilm_int *pArray)
 {
     t_ilm_int *tempArray = new t_ilm_int[4];
     bool result = true;
-    char * pRes = new char[strlen(param)+1];
-    strcpy(pRes,param);
+    std::string pRes = std::string(param);
+    size_t pos = pRes.find(",");
     int i = 0;
-    pRes = strtok (pRes,",");
-    while (pRes != NULL)
+    while (pos != std::string::npos)
     {
-        tempArray[i++] = atoi(pRes);
-        pRes = strtok (NULL, ",");
+        std::string tempString = pRes.substr(0,pos);
+        printf("Dim param %s\n",tempString.c_str());        
+        tempArray[i++] = atoi(tempString.c_str());
+        pRes = pRes.substr(pos+1);
+        pos = pRes.find(",");
+        /*convert the last value*/
+        if ( pos == std::string::npos && i==3 ) 
+        {
+            tempString = pRes.substr(0);
+            printf("Dim param %s\n",tempString.c_str());        
+            tempArray[i++] = atoi(tempString.c_str());
+        }
     }
     if (i<4) 
     {
@@ -356,7 +365,6 @@ bool fillDimension(const char * param, t_ilm_int *pArray)
         memcpy(pArray,tempArray,4*sizeof(t_ilm_int));
         printf("Dimension Parameter successfully filled %i %i %i %i\n",pArray[0],pArray[1],pArray[2],pArray[3]);        
     }
-    delete[] pRes;
     delete[] tempArray;
     return result;
 }
@@ -401,7 +409,7 @@ bool initParamStruct(t_param_struct* pStruct,char* argv)
     while ( result && i < curParam.numberArguments ) 
     {
         bool found = false;
-        const char * param = NULL;
+        char * param = NULL;
         switch (curParam.params[i].type) 
         {
             case ARGUMENT_LAYERID :
@@ -510,7 +518,8 @@ bool initParamStruct(t_param_struct* pStruct,char* argv)
                 if ( param != 0 ) 
                 {
                     found = true;
-                    pStruct->filename = param;
+                    pStruct->filename = new char[strlen(param)+1];
+                    strcpy(pStruct->filename,param);
                 }
                 printf("Filename is %s\n",pStruct->filename);                                
             break;            
@@ -525,6 +534,8 @@ bool initParamStruct(t_param_struct* pStruct,char* argv)
             result = false;
         } 
         i++;
+        if (param != NULL) 
+            delete[] param;
     }
     return result;
 }
