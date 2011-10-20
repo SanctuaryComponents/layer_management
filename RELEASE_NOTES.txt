@@ -1,3 +1,36 @@
+Version 0.9.4
+-------------
+This version includes the following enhancements.
+
+Bugfixes :
+
+- Removed Quiet Message, is not working with CMake 2.6
+
+- Bugfix fixes issue regarding layer source transformation
+  LayerSource Width should be considered with crop amount
+  Unit Test case added
+
+- Bugfix to establish rpm build with version tracking
+  Added newly created files to rpm
+  fix ILM VERSION for rpm, character '-' ist not allowed
+  in RELEASE variable, so now it is replaced by underscore
+
+- LayerManagerToolBox - remove wrong parameter parse
+ 
+
+Improvements:
+
+-   Add restrictions on adding a surface to a layer
+    This prevents:
+    1. A surface being added to multiple layers.
+    2. A surface being added to the same layer multiple times.
+-   New Example Application(EGLX11MockNavigation) added, 
+    which emulates 3D City 
+-   Input Events: better support of Qt: XMotionEvent need to be 
+    reported for Button1 to move sliders & scrollbars
+-   Adding new Command to set the hardware layertype during scene
+    creation        
+
 Version 0.9.3
 -------------
 This version includes the following enhancements.
