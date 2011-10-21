@@ -217,14 +217,14 @@ typedef struct s_global_parameter
     t_ilm_int           surfacero_length;
     t_ilm_layer*        layerro;
     t_ilm_int           layerro_length;
-    char*         filename;
+    char*               filename;
     toolbox_state state;
 } t_param_struct;
 
 
 char* parseParameters(char* argv, const char* argument, const char* beginterm , const char* endterm) 
 {
-    char* cresult = new char[2048];
+    char* cresult = NULL;
     std::string result = std::string(argv);
     printf("Argument is %s\n",result.c_str());
     size_t pos = result.find(std::string (argument));
@@ -232,13 +232,15 @@ char* parseParameters(char* argv, const char* argument, const char* beginterm , 
     {
         size_t endpos = 0;
         size_t beginpos = result.find( std::string (beginterm), pos + strlen(argument) );
-        if ( pos != std::string::npos ) 
+        if ( beginpos != std::string::npos )
         {
             beginpos += strlen(beginterm);
             endpos = result.find( std::string (endterm), beginpos); 
             if ( endpos != std::string::npos ) 
             {
-                strcpy(cresult,(result.substr(beginpos,endpos-beginpos)).c_str());
+                result = result.substr(beginpos,endpos-beginpos);
+                cresult = new char [result.size()+1];
+                strcpy(cresult,result.c_str());
                 printf("Value is %s\n",cresult);
             }
         }
@@ -295,7 +297,7 @@ void showSurfaceProperties(t_param_struct *pStruct)
 
 
 
-bool fillLayerRenderOrder(const char * param, t_param_struct* pStruct) 
+bool fillLayerRenderOrder(char * param, t_param_struct* pStruct)
 {
     bool result = true;
     char * pRes = new char[strlen(param)+1];
@@ -334,7 +336,7 @@ bool fillLayerRenderOrder(const char * param, t_param_struct* pStruct)
     return result;
 }
 
-bool fillDimension(const char * param, t_ilm_int *pArray) 
+bool fillDimension(char * param, t_ilm_int *pArray)
 {
     t_ilm_int *tempArray = new t_ilm_int[4];
     bool result = true;
@@ -534,7 +536,7 @@ bool initParamStruct(t_param_struct* pStruct,char* argv)
             result = false;
         } 
         i++;
-        if (param != NULL) 
+        if (param != NULL)
             delete[] param;
     }
     return result;
