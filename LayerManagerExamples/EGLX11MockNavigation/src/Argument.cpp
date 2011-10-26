@@ -85,7 +85,34 @@ IntArgument::IntArgument(string name, int default_value, int argc, const char * 
     }
 }
 
-float IntArgument::get()
+int IntArgument::get()
+{
+    return value;
+}
+
+
+UnsignedIntArgument::UnsignedIntArgument(string name, unsigned int default_value, int argc, const char * const argv[])
+: value(default_value)
+{
+    for (int arg = 1; arg < argc; ++arg)
+    {
+        char dummy[] = "";
+        const char* lpArgNow = argv[arg];
+        const char* lpArgNext = dummy;
+
+        if (arg != argc - 1)
+        {
+            lpArgNext = argv[arg + 1];
+        }
+
+        if ((lpArgNow[0] == '-') && (name == &lpArgNow[1]))
+        {
+            value = atoll(lpArgNext);
+        }
+    }
+}
+
+unsigned int UnsignedIntArgument::get()
 {
     return value;
 }

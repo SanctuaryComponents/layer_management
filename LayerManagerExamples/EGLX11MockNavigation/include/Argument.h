@@ -43,10 +43,19 @@ private:
 class IntArgument {
 public:
     IntArgument(string name, int default_value, int argc, const char * const argv[]);
-    float get();
+    int get();
 
 private:
     int value;
+};
+
+class UnsignedIntArgument {
+public:
+    UnsignedIntArgument(string name, unsigned int default_value, int argc, const char * const argv[]);
+    unsigned int get();
+
+private:
+    unsigned int value;
 };
 
 #endif
