@@ -34,8 +34,8 @@ int main (int argc, const char * argv[])
 {
     FloatArgument fps("fps", DEFAULT_FPS, argc, argv);
     FloatArgument animSpeed("anim", DEFAULT_ANIM, argc, argv);
-    IntArgument surfaceId("surface", DEFAULT_SURFACE, argc, argv);
-    IntArgument layerId("layer", DEFAULT_LAYER, argc, argv);
+    UnsignedIntArgument surfaceId("surface", DEFAULT_SURFACE, argc, argv);
+    UnsignedIntArgument layerId("layer", DEFAULT_LAYER, argc, argv);
     IntArgument width("width", DEFAULT_WIDTH, argc, argv);
     IntArgument height("height", DEFAULT_HEIGHT, argc, argv);
     BoolArgument help("help", false, argc, argv);
