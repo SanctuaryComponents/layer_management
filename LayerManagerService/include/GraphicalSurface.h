@@ -20,7 +20,7 @@
 #ifndef _GRAPHICALSURFACE_H_
 #define _GRAPHICALSURFACE_H_
 
-#include "LogicalGraphicsObject.h"
+#include "GraphicalObject.h"
 #include "OrientationType.h"
 #include "Rectangle.h"
 #include "Vector2.h"

@@ -17,8 +17,8 @@
  *
  ****************************************************************************/
 
-#ifndef _LOGICALGRAPHICSOBJECT_H_
-#define _LOGICALGRAPHICSOBJECT_H_
+#ifndef _GRAPHICALOBJECT_H_
+#define _GRAPHICALOBJECT_H_
 
 #include "ObjectType.h"
 
@@ -162,4 +162,4 @@ inline Shader* GraphicalObject::getShader()
 }
 
 
-#endif /* _LOGICALGRAPHICSOBJECT_H_ */
+#endif /* _GRAPHICALOBJECT_H_ */

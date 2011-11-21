@@ -21,7 +21,7 @@
 #define _GRAPHICALGROUP_H_
 
 #include <list>
-#include "LogicalGraphicsObject.h"
+#include "GraphicalObject.h"
 #include "ObjectType.h"
 
 /**

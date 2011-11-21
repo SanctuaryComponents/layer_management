@@ -17,7 +17,7 @@
 *
 ****************************************************************************/
 
-#include "LogicalGraphicsObject.h"
+#include "GraphicalObject.h"
 
 unsigned int GraphicalObject::nextGraphicId[TypeMax]={1,1,1,1};
 

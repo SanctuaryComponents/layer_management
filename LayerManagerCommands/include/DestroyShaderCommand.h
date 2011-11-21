@@ -21,7 +21,7 @@
 #define _DESTROYSHADERCOMMAND_H_
 
 #include "BaseCommandSynchronous.h"
-#include "LogicalGraphicsObject.h"
+#include "GraphicalObject.h"
 #include "Scene.h"
 #include "LayerMap.h"
 #include "SurfaceMap.h"
