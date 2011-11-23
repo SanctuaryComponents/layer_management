@@ -117,6 +117,8 @@ DBusMessage* _ilm_dbus_method_call(DBusConnection* const pConnection, const t_il
 
     if (!dbus_connection_send_with_reply(pConnection, pMessage, &pPending, 500))
     {
+        // TODO: dbus_message_unref() required here?
+
         return NULL;
     }
 
