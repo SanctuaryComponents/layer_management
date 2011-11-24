@@ -28,6 +28,13 @@ include_directories ("${PROJECT_SOURCE_DIR}/LayerManagerCommands/include")
 link_directories ("${PROJECT_SOURCE_DIR}/LayerManagerUtils/bin")
 link_directories ("${PROJECT_SOURCE_DIR}/LayerManagerCommands")
 
+# generate version header file, used in main.cpp
+message("-- Generating Version.h header file")
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/Version.h.in
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/Version.h
+)
+
 file(GLOB LM_SOURCES src/*.cpp src/shader/*.cpp)
 file(GLOB LM_INCLUDES include/*.h)
 

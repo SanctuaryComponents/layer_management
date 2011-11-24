@@ -18,6 +18,7 @@
  ****************************************************************************/
 
 #include "Layermanager.h"
+#include "Version.h"
 #include "IRenderer.h"
 #include "ICommunicator.h"
 #include "ISceneProvider.h"
@@ -70,7 +71,7 @@ const char* USAGE_DESCRIPTION = "Usage:\t LayerManagerService [options]\n"
                                 "\t-v: show version info\t\n"
                                 "\nexample: LayerManagerService -w800 -h480 -d:0\n";
 
-const char* VERSION_STRING = ILM_VERSION;
+
 template<class T>
 T* getCreateFunction(string libname)
 {
@@ -345,7 +346,7 @@ int main(int argc, char **argv)
 {
     parseCommandLine(argc, (char**) argv);
     char* pluginLookupPath = getenv("LM_PLUGIN_PATH");
-    LOG_INFO("LayerManagerService", "Starting Layermanager - " << ILM_VERSION << " .");
+    LOG_INFO("LayerManagerService", "Starting Layermanager - " << VERSION_STRING << " .");
     
     if  (pluginLookupPath != NULL ) 
     {

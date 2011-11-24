@@ -41,7 +41,6 @@ message(STATUS
         "Build for Version ${VERSION} build ${ILM_VERSION}"
         )
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DILM_VERSION='\"${ILM_VERSION}\"' " CACHE STRING "" FORCE)        
 
 ##################### RPM CONFIG ########################
 set(GENIVI_RPM_RELEASE "1${ILM_VERSION}")
