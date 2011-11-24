@@ -30,11 +30,9 @@ ScreenDumpCommand::ScreenDumpCommand(char* givenfilename, unsigned int id)
 ExecutionResult ScreenDumpCommand::execute(ICommandExecutor* executor)
 {
 	ExecutionResult result = ExecutionFailed;
-    Scene& scene = *(executor->getScene());
     RendererList& m_rendererList = *(executor->getRendererList());
 
     bool status = false;
-    unsigned int layer_id = 0;
 
     LOG_INFO("ScreenDumpCommand","making screenshot, output file: " << m_filename);
 

@@ -34,7 +34,6 @@ ExecutionResult LayerDumpCommand::execute(ICommandExecutor* executor)
     RendererList& m_rendererList = *(executor->getRendererList());
 
     bool status = false;
-    unsigned int layer_id = 0;
 
     LOG_INFO("LayerDumpCommand","making screenshot, output file: " << m_filename);
 
