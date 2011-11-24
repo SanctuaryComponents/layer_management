@@ -44,10 +44,10 @@ class Scene: public IScene
     // TODO: these should use public interface instead
     friend class Layermanager;
     friend class CommitCommand;
-    friend class CreateShaderCommand;
-    friend class DestroyShaderCommand;
-    friend class SetShaderCommand;
-    friend class SetUniformsCommand;
+    friend class ShaderCreateCommand;
+    friend class ShaderDestroyCommand;
+    friend class SurfaceSetShaderCommand;
+    friend class ShaderSetUniformsCommand;
 
 public:
     Scene();

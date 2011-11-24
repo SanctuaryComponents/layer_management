@@ -16,28 +16,23 @@
  * limitations under the License.
  *
  ****************************************************************************/
- 
-#ifndef _LAYERSCENE_PROVIDER_H_
-#define _LAYERSCENE_PROVIDER_H_
 
-#include "ISceneProvider.h"
+#ifndef _SCREENSETRENDERORDERCOMMAND_H_
+#define _SCREENSETRENDERORDERCOMMAND_H_
 
-class ICommandExecutor;
+#include "BaseCommandAsynchronous.h"
 
-/**
- * scene Providers to setup a inital layer scenary on target platform
- */
-class LayerSceneProvider : public ISceneProvider
+class ScreenSetRenderOrderCommand: public BaseCommandAsynchronous
 {
 public:
-    
-    LayerSceneProvider(ICommandExecutor* executor);
-    /**
-     * Delegate Scene : this method will be called on LayerManager startup
-     * to delegate a initial scene description of Layers on the target Platform
-     */
-    virtual bool delegateScene();
+	ScreenSetRenderOrderCommand(unsigned int* array, unsigned int length);
+
+    virtual ExecutionResult execute(ICommandExecutor* executor);
+    virtual const std::string getString();
+
+private:
+    unsigned int* m_array;
+    const unsigned int m_length;
 };
 
-
-#endif /* _LAYERSCENE_PROVIDER_H_ */
+#endif /* _SCREENSETRENDERORDERCOMMAND_H_ */

@@ -18,6 +18,16 @@
  ****************************************************************************/
 
 #include "LayerSceneProvider.h"
+#include "ICommandExecutor.h"
+#include "CommitCommand.h"
+#include "LayerCreateCommand.h"
+#include "LayerSetDestinationRectangleCommand.h"
+#include "LayerSetSourceRectangleCommand.h"
+#include "LayerSetVisibilityCommand.h"
+#include "LayerSetOpacityCommand.h"
+#include "ScreenSetRenderOrderCommand.h"
+#include "LayerScene.h"
+
 
 LayerSceneProvider::LayerSceneProvider(ICommandExecutor* executor)
 : ISceneProvider(executor)
@@ -44,22 +54,22 @@ bool LayerSceneProvider::delegateScene()
     int i = 0;
     int numberOfLayers = sizeof(gInitialLayerScene) / sizeof (layerScene);
     unsigned int *renderOrder = new unsigned int [numberOfLayers];
-    unsigned int* screenResolution = m_executor->getScreenResolution(0);    
+    unsigned int* screenResolution = m_executor->getScreenResolution(0);
     if ( numberOfLayers > 0 ) 
     {
         /* setup inital layer scenery */
         for (i = 0;i<numberOfLayers;i++)
         {
-            m_executor->execute(new CreateCommand(0, TypeLayer, PIXELFORMAT_R8, screenResolution[0], screenResolution[1], &(gInitialLayerScene[i].layer)));            
-            m_executor->execute(new SetSourceRectangleCommand(gInitialLayerScene[i].layer, TypeLayer, 0, 0, screenResolution[0], screenResolution[1]));
-            m_executor->execute(new SetDestinationRectangleCommand(gInitialLayerScene[i].layer, TypeLayer, 0, 0, screenResolution[0], screenResolution[1]));
-            m_executor->execute(new SetOpacityCommand(gInitialLayerScene[i].layer,TypeLayer,gInitialLayerScene[i].opacity) );
-            m_executor->execute(new SetVisibilityCommand(gInitialLayerScene[i].layer,TypeLayer,gInitialLayerScene[i].visibility) );
-            m_executor->execute(new CommitCommand());            
+            m_executor->execute(new LayerCreateCommand(screenResolution[0], screenResolution[1], &(gInitialLayerScene[i].layer)));
+            m_executor->execute(new LayerSetSourceRectangleCommand(gInitialLayerScene[i].layer, 0, 0, screenResolution[0], screenResolution[1]));
+            m_executor->execute(new LayerSetDestinationRectangleCommand(gInitialLayerScene[i].layer, 0, 0, screenResolution[0], screenResolution[1]));
+            m_executor->execute(new LayerSetOpacityCommand(gInitialLayerScene[i].layer, gInitialLayerScene[i].opacity) );
+            m_executor->execute(new LayerSetVisibilityCommand(gInitialLayerScene[i].layer, gInitialLayerScene[i].visibility) );
+            m_executor->execute(new CommitCommand());
             renderOrder[i]=gInitialLayerScene[i].layer;
         }        
         /* Finally set the first executed renderorder */
-        m_executor->execute(new SetLayerOrderCommand(renderOrder,numberOfLayers));
+        m_executor->execute(new ScreenSetRenderOrderCommand(renderOrder, numberOfLayers));
         m_executor->execute(new CommitCommand());
     }
     return result;    

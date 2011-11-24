@@ -506,7 +506,7 @@ ilmErrorTypes ilm_surfaceCreate(t_ilm_nativehandle nativehandle, t_ilm_int width
 ilmErrorTypes ilm_surfaceCreatePlaceholder(t_ilm_surface *pSurfaceId);
 
 /**
- * \brief Associate the render buffer of an application with a placeholder surface
+ * \brief Set the render buffer of an application to be used as surface content
  * \ingroup Surface
  * \param[in] nativehandle The native windowsystem's handle for the surface
  * \param[in] width The original width of the surface
@@ -516,7 +516,7 @@ ilmErrorTypes ilm_surfaceCreatePlaceholder(t_ilm_surface *pSurfaceId);
  * \return ILM_TRUE if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
-ilmErrorTypes ilm_surfaceAssociateRenderBuffer(t_ilm_nativehandle nativehandle, t_ilm_int width, t_ilm_int height, ilmPixelFormat pixelFormat, t_ilm_surface surfaceId);
+ilmErrorTypes ilm_surfaceSetRenderBuffer(t_ilm_nativehandle nativehandle, t_ilm_int width, t_ilm_int height, ilmPixelFormat pixelFormat, t_ilm_surface surfaceId);
 
 /**
  * \brief Remove a surface

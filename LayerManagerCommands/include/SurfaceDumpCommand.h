@@ -16,28 +16,24 @@
  * limitations under the License.
  *
  ****************************************************************************/
- 
-#ifndef _LAYERSCENE_PROVIDER_H_
-#define _LAYERSCENE_PROVIDER_H_
 
-#include "ISceneProvider.h"
+#ifndef _SURFACEDUMPCOMMAND_H_
+#define _SURFACEDUMPCOMMAND_H_
 
-class ICommandExecutor;
+#include "BaseCommandSynchronous.h"
+#include <string>
 
-/**
- * scene Providers to setup a inital layer scenary on target platform
- */
-class LayerSceneProvider : public ISceneProvider
+class SurfaceDumpCommand: public BaseCommandSynchronous
 {
 public:
-    
-    LayerSceneProvider(ICommandExecutor* executor);
-    /**
-     * Delegate Scene : this method will be called on LayerManager startup
-     * to delegate a initial scene description of Layers on the target Platform
-     */
-    virtual bool delegateScene();
+	SurfaceDumpCommand(char* givenfilename, unsigned int id = 0);
+
+    virtual ExecutionResult execute(ICommandExecutor* executor);
+    virtual const std::string getString();
+
+private:
+    std::string m_filename;
+    const unsigned int m_id;
 };
 
-
-#endif /* _LAYERSCENE_PROVIDER_H_ */
+#endif /* _SURFACEDUMPCOMMAND_H_ */

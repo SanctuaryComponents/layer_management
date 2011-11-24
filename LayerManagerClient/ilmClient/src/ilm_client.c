@@ -1280,7 +1280,7 @@ ilmErrorTypes ilm_surfaceCreatePlaceholder(t_ilm_surface *pSurfaceId)
     return result;
 }
 
-ilmErrorTypes ilm_surfaceAssociateRenderBuffer(t_ilm_nativehandle nativehandle, t_ilm_int width, t_ilm_int height, ilmPixelFormat pixelFormat, t_ilm_surface surfaceId)
+ilmErrorTypes ilm_surfaceSetRenderBuffer(t_ilm_nativehandle nativehandle, t_ilm_int width, t_ilm_int height, ilmPixelFormat pixelFormat, t_ilm_surface surfaceId)
 {
     ilmErrorTypes result = ILM_FAILED;
     DBusMessage *message;

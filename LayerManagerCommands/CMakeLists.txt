@@ -29,7 +29,7 @@ file(GLOB LM_INCLUDES include/*.h)
 
 add_library(LayerManagerCommands SHARED ${LM_SOURCES})
 
-set(LIBS ${LIBS} LayerManagerUtils) 
+set(LIBS ${LIBS} LayerManagerUtils)
 target_link_libraries(LayerManagerCommands ${LIBS})
 
 install (TARGETS LayerManagerCommands DESTINATION lib)

@@ -16,28 +16,25 @@
  * limitations under the License.
  *
  ****************************************************************************/
- 
-#ifndef _LAYERSCENE_PROVIDER_H_
-#define _LAYERSCENE_PROVIDER_H_
 
-#include "ISceneProvider.h"
+#ifndef _SURFACEGETORIENTATIONCOMMAND_H_
+#define _SURFACEGETORIENTATIONCOMMAND_H_
 
-class ICommandExecutor;
+#include "BaseCommandSynchronous.h"
+#include "OrientationType.h"
 
-/**
- * scene Providers to setup a inital layer scenary on target platform
- */
-class LayerSceneProvider : public ISceneProvider
+
+class SurfaceGetOrientationCommand: public BaseCommandSynchronous
 {
 public:
-    
-    LayerSceneProvider(ICommandExecutor* executor);
-    /**
-     * Delegate Scene : this method will be called on LayerManager startup
-     * to delegate a initial scene description of Layers on the target Platform
-     */
-    virtual bool delegateScene();
+	SurfaceGetOrientationCommand(int id, OrientationType* orientation);
+
+    virtual ExecutionResult execute(ICommandExecutor* executor);
+    virtual const std::string getString();
+
+private:
+    const unsigned m_id;
+    OrientationType* m_pReturnOrientation;
 };
 
-
-#endif /* _LAYERSCENE_PROVIDER_H_ */
+#endif /* _SURFACEGETORIENTATIONCOMMAND_H_ */

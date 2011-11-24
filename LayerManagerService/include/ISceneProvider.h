@@ -20,8 +20,7 @@
 #ifndef _ISCENE_PROVIDER_H_
 #define _ISCENE_PROVIDER_H_
 
-#include <string>
-
+class ICommandExecutor;
 
 /**
  * Abstract Base Class for all Scene Providers to setup a inital layer Scenary
@@ -30,7 +29,7 @@ class ISceneProvider
 {
 public:
     /**
-     * constructor: any sceneprovide need a executor for commands
+     * constructor: any sceneprovider need a executor for commands
      * @param executor Pointer to an object to send commands to
      */
     ISceneProvider(ICommandExecutor* executor);
@@ -49,4 +48,5 @@ inline ISceneProvider::ISceneProvider(ICommandExecutor* executor)
 : m_executor(executor)
 {
 }
+
 #endif /* _ISCENE_PROVIDER_H_ */
