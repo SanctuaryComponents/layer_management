@@ -161,7 +161,7 @@ void X11WindowSystem::printDebug(){
             debugmessage << "                        " << std::setw(4) << (*surfaceIter)->getID() << " " << std::setprecision(3) << (*surfaceIter)->opacity<< " " << std::setw(3) << src.x << " " << std::setw(3) << src.y << " " << std::setw(3) << src.width << " " << std::setw(3) << src.height << " " << std::setw(3) << dest.x << " " << std::setw(3) << dest.y << " " << std::setw(3) << dest.width << " " << std::setw(3) << dest.height  << "\n";
         }
     }
-    LOG_INFO("X11WindowSystem",debugmessage.str());
+    LOG_DEBUG("X11WindowSystem",debugmessage.str());
 }
 
 Window * getListOfAllTopLevelWindows (Display *disp, unsigned int *len)
@@ -849,7 +849,7 @@ init_complete:
 #endif
 	}
 	this->cleanup();
-	LOG_INFO("X11WindowSystem", "Renderer thread finished");
+	LOG_DEBUG("X11WindowSystem", "Renderer thread finished");
 	return NULL;
 }
 
@@ -911,7 +911,7 @@ void X11WindowSystem::signalRedrawEvent()
 }
 
 void X11WindowSystem::cleanup(){
-    LOG_INFO("X11WindowSystem", "Cleanup");
+    LOG_DEBUG("X11WindowSystem", "Cleanup");
     if (None != CompositorWindow)
     {
         Window root = RootWindow(x11Display, 0);
@@ -950,7 +950,7 @@ bool X11WindowSystem::init(BaseGraphicSystem<Display*,Window>* base)
     while (!m_initialized)
     {
         usleep(10000); // TODO
-        LOG_INFO("X11WindowSystem","Waiting start complete " << m_initialized);
+        LOG_DEBUG("X11WindowSystem","Waiting start complete " << m_initialized);
     }
     LOG_INFO("X11WindowSystem","Start complete " << m_initialized << " success " << m_success);
     return m_success;
@@ -959,7 +959,7 @@ bool X11WindowSystem::init(BaseGraphicSystem<Display*,Window>* base)
 bool X11WindowSystem::start()
 {
     bool result = true;
-    LOG_INFO("X11WindowSystem", "Starting / Creating thread");
+    LOG_DEBUG("X11WindowSystem", "Starting / Creating thread");
     // let thread actually run
     if ( m_xerror == false )
     {

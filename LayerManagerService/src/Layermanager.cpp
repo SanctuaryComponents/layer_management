@@ -205,7 +205,7 @@ void Layermanager::printDebugInformation() const
 bool Layermanager::executeCommand(ICommand* commandToBeExecuted)
 {
     ExecutionResult status = ExecutionFailed;
-    LOG_INFO("Layermanager", "executing command: " << commandToBeExecuted->getString());
+    LOG_INFO("Layermanager", "executing " << commandToBeExecuted->getString());
     m_pScene->lockScene();
     status = commandToBeExecuted->execute(this);
     m_pScene->unlockScene();
@@ -222,7 +222,7 @@ bool Layermanager::executeCommand(ICommand* commandToBeExecuted)
 
 bool Layermanager::enqueueCommand(ICommand* commandToBeExecuted)
 {
-    LOG_INFO("Layermanager", "add command to queue: " << commandToBeExecuted->getString());
+    LOG_DEBUG("Layermanager", "add command to queue: " << commandToBeExecuted->getString());
     m_pScene->lockScene();
     m_pScene->m_toBeCommittedList.push_back(commandToBeExecuted);
     m_pScene->unlockScene();
@@ -302,7 +302,7 @@ bool Layermanager::delegateScene()
     }
     if (!allStarted)
     {
-        LOG_WARNING("LayerManager","Could not start delegate Scenes, inital Scene is lost");
+        LOG_WARNING("LayerManager","Could not start delegate Scenes, initial Scene is lost");
     }
     return allStarted;
 }

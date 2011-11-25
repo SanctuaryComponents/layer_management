@@ -36,7 +36,7 @@ ExecutionResult CommitCommand::execute(ICommandExecutor* executor)
         ICommand* command = (*iter);
         if (command)
         {
-            LOG_INFO("CommitCommand", "executing command: " << command->getString());
+            LOG_INFO("CommitCommand", "executing " << command->getString());
             ExecutionResult result = command->execute(executor);
 
             if (result == ExecutionFailed || result == ExecutionFailedRedraw)

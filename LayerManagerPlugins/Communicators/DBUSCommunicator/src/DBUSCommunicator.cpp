@@ -140,11 +140,11 @@ void DBUSCommunicator::setdebug(bool onoff)
 
 bool DBUSCommunicator::start()
 {
-    LOG_INFO("DBUSCommunicator", "Starting up dbus connector");
+	LOG_DEBUG("DBUSCommunicator", "Starting up dbus connector");
 
     g_pDbusMessage = new DBUSMessageHandler();
 
-    LOG_INFO("DBUSCommunicator","registering for dbus path " << DBUS_SERVICE_OBJECT_PATH);
+    LOG_DEBUG("DBUSCommunicator","registering for dbus path " << DBUS_SERVICE_OBJECT_PATH);
     bool registered = g_pDbusMessage->registerPathFunction(DBUSCommunicator::processMessageFunc,
     		                                               DBUSCommunicator::unregisterMessageFunc,
     		                                               this);
@@ -1878,7 +1878,7 @@ void DBUSCommunicator::SetUniforms(DBusConnection* conn, DBusMessage* msg)
 DBusHandlerResult DBUSCommunicator::delegateMessage(DBusConnection* conn, DBusMessage* msg) 
 {
     DBusHandlerResult result = DBUS_HANDLER_RESULT_HANDLED;
-    LOG_INFO("DBUSCommunicator","message received");
+    LOG_DEBUG("DBUSCommunicator","message received");
     const char *n = dbus_message_get_member(msg);
     bool found = false;
     int i = 0;
@@ -1888,9 +1888,9 @@ DBusHandlerResult DBUSCommunicator::delegateMessage(DBusConnection* conn, DBusMe
         if (n && strcmp(manager_methods[i].name, n) == 0)
         {
             MethodTable entry = manager_methods[i];
-            LOG_INFO("DBUSCommunicator","got call for method:" << entry.name);
+            LOG_DEBUG("DBUSCommunicator","got call for method:" << entry.name);
             CallBackMethod m = entry.function;
-            LOG_INFO("DBUSCommunicator","enter method");
+            LOG_DEBUG("DBUSCommunicator","enter method");
             (this->*m)(conn, msg);
             found = true;
         }
@@ -1899,7 +1899,7 @@ DBusHandlerResult DBUSCommunicator::delegateMessage(DBusConnection* conn, DBusMe
 
     if (dbus_message_is_method_call(msg, DBUS_INTERFACE_INTROSPECTABLE, "Introspect"))
     {
-        LOG_INFO("DBUSCommunicator", "Introspection called");
+    	LOG_DEBUG("DBUSCommunicator", "Introspection called");
         DBUSIntrospection introspectionString(manager_methods);
         introspectionString.process(conn, msg);
         g_pDbusMessage->setConnection(conn);

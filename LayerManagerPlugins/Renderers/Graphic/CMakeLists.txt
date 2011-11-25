@@ -115,10 +115,10 @@ file(GLOB GRAPHIC_TRANSFORM_INCLUDES
 
 endif(WITH_GLX_LIB)
 
-if (WITH_TESTS)
-    enable_testing()
-    add_subdirectory (tests)
-endif(WITH_TESTS)
+#if (WITH_TESTS)
+#    enable_testing()
+#    add_subdirectory (tests)
+#endif(WITH_TESTS)
 
 add_library(${GRAPHIC_LIB_NAME} SHARED ${SOURCES})
 
