@@ -112,7 +112,7 @@ void DBUSMessageHandler::closeReply()
         LOG_ERROR("DBUSCommunicator", "Out Of Memory!");
         exit(1);
     }
-    LOG_INFO("DBUSCommunicator", "sending reply");
+    LOG_DEBUG("DBUSCommunicator", "sending reply");
     dbus_connection_flush(m_pConnection);
 
     // free the reply
