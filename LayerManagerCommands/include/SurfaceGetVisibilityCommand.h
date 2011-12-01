@@ -35,7 +35,7 @@ private:
     bool* m_pVisibility;
 
     // for unit testing
-    //template <typename id_type, typename type_type> friend class GetVisibilityCommandEqMatcherP2;
+    template <typename id_type> friend class SurfaceGetVisibilityCommandEqMatcherP;
 };
 
 

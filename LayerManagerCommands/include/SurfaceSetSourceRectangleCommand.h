@@ -38,7 +38,7 @@ private:
     const unsigned int m_height;
 
     // for unit testing
-    //template <typename id_type, typename typeToSet_type, typename x_type, typename y_type, typename width_type, typename height_type> friend class SetSourceRectangleCommandEqMatcherP6;
+    template <typename id_type, typename x_type, typename y_type, typename width_type, typename height_type> friend class SurfaceSetSourceRectangleCommandEqMatcherP5;
 };
 
 

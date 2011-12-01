@@ -35,6 +35,8 @@ public:
 
     GraphicalSurface(int externalId,ObjectType type);
 
+    virtual ~GraphicalSurface() {}
+
     /**
      * Set Orientation value
      * @param orientation the new value. Multiples of 90 degrees. (0->0°, 1->90°, 2->180°,3->279°)

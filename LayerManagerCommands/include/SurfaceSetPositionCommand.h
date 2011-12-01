@@ -36,7 +36,7 @@ private:
     const unsigned int m_y;
 
     // for unit testing
-    //template <typename id_type, typename typeToSet_type, typename x_type, typename y_type> friend class SetPositionCommandEqMatcherP4;
+    template <typename id_type, typename x_type, typename y_type> friend class SurfaceSetPositionCommandEqMatcherP3;
 };
 
 

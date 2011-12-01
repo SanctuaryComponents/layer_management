@@ -29,7 +29,8 @@ link_directories ("${PROJECT_SOURCE_DIR}/LayerManagerUtils/bin")
 link_directories ("${PROJECT_SOURCE_DIR}/LayerManagerCommands")
 
 # generate version header file, used in main.cpp
-message("-- Generating Version.h header file")
+message(STATUS "Generating Version.h header file:")
+message(STATUS "-- version = ${ILM_VERSION}")
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/include/Version.h.in
     ${CMAKE_CURRENT_SOURCE_DIR}/include/Version.h

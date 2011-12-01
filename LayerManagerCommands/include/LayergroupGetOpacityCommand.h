@@ -36,7 +36,7 @@ private:
     double* m_pReturnOpacity;
 
     // for unit testing
-    //template <typename id_type, typename type_type> friend class GetOpacityCommandEqMatcherP2;
+    template <typename id_type> friend class LayergroupGetOpacityCommandEqMatcherP;
 };
 
 

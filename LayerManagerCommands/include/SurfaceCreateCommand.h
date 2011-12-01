@@ -39,7 +39,7 @@ private:
     uint* m_idReturn;
 
     // for unit testing
-    //template <typename nativeHandle_type, typename OriginalWidth_type, typename OriginalHeight_type, typename createType_type, typename pixelformat_type> friend class CreateCommandEqMatcherP5;
+    template <typename nativeHandle_type, typename pixelformat_type, typename OriginalWidth_type, typename OriginalHeight_type> friend class SurfaceCreateCommandEqMatcherP4;
 };
 
 

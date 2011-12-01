@@ -51,7 +51,7 @@ class Scene: public IScene
 
 public:
     Scene();
-    ~Scene();
+    virtual ~Scene();
 
     virtual Layer* createLayer(const uint id);
     virtual Surface *createSurface(const uint id);

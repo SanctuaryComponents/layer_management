@@ -38,6 +38,8 @@ public:
     Layer();
     Layer(int id);
 
+    virtual ~Layer() {}
+
     LayerType getLayerType() const;
     void setLayerType(LayerType lt);
     void setLayerCapabilities(unsigned int newCapabilities);

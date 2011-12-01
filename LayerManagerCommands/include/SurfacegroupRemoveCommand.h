@@ -34,7 +34,7 @@ private:
     const unsigned int m_idToRemove;
 
     // for unit testing
-    //template<typename idToRemove_type, typename typeToRemove_type> friend class RemoveCommandEqMatcherP2;
+    template<typename idToRemove_type> friend class SurfacegroupRemoveCommandEqMatcherP;
 };
 
 #endif /* _SURFACEGROUPREMOVECOMMAND_H_ */

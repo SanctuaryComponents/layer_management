@@ -36,7 +36,7 @@ private:
     unsigned int* m_pHeight;
 
     // for unit testing
-    //template <typename id_type, typename type_type> friend class GetDimensionCommandEqMatcherP2;
+    template <typename id_type> friend class SurfaceGetDimensionCommandEqMatcherP;
 };
 
 #endif /* _SURFACEGETDIMENSIONCOMMAND_H_ */

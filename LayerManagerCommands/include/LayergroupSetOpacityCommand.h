@@ -35,7 +35,7 @@ private:
     const double m_opacity;
 
     // for unit testing
-    //template <typename id_type, typename type_type, typename Opacity_type> friend class SetOpacityCommandEqMatcherP3;
+    template <typename id_type, typename Opacity_type> friend class LayergroupSetOpacityCommandEqMatcherP2;
 };
 
 

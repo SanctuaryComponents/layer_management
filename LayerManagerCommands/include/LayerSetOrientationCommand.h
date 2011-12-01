@@ -36,7 +36,7 @@ private:
     const OrientationType m_orientation;
 
     // for unit testing
-    //template <typename id_type, typename type_type, typename Orientation_type> friend class SetOrientationCommandEqMatcherP3;
+    template <typename id_type, typename Orientation_type> friend class LayerSetOrientationCommandEqMatcherP2;
 };
 
 

@@ -35,7 +35,7 @@ set(LIBS ${LIBS} ${DBUS_LIBRARY} ${CMAKE_THREAD_LIBS_INIT} LayerManagerUtils)
 
 file(GLOB LM_SOURCES "${PROJECT_SOURCE_DIR}/LayerManagerService/src/Scene.cpp"
                      "${PROJECT_SOURCE_DIR}/LayerManagerService/src/Layermanager.cpp"
-                     "${PROJECT_SOURCE_DIR}/LayerManagerService/src/LogicalGraphicsObject.cpp"
+                     "${PROJECT_SOURCE_DIR}/LayerManagerService/src/GraphicalObject.cpp"
                      "${PROJECT_SOURCE_DIR}/LayerManagerService/src/GraphicalSurface.cpp"
                      "${PROJECT_SOURCE_DIR}/LayerManagerService/src/shader/*.cpp"
                      "${PROJECT_SOURCE_DIR}/LayerManagerService/src/commands/*.cpp")

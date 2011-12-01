@@ -36,7 +36,7 @@ private:
     PixelFormat* m_pFormatreturn;
 
     // for unit testing
-    //template <typename id_type, typename type_type> friend class GetPixelformatCommandEqMatcherP2;
+    template <typename id_type> friend class SurfaceGetPixelformatCommandEqMatcherP;
 };
 
 #endif /* _SURFACEGETPIXELFORMATCOMMAND_H_ */

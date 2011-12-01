@@ -35,7 +35,7 @@ private:
     const bool m_visibility;
 
     // for unit testing
-    //template <typename id_type, typename otype_type, typename visibility_type> friend class SetVisibilityCommandEqMatcherP3;
+    template <typename id_type, typename visibility_type> friend class SurfacegroupSetVisibilityCommandEqMatcherP2;
 };
 
 

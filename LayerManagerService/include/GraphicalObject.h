@@ -35,6 +35,8 @@ public:
 
 	GraphicalObject(int externalId,ObjectType type, double opacity, bool visibility);
 
+	virtual ~GraphicalObject() {}
+
     /**
      * @brief Set alpha value
      * @param alpha The new Alpha Value between 0.0 (full transparency) and 1.0 (fully visible)

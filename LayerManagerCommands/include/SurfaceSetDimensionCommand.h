@@ -36,7 +36,7 @@ private:
     const unsigned int m_height;
 
     // for unit testing
-    //template <typename id_type, typename typeToSet_type, typename width_type, typename height_type> friend class SetDimensionCommandEqMatcherP4;
+    template <typename id_type, typename width_type, typename height_type> friend class SurfaceSetDimensionCommandEqMatcherP3;
 };
 
 
