@@ -34,24 +34,42 @@ class Surface: public GraphicalSurface
 public:
     PixelFormat getPixelFormat() const
     {
-        return pixformat;
+        return m_pixformat;
     }
 
     void setPixelFormat(PixelFormat pf)
     {
-        pixformat = pf;
+        m_pixformat = pf;
     }
 
     unsigned int getContainingLayerId() const
     {
-        return layerId;
+        return m_layerId;
     }
 
     void setContainingLayerId(unsigned int id)
     {
-        layerId = id;
+        m_layerId = id;
     }
 
+    bool hasNativeContent() const
+    {
+        return m_hasNativeContent;
+    }
+
+    void setNativeContent(long nativeHandle)
+    {
+        if (!hasNativeContent())
+        {
+            m_nativeHandle = nativeHandle;
+            m_hasNativeContent = true;
+        }
+    }
+
+    long getNativeContent() const
+    {
+        return hasNativeContent() ? m_nativeHandle : -1;
+    }
 
     /**
      * Platform specific Object containing surface information specific to a used platform.
@@ -59,23 +77,34 @@ public:
      * by a specific renderer.unsigned
      */
     PlatformSurface *platform; // platform/rendering specific window attributes
-    long nativeHandle;
 
     int frameCounter;
+
 private:
-    Surface() :
-        GraphicalSurface(TypeSurface), platform(NULL), frameCounter(0)
+    Surface()
+    : GraphicalSurface(TypeSurface)
+    , platform(NULL)
+    , frameCounter(0)
+    , m_layerId(INVALID_ID)
+    , m_hasNativeContent(false)
     {
-        layerId = INVALID_ID;
     }
-    Surface(int id) :
-        GraphicalSurface(id, TypeSurface), platform(NULL), frameCounter(0)
+
+    Surface(int id)
+    : GraphicalSurface(id, TypeSurface)
+    , platform(NULL)
+    , frameCounter(0)
+    , m_layerId(INVALID_ID)
+    , m_hasNativeContent(false)
     {
-        layerId = INVALID_ID;
     }
+
     friend class Scene;
-    PixelFormat pixformat;
-    unsigned int layerId;
+
+    long m_nativeHandle;
+    PixelFormat m_pixformat;
+    unsigned int m_layerId;
+    bool m_hasNativeContent;
 };
 
 #endif /* _SURFACE_H_ */

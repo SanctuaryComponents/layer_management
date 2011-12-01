@@ -71,12 +71,12 @@ bool X11EglImage::unbindSurfaceTexture(Surface* surface)
 
 void X11EglImage::createClientBuffer(Surface* surface)
 {
-    LOG_DEBUG("X11EglImage", "creating client buffer with native display: " << m_x11display << " for native handle: " << surface->nativeHandle);
+    LOG_DEBUG("X11EglImage", "creating client buffer with native display: " << m_x11display << " for native handle: " << surface->getNativeContent());
     EglXPlatformSurface* nativeSurface = (EglXPlatformSurface*)surface->platform;
     if (NULL!=nativeSurface)
     {
         Pixmap windowPixmap = 0;
-        windowPixmap= XCompositeNameWindowPixmap (m_x11display, surface->nativeHandle);
+        windowPixmap= XCompositeNameWindowPixmap (m_x11display, surface->getNativeContent());
         if (windowPixmap==0)
         {
             LOG_ERROR("X11EglImage", "didnt create pixmap!");

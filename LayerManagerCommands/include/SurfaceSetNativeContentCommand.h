@@ -17,23 +17,30 @@
 *
 ****************************************************************************/
 
-#ifndef _SURFACECREATECOMMAND_H_
-#define _SURFACECREATECOMMAND_H_
+#ifndef _SURFACESETNATIVECONTENTCOMMAND_H_
+#define _SURFACESETNATIVECONTENTCOMMAND_H_
 
 #include "BaseCommandSynchronous.h"
 #include "PixelFormat.h"
 #include "IScene.h"
 
-class SurfaceCreateCommand : public BaseCommandSynchronous
+class SurfaceSetNativeContentCommand : public BaseCommandSynchronous
 {
 public:
-	SurfaceCreateCommand(uint* idReturn);
+    SurfaceSetNativeContentCommand(unsigned int surfaceId, unsigned int handle, PixelFormat pixelformat, uint OriginalWidth, uint OriginalHeight);
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();
 
 private:
-    uint* m_idReturn;
+    uint m_surfaceId;
+    const unsigned int m_nativeHandle;
+    const PixelFormat m_pixelformat;
+    uint m_originalWidth;
+    uint m_originalHeight;
+
+    // for unit testing
+    //template <typename nativeHandle_type, typename pixelformat_type, typename OriginalWidth_type, typename OriginalHeight_type> friend class SurfaceSetRenderBufferCommandEqMatcherP4;
 };
 
 
-#endif /* _SURFACECREATECOMMAND_H_ */
+#endif /* _SURFACESETNATIVECONTENTCOMMAND_H_ */

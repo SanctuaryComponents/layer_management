@@ -183,14 +183,16 @@ TEST_F(DBUSCommunicatorTest, getPropertiesOflayer) {
     EXPECT_CALL(this->layerlist, getLayer(Eq(876u) )).Times(1);
     system((DBUSCOMMAND + std::string("GetPropertiesOfLayer uint32:876")).c_str());
 }
-
+/*
 MATCHER_P4(SurfaceCreateCommandEq, nativeHandle, OriginalWidth, OriginalHeight, pixelformat, "%(*)s"){
     return ((SurfaceCreateCommand*)arg)->m_nativeHandle == nativeHandle
         && ((SurfaceCreateCommand*)arg)->m_originalHeight == OriginalHeight
         && ((SurfaceCreateCommand*)arg)->m_originalWidth == OriginalWidth
         && ((SurfaceCreateCommand*)arg)->m_pixelformat == pixelformat;
 }
+*/
 
+/*
 TEST_F(DBUSCommunicatorTest, CreateSurface) {
 
     EXPECT_CALL(this->mockCommandExecutor, execute( SurfaceCreateCommandEq(44u,33u,22u,PIXELFORMAT_RGBA8888))).Times(1);
@@ -199,6 +201,7 @@ TEST_F(DBUSCommunicatorTest, CreateSurface) {
     EXPECT_CALL(this->mockCommandExecutor, execute( SurfaceCreateCommandEq(404u,303u,0u,PIXELFORMAT_RGB888))).Times(1);
     system((DBUSCOMMAND + std::string("CreateSurface uint32:404 uint32:303 uint32:0 uint32:1 ")).c_str());
 }
+*/
 
 MATCHER_P2(LayerCreateCommandEq, OriginalWidth, OriginalHeight, "%(*)s"){
     return ((LayerCreateCommand*)arg)->m_originalHeight == OriginalHeight

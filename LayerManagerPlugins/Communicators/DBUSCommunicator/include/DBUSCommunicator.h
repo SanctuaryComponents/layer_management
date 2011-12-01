@@ -82,6 +82,7 @@
 #include "ScreenDumpCommand.h"
 #include "LayerDumpCommand.h"
 #include "SurfaceDumpCommand.h"
+#include "SurfaceSetNativeContentCommand.h"
 
 #include <dbus/dbus.h>
 #include "DBUSTypes.h"
@@ -114,6 +115,7 @@ public:
     void GetPropertiesOfLayer(DBusConnection* conn, DBusMessage* msg);
     void CreateSurface(DBusConnection* conn, DBusMessage* msg);
     void CreateSurfaceFromId(DBusConnection* conn, DBusMessage* msg);
+    void SetSurfaceNativeContent(DBusConnection* conn, DBusMessage* msg);
     void RemoveSurface(DBusConnection* conn, DBusMessage* msg);
     void CreateLayer(DBusConnection* conn, DBusMessage* msg);
     void CreateLayerFromId(DBusConnection* conn, DBusMessage* msg);

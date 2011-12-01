@@ -191,7 +191,7 @@ Surface* X11WindowSystem::getSurfaceForWindow(Window w)
         {
             continue;
         }
-        if (currentSurface->nativeHandle == static_cast<int>(w))
+        if (currentSurface->getNativeContent() == static_cast<int>(w))
         {
                 return currentSurface;
         }
@@ -385,13 +385,13 @@ XLowerWindow(x11Display,window);
 //XMoveWindow(x11Display,window,-1000,-1000);
 		//		Surface* s = layerlist->createSurface();
 
-        surface->nativeHandle = window;
+        surface->setNativeContent(window);
         XPlatformSurface * platformSurface = (XPlatformSurface*)graphicSystem->getTextureBinder()->createPlatformSurface(surface);
         platformSurface->isMapped = false;
 
         LOG_DEBUG("X11WindowSystem", "Created native Surface for X11 Window id " << window);
 
-        surface->nativeHandle = window;
+        surface->setNativeContent(window);
         surface->platform = platformSurface;
 /*      surface->visibility = false; */
 
@@ -989,8 +989,8 @@ void X11WindowSystem::allocatePlatformSurface(Surface* surface)
     {
         /*LOG_INFO("X11WindowSystem","creating native surface for new window");*/
         // this surface does not have a native platform surface attached yet!
-        NewWindow(surface,surface->nativeHandle);
-        MapWindow(surface->nativeHandle);
+        NewWindow(surface, surface->getNativeContent());
+        MapWindow(surface->getNativeContent());
     }
 }
 
