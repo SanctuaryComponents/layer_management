@@ -31,6 +31,7 @@
 #include "Log.h"
 #include <getopt.h>
 #include <libgen.h> // basename
+#include <signal.h>
 
 #include <list>
 using std::list;
@@ -68,6 +69,8 @@ const char* USAGE_DESCRIPTION = "Usage:\t LayerManagerService [options]\n"
                                 "\t-c: loglevel console \t 2 [default] \n\t\t\t\t[0=disabled,1=error,2=info,3=warning,4=debug]\n"
                                 "\t-v: show version info\t\n"
                                 "\nexample: LayerManagerService -w800 -h480 -d:0\n";
+
+bool g_LayerManagerRunning;
 
 template<class T>
 T* getCreateFunction(string libname)
@@ -339,6 +342,25 @@ void loadRendererPlugins(RendererList& rendererList, IScene* pScene)
     }
 }
 
+void signalHandler(int sig)
+{
+    switch (sig)
+    {
+    case SIGTERM:
+        g_LayerManagerRunning = false;
+        LOG_INFO("LayerManagerService", "Signal SIGTERM received. Shutting down.");
+        break;
+
+    case SIGINT:
+        g_LayerManagerRunning = false;
+        LOG_INFO("LayerManagerService", "Signal SIGINT received. Shutting down.");
+        break;
+
+    default:
+        LOG_INFO("LayerManagerService", "Signal " << sig << " received.");
+    }
+}
+
 int main(int argc, char **argv)
 {
     parseCommandLine(argc, (char**) argv);
@@ -403,7 +425,13 @@ int main(int argc, char **argv)
 
     // must stay within main method or else application would completely exit
     LOG_INFO("LayerManagerService", "Startup complete. EnterMainloop");
-    while (true)
+
+    // setup signal handler and global flag to handle shutdown
+    g_LayerManagerRunning = true;
+    signal(SIGTERM, signalHandler);
+    signal(SIGINT, signalHandler);
+
+    while (g_LayerManagerRunning)
     {
         CommunicatorListIterator commIter = communicatorList.begin();
         CommunicatorListIterator commIterEnd = communicatorList.end();
@@ -416,6 +444,10 @@ int main(int argc, char **argv)
 
     // cleanup
     cleanup:
+
+    // reset signal handling to default
+    signal(SIGTERM, SIG_DFL);
+    signal(SIGINT, SIG_DFL);
 
     LOG_INFO("LayerManagerService", "Exiting Application.");
     pManager->stopManagement();
