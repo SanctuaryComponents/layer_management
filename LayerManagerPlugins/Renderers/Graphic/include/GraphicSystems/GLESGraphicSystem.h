@@ -40,10 +40,10 @@ public:
 
     virtual void swapBuffers();
 
-	virtual void beginLayer(Layer* layer);
-	virtual void checkRenderLayer();
-	virtual void renderLayer();
-	virtual void endLayer();
+    virtual void beginLayer(Layer* layer);
+    virtual void checkRenderLayer();
+    virtual void renderLayer();
+    virtual void endLayer();
 
     virtual bool initOpenGLES(EGLint displayWidth, EGLint displayHeight);
     virtual void resize(EGLint displayWidth, EGLint displayHeight);
@@ -56,7 +56,7 @@ public:
     }
 
     virtual void renderSurface(Surface* surface);
-	virtual Shader *pickOptimizedShader(Shader* currentShader, const ShaderProgram::CommonUniforms curUniforms);
+    virtual Shader *pickOptimizedShader(Shader* currentShader, const ShaderProgram::CommonUniforms curUniforms);
 
 protected:
     int m_windowWidth;

@@ -156,56 +156,56 @@ void GLESGraphicsystem::beginLayer(Layer* currentLayer)
 
 void GLESGraphicsystem::checkRenderLayer()
 {
-	SurfaceList surfaces = m_currentLayer->getAllSurfaces();
+    SurfaceList surfaces = m_currentLayer->getAllSurfaces();
 
-	m_currentLayer->damaged = false;
+    m_currentLayer->damaged = false;
 
-	if (!m_baseWindowSystem->m_damaged)
-	{
-		if (m_currentLayer->renderPropertyChanged)
-		{
-			m_currentLayer->damaged = true;
-		}
-		else if ((m_currentLayer)->visibility && (m_currentLayer)->opacity > 0.0)
-		{
-			for(std::list<Surface*>::const_iterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++)
-			{
-				if ((*currentS)->renderPropertyChanged)
-				{
-					m_currentLayer->damaged = true;
-					break;
-				}
-				else if ((*currentS)->damaged && (*currentS)->visibility && (*currentS)->opacity>0.0f)
-				{
-					m_currentLayer->damaged = true;
-					break;
-				}
-			}
-		}
-	}
+    if (!m_baseWindowSystem->m_damaged)
+    {
+        if (m_currentLayer->renderPropertyChanged)
+        {
+            m_currentLayer->damaged = true;
+        }
+        else if ((m_currentLayer)->visibility && (m_currentLayer)->opacity > 0.0)
+        {
+            for(std::list<Surface*>::const_iterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++)
+            {
+                if ((*currentS)->renderPropertyChanged)
+                {
+                    m_currentLayer->damaged = true;
+                    break;
+                }
+                else if ((*currentS)->hasNativeContent() && (*currentS)->damaged && (*currentS)->visibility && (*currentS)->opacity>0.0f)
+                {
+                    m_currentLayer->damaged = true;
+                    break;
+                }
+            }
+        }
+    }
 
-	for(std::list<Surface*>::const_iterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++)
-	{
-		(*currentS)->damaged = false;
-		(*currentS)->renderPropertyChanged = false;
-	}
+    for(std::list<Surface*>::const_iterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++)
+    {
+        (*currentS)->damaged = false;
+        (*currentS)->renderPropertyChanged = false;
+    }
 
-	m_currentLayer->renderPropertyChanged = false;
+    m_currentLayer->renderPropertyChanged = false;
 
-	if (m_currentLayer->damaged)
-	{
-		m_baseWindowSystem->m_damaged = true;
-	}
+    if (m_currentLayer->damaged)
+    {
+        m_baseWindowSystem->m_damaged = true;
+    }
 }
 
 void GLESGraphicsystem::renderLayer()
 {
-	if ( (m_currentLayer)->visibility && (m_currentLayer)->opacity > 0.0 ) 
+    if ( (m_currentLayer)->visibility && (m_currentLayer)->opacity > 0.0 ) 
     {
         SurfaceList surfaces = m_currentLayer->getAllSurfaces();
         for(std::list<Surface*>::const_iterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++)
         {
-            if ((*currentS)->visibility && (*currentS)->opacity>0.0f)
+            if ((*currentS)->hasNativeContent() && (*currentS)->visibility && (*currentS)->opacity>0.0f)
             {
                 Surface* currentSurface = (Surface*)*currentS;
                 renderSurface(currentSurface);
