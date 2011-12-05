@@ -18,7 +18,7 @@
  ****************************************************************************/
 
 #include "Layermanager.h"
-#include "Version.h"
+#include "CmakeConfiguration.h"
 #include "IRenderer.h"
 #include "ICommunicator.h"
 #include "ISceneProvider.h"
@@ -150,12 +150,12 @@ void parseCommandLine(int argc, char **argv)
             }
             break;
         case 'v':
-            printf("LayerManagerService\nVersion: %s\n",VERSION_STRING);            
+            printf("LayerManagerService\nVersion: %s\n", ILM_VERSION);
             exit(-1);
             break;
         case '?':   
         default:
-            printf("LayerManagerService\nVersion: %s\n",VERSION_STRING);
+            printf("LayerManagerService\nVersion: %s\n", ILM_VERSION);
             puts(USAGE_DESCRIPTION);
             exit(-1);
         }
@@ -365,8 +365,10 @@ int main(int argc, char **argv)
 {
     parseCommandLine(argc, (char**) argv);
     char* pluginLookupPath = getenv("LM_PLUGIN_PATH");
-    LOG_INFO("LayerManagerService", "Starting Layermanager - " << VERSION_STRING << " .");
-    
+    LOG_INFO("LayerManagerService", "Starting Layermanager.");
+
+    printCmakeConfiguration();
+
     if  (pluginLookupPath != NULL ) 
     {
         gPluginLookupPath = pluginLookupPath;

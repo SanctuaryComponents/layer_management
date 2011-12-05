@@ -36,6 +36,14 @@ configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/include/Version.h
 )
 
+# generate cmake configuration header file, includes information on the
+# project configuration, compiler settings, ...
+message(STATUS "Generating CmakeConfiguration.h header file with build system configuration.")
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/CmakeConfiguration.h.in
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/CmakeConfiguration.h
+)
+
 file(GLOB LM_SOURCES src/*.cpp src/shader/*.cpp)
 file(GLOB LM_INCLUDES include/*.h)
 

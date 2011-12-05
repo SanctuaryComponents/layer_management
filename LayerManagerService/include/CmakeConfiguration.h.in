@@ -1,0 +1,73 @@
+/***************************************************************************
+ *
+ * Copyright 2010,2011 BMW Car IT GmbH
+ *
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ ****************************************************************************/
+#ifndef _CMAKECONFIGURATION_H_
+#define _CMAKECONFIGURATION_H_
+
+#include "Log.h"
+
+// Auto-generated. Do not modify.
+// Variables configured by CMake build system
+
+//-----------------------------------------------------------------------------
+// string variables
+//-----------------------------------------------------------------------------
+const char* ILM_VERSION          = "${ILM_VERSION}";
+const char* CMAKE_BUILD_TYPE     = "${CMAKE_BUILD_TYPE}";
+const char* CMAKE_CXX_FLAGS      = "${CMAKE_CXX_FLAGS}";
+const char* CMAKE_INSTALL_PREFIX = "${CMAKE_INSTALL_PREFIX}";
+
+//-----------------------------------------------------------------------------
+// build flags
+//-----------------------------------------------------------------------------
+#cmakedefine WITH_CLIENTEXAMPLES
+#cmakedefine WITH_DESKTOP
+#cmakedefine WITH_EGL_EXAMPLE
+#cmakedefine WITH_FORCE_COPY
+#cmakedefine WITH_GLESv2_LIB
+#cmakedefine WITH_GLX_EXAMPLE
+#cmakedefine WITH_GLX_LIB
+#cmakedefine WITH_INPUT_EVENTS
+#cmakedefine WITH_TESTS
+#cmakedefine WITH_X11_GLES
+#cmakedefine WITH_XTHREADS
+
+//-----------------------------------------------------------------------------
+// human readable report
+//-----------------------------------------------------------------------------
+void printCmakeConfiguration(void)
+{
+    LOG_INFO ("CmakeConfiguration", "LayerManager Version = " << ILM_VERSION);
+    LOG_DEBUG("CmakeConfiguration", "Build Type           = " << CMAKE_BUILD_TYPE);
+    LOG_DEBUG("CmakeConfiguration", "Compiler Flags       = " << CMAKE_CXX_FLAGS);
+    LOG_DEBUG("CmakeConfiguration", "Install Prefix       = " << CMAKE_INSTALL_PREFIX);
+
+    LOG_DEBUG("CmakeConfiguration", "WITH_CLIENTEXAMPLES  = ${WITH_CLIENTEXAMPLES}");
+    LOG_DEBUG("CmakeConfiguration", "WITH_DESKTOP         = ${WITH_DESKTOP}");
+    LOG_DEBUG("CmakeConfiguration", "WITH_EGL_EXAMPLE     = ${WITH_EGL_EXAMPLE}");
+    LOG_DEBUG("CmakeConfiguration", "WITH_FORCE_COPY      = ${WITH_FORCE_COPY}");
+    LOG_DEBUG("CmakeConfiguration", "WITH_GLESv2_LIB      = ${WITH_GLESv2_LIB}");
+    LOG_DEBUG("CmakeConfiguration", "WITH_GLX_EXAMPLE     = ${WITH_GLX_EXAMPLE}");
+    LOG_DEBUG("CmakeConfiguration", "WITH_GLX_LIB         = ${WITH_GLX_LIB}");
+    LOG_DEBUG("CmakeConfiguration", "WITH_INPUT_EVENTS    = ${WITH_INPUT_EVENTS}");
+    LOG_DEBUG("CmakeConfiguration", "WITH_TESTS           = ${WITH_TESTS}");
+    LOG_DEBUG("CmakeConfiguration", "WITH_X11_GLES        = ${WITH_X11_GLES}");
+    LOG_DEBUG("CmakeConfiguration", "WITH_XTHREADS        = ${WITH_XTHREADS}");
+}
+
+#endif // _CMAKECONFIGURATION_H_
