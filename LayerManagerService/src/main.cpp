@@ -32,6 +32,7 @@
 #include <getopt.h>
 #include <libgen.h> // basename
 #include <signal.h>
+#include <execinfo.h> // for stacktrace
 
 #include <list>
 using std::list;
@@ -342,6 +343,28 @@ void loadRendererPlugins(RendererList& rendererList, IScene* pScene)
     }
 }
 
+void printStackTrace()
+{
+    const int maxStackSize = 32;
+    void* array[maxStackSize];
+    size_t size;
+    char **strings;
+    size_t count;
+
+    size = backtrace(array, maxStackSize);
+    strings = backtrace_symbols(array, size);
+
+    LOG_ERROR("LayerManagerService", "--------------------------------------------------");
+    for (int i = 0; i < size; ++i)
+    {
+        LOG_ERROR("LayerManagerService", "Stack-Trace [" << i << "]: " << strings[i]);
+    }
+    LOG_ERROR("LayerManagerService", "--------------------------------------------------");
+
+    LOG_DEBUG("LayerManagerService", "Exiting application.")
+    exit(-1);
+}
+
 void signalHandler(int sig)
 {
     switch (sig)
@@ -356,6 +379,18 @@ void signalHandler(int sig)
         LOG_INFO("LayerManagerService", "Signal SIGINT received. Shutting down.");
         break;
 
+    case SIGBUS:
+        g_LayerManagerRunning = false;
+        LOG_ERROR("LayerManagerService", "Signal SIGBUS received. Shutting down.");
+        printStackTrace();
+        break;
+
+    case SIGSEGV:
+        g_LayerManagerRunning = false;
+        LOG_ERROR("LayerManagerService", "Signal SIGSEGV received. Shutting down.");
+        printStackTrace();
+        break;
+
     default:
         LOG_INFO("LayerManagerService", "Signal " << sig << " received.");
     }
@@ -363,6 +398,13 @@ void signalHandler(int sig)
 
 int main(int argc, char **argv)
 {
+    // setup signal handler and global flag to handle shutdown
+    g_LayerManagerRunning = true;
+    signal(SIGBUS, signalHandler);
+    signal(SIGSEGV, signalHandler);
+    signal(SIGTERM, signalHandler);
+    signal(SIGINT, signalHandler);
+
     parseCommandLine(argc, (char**) argv);
     char* pluginLookupPath = getenv("LM_PLUGIN_PATH");
     LOG_INFO("LayerManagerService", "Starting Layermanager.");
@@ -428,11 +470,6 @@ int main(int argc, char **argv)
     // must stay within main method or else application would completely exit
     LOG_INFO("LayerManagerService", "Startup complete. EnterMainloop");
 
-    // setup signal handler and global flag to handle shutdown
-    g_LayerManagerRunning = true;
-    signal(SIGTERM, signalHandler);
-    signal(SIGINT, signalHandler);
-
     while (g_LayerManagerRunning)
     {
         CommunicatorListIterator commIter = communicatorList.begin();
@@ -447,15 +484,17 @@ int main(int argc, char **argv)
     // cleanup
     cleanup:
 
-    // reset signal handling to default
-    signal(SIGTERM, SIG_DFL);
-    signal(SIGINT, SIG_DFL);
-
     LOG_INFO("LayerManagerService", "Exiting Application.");
     pManager->stopManagement();
     //delete pRenderer; TODO
     //delete pCommunicator; TODO
     delete pManager;
+
+    // reset signal handling to default
+    signal(SIGBUS, SIG_DFL);
+    signal(SIGSEGV, SIG_DFL);
+    signal(SIGTERM, SIG_DFL);
+    signal(SIGINT, SIG_DFL);
 
     return (int)started - 1;
 }

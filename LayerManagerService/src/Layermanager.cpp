@@ -123,6 +123,7 @@ void Layermanager::signalRendererRedraw()
 	if (NULL!=renderer)
 		renderer->signalWindowSystemRedraw();
 }
+
 void Layermanager::addRenderer(IRenderer* renderer)
 {
     if (renderer)
@@ -176,7 +177,7 @@ void Layermanager::removeCommunicator(ICommunicator* communicator)
 void Layermanager::printDebugInformation() const
 {
     // print stuff about layerlist
-    LOG_INFO("LayerManager", "Layer: ID |  X |  Y |  W |  H |Al.| Z \n");
+    LOG_INFO("LayerManagerService", "Layer: ID |  X |  Y |  W |  H |Al.| Z \n");
 
     unsigned int length;
     unsigned int* LayerIDs;
@@ -187,9 +188,9 @@ void Layermanager::printDebugInformation() const
     for (unsigned int i = 0; i < length; i++)
     {
         Layer* currentLayer = m_pScene->getLayer(LayerIDs[i]);
-        LOG_INFO("LayerManager", "      " << std::setw(4) << currentLayer->getID() << "\n");
+        LOG_INFO("LayerManagerService", "      " << std::setw(4) << currentLayer->getID() << "\n");
 
-        LOG_INFO("LayerManager", "    Surface:  ID |Al.| Z |  SVP: X |  Y |  W |  H     DVP:  X |  Y |  W |  H \n");
+        LOG_INFO("LayerManagerService", "    Surface:  ID |Al.| Z |  SVP: X |  Y |  W |  H     DVP:  X |  Y |  W |  H \n");
 
         // loop the surfaces of within each layer
         SurfaceListConstIterator iter = currentLayer->getAllSurfaces().begin();
@@ -197,7 +198,7 @@ void Layermanager::printDebugInformation() const
 
         for (; iter != iterEnd; ++iter)
         {
-            LOG_INFO("LayerManager", "            " << std::setw(4) << (*iter)->getID() << std::setw(4) << std::setprecision(3) << (*iter)->opacity << "\n");
+            LOG_INFO("LayerManagerService", "            " << std::setw(4) << (*iter)->getID() << std::setw(4) << std::setprecision(3) << (*iter)->opacity << "\n");
         }
     }
 }
@@ -205,7 +206,7 @@ void Layermanager::printDebugInformation() const
 bool Layermanager::executeCommand(ICommand* commandToBeExecuted)
 {
     ExecutionResult status = ExecutionFailed;
-    LOG_INFO("Layermanager", "executing " << commandToBeExecuted->getString());
+    LOG_INFO("LayerManagerService", "executing " << commandToBeExecuted->getString());
     m_pScene->lockScene();
     status = commandToBeExecuted->execute(this);
     m_pScene->unlockScene();
@@ -222,7 +223,7 @@ bool Layermanager::executeCommand(ICommand* commandToBeExecuted)
 
 bool Layermanager::enqueueCommand(ICommand* commandToBeExecuted)
 {
-    LOG_DEBUG("Layermanager", "add command to queue: " << commandToBeExecuted->getString());
+    LOG_DEBUG("LayerManagerService", "add command to queue: " << commandToBeExecuted->getString());
     m_pScene->lockScene();
     m_pScene->m_toBeCommittedList.push_back(commandToBeExecuted);
     m_pScene->unlockScene();
@@ -248,7 +249,7 @@ bool Layermanager::execute(ICommand* commandToBeExecuted)
 
     default:
         // TODO: error
-        LOG_ERROR("Layermanager", "Command " << commandToBeExecuted->getString() << " was not processed");
+        LOG_ERROR("LayerManagerService", "Command " << commandToBeExecuted->getString() << " was not processed");
         break;
     }
 
@@ -276,7 +277,7 @@ bool Layermanager::startAllRenderers(const int width, const int height,
     }
     if (!allStarted)
     {
-        LOG_ERROR("LayerManager","Could not start Compositing Controllers");
+        LOG_ERROR("LayerManagerService","Could not start Compositing Controllers");
     }
     return allStarted;
 }
@@ -302,7 +303,7 @@ bool Layermanager::delegateScene()
     }
     if (!allStarted)
     {
-        LOG_WARNING("LayerManager","Could not start delegate Scenes, initial Scene is lost");
+        LOG_WARNING("LayerManagerService","Could not start delegate Scenes, initial Scene is lost");
     }
     return allStarted;
 }
@@ -328,7 +329,7 @@ bool Layermanager::startAllCommunicators()
     }
     if (!allStarted)
     {
-        LOG_ERROR("LayerManager","Could not start Communication Controllers");
+        LOG_ERROR("LayerManagerService","Could not start Communication Controllers");
     }
     return allStarted;
 }
