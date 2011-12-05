@@ -26,7 +26,8 @@
 class ShaderSetUniformsCommand : public BaseCommandSynchronous
 {
 public:
-	ShaderSetUniformsCommand(unsigned int shaderid, const std::vector<std::string>& uniforms);
+    ShaderSetUniformsCommand(unsigned int shaderid, const std::vector<std::string>& uniforms);
+    virtual ~ShaderSetUniformsCommand() {}
 
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();

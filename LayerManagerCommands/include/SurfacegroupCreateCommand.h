@@ -26,7 +26,8 @@
 class SurfacegroupCreateCommand : public BaseCommandSynchronous
 {
 public:
-	SurfacegroupCreateCommand(uint* idReturn);
+    SurfacegroupCreateCommand(uint* idReturn);
+    virtual ~SurfacegroupCreateCommand() {}
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();
 

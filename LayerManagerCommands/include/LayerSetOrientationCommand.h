@@ -26,7 +26,8 @@
 class LayerSetOrientationCommand : public BaseCommandAsynchronous
 {
 public:
-	LayerSetOrientationCommand(unsigned int id, OrientationType Orientation);
+    LayerSetOrientationCommand(unsigned int id, OrientationType Orientation);
+    virtual ~LayerSetOrientationCommand() {}
 
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();

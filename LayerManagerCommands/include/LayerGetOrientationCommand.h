@@ -27,7 +27,8 @@
 class LayerGetOrientationCommand: public BaseCommandSynchronous
 {
 public:
-	LayerGetOrientationCommand(int id, OrientationType* orientation);
+    LayerGetOrientationCommand(int id, OrientationType* orientation);
+    virtual ~LayerGetOrientationCommand() {}
 
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();

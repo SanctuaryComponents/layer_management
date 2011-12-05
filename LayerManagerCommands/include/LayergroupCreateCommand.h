@@ -26,7 +26,8 @@
 class LayergroupCreateCommand : public BaseCommandSynchronous
 {
 public:
-	LayergroupCreateCommand(uint* idReturn);
+    LayergroupCreateCommand(uint* idReturn);
+    virtual ~LayergroupCreateCommand() {}
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();
 

@@ -37,6 +37,8 @@ class Scene;
 class ICommandExecutor
 {
 public:
+    virtual ~ICommandExecutor() {}
+
     /**
      * Have a command processed.
      * @param commandToBeExecuted The command to be processed

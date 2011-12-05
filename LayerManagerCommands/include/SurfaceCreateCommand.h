@@ -27,7 +27,8 @@
 class SurfaceCreateCommand : public BaseCommandSynchronous
 {
 public:
-	SurfaceCreateCommand(uint* idReturn);
+    SurfaceCreateCommand(uint* idReturn);
+    virtual ~SurfaceCreateCommand() {}
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();
 

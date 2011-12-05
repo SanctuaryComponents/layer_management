@@ -25,7 +25,8 @@
 class LayergroupAddLayerCommand : public BaseCommandAsynchronous
 {
 public:
-    LayergroupAddLayerCommand(unsigned int layergroupid,unsigned int layerid);
+       LayergroupAddLayerCommand(unsigned int layergroupid,unsigned int layerid);
+       virtual ~LayergroupAddLayerCommand() {}
 
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();

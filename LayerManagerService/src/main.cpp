@@ -390,6 +390,7 @@ void signalHandler(int sig)
 
     default:
         LOG_INFO("LayerManagerService", "Signal " << sig << " received.");
+        break;
     }
 }
 

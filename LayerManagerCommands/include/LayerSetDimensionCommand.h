@@ -25,7 +25,8 @@
 class LayerSetDimensionCommand : public BaseCommandAsynchronous
 {
 public:
-	LayerSetDimensionCommand(int id, unsigned int width, unsigned  int height);
+    LayerSetDimensionCommand(int id, unsigned int width, unsigned  int height);
+    virtual ~LayerSetDimensionCommand() {}
 
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();

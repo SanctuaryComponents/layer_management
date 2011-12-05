@@ -26,7 +26,8 @@
 class SurfaceGetOpacityCommand : public BaseCommandSynchronous
 {
 public:
-	SurfaceGetOpacityCommand(int id, double* returnOpacity);
+    SurfaceGetOpacityCommand(int id, double* returnOpacity);
+    virtual ~SurfaceGetOpacityCommand() {}
 
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();

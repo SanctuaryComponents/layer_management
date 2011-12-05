@@ -28,7 +28,8 @@ class ShaderBase;
 class Street : public IRenderable, public IUpdateable
 {
 public:
-	Street(vec3f position, vec3f size, vec4f color, ShaderBase* shader);
+    Street(vec3f position, vec3f size, vec4f color, ShaderBase* shader);
+    virtual ~Street() {}
     
     virtual void render();
     virtual void update(int currentTimeInMs, int lastFrameTime);

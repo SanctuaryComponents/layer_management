@@ -25,7 +25,8 @@
 class SurfaceRemoveCommand : public BaseCommandSynchronous
 {
 public:
-	SurfaceRemoveCommand(unsigned int objectID);
+    SurfaceRemoveCommand(unsigned int objectID);
+    virtual ~SurfaceRemoveCommand() {}
 
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();

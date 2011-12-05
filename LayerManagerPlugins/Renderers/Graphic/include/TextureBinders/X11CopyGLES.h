@@ -30,15 +30,16 @@
 class X11CopyGLES: public X11Copy
 {
 public:
-	X11CopyGLES(EGLDisplay eglDisplay, Display* display) : X11Copy(display){
-	    // TODO
-		// pseudo require EGL to have been initialised
-		// we dont really need the handle
-		// remove compiler Warning
-		eglDisplay = eglDisplay;
-	};
-	void swapPixmap(unsigned char* src,unsigned char* dest,unsigned int width,unsigned int height,bool swaprgb,bool includeAlpha);
-	bool bindSurfaceTexture(Surface* surface);
+    X11CopyGLES(EGLDisplay eglDisplay, Display* display) : X11Copy(display)
+    {
+
+        // pseudo require EGL to have been initialised
+        // we dont really need the handle
+        // remove compiler Warning
+        (void)eglDisplay; // TODO
+    };
+    void swapPixmap(unsigned char* src,unsigned char* dest,unsigned int width,unsigned int height,bool swaprgb,bool includeAlpha);
+    bool bindSurfaceTexture(Surface* surface);
     void createClientBuffer(Surface* surface);
     void destroyClientBuffer(Surface* surface);
 

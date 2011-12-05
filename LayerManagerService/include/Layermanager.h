@@ -32,8 +32,9 @@ class Layermanager: public ICommandExecutor
 {
 public:
     Layermanager();
-    ~Layermanager();
-	void signalRendererRedraw();
+    virtual ~Layermanager();
+
+    void signalRendererRedraw();
 
     virtual bool execute(ICommand* commandToBeExecuted);
     virtual uint getLayerTypeCapabilities(const LayerType layertype) const;

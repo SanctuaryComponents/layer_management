@@ -26,7 +26,8 @@
 class LayerSetTypeCommand : public BaseCommandAsynchronous
 {
 public:
-	LayerSetTypeCommand(const unsigned int givenid, LayerType layertype);
+    LayerSetTypeCommand(const unsigned int givenid, LayerType layertype);
+    virtual ~LayerSetTypeCommand() {}
 
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();

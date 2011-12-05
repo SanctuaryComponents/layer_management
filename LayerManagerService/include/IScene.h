@@ -34,6 +34,8 @@
 class IScene
 {
 public:
+    virtual ~IScene() {}
+
     virtual Layer* createLayer(const uint id) = 0;
     virtual Surface* createSurface(const uint id) = 0;
     virtual LayerGroup* createLayerGroup(const uint id) = 0;

@@ -24,6 +24,7 @@
 class CommitCommand : public BaseCommandSynchronous
 {
 public:
+    virtual ~CommitCommand() {}
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();
 };

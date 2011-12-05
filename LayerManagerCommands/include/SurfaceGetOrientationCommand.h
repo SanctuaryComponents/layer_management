@@ -28,6 +28,7 @@ class SurfaceGetOrientationCommand: public BaseCommandSynchronous
 {
 public:
 	SurfaceGetOrientationCommand(int id, OrientationType* orientation);
+	virtual ~SurfaceGetOrientationCommand() {}
 
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();

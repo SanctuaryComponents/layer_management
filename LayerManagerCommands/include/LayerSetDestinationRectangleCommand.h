@@ -25,7 +25,8 @@
 class LayerSetDestinationRectangleCommand : public BaseCommandAsynchronous
 {
 public:
-	LayerSetDestinationRectangleCommand(int id, unsigned int x, unsigned int y, unsigned int width, unsigned int height);
+    LayerSetDestinationRectangleCommand(int id, unsigned int x, unsigned int y, unsigned int width, unsigned int height);
+    virtual ~LayerSetDestinationRectangleCommand() {}
 
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();

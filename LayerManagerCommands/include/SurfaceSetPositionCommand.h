@@ -25,7 +25,8 @@
 class SurfaceSetPositionCommand : public BaseCommandAsynchronous
 {
 public:
-	SurfaceSetPositionCommand(unsigned int id, unsigned int x, unsigned int y);
+    SurfaceSetPositionCommand(unsigned int id, unsigned int x, unsigned int y);
+    virtual ~SurfaceSetPositionCommand() {}
 
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();

@@ -26,7 +26,8 @@
 class LayerCreateCommand : public BaseCommandSynchronous
 {
 public:
-	LayerCreateCommand(uint OriginalWidth, uint OriginalHeight, uint* idReturn);
+    LayerCreateCommand(uint OriginalWidth, uint OriginalHeight, uint* idReturn);
+    virtual ~LayerCreateCommand() {}
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();
 

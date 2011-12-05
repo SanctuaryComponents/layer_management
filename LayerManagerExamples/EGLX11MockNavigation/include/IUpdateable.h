@@ -22,6 +22,7 @@
 class IUpdateable
 {
 public:
+    virtual ~IUpdateable() {}
     virtual void update(int currentTimeInMs, int lastFrameTime) = 0;
 };
 

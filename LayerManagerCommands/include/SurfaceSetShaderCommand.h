@@ -25,7 +25,8 @@
 class SurfaceSetShaderCommand : public BaseCommandSynchronous
 {
 public:
-	SurfaceSetShaderCommand(unsigned int id,unsigned  int shaderid);
+    SurfaceSetShaderCommand(unsigned int id,unsigned  int shaderid);
+    virtual ~SurfaceSetShaderCommand() {}
 
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();

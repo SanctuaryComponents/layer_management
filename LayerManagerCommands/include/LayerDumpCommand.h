@@ -26,7 +26,8 @@
 class LayerDumpCommand: public BaseCommandSynchronous
 {
 public:
-	LayerDumpCommand(char* givenfilename, unsigned int id = 0);
+    LayerDumpCommand(char* givenfilename, unsigned int id = 0);
+    virtual ~LayerDumpCommand() {}
 
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();

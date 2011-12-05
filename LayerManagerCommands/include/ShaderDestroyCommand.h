@@ -30,7 +30,8 @@
 class ShaderDestroyCommand : public BaseCommandSynchronous
 {
 public:
-	ShaderDestroyCommand(unsigned int shaderid);
+    ShaderDestroyCommand(unsigned int shaderid);
+    virtual ~ShaderDestroyCommand() {}
 
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();

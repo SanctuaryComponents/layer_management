@@ -25,7 +25,8 @@
 class LayerGetPositionCommand : public BaseCommandSynchronous
 {
 public:
-	LayerGetPositionCommand(int id, unsigned int* xRet, unsigned int* yRet);
+    LayerGetPositionCommand(int id, unsigned int* xRet, unsigned int* yRet);
+    virtual ~LayerGetPositionCommand() {}
 
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();

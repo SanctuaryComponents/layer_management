@@ -26,7 +26,8 @@
 class SurfaceSetOrientationCommand : public BaseCommandAsynchronous
 {
 public:
-	SurfaceSetOrientationCommand(unsigned int id, OrientationType Orientation);
+    SurfaceSetOrientationCommand(unsigned int id, OrientationType Orientation);
+    virtual ~SurfaceSetOrientationCommand() {}
 
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();

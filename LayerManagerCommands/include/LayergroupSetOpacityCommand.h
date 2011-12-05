@@ -25,7 +25,8 @@
 class LayergroupSetOpacityCommand : public BaseCommandAsynchronous
 {
 public:
-	LayergroupSetOpacityCommand(unsigned int id, double Opacity);
+    LayergroupSetOpacityCommand(unsigned int id, double Opacity);
+    virtual ~LayergroupSetOpacityCommand() {}
 
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();

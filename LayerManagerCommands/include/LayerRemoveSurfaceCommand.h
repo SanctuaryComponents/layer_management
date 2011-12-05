@@ -25,7 +25,8 @@
 class LayerRemoveSurfaceCommand : public BaseCommandAsynchronous
 {
 public:
-    LayerRemoveSurfaceCommand(unsigned layerid, unsigned  surfaceid);
+       LayerRemoveSurfaceCommand(unsigned layerid, unsigned  surfaceid);
+       virtual ~LayerRemoveSurfaceCommand() {}
 
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();

@@ -30,6 +30,7 @@ public:
      * @param executor Pointer to an object to send commands to
      */
     ICommunicator(ICommandExecutor* executor);
+    virtual ~ICommunicator() {}
 
     /**
      * Start communication process, ie start specific listening process of communication method

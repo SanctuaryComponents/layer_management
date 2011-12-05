@@ -25,7 +25,8 @@
 class SurfaceGetDimensionCommand: public BaseCommandSynchronous
 {
 public:
-	SurfaceGetDimensionCommand(int id, unsigned int* widthRet, unsigned int* heightRet);
+    SurfaceGetDimensionCommand(int id, unsigned int* widthRet, unsigned int* heightRet);
+    virtual ~SurfaceGetDimensionCommand() {}
 
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();

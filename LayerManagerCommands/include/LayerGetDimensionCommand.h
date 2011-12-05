@@ -25,7 +25,8 @@
 class LayerGetDimensionCommand: public BaseCommandSynchronous
 {
 public:
-	LayerGetDimensionCommand(int id, unsigned int* widthRet, unsigned int* heightRet);
+    LayerGetDimensionCommand(int id, unsigned int* widthRet, unsigned int* heightRet);
+    virtual ~LayerGetDimensionCommand() {}
 
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();

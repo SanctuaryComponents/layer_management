@@ -27,6 +27,8 @@ class ICommandExecutor;
 class ICommand
 {
 public:
+    virtual ~ICommand() {}
+
     virtual ExecutionResult execute(ICommandExecutor* executor) = 0;
 
     virtual ExecutionType getExecutionType() = 0;

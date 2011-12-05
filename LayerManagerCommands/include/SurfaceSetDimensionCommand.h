@@ -25,7 +25,8 @@
 class SurfaceSetDimensionCommand : public BaseCommandAsynchronous
 {
 public:
-	SurfaceSetDimensionCommand(int id, unsigned int width,unsigned  int height);
+    SurfaceSetDimensionCommand(int id, unsigned int width,unsigned  int height);
+    virtual ~SurfaceSetDimensionCommand() {}
 
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();

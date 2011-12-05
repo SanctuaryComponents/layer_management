@@ -28,6 +28,7 @@ class Car : public IRenderable
 {
 public:
     Car(vec3f position, vec3f size, vec4f color, ShaderBase* shader);
+    virtual ~Car() {}
     
     virtual void render();
     

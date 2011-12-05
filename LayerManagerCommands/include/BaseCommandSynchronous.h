@@ -25,6 +25,7 @@
 class BaseCommandSynchronous : public ICommand
 {
 public:
+    virtual ~BaseCommandSynchronous() {}
     virtual ExecutionType getExecutionType()
     {
         return ExecuteSynchronous;

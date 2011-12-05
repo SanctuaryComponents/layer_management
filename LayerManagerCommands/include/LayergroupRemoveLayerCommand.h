@@ -25,7 +25,8 @@
 class LayergroupRemoveLayerCommand : public BaseCommandSynchronous
 {
 public:
-    LayergroupRemoveLayerCommand(unsigned int layergroupid, unsigned int layerid);
+       LayergroupRemoveLayerCommand(unsigned int layergroupid, unsigned int layerid);
+       virtual ~LayergroupRemoveLayerCommand() {}
 
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();

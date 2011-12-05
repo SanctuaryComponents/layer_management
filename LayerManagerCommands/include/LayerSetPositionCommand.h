@@ -25,7 +25,8 @@
 class LayerSetPositionCommand : public BaseCommandAsynchronous
 {
 public:
-	LayerSetPositionCommand(unsigned int id, unsigned int x, unsigned int y);
+    LayerSetPositionCommand(unsigned int id, unsigned int x, unsigned int y);
+    virtual ~LayerSetPositionCommand() {}
 
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();

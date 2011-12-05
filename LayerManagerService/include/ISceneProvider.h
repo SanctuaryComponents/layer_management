@@ -33,6 +33,7 @@ public:
      * @param executor Pointer to an object to send commands to
      */
     ISceneProvider(ICommandExecutor* executor);
+    virtual ~ISceneProvider() {}
 
     /**
      * Delegate Scene : this method will be called on LayerManager startup

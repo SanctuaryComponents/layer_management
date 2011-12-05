@@ -26,6 +26,7 @@ class LayerGetVisibilityCommand : public BaseCommandSynchronous
 {
 public:
 	LayerGetVisibilityCommand(int id, bool* visibility);
+	virtual ~LayerGetVisibilityCommand() {}
 
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();

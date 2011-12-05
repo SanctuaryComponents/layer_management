@@ -25,6 +25,7 @@
 class ExitCommand: public BaseCommandSynchronous
 {
 public:
+    virtual ~ExitCommand() {}
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();
 };

@@ -25,6 +25,8 @@
 class BaseCommandAsynchronous : public ICommand
 {
 public:
+    virtual ~BaseCommandAsynchronous() {}
+
     virtual ExecutionType getExecutionType()
     {
         return ExecuteAsynchronous;

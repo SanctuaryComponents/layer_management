@@ -529,6 +529,7 @@ bool initParamStruct(t_param_struct* pStruct,char* argv)
             default:
                 found = false;
                 printf("Argument not supported\n");
+                break;
         }
         if ( (curParam.params[i].required==true) && (found==false) )
         {

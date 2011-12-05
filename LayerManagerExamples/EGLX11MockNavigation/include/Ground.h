@@ -29,6 +29,7 @@ class Ground : public IRenderable
 {
 public:
     Ground(vec3f position, vec3f size, vec4f color, ShaderBase* pShader);
+    virtual ~Ground() {}
     
     virtual void render();
     

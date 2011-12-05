@@ -25,7 +25,8 @@
 class LayerSetVisibilityCommand : public BaseCommandAsynchronous
 {
 public:
-	LayerSetVisibilityCommand(const unsigned int givenid, bool newvisibility);
+    LayerSetVisibilityCommand(const unsigned int givenid, bool newvisibility);
+    virtual ~LayerSetVisibilityCommand() {}
 
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();

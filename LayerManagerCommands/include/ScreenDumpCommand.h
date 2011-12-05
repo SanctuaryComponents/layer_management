@@ -26,7 +26,8 @@
 class ScreenDumpCommand: public BaseCommandSynchronous
 {
 public:
-	ScreenDumpCommand(char* givenfilename, unsigned int id = 0);
+    ScreenDumpCommand(char* givenfilename, unsigned int id = 0);
+    virtual ~ScreenDumpCommand() {}
 
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();

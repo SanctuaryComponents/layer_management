@@ -26,7 +26,8 @@
 class LayerGetOpacityCommand : public BaseCommandSynchronous
 {
 public:
-	LayerGetOpacityCommand(int id, double* returnOpacity);
+    LayerGetOpacityCommand(int id, double* returnOpacity);
+    virtual ~LayerGetOpacityCommand() {}
 
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();

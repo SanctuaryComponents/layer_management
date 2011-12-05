@@ -25,7 +25,8 @@
 class LayerAddSurfaceCommand : public BaseCommandAsynchronous
 {
 public:
-    LayerAddSurfaceCommand(unsigned int layerid, unsigned  int surfaceid);
+       LayerAddSurfaceCommand(unsigned int layerid, unsigned  int surfaceid);
+       virtual ~LayerAddSurfaceCommand() {}
 
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();

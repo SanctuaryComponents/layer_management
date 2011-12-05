@@ -26,7 +26,8 @@
 class SurfaceDumpCommand: public BaseCommandSynchronous
 {
 public:
-	SurfaceDumpCommand(char* givenfilename, unsigned int id = 0);
+    SurfaceDumpCommand(char* givenfilename, unsigned int id = 0);
+    virtual ~SurfaceDumpCommand() {}
 
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();

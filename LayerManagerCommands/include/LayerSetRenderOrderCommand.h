@@ -25,7 +25,8 @@
 class LayerSetRenderOrderCommand : public BaseCommandAsynchronous
 {
 public:
-	LayerSetRenderOrderCommand(unsigned int layerid,unsigned  int* array,unsigned  int length);
+    LayerSetRenderOrderCommand(unsigned int layerid,unsigned  int* array,unsigned  int length);
+    virtual ~LayerSetRenderOrderCommand() {}
 
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();

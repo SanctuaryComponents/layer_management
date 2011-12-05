@@ -26,6 +26,7 @@ class DebugCommand : public BaseCommandSynchronous
 {
 public:
     DebugCommand(bool onoff);
+    virtual ~DebugCommand() {}
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();
 

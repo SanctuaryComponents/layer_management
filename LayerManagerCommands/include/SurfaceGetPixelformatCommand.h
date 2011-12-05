@@ -26,7 +26,8 @@
 class SurfaceGetPixelformatCommand : public BaseCommandSynchronous
 {
 public:
-	SurfaceGetPixelformatCommand(int id, PixelFormat* f);
+    SurfaceGetPixelformatCommand(int id, PixelFormat* f);
+    virtual ~SurfaceGetPixelformatCommand() {}
 
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();

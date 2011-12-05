@@ -25,7 +25,8 @@
 class SurfaceSetOpacityCommand : public BaseCommandAsynchronous
 {
 public:
-	SurfaceSetOpacityCommand(unsigned int id, double Opacity);
+    SurfaceSetOpacityCommand(unsigned int id, double Opacity);
+    virtual ~SurfaceSetOpacityCommand() {}
 
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();

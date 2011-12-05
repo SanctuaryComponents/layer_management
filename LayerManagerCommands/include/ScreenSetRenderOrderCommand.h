@@ -25,7 +25,8 @@
 class ScreenSetRenderOrderCommand: public BaseCommandAsynchronous
 {
 public:
-	ScreenSetRenderOrderCommand(unsigned int* array, unsigned int length);
+    ScreenSetRenderOrderCommand(unsigned int* array, unsigned int length);
+    virtual ~ScreenSetRenderOrderCommand() {}
 
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();

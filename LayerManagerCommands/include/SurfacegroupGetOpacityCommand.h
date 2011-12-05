@@ -26,7 +26,8 @@
 class SurfacegroupGetOpacityCommand : public BaseCommandSynchronous
 {
 public:
-	SurfacegroupGetOpacityCommand(int id, double* returnOpacity);
+    SurfacegroupGetOpacityCommand(int id, double* returnOpacity);
+    virtual ~SurfacegroupGetOpacityCommand() {}
 
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();

@@ -25,7 +25,8 @@
 class SurfacegroupAddSurfaceCommand : public BaseCommandAsynchronous
 {
 public:
-    SurfacegroupAddSurfaceCommand(unsigned int surfacegroupid, unsigned int surfaceid);
+       SurfacegroupAddSurfaceCommand(unsigned int surfacegroupid, unsigned int surfaceid);
+       virtual ~SurfacegroupAddSurfaceCommand() {}
 
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();

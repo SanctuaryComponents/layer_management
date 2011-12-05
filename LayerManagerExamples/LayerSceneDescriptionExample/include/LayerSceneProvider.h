@@ -32,6 +32,7 @@ class LayerSceneProvider : public ISceneProvider
 public:
     
     LayerSceneProvider(ICommandExecutor* executor);
+    virtual ~LayerSceneProvider() {}
     /**
      * Delegate Scene : this method will be called on LayerManager startup
      * to delegate a initial scene description of Layers on the target Platform

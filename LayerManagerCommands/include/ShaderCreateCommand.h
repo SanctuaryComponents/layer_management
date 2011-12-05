@@ -27,7 +27,8 @@
 class ShaderCreateCommand : public BaseCommandSynchronous
 {
 public:
-	ShaderCreateCommand(const std::string& vertName, const std::string& fragName, unsigned int* id);
+    ShaderCreateCommand(const std::string& vertName, const std::string& fragName, unsigned int* id);
+    virtual ~ShaderCreateCommand() {}
 
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();

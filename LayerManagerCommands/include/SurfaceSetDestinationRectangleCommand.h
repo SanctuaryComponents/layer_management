@@ -25,7 +25,8 @@
 class SurfaceSetDestinationRectangleCommand : public BaseCommandAsynchronous
 {
 public:
-	SurfaceSetDestinationRectangleCommand(int id, unsigned int x, unsigned int y, unsigned int width, unsigned int height);
+    SurfaceSetDestinationRectangleCommand(int id, unsigned int x, unsigned int y, unsigned int width, unsigned int height);
+    virtual ~SurfaceSetDestinationRectangleCommand() {}
 
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();

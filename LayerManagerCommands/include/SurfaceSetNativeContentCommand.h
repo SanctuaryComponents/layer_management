@@ -27,7 +27,8 @@
 class SurfaceSetNativeContentCommand : public BaseCommandSynchronous
 {
 public:
-    SurfaceSetNativeContentCommand(unsigned int surfaceId, unsigned int handle, PixelFormat pixelformat, uint OriginalWidth, uint OriginalHeight);
+       SurfaceSetNativeContentCommand(unsigned int surfaceId, unsigned int handle, PixelFormat pixelformat, uint OriginalWidth, uint OriginalHeight);
+       virtual ~SurfaceSetNativeContentCommand() {}
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();
 

@@ -91,6 +91,7 @@ class DBUSCommunicator: public ICommunicator
 {
 public:
     DBUSCommunicator(ICommandExecutor* executor);
+    virtual ~DBUSCommunicator() {}
     virtual bool start();
     virtual void stop();
     virtual void process(int timeout_ms);

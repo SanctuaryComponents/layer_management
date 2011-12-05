@@ -25,7 +25,9 @@
 class SurfacegroupSetVisibilityCommand : public BaseCommandAsynchronous
 {
 public:
-	SurfacegroupSetVisibilityCommand(const unsigned int givenid, bool newvisibility);
+    SurfacegroupSetVisibilityCommand(const unsigned int givenid, bool newvisibility);
+    virtual ~SurfacegroupSetVisibilityCommand() {}
+
 
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();

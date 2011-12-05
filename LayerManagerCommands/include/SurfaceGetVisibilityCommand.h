@@ -25,7 +25,8 @@
 class SurfaceGetVisibilityCommand : public BaseCommandSynchronous
 {
 public:
-	SurfaceGetVisibilityCommand(int id, bool* visibility);
+    SurfaceGetVisibilityCommand(int id, bool* visibility);
+    virtual ~SurfaceGetVisibilityCommand() {}
 
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();

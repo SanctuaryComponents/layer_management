@@ -25,7 +25,8 @@
 class SurfaceGetPositionCommand : public BaseCommandSynchronous
 {
 public:
-	SurfaceGetPositionCommand(int id, unsigned int* xRet, unsigned int* yRet);
+    SurfaceGetPositionCommand(int id, unsigned int* xRet, unsigned int* yRet);
+    virtual ~SurfaceGetPositionCommand() {}
 
     virtual ExecutionResult execute(ICommandExecutor* executor);
     virtual const std::string getString();
