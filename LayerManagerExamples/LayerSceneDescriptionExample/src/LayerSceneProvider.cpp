@@ -27,7 +27,9 @@
 #include "LayerSetOpacityCommand.h"
 #include "ScreenSetRenderOrderCommand.h"
 #include "LayerScene.h"
-
+#include "SurfaceCreateCommand.h"
+#include "SurfaceSetVisibilityCommand.h"
+#include "SurfaceSetOpacityCommand.h"
 
 LayerSceneProvider::LayerSceneProvider(ICommandExecutor* executor)
 : ISceneProvider(executor)
@@ -41,6 +43,14 @@ typedef struct t_layerScene
     float opacity;
 } layerScene;
 
+typedef struct t_surfaceScene 
+{
+    unsigned int surface;
+    bool visibility;
+    float opacity;
+} surfaceScene;
+
+
 static layerScene gInitialLayerScene[] = 
 {
     { LAYER_EXAMPLE_VIDEO_APPLICATIONS, true, 1.0 },
@@ -48,11 +58,30 @@ static layerScene gInitialLayerScene[] =
     { LAYER_EXAMPLE_X_APPLICATIONS, true, 1.0 }
 };
 
+static surfaceScene gInitialSurfaceScene[] = 
+{
+    { SURFACE_EXAMPLE_EGLX11_APPLICATION,false,1.0 },
+    { SURFACE_EXAMPLE_GDTESTENV_APPLICATION_1,false,1.0 },
+    { SURFACE_EXAMPLE_GDTESTENV_APPLICATION_2,false,1.0 },
+    { SURFACE_EXAMPLE_GDTESTENV_APPLICATION_3,false,1.0 },
+    { SURFACE_EXAMPLE_GDTESTENV_APPLICATION_4,false,1.0 },
+    { SURFACE_EXAMPLE_GDTESTENV_APPLICATION_5,false,1.0 },
+    { SURFACE_EXAMPLE_GDTESTENV_APPLICATION_6,false,1.0 },
+    { SURFACE_EXAMPLE_GDTESTENV_APPLICATION_7,false,1.0 },
+    { SURFACE_EXAMPLE_GDTESTENV_APPLICATION_8,false,1.0 },
+    { SURFACE_EXAMPLE_GDTESTENV_APPLICATION_9,false,1.0 },
+    { SURFACE_EXAMPLE_GLXX11_APPLICATION,false,1.0 },
+    { SURFACE_EXAMPLE_EGLRAW_APPLICATION,false,1.0 },
+    { SURFACE_EXAMPLE_VIDEO_APPLICATION,false,1.0 }
+};
+
+
 bool LayerSceneProvider::delegateScene() 
 {
     bool result = true;
     int i = 0;
     int numberOfLayers = sizeof(gInitialLayerScene) / sizeof (layerScene);
+    int numberOfSurfaces = sizeof(gInitialSurfaceScene) / sizeof (surfaceScene);
     unsigned int *renderOrder = new unsigned int [numberOfLayers];
     unsigned int* screenResolution = m_executor->getScreenResolution(0);
     if ( numberOfLayers > 0 ) 
@@ -71,6 +100,20 @@ bool LayerSceneProvider::delegateScene()
         /* Finally set the first executed renderorder */
         m_executor->execute(new ScreenSetRenderOrderCommand(renderOrder, numberOfLayers));
         m_executor->execute(new CommitCommand());
+    }
+    
+    if ( numberOfSurfaces > 0 ) 
+    {
+        /* setup inital surface scenery */
+        for (i = 0;i<numberOfSurfaces;i++)
+        {
+            m_executor->execute(new SurfaceCreateCommand( &(gInitialSurfaceScene[i].surface)));
+            m_executor->execute(new SurfaceSetOpacityCommand(gInitialSurfaceScene[i].surface, gInitialSurfaceScene[i].opacity));
+            m_executor->execute(new SurfaceSetVisibilityCommand(gInitialSurfaceScene[i].surface, gInitialSurfaceScene[i].visibility));
+            m_executor->execute(new CommitCommand());
+
+        }        
+        /* Finally set the first executed renderorder */
     }
     return result;    
 }
