@@ -209,7 +209,10 @@ void X11WindowSystem::checkForNewSurface()
         SurfaceList surfaces = (*current)->getAllSurfaces();
         for(SurfaceListConstIterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++)
         {
-            allocatePlatformSurface(*currentS);
+            if (currentS->hasNativeContent())
+            {
+                allocatePlatformSurface(*currentS);
+            }
         }
     }
     m_pScene->unlockScene();
@@ -339,8 +342,6 @@ void X11WindowSystem::UnMapWindow(Window window)
         if (x11surf->pixmap)
         {
             int result = XFreePixmap(x11Display, x11surf->pixmap);
-            delete surface->platform;
-            surface->platform = NULL;
             LOG_DEBUG("X11WindowSystem", "XFreePixmap() returned " << result);
         }
     }
@@ -419,6 +420,8 @@ void X11WindowSystem::DestroyWindow(Window window)
         UnMapWindow(window);
         LOG_DEBUG("X11WindowSystem", "Remove Native Content from Surface " << surface->getID());
         surface->removeNativeContent();
+        delete surface->platform;
+        surface->platform = NULL;                
     }
 }
 
@@ -607,7 +610,7 @@ void X11WindowSystem::Screenshot()
     }
 
     graphicSystem->saveScreenShotOfFramebuffer(screenShotFile);
-//		graphicSystem->swapBuffers();
+//  graphicSystem->swapBuffers();
     takeScreenshot = ScreenShotNone;
     LOG_DEBUG("X11WindowSystem", "Done taking screenshot");
 
@@ -979,6 +982,7 @@ void X11WindowSystem::stop()
 
 void X11WindowSystem::allocatePlatformSurface(Surface* surface)
 {
+    LOG_DEBUG("X11WindowSystem","allocatePlatformSurface begin");
     XPlatformSurface* nativeSurface = (XPlatformSurface*)surface->platform;
     if (!nativeSurface)
     {
@@ -987,6 +991,7 @@ void X11WindowSystem::allocatePlatformSurface(Surface* surface)
         NewWindow(surface, surface->getNativeContent());
         MapWindow(surface->getNativeContent());
     }
+    LOG_DEBUG("X11WindowSystem","allocatePlatformSurface end");
 }
 
 void X11WindowSystem::doScreenShot(std::string fileName)
