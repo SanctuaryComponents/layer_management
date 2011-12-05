@@ -67,13 +67,13 @@ bool X11TextureFromPixmap::unbindSurfaceTexture(Surface* surface)
 }
 
 void X11TextureFromPixmap::createClientBuffer(Surface* surface){
-    LOG_DEBUG("X11TextureFromPixmap", "creating clientBuffer for window: " << surface->nativeHandle);
+    LOG_DEBUG("X11TextureFromPixmap", "creating clientBuffer for window: " << surface->getNativeContent());
     GLXPlatformSurface* platformSurface = (GLXPlatformSurface*)surface->platform;
     if (NULL!=platformSurface)
     {
         Pixmap pixmap = 0;
         LOG_DEBUG("X11TextureFromPixmap", "get X Pixmap");
-        pixmap= XCompositeNameWindowPixmap (dpy, surface->nativeHandle);
+        pixmap= XCompositeNameWindowPixmap (dpy, surface->getNativeContent());
         if (pixmap==0)
         {
             LOG_ERROR("X11TextureFromPixmap", "didnt create pixmap!");
