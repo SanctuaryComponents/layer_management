@@ -345,23 +345,20 @@ void loadRendererPlugins(RendererList& rendererList, IScene* pScene)
 
 void printStackTrace()
 {
-    const int maxStackSize = 32;
-    void* array[maxStackSize];
-    size_t size;
-    char **strings;
-    size_t count;
+    const int maxStackSize = 64;
+    void* stack[maxStackSize];
 
-    size = backtrace(array, maxStackSize);
-    strings = backtrace_symbols(array, size);
+    size_t count = backtrace(stack, maxStackSize);
+    char **lines = backtrace_symbols(stack, count);
 
-    LOG_ERROR("LayerManagerService", "--------------------------------------------------");
-    for (int i = 0; i < size; ++i)
+    LOG_INFO("LayerManagerService", "--------------------------------------------------");
+    for (unsigned int i = 0; i < count; ++i)
     {
-        LOG_ERROR("LayerManagerService", "Stack-Trace [" << i << "]: " << strings[i]);
+        LOG_INFO("LayerManagerService", "Stack-Trace [" << i << "]: " << lines[i]);
     }
-    LOG_ERROR("LayerManagerService", "--------------------------------------------------");
+    LOG_INFO("LayerManagerService", "--------------------------------------------------");
 
-    LOG_DEBUG("LayerManagerService", "Exiting application.")
+    LOG_INFO("LayerManagerService", "Exiting application.")
     exit(-1);
 }
 
