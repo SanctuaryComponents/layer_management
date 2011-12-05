@@ -209,7 +209,7 @@ void X11WindowSystem::checkForNewSurface()
         SurfaceList surfaces = (*current)->getAllSurfaces();
         for(SurfaceListConstIterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++)
         {
-            if (currentS->hasNativeContent())
+            if ((*currentS)->hasNativeContent())
             {
                 allocatePlatformSurface(*currentS);
             }
