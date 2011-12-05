@@ -18,7 +18,7 @@
  ****************************************************************************/
 
 #include "Layermanager.h"
-#include "CmakeConfiguration.h"
+#include "config.h"
 #include "IRenderer.h"
 #include "ICommunicator.h"
 #include "ISceneProvider.h"
@@ -367,7 +367,7 @@ int main(int argc, char **argv)
     char* pluginLookupPath = getenv("LM_PLUGIN_PATH");
     LOG_INFO("LayerManagerService", "Starting Layermanager.");
 
-    printCmakeConfiguration();
+    printConfiguration();
 
     if  (pluginLookupPath != NULL ) 
     {

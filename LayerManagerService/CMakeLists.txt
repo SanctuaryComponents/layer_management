@@ -30,10 +30,10 @@ link_directories ("${PROJECT_SOURCE_DIR}/LayerManagerCommands")
 
 # generate cmake configuration header file, includes information on the
 # project configuration, compiler settings, ...
-message(STATUS "Generating CmakeConfiguration.h header file with build system configuration.")
+message(STATUS "Generating config.h header file with build system configuration.")
 configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/CmakeConfiguration.h.in
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/CmakeConfiguration.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/config.h.cmake
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/config.h
 )
 
 file(GLOB LM_SOURCES src/*.cpp src/shader/*.cpp)
