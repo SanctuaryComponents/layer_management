@@ -82,6 +82,7 @@ Surface* Scene::createSurface(const uint surfaceId)
         }
         else
         {
+            newSurface = m_surfaceMap.at(surfaceId); 
             LOG_DEBUG("Scene","Surface with id [ " << surfaceId << " ] " << " already exists " );
         }
     }
@@ -254,6 +255,14 @@ void Scene::removeSurface(Surface* surface)
         removeSurfaceFromAllSurfaceGroups(surface);
 
         delete surface;
+    }
+}
+/// \brief take removing applied native content
+void Scene::removeSurfaceNativeContent(Surface* surface)
+{
+    if (surface != NULL)
+    {
+        surface->removeNativeContent();
     }
 }
 

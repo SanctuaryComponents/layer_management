@@ -60,6 +60,7 @@ public:
 
     virtual void removeLayer(Layer* layer);
     virtual void removeSurface(Surface* surface);
+    virtual void removeSurfaceNativeContent(Surface* surface);
     virtual Layer* getLayer(const uint id) const;
     virtual Surface* getSurface(const uint id) const;
     virtual SurfaceGroup* getSurfaceGroup(const uint id) const;

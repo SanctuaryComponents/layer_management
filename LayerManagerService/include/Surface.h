@@ -56,6 +56,11 @@ public:
     {
         return m_hasNativeContent;
     }
+    
+    void removeNativeContent() 
+    {
+        m_hasNativeContent = false;
+    }
 
     void setNativeContent(long nativeHandle)
     {
