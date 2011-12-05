@@ -63,10 +63,6 @@ option (WITH_TESTS          "Build Available Tests "                            
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 
-if (WITH_FORCE_COPY)
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DGLX_GRAPHICSYSTEM_FORCE_COPY -DGLES_FORCE_COPY" CACHE STRING "" FORCE)
-endif(WITH_FORCE_COPY)
-
 if (WITH_DESKTOP)
     set (WITH_GLX_LIB ON CACHE STRING "" FORCE)
 endif(WITH_DESKTOP)     

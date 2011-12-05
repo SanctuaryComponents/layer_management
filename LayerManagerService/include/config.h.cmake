@@ -25,16 +25,16 @@
 // string variables
 //-----------------------------------------------------------------------------
 // version of the LayerManagementService
-const char* ILM_VERSION          = "${ILM_VERSION}";
+#define ILM_VERSION          "${ILM_VERSION}"
 
 // CMake build type, e.g. Debug, Release
-const char* CMAKE_BUILD_TYPE     = "${CMAKE_BUILD_TYPE}";
+#define CMAKE_BUILD_TYPE     "${CMAKE_BUILD_TYPE}"
 
 // compiler flags used to build project
-const char* CMAKE_CXX_FLAGS      = "${CMAKE_CXX_FLAGS}";
+#define CMAKE_CXX_FLAGS      "${CMAKE_CXX_FLAGS}"
 
 // install prefix of target platform
-const char* CMAKE_INSTALL_PREFIX = "${CMAKE_INSTALL_PREFIX}";
+#define CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}"
 
 
 //-----------------------------------------------------------------------------
@@ -77,23 +77,20 @@ const char* CMAKE_INSTALL_PREFIX = "${CMAKE_INSTALL_PREFIX}";
 //-----------------------------------------------------------------------------
 // human readable report
 //-----------------------------------------------------------------------------
-void printConfiguration(void)
-{
-    LOG_INFO ("Config", "Build Version       = " << ILM_VERSION);
-    LOG_DEBUG("Config", "Build Type          = " << CMAKE_BUILD_TYPE);
-    LOG_DEBUG("Config", "Compiler Flags      = " << CMAKE_CXX_FLAGS);
-    LOG_DEBUG("Config", "Install Prefix      = " << CMAKE_INSTALL_PREFIX);
-
-    LOG_DEBUG("Config", "WITH_CLIENTEXAMPLES = ${WITH_CLIENTEXAMPLES}");
-    LOG_DEBUG("Config", "WITH_DESKTOP        = ${WITH_DESKTOP}");
-    LOG_DEBUG("Config", "WITH_EGL_EXAMPLE    = ${WITH_EGL_EXAMPLE}");
-    LOG_DEBUG("Config", "WITH_FORCE_COPY     = ${WITH_FORCE_COPY}");
-    LOG_DEBUG("Config", "WITH_GLESv2_LIB     = ${WITH_GLESv2_LIB}");
-    LOG_DEBUG("Config", "WITH_GLX_EXAMPLE    = ${WITH_GLX_EXAMPLE}");
-    LOG_DEBUG("Config", "WITH_GLX_LIB        = ${WITH_GLX_LIB}");
-    LOG_DEBUG("Config", "WITH_INPUT_EVENTS   = ${WITH_INPUT_EVENTS}");
-    LOG_DEBUG("Config", "WITH_TESTS          = ${WITH_TESTS}");
-    LOG_DEBUG("Config", "WITH_X11_GLES       = ${WITH_X11_GLES}");
-    LOG_DEBUG("Config", "WITH_XTHREADS       = ${WITH_XTHREADS}");
-}
+#define printConfiguration() \
+    LOG_INFO ("Config", "Build Version       = " << ILM_VERSION); \
+    LOG_DEBUG("Config", "Build Type          = " << CMAKE_BUILD_TYPE); \
+    LOG_DEBUG("Config", "Compiler Flags      = " << CMAKE_CXX_FLAGS); \
+    LOG_DEBUG("Config", "Install Prefix      = " << CMAKE_INSTALL_PREFIX); \
+    LOG_DEBUG("Config", "WITH_CLIENTEXAMPLES = ${WITH_CLIENTEXAMPLES}"); \
+    LOG_DEBUG("Config", "WITH_DESKTOP        = ${WITH_DESKTOP}"); \
+    LOG_DEBUG("Config", "WITH_EGL_EXAMPLE    = ${WITH_EGL_EXAMPLE}"); \
+    LOG_DEBUG("Config", "WITH_FORCE_COPY     = ${WITH_FORCE_COPY}"); \
+    LOG_DEBUG("Config", "WITH_GLESv2_LIB     = ${WITH_GLESv2_LIB}"); \
+    LOG_DEBUG("Config", "WITH_GLX_EXAMPLE    = ${WITH_GLX_EXAMPLE}"); \
+    LOG_DEBUG("Config", "WITH_GLX_LIB        = ${WITH_GLX_LIB}"); \
+    LOG_DEBUG("Config", "WITH_INPUT_EVENTS   = ${WITH_INPUT_EVENTS}"); \
+    LOG_DEBUG("Config", "WITH_TESTS          = ${WITH_TESTS}"); \
+    LOG_DEBUG("Config", "WITH_X11_GLES       = ${WITH_X11_GLES}"); \
+    LOG_DEBUG("Config", "WITH_XTHREADS       = ${WITH_XTHREADS}")
 

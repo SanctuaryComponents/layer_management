@@ -18,6 +18,7 @@
 ****************************************************************************/
 
 #include "X11GLESRenderer.h"
+#include "config.h"
 #include "ShaderProgramGLES.h"
 #include "X11/Xlib.h"
 #include "TextureBinders/X11CopyGLES.h"
@@ -58,15 +59,15 @@ bool X11GLESRenderer::start(int width, int height, const char* displayname)
 
     eglDisplayhandle = m_pGraphicSystem->getEGLDisplay();
 
-#ifdef GLES_FORCE_COPY
+#ifdef WITH_FORCE_COPY
     binder = new X11CopyGLES(eglDisplayhandle, nativeDisplayHandle);
-#else
+#else // WITH_FORCE_COPY
 #ifdef EGL_NATIVE_PIXMAP_KHR
     binder = new X11EglImage(eglDisplayhandle, nativeDisplayHandle);
-#else
+#else // EGL_NATIVE_PIXMAP_KHR
     binder = new X11CopyGLES(eglDisplayhandle, nativeDisplayHandle);
-#endif
-#endif
+#endif // EGL_NATIVE_PIXMAP_KHR
+#endif // WITH_FORCE_COPY
     if ( binder && nativeDisplayHandle && eglDisplayhandle)
     {
         m_pGraphicSystem->setTextureBinder(binder);

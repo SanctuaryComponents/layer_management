@@ -18,6 +18,7 @@
 ****************************************************************************/
 
 #include "X11GLXRenderer.h"
+#include "config.h"
 #include "GraphicSystems/GLXGraphicsystem.h"
 #include "WindowSystems/X11WindowSystem.h"
 #include "TextureBinders/X11CopyGLX.h"
@@ -53,16 +54,16 @@ bool X11GLXRenderer::start(int width, int height, const char* displayname)
         if (x11Display != NULL && currentConfig != NULL )
         {
             LOG_INFO("X11GLXRenderer", "Initialization successfull.");
-#ifdef GLX_GRAPHICSYSTEM_FORCE_COPY
+#ifdef WITH_FORCE_COPY
             binder = new X11CopyGLX(x11Display);
-#else
+#else // WITH_FORCE_COPY
             if ( m_pGraphicSystem->isZeroCopyEnabled() == true ) 
             {
                 binder = new X11TextureFromPixmap(x11Display, *currentConfig);
             } else {
                 binder = new X11CopyGLX(x11Display);
             }
-#endif
+#endif // WITH_FORCE_COPY
             if ( binder != NULL ) 
             {
                 m_pGraphicSystem->setTextureBinder(binder);
