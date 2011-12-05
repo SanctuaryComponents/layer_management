@@ -1210,65 +1210,43 @@ ilmErrorTypes ilm_layergroupSetOpacity(t_ilm_layergroup group, t_ilm_float opaci
 
 ilmErrorTypes ilm_surfaceCreate(t_ilm_nativehandle nativehandle, t_ilm_int width, t_ilm_int height, ilmPixelFormat pixelFormat, t_ilm_surface* pSurfaceId)
 {
-    ilmErrorTypes result = ILM_FAILED;
+    ilmErrorTypes error = ILM_FAILED;
     DBusMessage *message;
 
+    // Setup parameter to send
+    t_ilm_param surfaceParam[5];
+    _ilm_setup_param(&surfaceParam[0], DBUS_TYPE_UINT32, &nativehandle);
+    _ilm_setup_param(&surfaceParam[1], DBUS_TYPE_UINT32, &width);
+    _ilm_setup_param(&surfaceParam[2], DBUS_TYPE_UINT32, &height);
+    _ilm_setup_param(&surfaceParam[3], DBUS_TYPE_UINT32, &pixelFormat);
+    _ilm_setup_param(&surfaceParam[4], DBUS_TYPE_UINT32, pSurfaceId);
+
+    if (*pSurfaceId == INVALID_ID)
     {
-         // Setup parameter to send
-         t_ilm_param surfaceParam[1];
-         _ilm_setup_param(&surfaceParam[0], DBUS_TYPE_UINT32, pSurfaceId);
-
-         if (*pSurfaceId == INVALID_ID)
-         {
-             // Setup Call
-             message = _ilm_dbus_method_call(g_ilm_client->dbus_connection, "CreateSurface", &surfaceParam[0], 0);
-         }
-         else
-         {
-             message = _ilm_dbus_method_call(g_ilm_client->dbus_connection, "CreateSurfaceFromId", &surfaceParam[0], 1);
-         }
-
-         if (message)
-         {
-             ILM_CHECK_METHOD_ERROR(message);
-             result = _ilm_get_dbus_basic_elements(message, 1, &surfaceParam[0]);
-             _ilm_close_dbus_method_call(message);
-         }
-         else
-         {
-             ILM_ERROR("ilm_surfaceCreate","IPC Method (CreateSurface[Id]) call not possible can't setup remote message\n");
-             result = ILM_ERROR_ON_CONNECTION;
-         }
-     }
-
+        // Setup Call
+        message = _ilm_dbus_method_call(g_ilm_client->dbus_connection, "CreateSurface", &surfaceParam[0], 4);
+    }
+    else
     {
-         // Setup parameter to send
-         t_ilm_param surfaceParam[5];
-         _ilm_setup_param(&surfaceParam[0], DBUS_TYPE_UINT32, pSurfaceId);
-         _ilm_setup_param(&surfaceParam[1], DBUS_TYPE_UINT32, &nativehandle);
-         _ilm_setup_param(&surfaceParam[2], DBUS_TYPE_UINT32, &width);
-         _ilm_setup_param(&surfaceParam[3], DBUS_TYPE_UINT32, &height);
-         _ilm_setup_param(&surfaceParam[4], DBUS_TYPE_UINT32, &pixelFormat);
+        message = _ilm_dbus_method_call(g_ilm_client->dbus_connection, "CreateSurfaceFromId", &surfaceParam[0], 5);
+    }
 
-         message = _ilm_dbus_method_call(g_ilm_client->dbus_connection, "SetSurfaceNativeContent", &surfaceParam[0], 5);
+    if (message)
+    {
+        ILM_CHECK_METHOD_ERROR(message);
+        error = _ilm_get_dbus_basic_elements(message, 1, &surfaceParam[4]);
+        _ilm_close_dbus_method_call(message);
+    }
+    else
+    {
+        ILM_ERROR("ilm_surfaceCreate","IPC Method call not possible can't setup remote message\n");
+        return ILM_ERROR_ON_CONNECTION;
+    }
 
-         if (message)
-         {
-             ILM_CHECK_METHOD_ERROR(message);
-             result = _ilm_get_dbus_basic_elements(message, 1, &surfaceParam[0]);
-             _ilm_close_dbus_method_call(message);
-         }
-         else
-         {
-             ILM_ERROR("ilm_surfaceCreate","IPC Method (SetSurfaceNativeContent) call not possible can't setup remote message\n");
-             result = ILM_ERROR_ON_CONNECTION;
-         }
-     }
-
-    return result;
+    return error;
 }
 
-ilmErrorTypes ilm_surfaceCreatePlaceholder(t_ilm_surface *pSurfaceId)
+ilmErrorTypes ilm_surfaceInitialize(t_ilm_surface *pSurfaceId)
 {
     ilmErrorTypes result = ILM_FAILED;
     DBusMessage *message;
@@ -1280,11 +1258,11 @@ ilmErrorTypes ilm_surfaceCreatePlaceholder(t_ilm_surface *pSurfaceId)
     if (*pSurfaceId == INVALID_ID)
     {
         // Setup Call
-        message = _ilm_dbus_method_call(g_ilm_client->dbus_connection, "CreateSurfacePlaceholder", &surfaceParam[0], 1);
+        message = _ilm_dbus_method_call(g_ilm_client->dbus_connection, "InitializeSurface", &surfaceParam[0], 0);
     }
     else
     {
-        message = _ilm_dbus_method_call(g_ilm_client->dbus_connection, "CreateSurfacePlaceholderFromId", &surfaceParam[0], 0);
+        message = _ilm_dbus_method_call(g_ilm_client->dbus_connection, "InitializeSurfaceFromId", &surfaceParam[0], 1);
     }
 
     if (message)
@@ -1295,41 +1273,40 @@ ilmErrorTypes ilm_surfaceCreatePlaceholder(t_ilm_surface *pSurfaceId)
     }
     else
     {
-        ILM_ERROR("ilm_surfaceCreatePlaceholder","IPC Method call not possible can't setup remote message\n");
+        ILM_ERROR("ilm_surfaceInitialize","IPC Method call not possible can't setup remote message\n");
         result = ILM_ERROR_ON_CONNECTION;
     }
 
     return result;
 }
 
-ilmErrorTypes ilm_surfaceSetRenderBuffer(t_ilm_nativehandle nativehandle, t_ilm_int width, t_ilm_int height, ilmPixelFormat pixelFormat, t_ilm_surface surfaceId)
+ilmErrorTypes ilm_surfaceSetNativeContent(t_ilm_nativehandle nativehandle, t_ilm_int width, t_ilm_int height, ilmPixelFormat pixelFormat, t_ilm_surface surfaceId)
 {
     ilmErrorTypes result = ILM_FAILED;
     DBusMessage *message;
 
     // Setup parameter to send
     t_ilm_param surfaceParam[5];
-    _ilm_setup_param(&surfaceParam[0], DBUS_TYPE_UINT32, &nativehandle);
-    _ilm_setup_param(&surfaceParam[1], DBUS_TYPE_UINT32, &width);
-    _ilm_setup_param(&surfaceParam[2], DBUS_TYPE_UINT32, &height);
-    _ilm_setup_param(&surfaceParam[3], DBUS_TYPE_UINT32, &pixelFormat);
-    _ilm_setup_param(&surfaceParam[4], DBUS_TYPE_UINT32, &surfaceId);
+    _ilm_setup_param(&surfaceParam[0], DBUS_TYPE_UINT32, &surfaceId);
+    _ilm_setup_param(&surfaceParam[1], DBUS_TYPE_UINT32, &nativehandle);
+    _ilm_setup_param(&surfaceParam[2], DBUS_TYPE_UINT32, &width);
+    _ilm_setup_param(&surfaceParam[3], DBUS_TYPE_UINT32, &height);
+    _ilm_setup_param(&surfaceParam[4], DBUS_TYPE_UINT32, &pixelFormat);
 
     // Setup Call
-    message = _ilm_dbus_method_call(g_ilm_client->dbus_connection, "CreateSurfaceFromId", &surfaceParam[0], 5);
+    message = _ilm_dbus_method_call(g_ilm_client->dbus_connection, "SetSurfaceNativeContent", &surfaceParam[0], 5);
 
     if (message)
     {
         ILM_CHECK_METHOD_ERROR(message);
-        result = _ilm_get_dbus_basic_elements(message, 1, &surfaceParam[4]);
         _ilm_close_dbus_method_call(message);
     }
     else
     {
-        ILM_ERROR("ilm_surfaceAssociateRenderBuffer","IPC Method call not possible can't setup remote message\n");
+        ILM_ERROR("ilm_surfaceSetNativeContent","IPC Method call not possible can't setup remote message\n");
         result = ILM_ERROR_ON_CONNECTION;
     }
-
+    
     return result;
 }
 

@@ -114,6 +114,8 @@ public:
     void GetPropertiesOfSurface(DBusConnection* conn, DBusMessage* msg);
     void GetPropertiesOfLayer(DBusConnection* conn, DBusMessage* msg);
     void CreateSurface(DBusConnection* conn, DBusMessage* msg);
+    void InitializeSurface(DBusConnection* conn, DBusMessage* msg);
+    void InitializeSurfaceFromId(DBusConnection* conn, DBusMessage* msg);
     void CreateSurfaceFromId(DBusConnection* conn, DBusMessage* msg);
     void SetSurfaceNativeContent(DBusConnection* conn, DBusMessage* msg);
     void RemoveSurface(DBusConnection* conn, DBusMessage* msg);

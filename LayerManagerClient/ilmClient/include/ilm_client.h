@@ -495,7 +495,7 @@ ilmErrorTypes ilm_layergroupSetOpacity(t_ilm_layergroup group, t_ilm_float opaci
 ilmErrorTypes ilm_surfaceCreate(t_ilm_nativehandle nativehandle, t_ilm_int width, t_ilm_int height, ilmPixelFormat pixelFormat, t_ilm_surface *pSurfaceId);
 
 /**
- * \brief Create a placeholder surface, which has no render buffer associated
+ * \brief Create the logical surface, which has no native buffer associated
  * \ingroup Surface
  * \param[in/out] pSurfaceId
  *                The value pSurfaceId points to is used as ID for new surface;
@@ -503,10 +503,10 @@ ilmErrorTypes ilm_surfaceCreate(t_ilm_nativehandle nativehandle, t_ilm_int width
  * \return ILM_TRUE if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
-ilmErrorTypes ilm_surfaceCreatePlaceholder(t_ilm_surface *pSurfaceId);
+ilmErrorTypes ilm_surfaceInitialize(t_ilm_surface *pSurfaceId);
 
 /**
- * \brief Set the render buffer of an application to be used as surface content
+ * \brief Set the native content of an application to be used as surface content
  * \ingroup Surface
  * \param[in] nativehandle The native windowsystem's handle for the surface
  * \param[in] width The original width of the surface
@@ -516,7 +516,7 @@ ilmErrorTypes ilm_surfaceCreatePlaceholder(t_ilm_surface *pSurfaceId);
  * \return ILM_TRUE if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
-ilmErrorTypes ilm_surfaceSetRenderBuffer(t_ilm_nativehandle nativehandle, t_ilm_int width, t_ilm_int height, ilmPixelFormat pixelFormat, t_ilm_surface surfaceId);
+ilmErrorTypes ilm_surfaceSetNativeContent(t_ilm_nativehandle nativehandle, t_ilm_int width, t_ilm_int height, ilmPixelFormat pixelFormat, t_ilm_surface surfaceId);
 
 /**
  * \brief Remove a surface

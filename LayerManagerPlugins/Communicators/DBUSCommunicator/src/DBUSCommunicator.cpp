@@ -56,8 +56,10 @@ static MethodTable manager_methods[] =
     { "ListSurfaceofLayer",               "u",     "au",          &DBUSCommunicator::ListSurfaceofLayer },
     { "GetPropertiesOfSurface",           "u",     "duuuuuuuuuuybu", &DBUSCommunicator::GetPropertiesOfSurface },
     { "GetPropertiesOfLayer",             "u",     "duuuuuuuuuuyb", &DBUSCommunicator::GetPropertiesOfLayer },
-    { "CreateSurface",                    "",      "u",           &DBUSCommunicator::CreateSurface },
-    { "CreateSurfaceFromId",              "u",     "u",           &DBUSCommunicator::CreateSurfaceFromId },
+    { "CreateSurface",                    "uuuu",  "u",           &DBUSCommunicator::CreateSurface },
+    { "CreateSurfaceFromId",              "uuuuu", "u",           &DBUSCommunicator::CreateSurfaceFromId },    
+    { "InitializeSurface",                "",      "u",           &DBUSCommunicator::InitializeSurface },
+    { "InitializeSurfaceFromId",          "u",     "u",           &DBUSCommunicator::InitializeSurfaceFromId },
     { "SetSurfaceNativeContent",          "uuuuu", "",            &DBUSCommunicator::SetSurfaceNativeContent },
     { "RemoveSurface",                    "u",     "",            &DBUSCommunicator::RemoveSurface },
     { "CreateLayer",                      "",      "u",           &DBUSCommunicator::CreateLayer },
@@ -560,9 +562,21 @@ void DBUSCommunicator::CreateSurface(DBusConnection* conn, DBusMessage* msg)
 {
     (void)conn; // TODO: remove, only prevents warning
 
+    (void)conn; // TODO: remove, only prevents warning
+
     g_pDbusMessage->initReceive(msg);
+    uint handle = g_pDbusMessage->getUInt();
+    uint width = g_pDbusMessage->getUInt();
+    uint height = g_pDbusMessage->getUInt();
+    uint pixelformat = g_pDbusMessage->getUInt();
+    PixelFormat pf = (PixelFormat) pixelformat;
+
+    //LOG_DEBUG("DBUSCommunicator::CreateSurface","pixelformat: " << pixelformat);
     uint id = GraphicalObject::INVALID_ID;
+    /* First of all create the surface */
     bool status = m_executor->execute(new SurfaceCreateCommand(&id));
+    /* after that apply the native content */
+    status &= m_executor->execute(new SurfaceSetNativeContentCommand(id, handle, pf, width, height));    
     if (status)
     {
         g_pDbusMessage->initReply(msg);
@@ -580,8 +594,58 @@ void DBUSCommunicator::CreateSurfaceFromId(DBusConnection* conn, DBusMessage* ms
     (void)conn; // TODO: remove, only prevents warning
 
     g_pDbusMessage->initReceive(msg);
+    uint handle = g_pDbusMessage->getUInt();
+    uint width = g_pDbusMessage->getUInt();
+    uint height = g_pDbusMessage->getUInt();
+    uint pixelformat = g_pDbusMessage->getUInt();
+    PixelFormat pf = (PixelFormat) pixelformat;
+
+    //LOG_DEBUG("DBUSCommunicator::CreateSurface","pixelformat: " << pixelformat);
     uint id = g_pDbusMessage->getUInt();
 
+    /* First of all create the surface */
+    bool status = m_executor->execute(new SurfaceCreateCommand(&id));
+    /* after that apply the native content */
+    status &= m_executor->execute(new SurfaceSetNativeContentCommand(id, handle, pf, width, height));    
+
+    if (status)
+    {
+        g_pDbusMessage->initReply(msg);
+        g_pDbusMessage->appendUInt(id);
+        g_pDbusMessage->closeReply();
+    }
+    else
+    {
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+    }
+}
+
+void DBUSCommunicator::InitializeSurface(DBusConnection* conn, DBusMessage* msg)
+{
+    (void)conn; // TODO: remove, only prevents warning
+
+    g_pDbusMessage->initReceive(msg);
+    uint id = GraphicalObject::INVALID_ID;
+
+    bool status = m_executor->execute(new SurfaceCreateCommand(&id));
+    if (status)
+    {
+        g_pDbusMessage->initReply(msg);
+        g_pDbusMessage->appendUInt(id);
+        g_pDbusMessage->closeReply();
+    }
+    else
+    {
+        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+    }
+}
+
+void DBUSCommunicator::InitializeSurfaceFromId(DBusConnection* conn, DBusMessage* msg)
+{
+    (void)conn; // TODO: remove, only prevents warning
+
+    g_pDbusMessage->initReceive(msg);
+    uint id = g_pDbusMessage->getUInt();
     bool status = m_executor->execute(new SurfaceCreateCommand(&id));
     if (status)
     {
