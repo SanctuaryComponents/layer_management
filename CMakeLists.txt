@@ -41,6 +41,14 @@ message(STATUS
         "Build for Version ${VERSION} build ${ILM_VERSION}"
         )
 
+# set default build type, if not defined by user
+if (NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING
+                         "Choose build type: Debug, Release, RelWithDebInfo, MinSizeRel."
+                         FORCE)
+    message(STATUS "Build type not defined. Using default build type 'Release'.")
+endif (NOT CMAKE_BUILD_TYPE)
+
 
 ##################### RPM CONFIG ########################
 set(GENIVI_RPM_RELEASE "1${ILM_VERSION}")
