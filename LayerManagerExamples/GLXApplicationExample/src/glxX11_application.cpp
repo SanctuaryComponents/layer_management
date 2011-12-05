@@ -17,6 +17,7 @@
 *
 ****************************************************************************/
 #include "ilm_client.h"
+#include "config.h"
 #include "glx_helper.h"
 #include "gl2application.h"
 #include "xevents.h"
@@ -70,7 +71,7 @@ int main()
     {
         draw(33);
         usleep(1000);
-#ifdef ENABLE_INPUT_EVENTS
+#ifdef WITH_INPUT_EVENTS
 		parseXEventsNonBlocking();
 #endif
     }

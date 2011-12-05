@@ -47,76 +47,44 @@ set(GENIVI_RPM_RELEASE "1${ILM_VERSION}")
 set(SPEC_DIR ".")
 #########################################################
 
-
 # Platforms / A set of indiviual options at once
-# Choose only ONE of these!!
 
-option (WITH_X11_GLES 
-        "Build for X11 with GLES 2.0" ON)   
-               
-option (WITH_DESKTOP 
-        "Build for Desktop / GLX" OFF)
-
-option (WITH_CLIENTEXAMPLES 
-        "Build client examples " ON)
-
-
-option (WITH_EGL_EXAMPLE 
-        "Build EGL_EXAMPLE " ON)
-
-option (WITH_GLX_EXAMPLE 
-        "Build GLX_EXAMPLE " OFF)
-        
-option (WITH_TESTS
-        "Build Available Tests " OFF)
-        
-option (WITH_XTHREADS
-        "Build with usage of X11 Threading" ON)
-        
-option (WITH_GLX_LIB
-        "Build development library for GLX Based Renderers" OFF)
-        
-option (WITH_GLESv2_LIB
-        "Build development library for GLES2 Based Renderers" OFF)
-
-option (WITH_INPUT_EVENTS
-        "Activate input events handling" OFF)
+option (WITH_X11_GLES       "Build for X11 with GLES 2.0"                         ON )
+option (WITH_GLESv2_LIB     "Build development library for GLES2 Based Renderers" OFF)
+option (WITH_EGL_EXAMPLE    "Build EGL_EXAMPLE "                                  ON )
+option (WITH_DESKTOP        "Build for Desktop / GLX"                             OFF)
+option (WITH_GLX_LIB        "Build development library for GLX Based Renderers"   OFF)
+option (WITH_GLX_EXAMPLE    "Build GLX_EXAMPLE "                                  OFF)
+option (WITH_INPUT_EVENTS   "Activate input events handling"                      OFF)
+option (WITH_FORCE_COPY     "Force Software Copy of Pixmaps"                      OFF)
+option (WITH_XTHREADS       "Build with usage of X11 Threading"                   ON )
+option (WITH_CLIENTEXAMPLES "Build client examples "                              ON )
+option (WITH_TESTS          "Build Available Tests "                              OFF)
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 
-option (WITH_FORCE_COPY 
-        "Force Software Copy of Pixmaps" OFF)
-
-if (WITH_XTHREADS)
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DUSE_XTHREADS" CACHE STRING "" FORCE)
-endif(WITH_XTHREADS)
-
-if (WITH_INPUT_EVENTS)
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DENABLE_INPUT_EVENTS" CACHE STRING "" FORCE)
-endif(WITH_INPUT_EVENTS)
-
-        
 if (WITH_FORCE_COPY)
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DGLX_GRAPHICSYSTEM_FORCE_COPY -DGLES_FORCE_COPY" CACHE STRING "" FORCE)
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DGLX_GRAPHICSYSTEM_FORCE_COPY -DGLES_FORCE_COPY" CACHE STRING "" FORCE)
 endif(WITH_FORCE_COPY)
 
-include_directories ("${PROJECT_SOURCE_DIR}/3rdParty/")
-add_subdirectory (3rdParty)
+if (WITH_DESKTOP)
+    set (WITH_GLX_LIB ON CACHE STRING "" FORCE)
+endif(WITH_DESKTOP)     
 
+if (WITH_X11_GLES)
+    set (WITH_GLESv2_LIB ON CACHE STRING "" FORCE)
+endif(WITH_X11_GLES)
+
+include_directories ("${PROJECT_SOURCE_DIR}/3rdParty/")
+
+add_subdirectory (3rdParty)
 add_subdirectory (LayerManagerPlugins/Communicators/DBUSCommunicator)
 add_subdirectory (LayerManagerClient/ilmClient)
 add_subdirectory (LayerManagerUtils)
 add_subdirectory (LayerManagerCommands)
 add_subdirectory (LayerManagerService)
 
-if (WITH_DESKTOP)
-set (WITH_GLX_LIB ON CACHE STRING "" FORCE)
-endif(WITH_DESKTOP)     
-
-if (WITH_X11_GLES)
-set (WITH_GLESv2_LIB ON CACHE STRING "" FORCE)
-endif(WITH_X11_GLES)   
-if (WITH_GLESv2_LIB OR WITH_GLX_LIB )    
+if (WITH_GLESv2_LIB OR WITH_GLX_LIB)
     add_subdirectory (LayerManagerPlugins/Renderers/Graphic)
 endif(WITH_GLESv2_LIB OR WITH_GLX_LIB)
 
@@ -138,16 +106,16 @@ if (WITH_GLX_EXAMPLE)
 endif(WITH_GLX_EXAMPLE)
 
 if (WITH_CLIENTEXAMPLES)
-add_subdirectory (LayerManagerExamples/LayerManagerClientExample)
-add_subdirectory (LayerManagerExamples/LayerManagerToolBox)
-add_subdirectory (LayerManagerExamples/LayerSceneDescriptionExample)
+    add_subdirectory (LayerManagerExamples/LayerManagerClientExample)
+    add_subdirectory (LayerManagerExamples/LayerManagerToolBox)
+    add_subdirectory (LayerManagerExamples/LayerSceneDescriptionExample)
 endif(WITH_CLIENTEXAMPLES)
 
 # enable ctest if building with tests
 # run 'make test' after build to run all tests
 # be aware that some tests require a running layermanager
 if (WITH_TESTS)
-enable_testing()
+    enable_testing()
 endif(WITH_TESTS)
 
 

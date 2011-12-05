@@ -17,6 +17,7 @@
 *
 ****************************************************************************/
 #include "glx_helper.h"
+#include "config.h"
 #include "xevents.h"
 #include "LayerScene.h"
 #include <stdlib.h>
@@ -172,7 +173,7 @@ t_ilm_bool createGLXContext(t_ilm_int width, t_ilm_int height)
 
     //if (error == ILM_FAILED) return ILM_FALSE;
 
-#ifdef ENABLE_INPUT_EVENTS
+#ifdef WITH_INPUT_EVENTS
     xeventInitialiaze(g_x11ContextStruct.x11Display, surfaceid, 0, 0, width, height);
 #endif
 

@@ -39,7 +39,7 @@ configure_file(
 file(GLOB LM_SOURCES src/*.cpp src/shader/*.cpp)
 file(GLOB LM_INCLUDES include/*.h)
 
-add_executable(LayerManagerService ${LM_SOURCES})
+add_executable(LayerManagerService ${LM_SOURCES} ${LM_INCLUDES} include/config.h)
 
 add_dependencies(LayerManagerService LayerManagerUtils)
 add_dependencies(LayerManagerService LayerManagerCommands)

@@ -27,6 +27,8 @@
 #include <X11/Xutil.h>
 #include "Log.h"
 #include "ScreenShotType.h"
+#include "config.h"
+
 
 typedef XVisualInfo* (*GetVisualInfoFunction)(Display *dpy);
 
@@ -119,7 +121,7 @@ private:
     static int error(Display *dpy, XErrorEvent *ev);
     bool redrawEvent;
     static bool m_xerror;
-    #ifdef ENABLE_INPUT_EVENTS
+    #ifdef WITH_INPUT_EVENTS
     void ManageXInputEvent(XEvent *pevent);
     #endif
 

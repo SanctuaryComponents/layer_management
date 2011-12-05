@@ -16,9 +16,6 @@
  * limitations under the License.
  *
  ****************************************************************************/
-#ifndef _CONFIG_H_
-#define _CONFIG_H_
-
 #include "Log.h"
 
 // Auto-generated. Do not modify.
@@ -80,7 +77,7 @@ const char* CMAKE_INSTALL_PREFIX = "${CMAKE_INSTALL_PREFIX}";
 //-----------------------------------------------------------------------------
 // human readable report
 //-----------------------------------------------------------------------------
-void printCmakeConfiguration(void)
+void printConfiguration(void)
 {
     LOG_INFO ("Config", "Build Version       = " << ILM_VERSION);
     LOG_DEBUG("Config", "Build Type          = " << CMAKE_BUILD_TYPE);
@@ -99,6 +96,4 @@ void printCmakeConfiguration(void)
     LOG_DEBUG("Config", "WITH_X11_GLES       = ${WITH_X11_GLES}");
     LOG_DEBUG("Config", "WITH_XTHREADS       = ${WITH_XTHREADS}");
 }
-
-#endif // _CONFIG_H_
 

@@ -444,7 +444,7 @@ bool X11WindowSystem::CreateCompositorWindow()
     XSetWindowAttributes attr;
     // draw a black background the full size of the resolution
     attr.override_redirect = True;
-#ifdef ENABLE_INPUT_EVENTS
+#ifdef WITH_INPUT_EVENTS
     attr.event_mask =  ExposureMask | StructureNotifyMask | ButtonPressMask | ButtonReleaseMask | Button1MotionMask;
 #else
     attr.event_mask = ExposureMask | StructureNotifyMask;
@@ -728,11 +728,12 @@ init_complete:
     this->graphicSystem->clearBackground();
     this->graphicSystem->swapBuffers();
     XFlush(this->x11Display);
+
     while (this->m_running)
     {
-#ifndef USE_XTHREADS
+#ifndef WITH_XTHREADS
         if ( XPending(this->x11Display) > 0) {
-#endif //USE_XTHREADS
+#endif //WITH_XTHREADS
             XEvent event;
             // blocking wait for event
             XNextEvent(this->x11Display, &event);
@@ -783,9 +784,10 @@ init_complete:
                 //			 else
                 //				 renderer->DestroyWindow(event.xreparent.window);
                 break;
-#ifdef ENABLE_INPUT_EVENTS
+#ifdef WITH_INPUT_EVENTS
             case ButtonPress:
             case ButtonRelease:
+
             case MotionNotify:
                 ManageXInputEvent(&event);
                 break;
@@ -806,9 +808,10 @@ init_complete:
                 break;
             }
             this->m_pScene->unlockScene();
-#ifndef USE_XTHREADS
+
+#ifndef WITH_XTHREADS
         }
-#endif //USE_XTHREADS
+#endif //WITH_XTHREADS
         if (this->redrawEvent)
         {
             this->redrawEvent = false;
@@ -831,7 +834,7 @@ init_complete:
             this->Redraw();
             checkRedraw = false;
         }
-#ifndef USE_XTHREADS
+#ifndef WITH_XTHREADS
         else {
             /* put thread in sleep mode for 500 useconds due to safe cpu performance */
 
@@ -845,7 +848,7 @@ init_complete:
 }
 
 
-#ifdef ENABLE_INPUT_EVENTS
+#ifdef WITH_INPUT_EVENTS
 void X11WindowSystem::ManageXInputEvent(XEvent *pevent)
 {
     Surface * surf;
@@ -870,22 +873,22 @@ void X11WindowSystem::ManageXInputEvent(XEvent *pevent)
     surf = m_pScene->getSurfaceAt((unsigned int *) pX, (unsigned int *) pY, 0.1);
     if (surf != NULL)
     {
-        pevent->xany.window = surf->nativeHandle;
-        XSendEvent(x11Display, surf->nativeHandle, false, 0, pevent);
+        pevent->xany.window = surf->getNativeContent();
+        XSendEvent(x11Display, pevent->xany.window, false, 0, pevent);
     }
 }
 #endif
 
 
-#ifdef USE_XTHREADS
+#ifdef WITH_XTHREADS
 static Display* displaySignal = NULL;
-#endif //USE_XTHREADS
+#endif //WITH_XTHREADS
 void X11WindowSystem::signalRedrawEvent()
 {
     // set flag that redraw is needed
     redrawEvent = true;
     m_damaged = true;
-#ifdef USE_XTHREADS
+#ifdef WITH_XTHREADS
     // send dummy expose event, to wake up blocking x11 event loop (XNextEvent)
     LOG_DEBUG("X11WindowSystem", "Sending dummy event to wake up renderer thread");
     if (NULL == displaySignal )
@@ -898,7 +901,7 @@ void X11WindowSystem::signalRedrawEvent()
     XUnlockDisplay(displaySignal);
     XFlush(displaySignal);
     LOG_DEBUG("X11WindowSystem", "Event successfully sent to renderer");
-#endif //USE_XTHREADS
+#endif //WITH_XTHREADS
 }
 
 void X11WindowSystem::cleanup(){
@@ -915,21 +918,21 @@ void X11WindowSystem::cleanup(){
         XFree(windowVis);
     }
 
-#ifdef USE_XTHREADS
+#ifdef WITH_XTHREADS
     if ( NULL  != displaySignal )
     {
         XCloseDisplay(displaySignal);
     }
-#endif //USE_XTHREADS
+#endif //WITH_XTHREADS
     XCloseDisplay(x11Display);
     m_running = false;
 }
 
 bool X11WindowSystem::init(BaseGraphicSystem<Display*,Window>* base)
 {
-#ifdef USE_XTHREADS
+#ifdef WITH_XTHREADS
     XInitThreads();
-#endif //USE_XTHREADS
+#endif //WITH_XTHREADS
     X11WindowSystem *renderer = this;
     graphicSystem = base;
     int status = pthread_create( &renderThread, NULL, X11eventLoopCallback, (void*) renderer);

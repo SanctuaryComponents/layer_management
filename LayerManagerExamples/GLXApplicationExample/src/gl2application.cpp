@@ -17,6 +17,7 @@
 *
 ****************************************************************************/
 #include "glx_helper.h"
+#include "config.h"
 #include "gl2application.h"
 #include "IlmMatrix.h"
 #include <stdlib.h>
@@ -77,7 +78,7 @@ t_ilm_bool initGlApplication(GLuint width, GLuint height)
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-#ifdef ENABLE_INPUT_EVENTS
+#ifdef WITH_INPUT_EVENTS
 	/* Make the background visible so that we can click on it */
 	glClearColor(.2f, .4f, .5f, 1.0f);
 #else
