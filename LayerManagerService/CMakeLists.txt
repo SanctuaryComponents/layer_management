@@ -28,14 +28,6 @@ include_directories ("${PROJECT_SOURCE_DIR}/LayerManagerCommands/include")
 link_directories ("${PROJECT_SOURCE_DIR}/LayerManagerUtils/bin")
 link_directories ("${PROJECT_SOURCE_DIR}/LayerManagerCommands")
 
-# generate version header file, used in main.cpp
-message(STATUS "Generating Version.h header file:")
-message(STATUS "-- version = ${ILM_VERSION}")
-configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/Version.h.in
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/Version.h
-)
-
 # generate cmake configuration header file, includes information on the
 # project configuration, compiler settings, ...
 message(STATUS "Generating CmakeConfiguration.h header file with build system configuration.")
