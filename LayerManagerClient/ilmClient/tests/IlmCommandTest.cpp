@@ -53,28 +53,28 @@ public:
 
     void removeAll(){
         t_ilm_layer* layers;
-        t_ilm_int numLayer;
+        t_ilm_int numLayer=0;
         ilm_getLayerIDs(&numLayer, &layers);
         for (t_ilm_int i=0; i<numLayer; i++ ){
             ilm_layerRemove(layers[i]);
         };
 
         t_ilm_surface* surfaces;
-        t_ilm_int numSurfaces;
+        t_ilm_int numSurfaces=0;
         ilm_getSurfaceIDs(&numSurfaces, &surfaces);
         for (t_ilm_int i=0; i<numSurfaces; i++ ){
             ilm_surfaceRemove(surfaces[i]);
         };
 
         t_ilm_layergroup* layergroups;
-        t_ilm_int numLayergroup;
+        t_ilm_int numLayergroup=0;
         ilm_getLayerGroupIDs(&numLayergroup, &layergroups);
         for (t_ilm_int i=0; i<numLayergroup; i++ ){
             ilm_layergroupRemove(layergroups[i]);
         };
 
         t_ilm_surfacegroup* surfacegroups;
-        t_ilm_int numSurfacegroup;
+        t_ilm_int numSurfacegroup=0;
         ilm_getSurfaceGroupIDs(&numSurfacegroup, &surfacegroups);
         for (t_ilm_int i=0; i<numSurfacegroup; i++ ){
             ilm_surfacegroupRemove(surfacegroups[i]);
@@ -451,11 +451,11 @@ TEST_F(IlmCommandTest, ilm_getLayerIDsOfScreen) {
     ilm_displaySetRenderOrder(0,idRenderOrder,roLength);
     ilm_commitChanges();
 
-    t_ilm_int length;
+    t_ilm_int length = 0;
     t_ilm_layer* IDs;
     ilm_getLayerIDsOnScreen(0,&length,&IDs);
 
-
+    ASSERT_NE(length,0);
     ASSERT_EQ(layer1,IDs[0]);
     ASSERT_EQ(layer2,IDs[1]);
 }
@@ -561,6 +561,22 @@ TEST_F(IlmCommandTest, ilm_layerCreate_Remove) {
     ilm_getLayerIDs(&length,&IDs);
     ASSERT_EQ(length,0);
 }
+
+TEST_F(IlmCommandTest, ilm_surface_initialize) {
+    uint surface_10 = 10;
+    uint surface_20 = 20;
+    ilm_surfaceInitialize(&surface_10);
+    ilm_surfaceInitialize(&surface_20);
+
+    t_ilm_int length;
+    t_ilm_uint* IDs;
+    ilm_getSurfaceIDs(&length,&IDs);
+
+    ASSERT_EQ(length,2);
+    ASSERT_EQ(surface_10,IDs[0]);
+    ASSERT_EQ(surface_20,IDs[1]);
+}
+
 
 TEST_F(IlmCommandTest, ilm_layerAddSurface_ilm_layerRemoveSurface_ilm_getSurfaceIDsOnLayer) {
     uint layer = 3246;
