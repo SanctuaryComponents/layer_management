@@ -113,6 +113,8 @@ private:
 
 inline GraphicalSurface::GraphicalSurface(ObjectType type)
 : GraphicalObject(type, 1.0, false)
+, OriginalSourceWidth(0)
+, OriginalSourceHeight(0)
 , m_orientation(Zero)
 , m_sourceViewport(0,0,0,0)
 , m_destinationViewport(0,0,0,0)
@@ -121,6 +123,8 @@ inline GraphicalSurface::GraphicalSurface(ObjectType type)
 
 inline GraphicalSurface::GraphicalSurface(int externalId,ObjectType type)
 : GraphicalObject(externalId,type,1.0,false)
+, OriginalSourceWidth(0)
+, OriginalSourceHeight(0)
 , m_orientation(Zero)
 , m_sourceViewport(0,0,0,0)
 , m_destinationViewport(0,0,0,0)
