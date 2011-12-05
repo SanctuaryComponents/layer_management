@@ -243,8 +243,6 @@ void X11WindowSystem::configureSurfaceWindow(Window window)
 
         surface->OriginalSourceHeight = winHeight;
         surface->OriginalSourceWidth = winWidth;
-/*        surface->setDestinationRegion(Rectangle(0, 0, winWidth, winHeight));*/
-/*        surface->setSourceRegion(Rectangle(0, 0, winWidth, winHeight));*/
 
         LOG_DEBUG("X11WindowSystem", "Done Updating window " << window);
     }
@@ -328,7 +326,7 @@ void X11WindowSystem::UnMapWindow(Window window)
             LOG_WARNING("X11WindowSystem", "Platform surface not available for window " << window);
             return;
         }
-        XPlatformSurface* x11surf = (XPlatformSurface*)surface->platform;
+        XPlatformSurface* x11surf = (XPlatformSurface*)surface->platform;        
         LOG_DEBUG("X11WindowSystem", "Unmapping surface " << surface->getID());
         x11surf->isMapped = false;
 
@@ -341,6 +339,8 @@ void X11WindowSystem::UnMapWindow(Window window)
         if (x11surf->pixmap)
         {
             int result = XFreePixmap(x11Display, x11surf->pixmap);
+            delete surface->platform;
+            surface->platform = NULL;
             LOG_DEBUG("X11WindowSystem", "XFreePixmap() returned " << result);
         }
     }
@@ -371,7 +371,7 @@ void X11WindowSystem::NewWindow(Surface* surface, Window window)
                 XMapRaised(x11Display, window);
             }
         }else {
-        LOG_DEBUG("X11WindowSystem", "Error fetching window name");
+            LOG_DEBUG("X11WindowSystem", "Error fetching window name");
         }
         LOG_DEBUG("X11WindowSystem","Creating New Damage for window - " << window);
         XDamageCreate(x11Display,window,XDamageReportNonEmpty);
@@ -799,7 +799,7 @@ init_complete:
                     Surface* currentSurface = this->getSurfaceForWindow(((XDamageNotifyEvent*)(&event))->drawable);
                     if (currentSurface==NULL)
                     {
-                        LOG_ERROR("X11WindowSystem", "surface empty");
+                        LOG_WARNING("X11WindowSystem", "Surface empty during damage notification");
                         break;
                     }
                     currentSurface->damaged = true;
@@ -972,6 +972,7 @@ void X11WindowSystem::stop()
     LOG_INFO("X11WindowSystem","Stopping..");
     this->m_running = false;
     // needed if start was never called, we wake up thread, so it can immediatly finish
+    this->signalRedrawEvent();
     pthread_mutex_unlock(&run_lock);
     pthread_join(renderThread,NULL);
 }
@@ -981,7 +982,7 @@ void X11WindowSystem::allocatePlatformSurface(Surface* surface)
     XPlatformSurface* nativeSurface = (XPlatformSurface*)surface->platform;
     if (!nativeSurface)
     {
-        /*LOG_INFO("X11WindowSystem","creating native surface for new window");*/
+        LOG_DEBUG("X11WindowSystem","creating native surface for new window");
         // this surface does not have a native platform surface attached yet!
         NewWindow(surface, surface->getNativeContent());
         MapWindow(surface->getNativeContent());
