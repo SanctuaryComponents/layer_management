@@ -491,9 +491,10 @@ int main(int argc, char **argv)
         for (; iter != iterEnd; ++iter)
         {
             ISceneProvider* sceneProvider = *iter;
-            pManager->removeSceneProvider(sceneProvider);
             delete sceneProvider;
         }
+
+        pList->clear();
     }
 
     LOG_DEBUG("LayerManagerService", "Removing all communicator plugins.")
@@ -505,9 +506,10 @@ int main(int argc, char **argv)
         for (; iter != iterEnd; ++iter)
         {
             ICommunicator* comm = *iter;
-            pManager->removeCommunicator(comm);
             delete comm;
         }
+
+        pList->clear();
     }
 
     LOG_DEBUG("LayerManagerService", "Removing all renderer plugins.")
@@ -519,11 +521,13 @@ int main(int argc, char **argv)
         for (; iter != iterEnd; ++iter)
         {
             IRenderer* renderer = *iter;
-            pManager->removeRenderer(renderer);
             delete renderer;
         }
+
+        pList->clear();
     }
 
+    LOG_DEBUG("LayerManagerService", "Removing manager.")
     delete pManager;
 
     // reset signal handling to default
@@ -532,6 +536,8 @@ int main(int argc, char **argv)
     signal(SIGSEGV, SIG_DFL);
     signal(SIGTERM, SIG_DFL);
     signal(SIGINT, SIG_DFL);
+
+    LOG_INFO("LayerManagerService", "Shutdown complete.")
 
     return (int)started - 1;
 }
