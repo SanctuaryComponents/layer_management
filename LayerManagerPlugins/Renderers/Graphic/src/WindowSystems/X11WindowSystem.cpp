@@ -233,12 +233,12 @@ void X11WindowSystem::configureSurfaceWindow(Window window)
         Surface* surface = getSurfaceForWindow(window);
         if (!surface)
         {
-            LOG_ERROR("X11WindowSystem", "surface emtpy");
+             LOG_WARNING("X11WindowSystem", "Could not find surface for window " << window);
             return;
         }
         if (!surface->platform)
         {
-            LOG_ERROR("X11WindowSystem", "platform surface empty");
+            LOG_WARNING("X11WindowSystem", "Platform surface not available for window " << window);
             return;
         }
 
@@ -305,7 +305,7 @@ void X11WindowSystem::MapWindow(Window window)
             graphicSystem->getTextureBinder()->createClientBuffer(surface);
             XSync(x11Display, 0);
 
-            LOG_DEBUG("X11WindowSystem", "Mapping Surface " << surface->getID() << "to window " << window);
+            LOG_DEBUG("X11WindowSystem", "Mapping Surface " << surface->getID() << " to window " << window);
             LOG_DEBUG("X11WindowSystem", "Mapping successfull");
         }
     }
