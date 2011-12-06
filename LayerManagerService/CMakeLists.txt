@@ -55,3 +55,24 @@ target_link_libraries(LayerManagerService ${LIBS})
 
 install (TARGETS LayerManagerService DESTINATION bin)
 install (FILES ${LM_INCLUDES} DESTINATION include/layermanager)
+
+
+if (WITH_TESTS)
+enable_testing()
+
+add_executable(LayerManagerService_Test
+    tests/SceneTest.cpp
+    src/GraphicalObject.cpp
+    src/GraphicalSurface.cpp
+    src/Layermanager.cpp
+    src/Scene.cpp
+    src/shader/Shader.cpp
+    src/shader/ShaderProgram.cpp
+    src/shader/ShaderProgramFactory.cpp
+    src/shader/ShaderUniform.cpp
+)
+target_link_libraries(LayerManagerService_Test ${LIBS} gtest gmock)
+
+add_test(LayerManagerService LayerManagerService_Test )
+
+endif(WITH_TESTS) 
