@@ -422,6 +422,7 @@ void X11WindowSystem::DestroyWindow(Window window)
         surface->removeNativeContent();
         delete surface->platform;
         surface->platform = NULL;                
+        surface->renderPropertyChanged = true;
     }
 }
 
