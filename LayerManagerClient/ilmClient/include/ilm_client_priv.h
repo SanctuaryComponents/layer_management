@@ -32,30 +32,17 @@ typedef struct _ilm_param
 
 #ifdef _ILM_CLIENT_C_
 
-#define ILM_INTERFACE_COMPOSITE_CLIENT "de.bmw.CompositingClient"
+#define ILM_INTERFACE_COMPOSITE_CLIENT "org.genivi.layermanagementclient"
 
 typedef struct s_ilmClient
 {
     DBusConnection *dbus_connection;
-    DBusBusType        dbus_type;
-    DBusError        dbus_error;
+    DBusBusType     dbus_type;
+    DBusError       dbus_error;
 } t_ilm_client;
 
 static t_ilm_bool g_ilm_init = ILM_FALSE;
 static t_ilm_client* g_ilm_client;
-
-#define ILM_ERROR(method,error) \
-    fprintf (stderr,"[ILM_CLIENT][%s] %s\n",method,error)
-
-#define ILM_CHECK_METHOD_ERROR(message) \
-if (message){ \
-    t_ilm_int messageType = dbus_message_get_type(message); \
-    if (messageType == DBUS_MESSAGE_TYPE_ERROR) \
-    { \
-        fprintf (stderr,"[ILM_CLIENT][%s] DBUS ERROR: %s\n",__func__,dbus_message_get_error_name(message) ); \
-        return ILM_FAILED; \
-    } \
-}
 
 DBusMessage* _ilm_dbus_method_call(DBusConnection* const connection, const t_ilm_char *method, t_ilm_param* param, const t_ilm_uint paramlength);
 ilmErrorTypes _ilm_get_dbus_array_length(DBusMessage* const message, const t_ilm_int type, t_ilm_int* const length);
@@ -73,6 +60,26 @@ t_ilm_long _ilm_get_int64_element(DBusMessageIter *iter);
 t_ilm_float _ilm_get_float_element(DBusMessageIter *iter);
 
 void _ilm_close_dbus_method_call(const DBusMessage* message);
+
+#define ILM_ERROR(method,error) \
+    fprintf (stderr,"ilm client | %s | %s\n",method,error)
+
+#define ILM_CHECK_METHOD_ERROR(message) \
+if (message){ \
+    t_ilm_int messageType = dbus_message_get_type(message); \
+    if (messageType == DBUS_MESSAGE_TYPE_ERROR) \
+    { \
+        t_ilm_param errorparam[1]; \
+        char *errorbuf; \
+        char writeoutbuf[256]; \
+        memset(writeoutbuf,0,256); \
+        _ilm_setup_param(errorparam, DBUS_TYPE_STRING, &errorbuf); \
+        _ilm_get_dbus_basic_elements(message, 1, errorparam); \
+        sprintf(writeoutbuf,"%s : %s\n",dbus_message_get_error_name(message), errorbuf); \
+        fprintf (stderr,"ilm client | %s | %s\n",__func__, writeoutbuf ); \
+        return ILM_FAILED; \
+    } \
+}
 
 #endif /* _ILM_CLIENT_C_ */
 #endif /* _ILM_CLIENT_PRIV_H_ */

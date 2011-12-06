@@ -33,7 +33,12 @@
 
 #define DEFAULT_SCREEN 0
 
-const char* ID_UNKNOWN = "id not known to layermanager";
+const char* SERVICE_ERROR = "org.genivi.layermanagementservice.error";
+const char* RESSOURCE_ALREADY_INUSE = "Ressource already in use";
+const char* INVALID_ARGUMENT = "Invalid argument";
+const char* RESSOURCE_NOT_FOUND = "Ressource not found";
+
+
 
 static DBUSMessageHandler* g_pDbusMessage;
 
@@ -184,7 +189,7 @@ void DBUSCommunicator::Debug(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, INVALID_ARGUMENT);
     }
 }
 
@@ -241,7 +246,7 @@ void DBUSCommunicator::ScreenShot(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, INVALID_ARGUMENT);
     }
 }
 void DBUSCommunicator::process(int timeout_ms) 
@@ -264,7 +269,7 @@ void DBUSCommunicator::ScreenShotOfLayer(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -283,7 +288,7 @@ void DBUSCommunicator::ScreenShotOfSurface(DBusConnection* conn, DBusMessage* ms
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -320,7 +325,7 @@ void DBUSCommunicator::ListAllLayerIDsOnScreen(DBusConnection* conn, DBusMessage
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, INVALID_ARGUMENT);
     }
     m_executor->getScene()->unlockScene();
 
@@ -398,7 +403,7 @@ void DBUSCommunicator::ListSurfacesOfSurfacegroup(DBusConnection* conn, DBusMess
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 DBusHandlerResult DBUSCommunicator::processMessageFunc(DBusConnection* conn,DBusMessage* msg, void *user_data)
@@ -445,7 +450,7 @@ void DBUSCommunicator::ListLayersOfLayergroup(DBusConnection* conn, DBusMessage*
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -480,7 +485,7 @@ void DBUSCommunicator::ListSurfaceofLayer(DBusConnection* conn, DBusMessage* msg
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
     m_executor->getScene()->unlockScene();
 }
@@ -518,7 +523,7 @@ void DBUSCommunicator::GetPropertiesOfSurface(DBusConnection* conn, DBusMessage*
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -554,7 +559,7 @@ void DBUSCommunicator::GetPropertiesOfLayer(DBusConnection* conn, DBusMessage* m
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -585,7 +590,7 @@ void DBUSCommunicator::CreateSurface(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_ALREADY_INUSE);
     }
 }
 
@@ -616,7 +621,7 @@ void DBUSCommunicator::CreateSurfaceFromId(DBusConnection* conn, DBusMessage* ms
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_ALREADY_INUSE);
     }
 }
 
@@ -636,7 +641,7 @@ void DBUSCommunicator::InitializeSurface(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_ALREADY_INUSE);
     }
 }
 
@@ -655,7 +660,7 @@ void DBUSCommunicator::InitializeSurfaceFromId(DBusConnection* conn, DBusMessage
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_ALREADY_INUSE);
     }
 }
 
@@ -678,7 +683,7 @@ void DBUSCommunicator::SetSurfaceNativeContent(DBusConnection* conn, DBusMessage
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_ALREADY_INUSE);
     }
 }
 
@@ -696,7 +701,7 @@ void DBUSCommunicator::RemoveSurface(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_ALREADY_INUSE);
     }
 }
 
@@ -716,7 +721,7 @@ void DBUSCommunicator::CreateLayer(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_ALREADY_INUSE);
     }
 }
 
@@ -738,7 +743,7 @@ void DBUSCommunicator::CreateLayerFromId(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_ALREADY_INUSE);
     }
 }
 
@@ -761,7 +766,7 @@ void DBUSCommunicator::CreateLayerWithDimension(DBusConnection* conn, DBusMessag
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -783,7 +788,7 @@ void DBUSCommunicator::CreateLayerFromIdWithDimension(DBusConnection* conn, DBus
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_ALREADY_INUSE);
     }
 }
 
@@ -801,7 +806,7 @@ void DBUSCommunicator::RemoveLayer(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -821,7 +826,7 @@ void DBUSCommunicator::AddSurfaceToSurfaceGroup(DBusConnection* conn, DBusMessag
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -841,7 +846,7 @@ void DBUSCommunicator::RemoveSurfaceFromSurfaceGroup(DBusConnection* conn, DBusM
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -861,7 +866,7 @@ void DBUSCommunicator::AddLayerToLayerGroup(DBusConnection* conn, DBusMessage* m
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -881,7 +886,7 @@ void DBUSCommunicator::RemoveLayerFromLayerGroup(DBusConnection* conn, DBusMessa
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -901,7 +906,7 @@ void DBUSCommunicator::AddSurfaceToLayer(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_ALREADY_INUSE);
     }
 }
 
@@ -921,7 +926,7 @@ void DBUSCommunicator::RemoveSurfaceFromLayer(DBusConnection* conn, DBusMessage*
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -940,7 +945,7 @@ void DBUSCommunicator::CreateSurfaceGroup(DBusConnection* conn, DBusMessage* msg
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_ALREADY_INUSE);
     }
 }
 
@@ -961,7 +966,7 @@ void DBUSCommunicator::CreateSurfaceGroupFromId(DBusConnection* conn, DBusMessag
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_ALREADY_INUSE);
     }
 }
 
@@ -980,7 +985,7 @@ void DBUSCommunicator::RemoveSurfaceGroup(DBusConnection* conn, DBusMessage* msg
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -999,7 +1004,7 @@ void DBUSCommunicator::CreateLayerGroup(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_ALREADY_INUSE);
     }
 }
 
@@ -1020,7 +1025,7 @@ void DBUSCommunicator::CreateLayerGroupFromId(DBusConnection* conn, DBusMessage*
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_ALREADY_INUSE);
     }
 }
 
@@ -1039,7 +1044,7 @@ void DBUSCommunicator::RemoveLayerGroup(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -1062,7 +1067,7 @@ void DBUSCommunicator::SetSurfaceSourceRegion(DBusConnection* conn, DBusMessage*
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -1086,7 +1091,7 @@ void DBUSCommunicator::SetLayerSourceRegion(DBusConnection* conn, DBusMessage* m
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -1109,7 +1114,7 @@ void DBUSCommunicator::SetSurfaceDestinationRegion(DBusConnection* conn, DBusMes
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -1130,7 +1135,7 @@ void DBUSCommunicator::SetSurfacePosition(DBusConnection* conn, DBusMessage* msg
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -1153,7 +1158,7 @@ void DBUSCommunicator::GetSurfacePosition(DBusConnection* conn, DBusMessage* msg
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -1174,7 +1179,7 @@ void DBUSCommunicator::SetSurfaceDimension(DBusConnection* conn, DBusMessage* ms
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -1189,7 +1194,6 @@ void DBUSCommunicator::SetLayerDestinationRegion(DBusConnection* conn, DBusMessa
     uint width = g_pDbusMessage->getUInt();
     uint height = g_pDbusMessage->getUInt();
 
-    //LOG_DEBUG("DBUSCommunicator","new SetDestinationRectangleCommand with arguments: " <<id <<" " << x <<" "<< y <<" "<< width <<" "<< height );
     bool status = m_executor->execute(new LayerSetDestinationRectangleCommand(id, x, y, width, height));
     if (status)
     {
@@ -1198,7 +1202,7 @@ void DBUSCommunicator::SetLayerDestinationRegion(DBusConnection* conn, DBusMessa
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -1219,7 +1223,7 @@ void DBUSCommunicator::SetLayerPosition(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -1242,7 +1246,7 @@ void DBUSCommunicator::GetLayerPosition(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -1263,7 +1267,7 @@ void DBUSCommunicator::SetLayerDimension(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -1286,7 +1290,7 @@ void DBUSCommunicator::GetLayerDimension(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -1309,7 +1313,7 @@ void DBUSCommunicator::GetSurfaceDimension(DBusConnection* conn, DBusMessage* ms
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -1329,7 +1333,7 @@ void DBUSCommunicator::SetSurfaceOpacity(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -1349,7 +1353,7 @@ void DBUSCommunicator::SetLayerOpacity(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -1369,7 +1373,7 @@ void DBUSCommunicator::SetSurfacegroupOpacity(DBusConnection* conn, DBusMessage*
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -1389,7 +1393,7 @@ void DBUSCommunicator::SetLayergroupOpacity(DBusConnection* conn, DBusMessage* m
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -1410,7 +1414,7 @@ void DBUSCommunicator::GetSurfaceOpacity(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -1431,7 +1435,7 @@ void DBUSCommunicator::GetLayerOpacity(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -1452,7 +1456,7 @@ void DBUSCommunicator::GetSurfacegroupOpacity(DBusConnection* conn, DBusMessage*
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -1473,7 +1477,7 @@ void DBUSCommunicator::GetLayergroupOpacity(DBusConnection* conn, DBusMessage* m
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -1494,7 +1498,7 @@ void DBUSCommunicator::SetSurfaceOrientation(DBusConnection* conn, DBusMessage* 
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -1515,7 +1519,7 @@ void DBUSCommunicator::GetSurfaceOrientation(DBusConnection* conn, DBusMessage* 
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -1536,7 +1540,7 @@ void DBUSCommunicator::SetLayerOrientation(DBusConnection* conn, DBusMessage* ms
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -1557,7 +1561,7 @@ void DBUSCommunicator::GetLayerOrientation(DBusConnection* conn, DBusMessage* ms
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -1578,7 +1582,7 @@ void DBUSCommunicator::GetSurfacePixelformat(DBusConnection* conn, DBusMessage* 
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -1598,7 +1602,7 @@ void DBUSCommunicator::SetSurfaceVisibility(DBusConnection* conn, DBusMessage* m
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -1618,7 +1622,7 @@ void DBUSCommunicator::SetLayerVisibility(DBusConnection* conn, DBusMessage* msg
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -1640,7 +1644,7 @@ void DBUSCommunicator::GetSurfaceVisibility(DBusConnection* conn, DBusMessage* m
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -1662,7 +1666,7 @@ void DBUSCommunicator::GetLayerVisibility(DBusConnection* conn, DBusMessage* msg
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -1682,7 +1686,7 @@ void DBUSCommunicator::SetSurfacegroupVisibility(DBusConnection* conn, DBusMessa
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -1702,7 +1706,7 @@ void DBUSCommunicator::SetLayergroupVisibility(DBusConnection* conn, DBusMessage
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -1726,7 +1730,7 @@ void DBUSCommunicator::SetRenderOrderOfLayers(DBusConnection* conn, DBusMessage*
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -1751,7 +1755,7 @@ void DBUSCommunicator::SetSurfaceRenderOrderWithinLayer(DBusConnection* conn, DB
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -1770,7 +1774,7 @@ void DBUSCommunicator::GetLayerType(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -1803,7 +1807,7 @@ void DBUSCommunicator::GetLayerCapabilities(DBusConnection* conn, DBusMessage* m
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -1846,7 +1850,7 @@ void DBUSCommunicator::Exit(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, INVALID_ARGUMENT);
     }
 }
 
@@ -1862,7 +1866,7 @@ void DBUSCommunicator::CommitChanges(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, INVALID_ARGUMENT);
     }
 }
 
@@ -1884,7 +1888,7 @@ void DBUSCommunicator::CreateShader(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -1903,7 +1907,7 @@ void DBUSCommunicator::DestroyShader(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -1923,7 +1927,7 @@ void DBUSCommunicator::SetShader(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
@@ -1946,7 +1950,7 @@ void DBUSCommunicator::SetUniforms(DBusConnection* conn, DBusMessage* msg)
     }
     else
     {
-        g_pDbusMessage->ReplyError(msg, DBUS_ERROR_INVALID_ARGS, ID_UNKNOWN);
+        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
     }
 }
 
