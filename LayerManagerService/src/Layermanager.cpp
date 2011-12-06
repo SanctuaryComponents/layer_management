@@ -223,11 +223,17 @@ bool Layermanager::executeCommand(ICommand* commandToBeExecuted)
 
 bool Layermanager::enqueueCommand(ICommand* commandToBeExecuted)
 {
+    unsigned int sizeBefore;
+    unsigned int sizeAfter;
     LOG_DEBUG("LayerManagerService", "add command to queue: " << commandToBeExecuted->getString());
     m_pScene->lockScene();
+    sizeBefore = m_pScene->m_toBeCommittedList.size();
     m_pScene->m_toBeCommittedList.push_back(commandToBeExecuted);
+    sizeAfter = m_pScene->m_toBeCommittedList.size();
     m_pScene->unlockScene();
-    return true; // TODO
+
+    // if queue size increased by 1, enqueue command was successful
+    return (sizeAfter == sizeBefore + 1);
 }
 
 bool Layermanager::execute(ICommand* commandToBeExecuted)

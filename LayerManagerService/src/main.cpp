@@ -398,6 +398,8 @@ int main(int argc, char **argv)
 {
     // setup signal handler and global flag to handle shutdown
     g_LayerManagerRunning = true;
+
+    LOG_DEBUG("LayerManagerService", "Setup signal handling.");
     signal(SIGBUS, signalHandler);
     signal(SIGSEGV, signalHandler);
     signal(SIGTERM, signalHandler);
@@ -460,35 +462,72 @@ int main(int argc, char **argv)
     }
     bool started = pManager->startManagement(displayWidth, displayHeight, displayName);
 
-    if (!started)
+    if (started)
     {
-        goto cleanup;
-    }
-
-    // must stay within main method or else application would completely exit
-    LOG_INFO("LayerManagerService", "Startup complete. EnterMainloop");
-
-    while (g_LayerManagerRunning)
-    {
-        CommunicatorListIterator commIter = communicatorList.begin();
-        CommunicatorListIterator commIterEnd = communicatorList.end();
-        for (; commIter != commIterEnd; ++commIter)
+        LOG_INFO("LayerManagerService", "Startup complete. EnterMainloop");
+    
+        while (g_LayerManagerRunning)
         {
-            (*commIter)->process(100);
+            CommunicatorListIterator commIter = communicatorList.begin();
+            CommunicatorListIterator commIterEnd = communicatorList.end();
+            for (; commIter != commIterEnd; ++commIter)
+            {
+                (*commIter)->process(100);
+            }
         }
     }
 
-
-    // cleanup
-    cleanup:
-
     LOG_INFO("LayerManagerService", "Exiting Application.");
+
+    LOG_DEBUG("LayerManagerService", "Stopping service.")
     pManager->stopManagement();
-    //delete pRenderer; TODO
-    //delete pCommunicator; TODO
+
+    LOG_DEBUG("LayerManagerService", "Removing all scene provider plugins.")
+    {
+        SceneProviderList* pList = pManager->getSceneProviderList();
+        SceneProviderListIterator iter = pList->begin();
+        SceneProviderListIterator iterEnd = pList->end();
+
+        for (; iter != iterEnd; ++iter)
+        {
+            ISceneProvider* sceneProvider = *iter;
+            pManager->removeSceneProvider(sceneProvider);
+            delete sceneProvider;
+        }
+    }
+
+    LOG_DEBUG("LayerManagerService", "Removing all communicator plugins.")
+    {
+        CommunicatorList* pList = pManager->getCommunicatorList();
+        CommunicatorListIterator iter = pList->begin();
+        CommunicatorListIterator iterEnd = pList->end();
+
+        for (; iter != iterEnd; ++iter)
+        {
+            ICommunicator* comm = *iter;
+            pManager->removeCommunicator(comm);
+            delete comm;
+        }
+    }
+
+    LOG_DEBUG("LayerManagerService", "Removing all renderer plugins.")
+    {
+        RendererList* pList = pManager->getRendererList();
+        RendererListIterator iter = pList->begin();
+        RendererListIterator iterEnd = pList->end();
+
+        for (; iter != iterEnd; ++iter)
+        {
+            IRenderer* renderer = *iter;
+            pManager->removeRenderer(renderer);
+            delete renderer;
+        }
+    }
+
     delete pManager;
 
     // reset signal handling to default
+    LOG_DEBUG("LayerManagerService", "Remove signal handling.");
     signal(SIGBUS, SIG_DFL);
     signal(SIGSEGV, SIG_DFL);
     signal(SIGTERM, SIG_DFL);
