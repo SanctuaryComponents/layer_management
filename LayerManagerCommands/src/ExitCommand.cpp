@@ -23,9 +23,8 @@
 
 ExecutionResult ExitCommand::execute(ICommandExecutor* executor)
 {
-    (void)executor; // TODO: remove, only prevents warning
-    ExecutionResult result = ExecutionFailed; //executor->stopManagement(); //TODO
-    return result;
+    bool result = executor->stopManagement();
+    return result ? ExecutionSuccess : ExecutionFailed;
 }
 
 const std::string ExitCommand::getString()
