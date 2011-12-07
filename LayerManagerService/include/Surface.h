@@ -85,7 +85,6 @@ public:
 
     int frameCounter;
 
-private:
     Surface()
     : GraphicalSurface(TypeSurface)
     , platform(NULL)
@@ -104,8 +103,8 @@ private:
     {
     }
 
-    friend class Scene;
 
+private:
     long m_nativeHandle;
     PixelFormat m_pixformat;
     unsigned int m_layerId;

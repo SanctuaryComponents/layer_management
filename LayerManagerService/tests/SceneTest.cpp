@@ -28,6 +28,7 @@ public:
     void SetUp()
     {
         m_pScene = new Scene();
+        ASSERT_TRUE(m_pScene);
     }
 
     void TearDown()
@@ -113,9 +114,6 @@ TEST_F(SceneTest, createLayerGroup)
 TEST_F(SceneTest, createSurfaceGroup)
 {
 }
-
-
-
 
 TEST_F(SceneTest, removeLayer)
 {
