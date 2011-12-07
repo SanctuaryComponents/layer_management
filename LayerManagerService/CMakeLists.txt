@@ -64,10 +64,15 @@ add_executable(LayerManagerService_Test
     tests/SceneTest.cpp
     tests/LayermanagerTest.cpp
     tests/GraphicalObjectTest.cpp
+    tests/GraphicalGroupTest.cpp
     tests/GraphicalSurfaceTest.cpp
     tests/SurfaceTest.cpp
     tests/LayerTest.cpp
     tests/ShaderTest.cpp
+    tests/ShaderUniformTest.cpp
+    tests/ShaderProgramTest.cpp
+    tests/ShaderProgramFactoryTest.cpp
+    tests/RectangleTest.cpp
     
     src/GraphicalObject.cpp
     src/GraphicalSurface.cpp
