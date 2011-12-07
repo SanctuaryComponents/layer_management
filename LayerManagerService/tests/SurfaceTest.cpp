@@ -42,6 +42,86 @@ public:
     Surface* m_pSurface;
 };
 
+TEST_F(SurfaceTest, defaultConstructor)
+{
+    Surface surface;
+
+    /// make sure, surface was not added to any layer
+    //EXPECT_EQ(INVALID_ID, surface.getContainingLayerId());
+
+    /// make sure, surface has default size
+    EXPECT_EQ(0, surface.OriginalSourceHeight);
+    EXPECT_EQ(0, surface.OriginalSourceWidth);
+
+    /// make sure, surface has default visibility
+    EXPECT_EQ(false, surface.getVisibility());
+
+    /// make sure, surface has default opacity
+    EXPECT_DOUBLE_EQ(1.0, surface.getOpacity());
+
+    /// make sure, surface has default orientation
+    EXPECT_EQ(Zero, surface.getOrientation());
+
+    /// make sure, surface has default pixel format
+    EXPECT_EQ(PIXELFORMAT_UNKNOWN, surface.getPixelFormat());
+
+    /// make sure, surface has default source rectangle
+    const Rectangle& srcRect = surface.getSourceRegion();
+    EXPECT_EQ(0, srcRect.height);
+    EXPECT_EQ(0, srcRect.width);
+    EXPECT_EQ(0, srcRect.x);
+    EXPECT_EQ(0, srcRect.y);
+
+    /// make sure, surface has default destination rectangle
+    const Rectangle& destRect = surface.getDestinationRegion();
+    EXPECT_EQ(0, destRect.height);
+    EXPECT_EQ(0, destRect.width);
+    EXPECT_EQ(0, destRect.x);
+    EXPECT_EQ(0, destRect.y);
+}
+
+TEST_F(SurfaceTest, specialConstructor)
+{
+    unsigned int expectedId = 144;
+    Surface surface(expectedId);
+
+    /// make sure surface has specified id
+    EXPECT_EQ(expectedId, surface.getID());
+
+    /// make sure, surface was not added to any layer
+    //EXPECT_EQ(INVALID_ID, surface.getContainingLayerId());
+
+    /// make sure, surface has default size
+    EXPECT_EQ(0, surface.OriginalSourceHeight);
+    EXPECT_EQ(0, surface.OriginalSourceWidth);
+
+    /// make sure, surface has default visibility
+    EXPECT_EQ(false, surface.getVisibility());
+
+    /// make sure, surface has default opacity
+    EXPECT_DOUBLE_EQ(1.0, surface.getOpacity());
+
+    /// make sure, surface has default orientation
+    EXPECT_EQ(Zero, surface.getOrientation());
+
+    /// make sure, surface has default pixel format
+    EXPECT_EQ(PIXELFORMAT_UNKNOWN, surface.getPixelFormat());
+
+    /// make sure, surface has default source rectangle
+    const Rectangle& srcRect = surface.getSourceRegion();
+    EXPECT_EQ(0, srcRect.height);
+    EXPECT_EQ(0, srcRect.width);
+    EXPECT_EQ(0, srcRect.x);
+    EXPECT_EQ(0, srcRect.y);
+
+    /// make sure, surface has default destination rectangle
+    const Rectangle& destRect = surface.getDestinationRegion();
+    EXPECT_EQ(0, destRect.height);
+    EXPECT_EQ(0, destRect.width);
+    EXPECT_EQ(0, destRect.x);
+    EXPECT_EQ(0, destRect.y);
+}
+
 TEST_F(SurfaceTest, getPixelFormat)
 {
 

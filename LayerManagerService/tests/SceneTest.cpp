@@ -48,63 +48,124 @@ TEST_F(SceneTest, createLayer)
     uint size;
     uint* array;
     Layer* pLayer;
+    int expected = 91;
 
     /// make sure, scene contains no layers
     m_pScene->getLayerIDs(&size, &array);
     ASSERT_EQ(0, size) << "Scene should contain 0 layers";
 
-    /// create layer with id 91
-    int expected = 91;
-    m_pScene->createLayer(expected);
+    /// create layer with expected id
+    pLayer = m_pScene->createLayer(expected);
+    ASSERT_TRUE(pLayer) << "Layer was not created.";
+
+    /// make sure layer has expected id
+    EXPECT_EQ(expected, pLayer->getID());
 
     /// make sure, scene contains one layer
     m_pScene->getLayerIDs(&size, &array);
     ASSERT_EQ(1, size) << "Scene should contain 1 layer";
 
-    /// make sure layer has id 91
-    pLayer = m_pScene->getLayer(expected);
-    ASSERT_TRUE(pLayer) << "Layer was not found.";
-    EXPECT_EQ(expected, pLayer->getID());
-
-    /// make sure, layer has default size
-    EXPECT_EQ(0, pLayer->OriginalSourceHeight);
-    EXPECT_EQ(0, pLayer->OriginalSourceWidth);
-
-    /// make sure, layer has default visibility
-    EXPECT_EQ(false, pLayer->visibility);
-
-    /// make sure, layer has default opacity
-    EXPECT_DOUBLE_EQ(1.0, pLayer->opacity);
-
-    /// make sure, layer has default source rectangle
-    const Rectangle& srcRect = pLayer->getSourceRegion();
-    EXPECT_EQ(0, srcRect.height);
-    EXPECT_EQ(0, srcRect.width);
-    EXPECT_EQ(0, srcRect.x);
-    EXPECT_EQ(0, srcRect.y);
-
-    /// make sure, layer has default destination rectangle
-    const Rectangle& destRect = pLayer->getDestinationRegion();
-    EXPECT_EQ(0, destRect.height);
-    EXPECT_EQ(0, destRect.width);
-    EXPECT_EQ(0, destRect.x);
-    EXPECT_EQ(0, destRect.y);
-
-    /// make sure, layer layer has default type
-    EXPECT_EQ(Software_2D, pLayer->getLayerType());
-
     /// make sure, layer contains no surfaces (TODO)
 }
 
-TEST_F(SceneTest, createLayer_InvalidInput)
+TEST_F(SceneTest, createLayer_twice)
 {
-    /// create Layer with id 55 (TODO)
+    uint size;
+    uint* array;
+    int expected = 55;
+    double expectedOpacity = 0.322;
+    Layer* pLayer1;
+    Layer* pLayer2;
 
-    /// try to create existing layer 55 (TODO)
+    /// create Layer with id 55
+    pLayer1 = m_pScene->createLayer(expected);
+    ASSERT_EQ(expected, pLayer1->getID());
+
+    /// make sure, scene contains one layer
+    m_pScene->getLayerIDs(&size, &array);
+    ASSERT_EQ(1, size) << "Scene should contain 1 layer";
+
+    /// try to create existing layer 55, handle to existing layer should be returned
+    pLayer2 = m_pScene->createLayer(expected);
+    ASSERT_EQ(expected, pLayer2->getID());
+
+    /// make sure, scene still contains one layer
+    m_pScene->getLayerIDs(&size, &array);
+    ASSERT_EQ(1, size) << "Scene should contain 1 layer";
+
+    /// change opacity using first layer handle
+    pLayer1->setOpacity(expectedOpacity);
+
+    /// check opacity of layer using second handle
+    EXPECT_DOUBLE_EQ(expectedOpacity, pLayer2->getOpacity());
 }
 
 TEST_F(SceneTest, createSurface)
 {
+    uint size;
+    uint* array;
+    Surface* pSurface;
+    int expected = 131;
+
+    /// make sure, scene contains no surfaces
+    m_pScene->getSurfaceIDs(&size, &array);
+    ASSERT_EQ(0, size) << "Scene should contain 0 surfaces";
+
+    /// create surface with expected id
+    pSurface = m_pScene->createSurface(expected);
+    ASSERT_TRUE(pSurface) << "Surface was not created.";
+
+    /// make sure surface has expected id
+    EXPECT_EQ(expected, pSurface->getID());
+
+    /// make sure, scene contains one surface
+    m_pScene->getSurfaceIDs(&size, &array);
+    ASSERT_EQ(1, size) << "Scene should contain 1 surface";
+
+    /// make sure, surface was not added to any layer
+    //EXPECT_EQ(INVALID_ID, pSurface->getContainingLayerId());
+}
+
+TEST_F(SceneTest, createSurface_twice)
+{
+    uint size;
+    uint* array;
+    Surface* pSurface1;
+    Surface* pSurface2;
+    int expected = 135;
+    double expectedOpacity = 0.718;
+
+    /// make sure, scene contains no surfaces
+    m_pScene->getSurfaceIDs(&size, &array);
+    ASSERT_EQ(0, size) << "Scene should contain 0 surfaces";
+
+    /// create surface with expected id
+    pSurface1 = m_pScene->createSurface(expected);
+    ASSERT_TRUE(pSurface1) << "Surface was not created.";
+
+    /// make sure surface has expected id
+    EXPECT_EQ(expected, pSurface1->getID());
+
+    /// make sure, scene contains one surface
+    m_pScene->getSurfaceIDs(&size, &array);
+    ASSERT_EQ(1, size) << "Scene should contain 1 surface";
+
+    /// create surface with expected id again
+    pSurface2 = m_pScene->createSurface(expected);
+    ASSERT_TRUE(pSurface2) << "Surface was not created.";
+
+    /// make sure surface has expected id again
+    EXPECT_EQ(expected, pSurface2->getID());
+
+    /// make sure, scene still contains one surface
+    m_pScene->getSurfaceIDs(&size, &array);
+    ASSERT_EQ(1, size) << "Scene should contain 1 surface";
+
+    /// change opacity using first surface handle
+    pSurface1->setOpacity(expectedOpacity);
+
+    /// check opacity of surface using second surface handle
+    EXPECT_DOUBLE_EQ(expectedOpacity, pSurface2->getOpacity());
 }
 
 TEST_F(SceneTest, createLayerGroup)

@@ -65,7 +65,8 @@ add_executable(LayerManagerService_Test
 #    tests/LayermanagerTest.cpp
 #    tests/GraphicalObjectTest.cpp
 #    tests/GraphicalSurfaceTest.cpp
-#    tests/SurfaceTest.cpp
+    tests/SurfaceTest.cpp
+    tests/LayerTest.cpp
 #    tests/ShaderTest.cpp
     
     src/GraphicalObject.cpp
