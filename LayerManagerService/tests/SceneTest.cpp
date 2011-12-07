@@ -433,10 +433,10 @@ TEST_F(SceneTest, getLayerIDs)
 TEST_F(SceneTest, getLayerIDsOfScreen)
 {
     unsigned int screenId = 0;
-    unsigned int layerId1 = 101;
-    unsigned int layerId2 = 102;
-    unsigned int layerId3 = 103;
-    unsigned int layerId4 = 104;
+    unsigned int layerId1 = 121;
+    unsigned int layerId2 = 122;
+    unsigned int layerId3 = 123;
+    unsigned int layerId4 = 124;
     unsigned int size;
     unsigned int* array;
     Layer* l1;
@@ -493,44 +493,116 @@ TEST_F(SceneTest, getLayerIDsOfScreen)
 
 TEST_F(SceneTest, getSurfaceIDs)
 {
+    unsigned int surfaceId1 = 141;
+    unsigned int surfaceId2 = 142;
+    unsigned int surfaceId3 = 143;
+    unsigned int surfaceId4 = 144;
+    unsigned int size;
+    unsigned int* array;
+
+    /// make sure, scene contains no surfaces
+    m_pScene->getSurfaceIDs(&size, &array);
+    ASSERT_EQ(0, size);
+
+    /// create 4 surfaces in scene
+    m_pScene->createSurface(surfaceId1);
+    m_pScene->createSurface(surfaceId2);
+    m_pScene->createSurface(surfaceId3);
+    m_pScene->createSurface(surfaceId4);
+
+    /// make sure, scene contains these 4 surfaces
+    m_pScene->getSurfaceIDs(&size, &array);
+    ASSERT_EQ(4, size);
+    EXPECT_EQ(surfaceId1, array[0]);
+    EXPECT_EQ(surfaceId2, array[1]);
+    EXPECT_EQ(surfaceId3, array[2]);
+    EXPECT_EQ(surfaceId4, array[3]);
 }
 
 TEST_F(SceneTest, getLayerGroupIDs)
 {
+    unsigned int layergroupId1 = 201;
+    unsigned int layergroupId2 = 202;
+    unsigned int layergroupId3 = 203;
+    unsigned int layergroupId4 = 204;
+    unsigned int size;
+    unsigned int* array;
+
+    /// make sure, scene contains no layergroups
+    m_pScene->getLayerGroupIDs(&size, &array);
+    ASSERT_EQ(0, size);
+
+    /// create 4 layergroups in scene
+    m_pScene->createLayerGroup(layergroupId1);
+    m_pScene->createLayerGroup(layergroupId2);
+    m_pScene->createLayerGroup(layergroupId3);
+    m_pScene->createLayerGroup(layergroupId4);
+
+    /// make sure, scene contains these 4 layergroups
+    m_pScene->getLayerGroupIDs(&size, &array);
+    ASSERT_EQ(4, size);
+    EXPECT_EQ(layergroupId1, array[0]);
+    EXPECT_EQ(layergroupId2, array[1]);
+    EXPECT_EQ(layergroupId3, array[2]);
+    EXPECT_EQ(layergroupId4, array[3]);
 }
 
 TEST_F(SceneTest, getSurfaceGroupIDs)
 {
+    unsigned int surfacegroupId1 = 201;
+    unsigned int surfacegroupId2 = 202;
+    unsigned int surfacegroupId3 = 203;
+    unsigned int surfacegroupId4 = 204;
+    unsigned int size;
+    unsigned int* array;
+
+    /// make sure, scene contains no surfacegroups
+    m_pScene->getSurfaceGroupIDs(&size, &array);
+    ASSERT_EQ(0, size);
+
+    /// create 4 surfacegroups in scene
+    m_pScene->createSurfaceGroup(surfacegroupId1);
+    m_pScene->createSurfaceGroup(surfacegroupId2);
+    m_pScene->createSurfaceGroup(surfacegroupId3);
+    m_pScene->createSurfaceGroup(surfacegroupId4);
+
+    /// make sure, scene contains these 4 surfacegroups
+    m_pScene->getSurfaceGroupIDs(&size, &array);
+    ASSERT_EQ(4, size);
+    EXPECT_EQ(surfacegroupId1, array[0]);
+    EXPECT_EQ(surfacegroupId2, array[1]);
+    EXPECT_EQ(surfacegroupId3, array[2]);
+    EXPECT_EQ(surfacegroupId4, array[3]);
 }
 
-TEST_F(SceneTest, lockScene)
+TEST_F(SceneTest, DISABLED_lockScene)
 {
 }
 
-TEST_F(SceneTest, unlockScene)
+TEST_F(SceneTest, DISABLED_unlockScene)
 {
 }
 
-TEST_F(SceneTest, getCurrentRenderOrder)
+TEST_F(SceneTest, DISABLED_getCurrentRenderOrder)
 {
 }
 
-TEST_F(SceneTest, removeSurfaceGroup)
+TEST_F(SceneTest, DISABLED_removeSurfaceGroup)
 {
 }
 
-TEST_F(SceneTest, removeLayerGroup)
+TEST_F(SceneTest, DISABLED_removeLayerGroup)
 {
 }
 
-TEST_F(SceneTest, getAllSurfaces)
+TEST_F(SceneTest, DISABLED_getAllSurfaces)
 {
 }
 
-TEST_F(SceneTest, getSurfaceAt)
+TEST_F(SceneTest, DISABLED_getSurfaceAt)
 {
 }
 
-TEST_F(SceneTest, isLayerInCurrentRenderOrder)
+TEST_F(SceneTest, DISABLED_isLayerInCurrentRenderOrder)
 {
 }

@@ -42,44 +42,44 @@ public:
     GraphicalObject* m_pGraphicalObject;
 };
 
-TEST_F(GraphicalObjectTest, construction)
+TEST_F(GraphicalObjectTest, DISABLED_construction)
 {
     //GraphicalObject(ObjectType type, double opacity, bool visibility);
     //GraphicalObject(int externalId,ObjectType type, double opacity, bool visibility);
     //virtual ~GraphicalObject() {}
 }
 
-TEST_F(GraphicalObjectTest, setOpacity)
+TEST_F(GraphicalObjectTest, DISABLED_setOpacity)
 {
 
 }
 
-TEST_F(GraphicalObjectTest, getOpacity)
+TEST_F(GraphicalObjectTest, DISABLED_getOpacity)
 {
 
 }
 
-TEST_F(GraphicalObjectTest, setVisibility)
+TEST_F(GraphicalObjectTest, DISABLED_setVisibility)
 {
 
 }
 
-TEST_F(GraphicalObjectTest, getVisibility)
+TEST_F(GraphicalObjectTest, DISABLED_getVisibility)
 {
 
 }
 
-TEST_F(GraphicalObjectTest, getID)
+TEST_F(GraphicalObjectTest, DISABLED_getID)
 {
 
 }
 
-TEST_F(GraphicalObjectTest, setShader)
+TEST_F(GraphicalObjectTest, DISABLED_setShader)
 {
 
 }
 
-TEST_F(GraphicalObjectTest, getShader)
+TEST_F(GraphicalObjectTest, DISABLED_getShader)
 {
 
 }

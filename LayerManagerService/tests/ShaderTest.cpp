@@ -45,33 +45,33 @@ public:
     Shader* m_pShader;
 };
 
-TEST_F(ShaderTest, construction)
+TEST_F(ShaderTest, DISABLED_construction)
 {
     //static Shader* createShader(const string& vertFileName, const string& fragFileName);
     //~Shader();
 }
 
-TEST_F(ShaderTest, getId)
+TEST_F(ShaderTest, DISABLED_getId)
 {
 
 }
 
-TEST_F(ShaderTest, use)
+TEST_F(ShaderTest, DISABLED_use)
 {
 
 }
 
-TEST_F(ShaderTest, setUniform)
+TEST_F(ShaderTest, DISABLED_setUniform)
 {
 
 }
 
-TEST_F(ShaderTest, loadUniforms)
+TEST_F(ShaderTest, DISABLED_loadUniforms)
 {
 
 }
 
-TEST_F(ShaderTest, loadCommonUniforms)
+TEST_F(ShaderTest, DISABLED_loadCommonUniforms)
 {
 
 }

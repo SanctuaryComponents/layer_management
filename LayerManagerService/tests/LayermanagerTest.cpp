@@ -42,87 +42,87 @@ public:
     ICommandExecutor* m_pLayermanager;
 };
 
-TEST_F(LayermanagerTest, execute)
+TEST_F(LayermanagerTest, DISABLED_execute)
 {
 
 }
 
-TEST_F(LayermanagerTest, startManagement)
+TEST_F(LayermanagerTest, DISABLED_startManagement)
 {
 
 }
 
-TEST_F(LayermanagerTest, stopManagement)
+TEST_F(LayermanagerTest, DISABLED_stopManagement)
 {
 
 }
 
-TEST_F(LayermanagerTest, getScene)
+TEST_F(LayermanagerTest, DISABLED_getScene)
 {
 
 }
 
-TEST_F(LayermanagerTest, getRendererList)
+TEST_F(LayermanagerTest, DISABLED_getRendererList)
 {
 
 }
 
-TEST_F(LayermanagerTest, addRenderer)
+TEST_F(LayermanagerTest, DISABLED_addRenderer)
 {
 
 }
 
-TEST_F(LayermanagerTest, removeRenderer)
+TEST_F(LayermanagerTest, DISABLED_removeRenderer)
 {
 
 }
 
-TEST_F(LayermanagerTest, getCommunicatorList)
+TEST_F(LayermanagerTest, DISABLED_getCommunicatorList)
 {
 
 }
 
-TEST_F(LayermanagerTest, addCommunicator)
+TEST_F(LayermanagerTest, DISABLED_addCommunicator)
 {
 
 }
 
-TEST_F(LayermanagerTest, removeCommunicator)
+TEST_F(LayermanagerTest, DISABLED_removeCommunicator)
 {
 
 }
 
-TEST_F(LayermanagerTest, getSceneProviderList)
+TEST_F(LayermanagerTest, DISABLED_getSceneProviderList)
 {
 
 }
 
-TEST_F(LayermanagerTest, addSceneProvider)
+TEST_F(LayermanagerTest, DISABLED_addSceneProvider)
 {
 
 }
 
-TEST_F(LayermanagerTest, removeSceneProvider)
+TEST_F(LayermanagerTest, DISABLED_removeSceneProvider)
 {
 
 }
 
-TEST_F(LayermanagerTest, getLayerTypeCapabilities)
+TEST_F(LayermanagerTest, DISABLED_getLayerTypeCapabilities)
 {
 
 }
 
-TEST_F(LayermanagerTest, getNumberOfHardwareLayers)
+TEST_F(LayermanagerTest, DISABLED_getNumberOfHardwareLayers)
 {
 
 }
 
-TEST_F(LayermanagerTest, getScreenResolution)
+TEST_F(LayermanagerTest, DISABLED_getScreenResolution)
 {
 
 }
 
-TEST_F(LayermanagerTest, getScreenIDs)
+TEST_F(LayermanagerTest, DISABLED_getScreenIDs)
 {
 
 }

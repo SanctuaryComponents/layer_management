@@ -42,69 +42,69 @@ public:
     GraphicalSurface* m_pGraphicalSurface;
 };
 
-TEST_F(GraphicalSurfaceTest, construction)
+TEST_F(GraphicalSurfaceTest, DISABLED_construction)
 {
     //GraphicalSurface(ObjectType type);
     //GraphicalSurface(int externalId,ObjectType type);
     //virtual ~GraphicalSurface() {}
 }
 
-TEST_F(GraphicalSurfaceTest, setOrientation)
+TEST_F(GraphicalSurfaceTest, DISABLED_setOrientation)
 {
 
 }
 
-TEST_F(GraphicalSurfaceTest, getOrientation)
+TEST_F(GraphicalSurfaceTest, DISABLED_getOrientation)
 {
 
 }
 
-TEST_F(GraphicalSurfaceTest, setSourceRegion)
+TEST_F(GraphicalSurfaceTest, DISABLED_setSourceRegion)
 {
 
 }
 
-TEST_F(GraphicalSurfaceTest, getSourceRegion)
+TEST_F(GraphicalSurfaceTest, DISABLED_getSourceRegion)
 {
 
 }
 
-TEST_F(GraphicalSurfaceTest, setDestinationRegion)
+TEST_F(GraphicalSurfaceTest, DISABLED_setDestinationRegion)
 {
 
 }
 
-TEST_F(GraphicalSurfaceTest, setPosition)
+TEST_F(GraphicalSurfaceTest, DISABLED_setPosition)
 {
 
 }
 
-TEST_F(GraphicalSurfaceTest, getPosition)
+TEST_F(GraphicalSurfaceTest, DISABLED_getPosition)
 {
 
 }
 
-TEST_F(GraphicalSurfaceTest, setDimension)
+TEST_F(GraphicalSurfaceTest, DISABLED_setDimension)
 {
 
 }
 
-TEST_F(GraphicalSurfaceTest, getDestinationRegion)
+TEST_F(GraphicalSurfaceTest, DISABLED_getDestinationRegion)
 {
 
 }
 
-TEST_F(GraphicalSurfaceTest, getDimension)
+TEST_F(GraphicalSurfaceTest, DISABLED_getDimension)
 {
 
 }
 
-TEST_F(GraphicalSurfaceTest, isInside)
+TEST_F(GraphicalSurfaceTest, DISABLED_isInside)
 {
 
 }
 
-TEST_F(GraphicalSurfaceTest, DestToSourceCoordinates)
+TEST_F(GraphicalSurfaceTest, DISABLED_DestToSourceCoordinates)
 {
 
 }
