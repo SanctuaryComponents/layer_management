@@ -21,6 +21,7 @@
 
 #include "IScene.h"
 #include "Scene.h"
+#include "SurfaceMap.h"
 
 class SceneTest : public ::testing::Test
 {
@@ -583,26 +584,126 @@ TEST_F(SceneTest, DISABLED_unlockScene)
 {
 }
 
-TEST_F(SceneTest, DISABLED_getCurrentRenderOrder)
+TEST_F(SceneTest, getCurrentRenderOrder)
 {
+    // TODO: how to test? return by typically reference can't be invalid.
+
+    /// get render order
+    LayerList& llist = m_pScene->getCurrentRenderOrder();
+
+    /// make sure, list of layers is returned
+    ASSERT_TRUE(&llist);
 }
 
-TEST_F(SceneTest, DISABLED_removeSurfaceGroup)
+TEST_F(SceneTest, removeSurfaceGroup)
 {
+    unsigned int expectedSurfaceGroupId = 172;
+    SurfaceGroup* pSurfaceGroup;
+
+    /// create expected Surface group
+    pSurfaceGroup = m_pScene->createSurfaceGroup(expectedSurfaceGroupId);
+    ASSERT_TRUE(pSurfaceGroup);
+
+    /// make sure, expected Surface group does exist
+    pSurfaceGroup = m_pScene->getSurfaceGroup(expectedSurfaceGroupId);
+    EXPECT_TRUE(pSurfaceGroup);
+
+    /// remove surface group
+    m_pScene->removeSurfaceGroup(pSurfaceGroup);
+
+    /// make sure, expected Surface group does not exist
+    pSurfaceGroup = m_pScene->getSurfaceGroup(expectedSurfaceGroupId);
+    ASSERT_FALSE(pSurfaceGroup);
 }
 
-TEST_F(SceneTest, DISABLED_removeLayerGroup)
+TEST_F(SceneTest, removeLayerGroup)
 {
+    unsigned int expectedLayerGroupId = 172;
+    LayerGroup* pLayerGroup;
+
+    /// create expected Layer group
+    pLayerGroup = m_pScene->createLayerGroup(expectedLayerGroupId);
+    ASSERT_TRUE(pLayerGroup);
+
+    /// make sure, expected Layer group does exist
+    pLayerGroup = m_pScene->getLayerGroup(expectedLayerGroupId);
+    EXPECT_TRUE(pLayerGroup);
+
+    /// remove layer group
+    m_pScene->removeLayerGroup(pLayerGroup);
+
+    /// make sure, expected Layer group does not exist
+    pLayerGroup = m_pScene->getLayerGroup(expectedLayerGroupId);
+    ASSERT_FALSE(pLayerGroup);
 }
 
-TEST_F(SceneTest, DISABLED_getAllSurfaces)
+TEST_F(SceneTest, getAllSurfaces)
 {
+    unsigned int expectedId1 = 241;
+    unsigned int expectedId2 = 242;
+    unsigned int expectedId3 = 243;
+    Surface* s1;
+    Surface* s2;
+    Surface* s3;
+
+    /// try to get surfaces, when no surfaces exist in scene
+    ASSERT_EQ(0, m_pScene->getAllSurfaces().size());
+
+    /// add 3 surfaces to scene
+    s1 = m_pScene->createSurface(expectedId1);
+    s2 = m_pScene->createSurface(expectedId2);
+    s3 = m_pScene->createSurface(expectedId3);
+
+    /// get all surfaces
+    const SurfaceMap& smap1 = m_pScene->getAllSurfaces();
+    ASSERT_EQ(3, smap1.size());
+    // order is undefined here, but each surface must be contained once
+    EXPECT_EQ(1, smap1.count(expectedId1));
+    EXPECT_EQ(1, smap1.count(expectedId2));
+    EXPECT_EQ(1, smap1.count(expectedId3));
+
+    /// remove 2 surfaces again
+    m_pScene->removeSurface(s1);
+    m_pScene->removeSurface(s3);
+
+    /// check, if the remaining surface is the expected one
+    const SurfaceMap& smap2 = m_pScene->getAllSurfaces();
+    ASSERT_EQ(1, smap2.size());
+    EXPECT_EQ(1, smap2.count(expectedId2));
 }
 
 TEST_F(SceneTest, DISABLED_getSurfaceAt)
 {
 }
 
-TEST_F(SceneTest, DISABLED_isLayerInCurrentRenderOrder)
+TEST_F(SceneTest, isLayerInCurrentRenderOrder)
 {
+    unsigned int layerId1 = 121;
+    unsigned int size;
+    unsigned int* array;
+    Layer* l1;
+
+    /// create layer in scene, but dont add it to render order
+    l1 = m_pScene->createLayer(layerId1);
+
+    /// make sure, scene contains the new layers
+    m_pScene->getLayerIDs(&size, &array);
+    ASSERT_EQ(1, size);
+    EXPECT_EQ(layerId1, array[0]);
+
+    /// make sure, layer is not in render order
+    ASSERT_FALSE(m_pScene->isLayerInCurrentRenderOrder(layerId1));
+
+    /// add layer to render order
+    LayerList& llist = m_pScene->getCurrentRenderOrder();
+    llist.push_back(l1);
+
+    /// make sure, layer is in render order
+    ASSERT_TRUE(m_pScene->isLayerInCurrentRenderOrder(layerId1));
+
+    /// remove layer from render order
+    llist.remove(l1);
+
+    /// make sure, layer is not in render order
+    ASSERT_FALSE(m_pScene->isLayerInCurrentRenderOrder(layerId1));
 }
