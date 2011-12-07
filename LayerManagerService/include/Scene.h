@@ -75,14 +75,12 @@ public:
     virtual void lockScene();
     virtual void unlockScene();
 
-public:
-    // TODO: should be private -> not in ILayerList; clients should use only the interface
-    LayerList& getCurrentRenderOrder();
-    void removeSurfaceGroup(SurfaceGroup *surface);
-    void removeLayerGroup(LayerGroup *layer);
-    const SurfaceMap getAllSurfaces() const;
-    Surface* getSurfaceAt(unsigned int *x, unsigned int *y, double minOpacity);
-    bool isLayerInCurrentRenderOrder(const uint id);
+    virtual LayerList& getCurrentRenderOrder();
+    virtual void removeSurfaceGroup(SurfaceGroup *surface);
+    virtual void removeLayerGroup(LayerGroup *layer);
+    virtual const SurfaceMap getAllSurfaces() const;
+    virtual Surface* getSurfaceAt(unsigned int *x, unsigned int *y, double minOpacity);
+    virtual bool isLayerInCurrentRenderOrder(const uint id);
 
 private:
     const LayerMap getAllLayers() const;

@@ -25,6 +25,8 @@
 #include "LayerGroup.h"
 #include "Surface.h"
 #include "SurfaceGroup.h"
+#include "LayerList.h"
+#include "SurfaceMap.h"
 
 /*
  * Represents a scene with screens which have Layers which contain the Surfaces.
@@ -87,6 +89,18 @@ public:
      * Unlock the list for read and write access
      */
     virtual void unlockScene() = 0;
+
+    virtual LayerList& getCurrentRenderOrder() = 0;
+
+    virtual void removeSurfaceGroup(SurfaceGroup *surface) = 0;
+
+    virtual void removeLayerGroup(LayerGroup *layer) = 0;
+
+    virtual const SurfaceMap getAllSurfaces() const = 0;
+
+    virtual Surface* getSurfaceAt(unsigned int *x, unsigned int *y, double minOpacity) = 0;
+
+    virtual bool isLayerInCurrentRenderOrder(const uint id) = 0;
 
     bool debugMode;
 
