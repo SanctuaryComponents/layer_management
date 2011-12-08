@@ -17,24 +17,24 @@ DBUSMessageHandler::DBUSMessageHandler()
     char* useSessionBus = getenv("LM_USE_SESSION_BUS");
     if ( NULL != useSessionBus && strcmp(useSessionBus,"enable") == 0 )
     {
-        LOG_INFO("DBUSCommunicator", "Using Session Bus");
+        LOG_INFO("DBUSMessageHandler", "Using Session Bus");
         m_pConnection = dbus_bus_get(DBUS_BUS_SESSION, &m_err);
     } 
     else 
     {
-        LOG_INFO("DBUSCommunicator", "Using System Bus");
+        LOG_INFO("DBUSMessageHandler", "Using System Bus");
         m_pConnection = dbus_bus_get(DBUS_BUS_SYSTEM, &m_err);
     }    
 
     if (dbus_error_is_set(&m_err))
     {
-        LOG_ERROR("DBUSCommunicator","Connection error");
+        LOG_ERROR("DBUSMessageHandler","Connection error");
         dbus_error_free(&m_err);
     }
     
     if (NULL == m_pConnection)
     {
-        LOG_ERROR("DBUSCommunicator","Connection is null");
+        LOG_ERROR("DBUSMessageHandler","Connection is null");
         exit(1);
     }
     
@@ -42,13 +42,13 @@ DBUSMessageHandler::DBUSMessageHandler()
     
     if (dbus_error_is_set(&m_err))
     {
-        LOG_ERROR("DBUSCommunicator", "Name Error "<< m_err.message);
+        LOG_ERROR("DBUSMessageHandler", "Name Error "<< m_err.message);
         dbus_error_free(&m_err);
     }
     
     if (DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER != ret)
     {
-        LOG_ERROR("DBUSCommunicator", "Not Primary Owner "<< ret);
+        LOG_ERROR("DBUSMessageHandler", "Not Primary Owner "<< ret);
         exit(1);
     }
 }
@@ -60,19 +60,31 @@ DBUSMessageHandler::~DBUSMessageHandler()
     bool errorset = dbus_error_is_set(&err);
     if (errorset)
     {
-        LOG_ERROR("DBUSCommunicator","there was an dbus error");
+        LOG_ERROR("DBUSMessageHandler","there was an dbus error");
     }
     dbus_connection_unregister_object_path(m_pConnection,DBUS_SERVICE_OBJECT_PATH);
-    LOG_INFO("DBUSCommunicator","Ask about owner name");
+    LOG_INFO("DBUSMessageHandler","Ask about owner name");
     dbus_bus_name_has_owner(m_pConnection, DBUS_SERVICE_PREFIX, &err);
     errorset = dbus_error_is_set(&err);
     if (errorset)
     {
-        LOG_ERROR("DBUSCommunicator","there was an dbus error");
+        LOG_ERROR("DBUSMessageHandler","there was an dbus error");
     }
     dbus_error_init(&err);
     dbus_bus_release_name(m_pConnection, DBUS_SERVICE_PREFIX, &err);
 }
+
+bool DBUSMessageHandler::registerMessageFilter(  DBusHandleMessageFunction fMessageFunc,
+                                                 void* comInstance )
+{
+    bool result = true;
+    if ( !dbus_connection_add_filter ( m_pConnection , fMessageFunc, comInstance, NULL) ) 
+    {
+        result = false;
+    }
+    return result;
+}
+
 
 bool DBUSMessageHandler::registerPathFunction(  DBusObjectPathMessageFunction fMessageFunc,
                                                 DBusObjectPathUnregisterFunction fUnregisterFunc, 
@@ -91,10 +103,10 @@ bool DBUSMessageHandler::registerPathFunction(  DBusObjectPathMessageFunction fM
 
 void DBUSMessageHandler::initReceive(DBusMessage* msg)
 {
-    LOG_DEBUG("DBUSCommunicator","Message " << dbus_message_get_member(msg) << " was sent by " << dbus_message_get_sender(msg) );
+    LOG_DEBUG("DBUSMessageHandler","Message " << dbus_message_get_member(msg) << " was sent by " << dbus_message_get_sender(msg) );
     if (!dbus_message_iter_init(msg, &m_MessageIter))
     {
-        LOG_ERROR("DBUSCommunicator", "Message has no arguments!");
+        LOG_ERROR("DBUSMessageHandler", "Message has no arguments!");
     }
 }
 
@@ -110,10 +122,10 @@ void DBUSMessageHandler::closeReply()
     // send the reply && flush the connection
     if (!dbus_connection_send(m_pConnection, m_pReply, &m_serial))
     {
-        LOG_ERROR("DBUSCommunicator", "Out Of Memory!");
+        LOG_ERROR("DBUSMessageHandler", "Out Of Memory!");
         exit(1);
     }
-    LOG_DEBUG("DBUSCommunicator", "sending reply");
+    LOG_DEBUG("DBUSMessageHandler", "sending reply");
     dbus_connection_flush(m_pConnection);
 
     // free the reply
@@ -127,10 +139,10 @@ void DBUSMessageHandler::ReplyError(DBusMessage* msg, const char* errorname, con
     // send the reply && flush the connection
     if (!dbus_connection_send(m_pConnection, m_pReply, &m_serial))
     {
-        LOG_ERROR("DBUSCommunicator", "Out Of Memory!");
+        LOG_ERROR("DBUSMessageHandler", "Out Of Memory!");
         exit(1);
     }
-    LOG_INFO("DBUSCommunicator", "sending reply with error");
+    LOG_INFO("DBUSMessageHandler", "sending reply with error");
     dbus_connection_flush(m_pConnection);
 
     // free the reply
@@ -144,7 +156,7 @@ char* DBUSMessageHandler::getString()
 
     if (DBUS_TYPE_STRING != dbus_message_iter_get_arg_type(&m_MessageIter))
     {
-        LOG_ERROR("DBUSCommunicator", "Argument is not string!");
+        LOG_ERROR("DBUSMessageHandler", "Argument is not string!");
     }
     else
     {
@@ -160,7 +172,7 @@ dbus_bool_t DBUSMessageHandler::getBool()
 
     if (DBUS_TYPE_BOOLEAN != dbus_message_iter_get_arg_type(&m_MessageIter))
     {
-        LOG_ERROR("DBUSCommunicator", "Argument is not bool!");
+        LOG_ERROR("DBUSMessageHandler", "Argument is not bool!");
     }
     else
     {
@@ -176,7 +188,7 @@ char DBUSMessageHandler::getByte()
 
     if (DBUS_TYPE_BYTE != dbus_message_iter_get_arg_type(&m_MessageIter))
     {
-        LOG_ERROR("DBUSCommunicator", "Argument is not byte!");
+        LOG_ERROR("DBUSMessageHandler", "Argument is not byte!");
     }
     else
     {
@@ -192,7 +204,7 @@ dbus_uint32_t DBUSMessageHandler::getUInt()
 
     if (DBUS_TYPE_UINT32 != dbus_message_iter_get_arg_type(&m_MessageIter))
     {
-        LOG_ERROR("DBUSCommunicator", "Argument is not uint32!");
+        LOG_ERROR("DBUSMessageHandler", "Argument is not uint32!");
     }
     else
     {
@@ -208,7 +220,7 @@ double DBUSMessageHandler::getDouble()
 
     if (DBUS_TYPE_DOUBLE != dbus_message_iter_get_arg_type(&m_MessageIter))
     {
-        LOG_ERROR("DBUSCommunicator","Argument is not double!");
+        LOG_ERROR("DBUSMessageHandler","Argument is not double!");
     }
     else
     {
@@ -222,7 +234,7 @@ void DBUSMessageHandler::getArrayOfUInt(int* pLength, unsigned int** ppArray)
 {
     if (DBUS_TYPE_ARRAY != dbus_message_iter_get_arg_type(&m_MessageIter))
     {
-        LOG_ERROR("DBUSCommunicator","Argument is not an array!");
+        LOG_ERROR("DBUSMessageHandler","Argument is not an array!");
         return;
     }
 
@@ -243,7 +255,7 @@ void DBUSMessageHandler::getArrayOfString(std::vector<std::string>* stringVector
 {
     if (DBUS_TYPE_ARRAY != dbus_message_iter_get_arg_type(&m_MessageIter))
     {
-        LOG_ERROR("DBUSCommunicator", "Argument is not an array!");
+        LOG_ERROR("DBUSMessageHandler", "Argument is not an array!");
         return;
     }
 
@@ -254,7 +266,7 @@ void DBUSMessageHandler::getArrayOfString(std::vector<std::string>* stringVector
     {
         if (DBUS_TYPE_STRING != dbus_message_iter_get_arg_type(&arrayIter))
         {
-            LOG_ERROR("DBUSCommunicator", "Argument is not an string!");
+            LOG_ERROR("DBUSMessageHandler", "Argument is not an string!");
         }
         char* param;
         dbus_message_iter_get_basic(&arrayIter, &param);
@@ -276,7 +288,7 @@ void DBUSMessageHandler::appendBool(dbus_bool_t toAppend)
 {
     if (!dbus_message_iter_append_basic(&m_MessageIter, DBUS_TYPE_BOOLEAN, &toAppend))
     {
-        LOG_ERROR("DBUSCommunicator", "Out Of Memory!");
+        LOG_ERROR("DBUSMessageHandler", "Out Of Memory!");
         exit(1);
     }
 }
@@ -285,7 +297,7 @@ void DBUSMessageHandler::appendUInt(dbus_uint32_t toAppend)
 {
     if (!dbus_message_iter_append_basic(&m_MessageIter, DBUS_TYPE_UINT32, &toAppend))
     {
-        LOG_ERROR("DBUSCommunicator", "Out Of Memory!");
+        LOG_ERROR("DBUSMessageHandler", "Out Of Memory!");
         exit(1);
     }
 }
@@ -294,7 +306,7 @@ void DBUSMessageHandler::appendDouble(double toAppend)
 {
     if (!dbus_message_iter_append_basic(&m_MessageIter, DBUS_TYPE_DOUBLE, &toAppend))
     {
-        LOG_ERROR("DBUSCommunicator", "Out Of Memory!");
+        LOG_ERROR("DBUSMessageHandler", "Out Of Memory!");
         exit(1);
     }
 }
@@ -303,7 +315,7 @@ void DBUSMessageHandler::appendByte(char toAppend)
 {
     if (!dbus_message_iter_append_basic(&m_MessageIter, DBUS_TYPE_BYTE, &toAppend))
     {
-        LOG_ERROR("DBUSCommunicator", "Out Of Memory!");
+        LOG_ERROR("DBUSMessageHandler", "Out Of Memory!");
         exit(1);
     }
 }

@@ -187,7 +187,10 @@ public:
     void SetUniforms(DBusConnection* conn, DBusMessage* msg);
     DBusHandlerResult delegateMessage(DBusConnection* conn, DBusMessage* msg);
 
+
 private:
+    void AddClientWatch(DBusConnection *conn, char* sender);
+    void RemoveApplicationReference(char* owner);
     static DBusHandlerResult processMessageFunc(DBusConnection* conn,DBusMessage* msg, void *user_data);
     static void unregisterMessageFunc(DBusConnection* conn, void *user_data);
     bool m_running;

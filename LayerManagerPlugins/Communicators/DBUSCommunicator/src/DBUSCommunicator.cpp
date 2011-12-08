@@ -150,22 +150,32 @@ void DBUSCommunicator::setdebug(bool onoff)
 
 bool DBUSCommunicator::start()
 {
-	LOG_DEBUG("DBUSCommunicator", "Starting up dbus connector");
-
+    LOG_DEBUG("DBUSCommunicator", "Starting up dbus connector");
+    bool result = true;
     g_pDbusMessage = new DBUSMessageHandler();
 
     LOG_DEBUG("DBUSCommunicator","registering for dbus path " << DBUS_SERVICE_OBJECT_PATH);
     bool registered = g_pDbusMessage->registerPathFunction(DBUSCommunicator::processMessageFunc,
-    		                                               DBUSCommunicator::unregisterMessageFunc,
-    		                                               this);
+                                                           DBUSCommunicator::unregisterMessageFunc,
+                                                           this);
     if (!registered)
     {
+        
         LOG_ERROR("DBUSCommunicator","Register Message Callbacks failed");
-        exit(-1);
+        result = false;
+    } 
+    else 
+    {
+        registered =  g_pDbusMessage->registerMessageFilter(DBUSCommunicator::processMessageFunc,this);
+        if (!registered)
+        {
+            
+            LOG_ERROR("DBUSCommunicator","Register Message Filter failed");
+            result = false;
+        } 
     }
-
     LOG_INFO("DBUSCommunicator", "Started dbus connector");
-    return true;
+    return result;
 }
 
 void DBUSCommunicator::stop()
@@ -178,15 +188,14 @@ void DBUSCommunicator::stop()
 
 void DBUSCommunicator::ServiceConnect(DBusConnection* conn, DBusMessage* msg)
 {
-   (void)conn; // TODO: remove, only prevents warning
     g_pDbusMessage->initReceive(msg);
     u_int32_t processId = g_pDbusMessage->getUInt();
     char* owner = strdup(dbus_message_get_sender(msg));   
     m_executor->addApplicationReference(new IApplicationReference(owner,processId));    
+    AddClientWatch(conn,owner);
     g_pDbusMessage->initReply(msg);
     g_pDbusMessage->closeReply();
 }
-
 
 void DBUSCommunicator::ServiceDisconnect(DBusConnection* conn, DBusMessage* msg)   
 {
@@ -195,14 +204,7 @@ void DBUSCommunicator::ServiceDisconnect(DBusConnection* conn, DBusMessage* msg)
     g_pDbusMessage->initReceive(msg);
     char* owner = strdup(dbus_message_get_sender(msg));
     u_int32_t processId = g_pDbusMessage->getUInt();
-    ApplicationReferenceMapIterator iter = m_executor->getApplicationReferenceMap()->find(IApplicationReference::generateApplicationHash(owner));
-    ApplicationReferenceMapIterator iterEnd = m_executor->getApplicationReferenceMap()->end();
-
-    if ( iter != iterEnd ) 
-    {
-        m_executor->removeApplicationReference((*iter).second);
-    }
-    
+    RemoveApplicationReference(owner);
     g_pDbusMessage->initReply(msg);
     g_pDbusMessage->closeReply();
 }
@@ -1987,6 +1989,32 @@ void DBUSCommunicator::SetUniforms(DBusConnection* conn, DBusMessage* msg)
     }
 }
 
+void DBUSCommunicator::RemoveApplicationReference(char* owner)
+{
+    ApplicationReferenceMapIterator iter = m_executor->getApplicationReferenceMap()->find(IApplicationReference::generateApplicationHash(owner));
+    ApplicationReferenceMapIterator iterEnd = m_executor->getApplicationReferenceMap()->end();
+
+    if ( iter != iterEnd ) 
+    {
+        m_executor->removeApplicationReference((*iter).second);
+    }
+}
+
+
+void DBUSCommunicator::AddClientWatch(DBusConnection *conn, char* sender) 
+{
+    DBusError err;
+    char rule[1024];
+    sprintf(rule,"type='signal',sender='%s',interface='%s',member='%s',arg0='%s'",DBUS_INTERFACE_DBUS,DBUS_INTERFACE_DBUS,"NameOwnerChanged",sender);
+    
+    dbus_bus_add_match(conn,rule,&err);
+    if (dbus_error_is_set(&err))
+    {
+        LOG_ERROR("DBUSCommunicator", "Could not add client watch "<< err.message);
+        dbus_error_free(&err);
+    }
+}
+
 DBusHandlerResult DBUSCommunicator::delegateMessage(DBusConnection* conn, DBusMessage* msg) 
 {
     DBusHandlerResult result = DBUS_HANDLER_RESULT_HANDLED;
@@ -2011,13 +2039,30 @@ DBusHandlerResult DBUSCommunicator::delegateMessage(DBusConnection* conn, DBusMe
 
     if (dbus_message_is_method_call(msg, DBUS_INTERFACE_INTROSPECTABLE, "Introspect"))
     {
-    	LOG_DEBUG("DBUSCommunicator", "Introspection called");
+        LOG_DEBUG("DBUSCommunicator", "Introspection called");
         DBUSIntrospection introspectionString(manager_methods);
         introspectionString.process(conn, msg);
         g_pDbusMessage->setConnection(conn);
         found = true; // TODO: always true
     }
-
+    
+    if (dbus_message_is_signal(msg, DBUS_INTERFACE_DBUS, "NameOwnerChanged"))
+    {
+        char *name, *oldName, *newName;
+        LOG_DEBUG("DBUSCommunicator","NameOwner Changed detected ");
+        if (!dbus_message_get_args(msg, NULL,
+            DBUS_TYPE_STRING, &name,
+            DBUS_TYPE_STRING, &oldName,
+            DBUS_TYPE_STRING, &newName,
+            DBUS_TYPE_INVALID)) 
+        {
+            LOG_WARNING("DBUSCommunicator","Invalid arguments for NameOwnerChanged signal");
+        } else if ( *newName == '\0' ) 
+        {
+            LOG_DEBUG("DBUSCommunicator","Client Disconnect detected " << name);
+            RemoveApplicationReference(name);
+        }
+    }
     if (!found)
     {
         result = DBUS_HANDLER_RESULT_NOT_YET_HANDLED;

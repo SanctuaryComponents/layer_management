@@ -40,7 +40,8 @@ public:
     void initReply(DBusMessage* msg);
     void closeReply();
     void ReplyError(DBusMessage* msg, const char* errorname, const char* errorMsg);
-
+    bool registerMessageFilter(  DBusHandleMessageFunction fMessageFunc,
+                                 void* comInstance );
 
     dbus_uint32_t getUInt();
     char getByte();
