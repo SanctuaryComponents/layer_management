@@ -50,8 +50,6 @@ public:
     {
         return (x == rhs.x && y == rhs.y && width == rhs.width && height == rhs.height);
     }
-
-    friend std::ostream& operator<<(std::ostream& stream, const Rectangle& obj);
 };
 
 #endif /* _RECTANGLE_H_ */
