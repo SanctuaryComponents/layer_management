@@ -71,6 +71,28 @@ TEST_F(SceneTest, createLayer)
     EXPECT_EQ(0, slist.size());
 }
 
+TEST_F(SceneTest, createLayer_invalidId)
+{
+    uint size;
+    uint* array;
+    Layer* pLayer;
+
+    /// make sure, scene contains no layers
+    m_pScene->getLayerIDs(&size, &array);
+    ASSERT_EQ(0, size) << "Scene should contain 0 layers";
+
+    /// create layer with invalid id
+    pLayer = m_pScene->createLayer(GraphicalObject::INVALID_ID);
+    ASSERT_TRUE(pLayer) << "Layer was not created.";
+
+    /// make sure new layer has valid id
+    EXPECT_NE(GraphicalObject::INVALID_ID, pLayer->getID());
+
+    /// make sure, scene contains one layer
+    m_pScene->getLayerIDs(&size, &array);
+    ASSERT_EQ(1, size) << "Scene should contain 1 layer";
+}
+
 TEST_F(SceneTest, createLayer_twice)
 {
     uint size;
@@ -127,6 +149,28 @@ TEST_F(SceneTest, createSurface)
 
     /// make sure, surface was not added to any layer
     EXPECT_EQ(GraphicalObject::INVALID_ID, pSurface->getContainingLayerId());
+}
+
+TEST_F(SceneTest, createSurface_invalidId)
+{
+    uint size;
+    uint* array;
+    Surface* pSurface;
+
+    /// make sure, scene contains no surfaces
+    m_pScene->getSurfaceIDs(&size, &array);
+    ASSERT_EQ(0, size) << "Scene should contain 0 surfaces";
+
+    /// create surface with invalid id
+    pSurface = m_pScene->createSurface(GraphicalObject::INVALID_ID);
+    ASSERT_TRUE(pSurface) << "Surface was not created.";
+
+    /// make sure new surface has valid id
+    EXPECT_NE(GraphicalObject::INVALID_ID, pSurface->getID());
+
+    /// make sure, scene contains one surface
+    m_pScene->getSurfaceIDs(&size, &array);
+    ASSERT_EQ(1, size) << "Scene should contain 1 surface";
 }
 
 TEST_F(SceneTest, createSurface_twice)
