@@ -672,8 +672,298 @@ TEST_F(SceneTest, getAllSurfaces)
     EXPECT_EQ(1, smap2.count(expectedId2));
 }
 
-TEST_F(SceneTest, DISABLED_getSurfaceAt)
+TEST_F(SceneTest, getSurfaceAt)
 {
+    double minOpacity;
+    unsigned int x;
+    unsigned int y;
+    Surface* s;
+
+    /*
+     * Test Scene:
+     *
+     *   -----------------------------------------------------------
+     *   | Screen 0                                                |
+     *   |   --------------------------------------------------    |
+     *   |   | Surface 1                                      |    |
+     *   |   |                  ------------------            |    |
+     *   |   |                  | Surface 3      |            |    |
+     *   |   |      P1          |                |            |    |
+     *   |   |                  |          P4    |            |    |
+     *   |   |       ------------------          |            |    |
+     *   |   |       | Surface 2   P5 |          |            |    |
+     *   |   --------|                |          |-------------    |
+     *   |           |                |          |                 |
+     *   |           |            P3  |          |                 |
+     *   |           ------------------          |                 |
+     *   |                      |                |        P2       |
+     *   |                      |                |                 |
+     *   |                      ------------------                 |
+     *   |                                                         |
+     *   -----------------------------------------------------------
+     *
+     * P1..P5: click points for test
+     */
+
+    /*
+     * Scene Structure:
+     *
+     *    Screen 0
+     *        Layer 10
+     *            Surface 1
+     *        Layer 20
+     *            Surface 2
+     *            Surface 3
+     */
+
+    /// create scene
+    Layer layer10(10);
+    Rectangle rectLayer10(0, 0, 800, 480);
+    layer10.setSourceRegion(rectLayer10);
+    layer10.setDestinationRegion(rectLayer10);
+    layer10.OriginalSourceHeight = 800;
+    layer10.OriginalSourceWidth = 480;
+
+    Layer layer20(20);
+    Rectangle rectLayer20(0, 0, 800, 480);
+    layer20.setSourceRegion(rectLayer20);
+    layer20.setDestinationRegion(rectLayer20);
+    layer20.OriginalSourceHeight = 800;
+    layer20.OriginalSourceWidth = 480;
+
+    m_pScene->getCurrentRenderOrder().push_back(&layer10);
+    m_pScene->getCurrentRenderOrder().push_back(&layer20);
+
+    Surface surface1(1);
+    Rectangle rectSurface1(30, 30, 740, 270);
+    surface1.setDestinationRegion(rectSurface1);
+
+    Surface surface2(2);
+    Rectangle rectSurface2(200, 200, 200, 180);
+    surface2.setDestinationRegion(rectSurface2);
+
+    Surface surface3(3);
+    Rectangle rectSurface3(300, 100, 200, 350);
+    surface3.setDestinationRegion(rectSurface3);
+
+    layer10.addSurface(&surface1);
+    layer20.addSurface(&surface2);
+    layer20.addSurface(&surface3);
+
+    /// create picking point
+    struct PickingPoint
+    {
+        PickingPoint(int _x, int _y) : x(_x), y(_y) {}
+        int x;
+        int y;
+    };
+
+    PickingPoint P1(200, 100);
+    PickingPoint P2(700, 400);
+    PickingPoint P3(350, 340);
+    PickingPoint P4(450, 150);
+    PickingPoint P5(350, 250);
+
+    /*
+     * Test 1
+     * all surfaces and layers visible and opacity = 1.0
+     */
+    minOpacity = 0.5;
+
+    layer10.setVisibility(true);
+    layer10.setOpacity(1.0);
+
+    layer20.setVisibility(true);
+    layer20.setOpacity(1.0);
+
+    surface1.setVisibility(true);
+    surface1.setOpacity(1.0);
+
+    surface2.setVisibility(true);
+    surface2.setOpacity(1.0);
+
+    surface3.setVisibility(true);
+    surface3.setOpacity(1.0);
+
+    x = P1.x;
+    y = P1.y;
+    s = m_pScene->getSurfaceAt(&x, &y, 0.5);
+    ASSERT_TRUE(s);
+    EXPECT_EQ(surface1.getID(), s->getID());
+
+    x = P2.x;
+    y = P2.y;
+    s = m_pScene->getSurfaceAt(&x, &y, 0.5);
+    EXPECT_FALSE(s);
+
+    x = P3.x;
+    y = P3.y;
+    s = m_pScene->getSurfaceAt(&x, &y, 0.5);
+    ASSERT_TRUE(s);
+    EXPECT_EQ(surface2.getID(), s->getID());
+
+    x = P4.x;
+    y = P4.y;
+    s = m_pScene->getSurfaceAt(&x, &y, 0.5);
+    ASSERT_TRUE(s);
+    EXPECT_EQ(surface3.getID(), s->getID());
+
+    x = P5.x;
+    y = P5.y;
+    s = m_pScene->getSurfaceAt(&x, &y, 0.5);
+    ASSERT_TRUE(s);
+    EXPECT_EQ(surface2.getID(), s->getID());
+
+    /*
+     * Test 2
+     * all surfaces and layers visible and opacity = 1.0
+     * except layer 20 invisible
+     */
+    minOpacity = 0.5;
+
+    layer10.setVisibility(true);
+    layer10.setOpacity(1.0);
+
+    layer20.setVisibility(false);
+    layer20.setOpacity(1.0);
+
+    surface1.setVisibility(true);
+    surface1.setOpacity(1.0);
+
+    surface2.setVisibility(true);
+    surface2.setOpacity(1.0);
+
+    surface3.setVisibility(true);
+    surface3.setOpacity(1.0);
+
+    x = P1.x;
+    y = P1.y;
+    s = m_pScene->getSurfaceAt(&x, &y, 0.5);
+    ASSERT_TRUE(s);
+    EXPECT_EQ(surface1.getID(), s->getID());
+
+    x = P2.x;
+    y = P2.y;
+    s = m_pScene->getSurfaceAt(&x, &y, 0.5);
+    EXPECT_FALSE(s);
+
+    x = P3.x;
+    y = P3.y;
+    s = m_pScene->getSurfaceAt(&x, &y, 0.5);
+    EXPECT_FALSE(s);
+
+    x = P4.x;
+    y = P4.y;
+    s = m_pScene->getSurfaceAt(&x, &y, 0.5);
+    ASSERT_TRUE(s);
+    EXPECT_EQ(surface1.getID(), s->getID());
+
+    x = P5.x;
+    y = P5.y;
+    s = m_pScene->getSurfaceAt(&x, &y, 0.5);
+    ASSERT_TRUE(s);
+    EXPECT_EQ(surface1.getID(), s->getID());
+
+    /*
+     * Test 3
+     * all surfaces and layers visible and opacity = 1.0
+     * except layer 20 opacity 0.3
+     */
+    minOpacity = 0.5;
+
+    layer10.setVisibility(true);
+    layer10.setOpacity(1.0);
+
+    layer20.setVisibility(true);
+    layer20.setOpacity(0.3);
+
+    surface1.setVisibility(true);
+    surface1.setOpacity(1.0);
+
+    surface2.setVisibility(true);
+    surface2.setOpacity(1.0);
+
+    surface3.setVisibility(true);
+    surface3.setOpacity(1.0);
+
+    x = P1.x;
+    y = P1.y;
+    s = m_pScene->getSurfaceAt(&x, &y, 0.5);
+    ASSERT_TRUE(s);
+    EXPECT_EQ(surface1.getID(), s->getID());
+
+    x = P2.x;
+    y = P2.y;
+    s = m_pScene->getSurfaceAt(&x, &y, 0.5);
+    EXPECT_FALSE(s);
+
+    x = P3.x;
+    y = P3.y;
+    s = m_pScene->getSurfaceAt(&x, &y, 0.5);
+    EXPECT_FALSE(s);
+
+    x = P4.x;
+    y = P4.y;
+    s = m_pScene->getSurfaceAt(&x, &y, 0.5);
+    ASSERT_TRUE(s);
+    EXPECT_EQ(surface1.getID(), s->getID());
+
+    x = P5.x;
+    y = P5.y;
+    s = m_pScene->getSurfaceAt(&x, &y, 0.5);
+    ASSERT_TRUE(s);
+    EXPECT_EQ(surface1.getID(), s->getID());
+
+    /*
+     * Test 4
+     * all surfaces and layers visible and opacity = 1.0
+     * except layer 20 opacity 0.6, surface 3 opacity 0.5
+     */
+    minOpacity = 0.5;
+
+    layer10.setVisibility(true);
+    layer10.setOpacity(1.0);
+
+    layer20.setVisibility(true);
+    layer20.setOpacity(0.6);
+
+    surface1.setVisibility(true);
+    surface1.setOpacity(1.0);
+
+    surface2.setVisibility(true);
+    surface2.setOpacity(1.0);
+
+    surface3.setVisibility(true);
+    surface3.setOpacity(0.5);
+
+    x = P1.x;
+    y = P1.y;
+    s = m_pScene->getSurfaceAt(&x, &y, 0.5);
+    ASSERT_TRUE(s);
+    EXPECT_EQ(surface1.getID(), s->getID());
+
+    x = P2.x;
+    y = P2.y;
+    s = m_pScene->getSurfaceAt(&x, &y, 0.5);
+    EXPECT_FALSE(s);
+
+    x = P3.x;
+    y = P3.y;
+    s = m_pScene->getSurfaceAt(&x, &y, 0.5);
+    ASSERT_TRUE(s);
+    EXPECT_EQ(surface2.getID(), s->getID());
+
+    x = P4.x;
+    y = P4.y;
+    s = m_pScene->getSurfaceAt(&x, &y, 0.5);
+    ASSERT_TRUE(s);
+    EXPECT_EQ(surface1.getID(), s->getID());
+
+    x = P5.x;
+    y = P5.y;
+    s = m_pScene->getSurfaceAt(&x, &y, 0.5);
+    ASSERT_TRUE(s);
+    EXPECT_EQ(surface2.getID(), s->getID());
 }
 
 TEST_F(SceneTest, isLayerInCurrentRenderOrder)
