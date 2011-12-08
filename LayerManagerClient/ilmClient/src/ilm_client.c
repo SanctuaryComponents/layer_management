@@ -22,6 +22,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #define INVALID_ID 0xFFFFFFFF
 
@@ -57,7 +59,32 @@ ilmErrorTypes ilm_init()
             }
             else
             {
-                result = ILM_SUCCESS;
+                /* Connect to Service */              
+                DBusMessage *message;
+                int pid = getpid();
+                // Setup parameter to send
+                t_ilm_param layerParam[1];
+                
+                _ilm_setup_param(layerParam, DBUS_TYPE_UINT32, &pid);
+                // Setup Call
+                message = _ilm_dbus_method_call(g_ilm_client->dbus_connection, "ServiceConnect", layerParam, 1);
+
+                if (message)
+                {
+                    result = ILM_SUCCESS;                    
+                    t_ilm_int messageType = dbus_message_get_type(message);
+                    if (messageType == DBUS_MESSAGE_TYPE_ERROR) 
+                    { 
+                        ILM_ERROR("ilm_init","Can not connect to service\n");
+                        result = ILM_ERROR_ON_CONNECTION;
+                    } 
+                    _ilm_close_dbus_method_call(message);
+                }
+                else
+                {
+                    ILM_ERROR("ilm_init","Can not connect to service\n");
+                    result = ILM_ERROR_ON_CONNECTION;
+                }
             }
         }
     }
@@ -2078,6 +2105,27 @@ ilmErrorTypes ilm_destroy()
 
     if (g_ilm_client && g_ilm_init == ILM_TRUE)
     {
+        /* Connect to Service */              
+        DBusMessage *message;
+        int pid = getpid();
+        // Setup parameter to send
+        t_ilm_param layerParam[1];
+        
+        _ilm_setup_param(layerParam, DBUS_TYPE_UINT32, &pid);
+        // Setup Call
+        message = _ilm_dbus_method_call(g_ilm_client->dbus_connection, "ServiceDisconnect", layerParam, 1);
+
+        if (message)
+        {
+            ILM_CHECK_METHOD_ERROR(message);
+            _ilm_close_dbus_method_call(message);
+            result = ILM_SUCCESS;                    
+        }
+        else
+        {
+            ILM_ERROR("ilm_deinit","Can'not disconnect from service\n");
+        }
+        
         if (g_ilm_client->dbus_connection)
         {
             dbus_connection_unref(g_ilm_client->dbus_connection);

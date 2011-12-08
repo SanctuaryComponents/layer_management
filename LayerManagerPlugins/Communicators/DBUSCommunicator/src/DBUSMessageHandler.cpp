@@ -91,6 +91,7 @@ bool DBUSMessageHandler::registerPathFunction(  DBusObjectPathMessageFunction fM
 
 void DBUSMessageHandler::initReceive(DBusMessage* msg)
 {
+    LOG_DEBUG("DBUSCommunicator","Message " << dbus_message_get_member(msg) << " was sent by " << dbus_message_get_sender(msg) );
     if (!dbus_message_iter_init(msg, &m_MessageIter))
     {
         LOG_ERROR("DBUSCommunicator", "Message has no arguments!");

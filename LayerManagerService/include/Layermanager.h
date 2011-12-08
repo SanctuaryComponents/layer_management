@@ -27,6 +27,7 @@ class ICommand;
 class IRenderer;
 class ICommunicator;
 class ISceneProvider;
+class IApplicationReference;
 
 class Layermanager: public ICommandExecutor
 {
@@ -48,6 +49,9 @@ public:
     virtual void removeCommunicator(ICommunicator* communicator);
     virtual void addSceneProvider(ISceneProvider* sceneProvider);
     virtual void removeSceneProvider(ISceneProvider* sceneProvider);
+    virtual void addApplicationReference(IApplicationReference* reference);
+    virtual void removeApplicationReference(IApplicationReference* reference);
+    
     virtual bool startManagement(const int width, const int height, const char* displayName);
     virtual bool stopManagement();
 
@@ -55,6 +59,7 @@ public:
     virtual RendererList* getRendererList(void);
     virtual CommunicatorList* getCommunicatorList(void);
     virtual SceneProviderList* getSceneProviderList(void);
+    virtual ApplicationReferenceMap* getApplicationReferenceMap(void);
 
 private:
     void printDebugInformation() const;
@@ -71,6 +76,7 @@ private:
     RendererList* m_pRendererList;
     CommunicatorList* m_pCommunicatorList;
     SceneProviderList* m_pSceneProviderList;
+    ApplicationReferenceMap* m_pApplicationReferenceMap;
 };
 
 inline Scene* Layermanager::getScene(void)
@@ -93,5 +99,8 @@ inline SceneProviderList* Layermanager::getSceneProviderList(void)
     return m_pSceneProviderList;
 }
 
-
+inline ApplicationReferenceMap* Layermanager::getApplicationReferenceMap(void)
+{
+    return m_pApplicationReferenceMap;
+}
 #endif /* _LAYERMANAGER_H_ */

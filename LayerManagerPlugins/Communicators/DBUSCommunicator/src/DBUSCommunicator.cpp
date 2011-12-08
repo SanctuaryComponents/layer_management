@@ -44,6 +44,8 @@ static DBUSMessageHandler* g_pDbusMessage;
 
 static MethodTable manager_methods[] =
 {
+    { "ServiceConnect",                   "u",     "",            &DBUSCommunicator::ServiceConnect },
+    { "ServiceDisconnect",                "u",     "",            &DBUSCommunicator::ServiceDisconnect },    
     { "Debug",                            "b",     "",            &DBUSCommunicator::Debug },
     { "ScreenShot",                       "us",    "",            &DBUSCommunicator::ScreenShot },
     { "ScreenShotOfLayer",                "su",    "",            &DBUSCommunicator::ScreenShotOfLayer },
@@ -172,6 +174,37 @@ void DBUSCommunicator::stop()
 
     // deregister dbus messaging implicitly by deleting messageHandler
     delete g_pDbusMessage;
+}
+
+void DBUSCommunicator::ServiceConnect(DBusConnection* conn, DBusMessage* msg)
+{
+   (void)conn; // TODO: remove, only prevents warning
+    g_pDbusMessage->initReceive(msg);
+    u_int32_t processId = g_pDbusMessage->getUInt();
+    char* owner = strdup(dbus_message_get_sender(msg));   
+    m_executor->addApplicationReference(new IApplicationReference(owner,processId));    
+    g_pDbusMessage->initReply(msg);
+    g_pDbusMessage->closeReply();
+}
+
+
+void DBUSCommunicator::ServiceDisconnect(DBusConnection* conn, DBusMessage* msg)   
+{
+   IApplicationReference* reference = NULL;
+   (void)conn; // TODO: remove, only prevents warning
+    g_pDbusMessage->initReceive(msg);
+    char* owner = strdup(dbus_message_get_sender(msg));
+    u_int32_t processId = g_pDbusMessage->getUInt();
+    ApplicationReferenceMapIterator iter = m_executor->getApplicationReferenceMap()->find(IApplicationReference::generateApplicationHash(owner));
+    ApplicationReferenceMapIterator iterEnd = m_executor->getApplicationReferenceMap()->end();
+
+    if ( iter != iterEnd ) 
+    {
+        m_executor->removeApplicationReference((*iter).second);
+    }
+    
+    g_pDbusMessage->initReply(msg);
+    g_pDbusMessage->closeReply();
 }
 
 void DBUSCommunicator::Debug(DBusConnection* conn, DBusMessage* msg)

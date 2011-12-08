@@ -32,6 +32,7 @@ Layermanager::Layermanager()
     m_pRendererList = new RendererList();
     m_pCommunicatorList = new CommunicatorList();
     m_pSceneProviderList = new SceneProviderList();
+    m_pApplicationReferenceMap = new ApplicationReferenceMap();
 }
 
 Layermanager::~Layermanager()
@@ -157,6 +158,26 @@ void Layermanager::removeSceneProvider(ISceneProvider* sceneProvider)
         m_pSceneProviderList->remove(sceneProvider);
     }
 }
+void Layermanager::addApplicationReference(IApplicationReference* reference)
+{
+    if (reference)
+    {
+        LOG_INFO("LayerManagerService", "Connect from application hash :" << reference->getApplicationHash() << " pid : " << reference->getProcessId()); 
+        (*m_pApplicationReferenceMap)[reference->getApplicationHash()]=reference;
+    }
+
+}
+
+void Layermanager::removeApplicationReference(IApplicationReference* reference)
+{
+    if (reference)
+    {
+        LOG_INFO("LayerManagerService", "Disconnect from application with hash :" << reference->getApplicationHash() << " pid : " << reference->getProcessId());         
+        m_pApplicationReferenceMap->erase(reference->getApplicationHash());
+    }
+}
+
+
 
 void Layermanager::addCommunicator(ICommunicator* communicator)
 {

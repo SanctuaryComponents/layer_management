@@ -23,6 +23,8 @@
 #include "Log.h"
 
 #include "ICommandExecutor.h"
+#include "IApplicationReference.h"
+#include "ApplicationReferenceMap.h"
 #include "CommitCommand.h"
 #include "LayerCreateCommand.h"
 #include "LayergroupCreateCommand.h"
@@ -96,7 +98,8 @@ public:
     virtual void stop();
     virtual void process(int timeout_ms);
     virtual void setdebug(bool onoff);
-
+    void ServiceConnect(DBusConnection* conn, DBusMessage* msg);
+    void ServiceDisconnect(DBusConnection* conn, DBusMessage* msg);    
     void Debug(DBusConnection* conn, DBusMessage* msg);
     void ScreenShot(DBusConnection* conn, DBusMessage* msg);
     void ScreenShotOfLayer(DBusConnection* conn, DBusMessage* msg);

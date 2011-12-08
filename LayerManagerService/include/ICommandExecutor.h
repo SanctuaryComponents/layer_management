@@ -23,6 +23,7 @@
 #include "RendererList.h"
 #include "CommunicatorList.h"
 #include "SceneProviderList.h"
+#include "ApplicationReferenceMap.h"
 #include "LayerType.h"
 
 class ICommand;
@@ -63,6 +64,10 @@ public:
     virtual SceneProviderList* getSceneProviderList(void) = 0;
     virtual void addSceneProvider(ISceneProvider* sceneProvider) = 0;
     virtual void removeSceneProvider(ISceneProvider* sceneProvider) = 0;
+
+    virtual ApplicationReferenceMap* getApplicationReferenceMap(void) = 0;
+    virtual void addApplicationReference(IApplicationReference* applicationReference) = 0;
+    virtual void removeApplicationReference(IApplicationReference* applicationReference) = 0;
 
     virtual unsigned int getLayerTypeCapabilities(const LayerType layertype) const = 0; // TODO: removeable, use default command processing ?
     virtual unsigned int getNumberOfHardwareLayers(const unsigned int screenID) const = 0; // TODO: removeable, use default command processing ?
