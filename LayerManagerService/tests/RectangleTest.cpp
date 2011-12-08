@@ -21,22 +21,64 @@
 
 #include "Rectangle.h"
 
-TEST(RectangleTest, DISABLED_defaultConstructor)
+TEST(RectangleTest, defaultConstructor)
 {
+    /// create rectangle
+    Rectangle rect;
 
+    /// check default properties of rectangle
+    EXPECT_EQ(0, rect.x);
+    EXPECT_EQ(0, rect.y);
+    EXPECT_EQ(0, rect.width);
+    EXPECT_EQ(0, rect.height);
 }
 
-TEST(RectangleTest, DISABLED_specialConstructor)
+TEST(RectangleTest, specialConstructor)
 {
+    /// create rectangle with specified properties
+    Rectangle rect(1, 2, 3, 4);
 
+    /// check specified properties of rectangle
+    EXPECT_EQ(1, rect.x);
+    EXPECT_EQ(2, rect.y);
+    EXPECT_EQ(3, rect.width);
+    EXPECT_EQ(4, rect.height);
 }
 
-TEST(RectangleTest, DISABLED_assignOperator)
+TEST(RectangleTest, assignOperator)
 {
+    /// create 3 rectangles with different properties
+    Rectangle rect1;
+    Rectangle rect2(1, 2, 3, 4);
+    Rectangle rect3(9, 8, 7, 6);
 
-}
+    /// make sure, rectangle 1 and 2 have different properties
+    EXPECT_NE(rect2.x, rect1.x);
+    EXPECT_NE(rect2.y, rect1.y);
+    EXPECT_NE(rect2.width, rect1.width);
+    EXPECT_NE(rect2.height, rect1.height);
 
-TEST(RectangleTest, DISABLED_streamOperator)
-{
+    /// assign specified rectangle 2 to rectangle 1
+    rect1 = rect2;
 
+    /// make sure, rectangle 1 and 2 have equal properties now
+    EXPECT_EQ(rect2.x, rect1.x);
+    EXPECT_EQ(rect2.y, rect1.y);
+    EXPECT_EQ(rect2.width, rect1.width);
+    EXPECT_EQ(rect2.height, rect1.height);
+
+    /// make sure, rectangle 2 and 3 have different properties
+    EXPECT_NE(rect3.x, rect2.x);
+    EXPECT_NE(rect3.y, rect2.y);
+    EXPECT_NE(rect3.width, rect2.width);
+    EXPECT_NE(rect3.height, rect2.height);
+
+    /// assign rectangle 3 to rectangle 2
+    rect2 = rect3;
+
+    /// make sure, rectangle 2 and 3 have equal properties now
+    EXPECT_EQ(rect3.x, rect2.x);
+    EXPECT_EQ(rect3.y, rect2.y);
+    EXPECT_EQ(rect3.width, rect2.width);
+    EXPECT_EQ(rect3.height, rect2.height);
 }
