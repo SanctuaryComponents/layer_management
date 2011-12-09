@@ -58,7 +58,7 @@ bool X11TextureFromPixmap::bindSurfaceTexture(Surface* surface)
 bool X11TextureFromPixmap::unbindSurfaceTexture(Surface* surface)
 {
     GLXPlatformSurface* nativeSurface = (GLXPlatformSurface*)surface->platform;
-    if (nativeSurface)
+    if (nativeSurface && nativeSurface->isReadyForRendering())
     {
         glXReleaseTexImageEXT_func(dpy, nativeSurface->glxPixmap, GLX_FRONT_LEFT_EXT);
         return true;

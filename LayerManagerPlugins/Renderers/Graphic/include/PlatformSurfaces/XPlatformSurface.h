@@ -32,17 +32,33 @@ public:
     , isMapped(false)
     , pixmap(0)
     , texture(0)
+    , m_isReadyForRendering(false)
     {
     }
 
     ~XPlatformSurface()
     {
     }
+    
+    bool enableRendering()
+    {
+        m_isReadyForRendering = true;
+    }
 
+    bool disableRendering()
+    {
+        m_isReadyForRendering = false;
+    }
+
+    bool isReadyForRendering()
+    {
+        return m_isReadyForRendering;
+    }
     // TODO: private/protected
     bool isMapped;
     Pixmap pixmap;
     uint texture;
+    bool m_isReadyForRendering;    
 };
 
 #endif /* _XPLATFORMSURFACE_H_ */

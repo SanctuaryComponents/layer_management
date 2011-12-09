@@ -805,6 +805,13 @@ init_complete:
                     {
                         LOG_WARNING("X11WindowSystem", "Surface empty during damage notification");
                         break;
+                    } else {
+                        if (currentSurface->platform != NULL) 
+                        {
+                            /* Enable Rendering for Surface, after damage Notification was send successfully */
+                            /* This will ensure, that the content is not dirty */
+                            ((XPlatformSurface *)(currentSurface->platform))->enableRendering();
+                        }
                     }
                     currentSurface->damaged = true;
                     checkRedraw = true;

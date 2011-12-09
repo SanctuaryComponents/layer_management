@@ -34,7 +34,7 @@ bool X11CopyGLX::bindSurfaceTexture(Surface* surface)
     {
         nativeSurface = (XPlatformSurface*)surface->platform;
     } 
-    if( nativeSurface != NULL && surface->getNativeContent() != 0 )
+    if( nativeSurface != NULL && surface->getNativeContent() != 0 && nativeSurface->isReadyForRendering())
     {
         pixmap = XCompositeNameWindowPixmap (dpy, surface->getNativeContent());
         if (!pixmap)

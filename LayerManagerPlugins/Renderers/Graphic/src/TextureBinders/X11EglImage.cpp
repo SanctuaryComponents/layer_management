@@ -45,7 +45,7 @@ X11EglImage::X11EglImage(EGLDisplay eglDisplay, Display* x11display)
 bool X11EglImage::bindSurfaceTexture(Surface* surface)
 {
     EglXPlatformSurface* nativeSurface = (EglXPlatformSurface*)surface->platform;
-    if (nativeSurface)
+    if (nativeSurface && nativeSurface->isReadyForRendering())
     {
         glBindTexture(GL_TEXTURE_2D, nativeSurface->texture);
         if (nativeSurface->eglImage)
