@@ -31,7 +31,7 @@
 
 MockNavi::MockNavi(float fps, float animationSpeed, SurfaceConfiguration* config)
 : OpenGLES2App(fps, animationSpeed, config)
-, m_camera(vec3f(-1.5 * CITY_GRID_SIZE, -0.1, 0.0), vec3f(0.0, 0.0, 0.0))
+, m_camera(vec3f(-1.5 * CITY_GRID_SIZE, -0.1, 0.0), vec3f(0.0, 0.0, 0.0), config->surfaceWidth, config->surfaceHeight)
 , m_houseCount(15)
 {
     generateCity();

@@ -26,7 +26,7 @@
 class Camera : public IUpdateable
 {
 public:
-    Camera(vec3f position, vec3f target);
+    Camera(vec3f position, vec3f target, float viewportWidth, float viewportHeight);
     virtual ~Camera();
 
     IlmMatrix* getViewProjectionMatrix();
