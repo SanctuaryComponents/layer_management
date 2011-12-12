@@ -20,9 +20,9 @@
 #include "IlmMatrix.h"
 
 const char* vertexShaderCode =
-		    "attribute highp vec4 a_vertex;                                   \
+		    "attribute mediump vec4 a_vertex;                                 \
 		     uniform mediump mat4 u_modelMatrix;                              \
-		     varying highp vec4 v_normal;                                     \
+		     varying mediump vec4 v_normal;                                   \
              void main(void)                                                  \
              {                                                                \
                  gl_Position = u_projectionMatrix * u_modelMatrix * a_vertex; \
@@ -30,11 +30,11 @@ const char* vertexShaderCode =
              }";
 
 const char* fragmentShaderCode =
-		    "uniform mediump vec4 u_color; \
-		     varying highp vec4 v_normal;  \
-		     highp vec4 lightPosition;     \
-             void main (void)              \
-		     {                             \
+		    "uniform mediump vec4 u_color;   \
+		     varying mediump vec4 v_normal;  \
+		     mediump vec4 lightPosition;     \
+             void main (void)                \
+		     {                               \
 		         lightPosition = normalize(vec4(-3.0, -5.0, 10.0, 1.0));   \
 		         gl_FragColor = max(dot(v_normal, lightPosition), 0.0) * 0.5 * u_color + 0.8 * u_color;   \
 		         gl_FragColor.a = 1.0;   \
