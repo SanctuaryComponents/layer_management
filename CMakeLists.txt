@@ -22,24 +22,7 @@ project (LayerManager)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/")
 
-SET( ${PROJECT_NAME}_MAJOR_VERSION 0 )
-SET( ${PROJECT_NAME}_MINOR_VERSION 9 )
-SET( ${PROJECT_NAME}_PATCH_LEVEL 4 )
-
-SET(VERSION ${${PROJECT_NAME}_MAJOR_VERSION}.${${PROJECT_NAME}_MINOR_VERSION}.${${PROJECT_NAME}_PATCH_LEVEL})
-if(NOT DEFINED ILM_VERSION)
-execute_process(COMMAND git describe --tags WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} 
-                OUTPUT_VARIABLE ILM_VERSION 
-                OUTPUT_STRIP_TRAILING_WHITESPACE)
-string(REPLACE "-" "_" ILM_VERSION ${ILM_VERSION} )
-endif(NOT DEFINED ILM_VERSION)
-                
-set(LICENSE "APACHE 2.0")
-
-set(GENIVI_PROJECT_VERSION ${VERSION})
-message(STATUS
-        "Build for Version ${VERSION} build ${ILM_VERSION}"
-        )
+include(${CMAKE_MODULE_PATH}/CMakeVersions.txt)
 
 # set default build type, if not defined by user
 if (NOT CMAKE_BUILD_TYPE)
@@ -48,12 +31,6 @@ if (NOT CMAKE_BUILD_TYPE)
                          FORCE)
     message(STATUS "Build type not defined. Using default build type 'Release'.")
 endif (NOT CMAKE_BUILD_TYPE)
-
-
-##################### RPM CONFIG ########################
-set(GENIVI_RPM_RELEASE "1${ILM_VERSION}")
-set(SPEC_DIR ".")
-#########################################################
 
 # Platforms / A set of indiviual options at once
 
