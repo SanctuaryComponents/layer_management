@@ -58,7 +58,7 @@ ShaderProgram* ShaderProgramGLES::createProgram(const std::string& vertName, con
 	else
 	{
 		// load shader sources from file, compile and link them:
-		progHandle = RenderUtilLoadShaderSources(vertName.c_str(), fragName.c_str(), GL_FALSE);
+		progHandle = RenderUtilLoadShaderSources(vertName.c_str(), fragName.c_str(), GL_TRUE);
 	}
 
     if (progHandle != 0)

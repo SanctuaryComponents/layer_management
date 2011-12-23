@@ -86,14 +86,14 @@ void Shader::setUniform(const ShaderUniform& uniform)
     m_uniformMap[name]->setData(uniform);
 }
 
-void Shader::loadUniforms(void) const
+void Shader::loadUniforms(void)
 {
     UniformMapConstIterator iter = m_uniformMap.begin();
     UniformMapConstIterator iterEnd = m_uniformMap.end();
 
     for (; iter != iterEnd; ++iter)
-    {
-        const ShaderUniform* uniform = (*iter).second;
+    {       
+        ShaderUniform* uniform = (*iter).second;
         uniform->load(m_program);
     }
 }

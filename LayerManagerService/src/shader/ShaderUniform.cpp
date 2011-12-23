@@ -174,11 +174,18 @@ void ShaderUniform::setData(const ShaderUniform& other)
     m_transpose = other.m_transpose;
 }
 
-void ShaderUniform::load(const ShaderProgram& program) const
+void ShaderUniform::load(ShaderProgram& program)
 {
+    LOG_DEBUG("ShaderUniform","Load Uniform " << getName() << " location " << m_location);
+    if ( m_location == 0 ) 
+    {
+        m_location = program.getUniformLocation(getName().c_str());
+    }
+    LOG_DEBUG("ShaderUniform","Load Uniform " << getName() << " location " << m_location);
     if (m_location == -1)
     {
         // TODO: error? or silently fail?
+        LOG_WARNING("ShaderUniform","Load Uniform failed, location not defined" );
         return;
     }
 
@@ -188,18 +195,22 @@ void ShaderUniform::load(const ShaderProgram& program) const
     switch (m_type)
     {
     case Vector1f:
+        LOG_DEBUG("ShaderUniform","Load Uniform1fv : " << values[0] );
         program.uniform1fv(m_location, m_count, values);
         break;
 
     case Vector2f:
+        LOG_DEBUG("ShaderUniform","Load Uniform2fv : " << values[0] << "," << values[1] );
         program.uniform2fv(m_location, m_count, values);
         break;
 
     case Vector3f:
+        LOG_DEBUG("ShaderUniform","Load Uniform3fv : " << values[0] << "," << values[1] << "," << values[2] );
         program.uniform3fv(m_location, m_count, values);
         break;
 
     case Vector4f:
+        LOG_DEBUG("ShaderUniform","Load Uniform4fv : " << values[0] << "," << values[1] << "," << values[2] << "," << values[3] );
         program.uniform4fv(m_location, m_count, values);
         break;
 

@@ -110,7 +110,7 @@ public:
      */
     void unref(void);
 
-    virtual int getUniformLocation(const char* name) const = 0;
+    virtual int getUniformLocation(const char* name) = 0;
 
     virtual void uniform1iv(int location, int count, const int* v) const = 0;
 

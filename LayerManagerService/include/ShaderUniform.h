@@ -114,7 +114,7 @@ public:
     /**
      * Load uniform data in current OpenGL context.
      */
-    void load(const ShaderProgram& program) const;
+    void load(ShaderProgram& program);
 
 private:
     /// the uniform name

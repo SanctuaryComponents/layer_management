@@ -76,7 +76,7 @@ public:
      * used for position, size, etc... They need to be set separately
      * by loadCommonUniforms().
      */
-    void loadUniforms(void) const;
+    void loadUniforms(void);
 
     /**
      * Load uniform values for common surface properties, like position,
