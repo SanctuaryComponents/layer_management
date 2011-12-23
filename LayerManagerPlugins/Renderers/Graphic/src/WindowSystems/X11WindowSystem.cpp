@@ -559,10 +559,12 @@ void X11WindowSystem::Redraw()
     CheckRedrawAllLayers();
     if (m_damaged)
     {   
+        graphicSystem->activateGraphicContext();
         graphicSystem->clearBackground();
         RedrawAllLayers();
-        m_pScene->unlockScene();       
         graphicSystem->swapBuffers();
+        graphicSystem->releaseGraphicContext();
+        m_pScene->unlockScene();       
         if (debugMode)
         {
             printDebug();

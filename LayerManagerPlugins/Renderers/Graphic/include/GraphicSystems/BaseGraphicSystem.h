@@ -44,6 +44,8 @@ public:
         m_baseWindowSystem = windowSystem;
     }
 
+    virtual void activateGraphicContext() = 0;
+    virtual void releaseGraphicContext() = 0;
     virtual void clearBackground() = 0;
     virtual void swapBuffers() = 0;
     virtual void saveScreenShotOfFramebuffer(std::string fileToSave) = 0;

@@ -52,6 +52,21 @@ GLESGraphicsystem::GLESGraphicsystem(int windowWidth, int windowHeight, PfnShade
     LOG_DEBUG("GLESGraphicsystem", "creating GLESGraphicsystem");
 }
 
+void GLESGraphicsystem::activateGraphicContext()
+{
+    LOG_DEBUG("GLESGraphicsystem", "Activate Graphic Context");
+    EGLBoolean eglStatus = false;
+    eglStatus = eglMakeCurrent(m_eglDisplay, m_eglSurface, m_eglSurface, m_eglContext);
+    
+}
+
+void GLESGraphicsystem::releaseGraphicContext() 
+{
+    LOG_DEBUG("GLESGraphicsystem", "Release Graphic Context");
+    EGLBoolean eglStatus = false;
+    eglStatus = eglMakeCurrent(m_eglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+}   
+
 bool GLESGraphicsystem::init(EGLNativeDisplayType display, EGLNativeWindowType NativeWindow)
 {
     m_nativeDisplay = display;

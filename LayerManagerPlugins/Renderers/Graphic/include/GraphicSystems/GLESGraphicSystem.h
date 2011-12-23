@@ -37,7 +37,10 @@ public:
     virtual bool init(EGLNativeDisplayType display, EGLNativeWindowType window);
 
     virtual void clearBackground();
-
+    
+    virtual void activateGraphicContext();
+    virtual void releaseGraphicContext();
+    
     virtual void swapBuffers();
 
     virtual void beginLayer(Layer* layer);

@@ -47,12 +47,15 @@ public:
     bool CheckConfigValue(Display *curDisplay,GLXFBConfig currentConfig, int attribute, int expectedValue);
     bool CheckConfigMask(Display *curDisplay,GLXFBConfig currentConfig, int attribute, int expectedValue);
     virtual void renderSurface(Surface* currentSurface);
+    virtual void activateGraphicContext();
+    virtual void releaseGraphicContext();
 
 private:
-    int         windowWidth;
-    int         windowHeight;
-    Display*    x11disp;
-    Window      window;
+    int         m_windowWidth;
+    int         m_windowHeight;
+    Display*    m_x11display;
+    Window      m_window;
+    GLXContext  m_context;
     Layer*      m_currentLayer;
     bool        m_zerocopy;
 };

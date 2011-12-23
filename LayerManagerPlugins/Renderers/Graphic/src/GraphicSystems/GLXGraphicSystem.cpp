@@ -28,8 +28,8 @@
 GLXGraphicsystem::GLXGraphicsystem(int WindowWidth, int WindowHeight)
 {
     LOG_DEBUG("GLXGraphicsystem", "creating GLXGraphicsystem");
-    this->windowHeight = WindowHeight;
-    this->windowWidth = WindowWidth;
+    this->m_windowHeight = WindowHeight;
+    this->m_windowWidth = WindowWidth;
     m_zerocopy = false;
 }
 
@@ -66,7 +66,7 @@ XVisualInfo* GLXGraphicsystem::GetMatchingVisual(Display *dpy)
 }
 bool GLXGraphicsystem::CheckConfigMask(Display *curDisplay,GLXFBConfig currentConfig, int attribute, int expectedValue)
 {
-     bool result = true;
+    bool result = true;
     int returnedValue = 0;
 
     glXGetFBConfigAttrib(curDisplay,currentConfig,attribute,&returnedValue);
@@ -79,7 +79,7 @@ bool GLXGraphicsystem::CheckConfigMask(Display *curDisplay,GLXFBConfig currentCo
 
 bool GLXGraphicsystem::CheckConfigValue(Display *curDisplay,GLXFBConfig currentConfig, int attribute, int expectedValue)
 {
-     bool result = true;
+    bool result = true;
     int returnedValue = 0;
 
     glXGetFBConfigAttrib(curDisplay,currentConfig,attribute,&returnedValue);
@@ -90,6 +90,18 @@ bool GLXGraphicsystem::CheckConfigValue(Display *curDisplay,GLXFBConfig currentC
     return result;
 }
 
+void GLXGraphicsystem::activateGraphicContext()
+{
+    LOG_DEBUG("GLXGraphicsystem", "Activate Graphic Context");
+    glXMakeCurrent(m_x11display, m_window, m_context);
+    
+}
+
+void GLXGraphicsystem::releaseGraphicContext() 
+{
+    LOG_DEBUG("GLXGraphicsystem", "Release Graphic Context");
+    glXMakeCurrent(m_x11display, None, NULL);
+}
 
 GLXFBConfig* GLXGraphicsystem::GetMatchingPixmapConfig(Display *curDisplay)
 {
@@ -163,39 +175,39 @@ GLXFBConfig* GLXGraphicsystem::GetMatchingPixmapConfig(Display *curDisplay)
 bool GLXGraphicsystem::init(Display* x11Display, Window x11Window)
 {
     LOG_DEBUG("GLXGraphicsystem", "init");
-    x11disp = x11Display;
-    window = x11Window;
+    m_x11display = x11Display;
+    m_window = x11Window;
 
-    if (!x11disp)
+    if (!m_x11display)
     {
         LOG_ERROR("GLXGraphicsystem", "given display is null");
         return false;
     }
 
-    if (!window)
+    if (!m_window)
     {
         LOG_ERROR("GLXGraphicsystem", "given windowid is 0");
         return false;
     }
 
-    XVisualInfo* windowVis = GetMatchingVisual(x11disp);
+    XVisualInfo* windowVis = GetMatchingVisual(m_x11display);
 
     LOG_DEBUG("X11GLXRenderer", "Initialising opengl");
-    GLXContext ctx = glXCreateContext(x11disp, windowVis, 0, GL_TRUE);
-    if (!ctx)
+    m_context = glXCreateContext(m_x11display, windowVis, 0, GL_TRUE);
+    if (!m_context)
     {
         LOG_ERROR("GLXGraphicsystem", "Couldn't create GLX context!");
         return false;
     }
     LOG_DEBUG("GLXGraphicsystem", "Make GLX Context current");
-    glXMakeCurrent(x11disp, window, ctx);
+    glXMakeCurrent(m_x11display, m_window, m_context);
     glEnable (GL_BLEND);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glEnable(GL_TEXTURE_2D);
     glMatrixMode(GL_MODELVIEW);
     const char *ext;
-    ext = glXQueryExtensionsString(x11disp, 0);
+    ext = glXQueryExtensionsString(m_x11display, 0);
     if (!strstr(ext, "GLX_EXT_texture_from_pixmap") )
     {
         m_zerocopy = false;
@@ -217,7 +229,7 @@ void GLXGraphicsystem::clearBackground()
 
 void GLXGraphicsystem::swapBuffers()
 {
-    glXSwapBuffers(x11disp, window);
+    glXSwapBuffers(m_x11display, m_window);
 }
 
 void GLXGraphicsystem::beginLayer(Layer* currentLayer)
@@ -334,23 +346,23 @@ void GLXGraphicsystem::renderSurface(Surface* currentSurface)
 //    LOG_DEBUG("GLXGraphicsystem","rendersurface: src" << src.x << " " << src.y << " " << src.width << " " << src.height );
 //    LOG_DEBUG("GLXGraphicsystem","rendersurface: dest" << dest.x << " " << dest.y << " " << dest.width << " " << dest.height );
 //    LOG_DEBUG("GLXGraphicsystem","orig: " << currentSurface->OriginalSourceWidth << " " << currentSurface->OriginalSourceHeight  );
-//    LOG_DEBUG("GLXGraphicsystem","window: " << windowWidth << " " << windowHeight  );
+//    LOG_DEBUG("GLXGraphicsystem","window: " << m_windowWidth << " " << m_windowHeight  );
 
     //bottom left
     glTexCoord2d(textureCoordinates[0],textureCoordinates[3]);
-    glVertex2d((float)targetSurfaceDestination.x/windowWidth*2-1,  1-(float)(targetSurfaceDestination.y+targetSurfaceDestination.height)/windowHeight*2);
+    glVertex2d((float)targetSurfaceDestination.x/m_windowWidth*2-1,  1-(float)(targetSurfaceDestination.y+targetSurfaceDestination.height)/m_windowHeight*2);
 
     // bottom right
     glTexCoord2f(textureCoordinates[1],textureCoordinates[3]);
-    glVertex2d( (float)(targetSurfaceDestination.x+targetSurfaceDestination.width)/windowWidth*2-1, 1-(float)(targetSurfaceDestination.y+targetSurfaceDestination.height)/windowHeight*2);
+    glVertex2d( (float)(targetSurfaceDestination.x+targetSurfaceDestination.width)/m_windowWidth*2-1, 1-(float)(targetSurfaceDestination.y+targetSurfaceDestination.height)/m_windowHeight*2);
 
     // top right
     glTexCoord2f(textureCoordinates[1], textureCoordinates[2]);
-    glVertex2d((float)(targetSurfaceDestination.x+targetSurfaceDestination.width)/windowWidth*2-1, 1-(float)targetSurfaceDestination.y/windowHeight*2);
+    glVertex2d((float)(targetSurfaceDestination.x+targetSurfaceDestination.width)/m_windowWidth*2-1, 1-(float)targetSurfaceDestination.y/m_windowHeight*2);
 
     // top left
     glTexCoord2f(textureCoordinates[0], textureCoordinates[2]);
-    glVertex2d((float)targetSurfaceDestination.x/windowWidth*2-1 ,  1-(float)targetSurfaceDestination.y/windowHeight*2);
+    glVertex2d((float)targetSurfaceDestination.x/m_windowWidth*2-1 ,  1-(float)targetSurfaceDestination.y/m_windowHeight*2);
     glEnd();
 
     m_binder->unbindSurfaceTexture(currentSurface);
