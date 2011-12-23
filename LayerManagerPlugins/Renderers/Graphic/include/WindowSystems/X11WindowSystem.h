@@ -32,6 +32,14 @@
 
 typedef XVisualInfo* (*GetVisualInfoFunction)(Display *dpy);
 
+typedef enum x11WindowSystemStates
+{
+    REDRAW_STATE = 0,
+    WAKEUP_STATE = 1,
+    IDLE_STATE = 2,
+    UNKOWN_STATE    
+} X11WindowSystemStates;
+
 class X11WindowSystem: public BaseWindowSystem
 {
 public:
@@ -41,23 +49,16 @@ public:
     bool start();
     void stop();
     static XVisualInfo * getDefaultVisual(Display *dpy);
-	void signalRedrawEvent();
-
-    Display* getNativeDisplayHandle()
-    {
-        return x11Display;
-    }
-
-    Window getCompositorNativeWindowHandle()
-    {
-        return CompositorWindow;
-    }
-
+    void signalRedrawEvent();
+    void wakeUpRendererThread();
+    void setSystemState (X11WindowSystemStates state);
+    X11WindowSystemStates getSystemState ();
+    Display* getNativeDisplayHandle();
+    Window getCompositorNativeWindowHandle();
     virtual void allocatePlatformSurface(Surface *surface);
     void doScreenShot(std::string fileName);
     void doScreenShotOfLayer(std::string fileName, const uint id);
     void doScreenShotOfSurface(std::string fileName, const uint id, const uint layer_id);
-
 private:
     ScreenShotType takeScreenshot;
     std::string screenShotFile;
@@ -71,13 +72,14 @@ private:
     static int composite_opcode;
     int composite_event, composite_error;
     int composite_major, composite_minor;
-	static int damage_opcode;
-	int damage_event, damage_error;
-	int damage_major, damage_minor;
+    static int damage_opcode;
+    int damage_event, damage_error;
+    int damage_major, damage_minor;
     static const char CompositorWindowTitle[];
     bool m_running;
     bool m_initialized;
     bool m_success;
+    X11WindowSystemStates m_systemState;
 
 protected:
     Display* x11Display;
@@ -119,13 +121,32 @@ private:
     void printDebug();
     void* EventLoop();
     static int error(Display *dpy, XErrorEvent *ev);
-    bool redrawEvent;
+
     static bool m_xerror;
     #ifdef WITH_INPUT_EVENTS
     void ManageXInputEvent(XEvent *pevent);
     #endif
-
+    
     friend void * X11eventLoopCallback(void *);
 };
+
+inline void X11WindowSystem::setSystemState (X11WindowSystemStates state)
+{
+        m_systemState = state;
+};
+inline X11WindowSystemStates X11WindowSystem::getSystemState () 
+{
+    return m_systemState;
+};
+
+inline Display* X11WindowSystem::getNativeDisplayHandle()
+{
+    return x11Display;
+}
+
+inline Window X11WindowSystem::getCompositorNativeWindowHandle()
+{
+    return CompositorWindow;
+}
 
 #endif /* _X11WINDOWSYSTEM_H_ */

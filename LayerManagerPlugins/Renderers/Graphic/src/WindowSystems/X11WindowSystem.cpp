@@ -50,7 +50,7 @@ X11WindowSystem::X11WindowSystem(const char* displayname, int width, int height,
 , m_success(false)
 , windowWidth(width)
 , windowHeight(height)
-, redrawEvent(false)
+, m_systemState(IDLE_STATE)
 {
     LOG_DEBUG("X11WindowSystem", "creating X11WindowSystem");
 
@@ -558,12 +558,11 @@ void X11WindowSystem::Redraw()
 
     CheckRedrawAllLayers();
     if (m_damaged)
-    {
+    {   
         graphicSystem->clearBackground();
         RedrawAllLayers();
-        m_pScene->unlockScene();
+        m_pScene->unlockScene();       
         graphicSystem->swapBuffers();
-
         if (debugMode)
         {
             printDebug();
@@ -823,9 +822,10 @@ init_complete:
 #ifndef WITH_XTHREADS
         }
 #endif //WITH_XTHREADS
-        if (this->redrawEvent)
+        if (this->m_systemState == REDRAW_STATE)
         {
-            this->redrawEvent = false;
+            LOG_DEBUG("X11WindowSystem", "Enter Redraw State");
+            this->m_systemState = IDLE_STATE;
 
             // check if we are supposed to take screenshot
             if (this->takeScreenshot!=ScreenShotNone)
@@ -838,6 +838,10 @@ init_complete:
                 checkRedraw = true;
             }
 
+        } 
+        else if (this->m_systemState == WAKEUP_STATE)         
+        {
+            LOG_DEBUG("X11WindowSystem", "Enter Wake Up State");
         }
 
         if (checkRedraw)
@@ -894,11 +898,8 @@ void X11WindowSystem::ManageXInputEvent(XEvent *pevent)
 #ifdef WITH_XTHREADS
 static Display* displaySignal = NULL;
 #endif //WITH_XTHREADS
-void X11WindowSystem::signalRedrawEvent()
+void X11WindowSystem::wakeUpRendererThread() 
 {
-    // set flag that redraw is needed
-    redrawEvent = true;
-    m_damaged = true;
 #ifdef WITH_XTHREADS
     // send dummy expose event, to wake up blocking x11 event loop (XNextEvent)
     LOG_DEBUG("X11WindowSystem", "Sending dummy event to wake up renderer thread");
@@ -913,6 +914,14 @@ void X11WindowSystem::signalRedrawEvent()
     XFlush(displaySignal);
     LOG_DEBUG("X11WindowSystem", "Event successfully sent to renderer");
 #endif //WITH_XTHREADS
+}
+
+void X11WindowSystem::signalRedrawEvent()
+{
+    // set flag that redraw is needed
+    this->m_systemState = REDRAW_STATE;
+    m_damaged = true;
+    this->wakeUpRendererThread();
 }
 
 void X11WindowSystem::cleanup(){
