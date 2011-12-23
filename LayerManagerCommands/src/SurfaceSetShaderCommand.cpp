@@ -51,7 +51,7 @@ ExecutionResult SurfaceSetShaderCommand::execute(ICommandExecutor* executor)
         Shader* shader = NULL;
 
         // get shader by its ID
-        ShaderMap shaderMap = scene.m_shaderMap;
+        ShaderMap &shaderMap = scene.m_shaderMap;
         ShaderMapIterator iter = shaderMap.find(m_shaderid);
         ShaderMapIterator iterEnd = shaderMap.end();
         if (iter != iterEnd)

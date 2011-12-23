@@ -35,7 +35,7 @@ ExecutionResult ShaderSetUniformsCommand::execute(ICommandExecutor* executor)
     ExecutionResult result = ExecutionSuccessRedraw;
 
     // get shader by its ID
-    ShaderMap shaderMap = scene.m_shaderMap;
+    ShaderMap &shaderMap = scene.m_shaderMap;
     ShaderMapIterator iter = shaderMap.find(m_shaderid);
     ShaderMapIterator iterEnd = shaderMap.end();
 

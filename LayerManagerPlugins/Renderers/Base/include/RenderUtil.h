@@ -226,6 +226,7 @@ static GLuint RenderUtilLoadShaderSources(const char* vertFile, const char* frag
     prog = glCreateProgram();
     if (prog==0)
     {
+        LOG_DEBUG("RenderUtilShaderDebug","glError occured : " << glGetError()); 
         LOG_DEBUG("RenderUtilShaderDebug","could not create prog, prog is 0");
     }
 
