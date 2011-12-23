@@ -22,7 +22,7 @@
 
 #include <string>
 #include "LayerType.h"
-
+#include "Shader.h"
 /**
  * Abstract Base of all CompositingControllers, ie Renderers.
  */
@@ -60,9 +60,10 @@ public:
     virtual unsigned int* getScreenResolution(unsigned int screenID) = 0;
 
     virtual unsigned int* getScreenIDs(unsigned int* length) = 0;
+    
+    virtual Shader* createShader(const string* vertexName, const string* fragmentName) = 0;
 
-	virtual void signalWindowSystemRedraw()=0;
-
+    virtual void signalWindowSystemRedraw()=0;
 };
 
 #endif /* _IRENDERER_H_ */

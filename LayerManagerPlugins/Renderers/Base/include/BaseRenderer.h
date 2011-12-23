@@ -37,6 +37,7 @@ public:
 
     virtual void doScreenShot(std::string fileToSave) = 0;
     virtual uint getLayerTypeCapabilities(LayerType layerType);
+    virtual Shader* createShader(const string* vertexName, const string* fragmentName); 
 
 protected:
     Scene* m_pScene;
@@ -45,6 +46,10 @@ private:
     static bool debugMode;
 };
 
+inline Shader* BaseRenderer::createShader(const string* vertexName, const string* fragmentName) 
+{
+    return NULL;
+}
 inline void BaseRenderer::setdebug(bool onoff)
 {
     debugMode = onoff;

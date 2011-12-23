@@ -19,6 +19,7 @@
 
 #include "X11GLESRenderer.h"
 #include "config.h"
+#include "Shader.h"
 #include "ShaderProgramGLES.h"
 #include "X11/Xlib.h"
 #include "TextureBinders/X11CopyGLES.h"
@@ -148,7 +149,19 @@ uint* X11GLESRenderer::getScreenIDs(uint* length)
 
 void X11GLESRenderer::signalWindowSystemRedraw()
 {
-	m_pWindowSystem->signalRedrawEvent();
+    m_pWindowSystem->signalRedrawEvent();
+}
+
+Shader* X11GLESRenderer::createShader(const string* vertexName, const string* fragmentName)  
+{
+    Shader *result = NULL;
+    m_pWindowSystem->setSystemState(WAKEUP_STATE);
+    m_pWindowSystem->wakeUpRendererThread();    
+    m_pGraphicSystem->activateGraphicContext();
+    result = Shader::createShader(*vertexName,*fragmentName);
+    m_pGraphicSystem->releaseGraphicContext();
+    m_pWindowSystem->setSystemState(IDLE_STATE);   
+    return result;
 }
 
 extern "C" BaseRenderer* createX11GLESRenderer(Scene* pScene){

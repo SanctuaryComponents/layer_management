@@ -37,7 +37,8 @@ public:
     uint getNumberOfHardwareLayers(uint screenID);
     uint* getScreenResolution(uint screenID);
     uint* getScreenIDs(uint* length);
-	void signalWindowSystemRedraw();
+    void signalWindowSystemRedraw();
+    Shader* createShader(const string* vertexName, const string* fragmentName);
 
 private:
     X11WindowSystem* m_pWindowSystem;
