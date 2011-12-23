@@ -20,6 +20,7 @@
 #include "ICommandExecutor.h"
 #include "Scene.h"
 #include "Log.h"
+#include "RendererList.h"
 
 ShaderCreateCommand::ShaderCreateCommand(const std::string& vertName, const std::string& fragName, unsigned int* id)
 : m_vertName(vertName)
@@ -31,19 +32,26 @@ ShaderCreateCommand::ShaderCreateCommand(const std::string& vertName, const std:
 ExecutionResult ShaderCreateCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());
-
     ExecutionResult result = ExecutionFailed;
 
-    Shader* shader;
-
-    // create new shader instance
-    shader = Shader::createShader(m_vertName, m_fragName);
-
+    Shader* shader = NULL;
+    RendererListIterator iter = executor->getRendererList()->begin();
+    RendererListIterator iterEnd = executor->getRendererList()->end();
+    for (; iter != iterEnd; ++iter)
+    {
+        IRenderer* renderer = *iter;
+        if (renderer) 
+        {
+            shader = renderer->createShader(&m_vertName, &m_fragName);
+        } 
+        break;
+    }
     if (shader)
     {
         // insert shader to shader map
         int id = shader->getId();
-        ShaderMap shaderMap = scene.m_shaderMap;
+        LOG_DEBUG("CreateShaderCommand","Shader with shader id : " << id << " successfully created");
+        ShaderMap &shaderMap = scene.m_shaderMap;
         shaderMap[id] = shader;
         *m_returnID = id;
         result = ExecutionSuccessRedraw;
