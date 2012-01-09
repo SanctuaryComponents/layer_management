@@ -584,11 +584,10 @@ void X11WindowSystem::Redraw()
 
 void X11WindowSystem::Screenshot()
 {
-    graphicSystem->clearBackground();
-
     /*LOG_INFO("X11WindowSystem","Locking List");*/
     m_pScene->lockScene();
-
+    graphicSystem->clearBackground();
+    graphicSystem->activateGraphicContext();
     if (takeScreenshot==ScreenshotOfDisplay){
     LOG_DEBUG("X11WindowSystem", "Taking screenshot");
         RedrawAllLayers();
@@ -615,7 +614,7 @@ void X11WindowSystem::Screenshot()
 //  graphicSystem->swapBuffers();
     takeScreenshot = ScreenShotNone;
     LOG_DEBUG("X11WindowSystem", "Done taking screenshot");
-
+    graphicSystem->releaseGraphicContext();
     m_pScene->unlockScene();
     /*LOG_INFO("X11WindowSystem","UnLocking List");*/
 }

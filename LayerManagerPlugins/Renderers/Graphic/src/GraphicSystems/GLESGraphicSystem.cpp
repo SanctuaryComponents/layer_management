@@ -431,40 +431,31 @@ void GLESGraphicsystem::saveScreenShotOfFramebuffer(std::string fileToSave)
 {
     // clear error if any
     int error = glGetError();
-    LOG_DEBUG("BaseGraphicSystem","taking screenshot and saving it to:" << fileToSave);
+    LOG_DEBUG("GLESGraphicSystem","taking screenshot and saving it to:" << fileToSave);
 
-    GLint viewport[4];
-    glGetIntegerv(GL_VIEWPORT, viewport); // x,y,width,height
+    LOG_DEBUG("GLESGraphicSystem","Screenshot: " << m_displayWidth << " * " << m_displayHeight);
+    char *buffer = (char *) malloc( m_displayWidth * m_displayHeight * 4 * sizeof(char));
+    glReadPixels(0, 0, m_displayWidth, m_displayHeight, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
     error = glGetError();
     if (error != GL_NO_ERROR)
     {
-        LOG_DEBUG("BaseGraphicSystem","error getting dimensions");
-    }
-    int WINDOW_WIDTH = viewport[2];
-    int WINDOW_HEIGHT = viewport[3];
-    LOG_DEBUG("BaseGraphicSystem","Screenshot: " << WINDOW_WIDTH << " * " << WINDOW_HEIGHT);
-    char *buffer = (char *) malloc( WINDOW_WIDTH * WINDOW_HEIGHT * 4 * sizeof(char));
-    glReadPixels(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
-    error = glGetError();
-    if (error != GL_NO_ERROR)
-    {
-        LOG_DEBUG("BaseGraphicSystem","error reading pixels for screenshot: " << error);
+        LOG_DEBUG("GLESGraphicSystem","error reading pixels for screenshot: " << error);
     }
     // convert to RGB for bitmap
-    int pixelcount = WINDOW_WIDTH * WINDOW_HEIGHT;
+    int pixelcount = m_displayHeight * m_displayWidth;
     char *rgbbuffer = (char *) malloc(pixelcount * 3 * sizeof(char));
-    for (int row = 0; row < WINDOW_HEIGHT; row++)
+    for (int row = 0; row < m_displayHeight; row++)
     {
-        for (int col = 0; col < WINDOW_WIDTH; col++)
+        for (int col = 0; col < m_displayWidth; col++)
         {
-            int offset = row * WINDOW_WIDTH + col;
+            int offset = row * m_displayWidth + col;
             rgbbuffer[offset * 3] = buffer[offset * 4 + 2];
             rgbbuffer[offset * 3 + 1] = buffer[offset * 4 + 1];
             rgbbuffer[offset * 3 + 2] = buffer[offset * 4];
         }
     }
 
-    writeBitmap(fileToSave, rgbbuffer, WINDOW_WIDTH, WINDOW_HEIGHT);
+    writeBitmap(fileToSave, rgbbuffer, m_displayWidth, m_displayHeight);
     free(buffer);
     free(rgbbuffer);
 }
