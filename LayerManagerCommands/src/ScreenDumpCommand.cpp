@@ -53,7 +53,7 @@ ExecutionResult ScreenDumpCommand::execute(ICommandExecutor* executor)
                 renderer->doScreenShot(m_filename);
             }
         }
-        result = ExecutionSuccess;
+        result = ExecutionSuccessRedraw;
     }
 
     return result;

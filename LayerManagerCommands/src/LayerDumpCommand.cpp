@@ -61,7 +61,7 @@ ExecutionResult LayerDumpCommand::execute(ICommandExecutor* executor)
                 renderer->doScreenShotOfLayer(m_filename, m_id);
             }
         }
-        result = ExecutionSuccess;
+        result = ExecutionSuccessRedraw;
     }
 
     return result;
