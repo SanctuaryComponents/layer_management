@@ -89,6 +89,7 @@ public:
     : GraphicalSurface(TypeSurface)
     , platform(NULL)
     , frameCounter(0)
+    , m_pixformat(PIXELFORMAT_UNKNOWN)
     , m_layerId(INVALID_ID)
     , m_hasNativeContent(false)
     {
@@ -98,6 +99,7 @@ public:
     : GraphicalSurface(id, TypeSurface)
     , platform(NULL)
     , frameCounter(0)
+    , m_pixformat(PIXELFORMAT_UNKNOWN)
     , m_layerId(INVALID_ID)
     , m_hasNativeContent(false)
     {
