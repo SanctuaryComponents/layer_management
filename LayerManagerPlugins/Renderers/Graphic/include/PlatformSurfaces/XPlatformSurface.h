@@ -52,7 +52,8 @@ public:
 
     bool isReadyForRendering()
     {
-        return m_isReadyForRendering;
+	return true;        
+	/*return m_isReadyForRendering;*/
     }
     // TODO: private/protected
     bool isMapped;
