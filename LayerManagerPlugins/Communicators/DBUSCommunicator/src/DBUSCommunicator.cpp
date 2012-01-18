@@ -2004,6 +2004,7 @@ void DBUSCommunicator::RemoveApplicationReference(char* owner)
 void DBUSCommunicator::AddClientWatch(DBusConnection *conn, char* sender) 
 {
     DBusError err;
+    dbus_error_init(&err);
     char rule[1024];
     sprintf(rule,"type='signal',sender='%s',interface='%s',member='%s',arg0='%s'",DBUS_INTERFACE_DBUS,DBUS_INTERFACE_DBUS,"NameOwnerChanged",sender);
     
