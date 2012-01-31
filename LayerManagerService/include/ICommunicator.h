@@ -22,34 +22,48 @@
 
 class ICommandExecutor;
 
+/**
+ * Abstract Base of all Communicator plugins.
+ * \defgroup CommunicatorAPI Layer Management Communicator API
+ */
 class ICommunicator
 {
 public:
     /**
-     * constructor: any communicator need a executor for commands
-     * @param executor Pointer to an object to send commands to
+     * \brief     constructor: any communicator need a executor for commands
+     * \ingroup   CommunicatorAPI
+     * \param[in] executor Pointer to an object to send commands to
      */
     ICommunicator(ICommandExecutor* executor);
+
+    /**
+     * \brief     default destructor
+     */
     virtual ~ICommunicator() {}
 
     /**
-     * Start communication process, ie start specific listening process of communication method
+     * \brief     Start communication process, i.e. start specific listening process of communication method
+     * \ingroup   CommunicatorAPI
      */
     virtual bool start() = 0;
 
     /**
-     * Stop communication. Stop sending command objects.
+     * \brief     Stop communication. Stop sending command objects.
+     * \ingroup   CommunicatorAPI
      */
     virtual void stop() = 0;
 
     /**
-     * Process communication. 
+     * \brief     Process communication.
+     * \ingroup   CommunicatorAPI
+     * \param[in] timeout_ms timeout value in milliseconds
      */
     virtual void process(int timeout_ms) = 0;
 
     /**
-     * Switch debug mode of this component on or off
-     * @param onoff Turn on debug mode (true) or off (false)
+     * \brief     Switch debug mode of this component on or off
+     * \ingroup   CommunicatorAPI
+     * \param[in] onoff TRUE: Turn on debug mode, FALSE: Turn off debug mode
      */
     virtual void setdebug(bool onoff) = 0;
 
