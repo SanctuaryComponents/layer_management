@@ -7,3 +7,5 @@ build/
 toolchain_forcecopy.cmake
 
 
+doc_generated
+configure
