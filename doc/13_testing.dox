@@ -1,0 +1,15 @@
+/*!
+
+\page implementationNotes Implementation Notes
+
+The Layer Management service consists of platform independent
+and platform dependent components. On each platform a separate
+renderer and if required a separate communicator have to be
+implemented. The GENIVI proof of concept implementation uses for
+the communicator a d-bus interface and for the renderer an X11
+renderer which is using X-Composite and X-Damage to access the
+content of different applications. For the compositing itself the
+glx extension GLX_EXT_Texture_from_pixmap and the blending mode
+of Open GL are used.
+
+*/

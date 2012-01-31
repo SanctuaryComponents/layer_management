@@ -1,0 +1,32 @@
+/*!
+
+\page designOverview Design Overview
+
+\section designOverviewPackages Packages
+
+The Layer Management Service is composed of the following packages:
+
+\li Layer Management
+\li One or more Renderer packages
+\li One or more Communication packages
+
+The Layer Management Service component makes use of the following external packages provided by the application framework:
+ 
+\li Renderer and Communication packages which in turn depend on other packages/frameworks for the communication (e.g. middle ware) or the device dependent rendering (e.g. graphic frameworks)
+
+The diagram below shows the relationships between the packages:
+
+\image html ./doc/images/layer_management_packages.png Layer Management Packages
+\image latex ./doc/images/layer_management_packages.png Layer Management Packages
+
+The diagram below shows the interaction between the service and the renderer and communication package:
+
+\image html ./doc/images/layer_management_package_interaction.png Layer Management Package Interaction
+\image latex ./doc/images/layer_management_package_interaction.png Layer Management Package Interaction
+
+The diagram below shows dependencies to all software components used by the LayerManager (DL = Dynamic Linking):
+
+\image html ./doc/images/layer_management_package_dependencies.png Layer Management Package Dependencies
+\image latex ./doc/images/layer_management_package_dependencies.png Layer Management Package Dependencies
+
+*/

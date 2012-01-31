@@ -1,0 +1,36 @@
+/*!
+
+\page definitions Definitions
+
+<table>
+    <tr>
+        <th>Name</th>
+        <th>Definition</th>
+    </tr>
+    <tr>
+        <td>Surface</td>
+        <td>Graphical content of an application. One application can provide several surfaces.</td>
+    </tr>
+    <tr>
+        <td>Layer</td>
+        <td>Logical container for multiple surfaces.</td>
+    </tr>
+    <tr>
+        <td>LayerGroup</td>
+        <td>Groups multiple layers to a logical group, so commands can target multiple layers at once.</td>
+    </tr>
+    <tr>
+        <td>SurfaceGroup</td>
+        <td>Groups multiple surfaces to a logical group, so commands can target multiple surfaces at once.</td>
+    </tr>
+    <tr>
+        <td>IPC</td>
+        <td>Inter Process Communication.</td>
+    </tr>
+    <tr>
+        <td>RenderOrder</td>
+        <td>Logical arrangements of surfaces or layers from back to front.</td>
+    </tr>
+</table>
+
+*/

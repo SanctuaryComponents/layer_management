@@ -1,0 +1,29 @@
+/*!
+
+\page controlPackage Service Package
+
+\section controlPackageOverview Overview
+
+This is the main package for the Layer Management Service.
+
+\section servicePackageObjectModel Object Model
+
+\image html ./doc/images/layer_management_service_control_package.png Layer Management Service Control Package
+\image latex ./doc/images/layer_management_service_control_package.png Layer Management Service Control Package
+
+\section controlPackageLayerManagementService Layer Management Service
+
+\subsection layerManagementServiceDescription Description
+
+The control is responsible for loading communication and renderer packages to be used. The
+control initiates the main singleton class, which in turn contains and manages the lists
+of layers and their surfaces through the layerlist object, and the list of logical groups.
+The renderer packages are given access to these lists by the control and the communication
+packages must be able to obtain information about properties requested by clients (e.g.
+“SurfaceGetVisibility”).
+
+\subsection layerManagementServicePublicInterface Public Interface
+
+See \ref ServiceAPI. 
+
+*/

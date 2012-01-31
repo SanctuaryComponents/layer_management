@@ -1,0 +1,28 @@
+/*!
+
+\page testing Testing
+
+All packages (Communication, Renderers, Scene and Layermanager) must be tested on
+their own. The division of the Layer Management Service into these packages
+provides an easy usage of black box testing. For example all communication packages
+should be black box tested by configuring the communication package under test
+with a mock Layer Management, then using the provided communication channel it
+should be verified, that received messages result in “execute” calls to the Layer
+Management. This way the wanted functionality of communication packages can be
+tested fully.
+
+In a similar way, renderers can be tested by providing certain constellations of
+layers, surfaces and their properties in a mock Layerlist. This mock layerlist is
+then given to the renderer under test and then checking for the desired output of
+the renderer (positioning, overlapping, transparency etc).
+
+The implementation of the Layerlist can also be tested by automatic tests,
+inserting new layers, groups and surfaces, then changing properties and comparing
+the results of subsequent calls to getter methods with the desired values.
+
+For a smoke test based approach constellations of communication packages and
+renderers can be tested by starting up the Layer Management, inserting automated
+messages into the communication channel and comparing the rendered result to the
+desired output or resulting changes.
+
+*/

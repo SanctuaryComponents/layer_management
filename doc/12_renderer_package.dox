@@ -1,0 +1,70 @@
+/*!
+
+\page rendererPackage Renderer Package
+
+\section rendererPackageOverview Overview
+
+The Layer Management Service does not provide rendering functionality on its own.
+The rendering of layers and their respective surfaces is always handled by
+rendering libraries. These are typically device dependant because of possible
+dependencies on graphics hardware or displays for example.
+
+A typical implementation of a renderer will use the pointer to the layerlist given
+in the constructor to access the list of current layers and their respective
+surfaces. In its own thread it will use the information in the layerlist to render
+its content. In most cases the renderer will need specific platform information for
+each surface in order to access the actual graphical content of the platform (e.g.
+native window handles or memory addresses). For this reason a renderer can append
+an instance of a subclass of the type PlatformSurface to a Surface object. This can
+be used to save information like window handles into these objects as these
+subclasses can be defined by the renderer implementation.
+
+An implementation of a renderer library must subclass BaseRenderer and implement
+the inherited start(), stop() and doScreenShot() methods, as well as a way to
+load the library dynamically at runtime.
+
+The layermanager searches the provided renderer shared library for two entry
+points, which are both mandatory for a renderer library. Their name is specified
+by the following naming scheme:
+
+\li \code IRenderer* create<Library_Name>(LayerList*) \endcode
+\li \code void destroy<Library_Name>(<Library_Name>*) \endcode
+
+In order to be loadable by the layermanager, the created shared library must provide
+both of these functions.
+
+\section rendererPackageExample Example: Create the renderer library “MyRenderer”
+
+(1) Create the class MyRenderer, which inherits BaseRenderer
+
+(2) Implement the virtual class functions
+
+\li \code virtual bool start(void) \endcode
+\li \code virtual void stop(void) \endcode
+\li \code virtual void doScreenShot(std::string fileToSave) \endcode
+
+(3) Create the static functions (see example source code below)
+
+\li \code extern "C"
+IRenderer* createMyRenderer(LayerList* ll)
+{
+    return new MyRenderer(ll);
+}
+\endcode
+
+\li \code extern "C"
+void destroyMyRenderer(MyRenderer* renderer)
+{
+    delete renderer;
+}
+\endcode
+
+(4) Implement rendering of “MyRenderer”
+
+(5) Link the implementation to a shared library called “libMyRenderer.so”
+
+\section rendererPackagePublicInterface Public Interface
+
+See \ref RendererAPI.
+
+*/

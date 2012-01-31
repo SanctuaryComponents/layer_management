@@ -1,0 +1,71 @@
+/*!
+
+\page functionalOverview Functional Overview
+
+The Layer Management Service provides means to arrange the output of graphical
+applications on the platform in a two dimensional fashion. This Service takes
+care of which application is shown by the end user needs. Therefore it is possible
+to change the content of the shown application during runtime, sometimes it is
+required that different application content is on top of other applications. An
+important aspect is that a defined interface is given to be able to change the
+application layout during runtime. Additionally means are provided in order to
+group surfaces of applications and layers containing surfaces for easier handling
+as a single entity.
+
+\image html ./doc/images/relation_of_display_layers_surfaces.png Relation of displays, surfaces and layers and groups thereof
+\image latex ./doc/images/relation_of_display_layers_surfaces.png Relation of displays, surfaces and layers and groups thereof
+
+The Types Surface, Layer, SurfaceGroup and LayerGroup are logical entities contained
+in corresponding classes within the layermanager. They are not platform dependant,
+they are just logical entities or data containers keeping the values for opacity,
+position etc. The class Surface contains a pointer to a platform dependant
+“PlatformSurface” type with can store platform dependant data for renderers
+(Window handles for example).
+
+"UML sequence example" diagram shows an exemplary sequence of actions. The layermanager
+control is started, which in turn creates a communicator and starts it. A management
+application is run and creates an initial layer, for example for third party
+applications. The management applications then – at a later point in time – receives an
+event that a new application has been started or a new window has been created within
+the window framework for example and creates a Layer Management surface for this
+application window. Then again later an external event is received which causes the
+management application to want to reorder the visible output of the Layer Management
+and sends a SetVisibilityCommand to hide the layer with user applications or to show
+a notification layer.
+
+\image html ./doc/images/uml_sequence_example.png UML Sequence example
+\image latex ./doc/images/uml_sequence_example.png UML Sequence example
+
+Similarly the management application would set multiple properties of multiple surfaces and layers in order to react to user input (change to an application or switch to a “TV mode” etc).
+
+The Layer Management can be used in two scenarios:
+
+\section scenarioA Scenario A: All applications talk to the Layer Management themselves and configure their output.
+
+Course of events:
+
+\li (1) Application creates window using native window system
+\li (2) Gets native window handle
+\li (3) Platform dependant renderer gets new window event from window system
+\li (4) Application registers/requests logical surface from Layer Management including native window id, width, height and pixelformat of the surface. The renderer uses the given native window id to access the graphical content, this content is associated with the logical surfaceid.
+\li (5) Layermanager returns the newly created surface identifier
+\li (6) Application uses this identifier to set properties of its surface
+
+\section scenarioB Scenario B: A central control instances decides if applications are shown and where
+
+\image html ./doc/images/with_central_control_instance.png Example with Central Control Instance
+\image latex ./doc/images/with_central_control_instance.png Example with Central Control Instance
+
+Course of events:
+
+\li (1) Application creates window using native window system
+\li (2) Gets native window handle
+\li (3) Platform dependant renderer gets new window event from window system
+\li (4) Application registers with central control instance, maybe presenting a certificate or AppID ( this can be proprietary)
+\li (5) The control instance registers/requests logical surface from Layer Management including native window id, width, height and pixelformat of the surface. The renderer uses the given native window id to access the graphical content, this content is associated with the logical surfaceid.
+\li (6) Layermanager returns the newly created surface identifier
+\li (7) Control instance uses this identifier to set properties of the application's surface
+\li (8) Later an external event occurs (e.g. telephone call) at the control instance
+\li (9) Control instance decides to change the graphical arrangement to blend out all applications except telephone application
+
+*/
