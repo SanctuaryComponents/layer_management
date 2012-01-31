@@ -26,9 +26,36 @@
 class SurfacegroupCreateCommand : public BaseCommandSynchronous
 {
 public:
+    /*!
+     * \action    This command creates a surface group within the
+     *            GENIVI LayerManagement
+     * \frequency Used for management of several surfaces, only called
+     *            in initialization phase.
+     * \param[in] idReturn location to store id for new surface group on execution
+     *            pre-initialized values is interpreted as requested id for new surface group
+     * \ingroup Commands
+     */
     SurfacegroupCreateCommand(uint* idReturn);
+
+    /**
+     * \brief default destructor
+     */
     virtual ~SurfacegroupCreateCommand() {}
+
+    /**
+     * \brief Execute this command.
+     * \param[in] executor Pointer to instance executing the LayerManagement COmmands
+     * \return ExecutionSuccess: execution successful
+     * \return ExecutionSuccessRedraw: execution successful and screen needs to be redrawn
+     * \return ExecutionFailed: execution failed
+     * \return ExecutionFailedRedraw: execution unsuccessful and screen needs to be redrawn
+     */
     virtual ExecutionResult execute(ICommandExecutor* executor);
+
+    /**
+     * \brief Get description string for this command.
+     * \return String object with description of this command object
+     */
     virtual const std::string getString();
 
 private:

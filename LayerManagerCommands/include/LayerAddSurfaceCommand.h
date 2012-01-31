@@ -25,10 +25,36 @@
 class LayerAddSurfaceCommand : public BaseCommandAsynchronous
 {
 public:
-       LayerAddSurfaceCommand(unsigned int layerid, unsigned  int surfaceid);
-       virtual ~LayerAddSurfaceCommand() {}
+    /*!
+     * \action    This command adds a surface to a layer within the GENIVI LayerManagement
+     * \frequency Typically surfaces will be added to one or more layers once in their life
+     *            cycle. So this will typically be called at least once for every surface
+     *            created.
+     * \param[in] layerid id of layer
+     * \param[in] surfaceid id of surface
+     * \ingroup Commands
+     */
+    LayerAddSurfaceCommand(unsigned int layerid, unsigned int surfaceid);
 
+    /**
+     * \brief default destructor
+     */
+    virtual ~LayerAddSurfaceCommand() {}
+
+    /**
+     * \brief Execute this command.
+     * \param[in] executor Pointer to instance executing the LayerManagement COmmands
+     * \return ExecutionSuccess: execution successful
+     * \return ExecutionSuccessRedraw: execution successful and screen needs to be redrawn
+     * \return ExecutionFailed: execution failed
+     * \return ExecutionFailedRedraw: execution unsuccessful and screen needs to be redrawn
+     */
     virtual ExecutionResult execute(ICommandExecutor* executor);
+
+    /**
+     * \brief Get description string for this command.
+     * \return String object with description of this command object
+     */
     virtual const std::string getString();
 
 private:

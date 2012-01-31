@@ -25,10 +25,35 @@
 class LayerGetVisibilityCommand : public BaseCommandSynchronous
 {
 public:
-	LayerGetVisibilityCommand(int id, bool* visibility);
-	virtual ~LayerGetVisibilityCommand() {}
+    /*!
+     * \action    This command returns the visibility of a layer within the GENIVI LayerManagement
+     * \frequency Frequently when events occur within the system which cause a rearrangement of
+     *            graphics, applications or contexts.
+     * \param[in] id id of layer
+     * \param[in] visibility location to store visibility on execution
+     * \ingroup Commands
+     */
+    LayerGetVisibilityCommand(int id, bool* visibility);
 
+    /**
+     * \brief default destructor
+     */
+    virtual ~LayerGetVisibilityCommand() {}
+
+    /**
+     * \brief Execute this command.
+     * \param[in] executor Pointer to instance executing the LayerManagement COmmands
+     * \return ExecutionSuccess: execution successful
+     * \return ExecutionSuccessRedraw: execution successful and screen needs to be redrawn
+     * \return ExecutionFailed: execution failed
+     * \return ExecutionFailedRedraw: execution unsuccessful and screen needs to be redrawn
+     */
     virtual ExecutionResult execute(ICommandExecutor* executor);
+
+    /**
+     * \brief Get description string for this command.
+     * \return String object with description of this command object
+     */
     virtual const std::string getString();
 
 private:

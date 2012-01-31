@@ -26,9 +26,40 @@
 class LayerCreateCommand : public BaseCommandSynchronous
 {
 public:
+    /**
+     * \action    This command creates a new layer within the GENIVI LayerManagement
+     * \frequency The output of several applications is grouped into layers so they can be adjusted together.
+     *            This means there will be less layers than surfaces. A small configuration might create a
+     *            layer for everything concerning OEM branding, one layer for third party applications and one
+     *            layer for status applications.
+     * \ingroup Commands
+     * \param[in] OriginalWidth width of the original layer
+     * \param[in] OriginalHeight height of the original layer
+     * \param[in] idReturn location to store layer id on execution;
+     *                     pre-initialized value will be used as new
+     *                     id for the layer to be created
+     */
     LayerCreateCommand(uint OriginalWidth, uint OriginalHeight, uint* idReturn);
+
+    /**
+     * \brief default destructor
+     */
     virtual ~LayerCreateCommand() {}
+
+    /**
+     * \brief Execute this command.
+     * \param[in] executor Pointer to instance executing the LayerManagement COmmands
+     * \return ExecutionSuccess: execution successful
+     * \return ExecutionSuccessRedraw: execution successful and screen needs to be redrawn
+     * \return ExecutionFailed: execution failed
+     * \return ExecutionFailedRedraw: execution unsuccessful and screen needs to be redrawn
+     */
     virtual ExecutionResult execute(ICommandExecutor* executor);
+
+    /**
+     * \brief Get description string for this command.
+     * \return String object with description of this command object
+     */
     virtual const std::string getString();
 
 private:

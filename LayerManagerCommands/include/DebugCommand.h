@@ -25,9 +25,33 @@
 class DebugCommand : public BaseCommandSynchronous
 {
 public:
+    /*!
+     * \action    This command sets the debug mode within the GENIVI LayerManagement
+     * \frequency Used only for development and debugging.
+     * \param[in] onoff TRUE: enable debug mode, FALSE: disable debug mode
+     * \ingroup Commands
+     */
     DebugCommand(bool onoff);
+
+    /**
+     * \brief default destructor
+     */
     virtual ~DebugCommand() {}
+
+    /**
+     * \brief Execute this command.
+     * \param[in] executor Pointer to instance executing the LayerManagement COmmands
+     * \return ExecutionSuccess: execution successful
+     * \return ExecutionSuccessRedraw: execution successful and screen needs to be redrawn
+     * \return ExecutionFailed: execution failed
+     * \return ExecutionFailedRedraw: execution unsuccessful and screen needs to be redrawn
+     */
     virtual ExecutionResult execute(ICommandExecutor* executor);
+
+    /**
+     * \brief Get description string for this command.
+     * \return String object with description of this command object
+     */
     virtual const std::string getString();
 
 private:

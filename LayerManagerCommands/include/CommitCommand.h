@@ -24,8 +24,32 @@
 class CommitCommand : public BaseCommandSynchronous
 {
 public:
+    /*!
+     * \action    This command executes all enqueued asynchronous commands within the GENIVI LayerManagement
+     * \frequency Called after one or more calls of changing properties.
+     * \ingroup Commands
+     */
+    CommitCommand(void) {}
+
+     /**
+     * \brief default destructor
+     */
     virtual ~CommitCommand() {}
+
+    /**
+     * \brief Execute this command.
+     * \param[in] executor Pointer to instance executing the LayerManagement COmmands
+     * \return ExecutionSuccess: execution successful
+     * \return ExecutionSuccessRedraw: execution successful and screen needs to be redrawn
+     * \return ExecutionFailed: execution failed
+     * \return ExecutionFailedRedraw: execution unsuccessful and screen needs to be redrawn
+     */
     virtual ExecutionResult execute(ICommandExecutor* executor);
+
+    /**
+     * \brief Get description string for this command.
+     * \return String object with description of this command object
+     */
     virtual const std::string getString();
 };
 

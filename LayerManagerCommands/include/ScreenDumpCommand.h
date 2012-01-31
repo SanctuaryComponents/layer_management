@@ -26,10 +26,35 @@
 class ScreenDumpCommand: public BaseCommandSynchronous
 {
 public:
+    /*!
+     * \action    This command stores a bitmap file with the graphical content
+     *            of a screen within the GENIVI LayerManagement
+     * \frequency Used for screen management.
+     * \param[in] givenfilename path and filename to store bitmap file
+     * \param[in] id
+     * \ingroup Commands
+     */
     ScreenDumpCommand(char* givenfilename, unsigned int id = 0);
+
+    /**
+     * \brief default destructor
+     */
     virtual ~ScreenDumpCommand() {}
 
+    /**
+     * \brief Execute this command.
+     * \param[in] executor Pointer to instance executing the LayerManagement COmmands
+     * \return ExecutionSuccess: execution successful
+     * \return ExecutionSuccessRedraw: execution successful and screen needs to be redrawn
+     * \return ExecutionFailed: execution failed
+     * \return ExecutionFailedRedraw: execution unsuccessful and screen needs to be redrawn
+     */
     virtual ExecutionResult execute(ICommandExecutor* executor);
+
+    /**
+     * \brief Get description string for this command.
+     * \return String object with description of this command object
+     */
     virtual const std::string getString();
 
 private:

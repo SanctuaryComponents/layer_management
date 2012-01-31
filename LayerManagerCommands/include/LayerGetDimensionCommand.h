@@ -25,10 +25,35 @@
 class LayerGetDimensionCommand: public BaseCommandSynchronous
 {
 public:
+    /*!
+     * \action    This command returns the dimensions of a layer within the GENIVI LayerManagement
+     * \frequency Called for rearranging graphical contents.
+     * \param[in] id id of layer
+     * \param[in] widthRet location to return width of layer on execution
+     * \param[in] heightRet location to return height of layer on execution
+     * \ingroup Commands
+     */
     LayerGetDimensionCommand(int id, unsigned int* widthRet, unsigned int* heightRet);
+
+    /**
+     * \brief default destructor
+     */
     virtual ~LayerGetDimensionCommand() {}
 
+    /**
+     * \brief Execute this command.
+     * \param[in] executor Pointer to instance executing the LayerManagement COmmands
+     * \return ExecutionSuccess: execution successful
+     * \return ExecutionSuccessRedraw: execution successful and screen needs to be redrawn
+     * \return ExecutionFailed: execution failed
+     * \return ExecutionFailedRedraw: execution unsuccessful and screen needs to be redrawn
+     */
     virtual ExecutionResult execute(ICommandExecutor* executor);
+
+    /**
+     * \brief Get description string for this command.
+     * \return String object with description of this command object
+     */
     virtual const std::string getString();
 
 private:

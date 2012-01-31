@@ -25,10 +25,37 @@
 class SurfaceSetDestinationRectangleCommand : public BaseCommandAsynchronous
 {
 public:
+    /*!
+     * \action    This command sets the destination region of a surface within the GENIVI LayerManagement
+     * \frequency Called to rearrange applications output.
+     * \param[in] id id of surface
+     * \param[in] x x position of surface on layer
+     * \param[in] y y position of surface on layer
+     * \param[in] width width of surface on layer
+     * \param[in] height height of surface on layer
+     * \ingroup Commands
+     */
     SurfaceSetDestinationRectangleCommand(int id, unsigned int x, unsigned int y, unsigned int width, unsigned int height);
+
+    /**
+     * \brief default destructor
+     */
     virtual ~SurfaceSetDestinationRectangleCommand() {}
 
+    /**
+     * \brief Execute this command.
+     * \param[in] executor Pointer to instance executing the LayerManagement COmmands
+     * \return ExecutionSuccess: execution successful
+     * \return ExecutionSuccessRedraw: execution successful and screen needs to be redrawn
+     * \return ExecutionFailed: execution failed
+     * \return ExecutionFailedRedraw: execution unsuccessful and screen needs to be redrawn
+     */
     virtual ExecutionResult execute(ICommandExecutor* executor);
+
+    /**
+     * \brief Get description string for this command.
+     * \return String object with description of this command object
+     */
     virtual const std::string getString();
 
 private:

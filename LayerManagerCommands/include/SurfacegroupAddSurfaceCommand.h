@@ -25,10 +25,37 @@
 class SurfacegroupAddSurfaceCommand : public BaseCommandAsynchronous
 {
 public:
-       SurfacegroupAddSurfaceCommand(unsigned int surfacegroupid, unsigned int surfaceid);
-       virtual ~SurfacegroupAddSurfaceCommand() {}
+    /*!
+     * \action    This command adds a surface to a surface group within the
+     *            GENIVI LayerManagement
+     * \frequency Called within initializations in order to change properties of
+     *            all group members at once at a later point in time, not needed
+     *            for every surface.
+     * \param[in] surfacegroupid id of surface group
+     * \param[in] surfaceid id of surface
+     * \ingroup Commands
+     */
+    SurfacegroupAddSurfaceCommand(unsigned int surfacegroupid, unsigned int surfaceid);
 
+    /**
+     * \brief default destructor
+     */
+    virtual ~SurfacegroupAddSurfaceCommand() {}
+
+    /**
+     * \brief Execute this command.
+     * \param[in] executor Pointer to instance executing the LayerManagement COmmands
+     * \return ExecutionSuccess: execution successful
+     * \return ExecutionSuccessRedraw: execution successful and screen needs to be redrawn
+     * \return ExecutionFailed: execution failed
+     * \return ExecutionFailedRedraw: execution unsuccessful and screen needs to be redrawn
+     */
     virtual ExecutionResult execute(ICommandExecutor* executor);
+
+    /**
+     * \brief Get description string for this command.
+     * \return String object with description of this command object
+     */
     virtual const std::string getString();
 
 private:

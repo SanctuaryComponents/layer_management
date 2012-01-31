@@ -25,10 +25,39 @@
 class SurfaceSetSourceRectangleCommand : public BaseCommandAsynchronous
 {
 public:
+    /*!
+     * \action    This command sets the source region of a surface within the
+     *            GENIVI LayerManagement
+     * \frequency Typically only called at creation of an surface if the
+     *            graphical output of the application should not be used entirely
+     * \param[in] id id of surface
+     * \param[in] x x position within surface
+     * \param[in] y y position wihtin surface
+     * \param[in] width width within surface
+     * \param[in] height height within surface
+     * \ingroup Commands
+     */
     SurfaceSetSourceRectangleCommand(int id, unsigned int x, unsigned int y, unsigned int width, unsigned int height);
+
+    /**
+     * \brief default destructor
+     */
     virtual ~SurfaceSetSourceRectangleCommand() {}
 
+    /**
+     * \brief Execute this command.
+     * \param[in] executor Pointer to instance executing the LayerManagement COmmands
+     * \return ExecutionSuccess: execution successful
+     * \return ExecutionSuccessRedraw: execution successful and screen needs to be redrawn
+     * \return ExecutionFailed: execution failed
+     * \return ExecutionFailedRedraw: execution unsuccessful and screen needs to be redrawn
+     */
     virtual ExecutionResult execute(ICommandExecutor* executor);
+
+    /**
+     * \brief Get description string for this command.
+     * \return String object with description of this command object
+     */
     virtual const std::string getString();
 
 private:

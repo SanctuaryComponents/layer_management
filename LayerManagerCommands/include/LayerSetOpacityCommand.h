@@ -25,10 +25,34 @@
 class LayerSetOpacityCommand : public BaseCommandAsynchronous
 {
 public:
+    /*!
+     * \action    This command sets the opacity of a layer within the GENIVI LayerManagement
+     * \frequency Can occur very frequently for animations.
+     * \param[in] id id of layer
+     * \param[in] Opacity opacity of layer
+     * \ingroup Commands
+     */
     LayerSetOpacityCommand(unsigned int id, double Opacity);
+
+    /**
+     * \brief default destructor
+     */
     virtual ~LayerSetOpacityCommand() {}
 
+    /**
+     * \brief Execute this command.
+     * \param[in] executor Pointer to instance executing the LayerManagement COmmands
+     * \return ExecutionSuccess: execution successful
+     * \return ExecutionSuccessRedraw: execution successful and screen needs to be redrawn
+     * \return ExecutionFailed: execution failed
+     * \return ExecutionFailedRedraw: execution unsuccessful and screen needs to be redrawn
+     */
     virtual ExecutionResult execute(ICommandExecutor* executor);
+
+    /**
+     * \brief Get description string for this command.
+     * \return String object with description of this command object
+     */
     virtual const std::string getString();
 
 private:

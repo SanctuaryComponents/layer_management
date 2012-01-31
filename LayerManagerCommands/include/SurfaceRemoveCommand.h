@@ -25,10 +25,34 @@
 class SurfaceRemoveCommand : public BaseCommandSynchronous
 {
 public:
+    /*!
+     * \action    This command removes a surface within the GENIVI LayerManagement
+     * \frequency Called at end of application or when an application or its window
+     *            is shut down.
+     * \param[in] objectID id of surface
+     * \ingroup Commands
+     */
     SurfaceRemoveCommand(unsigned int objectID);
+
+    /**
+     * \brief default destructor
+     */
     virtual ~SurfaceRemoveCommand() {}
 
+    /**
+     * \brief Execute this command.
+     * \param[in] executor Pointer to instance executing the LayerManagement COmmands
+     * \return ExecutionSuccess: execution successful
+     * \return ExecutionSuccessRedraw: execution successful and screen needs to be redrawn
+     * \return ExecutionFailed: execution failed
+     * \return ExecutionFailedRedraw: execution unsuccessful and screen needs to be redrawn
+     */
     virtual ExecutionResult execute(ICommandExecutor* executor);
+
+    /**
+     * \brief Get description string for this command.
+     * \return String object with description of this command object
+     */
     virtual const std::string getString();
 
 private:

@@ -25,10 +25,35 @@
 class LayerSetRenderOrderCommand : public BaseCommandAsynchronous
 {
 public:
-    LayerSetRenderOrderCommand(unsigned int layerid,unsigned  int* array,unsigned  int length);
+    /*!
+     * \action    This command sets the render order of surfaces on a layer within the GENIVI LayerManagement
+     * \frequency Called for rearranging graphical contents.
+     * \param[in] layerid id of layer
+     * \param[in] array array of surface ids
+     * \param[in] length length of array provided as argument array
+     * \ingroup Commands
+     */
+    LayerSetRenderOrderCommand(unsigned int layerid, unsigned int* array, unsigned  int length);
+
+    /**
+     * \brief default destructor
+     */
     virtual ~LayerSetRenderOrderCommand() {}
 
+    /**
+     * \brief Execute this command.
+     * \param[in] executor Pointer to instance executing the LayerManagement COmmands
+     * \return ExecutionSuccess: execution successful
+     * \return ExecutionSuccessRedraw: execution successful and screen needs to be redrawn
+     * \return ExecutionFailed: execution failed
+     * \return ExecutionFailedRedraw: execution unsuccessful and screen needs to be redrawn
+     */
     virtual ExecutionResult execute(ICommandExecutor* executor);
+
+    /**
+     * \brief Get description string for this command.
+     * \return String object with description of this command object
+     */
     virtual const std::string getString();
 
 private:

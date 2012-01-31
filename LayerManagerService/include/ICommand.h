@@ -22,6 +22,10 @@
 #include <string>
 #include "ExecutionType.h"
 
+/**
+ * \defgroup Commands Layer Management Commands
+ */
+
 class ICommandExecutor;
 
 class ICommand

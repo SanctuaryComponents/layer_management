@@ -26,14 +26,36 @@
 #include "LayerMap.h"
 #include "SurfaceMap.h"
 
-
 class ShaderDestroyCommand : public BaseCommandSynchronous
 {
 public:
+    /*!
+     * \action    This command destroys a shader within the GENIVI LayerManagement
+     * \frequency Once per shader.
+     * \param[in] shaderid id of shader
+     * \ingroup Commands
+     */
     ShaderDestroyCommand(unsigned int shaderid);
+
+    /**
+     * \brief default destructor
+     */
     virtual ~ShaderDestroyCommand() {}
 
+    /**
+     * \brief Execute this command.
+     * \param[in] executor Pointer to instance executing the LayerManagement COmmands
+     * \return ExecutionSuccess: execution successful
+     * \return ExecutionSuccessRedraw: execution successful and screen needs to be redrawn
+     * \return ExecutionFailed: execution failed
+     * \return ExecutionFailedRedraw: execution unsuccessful and screen needs to be redrawn
+     */
     virtual ExecutionResult execute(ICommandExecutor* executor);
+
+    /**
+     * \brief Get description string for this command.
+     * \return String object with description of this command object
+     */
     virtual const std::string getString();
 
     unsigned int getShaderID() const;

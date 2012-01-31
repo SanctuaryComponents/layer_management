@@ -26,9 +26,35 @@
 class LayergroupCreateCommand : public BaseCommandSynchronous
 {
 public:
+    /*!
+     * \action    This command creates a layer group within the GENIVI LayerManagement
+     * \frequency Called within initializations in order to change properties of all
+     *            group members at once at a later point in time.
+     * \param[in] idReturn location to store layer group id on execution;
+     *                     pre-initialized value will be interpreted as id request
+     * \ingroup Commands
+     */
     LayergroupCreateCommand(uint* idReturn);
+
+    /**
+     * \brief default destructor
+     */
     virtual ~LayergroupCreateCommand() {}
+
+    /**
+     * \brief Execute this command.
+     * \param[in] executor Pointer to instance executing the LayerManagement COmmands
+     * \return ExecutionSuccess: execution successful
+     * \return ExecutionSuccessRedraw: execution successful and screen needs to be redrawn
+     * \return ExecutionFailed: execution failed
+     * \return ExecutionFailedRedraw: execution unsuccessful and screen needs to be redrawn
+     */
     virtual ExecutionResult execute(ICommandExecutor* executor);
+
+    /**
+     * \brief Get description string for this command.
+     * \return String object with description of this command object
+     */
     virtual const std::string getString();
 
 private:

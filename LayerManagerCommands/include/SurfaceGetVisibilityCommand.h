@@ -25,10 +25,34 @@
 class SurfaceGetVisibilityCommand : public BaseCommandSynchronous
 {
 public:
+    /*!
+     * \action    This command returns the visibility of a surface within the GENIVI LayerManagement
+     * \frequency Can be used for rearrangement.
+     * \param[in] id id of surface
+     * \param[in] visibility location to store visibility on execution
+     * \ingroup Commands
+     */
     SurfaceGetVisibilityCommand(int id, bool* visibility);
+
+    /**
+     * \brief default destructor
+     */
     virtual ~SurfaceGetVisibilityCommand() {}
 
+    /**
+     * \brief Execute this command.
+     * \param[in] executor Pointer to instance executing the LayerManagement COmmands
+     * \return ExecutionSuccess: execution successful
+     * \return ExecutionSuccessRedraw: execution successful and screen needs to be redrawn
+     * \return ExecutionFailed: execution failed
+     * \return ExecutionFailedRedraw: execution unsuccessful and screen needs to be redrawn
+     */
     virtual ExecutionResult execute(ICommandExecutor* executor);
+
+    /**
+     * \brief Get description string for this command.
+     * \return String object with description of this command object
+     */
     virtual const std::string getString();
 
 private:

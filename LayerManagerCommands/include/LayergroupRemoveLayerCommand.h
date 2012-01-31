@@ -25,10 +25,34 @@
 class LayergroupRemoveLayerCommand : public BaseCommandSynchronous
 {
 public:
-       LayergroupRemoveLayerCommand(unsigned int layergroupid, unsigned int layerid);
-       virtual ~LayergroupRemoveLayerCommand() {}
+    /*!
+     * \action    This command removes a layer from a layer group within the GENIVI LayerManagement
+     * \frequency Infrequent.
+     * \param[in] layergroupid id of layer group
+     * \param[in] layerid id lf layer
+     * \ingroup Commands
+     */
+    LayergroupRemoveLayerCommand(unsigned int layergroupid, unsigned int layerid);
 
+    /**
+     * \brief default destructor
+     */
+    virtual ~LayergroupRemoveLayerCommand() {}
+
+    /**
+     * \brief Execute this command.
+     * \param[in] executor Pointer to instance executing the LayerManagement COmmands
+     * \return ExecutionSuccess: execution successful
+     * \return ExecutionSuccessRedraw: execution successful and screen needs to be redrawn
+     * \return ExecutionFailed: execution failed
+     * \return ExecutionFailedRedraw: execution unsuccessful and screen needs to be redrawn
+     */
     virtual ExecutionResult execute(ICommandExecutor* executor);
+
+    /**
+     * \brief Get description string for this command.
+     * \return String object with description of this command object
+     */
     virtual const std::string getString();
 
 private:

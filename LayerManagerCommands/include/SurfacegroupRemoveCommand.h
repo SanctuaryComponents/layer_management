@@ -25,10 +25,35 @@
 class SurfacegroupRemoveCommand : public BaseCommandSynchronous
 {
 public:
+    /*!
+     * \action    This command removes a surface group within the GENIVI
+     *            LayerManagement
+     * \frequency Called during removal of applications with several surfaces
+     *            or even application groups combined of several surfaces.
+     * \param[in] objectID id of surface group
+     * \ingroup Commands
+     */
     SurfacegroupRemoveCommand(unsigned int objectID);
+
+    /**
+     * \brief default destructor
+     */
     virtual ~SurfacegroupRemoveCommand() {}
 
+    /**
+     * \brief Execute this command.
+     * \param[in] executor Pointer to instance executing the LayerManagement COmmands
+     * \return ExecutionSuccess: execution successful
+     * \return ExecutionSuccessRedraw: execution successful and screen needs to be redrawn
+     * \return ExecutionFailed: execution failed
+     * \return ExecutionFailedRedraw: execution unsuccessful and screen needs to be redrawn
+     */
     virtual ExecutionResult execute(ICommandExecutor* executor);
+
+    /**
+     * \brief Get description string for this command.
+     * \return String object with description of this command object
+     */
     virtual const std::string getString();
 
 private:

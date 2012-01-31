@@ -25,10 +25,36 @@
 class SurfaceSetVisibilityCommand : public BaseCommandAsynchronous
 {
 public:
+    /*!
+     * \action    This command sets the visibility of a surface within
+     *            the GENIVI LayerManagement
+     * \frequency Called more frequently than setOpacity, as event occur
+     *            which change the general context for the user for example.
+     * \param[in] givenid id of surface
+     * \param[in] newvisibility TRUE: surface is visible, FALSE: surface is invisible
+     * \ingroup Commands
+     */
     SurfaceSetVisibilityCommand(const unsigned int givenid, bool newvisibility);
+
+    /**
+     * \brief default destructor
+     */
     virtual ~SurfaceSetVisibilityCommand() {}
 
+    /**
+     * \brief Execute this command.
+     * \param[in] executor Pointer to instance executing the LayerManagement COmmands
+     * \return ExecutionSuccess: execution successful
+     * \return ExecutionSuccessRedraw: execution successful and screen needs to be redrawn
+     * \return ExecutionFailed: execution failed
+     * \return ExecutionFailedRedraw: execution unsuccessful and screen needs to be redrawn
+     */
     virtual ExecutionResult execute(ICommandExecutor* executor);
+
+    /**
+     * \brief Get description string for this command.
+     * \return String object with description of this command object
+     */
     virtual const std::string getString();
 
 private:

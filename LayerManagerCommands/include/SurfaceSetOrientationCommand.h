@@ -26,10 +26,34 @@
 class SurfaceSetOrientationCommand : public BaseCommandAsynchronous
 {
 public:
+    /*!
+     * \action    This command sets the orientation of a surface within the GENIVI LayerManagement
+     * \frequency Called to rearrange applications output.
+     * \param[in] id id of surface
+     * \param[in] Orientation orientation of surface (rotation)
+     * \ingroup Commands
+     */
     SurfaceSetOrientationCommand(unsigned int id, OrientationType Orientation);
+
+    /**
+     * \brief default destructor
+     */
     virtual ~SurfaceSetOrientationCommand() {}
 
+    /**
+     * \brief Execute this command.
+     * \param[in] executor Pointer to instance executing the LayerManagement COmmands
+     * \return ExecutionSuccess: execution successful
+     * \return ExecutionSuccessRedraw: execution successful and screen needs to be redrawn
+     * \return ExecutionFailed: execution failed
+     * \return ExecutionFailedRedraw: execution unsuccessful and screen needs to be redrawn
+     */
     virtual ExecutionResult execute(ICommandExecutor* executor);
+
+    /**
+     * \brief Get description string for this command.
+     * \return String object with description of this command object
+     */
     virtual const std::string getString();
 
 private:

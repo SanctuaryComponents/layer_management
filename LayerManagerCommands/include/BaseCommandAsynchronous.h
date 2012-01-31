@@ -25,8 +25,16 @@
 class BaseCommandAsynchronous : public ICommand
 {
 public:
+
+    /**
+     * \brief default destructor
+     */
     virtual ~BaseCommandAsynchronous() {}
 
+    /**
+     * \brief returns the execution type of a command
+     * \return ExecuteAsynchronous: all commands inheriting this class will be asynchronous
+     */
     virtual ExecutionType getExecutionType()
     {
         return ExecuteAsynchronous;

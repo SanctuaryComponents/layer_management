@@ -27,9 +27,39 @@
 class SurfaceSetNativeContentCommand : public BaseCommandSynchronous
 {
 public:
-       SurfaceSetNativeContentCommand(unsigned int surfaceId, unsigned int handle, PixelFormat pixelformat, uint OriginalWidth, uint OriginalHeight);
-       virtual ~SurfaceSetNativeContentCommand() {}
+    /*!
+     * \action    This command sets the native content (application content)
+     *            of a surface within the GENIVI LayerManagement
+     * \frequency Typically once during startup of an application providing content
+     *            for a surface.
+     * \param[in] surfaceId id of surface
+     * \param[in] handle
+     * \param[in] pixelformat
+     * \param[in] OriginalWidth
+     * \param[in] OriginalHeight original height for native content
+     * \ingroup Commands
+     */
+    SurfaceSetNativeContentCommand(unsigned int surfaceId, unsigned int handle, PixelFormat pixelformat, uint OriginalWidth, uint OriginalHeight);
+
+    /**
+     * \brief default destructor
+     */
+    virtual ~SurfaceSetNativeContentCommand() {}
+
+    /**
+     * \brief Execute this command.
+     * \param[in] executor Pointer to instance executing the LayerManagement COmmands
+     * \return ExecutionSuccess: execution successful
+     * \return ExecutionSuccessRedraw: execution successful and screen needs to be redrawn
+     * \return ExecutionFailed: execution failed
+     * \return ExecutionFailedRedraw: execution unsuccessful and screen needs to be redrawn
+     */
     virtual ExecutionResult execute(ICommandExecutor* executor);
+
+    /**
+     * \brief Get description string for this command.
+     * \return String object with description of this command object
+     */
     virtual const std::string getString();
 
 private:

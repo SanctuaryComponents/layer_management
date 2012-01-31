@@ -27,10 +27,35 @@
 class ShaderCreateCommand : public BaseCommandSynchronous
 {
 public:
+    /*!
+     * \action    This command creates a shader within the GENIVI LayerManagement
+     * \frequency Once per shader.
+     * \param[in] vertName path and filename to vertex shader source file
+     * \param[in] fragName path and filename to fragment shader source file
+     * \param[in] id location to store shader id on execution
+     * \ingroup Commands
+     */
     ShaderCreateCommand(const std::string& vertName, const std::string& fragName, unsigned int* id);
+
+    /**
+     * \brief default destructor
+     */
     virtual ~ShaderCreateCommand() {}
 
+    /**
+     * \brief Execute this command.
+     * \param[in] executor Pointer to instance executing the LayerManagement COmmands
+     * \return ExecutionSuccess: execution successful
+     * \return ExecutionSuccessRedraw: execution successful and screen needs to be redrawn
+     * \return ExecutionFailed: execution failed
+     * \return ExecutionFailedRedraw: execution unsuccessful and screen needs to be redrawn
+     */
     virtual ExecutionResult execute(ICommandExecutor* executor);
+
+    /**
+     * \brief Get description string for this command.
+     * \return String object with description of this command object
+     */
     virtual const std::string getString();
 
     const std::string getVertName() const;

@@ -27,9 +27,36 @@
 class SurfaceCreateCommand : public BaseCommandSynchronous
 {
 public:
+    /*!
+     * \action    This command creates a surface within the GENIVI LayerManagement
+     * \frequency Called at least once for all graphical applications, either by
+     *            applications themselves or through a management component informed
+     *            of a new window by the window management API.
+     * \param[in] idReturn location where surface id will be stored during execution
+     *                     pre-initialized value is used as requested surface id
+     * \ingroup Commands
+     */
     SurfaceCreateCommand(uint* idReturn);
+
+    /**
+     * \brief default destructor
+     */
     virtual ~SurfaceCreateCommand() {}
+
+    /**
+     * \brief Execute this command.
+     * \param[in] executor Pointer to instance executing the LayerManagement COmmands
+     * \return ExecutionSuccess: execution successful
+     * \return ExecutionSuccessRedraw: execution successful and screen needs to be redrawn
+     * \return ExecutionFailed: execution failed
+     * \return ExecutionFailedRedraw: execution unsuccessful and screen needs to be redrawn
+     */
     virtual ExecutionResult execute(ICommandExecutor* executor);
+
+    /**
+     * \brief Get description string for this command.
+     * \return String object with description of this command object
+     */
     virtual const std::string getString();
 
 private:

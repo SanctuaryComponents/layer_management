@@ -25,7 +25,16 @@
 class BaseCommandSynchronous : public ICommand
 {
 public:
+
+    /**
+     * \brief default destructor
+     */
     virtual ~BaseCommandSynchronous() {}
+
+    /**
+     * \brief returns the execution type of a command
+     * \return ExecuteSynchronous: commands inheriting this class will be synchronous
+     */
     virtual ExecutionType getExecutionType()
     {
         return ExecuteSynchronous;

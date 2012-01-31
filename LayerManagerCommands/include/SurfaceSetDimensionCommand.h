@@ -25,10 +25,35 @@
 class SurfaceSetDimensionCommand : public BaseCommandAsynchronous
 {
 public:
+    /*!
+     * \action    This command sets the dimension of a surface within the GENIVI LayerManagement
+     * \frequency Called for rearranging graphical contents.
+     * \param[in] id id of surface
+     * \param[in] width width of surface
+     * \param[in] height height of surface
+     * \ingroup Commands
+     */
     SurfaceSetDimensionCommand(int id, unsigned int width,unsigned  int height);
+
+    /**
+     * \brief default destructor
+     */
     virtual ~SurfaceSetDimensionCommand() {}
 
+    /**
+     * \brief Execute this command.
+     * \param[in] executor Pointer to instance executing the LayerManagement COmmands
+     * \return ExecutionSuccess: execution successful
+     * \return ExecutionSuccessRedraw: execution successful and screen needs to be redrawn
+     * \return ExecutionFailed: execution failed
+     * \return ExecutionFailedRedraw: execution unsuccessful and screen needs to be redrawn
+     */
     virtual ExecutionResult execute(ICommandExecutor* executor);
+
+    /**
+     * \brief Get description string for this command.
+     * \return String object with description of this command object
+     */
     virtual const std::string getString();
 
 private:

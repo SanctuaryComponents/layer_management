@@ -25,10 +25,35 @@
 class LayerSetVisibilityCommand : public BaseCommandAsynchronous
 {
 public:
+    /*!
+     * \action    This command sets the visibility of a layer within the GENIVI LayerManagement
+     * \frequency Frequently when events occur within the system which cause a rearrangement
+     *            of graphics, applications or contexts.
+     * \param[in] givenid id of layer
+     * \param[in] newvisibility TRUE: layer is set to visible, FALSE: layer is set to invisible
+     * \ingroup Commands
+     */
     LayerSetVisibilityCommand(const unsigned int givenid, bool newvisibility);
+
+    /**
+     * \brief default destructor
+     */
     virtual ~LayerSetVisibilityCommand() {}
 
+    /**
+     * \brief Execute this command.
+     * \param[in] executor Pointer to instance executing the LayerManagement COmmands
+     * \return ExecutionSuccess: execution successful
+     * \return ExecutionSuccessRedraw: execution successful and screen needs to be redrawn
+     * \return ExecutionFailed: execution failed
+     * \return ExecutionFailedRedraw: execution unsuccessful and screen needs to be redrawn
+     */
     virtual ExecutionResult execute(ICommandExecutor* executor);
+
+    /**
+     * \brief Get description string for this command.
+     * \return String object with description of this command object
+     */
     virtual const std::string getString();
 
 private:

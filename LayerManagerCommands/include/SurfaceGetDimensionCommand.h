@@ -25,10 +25,35 @@
 class SurfaceGetDimensionCommand: public BaseCommandSynchronous
 {
 public:
+    /*!
+     * \action    This command returns the dimension of a surface within the GENIVI LayerManagement
+     * \frequency Called for rearranging graphical contents.
+     * \param[in] id id of surface
+     * \param[in] widthRet pointer to store surface width on execution
+     * \param[in] heightRet pointer to store surface height on execution
+     * \ingroup Commands
+     */
     SurfaceGetDimensionCommand(int id, unsigned int* widthRet, unsigned int* heightRet);
+
+    /**
+     * \brief default destructor
+     */
     virtual ~SurfaceGetDimensionCommand() {}
 
+    /**
+     * \brief Execute this command.
+     * \param[in] executor Pointer to instance executing the LayerManagement COmmands
+     * \return ExecutionSuccess: execution successful
+     * \return ExecutionSuccessRedraw: execution successful and screen needs to be redrawn
+     * \return ExecutionFailed: execution failed
+     * \return ExecutionFailedRedraw: execution unsuccessful and screen needs to be redrawn
+     */
     virtual ExecutionResult execute(ICommandExecutor* executor);
+
+    /**
+     * \brief Get description string for this command.
+     * \return String object with description of this command object
+     */
     virtual const std::string getString();
 
 private:

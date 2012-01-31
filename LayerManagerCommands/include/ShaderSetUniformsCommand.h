@@ -26,10 +26,34 @@
 class ShaderSetUniformsCommand : public BaseCommandSynchronous
 {
 public:
+    /*!
+     * \action    This command sets the uniform value of a shader within the GENIVI LayerManagement
+     * \frequency Typically for every rendered frame.
+     * \param[in] shaderid id of shader
+     * \param[in] uniforms vector holding uniforms
+     * \ingroup Commands
+     */
     ShaderSetUniformsCommand(unsigned int shaderid, const std::vector<std::string>& uniforms);
+
+    /**
+     * \brief default destructor
+     */
     virtual ~ShaderSetUniformsCommand() {}
 
+    /**
+     * \brief Execute this command.
+     * \param[in] executor Pointer to instance executing the LayerManagement COmmands
+     * \return ExecutionSuccess: execution successful
+     * \return ExecutionSuccessRedraw: execution successful and screen needs to be redrawn
+     * \return ExecutionFailed: execution failed
+     * \return ExecutionFailedRedraw: execution unsuccessful and screen needs to be redrawn
+     */
     virtual ExecutionResult execute(ICommandExecutor* executor);
+
+    /**
+     * \brief Get description string for this command.
+     * \return String object with description of this command object
+     */
     virtual const std::string getString();
 
     const std::vector<std::string> getUniforms() const;

@@ -25,10 +25,36 @@
 class SurfaceSetShaderCommand : public BaseCommandSynchronous
 {
 public:
-    SurfaceSetShaderCommand(unsigned int id,unsigned  int shaderid);
+    /*!
+     * \action    This command applies a shader to a surface within the GENIVI
+     *            LayerManagement
+     * \frequency Typically once during surface creation. May be used during
+     *            runtime for effects.
+     * \param[in] id id of surface
+     * \param[in] shaderid id of shader
+     * \ingroup Commands
+     */
+    SurfaceSetShaderCommand(unsigned int id, unsigned int shaderid);
+
+    /**
+     * \brief default destructor
+     */
     virtual ~SurfaceSetShaderCommand() {}
 
+    /**
+     * \brief Execute this command.
+     * \param[in] executor Pointer to instance executing the LayerManagement COmmands
+     * \return ExecutionSuccess: execution successful
+     * \return ExecutionSuccessRedraw: execution successful and screen needs to be redrawn
+     * \return ExecutionFailed: execution failed
+     * \return ExecutionFailedRedraw: execution unsuccessful and screen needs to be redrawn
+     */
     virtual ExecutionResult execute(ICommandExecutor* executor);
+
+    /**
+     * \brief Get description string for this command.
+     * \return String object with description of this command object
+     */
     virtual const std::string getString();
 
     unsigned int getID() const;

@@ -19,6 +19,10 @@
 #ifndef _DBUSCOMMUNICATOR_H_
 #define _DBUSCOMMUNICATOR_H_
 
+/**
+ * \defgroup DbusCommunicator DBUS Communicator API
+ */
+
 #include "ICommunicator.h"
 #include "Log.h"
 

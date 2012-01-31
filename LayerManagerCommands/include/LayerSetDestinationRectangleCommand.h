@@ -25,10 +25,37 @@
 class LayerSetDestinationRectangleCommand : public BaseCommandAsynchronous
 {
 public:
+    /*!
+     * \action    This command sets the destination region of a layer within the GENIVI LayerManagement
+     * \frequency Called when first initializing a new layer and for rearranging graphical contents.
+     * \param[in] id id of layer
+     * \param[in] x x position of layer on screen
+     * \param[in] y y position of layer on screen
+     * \param[in] width width of layer on screen
+     * \param[in] height height of layer on screen
+     * \ingroup Commands
+     */
     LayerSetDestinationRectangleCommand(int id, unsigned int x, unsigned int y, unsigned int width, unsigned int height);
+
+    /**
+     * \brief default destructor
+     */
     virtual ~LayerSetDestinationRectangleCommand() {}
 
+    /**
+     * \brief Execute this command.
+     * \param[in] executor Pointer to instance executing the LayerManagement COmmands
+     * \return ExecutionSuccess: execution successful
+     * \return ExecutionSuccessRedraw: execution successful and screen needs to be redrawn
+     * \return ExecutionFailed: execution failed
+     * \return ExecutionFailedRedraw: execution unsuccessful and screen needs to be redrawn
+     */
     virtual ExecutionResult execute(ICommandExecutor* executor);
+
+    /**
+     * \brief Get description string for this command.
+     * \return String object with description of this command object
+     */
     virtual const std::string getString();
 
 private:

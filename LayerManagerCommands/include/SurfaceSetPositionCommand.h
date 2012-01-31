@@ -25,10 +25,35 @@
 class SurfaceSetPositionCommand : public BaseCommandAsynchronous
 {
 public:
+    /*!
+     * \action    This command sets the position of a surface within the GENIVI LayerManagement
+     * \frequency Called for rearranging graphical contents.
+     * \param[in] id id of surface
+     * \param[in] x x position of surface on layer
+     * \param[in] y y position of surface on layer
+     * \ingroup Commands
+     */
     SurfaceSetPositionCommand(unsigned int id, unsigned int x, unsigned int y);
+
+    /**
+     * \brief default destructor
+     */
     virtual ~SurfaceSetPositionCommand() {}
 
+    /**
+     * \brief Execute this command.
+     * \param[in] executor Pointer to instance executing the LayerManagement COmmands
+     * \return ExecutionSuccess: execution successful
+     * \return ExecutionSuccessRedraw: execution successful and screen needs to be redrawn
+     * \return ExecutionFailed: execution failed
+     * \return ExecutionFailedRedraw: execution unsuccessful and screen needs to be redrawn
+     */
     virtual ExecutionResult execute(ICommandExecutor* executor);
+
+    /**
+     * \brief Get description string for this command.
+     * \return String object with description of this command object
+     */
     virtual const std::string getString();
 
 private:

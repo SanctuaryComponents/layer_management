@@ -25,10 +25,34 @@
 class LayergroupSetOpacityCommand : public BaseCommandAsynchronous
 {
 public:
+    /*!
+     * \action    This command sets the opacity of a layer group within the GENIVI LayerManagement
+     * \frequency Called in order to rearrange graphical output.
+     * \param[in] id id of layer group
+     * \param[in] Opacity new opacity for all layers in layer group
+     * \ingroup Commands
+     */
     LayergroupSetOpacityCommand(unsigned int id, double Opacity);
+
+    /**
+     * \brief default destructor
+     */
     virtual ~LayergroupSetOpacityCommand() {}
 
+    /**
+     * \brief Execute this command.
+     * \param[in] executor Pointer to instance executing the LayerManagement COmmands
+     * \return ExecutionSuccess: execution successful
+     * \return ExecutionSuccessRedraw: execution successful and screen needs to be redrawn
+     * \return ExecutionFailed: execution failed
+     * \return ExecutionFailedRedraw: execution unsuccessful and screen needs to be redrawn
+     */
     virtual ExecutionResult execute(ICommandExecutor* executor);
+
+    /**
+     * \brief Get description string for this command.
+     * \return String object with description of this command object
+     */
     virtual const std::string getString();
 
 private:

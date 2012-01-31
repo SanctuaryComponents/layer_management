@@ -26,10 +26,34 @@
 class SurfaceDumpCommand: public BaseCommandSynchronous
 {
 public:
+    /*!
+     * \action    This command stores a bitmap file with the graphical content of a surface within the GENIVI LayerManagement
+     * \frequency Used for surface management.
+     * \param[in] givenfilename path and filename for bitmap file
+     * \param[in] id id of surface
+     * \ingroup Commands
+     */
     SurfaceDumpCommand(char* givenfilename, unsigned int id = 0);
+
+    /**
+     * \brief default destructor
+     */
     virtual ~SurfaceDumpCommand() {}
 
+    /**
+     * \brief Execute this command.
+     * \param[in] executor Pointer to instance executing the LayerManagement COmmands
+     * \return ExecutionSuccess: execution successful
+     * \return ExecutionSuccessRedraw: execution successful and screen needs to be redrawn
+     * \return ExecutionFailed: execution failed
+     * \return ExecutionFailedRedraw: execution unsuccessful and screen needs to be redrawn
+     */
     virtual ExecutionResult execute(ICommandExecutor* executor);
+
+    /**
+     * \brief Get description string for this command.
+     * \return String object with description of this command object
+     */
     virtual const std::string getString();
 
 private:
