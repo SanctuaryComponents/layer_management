@@ -16,7 +16,7 @@ layers, surfaces and their properties in a mock Layerlist. This mock layerlist i
 then given to the renderer under test and then checking for the desired output of
 the renderer (positioning, overlapping, transparency etc).
 
-The implementation of the Layerlist can also be tested by automatic tests,
+The implementation of the Scene can also be tested by automatic tests,
 inserting new layers, groups and surfaces, then changing properties and comparing
 the results of subsequent calls to getter methods with the desired values.
 

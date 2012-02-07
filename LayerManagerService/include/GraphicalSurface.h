@@ -38,19 +38,16 @@ public:
     virtual ~GraphicalSurface() {}
 
     /**
-     * Set Orientation value
-     * @param orientation the new value. Multiples of 90 degrees. (0->0°, 1->90°, 2->180°,3->279°)
+     * @brief Set Orientation value
+     * @param[in] newOrientation the new value. Multiples of 90 degrees. (0->0°, 1->90°, 2->180°,3->279°)
      */
     void setOrientation(OrientationType newOrientation);
 
     OrientationType getOrientation() const;
 
     /**
-     * Set Source Viewport (only use portion of source graphics)
-     * @param x Horizontal x position within source (clip from the left)
-     * @param y Vertical y position within source (clip from the top)
-     * @param width Width within source (can be used to clip from the right)
-     * @param height Height within source (can be used to clip fromt he bottom)
+     * @brief Set Source Viewport (only use portion of source graphics)
+     * @param[in] newSource Rectangle defining position and size within surface (clip from the left)
      */
     void setSourceRegion(const Rectangle& newSource);
 
@@ -58,10 +55,7 @@ public:
 
     /**
      * Set Destination Viewport (Scale output)
-     * @param x Horizontal x position of destination
-     * @param y Vertical y position of destination
-     * @param width Width of destination
-     * @param height Height of destination
+     * @param[in] newDestination Rectangle defining destination position and size
      */
     void setDestinationRegion(const Rectangle& newDestination);
 
@@ -74,8 +68,8 @@ public:
     Vector2 getDimension();
 
     /**
-     * @Description Indicate if a x,y position is inside the destination region.
-     *              Attention: Graphical Surface rotation is not yet supported.
+     * @brief Indicate if a x,y position is inside the destination region.
+     *        Attention: Graphical Surface rotation is not yet supported.
      * @param x_DestCoordinateSyst x position in the destination coordinate system
      * @param y_DestCoordinateSyst y position in the destination coordinate system
      * @return TRUE if the position is inside the destination region
@@ -83,15 +77,15 @@ public:
     bool isInside(unsigned int x_DestCoordinateSyst, unsigned int y_DestCoordinateSyst) const;
 
     /**
-     * @Description Transform a x,y position from destination coordinate system to
+     * @brief Transform a x,y position from destination coordinate system to
      *              source coordinate system. Attention, to get valid result the x,y
      *              positions given in parameter must be located within the destination
      *              region of the GraphicalSurface
      *
-     * @param x in/out : IN    x position in the destination coordinate system
-     *                   OUT   x position in the source coordinate system
-     * @param y in/out : IN    y position in the destination coordinate system
-     *                   OUT   y position in the source coordinate system
+     * @param[in]  x x position in the destination coordinate system
+     * @param[out] x x position in the source coordinate system
+     * @param[in] y y position in the destination coordinate system
+     * @param[out] y y position in the source coordinate system
      * @param check If TRUE, a test will be done to make sure the x,y positions
      *              given in parameter are located within the destination region.
      *

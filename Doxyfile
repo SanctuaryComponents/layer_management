@@ -25,13 +25,13 @@ DOXYFILE_ENCODING      = UTF-8
 # The PROJECT_NAME tag is a single word (or a sequence of words surrounded
 # by quotes) that should identify the project.
 
-PROJECT_NAME           = "GENIVI LayerManagement"
+PROJECT_NAME           = "GENIVI LayerManagement 0.9.5"
 
 # The PROJECT_NUMBER tag can be used to enter a project or revision number.
 # This could be handy for archiving the generated documentation or
 # if some version control system is used.
 
-PROJECT_NUMBER         = 0.9.5
+PROJECT_NUMBER         = "2.0"
 
 # The OUTPUT_DIRECTORY tag is used to specify the (relative or absolute)
 # base path where the generated documentation will be put.
@@ -632,7 +632,7 @@ EXCLUDE_PATTERNS       =  */test/* */tests/*
 # wildcard * is used, a substring. Examples: ANamespace, AClass,
 # AClass::ANamespace, ANamespace::*Test
 
-EXCLUDE_SYMBOLS        = Vector2 _ilm_param t_ilm_param
+EXCLUDE_SYMBOLS        =
 
 # The EXAMPLE_PATH tag can be used to specify one or more files or
 # directories that contain example code fragments that are included (see
@@ -752,7 +752,7 @@ VERBATIM_HEADERS       = NO
 # of all compounds will be generated. Enable this if the project
 # contains a lot of classes, structs, unions or interfaces.
 
-ALPHABETICAL_INDEX     = YES
+ALPHABETICAL_INDEX     = NO
 
 # If the alphabetical index is enabled (see ALPHABETICAL_INDEX) then
 # the COLS_IN_ALPHA_INDEX tag can be used to specify the number of columns
@@ -1639,5 +1639,3 @@ DOT_CLEANUP            = YES
 ALIASES += frequency="\xrefitem frequency \"Expected Frequency\" \"LayerManagement Command Frequency Overview\""
 ALIASES += action="\xrefitem action \"Action Taken\" \"LayerManagement Command Action Overview\""
 
-#ALIASES += frequency="\b Expected \b Call \b Frequency:\\"
-#ALIASES += action="\b Action \bTaken:\\"

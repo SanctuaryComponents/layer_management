@@ -38,8 +38,8 @@ class Shader
 public:
     /**
      * Creates a new shader instance by vertex and fragment shader name.
-     * @param vertName   File name of vertex shader.
-     * @param fragName   File name of fragment shader.
+     * @param vertFileName   File name of vertex shader.
+     * @param fragFileName   File name of fragment shader.
      * @return new Shader instance, NULL if shader could not be loaded, compiled or linked.
      */
     static Shader* createShader(const string& vertFileName, const string& fragFileName);

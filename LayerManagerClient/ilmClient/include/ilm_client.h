@@ -339,7 +339,7 @@ ilmErrorTypes ilm_layerGetPosition(t_ilm_layer layerId, t_ilm_uint *pPosition);
  * \brief Sets the horizontal and vertical position of the layer.
  * \ingroup ilmClient
  * \param[in] layerId Id of layer.
- * \param[in] Pposition pointer to an array where the position is stored.
+ * \param[in] pPosition pointer to an array where the position is stored.
  *                      dimension[0]=x, dimension[1]=y
  * \return ILM_TRUE if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
@@ -479,9 +479,8 @@ ilmErrorTypes ilm_layergroupSetOpacity(t_ilm_layergroup group, t_ilm_float opaci
  * \param[in] width The original width of the surface
  * \param[in] height The original height of the surface
  * \param[in] pixelFormat The pixelformat to be used for the surface
- * \param[in/out] pSurfaceId
- *                The value pSurfaceId points to is used as ID for new surface;
- *                The ID of the newly created surface is returned in this parameter
+ * \param[in] pSurfaceId The value pSurfaceId points to is used as ID for new surface;
+ * \param[out] pSurfaceId The ID of the newly created surface is returned in this parameter
  *
  * \return ILM_TRUE if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
@@ -491,9 +490,8 @@ ilmErrorTypes ilm_surfaceCreate(t_ilm_nativehandle nativehandle, t_ilm_int width
 /**
  * \brief Create the logical surface, which has no native buffer associated
  * \ingroup ilmClient
- * \param[in/out] pSurfaceId
- *                The value pSurfaceId points to is used as ID for new surface;
- *                The ID of the newly created surface is returned in this parameter
+ * \param[in] pSurfaceId The value pSurfaceId points to is used as ID for new surface;
+ * \param[out] pSurfaceId The ID of the newly created surface is returned in this parameter
  * \return ILM_TRUE if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */

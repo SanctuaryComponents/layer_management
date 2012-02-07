@@ -82,6 +82,7 @@ public:
      * \ingroup    RendererAPI
      * \param[in]  fileToSave path to bitmap file to store the graphical content
      * \param[in]  id id of surface
+     * \param[in]  layer_id id of layer
      */
     virtual void doScreenShotOfSurface(std::string fileToSave, const unsigned int id, const unsigned int layer_id) = 0;
 

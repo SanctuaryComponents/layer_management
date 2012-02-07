@@ -5,7 +5,7 @@
 The Layer Management Service is one of a number of components that have
 been identified in the Graphics Framework Component Model. The components
 that comprise the Graphics Framework are shown in the following diagram
-and summarised in the subsequent text.
+and summarized in the subsequent text.
 
 \image html ./doc/images/overall_component_model.png Overall Component Model
 \image latex ./doc/images/overall_component_model.png Overall Component Model

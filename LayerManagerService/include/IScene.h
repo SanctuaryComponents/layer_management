@@ -45,8 +45,6 @@ public:
     /**
      * \brief default destructor
      * \ingroup SceneAPI
-     * \param[in]
-     * \return
      */
     virtual ~IScene() {}
 
@@ -85,14 +83,14 @@ public:
     /**
      * \brief Remove a layer from the scene.
      * \ingroup SceneAPI
-     * \param[in] pointer to layer
+     * \param[in] layer pointer to layer
      */
     virtual void removeLayer(Layer* layer) = 0;
 
     /**
      * \brief Remove surface from scene.
      * \ingroup SceneAPI
-     * \param[in] pointer to surface
+     * \param[in] surface pointer to surface
      */
     virtual void removeSurface(Surface* surface) = 0;
 

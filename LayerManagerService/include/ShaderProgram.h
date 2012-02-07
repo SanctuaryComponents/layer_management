@@ -59,8 +59,8 @@ public:
      * Return a shader program from the gobal list. If no matching instance is found, a new
      * one will be created and added to the list.
      *
-     * @param vertName   File name of vertex shader.
-     * @param fragName   File name of fragment shader.
+     * @param vertFileName   File name of vertex shader.
+     * @param fragFileName   File name of fragment shader.
      * @return new Program instance, NULL if shader could not be loaded, compiled or linked.
      */
     static ShaderProgram* obtain(const string& vertFileName, const string& fragFileName);
@@ -133,8 +133,8 @@ protected:
      * Protected constructor.
      * New instances of this class are supposed to be created by the shader program factory.
      *
-     * @param vertName    File name of vertex shader.
-     * @param fragName    File name of fragment shader.
+     * @param vertFileName    File name of vertex shader.
+     * @param fragFileName    File name of fragment shader.
      */
     ShaderProgram(const string& vertFileName, const string& fragFileName);
 

@@ -39,7 +39,7 @@ public:
 
     /**
      * @brief Set alpha value
-     * @param alpha The new Alpha Value between 0.0 (full transparency) and 1.0 (fully visible)
+     * @param[in] newOpacity The new Alpha Value between 0.0 (full transparency) and 1.0 (fully visible)
      */
     virtual void setOpacity(double newOpacity);
 
@@ -51,7 +51,7 @@ public:
 
 	/**
 	 * Set the visibility
-	 * @param visible set this object visible (true) or invisible (false)
+	 * @param[in] newVisibility set this object visible (true) or invisible (false)
 	 */
 	virtual void setVisibility(bool newVisibility);
 
@@ -66,7 +66,7 @@ public:
 	/**
 	 * Assign custom shader for rendering
 	 *
-	 * @param s   Custom shader. If NULL, default shader will be used.
+	 * @param[in] s Custom shader. If NULL, default shader will be used.
 	 */
 	void setShader(Shader* s);
 

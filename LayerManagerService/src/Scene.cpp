@@ -385,7 +385,7 @@ void Scene::getLayerGroupIDs(uint* length, uint** array) const
 }
 
 /**
- * @Description:
+ * \brief:
  * Return the first Surface located below a specific coordinate, and for which
  * the opacity is above a certain level. Also translate the input coordinates
  * which are display wide into surface wide coordinates.
@@ -394,13 +394,11 @@ void Scene::getLayerGroupIDs(uint* length, uint** array) const
  * window. For this, we need to know to what is the layer / surface under the
  * (x,y) mouse pointer.
  *
- *
- *
- * @param x in/out : IN    x position in the scene
- *                   OUT   x position in the surface coordinate system
- * @param y in/out : IN    y position in the scene
- *                   OUT   y position in the surface coordinate system
- * @param minOpacity Minimal opacity that a surface should have to be elected
+ * @param[in] x x position in the scene
+ * @param[out] x x position in the surface coordinate system
+ * @param[in] y y position in the scene
+ * @param[out] y y position in the surface coordinate system
+ * @param[in] minOpacity Minimal opacity that a surface should have to be elected
  */
 Surface* Scene::getSurfaceAt(unsigned int *x, unsigned int *y, double minOpacity)
 {

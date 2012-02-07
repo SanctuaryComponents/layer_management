@@ -64,7 +64,7 @@ public:
      *    "uSize 2f 1 2.5 1.25"
      *    "uTransform 4f 1 0 1.0 0.0 0.0 1.0 0.0 ..."
      *
-     * @param desc  The description
+     * @param description  The description
      * @return Uniform object or NULL in case of a parse error
      */
     static ShaderUniform* createFromStringDescription(const string& description);
@@ -101,7 +101,7 @@ public:
      *
      * @param type   Data type
      * @param count  Number of data elements
-     * @param value  Data values. Actual number of floats must be (count*(size of type)).
+     * @param values  Data values. Actual number of floats must be (count*(size of type)).
      * @param transpose  Whether to transpose a matrix. Only needed if element type is a matrix.
      */
     void setData(Type type, int count, const std::vector<float>& values, bool transpose = false);

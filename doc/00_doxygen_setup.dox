@@ -1,0 +1,10 @@
+// This file defines the order of groups in the generated documentation
+
+/**
+ * \defgroup ServiceAPI      Layer Management Service API
+ * \defgroup ilmClient       Layer Management Client API
+ * \defgroup SceneAPI        Layer Management Scene API
+ * \defgroup RendererAPI     Layer Management Renderer API
+ * \defgroup CommunicatorAPI Layer Management Communicator API
+ * \defgroup Commands        Layer Management Commands
+ */

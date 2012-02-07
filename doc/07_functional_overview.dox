@@ -22,7 +22,7 @@ position etc. The class Surface contains a pointer to a platform dependant
 “PlatformSurface” type with can store platform dependant data for renderers
 (Window handles for example).
 
-"UML sequence example" diagram shows an exemplary sequence of actions. The layermanager
+"UML sequence example" diagram shows an exemplary sequence of actions. The LayerManagement
 control is started, which in turn creates a communicator and starts it. A management
 application is run and creates an initial layer, for example for third party
 applications. The management applications then – at a later point in time – receives an
@@ -40,7 +40,10 @@ Similarly the management application would set multiple properties of multiple s
 
 The Layer Management can be used in two scenarios:
 
-\section scenarioA Scenario A: All applications talk to the Layer Management themselves and configure their output.
+\section scenarioA Scenario A: LayerManagement without Central Control Instance
+
+This scenario uses no master to control the LayerManagement setup.
+All applications talk to the Layer Management themselves and configure their output.
 
 Course of events:
 
@@ -51,7 +54,10 @@ Course of events:
 \li (5) Layermanager returns the newly created surface identifier
 \li (6) Application uses this identifier to set properties of its surface
 
-\section scenarioB Scenario B: A central control instances decides if applications are shown and where
+\section scenarioB Scenario B: LayerManagement with Central Control Instance
+
+A central control instances sets up the LayerManagement configuration.
+It has full control, which applications are shown and the way they are rendered.
 
 \image html ./doc/images/with_central_control_instance.png Example with Central Control Instance
 \image latex ./doc/images/with_central_control_instance.png Example with Central Control Instance

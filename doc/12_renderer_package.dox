@@ -9,9 +9,9 @@ The rendering of layers and their respective surfaces is always handled by
 rendering libraries. These are typically device dependant because of possible
 dependencies on graphics hardware or displays for example.
 
-A typical implementation of a renderer will use the pointer to the layerlist given
+A typical implementation of a renderer will use the pointer to the scene given
 in the constructor to access the list of current layers and their respective
-surfaces. In its own thread it will use the information in the layerlist to render
+surfaces. In its own thread it will use the information in the scene to render
 its content. In most cases the renderer will need specific platform information for
 each surface in order to access the actual graphical content of the platform (e.g.
 native window handles or memory addresses). For this reason a renderer can append

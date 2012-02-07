@@ -8,7 +8,7 @@ A completely platform independent solution is not possible due to the
 dependence on a specific platform for rendering and window management.
 The division of the Layer Management Service addresses this problem by
 having separate rendering packages for each target platform. The
-communication packages, main program and layerlist are not platform
+communication packages, main program and scene are not platform
 dependant. For maximum flexibility the communication and rendering
 packages must not be known at compile time of the rest of the Layer
 Management, i.e. they are loaded at runtime and integrated using a
@@ -22,7 +22,7 @@ executed at high frequency per second.
 
 \section assumptions Assumptions
 
-The Window Management API in use must provide a means for the rendering
-package to access the graphical content of individual applications.
+The Window Management API in use must provide access to the graphical
+content of individual applications for the rendering package.
 
 */

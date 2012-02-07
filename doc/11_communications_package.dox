@@ -12,6 +12,17 @@ control component of the Layer Management Service. This way the service has no
 dependencies towards certain ways of communication and the usage of specific
 communication libraries can be decided at runtime.
 
+On the client side it is recommended to use the \ref ilmClient for communication
+with the LayerManagerService, or to be more precise, with the loaded Communicator Plugin
+of the LayerManagerService.
+The LayerManagment client library implements an abstraction layer hiding the technical
+details of the underlying communication technology.
+This enables client applications to be used with different communication technologies
+implemented in LayerManager Communicator plugins.
+
+\image html ./images/layer_management_communicator_structure.png Layer Manager Communicator Structure 
+\image latex ./images/layer_management_communicator_structure.png Layer Manager Communicator Structure 
+
 The general procedure for communicators is to establish their specific communication
 (IPC, proprietary method, specific bus etc) and provide the message interface described
 in chapter 6. When receiving commands on this communication channel the package builds
@@ -34,6 +45,13 @@ following naming scheme:
 
 In order to be loadable by the layermanager, the created shared library must provide
 both of these functions.
+
+This component is to be provided by the platform supplier.
+
+The GENIVI Consortium does not mandate any specific implementation. The only constraint
+is that the proposed solution needs to fulfill the API specification. Furthermore each
+Communicator Implementation has to provide a C-API for the Client applications (like HMI,
+Browser, Navigation) to hide the used InterProcessCommunication scheme.
 
 \section communicationsPackageExample Example: Create the communication library “MyCommunicator”
 
@@ -68,6 +86,10 @@ void destroyMyCommunicator(MyCommunicator* comm)
 \section communicationsPackagePublicInterface Public Interface
 
 See \ref CommunicatorAPI.
+
+\section communicationsPackageClientInterface Client Interface
+
+See \ref ilmClient.
 
 \section communicationsPackageCommandObjectReference Command Object Reference
 

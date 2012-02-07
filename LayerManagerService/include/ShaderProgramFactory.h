@@ -33,8 +33,8 @@ public:
     /**
      * Create a new shader program.
      *
-     * @param vertName   File name of vertex shader.
-     * @param fragName   File name of fragment shader.
+     * @param vertFileName   File name of vertex shader.
+     * @param fragFileName   File name of fragment shader.
      * @return new Program instance, NULL if program could not be created.
      */
     static ShaderProgram* createProgram(const string& vertFileName, const string& fragFileName);
