@@ -33,6 +33,20 @@ by the following naming scheme:
 In order to be loadable by the layermanager, the created shared library must provide
 both of these functions.
 
+
+\section rendererPackageArchitecture Architecture Overview
+
+The reference renderer plugins are assembled using re-usable modules implementing
+different aspects like window systems or texture binders.
+
+\image html ./doc/images/example_renderer_wayland.png Renderer Architecture Overview
+\image latex ./doc/images/example_renderer_wayland.png Renderer Architecture Overview
+
+In order to implement a new renderer it often is sufficient to implement only a small
+amount of modules to switch to a different platform while using ready-to-use modules
+provided by the reference implementation.
+ 
+
 \section rendererPackageExample Example: Create the renderer library “MyRenderer”
 
 (1) Create the class MyRenderer, which inherits BaseRenderer
