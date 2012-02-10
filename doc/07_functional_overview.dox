@@ -1,3 +1,21 @@
+/***************************************************************************
+*
+* Copyright 2012 BMW Car IT GmbH
+*
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*        http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*
+****************************************************************************/
 /*!
 
 \page functionalOverview Functional Overview
@@ -33,8 +51,11 @@ management application to want to reorder the visible output of the Layer Manage
 and sends a SetVisibilityCommand to hide the layer with user applications or to show
 a notification layer.
 
-\image html ./doc/images/uml_sequence_example.png UML Sequence example
-\image latex ./doc/images/uml_sequence_example.png UML Sequence example
+\image html ./doc/images/uml_sequence_example_ids_managed_by_layermanagement.png UML Sequence example, IDs managed by LayerManagement
+\image latex ./doc/images/uml_sequence_example_ids_managed_by_layermanagement.png UML Sequence example, IDs managed by LayerManagement
+
+\image html ./doc/images/uml_sequence_example_ids_managed_by_application.png UML Sequence example, IDs managed by Application
+\image latex ./doc/images/uml_sequence_example_ids_managed_by_application.png UML Sequence example, IDs managed by Application
 
 Similarly the management application would set multiple properties of multiple surfaces and layers in order to react to user input (change to an application or switch to a “TV mode” etc).
 
@@ -48,9 +69,9 @@ All applications talk to the Layer Management themselves and configure their out
 Course of events:
 
 \li (1) Application creates window using native window system
-\li (2) Gets native window handle
-\li (3) Platform dependant renderer gets new window event from window system
-\li (4) Application registers/requests logical surface from Layer Management including native window id, width, height and pixelformat of the surface. The renderer uses the given native window id to access the graphical content, this content is associated with the logical surfaceid.
+\li (2) Platform dependant renderer gets new window event from window system
+\li (3) Gets native window handle
+\li (4) Application registers/requests logical surface from Layer Management including native window id, width, height and pixelformat of the surface.The renderer uses the given native window id to access the graphical content, this content is associated with the logical surfaceid.
 \li (5) Layermanager returns the newly created surface identifier
 \li (6) Application uses this identifier to set properties of its surface
 
@@ -64,14 +85,18 @@ It has full control, which applications are shown and the way they are rendered.
 
 Course of events:
 
-\li (1) Application creates window using native window system
-\li (2) Gets native window handle
-\li (3) Platform dependant renderer gets new window event from window system
-\li (4) Application registers with central control instance, maybe presenting a certificate or AppID ( this can be proprietary)
-\li (5) The control instance registers/requests logical surface from Layer Management including native window id, width, height and pixelformat of the surface. The renderer uses the given native window id to access the graphical content, this content is associated with the logical surfaceid.
-\li (6) Layermanager returns the newly created surface identifier
-\li (7) Control instance uses this identifier to set properties of the application's surface
-\li (8) Later an external event occurs (e.g. telephone call) at the control instance
-\li (9) Control instance decides to change the graphical arrangement to blend out all applications except telephone application
+\li (1) The control instance creates all Layers and Surfaces of the scene according to their properties including native window id, width, height and pixelformat of the surface.
+\li (2) The control instance configures the scene to show the client application
+\li (3) Application creates window using native window system
+\li (4) Platform dependant renderer gets new window event from window system
+\li (5) Gets native window handle
+\li (6) The client application registers its native window at the LayerManager. The renderer uses the given native window id to access the graphical content, this content is associated with the logical surfaceid that was created by the control instance.
+
+Now the client application is rendered on screen.
+
+\li (7) An external event occurs (e.g. phone call) at the control instance
+\li (8) Control instance decides to change the graphical arrangement to blend out all applications except telephone application
+
+Now only the phone application is rendered on screen.
 
 */

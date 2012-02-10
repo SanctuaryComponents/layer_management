@@ -1,3 +1,21 @@
+/***************************************************************************
+*
+* Copyright 2012 BMW Car IT GmbH
+*
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*        http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*
+****************************************************************************/
 /*!
 
 \page specification Specification
@@ -12,12 +30,13 @@ On startup the Layer Management Service shall perform the following tasks:
 \li Load and instantiate Communication and Rendering packages to be used.
     These will typically create own threads internally. It must be possible
     to load these at runtime in order to have maximum flexibility.
-\li Call initialization method on loaded packages
-\li Call run method on loaded packages
+\li Call start method on loaded packages
 \li Communication Packages will now typically wait for IPC Calls for creating
     surfaces, layers etc and arranging themselves. Rendering packages will now
     typically start rendering all known layers and their surfaces.
 
+\image html ./doc/images/layermanager_lifecycle.png LayerManagerService Lifecycle
+\image latex ./doc/images/layermanager_lifecycle.png LayerManagerService Lifecycle
 
 \section componentInterfaces Component Interfaces
 
@@ -43,7 +62,7 @@ provided be individual communication implementations though.
 
 \subsection componentInterfacesCommands Commands
 
-See \ref Commands.
+The IPC Message interfaces are described in \ref Commands.
 
 \section componentInterfacesRequirements Requirements
 

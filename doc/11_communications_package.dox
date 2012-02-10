@@ -1,3 +1,21 @@
+/***************************************************************************
+*
+* Copyright 2012 BMW Car IT GmbH
+*
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*        http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*
+****************************************************************************/
 /*!
 
 \page communicationsPackage Communications Package
@@ -40,7 +58,7 @@ The layermanager searches the provided communicator shared library for two entry
 which are both mandatory for a communicator library. Their name is specified by the
 following naming scheme:
 
-\li \code <Library_Name>* create<Library_Name>(CommandExecutor*, LayerList*) \endcode
+\li \code ICommunicator* create<Library_Name>(ICommandExecutor*) \endcode
 \li \code void destroy<Library_Name>(<Library_Name>*) \endcode
 
 In order to be loadable by the layermanager, the created shared library must provide
@@ -63,19 +81,20 @@ Browser, Navigation) to hide the used InterProcessCommunication scheme.
 \li \code virtual void stop(void) \endcode
 
 (3) Create the static functions (see example source code below)
+
 \li \code
 extern "C"
-MyCommunicator* createMyCommunicator(CommandExecutor* ex, LayerList* ll)
+ICommunicator* createMyCommunicator(ICommandExecutor* pExecutor)
 {
-    return new MyCommunicator(ex, ll);
+    return new MyCommunicator(pExecutor);
 }
 \endcode
 
 \li \code
 extern "C"
-void destroyMyCommunicator(MyCommunicator* comm)
+void destroyMyCommunicator(MyCommunicator* pCommunicator)
 {
-    delete comm;
+    delete pCommunicator;
 }
 \endcode
 
@@ -83,16 +102,25 @@ void destroyMyCommunicator(MyCommunicator* comm)
 
 (5) Link the implementation to a shared library called “libMyCommunicator.so”
 
+\section communicationsPackageReferenceImplementation Reference Implementation
+
+The LayerManagement package contains a reference 
+implementation for a communicator, which is based on DBUS.
+
+The source code is available in the
+\code <package_root>/LayerManagerPlugins/Communicators/DBUSCommunicator \endcode
+directory.
+
 \section communicationsPackagePublicInterface Public Interface
 
-See \ref CommunicatorAPI.
+The interface of the Communicator package is described in more detail in \ref CommunicatorAPI.
 
 \section communicationsPackageClientInterface Client Interface
 
-See \ref ilmClient.
+The interface of the Layer Manager Client package is described in more detail in \ref ilmClient.
 
 \section communicationsPackageCommandObjectReference Command Object Reference
 
-See \ref Commands.
+The description of all available Layer Manager Commands is available in \ref Commands.
 
 */

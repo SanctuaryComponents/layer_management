@@ -22,29 +22,24 @@
 #include "ilm_client_platform.h"
 
 /**
- * \defgroup Defines
- * \defgroup Enumerations
- * \defgroup TypeDefinitions
- **/
-/**
  * \brief Represent the logical true value
- * \ingroup Defines
+ * \ingroup ilmClient
  **/
 #define ILM_TRUE     1u
 
 /**
  * \brief Represent the logical false value
- * \ingroup Defines
+ * \ingroup ilmClient
  **/
 #define ILM_FALSE     0u
 
 /**
  * \brief Enumeration on possible error codes
- * \ingroup Enumerations
+ * \ingroup ilmClient
  **/
 typedef enum e_ilmErrorTypes
 {
-    ILM_SUCCESS = 0,                  /*!< ErrorCode if the method call was successfull */
+    ILM_SUCCESS = 0,                  /*!< ErrorCode if the method call was successful */
     ILM_FAILED= 1,                    /*!< ErrorCode if the method call has failed */
     ILM_ERROR_INVALID_ARGUMENTS = 2,  /*!< ErrorCode if the method was called with invalid arguments */
     ILM_ERROR_ON_CONNECTION = 3       /*!< ErrorCode if connection error has occured */
@@ -52,7 +47,7 @@ typedef enum e_ilmErrorTypes
 
 /**
  * \brief Enumeration for supported pixelformats
- * \ingroup Enumerations
+ * \ingroup ilmClient
  **/
 typedef enum e_ilmPixelFormat
 {
@@ -60,15 +55,15 @@ typedef enum e_ilmPixelFormat
     ILM_PIXELFORMAT_RGB_888 = 1,       /*!< Pixelformat value, to describe a 24 bit rgb surface */
     ILM_PIXELFORMAT_RGBA_8888 =2,      /*!< Pixelformat value, to describe a 24 bit rgb surface with 8 bit alpha */
     ILM_PIXELFORMAT_RGB_565 = 3,       /*!< Pixelformat value, to describe a 16 bit rgb surface */
-    ILM_PIXELFORMAT_RGBA_5551 = 4,     /*!< Pixelformat value, to desicribe a 16 bit rgb surface, with binary mask */
-    ILM_PIXELFORMAT_RGBA_6661 = 5,     /*!< Pixelformat value, to desicribe a 18 bit rgb surface, with binars mask */
-    ILM_PIXELFORMAT_RGBA_4444 = 6,     /*!< Pixelformat value, to desicribe a 12 bit rgb surface, with 4 bit alpha */
+    ILM_PIXELFORMAT_RGBA_5551 = 4,     /*!< Pixelformat value, to describe a 16 bit rgb surface, with binary mask */
+    ILM_PIXELFORMAT_RGBA_6661 = 5,     /*!< Pixelformat value, to describe a 18 bit rgb surface, with binars mask */
+    ILM_PIXELFORMAT_RGBA_4444 = 6,     /*!< Pixelformat value, to describe a 12 bit rgb surface, with 4 bit alpha */
     ILM_PIXEL_FORMAT_UNKNOWN = 7       /*!< Pixelformat not known */
 } ilmPixelFormat;
 
 /**
  * \brief Enumeration for supported layertypes
- * \ingroup Enumerations
+ * \ingroup ilmClient
  **/
 typedef enum e_ilmLayerType
 {
@@ -80,7 +75,7 @@ typedef enum e_ilmLayerType
 
 /**
  * \brief Enumeration for supported graphical objects
- * \ingroup Enumerations
+ * \ingroup ilmClient
  **/
 typedef enum e_ilmObjectType
 {
@@ -92,7 +87,7 @@ typedef enum e_ilmObjectType
 
 /**
  * \brief Enumeration for supported orientations of booth, surface and layer
- * \ingroup Enumerations
+ * \ingroup ilmClient
  **/
 typedef enum e_ilmOrientation
 {
@@ -104,61 +99,61 @@ typedef enum e_ilmOrientation
 
 /**
  * \brief Typedef for representing a layer
- * \ingroup TypeDefinitions
+ * \ingroup ilmClient
  **/
 typedef t_ilm_uint     t_ilm_layer;
 
 /**
  * \brief Typedef for representing a surface
- * \ingroup TypeDefinitions
+ * \ingroup ilmClient
  **/
 typedef t_ilm_uint     t_ilm_surface;
 
 /**
  * \brief Typedef for representing a layergroup
- * \ingroup TypeDefinitions
+ * \ingroup ilmClient
  **/
 typedef t_ilm_uint     t_ilm_layergroup;
 
 /**
  * \brief Typedef for representing a surfacegroup
- * \ingroup TypeDefinitions
+ * \ingroup ilmClient
  **/
 typedef t_ilm_uint     t_ilm_surfacegroup;
 
 /**
  * \brief Typedef for representing a display number
- * \ingroup TypeDefinitions
+ * \ingroup ilmClient
  **/
 typedef t_ilm_uint     t_ilm_display;
 
 /**
  * \brief Typedef for representing layer capabilities
- * \ingroup TypeDefinitions
+ * \ingroup ilmClient
  **/
 typedef t_ilm_uint     t_ilm_layercapabilities;
 
 /**
  * \brief Typedef for representing a native window handle
- * \ingroup TypeDefinitions
+ * \ingroup ilmClient
  **/
 typedef t_ilm_ulong    t_ilm_nativehandle;
 
 /**
  * \brief Typedef for representing a ascii string
- * \ingroup TypeDefinitions
+ * \ingroup ilmClient
  **/
 typedef t_ilm_char* t_ilm_string;
 
 /**
  * \brief Typedef for representing a const ascii string
- * \ingroup TypeDefinitions
+ * \ingroup ilmClient
  **/
 typedef t_ilm_const_char* t_ilm_const_string;
 
 /**
  * \brief Typedef for representing a the surface properties structure
- * \ingroup TypeDefinitions
+ * \ingroup ilmClient
  **/
 struct ilmSurfaceProperties
 {
@@ -180,7 +175,7 @@ struct ilmSurfaceProperties
 
 /**
  * \brief Typedef for representing a the layer properties structure
- * \ingroup TypeDefinitions
+ * \ingroup ilmClient
  **/
 struct ilmLayerProperties
 {

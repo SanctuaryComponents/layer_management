@@ -1,11 +1,8 @@
-
 *.o
-
 .gitconfig
 debian/
 build/
 toolchain_forcecopy.cmake
-
-
 doc_generated
 configure
+*.pdf

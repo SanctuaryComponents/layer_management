@@ -1,3 +1,21 @@
+/***************************************************************************
+*
+* Copyright 2012 BMW Car IT GmbH
+*
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*        http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*
+****************************************************************************/
 /*!
 
 \page rendererPackage Renderer Package
@@ -27,7 +45,8 @@ The layermanager searches the provided renderer shared library for two entry
 points, which are both mandatory for a renderer library. Their name is specified
 by the following naming scheme:
 
-\li \code IRenderer* create<Library_Name>(LayerList*) \endcode
+
+\li \code BaseRenderer* create<Library_Name>(Scene*) \endcode
 \li \code void destroy<Library_Name>(<Library_Name>*) \endcode
 
 In order to be loadable by the layermanager, the created shared library must provide
@@ -60,16 +79,15 @@ provided by the reference implementation.
 (3) Create the static functions (see example source code below)
 
 \li \code extern "C"
-IRenderer* createMyRenderer(LayerList* ll)
-{
-    return new MyRenderer(ll);
+BaseRenderer* createMyRenderer(Scene* pScene){
+    return new MyRenderer(pScene);
 }
 \endcode
 
 \li \code extern "C"
-void destroyMyRenderer(MyRenderer* renderer)
+void destroyMyRenderer(MyRenderer* pRenderer)
 {
-    delete renderer;
+    delete pRenderer;
 }
 \endcode
 
@@ -77,8 +95,22 @@ void destroyMyRenderer(MyRenderer* renderer)
 
 (5) Link the implementation to a shared library called “libMyRenderer.so”
 
+\section rendererPackageReferenceImplementation Reference Implementation
+
+The LayerManagement package contains two reference 
+implementations for renderers. One is based on OpenGL, the other is based
+on OpenGL ES 2.0. Both implementations rely on the X11 backend server.
+
+The source code for the OpenGL/X11-based reference renderer is available in the
+\code <package_root>/LayerManagerPlugins/Renderers/Platform/GLXRenderer \endcode
+directory.
+
+The source code for the OpenGL ES 2.0/X11-based reference renderer is available in the
+\code <package_root>/LayerManagerPlugins/Renderers/Platform/X11GLESRenderer \endcode
+directory.
+
 \section rendererPackagePublicInterface Public Interface
 
-See \ref RendererAPI.
+The interface of the Renderer package is described in more detail in \ref RendererAPI.
 
 */
