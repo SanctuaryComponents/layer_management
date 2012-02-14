@@ -104,8 +104,6 @@ static MethodTable manager_methods[] =
     { "SetLayergroupOpacity",             "ud",    "",            &DBUSCommunicator::SetLayergroupOpacity },
     { "GetSurfaceOpacity",                "u",     "d",           &DBUSCommunicator::GetSurfaceOpacity },
     { "GetLayerOpacity",                  "u",     "d",           &DBUSCommunicator::GetLayerOpacity },
-    { "GetSurfacegroupOpacity",           "u",     "d",           &DBUSCommunicator::GetSurfacegroupOpacity },
-    { "GetLayergroupOpacity",             "u",     "d",           &DBUSCommunicator::GetLayergroupOpacity },
     { "SetSurfaceOrientation",            "uu",    "",            &DBUSCommunicator::SetSurfaceOrientation },
     { "GetSurfaceOrientation",            "uu",    "",            &DBUSCommunicator::GetSurfaceOrientation },
     { "SetLayerOrientation",              "uu",    "",            &DBUSCommunicator::SetLayerOrientation },
@@ -1461,48 +1459,6 @@ void DBUSCommunicator::GetLayerOpacity(DBusConnection* conn, DBusMessage* msg)
     double param = 0.0;
 
     bool status = m_executor->execute(new LayerGetOpacityCommand(id, &param));
-    if (status)
-    {
-        g_pDbusMessage->initReply(msg);
-        g_pDbusMessage->appendDouble(param);
-        g_pDbusMessage->closeReply();
-    }
-    else
-    {
-        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
-    }
-}
-
-void DBUSCommunicator::GetSurfacegroupOpacity(DBusConnection* conn, DBusMessage* msg)
-{
-    (void)conn; // TODO: remove, only prevents warning
-
-    g_pDbusMessage->initReceive(msg);
-    uint id = g_pDbusMessage->getUInt();
-    double param = 0.0;
-
-    bool status = m_executor->execute(new SurfacegroupGetOpacityCommand(id, &param));
-    if (status)
-    {
-        g_pDbusMessage->initReply(msg);
-        g_pDbusMessage->appendDouble(param);
-        g_pDbusMessage->closeReply();
-    }
-    else
-    {
-        g_pDbusMessage->ReplyError(msg, SERVICE_ERROR, RESSOURCE_NOT_FOUND);
-    }
-}
-
-void DBUSCommunicator::GetLayergroupOpacity(DBusConnection* conn, DBusMessage* msg)
-{
-    (void)conn; // TODO: remove, only prevents warning
-
-    g_pDbusMessage->initReceive(msg);
-    uint id = g_pDbusMessage->getUInt();
-    double param = 0.0;
-
-    bool status = m_executor->execute(new LayergroupGetOpacityCommand(id, &param));
     if (status)
     {
         g_pDbusMessage->initReply(msg);
