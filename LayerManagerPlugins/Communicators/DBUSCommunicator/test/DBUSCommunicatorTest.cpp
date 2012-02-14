@@ -100,17 +100,17 @@ MATCHER_P(DebugCommandEq, onoff, "DebugCommand has onoff set to %(onoff)s") {
 
 TEST_F(DBUSCommunicatorTest, TurnDebugOnAndOff) {
     EXPECT_CALL(this->mockCommandExecutor, execute(DebugCommandEq(false) ) ).Times(1);
-    system((DBUSCOMMAND + std::string("Debug boolean:false")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("Debug boolean:false")).c_str()));
     EXPECT_CALL(this->mockCommandExecutor, execute(DebugCommandEq(true) ) ).Times(1);
-    system((DBUSCOMMAND + std::string("Debug boolean:true")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("Debug boolean:true")).c_str()));
     EXPECT_CALL(this->mockCommandExecutor, execute(DebugCommandEq(false) ) ).Times(1);
-    system((DBUSCOMMAND + std::string("Debug boolean:false")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("Debug boolean:false")).c_str()));
 }
 
 TEST_F(DBUSCommunicatorTest, ListAllLayerIDS) {
     DefaultValue<Scene*>::Set((Scene*) &this->layerlist);
     EXPECT_CALL(this->layerlist, getLayerIDs(NotNull(),NotNull() )).Times(1);
-    system((DBUSCOMMAND + std::string("ListAllLayerIDS")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("ListAllLayerIDS")).c_str()));
 }
 
 TEST_F(DBUSCommunicatorTest, listAlllayerGroupIDS) {
@@ -119,7 +119,7 @@ TEST_F(DBUSCommunicatorTest, listAlllayerGroupIDS) {
     DefaultValue<Scene*>::Set((Scene*) &this->layerlist);
     DefaultValue<std::list<int> >::Set(defaultlist);
     EXPECT_CALL(this->layerlist, getLayerGroupIDs(NotNull(),NotNull()) ).Times(1);
-    system((DBUSCOMMAND + std::string("ListAllLayerGroupIDS")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("ListAllLayerGroupIDS")).c_str()));
 }
 
 TEST_F(DBUSCommunicatorTest, listAllSurfaceGroupIDS) {
@@ -128,7 +128,7 @@ TEST_F(DBUSCommunicatorTest, listAllSurfaceGroupIDS) {
     DefaultValue<Scene*>::Set((Scene*) &this->layerlist);
     DefaultValue<std::list<int> >::Set(defaultlist);
     EXPECT_CALL(this->layerlist, getSurfaceGroupIDs(NotNull(),NotNull() )).Times(1);
-    system((DBUSCOMMAND + std::string("ListAllSurfaceGroupIDS")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("ListAllSurfaceGroupIDS")).c_str()));
 }
 
 TEST_F(DBUSCommunicatorTest, listSurfacesOfSurfacegroup) {
@@ -139,7 +139,7 @@ TEST_F(DBUSCommunicatorTest, listSurfacesOfSurfacegroup) {
     DefaultValue<std::list<int> >::Set(defaultlist);
     DefaultValue<SurfaceGroup*>::Set(new SurfaceGroup());
     EXPECT_CALL(this->layerlist, getSurfaceGroup(Eq(84567u) )).Times(1);
-    system((DBUSCOMMAND + std::string("ListSurfacesOfSurfacegroup uint32:84567")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("ListSurfacesOfSurfacegroup uint32:84567")).c_str()));
 
 }
 
@@ -152,7 +152,7 @@ TEST_F(DBUSCommunicatorTest, listlayersOflayergroup) {
     DefaultValue<LayerGroup*>::Set(new LayerGroup());
 
     EXPECT_CALL(this->layerlist, getLayerGroup(Eq(345u) )).Times(1);
-    system((DBUSCOMMAND + std::string("ListLayersOfLayergroup uint32:345")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("ListLayersOfLayergroup uint32:345")).c_str()));
 
 }
 
@@ -162,7 +162,7 @@ TEST_F(DBUSCommunicatorTest, listSurfaceoflayer) {
     DefaultValue<Layer*>::Set(scene.createLayer(234));
     DefaultValue<Scene*>::Set((Scene*) &layerlist);
     EXPECT_CALL(this->layerlist, getLayer(Eq(234u) )).Times(1);
-    system((DBUSCOMMAND + std::string("ListSurfaceofLayer uint32:234")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("ListSurfaceofLayer uint32:234")).c_str()));
 }
 
 TEST_F(DBUSCommunicatorTest, getPropertiesOfSurface) {
@@ -172,7 +172,7 @@ TEST_F(DBUSCommunicatorTest, getPropertiesOfSurface) {
     DefaultValue<Scene*>::Set((Scene*) &layerlist);
     DefaultValue<Surface*>::Set(scene.createSurface(newID));
     EXPECT_CALL(this->layerlist, getSurface(Eq(876u) )).Times(1);
-    system((DBUSCOMMAND + std::string("GetPropertiesOfSurface uint32:876")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("GetPropertiesOfSurface uint32:876")).c_str()));
 }
 
 TEST_F(DBUSCommunicatorTest, getPropertiesOflayer) {
@@ -181,7 +181,7 @@ TEST_F(DBUSCommunicatorTest, getPropertiesOflayer) {
     DefaultValue<Layer*>::Set(scene.createLayer(0));
     DefaultValue<Scene*>::Set((Scene*) &layerlist);
     EXPECT_CALL(this->layerlist, getLayer(Eq(876u) )).Times(1);
-    system((DBUSCOMMAND + std::string("GetPropertiesOfLayer uint32:876")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("GetPropertiesOfLayer uint32:876")).c_str()));
 }
 /*
 MATCHER_P4(SurfaceCreateCommandEq, nativeHandle, OriginalWidth, OriginalHeight, pixelformat, "%(*)s"){
@@ -196,10 +196,10 @@ MATCHER_P4(SurfaceCreateCommandEq, nativeHandle, OriginalWidth, OriginalHeight, 
 TEST_F(DBUSCommunicatorTest, CreateSurface) {
 
     EXPECT_CALL(this->mockCommandExecutor, execute( SurfaceCreateCommandEq(44u,33u,22u,PIXELFORMAT_RGBA8888))).Times(1);
-    system((DBUSCOMMAND + std::string("CreateSurface uint32:44 uint32:33 uint32:22 uint32:2 ")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("CreateSurface uint32:44 uint32:33 uint32:22 uint32:2 ")).c_str());
 
     EXPECT_CALL(this->mockCommandExecutor, execute( SurfaceCreateCommandEq(404u,303u,0u,PIXELFORMAT_RGB888))).Times(1);
-    system((DBUSCOMMAND + std::string("CreateSurface uint32:404 uint32:303 uint32:0 uint32:1 ")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("CreateSurface uint32:404 uint32:303 uint32:0 uint32:1 ")).c_str());
 }
 */
 
@@ -214,7 +214,7 @@ TEST_F(DBUSCommunicatorTest, CreateLayer) {
     DefaultValue<uint*>::Set(resolution);
 
     EXPECT_CALL(this->mockCommandExecutor, execute( LayerCreateCommandEq(0u,0u))).Times(1);
-    system((DBUSCOMMAND + std::string("CreateLayer")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("CreateLayer")).c_str()));
 }
 
 MATCHER_P(SurfaceRemoveCommandEq, idToRemove, "%(*)s"){
@@ -224,10 +224,10 @@ MATCHER_P(SurfaceRemoveCommandEq, idToRemove, "%(*)s"){
 TEST_F(DBUSCommunicatorTest, RemoveSurface) {
 
     EXPECT_CALL(this->mockCommandExecutor, execute( SurfaceRemoveCommandEq(8u))).Times(1);
-    system((DBUSCOMMAND + std::string("RemoveSurface uint32:8")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("RemoveSurface uint32:8")).c_str()));
 
     EXPECT_CALL(this->mockCommandExecutor, execute( SurfaceRemoveCommandEq(5u))).Times(1);
-    system((DBUSCOMMAND + std::string("RemoveSurface uint32:5")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("RemoveSurface uint32:5")).c_str()));
 }
 
 MATCHER_P(LayerRemoveCommandEq, idToRemove, "%(*)s"){
@@ -236,10 +236,10 @@ MATCHER_P(LayerRemoveCommandEq, idToRemove, "%(*)s"){
 
 TEST_F(DBUSCommunicatorTest, Removelayer) {
     EXPECT_CALL(this->mockCommandExecutor, execute( LayerRemoveCommandEq(8u))).Times(1);
-    system((DBUSCOMMAND + std::string("RemoveLayer uint32:8")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("RemoveLayer uint32:8")).c_str()));
 
     EXPECT_CALL(this->mockCommandExecutor, execute( LayerRemoveCommandEq(5u))).Times(1);
-    system((DBUSCOMMAND + std::string("RemoveLayer uint32:5")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("RemoveLayer uint32:5")).c_str()));
 }
 
 MATCHER_P2(SurfaceSetOpacityCommandEq, id, Opacity, "%(*)s"){
@@ -249,25 +249,25 @@ MATCHER_P2(SurfaceSetOpacityCommandEq, id, Opacity, "%(*)s"){
 
 TEST_F(DBUSCommunicatorTest, SetSurfaceOpacity) {
     EXPECT_CALL(this->mockCommandExecutor, execute(SurfaceSetOpacityCommandEq(36u,0.88) )).Times(1);
-    system((DBUSCOMMAND + std::string("SetSurfaceOpacity uint32:36 double:0.88")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetSurfaceOpacity uint32:36 double:0.88")).c_str()));
 
     EXPECT_CALL(this->mockCommandExecutor, execute(SurfaceSetOpacityCommandEq(44u,0.001) )).Times(1);
-    system((DBUSCOMMAND + std::string("SetSurfaceOpacity uint32:44 double:0.001")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetSurfaceOpacity uint32:44 double:0.001")).c_str()));
 }
 
 /*
 TEST_F(DBUSCommunicatorTest, Exit) {
     EXPECT_CALL(this->mockCommandExecutor, execute(Field(&Command::commandType,Eq(Command::Exit)) ) ).Times(1);
-    system((DBUSCOMMAND + std::string("Exit")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("Exit")).c_str());
 
-    //EXPECT_EXIT(system((DBUSCOMMAND + std::string("Exit")).c_str());, ::testing::ExitedWithCode(0), "");
+    //EXPECT_EXIT(ASSERT_NE(-1, system((DBUSCOMMAND + std::string("Exit")).c_str());, ::testing::ExitedWithCode(0), "");
 }
 */
 
 /*
 TEST_F(DBUSCommunicatorTest, Commit) {
     EXPECT_CALL(this->mockCommandExecutor, execute(Field(&ICommand::commandType, Eq(ICommand::CommitChanges)) ) ).Times(1);
-    system((DBUSCOMMAND + std::string("CommitChanges")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("CommitChanges")).c_str());
 }
 */
 
@@ -282,10 +282,10 @@ MATCHER_P5(SurfaceSetSourceRectangleCommandEq, id, x, y, width, height, "%(*)s")
 TEST_F(DBUSCommunicatorTest, SetSurfaceSourceRegion) {
 
     EXPECT_CALL(this->mockCommandExecutor, execute( SurfaceSetSourceRectangleCommandEq(36u,1u,2u,3u,4u))).Times(1);
-    system((DBUSCOMMAND + std::string("SetSurfaceSourceRegion uint32:36 uint32:1 uint32:2 uint32:3 uint32:4")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetSurfaceSourceRegion uint32:36 uint32:1 uint32:2 uint32:3 uint32:4")).c_str()));
 
     EXPECT_CALL(this->mockCommandExecutor, execute( SurfaceSetSourceRectangleCommandEq(44u,15u,25u,35u,45u))).Times(1);
-    system((DBUSCOMMAND + std::string("SetSurfaceSourceRegion uint32:44 uint32:15 uint32:25 uint32:35 uint32:45 ")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetSurfaceSourceRegion uint32:44 uint32:15 uint32:25 uint32:35 uint32:45 ")).c_str()));
 }
 
 MATCHER_P5(LayerSetSourceRectangleCommandEq, id, x, y, width, height, "%(*)s"){
@@ -299,10 +299,10 @@ MATCHER_P5(LayerSetSourceRectangleCommandEq, id, x, y, width, height, "%(*)s"){
 TEST_F(DBUSCommunicatorTest, SetlayerSourceRegion) {
 
     EXPECT_CALL(this->mockCommandExecutor, execute(LayerSetSourceRectangleCommandEq(36u,1u,2u,3u,4u))).Times(1);
-    system((DBUSCOMMAND + std::string("SetLayerSourceRegion uint32:36 uint32:1 uint32:2 uint32:3 uint32:4")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetLayerSourceRegion uint32:36 uint32:1 uint32:2 uint32:3 uint32:4")).c_str()));
 
     EXPECT_CALL(this->mockCommandExecutor, execute(LayerSetSourceRectangleCommandEq(44u,15u,25u,35u,45u))).Times(1);
-    system((DBUSCOMMAND + std::string("SetLayerSourceRegion uint32:44 uint32:15 uint32:25 uint32:35 uint32:45 ")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetLayerSourceRegion uint32:44 uint32:15 uint32:25 uint32:35 uint32:45 ")).c_str()));
 }
 
 MATCHER_P5(LayerSetDestinationRectangleCommandEq, id, x, y, width, height, "%(*)s") {
@@ -316,10 +316,10 @@ MATCHER_P5(LayerSetDestinationRectangleCommandEq, id, x, y, width, height, "%(*)
 TEST_F(DBUSCommunicatorTest, SetlayerDestinationRegion) {
 
     EXPECT_CALL(this->mockCommandExecutor, execute(LayerSetDestinationRectangleCommandEq(36u,1u,2u,3u,4u))).Times(1);
-    system((DBUSCOMMAND + std::string("SetLayerDestinationRegion uint32:36 uint32:1 uint32:2 uint32:3 uint32:4")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetLayerDestinationRegion uint32:36 uint32:1 uint32:2 uint32:3 uint32:4")).c_str()));
 
     EXPECT_CALL(this->mockCommandExecutor, execute(LayerSetDestinationRectangleCommandEq(44u,15u,25u,35u,45u))).Times(1);
-    system((DBUSCOMMAND + std::string("SetLayerDestinationRegion uint32:44 uint32:15 uint32:25 uint32:35 uint32:45 ")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetLayerDestinationRegion uint32:44 uint32:15 uint32:25 uint32:35 uint32:45 ")).c_str()));
 }
 
 MATCHER_P5(SurfaceSetDestinationRectangleCommandEq, id, x, y, width, height, "%(*)s") {
@@ -333,10 +333,10 @@ MATCHER_P5(SurfaceSetDestinationRectangleCommandEq, id, x, y, width, height, "%(
 TEST_F(DBUSCommunicatorTest, SetSurfaceDestinationRegion) {
 
     EXPECT_CALL(this->mockCommandExecutor, execute(SurfaceSetDestinationRectangleCommandEq(36u,1u,2u,3u,4u))).Times(1);
-    system((DBUSCOMMAND + std::string("SetSurfaceDestinationRegion uint32:36 uint32:1 uint32:2 uint32:3 uint32:4")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetSurfaceDestinationRegion uint32:36 uint32:1 uint32:2 uint32:3 uint32:4")).c_str()));
 
     EXPECT_CALL(this->mockCommandExecutor, execute(SurfaceSetDestinationRectangleCommandEq(44u,15u,25u,35u,45u))).Times(1);
-    system((DBUSCOMMAND + std::string("SetSurfaceDestinationRegion uint32:44 uint32:15 uint32:25 uint32:35 uint32:45 ")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetSurfaceDestinationRegion uint32:44 uint32:15 uint32:25 uint32:35 uint32:45 ")).c_str()));
 }
 
 MATCHER_P3(LayerSetPositionCommandEq, id, x, y, "%(*)s"){
@@ -347,10 +347,10 @@ MATCHER_P3(LayerSetPositionCommandEq, id, x, y, "%(*)s"){
 
 TEST_F(DBUSCommunicatorTest, SetlayerPosition) {
     EXPECT_CALL(this->mockCommandExecutor, execute(LayerSetPositionCommandEq(36u,1u,2u))).Times(1);
-    system((DBUSCOMMAND + std::string("SetLayerPosition uint32:36 uint32:1 uint32:2")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetLayerPosition uint32:36 uint32:1 uint32:2")).c_str()));
 
     EXPECT_CALL(this->mockCommandExecutor, execute(LayerSetPositionCommandEq(44u,15u,25u))).Times(1);
-    system((DBUSCOMMAND + std::string("SetLayerPosition uint32:44 uint32:15 uint32:25 ")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetLayerPosition uint32:44 uint32:15 uint32:25 ")).c_str()));
 }
 
 MATCHER_P3(SurfaceSetPositionCommandEq, id, x, y, "%(*)s"){
@@ -361,10 +361,10 @@ MATCHER_P3(SurfaceSetPositionCommandEq, id, x, y, "%(*)s"){
 
 TEST_F(DBUSCommunicatorTest, SetSurfacePosition) {
     EXPECT_CALL(this->mockCommandExecutor, execute(SurfaceSetPositionCommandEq(36u,3u,4u))).Times(1);
-    system((DBUSCOMMAND + std::string("SetSurfacePosition uint32:36 uint32:3 uint32:4")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetSurfacePosition uint32:36 uint32:3 uint32:4")).c_str()));
 
     EXPECT_CALL(this->mockCommandExecutor, execute(SurfaceSetPositionCommandEq(44u,35u,45u))).Times(1);
-    system((DBUSCOMMAND + std::string("SetSurfacePosition uint32:44 uint32:35 uint32:45 ")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetSurfacePosition uint32:44 uint32:35 uint32:45 ")).c_str()));
 }
 
 MATCHER_P3(LayerSetDimensionCommandEq, id, width, height, "%(*)s"){
@@ -375,10 +375,10 @@ MATCHER_P3(LayerSetDimensionCommandEq, id, width, height, "%(*)s"){
 
 TEST_F(DBUSCommunicatorTest, SetlayerDimension) {
     EXPECT_CALL(this->mockCommandExecutor, execute(LayerSetDimensionCommandEq(8554u,400u,444u))).Times(1);
-    system((DBUSCOMMAND + std::string("SetLayerDimension uint32:8554 uint32:400 uint32:444")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetLayerDimension uint32:8554 uint32:400 uint32:444")).c_str()));
 
     EXPECT_CALL(this->mockCommandExecutor, execute(LayerSetDimensionCommandEq(34589u,400u,444u))).Times(1);
-    system((DBUSCOMMAND + std::string("SetLayerDimension uint32:34589 uint32:400 uint32:444")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetLayerDimension uint32:34589 uint32:400 uint32:444")).c_str()));
 }
 
 MATCHER_P3(SurfaceSetDimensionCommandEq, id, width, height, "%(*)s"){
@@ -389,10 +389,10 @@ MATCHER_P3(SurfaceSetDimensionCommandEq, id, width, height, "%(*)s"){
 
 TEST_F(DBUSCommunicatorTest, SetSurfaceDimension) {
     EXPECT_CALL(this->mockCommandExecutor, execute(SurfaceSetDimensionCommandEq(36u,3u,4u))).Times(1);
-    system((DBUSCOMMAND + std::string("SetSurfaceDimension uint32:36 uint32:3 uint32:4")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetSurfaceDimension uint32:36 uint32:3 uint32:4")).c_str()));
 
     EXPECT_CALL(this->mockCommandExecutor, execute(SurfaceSetDimensionCommandEq(44u,35u,45u))).Times(1);
-    system((DBUSCOMMAND + std::string("SetSurfaceDimension uint32:44 uint32:35 uint32:45 ")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetSurfaceDimension uint32:44 uint32:35 uint32:45 ")).c_str()));
 }
 
 MATCHER_P2(LayerSetOpacityCommandEq, id, Opacity, "%(*)s"){
@@ -403,10 +403,10 @@ MATCHER_P2(LayerSetOpacityCommandEq, id, Opacity, "%(*)s"){
 TEST_F(DBUSCommunicatorTest, SetlayerOpacity) {
 
     EXPECT_CALL(this->mockCommandExecutor, execute(LayerSetOpacityCommandEq(36u,0.88))).Times(1);
-    system((DBUSCOMMAND + std::string("SetLayerOpacity uint32:36 double:0.88")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetLayerOpacity uint32:36 double:0.88")).c_str()));
 
     EXPECT_CALL(this->mockCommandExecutor, execute(LayerSetOpacityCommandEq(44u,0.001))).Times(1);
-    system((DBUSCOMMAND + std::string("SetLayerOpacity uint32:44 double:0.001")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetLayerOpacity uint32:44 double:0.001")).c_str()));
 }
 
 MATCHER_P(LayerGetOpacityCommandEq, id, "%(*)s"){
@@ -416,10 +416,10 @@ MATCHER_P(LayerGetOpacityCommandEq, id, "%(*)s"){
 TEST_F(DBUSCommunicatorTest, GetlayerOpacity) {
 
     EXPECT_CALL(this->mockCommandExecutor, execute(LayerGetOpacityCommandEq(36u))).Times(1);
-    system((DBUSCOMMAND + std::string("GetLayerOpacity uint32:36")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("GetLayerOpacity uint32:36")).c_str()));
 
     EXPECT_CALL(this->mockCommandExecutor, execute(LayerGetOpacityCommandEq(44u))).Times(1);
-    system((DBUSCOMMAND + std::string("GetLayerOpacity uint32:44 ")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("GetLayerOpacity uint32:44 ")).c_str()));
 }
 
 MATCHER_P2(SurfacegroupSetOpacityCommandEq, id, Opacity, "%(*)s") {
@@ -430,10 +430,10 @@ MATCHER_P2(SurfacegroupSetOpacityCommandEq, id, Opacity, "%(*)s") {
 TEST_F(DBUSCommunicatorTest, SetSurfacegroupOpacity) {
 
     EXPECT_CALL(this->mockCommandExecutor, execute(SurfacegroupSetOpacityCommandEq(36u,0.88))).Times(1);
-    system((DBUSCOMMAND + std::string("SetSurfacegroupOpacity uint32:36 double:0.88")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetSurfacegroupOpacity uint32:36 double:0.88")).c_str()));
 
     EXPECT_CALL(this->mockCommandExecutor, execute(SurfacegroupSetOpacityCommandEq(44u,0.001))).Times(1);
-    system((DBUSCOMMAND + std::string("SetSurfacegroupOpacity uint32:44 double:0.001")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetSurfacegroupOpacity uint32:44 double:0.001")).c_str()));
 }
 
 MATCHER_P2(LayergroupSetOpacityCommandEq, id, Opacity, "%(*)s"){
@@ -444,10 +444,10 @@ MATCHER_P2(LayergroupSetOpacityCommandEq, id, Opacity, "%(*)s"){
 TEST_F(DBUSCommunicatorTest, SetlayergroupOpacity) {
 
     EXPECT_CALL(this->mockCommandExecutor, execute(LayergroupSetOpacityCommandEq(36u,0.88))).Times(1);
-    system((DBUSCOMMAND + std::string("SetLayergroupOpacity uint32:36 double:0.88")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetLayergroupOpacity uint32:36 double:0.88")).c_str()));
 
     EXPECT_CALL(this->mockCommandExecutor, execute(LayergroupSetOpacityCommandEq(44u,0.001))).Times(1);
-    system((DBUSCOMMAND + std::string("SetLayergroupOpacity uint32:44 double:0.001")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetLayergroupOpacity uint32:44 double:0.001")).c_str()));
 }
 
 MATCHER_P2(SurfaceSetOrientationCommandEq, id, Orientation, "%(*)s") {
@@ -458,10 +458,10 @@ MATCHER_P2(SurfaceSetOrientationCommandEq, id, Orientation, "%(*)s") {
 TEST_F(DBUSCommunicatorTest, SetSurfaceOrientation) {
 
     EXPECT_CALL(this->mockCommandExecutor, execute(SurfaceSetOrientationCommandEq(36u,0))).Times(1);
-    system((DBUSCOMMAND + std::string("SetSurfaceOrientation uint32:36 uint32:0")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetSurfaceOrientation uint32:36 uint32:0")).c_str()));
 
     EXPECT_CALL(this->mockCommandExecutor, execute(SurfaceSetOrientationCommandEq(44u,1))).Times(1);
-    system((DBUSCOMMAND + std::string("SetSurfaceOrientation uint32:44 uint32:1")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetSurfaceOrientation uint32:44 uint32:1")).c_str()));
 }
 
 MATCHER_P2(LayerSetOrientationCommandEq, id, Orientation, "%(*)s") {
@@ -472,10 +472,10 @@ MATCHER_P2(LayerSetOrientationCommandEq, id, Orientation, "%(*)s") {
 TEST_F(DBUSCommunicatorTest, SetlayerOrientation) {
 
     EXPECT_CALL(this->mockCommandExecutor, execute(LayerSetOrientationCommandEq(36u,0))).Times(1);
-    system((DBUSCOMMAND + std::string("SetLayerOrientation uint32:36 uint32:0")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetLayerOrientation uint32:36 uint32:0")).c_str()));
 
     EXPECT_CALL(this->mockCommandExecutor, execute(LayerSetOrientationCommandEq(44u,1))).Times(1);
-    system((DBUSCOMMAND + std::string("SetLayerOrientation uint32:44 uint32:1")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetLayerOrientation uint32:44 uint32:1")).c_str()));
 }
 
 MATCHER_P2(SurfaceSetVisibilityCommandEq, id, visibility, "%(*)s"){
@@ -486,16 +486,16 @@ MATCHER_P2(SurfaceSetVisibilityCommandEq, id, visibility, "%(*)s"){
 TEST_F(DBUSCommunicatorTest, SetSurfaceVisibility) {
 
     EXPECT_CALL(this->mockCommandExecutor, execute(SurfaceSetVisibilityCommandEq(36u,false))).Times(1);
-    system((DBUSCOMMAND + std::string("SetSurfaceVisibility uint32:36 boolean:false")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetSurfaceVisibility uint32:36 boolean:false")).c_str()));
 
     EXPECT_CALL(this->mockCommandExecutor, execute(SurfaceSetVisibilityCommandEq(44u,true))).Times(1);
-    system((DBUSCOMMAND + std::string("SetSurfaceVisibility uint32:44 boolean:true")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetSurfaceVisibility uint32:44 boolean:true")).c_str()));
 
     EXPECT_CALL(this->mockCommandExecutor, execute(SurfaceSetVisibilityCommandEq(36u,false))).Times(1);
-    system((DBUSCOMMAND + std::string("SetSurfaceVisibility uint32:36 boolean:false")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetSurfaceVisibility uint32:36 boolean:false")).c_str()));
 
     EXPECT_CALL(this->mockCommandExecutor, execute(SurfaceSetVisibilityCommandEq(44u,true))).Times(1);
-    system((DBUSCOMMAND + std::string("SetSurfaceVisibility uint32:44 boolean:true")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetSurfaceVisibility uint32:44 boolean:true")).c_str()));
 }
 
 MATCHER_P2(LayerSetVisibilityCommandEq, id, visibility, "%(*)s"){
@@ -506,16 +506,16 @@ MATCHER_P2(LayerSetVisibilityCommandEq, id, visibility, "%(*)s"){
 TEST_F(DBUSCommunicatorTest, SetlayerVisibility) {
 
     EXPECT_CALL(this->mockCommandExecutor, execute(LayerSetVisibilityCommandEq(36u,false))).Times(1);
-    system((DBUSCOMMAND + std::string("SetLayerVisibility uint32:36 boolean:false")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetLayerVisibility uint32:36 boolean:false")).c_str()));
 
     EXPECT_CALL(this->mockCommandExecutor, execute(LayerSetVisibilityCommandEq(44u,true))).Times(1);
-    system((DBUSCOMMAND + std::string("SetLayerVisibility uint32:44 boolean:true")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetLayerVisibility uint32:44 boolean:true")).c_str()));
 
     EXPECT_CALL(this->mockCommandExecutor, execute(LayerSetVisibilityCommandEq(36u,false))).Times(1);
-    system((DBUSCOMMAND + std::string("SetLayerVisibility uint32:36 boolean:false")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetLayerVisibility uint32:36 boolean:false")).c_str()));
 
     EXPECT_CALL(this->mockCommandExecutor, execute(LayerSetVisibilityCommandEq(44u,true))).Times(1);
-    system((DBUSCOMMAND + std::string("SetLayerVisibility uint32:44 boolean:true")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetLayerVisibility uint32:44 boolean:true")).c_str()));
 }
 
 MATCHER_P2(SurfacegroupSetVisibilityCommandEq, id, visibility, "%(*)s"){
@@ -526,16 +526,16 @@ MATCHER_P2(SurfacegroupSetVisibilityCommandEq, id, visibility, "%(*)s"){
 TEST_F(DBUSCommunicatorTest, SetSurfacegroupVisibility) {
 
     EXPECT_CALL(this->mockCommandExecutor, execute(SurfacegroupSetVisibilityCommandEq(36u,false))).Times(1);
-    system((DBUSCOMMAND + std::string("SetSurfacegroupVisibility uint32:36 boolean:false")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetSurfacegroupVisibility uint32:36 boolean:false")).c_str()));
 
     EXPECT_CALL(this->mockCommandExecutor, execute(SurfacegroupSetVisibilityCommandEq(44u,true))).Times(1);
-    system((DBUSCOMMAND + std::string("SetSurfacegroupVisibility uint32:44 boolean:true")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetSurfacegroupVisibility uint32:44 boolean:true")).c_str()));
 
     EXPECT_CALL(this->mockCommandExecutor, execute(SurfacegroupSetVisibilityCommandEq(36u,false))).Times(1);
-    system((DBUSCOMMAND + std::string("SetSurfacegroupVisibility uint32:36 boolean:false")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetSurfacegroupVisibility uint32:36 boolean:false")).c_str()));
 
     EXPECT_CALL(this->mockCommandExecutor, execute(SurfacegroupSetVisibilityCommandEq(44u,true))).Times(1);
-    system((DBUSCOMMAND + std::string("SetSurfacegroupVisibility uint32:44 boolean:true")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetSurfacegroupVisibility uint32:44 boolean:true")).c_str()));
 
 }
 
@@ -547,16 +547,16 @@ MATCHER_P2(LayergroupSetVisibilityCommandEq, id, visibility, "%(*)s"){
 TEST_F(DBUSCommunicatorTest, SetlayergroupVisibility) {
 
     EXPECT_CALL(this->mockCommandExecutor, execute(LayergroupSetVisibilityCommandEq(36u,false))).Times(1);
-    system((DBUSCOMMAND + std::string("SetLayergroupVisibility uint32:36 boolean:false")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetLayergroupVisibility uint32:36 boolean:false")).c_str()));
 
     EXPECT_CALL(this->mockCommandExecutor, execute(LayergroupSetVisibilityCommandEq(44u,true))).Times(1);
-    system((DBUSCOMMAND + std::string("SetLayergroupVisibility uint32:44 boolean:true")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetLayergroupVisibility uint32:44 boolean:true")).c_str()));
 
     EXPECT_CALL(this->mockCommandExecutor, execute(LayergroupSetVisibilityCommandEq(36u,false))).Times(1);
-    system((DBUSCOMMAND + std::string("SetLayergroupVisibility uint32:36 boolean:false")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetLayergroupVisibility uint32:36 boolean:false")).c_str()));
 
     EXPECT_CALL(this->mockCommandExecutor, execute(LayergroupSetVisibilityCommandEq(44u,true))).Times(1);
-    system((DBUSCOMMAND + std::string("SetLayergroupVisibility uint32:44 boolean:true")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetLayergroupVisibility uint32:44 boolean:true")).c_str()));
 }
 
 MATCHER_P2(SurfacegroupAddSurfaceCommandEq, surfaceid, surfacegroupid, "%(*)s"){
@@ -567,7 +567,7 @@ MATCHER_P2(SurfacegroupAddSurfaceCommandEq, surfaceid, surfacegroupid, "%(*)s"){
 TEST_F(DBUSCommunicatorTest, AddSurfaceToSurfaceGroup) {
 
     EXPECT_CALL(this->mockCommandExecutor, execute( SurfacegroupAddSurfaceCommandEq(36u,77u))).Times(1);
-    system((DBUSCOMMAND + std::string("AddSurfaceToSurfaceGroup uint32:36 uint32:77")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("AddSurfaceToSurfaceGroup uint32:36 uint32:77")).c_str()));
 }
 
 MATCHER_P2(SurfacegroupRemoveSurfaceCommandEq, surfacegroupid, surfaceid, "%(*)s"){
@@ -578,7 +578,7 @@ MATCHER_P2(SurfacegroupRemoveSurfaceCommandEq, surfacegroupid, surfaceid, "%(*)s
 TEST_F(DBUSCommunicatorTest, RemoveSurfaceFromSurfaceGroup) {
 
     EXPECT_CALL(this->mockCommandExecutor, execute( SurfacegroupAddSurfaceCommandEq(36u,77u))).Times(1);
-    system((DBUSCOMMAND + std::string("RemoveSurfaceFromSurfaceGroup uint32:36 uint32:77")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("RemoveSurfaceFromSurfaceGroup uint32:36 uint32:77")).c_str()));
 }
 
 MATCHER_P2(LayergroupAddLayerCommandEq, layerid, layergroupid, "%(*)s"){
@@ -589,7 +589,7 @@ MATCHER_P2(LayergroupAddLayerCommandEq, layerid, layergroupid, "%(*)s"){
 TEST_F(DBUSCommunicatorTest, AddlayerTolayerGroup) {
 
     EXPECT_CALL(this->mockCommandExecutor, execute( LayergroupAddLayerCommandEq(36u,77u))).Times(1);
-    system((DBUSCOMMAND + std::string("AddLayerToLayerGroup uint32:36 uint32:77")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("AddLayerToLayerGroup uint32:36 uint32:77")).c_str()));
 }
 
 MATCHER_P2(LayergroupRemoveLayerCommandEq, layerid,layergroupid, "%(*)s"){
@@ -600,7 +600,7 @@ MATCHER_P2(LayergroupRemoveLayerCommandEq, layerid,layergroupid, "%(*)s"){
 TEST_F(DBUSCommunicatorTest, RemovelayerFromlayerGroup) {
 
     EXPECT_CALL(this->mockCommandExecutor, execute( LayergroupRemoveLayerCommandEq(36u,77u))).Times(1);
-    system((DBUSCOMMAND + std::string("RemoveLayerFromLayerGroup uint32:36 uint32:77")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("RemoveLayerFromLayerGroup uint32:36 uint32:77")).c_str()));
 }
 
 MATCHER_P2(LayerAddSurfaceCommandEq, surfaceid, layerid, "%(*)s"){
@@ -611,7 +611,7 @@ MATCHER_P2(LayerAddSurfaceCommandEq, surfaceid, layerid, "%(*)s"){
 TEST_F(DBUSCommunicatorTest, AddSurfaceTolayer) {
 
     EXPECT_CALL(this->mockCommandExecutor, execute( LayerAddSurfaceCommandEq(36u,77u))).Times(1);
-    system((DBUSCOMMAND + std::string("AddSurfaceToLayer uint32:36 uint32:77")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("AddSurfaceToLayer uint32:36 uint32:77")).c_str()));
 }
 
 MATCHER_P2(LayerRemoveSurfaceCommandEq, surfaceid, layerid, "%(*)s"){
@@ -622,17 +622,17 @@ MATCHER_P2(LayerRemoveSurfaceCommandEq, surfaceid, layerid, "%(*)s"){
 TEST_F(DBUSCommunicatorTest, RemoveSurfaceFromlayer) {
 
     EXPECT_CALL(this->mockCommandExecutor, execute( LayerRemoveSurfaceCommandEq(36u,77u))).Times(1);
-    system((DBUSCOMMAND + std::string("RemoveSurfaceFromLayer uint32:36 uint32:77")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("RemoveSurfaceFromLayer uint32:36 uint32:77")).c_str()));
 }
 
 /*
 TEST_F(DBUSCommunicatorTest, CreateSurfaceGroup) {
 
     EXPECT_CALL(this->mockCommandExecutor, execute()).Times(1);
-    system((DBUSCOMMAND + std::string("CreateSurfaceGroup")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("CreateSurfaceGroup")).c_str()));
 
     EXPECT_CALL(this->mockCommandExecutor, execute( CreateCommandEq(0u,0u,0u,TypeSurfaceGroup,PIXELFORMAT_R8))).Times(1);
-    system((DBUSCOMMAND + std::string("CreateSurfaceGroup")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("CreateSurfaceGroup")).c_str()));
 }
 */
 
@@ -643,20 +643,20 @@ MATCHER_P(SurfacegroupRemoveCommandEq, idToRemove, "%(*)s") {
 TEST_F(DBUSCommunicatorTest, RemoveSurfaceGroup) {
 
     EXPECT_CALL(this->mockCommandExecutor, execute(SurfacegroupRemoveCommandEq(8554u))).Times(1);
-    system((DBUSCOMMAND + std::string("RemoveSurfaceGroup uint32:8554")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("RemoveSurfaceGroup uint32:8554")).c_str()));
 
     EXPECT_CALL(this->mockCommandExecutor, execute(SurfacegroupRemoveCommandEq(34589u))).Times(1);
-    system((DBUSCOMMAND + std::string("RemoveSurfaceGroup uint32:34589")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("RemoveSurfaceGroup uint32:34589")).c_str()));
 }
 
 /*
 TEST_F(DBUSCommunicatorTest, CreatelayerGroup) {
 
     EXPECT_CALL(this->mockCommandExecutor, execute( CreateCommandEq(0u,0u,0u,TypeLayerGroup,PIXELFORMAT_R8))).Times(1);
-    system((DBUSCOMMAND + std::string("CreateLayerGroup")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("CreateLayerGroup")).c_str()));
 
     EXPECT_CALL(this->mockCommandExecutor, execute( CreateCommandEq(0u,0u,0u,TypeLayerGroup,PIXELFORMAT_R8))).Times(1);
-    system((DBUSCOMMAND + std::string("CreateLayerGroup")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("CreateLayerGroup")).c_str()));
 }
 */
 
@@ -667,10 +667,10 @@ MATCHER_P(LayergroupRemoveCommandEq, idToRemove, "%(*)s") {
 TEST_F(DBUSCommunicatorTest, RemovelayerGroup) {
 
     EXPECT_CALL(this->mockCommandExecutor, execute(LayergroupRemoveCommandEq(8554u))).Times(1);
-    system((DBUSCOMMAND + std::string("RemoveLayerGroup uint32:8554")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("RemoveLayerGroup uint32:8554")).c_str()));
 
     EXPECT_CALL(this->mockCommandExecutor, execute(LayergroupRemoveCommandEq(34589u))).Times(1);
-    system((DBUSCOMMAND + std::string("RemoveLayerGroup uint32:34589")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("RemoveLayerGroup uint32:34589")).c_str()));
 }
 
 MATCHER_P(LayerGetDimensionCommandEq, id, "%(*)s") {
@@ -679,10 +679,10 @@ MATCHER_P(LayerGetDimensionCommandEq, id, "%(*)s") {
 
 TEST_F(DBUSCommunicatorTest, GetlayerDimension) {
     EXPECT_CALL(this->mockCommandExecutor, execute(LayerGetDimensionCommandEq(8554u))).Times(1);
-    system((DBUSCOMMAND + std::string("GetLayerDimension uint32:8554")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("GetLayerDimension uint32:8554")).c_str()));
 
     EXPECT_CALL(this->mockCommandExecutor, execute(LayerGetDimensionCommandEq(34589u))).Times(1);
-    system((DBUSCOMMAND + std::string("GetLayerDimension uint32:34589")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("GetLayerDimension uint32:34589")).c_str()));
 }
 
 MATCHER_P(SurfaceGetDimensionCommandEq, id, "%(*)s") {
@@ -692,10 +692,10 @@ MATCHER_P(SurfaceGetDimensionCommandEq, id, "%(*)s") {
 TEST_F(DBUSCommunicatorTest, GetSurfaceDimension) {
 
     EXPECT_CALL(this->mockCommandExecutor, execute(SurfaceGetDimensionCommandEq(8554u))).Times(1);
-    system((DBUSCOMMAND + std::string("GetSurfaceDimension uint32:8554")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("GetSurfaceDimension uint32:8554")).c_str()));
 
     EXPECT_CALL(this->mockCommandExecutor, execute(SurfaceGetDimensionCommandEq(34589u))).Times(1);
-    system((DBUSCOMMAND + std::string("GetSurfaceDimension uint32:34589")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("GetSurfaceDimension uint32:34589")).c_str()));
 }
 
 MATCHER_P(SurfaceGetPixelformatCommandEq, id, "%(*)s"){
@@ -704,10 +704,10 @@ MATCHER_P(SurfaceGetPixelformatCommandEq, id, "%(*)s"){
 
 TEST_F(DBUSCommunicatorTest, GetSurfacePixelformat) {
     EXPECT_CALL(this->mockCommandExecutor, execute(SurfaceGetPixelformatCommandEq(8554u))).Times(1);
-    system((DBUSCOMMAND + std::string("GetSurfacePixelformat uint32:8554")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("GetSurfacePixelformat uint32:8554")).c_str()));
 
     EXPECT_CALL(this->mockCommandExecutor, execute(SurfaceGetPixelformatCommandEq(34589u))).Times(1);
-    system((DBUSCOMMAND + std::string("GetSurfacePixelformat uint32:34589")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("GetSurfacePixelformat uint32:34589")).c_str()));
 }
 
 MATCHER_P(SurfaceGetOpacityCommandEq, id, "%(*)s"){
@@ -716,10 +716,10 @@ MATCHER_P(SurfaceGetOpacityCommandEq, id, "%(*)s"){
 
 TEST_F(DBUSCommunicatorTest, GetSurfaceOpacity) {
     EXPECT_CALL(this->mockCommandExecutor, execute(SurfaceGetOpacityCommandEq(8554u))).Times(1);
-    system((DBUSCOMMAND + std::string("GetSurfaceOpacity uint32:8554")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("GetSurfaceOpacity uint32:8554")).c_str()));
 
     EXPECT_CALL(this->mockCommandExecutor, execute(SurfaceGetOpacityCommandEq(34589u))).Times(1);
-    system((DBUSCOMMAND + std::string("GetSurfaceOpacity uint32:34589")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("GetSurfaceOpacity uint32:34589")).c_str()));
 }
 
 MATCHER_P(SurfaceGetVisibilityCommandEq, id, "%(*)s") {
@@ -728,10 +728,10 @@ MATCHER_P(SurfaceGetVisibilityCommandEq, id, "%(*)s") {
 
 TEST_F(DBUSCommunicatorTest, GetSurfaceVisibility) {
     EXPECT_CALL(this->mockCommandExecutor, execute(SurfaceGetVisibilityCommandEq(8554u))).Times(1);
-    system((DBUSCOMMAND + std::string("GetSurfaceVisibility uint32:8554")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("GetSurfaceVisibility uint32:8554")).c_str()));
 
     EXPECT_CALL(this->mockCommandExecutor, execute(SurfaceGetVisibilityCommandEq(34589u))).Times(1);
-    system((DBUSCOMMAND + std::string("GetSurfaceVisibility uint32:34589")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("GetSurfaceVisibility uint32:34589")).c_str()));
 }
 
 MATCHER_P(LayerGetVisibilityCommandEq, id, "%(*)s"){
@@ -740,10 +740,10 @@ MATCHER_P(LayerGetVisibilityCommandEq, id, "%(*)s"){
 
 TEST_F(DBUSCommunicatorTest, GetlayerVisibility) {
     EXPECT_CALL(this->mockCommandExecutor, execute(LayerGetVisibilityCommandEq(8554u))).Times(1);
-    system((DBUSCOMMAND + std::string("GetLayerVisibility uint32:8554")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("GetLayerVisibility uint32:8554")).c_str()));
 
     EXPECT_CALL(this->mockCommandExecutor, execute(LayerGetVisibilityCommandEq(34589u))).Times(1);
-    system((DBUSCOMMAND + std::string("GetLayerVisibility uint32:34589")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("GetLayerVisibility uint32:34589")).c_str()));
 }
 
 /*
@@ -793,19 +793,19 @@ TEST_F(DBUSCommunicatorTest, SetRenderOrderWithinlayer) {
 TEST_F(DBUSCommunicatorTest, GetlayerType) {
     DefaultValue<Scene*>::Set((Scene*) &layerlist);
     EXPECT_CALL(this->layerlist, getLayer(Eq(8554u))).Times(1);
-    system((DBUSCOMMAND + std::string("GetLayerType uint32:8554")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("GetLayerType uint32:8554")).c_str()));
 }
 
 TEST_F(DBUSCommunicatorTest, GetlayertypeCapabilities) {
     EXPECT_CALL(this->mockCommandExecutor, getLayerTypeCapabilities(Eq(367))).Times(1);
-    system((DBUSCOMMAND + std::string("GetLayertypeCapabilities uint32:367")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("GetLayertypeCapabilities uint32:367")).c_str()));
 }
 
 TEST_F(DBUSCommunicatorTest, GetlayerCapabilities) {
     Scene scene;
     DefaultValue<Scene*>::Set((Scene*) &layerlist);
     EXPECT_CALL(this->layerlist, getLayer(Eq(367u))).Times(1);
-    system((DBUSCOMMAND + std::string("GetLayerCapabilities uint32:367")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("GetLayerCapabilities uint32:367")).c_str()));
 
 }
 
@@ -816,10 +816,10 @@ MATCHER_P2(ShaderCreateCommandEq, _vertName,_fragName, "%(*)s") {
 
 TEST_F(DBUSCommunicatorTest, CreateShader) {
     EXPECT_CALL(this->mockCommandExecutor, execute(ShaderCreateCommandEq(std::string("test123.glslv"),std::string("differentshader.glslv")))).Times(1);
-    system((DBUSCOMMAND + std::string("CreateShader string:test123.glslv string:differentshader.glslv")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("CreateShader string:test123.glslv string:differentshader.glslv")).c_str()));
 
     EXPECT_CALL(this->mockCommandExecutor, execute(ShaderCreateCommandEq(std::string("/usr/lib/shadertest.glslv"),std::string("foobar")))).Times(1);
-    system((DBUSCOMMAND + std::string("CreateShader string:/usr/lib/shadertest.glslv string:foobar")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("CreateShader string:/usr/lib/shadertest.glslv string:foobar")).c_str()));
 }
 
 MATCHER_P(ShaderDestroyCommandEq, id, "%(*)s") {
@@ -828,10 +828,10 @@ MATCHER_P(ShaderDestroyCommandEq, id, "%(*)s") {
 
 TEST_F(DBUSCommunicatorTest, DestroyShaderCommand) {
     EXPECT_CALL(this->mockCommandExecutor, execute(ShaderDestroyCommandEq(567u))).Times(1);
-    system((DBUSCOMMAND + std::string("DestroyShader uint32:567")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("DestroyShader uint32:567")).c_str()));
 
     EXPECT_CALL(this->mockCommandExecutor, execute(ShaderDestroyCommandEq(185u))).Times(1);
-    system((DBUSCOMMAND + std::string("DestroyShader uint32:185")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("DestroyShader uint32:185")).c_str()));
 }
 
 MATCHER_P2(SurfaceSetShaderCommandEq, id, shaderid, "%(*)s") {
@@ -842,10 +842,10 @@ MATCHER_P2(SurfaceSetShaderCommandEq, id, shaderid, "%(*)s") {
 TEST_F(DBUSCommunicatorTest, SetShaderCommand) {
 
     EXPECT_CALL(this->mockCommandExecutor, execute(SurfaceSetShaderCommandEq(987u, 567u))).Times(1);
-    system((DBUSCOMMAND + std::string("SetShader uint32:987 uint32:567")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetShader uint32:987 uint32:567")).c_str()));
 
     EXPECT_CALL(this->mockCommandExecutor, execute(SurfaceSetShaderCommandEq(1u, 998877u))).Times(1);
-    system((DBUSCOMMAND + std::string("SetShader uint32:1 uint32:998877")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetShader uint32:1 uint32:998877")).c_str()));
 }
 
 MATCHER_P(ShaderUniformsMatcher,expectedlist,"") {
@@ -865,11 +865,11 @@ TEST_F(DBUSCommunicatorTest, ShaderSetUniformsCommand) {
 
     std::string expected1[] = { "uRotAngle 1f 1 0", "uRotVector 3f 1 1 0 0" };
     EXPECT_CALL(this->mockCommandExecutor, execute( AllOf(ShaderSetUniformsCommandEq(1u), ShaderUniformsMatcher(&expected1)))).Times(1);
-    system((DBUSCOMMAND + std::string("SetUniforms uint32:1 array:string:\"uRotAngle 1f 1 0\",\"uRotVector 3f 1 1 0 0\"")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetUniforms uint32:1 array:string:\"uRotAngle 1f 1 0\",\"uRotVector 3f 1 1 0 0\"")).c_str()));
 
     std::string expected2[] = { "teststring foobar" };
     EXPECT_CALL(this->mockCommandExecutor, execute(AllOf(ShaderSetUniformsCommandEq(17346u), ShaderUniformsMatcher(&expected2)))).Times(1);
-    system((DBUSCOMMAND + std::string("SetUniforms uint32:17346 array:string:\"teststring foobar\"")).c_str());
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetUniforms uint32:17346 array:string:\"teststring foobar\"")).c_str()));
 }
 
 #endif /* DBUSCommunicatorTest_H_ */

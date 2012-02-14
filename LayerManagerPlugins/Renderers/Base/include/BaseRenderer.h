@@ -48,6 +48,8 @@ private:
 
 inline Shader* BaseRenderer::createShader(const string* vertexName, const string* fragmentName) 
 {
+	(void)vertexName; // TODO: removed, prevents warning
+	(void)fragmentName; // TODO: removed, prevents warning
     return NULL;
 }
 inline void BaseRenderer::setdebug(bool onoff)

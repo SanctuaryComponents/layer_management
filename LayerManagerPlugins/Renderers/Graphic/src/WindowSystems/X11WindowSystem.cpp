@@ -48,9 +48,9 @@ X11WindowSystem::X11WindowSystem(const char* displayname, int width, int height,
 , resolutionHeight(height)
 , m_initialized(false)
 , m_success(false)
+, m_systemState(IDLE_STATE)
 , windowWidth(width)
 , windowHeight(height)
-, m_systemState(IDLE_STATE)
 {
     LOG_DEBUG("X11WindowSystem", "creating X11WindowSystem");
 

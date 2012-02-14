@@ -43,11 +43,13 @@ public:
     bool enableRendering()
     {
         m_isReadyForRendering = true;
+        return m_isReadyForRendering;
     }
 
     bool disableRendering()
     {
         m_isReadyForRendering = false;
+        return m_isReadyForRendering;
     }
 
     bool isReadyForRendering()

@@ -199,11 +199,10 @@ void DBUSCommunicator::ServiceConnect(DBusConnection* conn, DBusMessage* msg)
 
 void DBUSCommunicator::ServiceDisconnect(DBusConnection* conn, DBusMessage* msg)   
 {
-   IApplicationReference* reference = NULL;
    (void)conn; // TODO: remove, only prevents warning
+
     g_pDbusMessage->initReceive(msg);
     char* owner = strdup(dbus_message_get_sender(msg));
-    u_int32_t processId = g_pDbusMessage->getUInt();
     RemoveApplicationReference(owner);
     g_pDbusMessage->initReply(msg);
     g_pDbusMessage->closeReply();
