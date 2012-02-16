@@ -17,7 +17,6 @@
 #
 
 ############################################################################
-include_directories ("include")
 include_directories ("../../LayerManagerClient/ilmClient/include")
 include_directories ("../LayerSceneDescriptionExample/include")
 include_directories ("../../LayerManagerUtils/include")
