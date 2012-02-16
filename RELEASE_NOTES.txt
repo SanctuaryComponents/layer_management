@@ -1,3 +1,50 @@
+Version 0.9.5
+-------------
+This version includes the following enhancements.
+
+Bugfixes :
+
+- Compiler warnings have been removed.
+
+- Fixed missing initialization of default values.
+
+- EGLMockNavigation aspect ratio was hard coded, now uses
+  actual application resolution.
+
+
+Improvements:
+
+- Surface can be created without the native context of a
+  client application. The client can add its native content
+  later.
+
+- Command objects have been updated. Now theres a one to one
+  relationship between API calls and Command objects.
+
+- Build System generated header file with configuration options.
+  This replaced a series of compiler flags for defining symbols.
+
+- Updated/added new unit tests.
+
+- Added signal handling for clean shutdown ofLayerManagerService.
+  Now a stack trace is printed on crash.
+
+- Build System now defaults to "release" build type.
+
+- Logging improved.
+
+- Introduced ServiceConnect and ServiceDisconnect. This allows
+  detection of crashed client applications.
+
+- Renderer:
+  - Improved state handling of X11 window system.
+  - Renderer context sharing between different threads.
+  - Improved Shader handling.
+
+- Added auto-generation feature for LayerManager design
+  document (based on doxygen and latex).
+
+
 Version 0.9.4
 -------------
 This version includes the following enhancements.
