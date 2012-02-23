@@ -553,6 +553,7 @@ void X11WindowSystem::calculateFps()
 
 void X11WindowSystem::CheckRedrawAllLayers()
 {
+    graphicSystem->activateGraphicContext();
     std::list<Layer*> layers = m_pScene->getCurrentRenderOrder();
     for(std::list<Layer*>::const_iterator current = layers.begin(); current != layers.end(); current++)
     {
@@ -561,6 +562,7 @@ void X11WindowSystem::CheckRedrawAllLayers()
         graphicSystem->checkRenderLayer();
         graphicSystem->endLayer();
     }
+    graphicSystem->releaseGraphicContext();    
 }
 
 void X11WindowSystem::RedrawAllLayers()
@@ -572,6 +574,7 @@ void X11WindowSystem::RedrawAllLayers()
         graphicSystem->renderLayer();
         graphicSystem->endLayer();
     }
+    
 }
 
 void X11WindowSystem::Redraw()
