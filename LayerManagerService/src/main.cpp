@@ -181,9 +181,10 @@ void getSharedLibrariesFromDirectory(tFileList& fileList, string dirName)
         string entryName = itemInDirectory->d_name;
 
         bool regularFile = (entryType == DT_REG);
+        bool linkToFile = (entryType == DT_LNK);
         bool sharedLibExtension = ("so" == entryName.substr(entryName.find_last_of(".") + 1));
 
-        if (regularFile && sharedLibExtension)
+        if ((linkToFile || regularFile) && sharedLibExtension)
         {
             LOG_DEBUG("LayerManagerService", "adding file " << entryName);
             fileList.push_back(dirName + "/" + entryName);
