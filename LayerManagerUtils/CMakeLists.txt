@@ -7,7 +7,7 @@
 # you may not use this file except in compliance with the License. 
 # You may obtain a copy of the License at 
 #
-#		http://www.apache.org/licenses/LICENSE-2.0 
+#       http://www.apache.org/licenses/LICENSE-2.0 
 #
 # Unless required by applicable law or agreed to in writing, software 
 # distributed under the License is distributed on an "AS IS" BASIS, 
@@ -20,6 +20,12 @@
 cmake_minimum_required (VERSION 2.6)
 
 include_directories ("include")
+include_directories ("${PROJECT_SOURCE_DIR}/LayerManagerService/include")
+if (WITH_DLT)
+find_package(AutomotiveDlt REQUIRED)
+include_directories(${DLT_INCLUDE_DIR})
+endif (WITH_DLT)
+
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 add_library(LayerManagerUtils STATIC src/Bitmap.cpp src/IlmMatrix.cpp src/Log.cpp src/LogMessageBuffer.cpp)
 
@@ -30,7 +36,7 @@ install (TARGETS LayerManagerUtils ARCHIVE DESTINATION lib/layermanager/static)
 if (WITH_TESTS)
 
 add_executable(UtilsTest tests/BitmapTest.cpp tests/LogTest.cpp)
-target_link_libraries(UtilsTest LayerManagerUtils gtest pthread)
+target_link_libraries(UtilsTest LayerManagerUtils gtest pthread ${DLT_LIBRARY})
 enable_testing()
 add_test(Utilities UtilsTest)
 

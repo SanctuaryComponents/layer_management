@@ -45,6 +45,7 @@ option (WITH_FORCE_COPY     "Force Software Copy of Pixmaps"                    
 option (WITH_XTHREADS       "Build with usage of X11 Threading"                   ON )
 option (WITH_CLIENTEXAMPLES "Build client examples "                              ON )
 option (WITH_TESTS          "Build Available Tests "                              OFF)
+option (WITH_DLT            "Build with DLT support "                             OFF)
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 

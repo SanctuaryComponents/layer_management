@@ -52,21 +52,21 @@ bool checkLogFileForMessage(std::string message)
 
 
 TEST(LogTest, writeAWarning) {
-    Log::instance->fileLogLevel = LOG_MAX_LEVEL;
+    Log::getInstance()->fileLogLevel = LOG_MAX_LEVEL;
     LOG_WARNING(moduleName, "writeAWarning");
 
     ASSERT_TRUE(checkLogFileForMessage("writeAWarning"));
 }
 
 TEST(LogTest, writeAnError) {
-    Log::instance->fileLogLevel = LOG_INFO;
+    Log::getInstance()->fileLogLevel = LOG_INFO;
     LOG_ERROR(moduleName, "writeAnError");
 
     ASSERT_TRUE(checkLogFileForMessage("writeAnError"));
 }
 
 TEST(LogTest, writeAnInformation) {
-    Log::instance->fileLogLevel = LOG_INFO;
+    Log::getInstance()->fileLogLevel = LOG_INFO;
     LOG_INFO(moduleName, "writeAnInformation");
 
     ASSERT_TRUE(checkLogFileForMessage("writeAnInformation"));
@@ -76,7 +76,7 @@ TEST(LogTest, writeAnInformation) {
 TEST(LogTest, logSomethingWithLowerLogLevel) {
 
     // when disabled, nothing should ever be logged
-    Log::instance->fileLogLevel = LOG_DISABLED;
+    Log::getInstance()->fileLogLevel = LOG_DISABLED;
     LOG_ERROR(moduleName, "err1");
     ASSERT_FALSE(checkLogFileForMessage("err1"));
 
@@ -90,7 +90,7 @@ TEST(LogTest, logSomethingWithLowerLogLevel) {
     ASSERT_FALSE(checkLogFileForMessage("info1"));
 
     // when error is set, only higher levels may be logged
-    Log::instance->fileLogLevel = LOG_ERROR;
+    Log::getInstance()->fileLogLevel = LOG_ERROR;
     LOG_ERROR(moduleName, "err2");
     ASSERT_TRUE(checkLogFileForMessage("err2"));
 
@@ -104,7 +104,7 @@ TEST(LogTest, logSomethingWithLowerLogLevel) {
     ASSERT_FALSE(checkLogFileForMessage("info2"));
 
     // when debug is set, only higher levels may be logged
-    Log::instance->fileLogLevel = LOG_DEBUG;
+    Log::getInstance()->fileLogLevel = LOG_DEBUG;
     LOG_ERROR(moduleName, "err3");
     ASSERT_TRUE(checkLogFileForMessage("err3"));
 
@@ -118,7 +118,7 @@ TEST(LogTest, logSomethingWithLowerLogLevel) {
     ASSERT_TRUE(checkLogFileForMessage("info3"));
 
     // when info is set, only higher levels may be logged
-    Log::instance->fileLogLevel = LOG_INFO;
+    Log::getInstance()->fileLogLevel = LOG_INFO;
     LOG_ERROR(moduleName, "err4");
     ASSERT_TRUE(checkLogFileForMessage("err4"));
 

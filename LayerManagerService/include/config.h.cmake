@@ -67,12 +67,14 @@
 // build unit tests for all projects
 #cmakedefine WITH_TESTS
 
-// build OpenGL ES 2.0/X11 renderer
+// build OpenGL ES 2.0 / X11 renderer
 #cmakedefine WITH_X11_GLES
 
 // use xthreads library
 #cmakedefine WITH_XTHREADS
 
+// use automotive dlt for logging
+#cmakedefine WITH_DLT
 
 //-----------------------------------------------------------------------------
 // human readable report
@@ -92,5 +94,5 @@
     LOG_DEBUG("Config", "WITH_INPUT_EVENTS   = ${WITH_INPUT_EVENTS}"); \
     LOG_DEBUG("Config", "WITH_TESTS          = ${WITH_TESTS}"); \
     LOG_DEBUG("Config", "WITH_X11_GLES       = ${WITH_X11_GLES}"); \
-    LOG_DEBUG("Config", "WITH_XTHREADS       = ${WITH_XTHREADS}")
-
+    LOG_DEBUG("Config", "WITH_XTHREADS       = ${WITH_XTHREADS}"); \
+    LOG_DEBUG("Config", "WITH_DLT            = ${WITH_DLT}");

@@ -36,11 +36,15 @@
 */
 #ifndef _LOG_H_
 #define _LOG_H_
-
+#include "config.h"
 #include "LogMessageBuffer.h"
 #include <iostream>
 #include <fstream>
 #include <pthread.h>
+
+#ifdef WITH_DLT
+#include <dlt/dlt.h>
+#endif
 
 typedef enum {
     LOG_DISABLED = 0,
@@ -51,51 +55,62 @@ typedef enum {
     LOG_MAX_LEVEL
 } LOG_MODES;
 
+#ifdef WITH_DLT
+typedef DltContext LogContext;
+#else 
+typedef std::string LogContext;
+#endif
+
 class Log
 {
 public:
     virtual ~Log();
-    static Log* instance;
     static LOG_MODES fileLogLevel;
     static LOG_MODES consoleLogLevel;
-    void warning (const std::string& moduleName, const std::basic_string<char>& output);
-    void info (const std::string& moduleName, const std::basic_string<char>& output);
-    void error (const std::string& moduleName, const std::basic_string<char>& output);
-    void debug (const std::string& moduleName, const std::basic_string<char>& output);
-    void log(LOG_MODES logMode, const std::string& moduleName, const std::basic_string<char>& output);
-
+    static LOG_MODES dltLogLevel;
+    static Log* getInstance();
+    void warning (LogContext *logContext, const std::string& moduleName, const std::basic_string<char>& output);
+    void info (LogContext *logContext, const std::string& moduleName, const std::basic_string<char>& output);
+    void error (LogContext *logContext, const std::string& moduleName, const std::basic_string<char>& output);
+    void debug (LogContext *logContext, const std::string& moduleName, const std::basic_string<char>& output);
+    void log(LogContext *logContext, LOG_MODES logMode, const std::string& moduleName, const std::basic_string<char>& output);
+    LogContext* getLogContext();
+    static void closeInstance();
 private:
     Log();
     void LogToFile(std::string logMode, const std::string& moduleName, const std::basic_string<char>& output);
-    void LogToConsole(std::string logMode,const std::string& moduleName,const std::basic_string<char>& output);
-
+    void LogToConsole(std::string logMode, const std::string& moduleName,const std::basic_string<char>& output);
+#ifdef WITH_DLT
+    void LogToDltDaemon(LogContext *logContext, LOG_MODES logMode,const std::string& moduleName,const std::basic_string<char>& output);
+#endif    
 private:
     std::ofstream* m_fileStream;
     pthread_mutex_t m_LogBufferMutex;
+    LogContext m_logContext;
+    static Log* m_instance;
 };
 
-//#define LOG_ERROR(module, message)
+//#define LOG_ERROR(logcontext,module, message)
 
 #define LOG_ERROR(module, message) { \
            LogMessageBuffer oss_; \
-           Log::instance->error(module, oss_.str(oss_<< message)); }
+           Log::getInstance()->error(Log::getInstance()->getLogContext(), module, oss_.str(oss_<< message)); }
 
-//#define LOG_INFO(module, message)
+//#define LOG_INFO(logcontext,module, message)
 
 #define LOG_INFO(module, message) { \
            LogMessageBuffer oss_; \
-           Log::instance->info(module, oss_.str(oss_<< message)); }
+           Log::getInstance()->info(Log::getInstance()->getLogContext(), module, oss_.str(oss_<< message)); }
 
-//#define LOG_DEBUG(module, message)
+//#define LOG_DEBUG(logcontext,module, message)
 
 #define LOG_DEBUG(module, message) { \
            LogMessageBuffer oss_; \
-           Log::instance->debug(module, oss_.str(oss_<< message)); }
+           Log::getInstance()->debug(Log::getInstance()->getLogContext(), module, oss_.str(oss_<< message)); }
 
-//#define LOG_WARNING(module, message)
+//#define LOG_WARNING(logcontext,module, message)
 
 #define LOG_WARNING(module, message) { \
            LogMessageBuffer oss_; \
-           Log::instance->warning(module, oss_.str(oss_<< message)); }
-
+           Log::getInstance()->warning(Log::getInstance()->getLogContext(), module, oss_.str(oss_<< message)); }
 #endif /* _LOG_H_ */
