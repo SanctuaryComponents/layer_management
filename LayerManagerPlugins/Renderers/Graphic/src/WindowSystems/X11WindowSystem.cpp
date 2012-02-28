@@ -34,7 +34,7 @@
 #include <iomanip>
 
 int     X11WindowSystem::composite_opcode;
-int		X11WindowSystem::damage_opcode;
+int     X11WindowSystem::damage_opcode;
 const char X11WindowSystem::CompositorWindowTitle[] = "LayerManager";
 bool    X11WindowSystem::m_xerror = false;
 
@@ -368,7 +368,7 @@ void X11WindowSystem::NewWindow(Surface* surface, Window window)
             {
                 LOG_DEBUG("X11WindowSystem", "Found gui window: repositioning it");
                 XCompositeUnredirectWindow(x11Display,window,CompositeRedirectManual);
-                XMoveWindow(x11Display, window, 50,	500);
+                XMoveWindow(x11Display, window, 50, 500);
                 XMapRaised(x11Display, window);
             }
         }else {
@@ -506,20 +506,44 @@ static struct timeval tv;
 static struct timeval tv0;
 static int Frame = 0;
 
-void CalculateFPS()
+
+void X11WindowSystem::calculateSurfaceFps(Surface *currentSurface, float time ) 
+{
+        char floatStringBuffer[256];
+        float surfaceUpdateFps = ((float)(currentSurface->updateCounter)) / time ;
+        float surfaceDrawFps = ((float)(currentSurface->drawCounter)) / time ;
+        sprintf(floatStringBuffer, "0x%08x update fps: %3.2f", currentSurface->getID(),surfaceUpdateFps);
+        currentSurface->updateCounter = 0;      
+        LOG_INFO("X11WindowSystem", "Surface " << floatStringBuffer);        
+        sprintf(floatStringBuffer, "0x%08x draw fps: %3.2f", currentSurface->getID(),surfaceDrawFps);
+        currentSurface->drawCounter = 0;        
+        LOG_INFO("X11WindowSystem", "Surface " << floatStringBuffer);
+}
+
+void X11WindowSystem::calculateFps()
 {
     // we have rendered a frame
     Frame ++;
-
+    std::list<Layer*> layers = m_pScene->getCurrentRenderOrder();
     // every 3 seconds, calculate & print fps
     gettimeofday(&tv, NULL);
     timeSinceLastCalc = (float)(tv.tv_sec-tv0.tv_sec) + 0.000001*((float)(tv.tv_usec-tv0.tv_usec));
 
-    if (timeSinceLastCalc > 3.0f)
+    if (timeSinceLastCalc > 10.0f)
     {
         FPS = ((float)(Frame)) / timeSinceLastCalc;
         char floatStringBuffer[256];
-        sprintf(floatStringBuffer, "FPS: %f", FPS);
+        sprintf(floatStringBuffer, "Overall fps: %f", FPS);
+        for(std::list<Layer*>::const_iterator current = layers.begin(); current != layers.end(); current++)
+        {
+            SurfaceList surfaceList = (*current)->getAllSurfaces();
+            SurfaceListIterator surfaceIter = surfaceList.begin();
+            SurfaceListIterator surfaceIterEnd = surfaceList.end();
+            for(; surfaceIter != surfaceIterEnd ; ++surfaceIter)
+            {
+                calculateSurfaceFps((*surfaceIter),timeSinceLastCalc);
+            }
+        }
         LOG_INFO("X11WindowSystem", floatStringBuffer);
         tv0 = tv;
         Frame = 0;
@@ -570,7 +594,7 @@ void X11WindowSystem::Redraw()
             printDebug();
         }
 
-        CalculateFPS();
+        calculateFps();
 
         /* Reset the damage flag, all is up to date */
         m_damaged = false;
@@ -783,10 +807,10 @@ init_complete:
                 break;
             case ReparentNotify:
                 LOG_DEBUG("X11WindowSystem", "Reparent Event");
-                //			 if (event.xreparent.parent == root)
-                //				 renderer->NewWindow(event.xreparent.window);
-                //			 else
-                //				 renderer->DestroyWindow(event.xreparent.window);
+                //           if (event.xreparent.parent == root)
+                //               renderer->NewWindow(event.xreparent.window);
+                //           else
+                //               renderer->DestroyWindow(event.xreparent.window);
                 break;
 #ifdef WITH_INPUT_EVENTS
             case ButtonPress:
@@ -814,6 +838,8 @@ init_complete:
                         }
                     }
                     currentSurface->damaged = true;
+                    currentSurface->frameCounter++;
+                    currentSurface->updateCounter++;
                     checkRedraw = true;
                 }
                 break;

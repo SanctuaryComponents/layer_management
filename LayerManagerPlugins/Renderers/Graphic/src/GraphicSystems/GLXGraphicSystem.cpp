@@ -367,6 +367,7 @@ void GLXGraphicsystem::renderSurface(Surface* currentSurface)
 
     m_binder->unbindSurfaceTexture(currentSurface);
     glPopMatrix();
+    currentSurface->drawCounter++;    
     delete textureCoordinates;
 }
 

@@ -84,11 +84,15 @@ public:
     PlatformSurface *platform; // platform/rendering specific window attributes
 
     int frameCounter;
+    int updateCounter;
+    int drawCounter;
 
     Surface()
     : GraphicalSurface(TypeSurface)
     , platform(NULL)
     , frameCounter(0)
+    , updateCounter(0)
+    , drawCounter(0)
     , m_pixformat(PIXELFORMAT_UNKNOWN)
     , m_layerId(INVALID_ID)
     , m_hasNativeContent(false)
@@ -99,6 +103,8 @@ public:
     : GraphicalSurface(id, TypeSurface)
     , platform(NULL)
     , frameCounter(0)
+    , updateCounter(0)
+    , drawCounter(0)   
     , m_pixformat(PIXELFORMAT_UNKNOWN)
     , m_layerId(INVALID_ID)
     , m_hasNativeContent(false)

@@ -118,6 +118,8 @@ private:
     bool CreatePixmapsForAllWindows();
     bool CreateCompositorWindow();
     void UnredirectSpecialWIndows(Window w);
+    void calculateFps();
+    void calculateSurfaceFps(Surface *currentSurface, float time) ;
     void printDebug();
     void* EventLoop();
     static int error(Display *dpy, XErrorEvent *ev);

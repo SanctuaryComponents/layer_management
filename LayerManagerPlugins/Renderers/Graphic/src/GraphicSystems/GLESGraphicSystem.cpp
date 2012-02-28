@@ -353,10 +353,8 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
     glActiveTexture(GL_TEXTURE0);
     if (false == m_binder->bindSurfaceTexture(surface)) 
     {   
-//        LOG_DEBUG("GLESGraphicsystem", "renderSurface not successfully bind " << surface->getID());
+        LOG_WARNING("GLESGraphicsystem", "Surface not successfully bind " << surface->getID());
         return;
-    } else {
-//        LOG_DEBUG("GLESGraphicsystem", "renderSurface " << surface->getID());
     }
 
     /* rotated positions are saved sequentially in vbo
@@ -365,7 +363,7 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
     int orientation = (surface)->getOrientation();
     orientation %= 4;
     index = orientation * 12;
-    surface->frameCounter++;
+    surface->drawCounter++;
     glDrawArrays(GL_TRIANGLES, index, 6);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
