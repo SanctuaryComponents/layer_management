@@ -20,26 +20,23 @@
 cmake_minimum_required (VERSION 2.6)
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Xlinker -export-dynamic")
+if (WITH_DLT)
+find_package(AutomotiveDlt REQUIRED)
+include_directories(${DLT_INCLUDE_DIR})
+endif (WITH_DLT)
 
 include_directories ("include")
+include_directories ("${PROJECT_SOURCE_DIR}/config")
 include_directories ("${PROJECT_SOURCE_DIR}/LayerManagerUtils/include")
 include_directories ("${PROJECT_SOURCE_DIR}/LayerManagerCommands/include")
 
 link_directories ("${PROJECT_SOURCE_DIR}/LayerManagerUtils/bin")
 link_directories ("${PROJECT_SOURCE_DIR}/LayerManagerCommands")
 
-# generate cmake configuration header file, includes information on the
-# project configuration, compiler settings, ...
-message(STATUS "Generating config.h header file with build system configuration.")
-configure_file(
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/config.h.cmake
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/config.h
-)
-
 file(GLOB LM_SOURCES src/*.cpp src/shader/*.cpp)
 file(GLOB LM_INCLUDES include/*.h)
 
-add_executable(LayerManagerService ${LM_SOURCES} ${LM_INCLUDES} include/config.h)
+add_executable(LayerManagerService ${LM_SOURCES} ${LM_INCLUDES} ${PROJECT_SOURCE_DIR}/config/config.h)
 
 add_dependencies(LayerManagerService LayerManagerUtils)
 add_dependencies(LayerManagerService LayerManagerCommands)
@@ -52,6 +49,7 @@ set(LIBS ${LIBS}
          dl
          ${CMAKE_THREAD_LIBS_INIT}
          ${DLT_LIBRARY}) 
+
 target_link_libraries(LayerManagerService ${LIBS})
 
 install (TARGETS LayerManagerService DESTINATION bin)

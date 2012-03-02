@@ -49,6 +49,14 @@ option (WITH_DLT            "Build with DLT support "                           
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 
+# generate cmake configuration header file, includes information on the
+# project configuration, compiler settings, ...
+message(STATUS "Generating config.h header file with build system configuration.")
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/config/config.h.cmake
+    ${CMAKE_CURRENT_SOURCE_DIR}/config/config.h
+)
+
 if (WITH_DESKTOP)
     set (WITH_GLX_LIB ON CACHE STRING "" FORCE)
 endif(WITH_DESKTOP)     
@@ -62,9 +70,9 @@ include_directories ("${PROJECT_SOURCE_DIR}/3rdParty/")
 add_subdirectory (3rdParty)
 add_subdirectory (LayerManagerPlugins/Communicators/DBUSCommunicator)
 add_subdirectory (LayerManagerClient/ilmClient)
-add_subdirectory (LayerManagerUtils)
 add_subdirectory (LayerManagerCommands)
 add_subdirectory (LayerManagerService)
+add_subdirectory (LayerManagerUtils)
 
 if (WITH_GLESv2_LIB OR WITH_GLX_LIB)
     add_subdirectory (LayerManagerPlugins/Renderers/Graphic)

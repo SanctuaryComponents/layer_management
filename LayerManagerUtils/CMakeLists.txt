@@ -20,7 +20,7 @@
 cmake_minimum_required (VERSION 2.6)
 
 include_directories ("include")
-include_directories ("${PROJECT_SOURCE_DIR}/LayerManagerService/include")
+include_directories ("${PROJECT_SOURCE_DIR}/config")
 if (WITH_DLT)
 find_package(AutomotiveDlt REQUIRED)
 include_directories(${DLT_INCLUDE_DIR})
@@ -28,7 +28,6 @@ endif (WITH_DLT)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 add_library(LayerManagerUtils STATIC src/Bitmap.cpp src/IlmMatrix.cpp src/Log.cpp src/LogMessageBuffer.cpp)
-
 install (FILES include/Log.h include/LogMessageBuffer.h include/IlmMatrix.h include/Bitmap.h DESTINATION include/layermanager)
 
 install (TARGETS LayerManagerUtils ARCHIVE DESTINATION lib/layermanager/static)

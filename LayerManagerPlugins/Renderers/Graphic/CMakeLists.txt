@@ -21,7 +21,7 @@ cmake_minimum_required (VERSION 2.6)
 
 include_directories ("include")
 include_directories ("../Base/include")
-
+include_directories ("${PROJECT_SOURCE_DIR}/config")
 include_directories ("${PROJECT_SOURCE_DIR}/LayerManagerService/include")
 link_directories ("${PROJECT_SOURCE_DIR}/LayerManagerService/bin")
 include_directories ("${PROJECT_SOURCE_DIR}/LayerManagerUtils/include")

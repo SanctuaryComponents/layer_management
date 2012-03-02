@@ -27,7 +27,6 @@
 #include <X11/Xutil.h>
 #include "Log.h"
 #include "ScreenShotType.h"
-#include "config.h"
 
 
 typedef XVisualInfo* (*GetVisualInfoFunction)(Display *dpy);

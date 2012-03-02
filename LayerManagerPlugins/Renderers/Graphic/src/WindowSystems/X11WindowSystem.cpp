@@ -18,6 +18,7 @@
 ****************************************************************************/
 
 #include "WindowSystems/X11WindowSystem.h"
+#include "config.h"
 #include "Log.h"
 #include "Layer.h"
 #include <time.h>
