@@ -37,11 +37,19 @@
 
 #include "Log.h"
 #include <iomanip>
+#include "config.h"
+#ifdef WITH_DLT
+#include <dlt/dlt.h>
+#endif
 
 Log* Log::m_instance = NULL;
 LOG_MODES Log::fileLogLevel = LOG_DISABLED;
 LOG_MODES Log::consoleLogLevel = LOG_INFO;
+#ifdef WITH_DLT
 LOG_MODES Log::dltLogLevel = LOG_DEBUG;
+#else 
+LOG_MODES Log::dltLogLevel = LOG_DISABLED;
+#endif
 
 Log::Log()
 {
@@ -49,11 +57,14 @@ Log::Log()
     m_fileStream = new std::ofstream("/tmp/LayerManagerService.log");
     pthread_mutex_init(&m_LogBufferMutex, NULL);
 #ifdef WITH_DLT
+    m_logContext = new DltContext;    
     DLT_REGISTER_APP("LMSA","LayerManagerService");
-    DLT_REGISTER_CONTEXT(m_logContext,"LMSC","LayerManagerService");
-#else 
-    m_logContext = "LMSC";
-#endif     
+    DLT_REGISTER_CONTEXT(*((DltContext*)m_logContext),"LMSC","LayerManagerService");
+#else
+    m_logContext = NULL;
+#endif
+
+
 }
 
 Log* Log::getInstance()
@@ -78,31 +89,33 @@ Log::~Log()
     pthread_mutex_destroy(&m_LogBufferMutex);
     Log::m_instance = NULL;
 #ifdef WITH_DLT
-    DLT_UNREGISTER_CONTEXT(m_logContext);
+    DLT_UNREGISTER_CONTEXT(*((DltContext*)m_logContext));
+    delete ((DltContext*)m_logContext);
 #endif    
+    m_logContext = NULL;
 }
 
-void Log::warning (LogContext* logContext, const std::string& moduleName, const std::basic_string<char>& output)
+void Log::warning (LogContext logContext, const std::string& moduleName, const std::basic_string<char>& output)
 {
     log(logContext,LOG_WARNING, moduleName, output);
 }
 
-void Log::info (LogContext* logContext,const std::string& moduleName, const std::basic_string<char>& output)
+void Log::info (LogContext logContext,const std::string& moduleName, const std::basic_string<char>& output)
 {
     log(logContext, LOG_INFO, moduleName, output);
 }
 
-void Log::error (LogContext* logContext,const std::string& moduleName, const std::basic_string<char>& output)
+void Log::error (LogContext logContext,const std::string& moduleName, const std::basic_string<char>& output)
 {
     log(logContext, LOG_ERROR, moduleName, output);
 }
 
-void Log::debug (LogContext* logContext, const std::string& moduleName, const std::basic_string<char>& output)
+void Log::debug (LogContext logContext, const std::string& moduleName, const std::basic_string<char>& output)
 {
     log(logContext,  LOG_DEBUG, moduleName, output);
 }
 
-void Log::log(LogContext* logContext, LOG_MODES logMode, const std::string& moduleName, const std::basic_string<char>& output)
+void Log::log(LogContext logContext, LOG_MODES logMode, const std::string& moduleName, const std::basic_string<char>& output)
 {
     std::string logString[LOG_MAX_LEVEL] = {"","ERROR","INFO","WARNING","DEBUG"};
     std::string logOutLevelString = logString[LOG_INFO];
@@ -168,13 +181,13 @@ void Log::LogToConsole(std::string logMode, const std::string& moduleName, const
               << output << std::endl;
 }
 
-LogContext* Log::getLogContext()
+LogContext Log::getLogContext()
 {
-    return &m_logContext;
+    return m_logContext;
 }
 
 #ifdef WITH_DLT    
-void Log::LogToDltDaemon(LogContext *logContext, LOG_MODES logMode, const std::string& moduleName, const std::basic_string<char>& output)
+void Log::LogToDltDaemon(LogContext logContext, LOG_MODES logMode, const std::string& moduleName, const std::basic_string<char>& output)
 {
     
     std::stringstream oss;
@@ -190,12 +203,12 @@ void Log::LogToDltDaemon(LogContext *logContext, LOG_MODES logMode, const std::s
     dltString = oss.str();                         
     switch ( logMode ) 
     {
-        case LOG_INFO : DLT_LOG(*logContext,DLT_LOG_INFO,DLT_STRING(dltString.c_str())); break;
-        case LOG_ERROR : DLT_LOG(*logContext,DLT_LOG_ERROR,DLT_STRING(dltString.c_str())); break;
-        case LOG_DEBUG : DLT_LOG(*logContext,DLT_LOG_DEBUG,DLT_STRING(dltString.c_str())); break;
-        case LOG_WARNING : DLT_LOG(*logContext,DLT_LOG_WARN,DLT_STRING(dltString.c_str())); break;
+        case LOG_INFO : DLT_LOG(*((DltContext*)logContext),DLT_LOG_INFO,DLT_STRING(dltString.c_str())); break;
+        case LOG_ERROR : DLT_LOG(*((DltContext*)logContext),DLT_LOG_ERROR,DLT_STRING(dltString.c_str())); break;
+        case LOG_DEBUG : DLT_LOG(*((DltContext*)logContext),DLT_LOG_DEBUG,DLT_STRING(dltString.c_str())); break;
+        case LOG_WARNING : DLT_LOG(*((DltContext*)logContext),DLT_LOG_WARN,DLT_STRING(dltString.c_str())); break;
         default:
-            DLT_LOG(*logContext,DLT_LOG_INFO,DLT_STRING(dltString.c_str()));
+            DLT_LOG(*((DltContext*)logContext),DLT_LOG_INFO,DLT_STRING(dltString.c_str()));
     }
 }
 #endif              

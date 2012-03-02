@@ -36,15 +36,10 @@
 */
 #ifndef _LOG_H_
 #define _LOG_H_
-#include "config.h"
 #include "LogMessageBuffer.h"
 #include <iostream>
 #include <fstream>
 #include <pthread.h>
-
-#ifdef WITH_DLT
-#include <dlt/dlt.h>
-#endif
 
 typedef enum {
     LOG_DISABLED = 0,
@@ -55,11 +50,11 @@ typedef enum {
     LOG_MAX_LEVEL
 } LOG_MODES;
 
-#ifdef WITH_DLT
-typedef DltContext LogContext;
-#else 
-typedef std::string LogContext;
-#endif
+/*The log context content is configuration dependend. Due
+  to the fact that we don't want to share the config file
+  in development headers, the real context is established
+  during the compiliation phase*/
+typedef void* LogContext;
 
 class Log
 {
@@ -69,20 +64,19 @@ public:
     static LOG_MODES consoleLogLevel;
     static LOG_MODES dltLogLevel;
     static Log* getInstance();
-    void warning (LogContext *logContext, const std::string& moduleName, const std::basic_string<char>& output);
-    void info (LogContext *logContext, const std::string& moduleName, const std::basic_string<char>& output);
-    void error (LogContext *logContext, const std::string& moduleName, const std::basic_string<char>& output);
-    void debug (LogContext *logContext, const std::string& moduleName, const std::basic_string<char>& output);
-    void log(LogContext *logContext, LOG_MODES logMode, const std::string& moduleName, const std::basic_string<char>& output);
-    LogContext* getLogContext();
+    void warning (LogContext logContext, const std::string& moduleName, const std::basic_string<char>& output);
+    void info (LogContext logContext, const std::string& moduleName, const std::basic_string<char>& output);
+    void error (LogContext logContext, const std::string& moduleName, const std::basic_string<char>& output);
+    void debug (LogContext logContext, const std::string& moduleName, const std::basic_string<char>& output);
+    void log(LogContext logContext, LOG_MODES logMode, const std::string& moduleName, const std::basic_string<char>& output);
+    LogContext getLogContext();
     static void closeInstance();
 private:
     Log();
     void LogToFile(std::string logMode, const std::string& moduleName, const std::basic_string<char>& output);
     void LogToConsole(std::string logMode, const std::string& moduleName,const std::basic_string<char>& output);
-#ifdef WITH_DLT
-    void LogToDltDaemon(LogContext *logContext, LOG_MODES logMode,const std::string& moduleName,const std::basic_string<char>& output);
-#endif    
+    void LogToDltDaemon(LogContext logContext, LOG_MODES logMode,const std::string& moduleName,const std::basic_string<char>& output);
+
 private:
     std::ofstream* m_fileStream;
     pthread_mutex_t m_LogBufferMutex;
