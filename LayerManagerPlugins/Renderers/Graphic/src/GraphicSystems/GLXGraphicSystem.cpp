@@ -92,14 +92,11 @@ bool GLXGraphicsystem::CheckConfigValue(Display *curDisplay,GLXFBConfig currentC
 
 void GLXGraphicsystem::activateGraphicContext()
 {
-    LOG_DEBUG("GLXGraphicsystem", "Activate Graphic Context");
-    glXMakeCurrent(m_x11display, m_window, m_context);
-    
+    glXMakeCurrent(m_x11display, m_window, m_context);   
 }
 
 void GLXGraphicsystem::releaseGraphicContext() 
 {
-    LOG_DEBUG("GLXGraphicsystem", "Release Graphic Context");
     glXMakeCurrent(m_x11display, None, NULL);
 }
 
@@ -192,7 +189,7 @@ bool GLXGraphicsystem::init(Display* x11Display, Window x11Window)
 
     XVisualInfo* windowVis = GetMatchingVisual(m_x11display);
 
-    LOG_DEBUG("X11GLXRenderer", "Initialising opengl");
+    LOG_DEBUG("GLXGraphicsystem", "Initialising opengl");
     m_context = glXCreateContext(m_x11display, windowVis, 0, GL_TRUE);
     if (!m_context)
     {
@@ -314,7 +311,7 @@ void GLXGraphicsystem::endLayer()
 void GLXGraphicsystem::renderSurface(Surface* currentSurface)
 {
 //    LOG_DEBUG("GLXGraphicsystem", "renderSurface " << currentSurface->getID() );
-    
+    GLenum glErrorCode = GL_NO_ERROR;
     const Rectangle &layerDestinationRegion = (m_currentLayer)->getDestinationRegion();
     const Rectangle &layerSourceRegion = (m_currentLayer)->getSourceRegion();
     
@@ -367,6 +364,11 @@ void GLXGraphicsystem::renderSurface(Surface* currentSurface)
 
     m_binder->unbindSurfaceTexture(currentSurface);
     glPopMatrix();
+    glErrorCode = glGetError();
+    if ( GL_NO_ERROR != glErrorCode )
+    {
+        LOG_ERROR("GLXGraphicsystem", "GL Error occured :" << glErrorCode );
+    };    
     currentSurface->drawCounter++;    
     delete textureCoordinates;
 }

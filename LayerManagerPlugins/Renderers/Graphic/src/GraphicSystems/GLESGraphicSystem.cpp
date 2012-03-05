@@ -54,7 +54,6 @@ GLESGraphicsystem::GLESGraphicsystem(int windowWidth, int windowHeight, PfnShade
 
 void GLESGraphicsystem::activateGraphicContext()
 {
-    LOG_DEBUG("GLESGraphicsystem", "Activate Graphic Context");
     EGLBoolean eglStatus = false;
     eglStatus = eglMakeCurrent(m_eglDisplay, m_eglSurface, m_eglSurface, m_eglContext);
     
@@ -62,7 +61,6 @@ void GLESGraphicsystem::activateGraphicContext()
 
 void GLESGraphicsystem::releaseGraphicContext() 
 {
-    LOG_DEBUG("GLESGraphicsystem", "Release Graphic Context");
     EGLBoolean eglStatus = false;
     eglStatus = eglMakeCurrent(m_eglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
 }   
@@ -253,7 +251,7 @@ Shader *GLESGraphicsystem::pickOptimizedShader(Shader* currentShader, const Shad
 void GLESGraphicsystem::renderSurface(Surface* surface)
 {
 //  LOG_DEBUG("GLESGraphicsystem", "renderSurface " << surface->getID());
-
+    GLenum glErrorCode = GL_NO_ERROR;
     // check if surface is cropped completely, if so then skip rendering
     if (ViewportTransform::isFullyCropped(surface->getDestinationRegion(), m_currentLayer->getSourceRegion() ) )
         return; // skip rendering of this surface, because it is cropped by layer source region
@@ -367,7 +365,11 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
     glDrawArrays(GL_TRIANGLES, index, 6);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glGetError(); // TODO
+    glErrorCode = glGetError();
+    if ( GL_NO_ERROR != glErrorCode )
+    {
+        LOG_ERROR("GLESGraphicsystem", "GL Error occured :" << glErrorCode );
+    };
 
     delete textureCoordinates;
 }
