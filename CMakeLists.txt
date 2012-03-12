@@ -1,6 +1,7 @@
 ############################################################################
 # 
 # Copyright 2010, 2011 BMW Car IT GmbH  
+# Copyright (C) 2011 DENSO CORPORATION and Robert Bosch Car Multimedia Gmbh
 # 
 # 
 # Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -36,9 +37,11 @@ endif (NOT CMAKE_BUILD_TYPE)
 
 option (WITH_X11_GLES       "Build for X11 with GLES 2.0"                         ON )
 option (WITH_GLESv2_LIB     "Build development library for GLES2 Based Renderers" OFF)
-option (WITH_EGL_EXAMPLE    "Build EGL_EXAMPLE "                                  ON )
+option (WITH_EGL_EXAMPLE    "Build EGL_EXAMPLE / X11"                             ON )
+option (WITH_WL_EXAMPLE     "Build EGL_EXAMPLE / Wayland"                         OFF)
 option (WITH_DESKTOP        "Build for Desktop / GLX"                             OFF)
 option (WITH_GLX_LIB        "Build development library for GLX Based Renderers"   OFF)
+option (WITH_WAYLAND        "Build for Desktop / Wayland(GLX)"                    OFF)
 option (WITH_GLX_EXAMPLE    "Build GLX_EXAMPLE "                                  OFF)
 option (WITH_INPUT_EVENTS   "Activate input events handling"                      OFF)
 option (WITH_FORCE_COPY     "Force Software Copy of Pixmaps"                      OFF)
@@ -61,9 +64,9 @@ if (WITH_DESKTOP)
     set (WITH_GLX_LIB ON CACHE STRING "" FORCE)
 endif(WITH_DESKTOP)     
 
-if (WITH_X11_GLES)
+if (WITH_X11_GLES OR WITH_WAYLAND)
     set (WITH_GLESv2_LIB ON CACHE STRING "" FORCE)
-endif(WITH_X11_GLES)
+endif(WITH_X11_GLES OR WITH_WAYLAND)
 
 include_directories ("${PROJECT_SOURCE_DIR}/3rdParty/")
 
@@ -81,6 +84,10 @@ endif(WITH_GLESv2_LIB OR WITH_GLX_LIB)
 if (WITH_DESKTOP)
     add_subdirectory (LayerManagerPlugins/Renderers/Platform/GLXRenderer)
 endif(WITH_DESKTOP)     
+
+if (WITH_WAYLAND)
+    add_subdirectory (LayerManagerPlugins/Renderers/Platform/WaylandGLESRenderer)
+endif(WITH_WAYLAND)     
 
 if (WITH_X11_GLES)
     add_subdirectory (LayerManagerPlugins/Renderers/Platform/X11GLESRenderer)
@@ -100,6 +107,11 @@ if (WITH_CLIENTEXAMPLES)
     add_subdirectory (LayerManagerExamples/LayerManagerToolBox)
     add_subdirectory (LayerManagerExamples/LayerSceneDescriptionExample)
 endif(WITH_CLIENTEXAMPLES)
+
+if (WITH_WL_EXAMPLE)
+    add_subdirectory (LayerManagerExamples/EGLWLApplicationExample)
+    add_subdirectory (LayerManagerExamples/EGLWLMockNavigation)
+endif(WITH_WL_EXAMPLE)
 
 # enable ctest if building with tests
 # run 'make test' after build to run all tests

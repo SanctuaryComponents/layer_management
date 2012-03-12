@@ -1,6 +1,7 @@
 ############################################################################
 # 
 # Copyright 2010, 2011 BMW Car IT GmbH 
+# Copyright (C) 2011 DENSO CORPORATION and Robert Bosch Car Multimedia Gmbh
 # 
 # 
 # Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -27,7 +28,7 @@ link_directories ("${PROJECT_SOURCE_DIR}/LayerManagerService/bin")
 include_directories ("${PROJECT_SOURCE_DIR}/LayerManagerUtils/include")
 link_directories ("${PROJECT_SOURCE_DIR}/LayerManagerUtils/bin")
 
-if (WITH_GLESv2_LIB) 
+if (WITH_GLESv2_LIB AND NOT WITH_WAYLAND) 
 set(GRAPHIC_LIB_NAME LayerManagerGraphicGLESv2)
 file(GLOB SOURCES 
         ../Base/src/BaseRenderer.cpp 
@@ -69,7 +70,7 @@ file(GLOB GRAPHIC_TRANSFORM_INCLUDES
     include/Transformation/ViewportTransform.h
 )
 
-endif(WITH_GLESv2_LIB)
+endif(WITH_GLESv2_LIB AND NOT WITH_WAYLAND) 
 
 if (WITH_GLX_LIB) 
 set(GRAPHIC_LIB_NAME LayerManagerGraphicGLX)
@@ -115,6 +116,48 @@ file(GLOB GRAPHIC_TRANSFORM_INCLUDES
 
 endif(WITH_GLX_LIB)
 
+if (WITH_WAYLAND) 
+set(GRAPHIC_LIB_NAME LayerManagerGraphicWaylandGLESv2)
+
+file(GLOB SOURCES 
+        ../Base/src/BaseRenderer.cpp 
+        src/GraphicSystems/GLESGraphicSystem.cpp
+        src/WindowSystems/WaylandWindowSystem.cpp  
+        src/WindowSystems/WaylandServerinfoProtocol.cpp  
+        src/TextureBinders/WaylandCopyGLES.cpp
+        src/Transformation/ViewportTransform.cpp
+        )
+
+file(GLOB GRAPHIC_BASE_INCLUDES 
+    ../Base/include/*.h
+)
+
+file(GLOB GRAPHIC_GRAPHICSYSTEM_INCLUDES 
+    include/GraphicSystems/BaseGraphicSystem.h
+    include/GraphicSystems/GLESGraphicSystem.h
+)
+
+file(GLOB GRAPHIC_TEXTUREBINDERS_INCLUDES 
+    include/TextureBinders/ITextureBinder.h
+    include/TextureBinders/WaylandCopyGLES.h
+)
+
+file(GLOB GRAPHIC_PLATFORM_INCLUDES 
+    include/PlatformSurfaces/WaylandPlatformSurface.h
+    include/PlatformSurfaces/EglWaylandPlatformSurface.h
+)
+
+file(GLOB GRAPHIC_WINDOWSYSTEMS_INCLUDES 
+    include/WindowSystems/BaseWindowSystem.h
+    include/WindowSystems/WaylandWindowSystem.h
+)
+
+file(GLOB GRAPHIC_TRANSFORM_INCLUDES 
+    include/Transformation/ViewportTransform.h
+)
+
+endif(WITH_WAYLAND)
+
 #if (WITH_TESTS)
 #    enable_testing()
 #    add_subdirectory (tests)
@@ -122,9 +165,12 @@ endif(WITH_GLX_LIB)
 
 add_library(${GRAPHIC_LIB_NAME} SHARED ${SOURCES})
 
+if (NOT WITH_WAYLAND)
 find_package(X11 REQUIRED)
 include_directories(${X11_INCLUDE_DIR})
 find_package (Threads)
+endif (NOT WITH_WAYLAND)
+
 if (WITH_GLESv2_LIB) 
 find_package(EGL REQUIRED)
 include_directories(${EGL_INCLUDE_DIR})
@@ -141,7 +187,13 @@ include_directories(${GLX_INCLUDE_DIR})
 set(GRAPHIC_NATIVE_LIBS ${GLX_LIBRARIES})
 endif(WITH_GLX_LIB)
 
+if (WITH_WAYLAND)
+find_package (Wayland)
+include_directories(${WAYLAND_SERVER_INCLUDE_DIR})
+set(LIBS ${LIBS} ${WAYLAND_SERVER_LIBRARIES})
+else(WITH_WAYLAND)
 set(LIBS ${LIBS} ${CMAKE_THREAD_LIBS_INIT} ${X11_X11_LIB} ${X11_Xcomposite_LIB} ${X11_Xdamage_LIB} ${GRAPHIC_NATIVE_LIBS} LayerManagerUtils )
+endif(WITH_WAYLAND)
 target_link_libraries(${GRAPHIC_LIB_NAME} ${LIBS})
 
 
