@@ -280,7 +280,7 @@ void X11WindowSystem::MapWindow(Window window)
             XPlatformSurface* x11surf = (XPlatformSurface*)surface->platform;
             if (x11surf->isMapped)
             {
-                LOG_WARNING("X11WindowSystem", "Platform surface already in use ");
+                LOG_WARNING("X11WindowSystem", "Platform surface already mapped");
                 return;
             }
             x11surf->isMapped = true;
@@ -302,6 +302,7 @@ void X11WindowSystem::MapWindow(Window window)
 
             surface->OriginalSourceHeight = winHeight;
             surface->OriginalSourceWidth = winWidth;
+            surface->renderPropertyChanged = true;
 
             graphicSystem->getTextureBinder()->createClientBuffer(surface);
             XSync(x11Display, 0);
@@ -330,8 +331,13 @@ void X11WindowSystem::UnMapWindow(Window window)
             LOG_WARNING("X11WindowSystem", "Platform surface not available for window " << window);
             return;
         }
-        XPlatformSurface* x11surf = (XPlatformSurface*)surface->platform;        
+        XPlatformSurface* x11surf = (XPlatformSurface*)surface->platform;
         LOG_DEBUG("X11WindowSystem", "Unmapping surface " << surface->getID());
+        if (!x11surf->isMapped)
+        {
+            LOG_WARNING("X11WindowSystem", "Platform surface already unmapped");
+            return;
+        }
         x11surf->isMapped = false;
 
 
@@ -345,6 +351,8 @@ void X11WindowSystem::UnMapWindow(Window window)
             int result = XFreePixmap(x11Display, x11surf->pixmap);
             LOG_DEBUG("X11WindowSystem", "XFreePixmap() returned " << result);
         }
+
+        surface->renderPropertyChanged = true;
     }
     LOG_DEBUG("X11WindowSystem", "Unmap finished");
 }
@@ -421,8 +429,7 @@ void X11WindowSystem::DestroyWindow(Window window)
         LOG_DEBUG("X11WindowSystem", "Remove Native Content from Surface " << surface->getID());
         surface->removeNativeContent();
         delete surface->platform;
-        surface->platform = NULL;                
-        surface->renderPropertyChanged = true;
+        surface->platform = NULL;
     }
 }
 
