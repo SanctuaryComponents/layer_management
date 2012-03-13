@@ -2,13 +2,14 @@
 # 
 # Copyright 2010, 2011 BMW Car IT GmbH 
 # Copyright (C) 2011 DENSO CORPORATION and Robert Bosch Car Multimedia Gmbh
+# Copyright (C) 2012 Bayerische Motorenwerke Aktiengesellschaft
 # 
 # 
 # Licensed under the Apache License, Version 2.0 (the "License"); 
 # you may not use this file except in compliance with the License. 
 # You may obtain a copy of the License at 
 #
-#		http://www.apache.org/licenses/LICENSE-2.0 
+#       http://www.apache.org/licenses/LICENSE-2.0 
 #
 # Unless required by applicable law or agreed to in writing, software 
 # distributed under the License is distributed on an "AS IS" BASIS, 
@@ -24,17 +25,17 @@ include_directories ("include")
 include_directories ("../X11GLESRenderer/include")
 include_directories ("../../Base/include")
 include_directories ("../../Graphic/include")
-
+include_directories ("${PROJECT_SOURCE_DIR}/config")
 include_directories ("${PROJECT_SOURCE_DIR}/LayerManagerService/include")
 link_directories ("${PROJECT_SOURCE_DIR}/LayerManagerService/bin")
 include_directories ("${PROJECT_SOURCE_DIR}/LayerManagerUtils/include")
 link_directories ("${PROJECT_SOURCE_DIR}/LayerManagerUtils/bin")
 
 file(GLOB SOURCES 
-		src/WaylandGLESRenderer.cpp
-		../X11GLESRenderer/src/ShaderProgramGLES.cpp 
-		)
-		
+        src/WaylandGLESRenderer.cpp
+        ../X11GLESRenderer/src/ShaderProgramGLES.cpp 
+        )
+        
 add_library(WaylandGLESRenderer SHARED ${SOURCES})
 
 find_package(Wayland REQUIRED)
