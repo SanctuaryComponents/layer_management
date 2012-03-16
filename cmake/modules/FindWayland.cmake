@@ -8,7 +8,7 @@
 # you may not use this file except in compliance with the License. 
 # You may obtain a copy of the License at 
 #
-#		http://www.apache.org/licenses/LICENSE-2.0 
+#       http://www.apache.org/licenses/LICENSE-2.0 
 #
 # Unless required by applicable law or agreed to in writing, software 
 # distributed under the License is distributed on an "AS IS" BASIS, 
@@ -46,7 +46,7 @@ PATHS /usr/lib /usr/local/lib
 )
 
 SET( WAYLAND_FOUND "NO" )
-IF(WAYLAND_LIBRARIES)
+IF(WAYLAND_CLIENT_LIBRARIES AND WAYLAND_SERVER_LIBRARIES)
     SET( WAYLAND_FOUND "YES" )
     message(STATUS "Found Wayland-Client libs: ${WAYLAND_CLIENT_LIBRARIES}")
     message(STATUS "Found Wayland-Client includes: ${WAYLAND_CLIENT_INCLUDE_DIR}")
@@ -54,7 +54,7 @@ IF(WAYLAND_LIBRARIES)
     message(STATUS "Found Wayland-Server includes: ${WAYLAND_SERVER_INCLUDE_DIR}")
     message(STATUS "Found ffi need by Wayland libs: ${FFI_LIBRARIES}")
     message(STATUS "Found ffi need by Wayland includes: ${FFI_INCLUDE_DIR}")
-ENDIF(WAYLAND_LIBRARIES)
+ENDIF(WAYLAND_CLIENT_LIBRARIES AND WAYLAND_SERVER_LIBRARIES)
 
 MARK_AS_ADVANCED(
   WAYLAND_CLIENT_INCLUDE_DIR

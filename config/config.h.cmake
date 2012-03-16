@@ -49,6 +49,9 @@
 // build OpenGL ES 2.0 examples
 #cmakedefine WITH_EGL_EXAMPLE
 
+// build OpenGL ES 2.0 Wayland Examples
+#cmakedefine WITH_WL_EXAMPLE
+
 // force copy of graphic buffers
 #cmakedefine WITH_FORCE_COPY
 
@@ -70,6 +73,9 @@
 // build OpenGL ES 2.0 / X11 renderer
 #cmakedefine WITH_X11_GLES
 
+// use OpenGL ES 2.0 / Wayland renderer
+#cmakedefine WITH_WAYLAND
+
 // use xthreads library
 #cmakedefine WITH_XTHREADS
 
@@ -87,6 +93,7 @@
     LOG_DEBUG("Config", "WITH_CLIENTEXAMPLES = ${WITH_CLIENTEXAMPLES}"); \
     LOG_DEBUG("Config", "WITH_DESKTOP        = ${WITH_DESKTOP}"); \
     LOG_DEBUG("Config", "WITH_EGL_EXAMPLE    = ${WITH_EGL_EXAMPLE}"); \
+    LOG_DEBUG("Config", "WITH_WL_EXAMPLE     = ${WITH_WL_EXAMPLE}"); \
     LOG_DEBUG("Config", "WITH_FORCE_COPY     = ${WITH_FORCE_COPY}"); \
     LOG_DEBUG("Config", "WITH_GLESv2_LIB     = ${WITH_GLESv2_LIB}"); \
     LOG_DEBUG("Config", "WITH_GLX_EXAMPLE    = ${WITH_GLX_EXAMPLE}"); \
@@ -94,5 +101,6 @@
     LOG_DEBUG("Config", "WITH_INPUT_EVENTS   = ${WITH_INPUT_EVENTS}"); \
     LOG_DEBUG("Config", "WITH_TESTS          = ${WITH_TESTS}"); \
     LOG_DEBUG("Config", "WITH_X11_GLES       = ${WITH_X11_GLES}"); \
+    LOG_DEBUG("Config", "WITH_WAYLAND        = ${WITH_WAYLAND}"); \
     LOG_DEBUG("Config", "WITH_XTHREADS       = ${WITH_XTHREADS}"); \
     LOG_DEBUG("Config", "WITH_DLT            = ${WITH_DLT}");
