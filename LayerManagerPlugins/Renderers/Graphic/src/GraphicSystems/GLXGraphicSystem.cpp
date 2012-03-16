@@ -335,9 +335,7 @@ void GLXGraphicsystem::renderSurface(Surface* currentSurface)
     }
 //    glPushMatrix();
     glColor4f(1.0f,1.0f,1.0f,currentSurface->opacity*(m_currentLayer)->opacity);
-    
-    currentSurface->frameCounter++;
-    
+       
     glBegin(GL_QUADS);
 
 //    LOG_DEBUG("GLXGraphicsystem","rendersurface: src" << src.x << " " << src.y << " " << src.width << " " << src.height );
@@ -369,6 +367,7 @@ void GLXGraphicsystem::renderSurface(Surface* currentSurface)
     {
         LOG_ERROR("GLXGraphicsystem", "GL Error occured :" << glErrorCode );
     };    
+    currentSurface->frameCounter++;    
     currentSurface->drawCounter++;    
     delete textureCoordinates;
 }
