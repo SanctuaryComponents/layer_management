@@ -124,10 +124,8 @@ private:
     static int error(Display *dpy, XErrorEvent *ev);
 
     static bool m_xerror;
-    #ifdef WITH_INPUT_EVENTS
     void ManageXInputEvent(XEvent *pevent);
-    #endif
-    
+   
     friend void * X11eventLoopCallback(void *);
 };
 
