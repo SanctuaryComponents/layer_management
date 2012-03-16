@@ -406,20 +406,20 @@ TEST_F(IlmCommandTest, SetGetSurfaceGroupVisibility) {
 
 }
 TEST_F(IlmCommandTest, ilm_getScreenIDs) {
-    t_ilm_uint numberOfScreens;
-    t_ilm_uint* screenIDs;
+    t_ilm_uint numberOfScreens = 0;
+    t_ilm_uint* screenIDs = NULL;
     ilm_getScreenIDs(&numberOfScreens,&screenIDs);
     ASSERT_GT(numberOfScreens,0u);
 }
 
 TEST_F(IlmCommandTest, ilm_getScreenResolution) {
-    t_ilm_uint numberOfScreens;
-    t_ilm_uint* screenIDs;
+    t_ilm_uint numberOfScreens = 0;
+    t_ilm_uint* screenIDs = NULL;
     ilm_getScreenIDs(&numberOfScreens,&screenIDs);
     ASSERT_TRUE(numberOfScreens>0);
 
     uint firstScreen = screenIDs[0];
-    t_ilm_uint width,height;
+    t_ilm_uint width = 0, height = 0;
     ilm_getScreenResolution(firstScreen, &width, &height);
     ASSERT_GT(width,0u);
     ASSERT_GT(height,0u);
