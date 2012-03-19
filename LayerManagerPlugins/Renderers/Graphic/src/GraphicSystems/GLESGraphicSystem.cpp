@@ -349,8 +349,8 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
     shader->loadUniforms();
     /* Bind texture and set section */
     glActiveTexture(GL_TEXTURE0);
-    if (false == m_binder->bindSurfaceTexture(surface)) 
-    {   
+    if (false == m_binder->bindSurfaceTexture(surface))
+    {
         LOG_WARNING("GLESGraphicsystem", "Surface not successfully bind " << surface->getID());
         return;
     }
@@ -366,6 +366,7 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
     glDrawArrays(GL_TRIANGLES, index, 6);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+    m_binder->unbindSurfaceTexture(surface);
     glErrorCode = glGetError();
     if ( GL_NO_ERROR != glErrorCode )
     {
