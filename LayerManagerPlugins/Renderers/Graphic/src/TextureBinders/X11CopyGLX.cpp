@@ -30,11 +30,11 @@ bool X11CopyGLX::bindSurfaceTexture(Surface* surface)
     Pixmap pixmap = 0;
     GLenum targetType = GL_BGRA;
     GLenum sourceType = GL_RGBA;
-    if (surface != NULL ) 
+    if (surface != NULL )
     {
         nativeSurface = (XPlatformSurface*)surface->platform;
-    } 
-    if( nativeSurface != NULL && surface->getNativeContent() != 0 && nativeSurface->isReadyForRendering())
+    }
+    if( nativeSurface != NULL && surface->getNativeContent() != -1 && nativeSurface->isReadyForRendering())
     {
         pixmap = XCompositeNameWindowPixmap (dpy, surface->getNativeContent());
         if (!pixmap)
@@ -55,22 +55,22 @@ bool X11CopyGLX::bindSurfaceTexture(Surface* surface)
                 targetType = GL_BGR;
                 sourceType = GL_RGB;
             } 
-            else if ( surface->getPixelFormat() == PIXELFORMAT_RGBA8888 ) 
+            else if ( surface->getPixelFormat() == PIXELFORMAT_RGBA8888 )
             {
                 targetType = GL_BGRA;
                 sourceType = GL_RGBA;
-                if (xim->depth == 24) 
+                if (xim->depth == 24)
                 {
                     /* Set alpha value */
                     int count = surface->OriginalSourceWidth*surface->OriginalSourceHeight;
-                    for (int j=0;j<count; j++) 
+                    for (int j=0;j<count; j++)
                     {
                         xim->data[j*4+3]=255;
-                    } 
+                    }
                 }
             } else {
                 LOG_ERROR("X11CopyGLX","Pixelformat currently not supported : " << surface->getPixelFormat());
-    		    XDestroyImage(xim);
+                XDestroyImage(xim);
                 return false;
             }
             glTexImage2D(GL_TEXTURE_2D, 0, sourceType, surface->OriginalSourceWidth, surface->OriginalSourceHeight, 0, targetType, GL_UNSIGNED_BYTE, xim->data);
