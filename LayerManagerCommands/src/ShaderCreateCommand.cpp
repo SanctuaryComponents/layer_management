@@ -40,10 +40,10 @@ ExecutionResult ShaderCreateCommand::execute(ICommandExecutor* executor)
     for (; iter != iterEnd; ++iter)
     {
         IRenderer* renderer = *iter;
-        if (renderer) 
+        if (renderer)
         {
             shader = renderer->createShader(&m_vertName, &m_fragName);
-        } 
+        }
         break;
     }
     if (shader)
@@ -54,7 +54,7 @@ ExecutionResult ShaderCreateCommand::execute(ICommandExecutor* executor)
         ShaderMap &shaderMap = scene.m_shaderMap;
         shaderMap[id] = shader;
         *m_returnID = id;
-        result = ExecutionSuccessRedraw;
+        result = ExecutionSuccess;
     }
 
     return result;

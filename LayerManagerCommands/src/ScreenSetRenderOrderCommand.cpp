@@ -30,6 +30,7 @@ ScreenSetRenderOrderCommand::ScreenSetRenderOrderCommand(unsigned int* array, un
 ExecutionResult ScreenSetRenderOrderCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());
+    ExecutionResult result = ExecutionFailed;
 
     // check for doubles
     for (unsigned int i = 0; i < m_length; i++)
@@ -55,10 +56,9 @@ ExecutionResult ScreenSetRenderOrderCommand::execute(ICommandExecutor* executor)
     //        } // TODO insert again later
 
     scene.getCurrentRenderOrder().clear();
+    result = ExecutionSuccessRedraw;
 
     LOG_DEBUG("ScreenSetRenderOrderCommand", "Length to set: " << m_length);
-
-    ExecutionResult result = ExecutionFailed;
 
     for (unsigned int i = 0; i < m_length; i++)
     {

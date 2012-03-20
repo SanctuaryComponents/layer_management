@@ -34,11 +34,11 @@ ExecutionResult SurfacegroupRemoveCommand::execute(ICommandExecutor* executor)
     ExecutionResult result = ExecutionFailed;
 
     SurfaceGroup* surfacegroup = scene.getSurfaceGroup(m_idToRemove);
-	if (surfacegroup)
-	{
-		scene.removeSurfaceGroup(surfacegroup);
-		result = ExecutionSuccessRedraw;
-	}
+    if (surfacegroup)
+    {
+        scene.removeSurfaceGroup(surfacegroup);
+        result = ExecutionSuccess;
+    }
 
     return result;
 }

@@ -37,18 +37,25 @@ ExecutionResult SurfaceSetNativeContentCommand::execute(ICommandExecutor* execut
 
     Surface* surface = scene.getSurface(m_surfaceId);
 
-    if (surface && !surface->hasNativeContent())
+    if (surface)
     {
-        surface->setNativeContent(m_nativeHandle);
-        surface->setPixelFormat(m_pixelformat);
-        surface->OriginalSourceWidth = m_originalWidth;
-        surface->OriginalSourceHeight = m_originalHeight;
+        if(!surface->hasNativeContent())
+        {
+            surface->setNativeContent(m_nativeHandle);
+            surface->setPixelFormat(m_pixelformat);
+            surface->OriginalSourceWidth = m_originalWidth;
+            surface->OriginalSourceHeight = m_originalHeight;
 
-        // has to be set by application
-        //surface->setDestinationRegion(Rectangle(0, 0, m_originalWidth, m_originalHeight));
-        //surface->setSourceRegion(Rectangle(0, 0, m_originalWidth, m_originalHeight));
+            // has to be set by application
+            //surface->setDestinationRegion(Rectangle(0, 0, m_originalWidth, m_originalHeight));
+            //surface->setSourceRegion(Rectangle(0, 0, m_originalWidth, m_originalHeight));
 
-        result = ExecutionSuccessRedraw;
+            result = ExecutionSuccessRedraw;
+        }
+        else if(surface->getNativeContent() == m_nativeHandle)
+        {
+            result = ExecutionSuccess;
+        }
     }
 
     return result;
