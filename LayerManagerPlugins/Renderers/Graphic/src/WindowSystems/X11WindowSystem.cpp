@@ -201,7 +201,7 @@ Surface* X11WindowSystem::getSurfaceForWindow(Window w)
     return NULL;
 }
 
-void X11WindowSystem::checkForNewSurface()
+void X11WindowSystem::checkForNewSurfaceNativeContent()
 {
     m_pScene->lockScene();
     LayerList layers = m_pScene->getCurrentRenderOrder();
@@ -386,13 +386,12 @@ void X11WindowSystem::NewWindow(Surface* surface, Window window)
 
         LOG_DEBUG("X11WindowSystem", "Created native Surface for X11 Window id " << window);
 
-        surface->setNativeContent(window);
         surface->platform = platformSurface;
 
         int winWidth = att.width;
         int winHeight = att.height;
 
-        surface->OriginalSourceHeight =winHeight;
+        surface->OriginalSourceHeight = winHeight;
         surface->OriginalSourceWidth = winWidth;
 
         LOG_DEBUG("X11WindowSystem", "Original width " << surface->OriginalSourceWidth);
@@ -864,7 +863,7 @@ init_complete:
             }
             else
             {
-                this->checkForNewSurface();
+                this->checkForNewSurfaceNativeContent();
                 checkRedraw = true;
             }
 

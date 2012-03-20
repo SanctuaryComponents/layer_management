@@ -110,7 +110,7 @@ private:
     bool initCompositor();
     void shutdownCompositor();
     Surface* getSurfaceFromNativeSurface(struct native_surface* nativeSurface);
-    void checkForNewSurface();
+    void checkForNewSurfaceNativeContent();
     void printDebug();
     void* eventLoop();
 

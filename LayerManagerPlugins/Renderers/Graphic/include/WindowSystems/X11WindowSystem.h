@@ -106,7 +106,7 @@ private:
     void createSurfaceForWindow(Window w);
     void configureSurfaceWindow(Window w);
     Surface* getSurfaceForWindow(Window w);
-    void checkForNewSurface();
+    void checkForNewSurfaceNativeContent();
     void destroy_surface(Window w);
     void updateSurface(Surface* s, Window w, XPlatformSurface* x11surf);
     void MapWindow(Window w);

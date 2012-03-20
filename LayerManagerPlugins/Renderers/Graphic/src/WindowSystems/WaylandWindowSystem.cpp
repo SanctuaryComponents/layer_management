@@ -191,7 +191,7 @@ Surface* WaylandWindowSystem::getSurfaceFromNativeSurface(struct native_surface*
     return NULL;
 }
 
-void WaylandWindowSystem::checkForNewSurface()
+void WaylandWindowSystem::checkForNewSurfaceNativeContent()
 {
     m_pScene->lockScene();
     LayerList layers = m_pScene->getCurrentRenderOrder();
@@ -548,7 +548,7 @@ extern "C" void WaylandWindowSystem::surfaceIFFrame(struct wl_client *client,
     wl_client_add_resource(client, &cb->resource);
     wl_list_insert(windowSystem->m_listFrameCallback.prev, &cb->link);
 
-    windowSystem->checkForNewSurface();
+    windowSystem->checkForNewSurfaceNativeContent();
     idleEventRepaint(windowSystem);
 
     LOG_DEBUG("WaylandWindowSystem", "surfaceIFFrame OUT");
