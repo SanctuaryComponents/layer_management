@@ -254,7 +254,7 @@ void GLXGraphicsystem::checkRenderLayer()
 
     m_currentLayer->damaged = false;
 
-    if (!m_baseWindowSystem->m_damaged)
+    if (!(m_baseWindowSystem->m_damaged && m_currentLayer->getLayerType() != Hardware))
     {
         if (m_currentLayer->renderPropertyChanged)
         {
@@ -269,12 +269,19 @@ void GLXGraphicsystem::checkRenderLayer()
                     m_currentLayer->damaged = true;
                     break;
                 }
-                else if ( (*currentS)->hasNativeContent() && (*currentS)->damaged && (*currentS)->visibility && (*currentS)->opacity>0.0f)
+                else if ((*currentS)->hasNativeContent() && (*currentS)->damaged && (*currentS)->visibility && (*currentS)->opacity>0.0f)
                 {
                     m_currentLayer->damaged = true;
                     break;
                 }
             }
+        }
+
+        // Preseve m_currentLayer->damaged for HW layers so that they can be updated independently
+        if (m_currentLayer->damaged && m_currentLayer->getLayerType() != Hardware)
+        {
+            m_baseWindowSystem->m_damaged = true;
+            m_currentLayer->damaged = false;
         }
     }
 
@@ -285,17 +292,12 @@ void GLXGraphicsystem::checkRenderLayer()
     }
 
     m_currentLayer->renderPropertyChanged = false;
-
-    if (m_currentLayer->damaged)
-    {
-        m_baseWindowSystem->m_damaged = true;
-    }
 }
 
-void GLXGraphicsystem::renderLayer()
+void GLXGraphicsystem::renderSWLayer()
 {
-    if ( (m_currentLayer)->visibility && (m_currentLayer)->opacity > 0.0 ) 
-    {    
+    if ( (m_currentLayer)->visibility && (m_currentLayer)->opacity > 0.0 )
+    {
         SurfaceList surfaces = m_currentLayer->getAllSurfaces();
         for(std::list<Surface*>::const_iterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++)
         {

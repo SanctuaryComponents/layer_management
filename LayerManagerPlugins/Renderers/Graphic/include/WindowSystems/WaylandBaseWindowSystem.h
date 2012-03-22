@@ -79,6 +79,7 @@ protected:
     BaseGraphicSystem<EGLNativeDisplayType, EGLNativeWindowType>* graphicSystem;
     virtual void CheckRedrawAllLayers();
     virtual void RedrawAllLayers();
+    virtual void renderHWLayer(Layer* layer);
     virtual bool initCompositor();
     struct wl_shm* m_wlShm;
     virtual bool createNativeContext() = 0;

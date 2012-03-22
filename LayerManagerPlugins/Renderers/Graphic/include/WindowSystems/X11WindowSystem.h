@@ -36,7 +36,7 @@ typedef enum x11WindowSystemStates
     REDRAW_STATE = 0,
     WAKEUP_STATE = 1,
     IDLE_STATE = 2,
-    UNKOWN_STATE    
+    UNKOWN_STATE
 } X11WindowSystemStates;
 
 class X11WindowSystem: public BaseWindowSystem
@@ -92,10 +92,11 @@ protected:
     Window CompositorWindow;
     XVisualInfo* windowVis;
     pthread_mutex_t run_lock;
-    BaseGraphicSystem<Display*, Window>* graphicSystem;    
-    virtual bool initXServer(); 
+    BaseGraphicSystem<Display*, Window>* graphicSystem;
+    virtual bool initXServer();
     virtual void CheckRedrawAllLayers();
     virtual void RedrawAllLayers();
+    virtual void renderHWLayer(Layer* layer);
 
 private:
     void cleanup();
@@ -126,7 +127,7 @@ private:
 
     static bool m_xerror;
     void ManageXInputEvent(XEvent *pevent);
-   
+
     friend void * X11eventLoopCallback(void *);
 };
 

@@ -185,7 +185,7 @@ void GLESGraphicsystem::checkRenderLayer()
 
     m_currentLayer->damaged = false;
 
-    if (!m_baseWindowSystem->m_damaged)
+    if (!(m_baseWindowSystem->m_damaged && m_currentLayer->getLayerType() != Hardware))
     {
         if (m_currentLayer->renderPropertyChanged)
         {
@@ -207,6 +207,13 @@ void GLESGraphicsystem::checkRenderLayer()
                 }
             }
         }
+
+        // Preseve m_currentLayer->damaged for HW layers so that they can be updated independently
+        if (m_currentLayer->damaged && m_currentLayer->getLayerType() != Hardware)
+        {
+            m_baseWindowSystem->m_damaged = true;
+            m_currentLayer->damaged = false;
+        }
     }
 
     for(std::list<Surface*>::const_iterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++)
@@ -216,16 +223,11 @@ void GLESGraphicsystem::checkRenderLayer()
     }
 
     m_currentLayer->renderPropertyChanged = false;
-
-    if (m_currentLayer->damaged)
-    {
-        m_baseWindowSystem->m_damaged = true;
-    }
 }
 
-void GLESGraphicsystem::renderLayer()
+void GLESGraphicsystem::renderSWLayer()
 {
-    if ( (m_currentLayer)->visibility && (m_currentLayer)->opacity > 0.0 ) 
+    if ( (m_currentLayer)->visibility && (m_currentLayer)->opacity > 0.0 )
     {
         SurfaceList surfaces = m_currentLayer->getAllSurfaces();
         for(std::list<Surface*>::const_iterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++)

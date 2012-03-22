@@ -37,7 +37,7 @@ public:
     }
     virtual void beginLayer(Layer* layer);
     virtual void checkRenderLayer();
-    virtual void renderLayer();
+    virtual void renderSWLayer();
     virtual void endLayer();
 
     virtual void clearBackground();

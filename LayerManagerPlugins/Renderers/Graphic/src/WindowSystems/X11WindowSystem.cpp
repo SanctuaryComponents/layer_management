@@ -408,8 +408,13 @@ void X11WindowSystem::NewWindow(Surface* surface, Window window)
         {
             LOG_DEBUG("X11WindowSystem", "Error fetching window name");
         }
-        LOG_DEBUG("X11WindowSystem","Creating New Damage for window - " << window);
-        XDamageCreate(x11Display,window,XDamageReportNonEmpty);
+
+        if (att.c_class == InputOutput)
+        {
+            LOG_DEBUG("X11WindowSystem","Creating New Damage for window - " << window);
+            XDamageCreate(x11Display,window,XDamageReportNonEmpty);
+        }
+
         XFree(name);
         XLowerWindow(x11Display,window);
 
@@ -593,19 +598,48 @@ void X11WindowSystem::CheckRedrawAllLayers()
         graphicSystem->checkRenderLayer();
         graphicSystem->endLayer();
     }
-    graphicSystem->releaseGraphicContext();    
+    graphicSystem->releaseGraphicContext();
 }
 
 void X11WindowSystem::RedrawAllLayers()
 {
     std::list<Layer*> layers = m_pScene->getCurrentRenderOrder();
+
+    // m_damaged represents that SW composition is required
+    // At this point if a layer has damaged = true then it must be a HW layer that needs update.
+    // A SW layer which needs update will make m_damaged = true
+    if (m_damaged)
+    {
+        graphicSystem->activateGraphicContext();
+        graphicSystem->clearBackground();
+    }
     for(std::list<Layer*>::const_iterator current = layers.begin(); current != layers.end(); current++)
     {
-        graphicSystem->beginLayer(*current);
-        graphicSystem->renderLayer();
-        graphicSystem->endLayer();
+        if ((*current)->getLayerType() == Hardware)
+        {
+            if ((*current)->damaged)
+            {
+                renderHWLayer(*current);
+                (*current)->damaged = false;
+            }
+        }
+        else if (m_damaged)
+        {
+            graphicSystem->beginLayer(*current);
+            graphicSystem->renderSWLayer();
+            graphicSystem->endLayer();
+        }
     }
-    
+    if (m_damaged)
+    {
+        graphicSystem->swapBuffers();
+        graphicSystem->releaseGraphicContext();
+    }
+}
+
+void X11WindowSystem::renderHWLayer(Layer *layer)
+{
+    (void)layer;
 }
 
 void X11WindowSystem::Redraw()
@@ -616,15 +650,15 @@ void X11WindowSystem::Redraw()
     m_pScene->lockScene();
 
     CheckRedrawAllLayers();
+    RedrawAllLayers();
+
+    m_pScene->unlockScene();
+
     if (m_damaged)
     {
-        graphicSystem->activateGraphicContext();
-        graphicSystem->clearBackground();
-        RedrawAllLayers();
-        graphicSystem->swapBuffers();
-        graphicSystem->releaseGraphicContext();
-        m_pScene->unlockScene();
-        if (debugMode)
+        // TODO: This block won't be executed for HW only changes
+        // Is that acceptable?
+       if (debugMode)
         {
             printDebug();
         }
@@ -633,11 +667,6 @@ void X11WindowSystem::Redraw()
 
         /* Reset the damage flag, all is up to date */
         m_damaged = false;
-    }
-    else
-    {
-        m_pScene->unlockScene();
-        /*LOG_INFO("X11WindowSystem","UnLocking List");*/
     }
 }
 
@@ -655,7 +684,7 @@ void X11WindowSystem::Screenshot()
         Layer* currentLayer = m_pScene->getLayer(screenShotLayerID);
         if (currentLayer!=NULL){
             graphicSystem->beginLayer(currentLayer);
-            graphicSystem->renderLayer();
+            graphicSystem->renderSWLayer();
             graphicSystem->endLayer();
         }
     }else if(takeScreenshot==ScreenshotOfSurface){

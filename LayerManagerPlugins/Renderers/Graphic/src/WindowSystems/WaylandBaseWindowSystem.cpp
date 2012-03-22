@@ -264,12 +264,42 @@ void WaylandBaseWindowSystem::CheckRedrawAllLayers()
 void WaylandBaseWindowSystem::RedrawAllLayers()
 {
     std::list<Layer*> layers = m_pScene->getCurrentRenderOrder();
+
+    // m_damaged represents that SW composition is required
+    // At this point if a layer has damaged = true then it must be a HW layer that needs update.
+    // A SW layer which needs update will make m_damaged = true
+    if (m_damaged)
+    {
+        graphicSystem->activateGraphicContext();
+        graphicSystem->clearBackground();
+    }
     for(std::list<Layer*>::const_iterator current = layers.begin(); current != layers.end(); current++)
     {
-        graphicSystem->beginLayer(*current);
-        graphicSystem->renderLayer();
-        graphicSystem->endLayer();
+        if ((*current)->getLayerType() == Hardware)
+        {
+            if ((*current)->damaged)
+            {
+                renderHWLayer(*current);
+                (*current)->damaged = false;
+            }
+        }
+        else if (m_damaged)
+        {
+            graphicSystem->beginLayer(*current);
+            graphicSystem->renderSWLayer();
+            graphicSystem->endLayer();
+        }
     }
+    if (m_damaged)
+    {
+        graphicSystem->swapBuffers();
+        graphicSystem->releaseGraphicContext();
+    }
+}
+
+void WaylandBaseWindowSystem::renderHWLayer(Layer *layer)
+{
+    (void)layer;
 }
 
 void WaylandBaseWindowSystem::Redraw()
@@ -280,15 +310,15 @@ void WaylandBaseWindowSystem::Redraw()
     m_pScene->lockScene();
 
     CheckRedrawAllLayers();
+    RedrawAllLayers();
+
+    m_pScene->unlockScene();
+
     if (m_damaged)
     {
-        graphicSystem->activateGraphicContext();
-        graphicSystem->clearBackground();
-        RedrawAllLayers();
-        graphicSystem->swapBuffers();
-        graphicSystem->releaseGraphicContext();
-        m_pScene->unlockScene();
-        if (m_debugMode)
+        // TODO: This block won't be executed for HW only changes
+        // Is that acceptable?
+        if (debugMode)
         {
             printDebug();
         }
@@ -297,11 +327,6 @@ void WaylandBaseWindowSystem::Redraw()
 
         /* Reset the damage flag, all is up to date */
         m_damaged = false;
-    }
-    else
-    {
-        m_pScene->unlockScene();
-        /*LOG_INFO("WaylandBaseWindowSystem","UnLocking List");*/
     }
 }
 
@@ -320,7 +345,7 @@ void WaylandBaseWindowSystem::Screenshot()
         Layer* currentLayer = m_pScene->getLayer(m_screenShotLayerID);
         if (currentLayer!=NULL){
             graphicSystem->beginLayer(currentLayer);
-            graphicSystem->renderLayer();
+            graphicSystem->renderSWLayer();
             graphicSystem->endLayer();
         }
     }else if(m_takeScreenshot==ScreenshotOfSurface){

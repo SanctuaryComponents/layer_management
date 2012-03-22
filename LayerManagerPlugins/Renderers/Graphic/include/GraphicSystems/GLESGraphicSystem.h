@@ -40,15 +40,15 @@ public:
     virtual bool init(EGLNativeDisplayType display, EGLNativeWindowType window);
 
     virtual void clearBackground();
-    
+
     virtual void activateGraphicContext();
     virtual void releaseGraphicContext();
-    
+
     virtual void swapBuffers();
 
     virtual void beginLayer(Layer* layer);
     virtual void checkRenderLayer();
-    virtual void renderLayer();
+    virtual void renderSWLayer();
     virtual void endLayer();
 
     virtual bool initOpenGLES(EGLint displayWidth, EGLint displayHeight);

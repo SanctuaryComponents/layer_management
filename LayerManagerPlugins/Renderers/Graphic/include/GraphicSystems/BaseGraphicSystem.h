@@ -30,14 +30,14 @@ template<class DisplayType, class WindowType>
 class BaseGraphicSystem
 {
 public:
-	virtual bool init(DisplayType display, WindowType window)=0;
-	virtual ~BaseGraphicSystem()
-	{
-	};
-	virtual void beginLayer(Layer* layer) = 0;
-	virtual void checkRenderLayer() = 0;
-	virtual void renderLayer() = 0;
-	virtual void endLayer() = 0;
+    virtual bool init(DisplayType display, WindowType window)=0;
+    virtual ~BaseGraphicSystem()
+    {
+    };
+    virtual void beginLayer(Layer* layer) = 0;
+    virtual void checkRenderLayer() = 0;
+    virtual void renderSWLayer() = 0;
+    virtual void endLayer() = 0;
 
     virtual void setBaseWindowSystem(BaseWindowSystem* windowSystem)
     {
@@ -49,7 +49,7 @@ public:
     virtual void clearBackground() = 0;
     virtual void swapBuffers() = 0;
     virtual void saveScreenShotOfFramebuffer(std::string fileToSave) = 0;
-    
+
     virtual void setTextureBinder(ITextureBinder* binder)
     {
         m_binder = binder;
@@ -62,7 +62,7 @@ public:
 
 protected:
     BaseWindowSystem* m_baseWindowSystem;
-    ITextureBinder* m_binder;    
+    ITextureBinder* m_binder;
 };
 
 #endif /* _BASEGRAPHICSYSTEM_H_ */
