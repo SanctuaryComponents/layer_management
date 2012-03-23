@@ -901,21 +901,23 @@ init_complete:
 
 void X11WindowSystem::ManageXInputEvent(XEvent *pevent)
 {
+    XEvent* currentEvent = pevent;
 #ifdef WITH_INPUT_EVENTS
     Surface * surf;
-    int *pX, *pY;
+    int *pX = NULL;
+    int *pY = NULL;
 
-    switch (pevent->type)
+    switch (currentEvent->type)
     {
         case ButtonRelease:
         case ButtonPress:
-            pX = &(((XButtonEvent*)pevent)->x);
-            pY = &(((XButtonEvent*)pevent)->y);
+            pX = &(((XButtonEvent*)currentEvent)->x);
+            pY = &(((XButtonEvent*)currentEvent)->y);
             break;
 
         case MotionNotify:
-            pX = &(((XMotionEvent*)pevent)->x);
-            pY = &(((XMotionEvent*)pevent)->y);
+            pX = &(((XMotionEvent*)currentEvent)->x);
+            pY = &(((XMotionEvent*)currentEvent)->y);
             break;
         default:
             break;
@@ -925,9 +927,10 @@ void X11WindowSystem::ManageXInputEvent(XEvent *pevent)
     if (surf != NULL)
     {
         pevent->xany.window = surf->getNativeContent();
-        XSendEvent(x11Display, pevent->xany.window, false, 0, pevent);
+        XSendEvent(x11Display, currentEvent->xany.window, false, 0, currentEvent);
     }
 #endif
+    currentEvent = NULL;
 }
 
 
