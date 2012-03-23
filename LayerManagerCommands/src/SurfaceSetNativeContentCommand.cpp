@@ -52,7 +52,7 @@ ExecutionResult SurfaceSetNativeContentCommand::execute(ICommandExecutor* execut
 
             result = ExecutionSuccessRedraw;
         }
-        else if(surface->getNativeContent() == m_nativeHandle)
+        else if( (unsigned int) surface->getNativeContent() == m_nativeHandle)
         {
             result = ExecutionSuccess;
         }
