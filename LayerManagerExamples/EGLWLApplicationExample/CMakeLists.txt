@@ -42,7 +42,7 @@ find_package (Wayland REQUIRED)
 include_directories(${WAYLAND_CLIENT_INCLUDE_DIR} ${FFI_INCLUDE_DIR})
 add_dependencies(EGLWLApplicationExample wayland-client)
 
-set(LIBS ${LIBS} ${GLESv2_LIBRARIES} ${WAYLAND_CLIENT_LIBRARIES} ${FFI_LIBRARIES} ${EGL_LIBRARY} LayerManagerUtils) 
-target_link_libraries(EGLWLApplicationExample ${LIBS} ilmClient wayland-client wayland-egl -ldl)
+set(LIBS ${LIBS} ${GLESv2_LIBRARIES} ${WAYLAND_CLIENT_LIBRARIES} ${WAYLAND_EGL_LIBRARIES} ${FFI_LIBRARIES} ${EGL_LIBRARY} LayerManagerUtils)
+target_link_libraries(EGLWLApplicationExample ${LIBS} ilmClient -ldl)
 
 install (TARGETS EGLWLApplicationExample DESTINATION bin)
