@@ -85,6 +85,7 @@ set(LIBS
 	${LIBS}
 	${GLESv2_LIBRARIES}
 	${WAYLAND_CLIENT_LIBRARIES}
+	${WAYLAND_EGL_LIBRARIES}
 	${FFI_LIBRARIES}
 	${EGL_LIBRARY}
 	LayerManagerUtils
@@ -92,6 +93,6 @@ set(LIBS
 )
 
 #target_link_libraries(EGLWLMockNavigation ${LIBS} wayland-client -ldl)
-target_link_libraries(EGLWLMockNavigation ${LIBS} wayland-client wayland-egl -static-libstdc++ -ldl)
+target_link_libraries(EGLWLMockNavigation ${LIBS} -ldl)
 
 install (TARGETS EGLWLMockNavigation DESTINATION bin)
