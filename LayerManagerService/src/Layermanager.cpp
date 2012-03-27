@@ -364,16 +364,16 @@ bool Layermanager::startAllCommunicators()
 bool Layermanager::startManagement(const int width, const int height,
         const char* displayName)
 {
-    bool renderersStarted = startAllRenderers(width, height, displayName);
-    bool communicatorsStarted = startAllCommunicators();
-    /* only call the initial layerscenery if all needed plugins are 
-     * successfully started */
-     
-    if (renderersStarted && communicatorsStarted)
-    {
-        delegateScene();
-    }
-    return renderersStarted && communicatorsStarted;
+    bool result = false;
+
+    // 1. start renderers, no prerequisites
+    // 2. execute scene provider plugins
+    // 3. start communication (after scene is ready to use)
+    result = startAllRenderers(width, height, displayName)
+             && delegateScene()
+             && startAllCommunicators();
+
+    return result;
 }
 
 void Layermanager::stopAllRenderers()
