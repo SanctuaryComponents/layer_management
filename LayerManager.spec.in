@@ -50,7 +50,6 @@ rm -rf $RPM_BUILD_ROOT
 %dir %_libdir/layermanager
 %{_libdir}/layermanager/libLayerScene.so
 %dir %_libdir/layermanager/communicator
-%{_libdir}/layermanager/communicator/libDBUSCommunicator.so
 %{_libdir}/layermanager/communicator/libGenericCommunicator.so
 %{_libdir}/layermanager/ipcmodules/*.so
 %{_libdir}/libIpcModuleLoader.so
