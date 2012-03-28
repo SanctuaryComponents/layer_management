@@ -1,3 +1,21 @@
+Version 0.9.6
+-------------
+This version includes the following enhancements.
+
+Bugfixes :
+
+- removed obsolete Commands.
+- added support for symbolic links to plugins.
+- Bugfix in GLXGraphicSystem Context has to be activated before beginLayer
+- Bug fixes in map/unmap window functions
+- Communciator plugins are now started after scene provider plugins
+
+Improvements:
+
+- Introducing DLT binding for Logging Framework
+- Introducing additional performance Counters
+- First version of Rendering Plugin for Wayland is introduced
+
 Version 0.9.5
 -------------
 This version includes the following enhancements.
