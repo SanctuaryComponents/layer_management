@@ -29,7 +29,3 @@ configure_file(
     ${CMAKE_SOURCE_DIR}/config/config.h
 )
 
-install (
-    FILES       config.h
-    DESTINATION include/ilm
-)
