@@ -33,12 +33,17 @@ ExecutionResult LayerRemoveCommand::execute(ICommandExecutor* executor)
 
     ExecutionResult result = ExecutionFailed;
 
-	Layer* layer = scene.getLayer(m_idToRemove);
-	if (layer)
-	{
-		scene.removeLayer(layer);
-		result = ExecutionSuccessRedraw;
-	}
+    Layer* layer = scene.getLayer(m_idToRemove);
+    if (layer)
+    {
+        if (scene.isLayerInCurrentRenderOrder(m_idToRemove))
+        {
+            IRenderer* renderer = *((executor->getRendererList())->begin());
+            renderer->forceCompositionWindowSystem();
+        }
+        scene.removeLayer(layer);
+        result = ExecutionSuccessRedraw;
+    }
 
     return result;
 }

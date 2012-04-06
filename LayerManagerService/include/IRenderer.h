@@ -132,6 +132,12 @@ public:
      * \ingroup    RendererAPI
      */
     virtual void signalWindowSystemRedraw() = 0;
+
+    /**
+     * \brief      Force composition for entire scene
+     * \ingroup    RendererAPI
+     */
+    virtual void forceCompositionWindowSystem() = 0;
 };
 
 #endif /* _IRENDERER_H_ */

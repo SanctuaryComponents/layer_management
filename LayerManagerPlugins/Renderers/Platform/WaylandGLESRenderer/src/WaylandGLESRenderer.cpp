@@ -157,6 +157,11 @@ void WaylandGLESRenderer::signalWindowSystemRedraw()
     m_pWindowSystem->signalRedrawEvent();
 }
 
+void WaylandGLESRenderer::forceCompositionWindowSystem()
+{
+    m_pWindowSystem->m_damaged = true;
+}
+
 Shader* WaylandGLESRenderer::createShader(const string* vertexName, const string* fragmentName)  
 {
     Shader *result = NULL;

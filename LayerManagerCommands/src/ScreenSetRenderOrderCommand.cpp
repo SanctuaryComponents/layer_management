@@ -31,6 +31,7 @@ ExecutionResult ScreenSetRenderOrderCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());
     ExecutionResult result = ExecutionFailed;
+    IRenderer* renderer = *((executor->getRendererList())->begin());
 
     // check for doubles
     for (unsigned int i = 0; i < m_length; i++)
@@ -57,6 +58,7 @@ ExecutionResult ScreenSetRenderOrderCommand::execute(ICommandExecutor* executor)
 
     scene.getCurrentRenderOrder().clear();
     result = ExecutionSuccessRedraw;
+    renderer->forceCompositionWindowSystem();
 
     LOG_DEBUG("ScreenSetRenderOrderCommand", "Length to set: " << m_length);
 

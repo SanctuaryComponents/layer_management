@@ -39,7 +39,8 @@ public:
     bool start(int, int, const char*);
     void stop();
 
-	void signalWindowSystemRedraw();
+    void signalWindowSystemRedraw();
+    void forceCompositionWindowSystem();
 private:
     X11WindowSystem*  m_pWindowSystem;
     GLXGraphicsystem* m_pGraphicSystem;

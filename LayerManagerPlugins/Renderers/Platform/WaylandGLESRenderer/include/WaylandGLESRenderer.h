@@ -39,6 +39,7 @@ public:
     uint* getScreenResolution(uint screenID);
     uint* getScreenIDs(uint* length);
     void signalWindowSystemRedraw();
+    void forceCompositionWindowSystem();
     Shader* createShader(const string* vertexName, const string* fragmentName);
 
 private:

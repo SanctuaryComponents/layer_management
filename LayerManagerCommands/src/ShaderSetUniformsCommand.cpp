@@ -78,6 +78,13 @@ ExecutionResult ShaderSetUniformsCommand::execute(ICommandExecutor* executor)
         LOG_ERROR("ShaderSetUniformsCommand", "shader ID "<<m_shaderid<<" not found");
         result = ExecutionFailed;
     }
+
+    if (result == ExecutionSuccessRedraw)
+    {
+        IRenderer* renderer = *((executor->getRendererList())->begin());
+        renderer->forceCompositionWindowSystem();
+    }
+
     return result;
 }
 

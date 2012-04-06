@@ -884,7 +884,6 @@ void WaylandBaseWindowSystem::signalRedrawEvent()
     LOG_DEBUG("WaylandBaseWindowSystem", "signalRedrawEvent");
     // set flag that redraw is needed
     this->m_systemState = REDRAW_STATE;
-    m_damaged = true;
     this->wakeUpRendererThread();
 }
 

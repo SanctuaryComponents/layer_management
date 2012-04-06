@@ -593,13 +593,13 @@ void X11WindowSystem::Redraw()
 
     CheckRedrawAllLayers();
     if (m_damaged)
-    {   
+    {
         graphicSystem->activateGraphicContext();
         graphicSystem->clearBackground();
         RedrawAllLayers();
         graphicSystem->swapBuffers();
         graphicSystem->releaseGraphicContext();
-        m_pScene->unlockScene();       
+        m_pScene->unlockScene();
         if (debugMode)
         {
             printDebug();
@@ -960,7 +960,6 @@ void X11WindowSystem::signalRedrawEvent()
 {
     // set flag that redraw is needed
     this->m_systemState = REDRAW_STATE;
-    m_damaged = true;
     this->wakeUpRendererThread();
 }
 

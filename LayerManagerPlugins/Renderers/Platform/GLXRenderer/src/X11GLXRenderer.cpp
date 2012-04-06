@@ -139,6 +139,11 @@ void X11GLXRenderer::signalWindowSystemRedraw()
 	m_pWindowSystem->signalRedrawEvent();
 }
 
+void X11GLXRenderer::forceCompositionWindowSystem()
+{
+    m_pWindowSystem->m_damaged = true;
+}
+
 extern "C" IRenderer* createX11GLXRenderer(Scene* pScene) {
 	return new X11GLXRenderer(pScene);
 }
