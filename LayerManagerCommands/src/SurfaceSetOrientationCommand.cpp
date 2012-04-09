@@ -37,8 +37,7 @@ ExecutionResult SurfaceSetOrientationCommand::execute(ICommandExecutor* executor
 
     if (surface)
     {
-        surface->setOrientation(m_orientation);
-        result = ExecutionSuccessRedraw;
+        result = surface->setOrientation(m_orientation) ? ExecutionSuccessRedraw : ExecutionSuccess;
     }
 
     return result;

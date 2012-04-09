@@ -38,8 +38,7 @@ ExecutionResult SurfaceSetPositionCommand::execute(ICommandExecutor* executor)
 
     if (surface)
     {
-        surface->setPosition(m_x, m_y);
-        result = ExecutionSuccessRedraw;
+        result = surface->setPosition(m_x, m_y) ? ExecutionSuccessRedraw : ExecutionSuccess;
     }
     return result;
 }

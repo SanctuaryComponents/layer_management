@@ -85,14 +85,14 @@ public:
      * \ingroup SceneAPI
      * \param[in] layer pointer to layer
      */
-    virtual void removeLayer(Layer* layer) = 0;
+    virtual bool removeLayer(Layer* layer) = 0;
 
     /**
      * \brief Remove surface from scene.
      * \ingroup SceneAPI
      * \param[in] surface pointer to surface
      */
-    virtual void removeSurface(Surface* surface) = 0;
+    virtual bool removeSurface(Surface* surface) = 0;
 
     /**
      * \brief Get a layer of the scene by id.

@@ -38,8 +38,7 @@ ExecutionResult SurfaceSetDimensionCommand::execute(ICommandExecutor* executor)
 
     if (surface)
     {
-        surface->setDimension(m_width, m_height);
-        result = ExecutionSuccessRedraw;
+        result = surface->setDimension(m_width, m_height) ? ExecutionSuccessRedraw : ExecutionSuccess;
     }
 
     return result;

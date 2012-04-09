@@ -38,8 +38,7 @@ ExecutionResult LayerSetRenderOrderCommand::execute(ICommandExecutor* executor)
 
     if (layer)
     {
-        layer->removeAllSurfaces();
-        result = ExecutionSuccessRedraw;
+        result = layer->removeAllSurfaces() ? ExecutionSuccessRedraw : ExecutionSuccess;
 
         for (unsigned int surfaceIndex = 0; surfaceIndex < m_length; ++surfaceIndex)
         {
@@ -48,15 +47,14 @@ ExecutionResult LayerSetRenderOrderCommand::execute(ICommandExecutor* executor)
             if (surface)
             {
                 unsigned int layer_id = surface->getContainingLayerId();
-                if (layer_id != GraphicalObject::INVALID_ID)
+                if (layer->addSurface(surface))
                 {
-                    LOG_WARNING("LayerSetRenderOrderCommand","surface : id [ " << m_array[surfaceIndex] << " ] already belongs to layer : id [ " << layer_id << " ]");
+                    LOG_DEBUG("LayerSetRenderOrderCommand","Adding surface " << surface->getID() << " to renderorder of layer " << m_layerid);
+                    result = ExecutionSuccessRedraw;
                 }
                 else
                 {
-                    LOG_DEBUG("LayerSetRenderOrderCommand","add surface " << surface->getID() << " to renderorder of layer " << m_layerid);
-                    layer->addSurface(surface);
-                    result = ExecutionSuccessRedraw;
+                    LOG_WARNING("LayerSetRenderOrderCommand","surface : id [ " << m_array[surfaceIndex] << " ] already belongs to layer : id [ " << layer_id << " ]");
                 }
             }
         }

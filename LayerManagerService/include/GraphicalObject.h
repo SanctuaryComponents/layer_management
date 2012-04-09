@@ -31,17 +31,19 @@ class GraphicalObject
 {
 public:
 
-	GraphicalObject(ObjectType type, double opacity, bool visibility);
+    GraphicalObject(ObjectType type, double opacity, bool visibility);
 
-	GraphicalObject(int externalId,ObjectType type, double opacity, bool visibility);
+    GraphicalObject(int externalId,ObjectType type, double opacity, bool visibility);
 
-	virtual ~GraphicalObject() {}
+    virtual ~GraphicalObject() {}
 
     /**
      * @brief Set alpha value
      * @param[in] newOpacity The new Alpha Value between 0.0 (full transparency) and 1.0 (fully visible)
+     * @return TRUE if the new Alpha Value is not equal to the current Alpha Value
+     *         FALSE if they are equal
      */
-    virtual void setOpacity(double newOpacity);
+    virtual bool setOpacity(double newOpacity);
 
     /**
      * @brief Get alpha value
@@ -49,13 +51,15 @@ public:
      */
     double getOpacity() const;
 
-	/**
-	 * Set the visibility
-	 * @param[in] newVisibility set this object visible (true) or invisible (false)
-	 */
-	virtual void setVisibility(bool newVisibility);
+    /**
+     * Set the visibility
+     * @param[in] newVisibility set this object visible (true) or invisible (false)
+     * @return TRUE if the new visiblity value is not equal to the current visibility value
+     *         FALSE if they are equal
+     */
+    virtual bool setVisibility(bool newVisibility);
 
-	bool getVisibility() const;
+    bool getVisibility() const;
 
     /**
      * @brief Get external ID for graphical object
@@ -63,12 +67,14 @@ public:
      */
     virtual unsigned int getID();
 
-	/**
-	 * Assign custom shader for rendering
-	 *
-	 * @param[in] s Custom shader. If NULL, default shader will be used.
-	 */
-	void setShader(Shader* s);
+    /**
+     * Assign custom shader for rendering
+     *
+     * @param[in] s Custom shader. If NULL, default shader will be used.
+     * @return TRUE if the new custom shader is different from the current custom shader
+     *         FALSE if they are same
+     */
+    bool setShader(Shader* s);
 
     /**
      * @brief get the currently assigned custom shader object
@@ -79,8 +85,8 @@ public:
 public:
     static const unsigned int INVALID_ID;
     ObjectType type;
-	bool renderPropertyChanged;
-	bool damaged;
+    bool renderPropertyChanged;
+    bool damaged;
 
     ///     Pointer to currently assigned shader. If NULL, a default shader will be used.
     Shader* shader;
@@ -119,13 +125,15 @@ inline GraphicalObject::GraphicalObject(int externalId, ObjectType type, double 
 {
 }
 
-inline void GraphicalObject::setOpacity(double newOpacity)
+inline bool GraphicalObject::setOpacity(double newOpacity)
 {
-	if (opacity != newOpacity)
-	{
-		renderPropertyChanged = true;
-	}
-	opacity = newOpacity;
+    if (opacity != newOpacity)
+    {
+        opacity = newOpacity;
+        renderPropertyChanged = true;
+        return true;
+    }
+    return false;
 }
 
 inline double GraphicalObject::getOpacity() const
@@ -133,13 +141,15 @@ inline double GraphicalObject::getOpacity() const
     return opacity;
 }
 
-inline void GraphicalObject::setVisibility(bool newVisibility)
+inline bool GraphicalObject::setVisibility(bool newVisibility)
 {
-	if (visibility != newVisibility)
-	{
-		renderPropertyChanged = true;
-	}
-	visibility = newVisibility;
+    if (visibility != newVisibility)
+    {
+        visibility = newVisibility;
+        renderPropertyChanged = true;
+        return true;
+    }
+    return false;
 }
 
 inline bool GraphicalObject::getVisibility() const
@@ -152,10 +162,15 @@ inline unsigned int GraphicalObject::getID()
     return graphicExternalId;
 }
 
-inline void GraphicalObject::setShader(Shader* s)
+inline bool GraphicalObject::setShader(Shader* s)
 {
-	renderPropertyChanged = true;
-	shader = s;
+    if (shader != s)
+    {
+        shader = s;
+        renderPropertyChanged = true;
+        return true;
+    }
+    return false;
 }
 
 inline Shader* GraphicalObject::getShader()

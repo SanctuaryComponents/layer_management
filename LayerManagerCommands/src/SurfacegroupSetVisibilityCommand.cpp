@@ -38,8 +38,7 @@ ExecutionResult SurfacegroupSetVisibilityCommand::execute(ICommandExecutor* exec
     if (surfacegroup)
     {
         LOG_DEBUG("SurfacegroupSetVisibilityCommand", "setting visibility: " << m_visibility << " of id " << m_idtoSet);
-        surfacegroup->setVisibility(m_visibility);
-        result = ExecutionSuccessRedraw;
+        result = surfacegroup->setVisibility(m_visibility) ? ExecutionSuccessRedraw : ExecutionSuccess;
     }
 
     return result;

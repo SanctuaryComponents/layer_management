@@ -37,8 +37,7 @@ ExecutionResult LayerSetOrientationCommand::execute(ICommandExecutor* executor)
 
     if (layer)
     {
-        layer->setOrientation(m_orientation);
-        result = ExecutionSuccessRedraw;
+        result = layer->setOrientation(m_orientation) ? ExecutionSuccessRedraw : ExecutionSuccess;
     }
 
     return result;

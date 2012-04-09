@@ -48,25 +48,29 @@ public:
     /**
      * Set visibility on every element of the group
      */
-    virtual void setVisibility(bool visible)
+    virtual bool setVisibility(bool visible)
     {
+        bool result = false;
         this->visibility = visible;
         for(typename std::list<T*>::iterator it = list.begin(); it != list.end(); ++it)
         {
-            (*it)->setVisibility(visible);
+            result |= (*it)->setVisibility(visible);
         }
+        return result;
     }
 
     /**
      * Set opacity on every element of the group
      */
-    virtual void setOpacity(double opacity)
+    virtual bool setOpacity(double opacity)
     {
+        bool result = false;
         this->opacity = opacity;
         for(typename std::list<T*>::iterator it = list.begin(); it != list.end(); ++it)
         {
-            (*it)->setOpacity(opacity);
+            result |= (*it)->setOpacity(opacity);
         }
+        return result;
     }
 
     const std::list<T*> getList() const

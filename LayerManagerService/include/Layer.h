@@ -41,13 +41,13 @@ public:
     virtual ~Layer() {}
 
     LayerType getLayerType() const;
-    void setLayerType(LayerType lt);
-    void setLayerCapabilities(unsigned int newCapabilities);
+    bool setLayerType(LayerType lt);
+    bool setLayerCapabilities(unsigned int newCapabilities);
     unsigned int getCapabilities() const;
-    void addSurface(Surface* s);
-    void removeSurface(Surface* s);
+    bool addSurface(Surface* s);
+    bool removeSurface(Surface* s);
     SurfaceList& getAllSurfaces();
-    void removeAllSurfaces();
+    bool removeAllSurfaces();
 
 private:
     SurfaceList m_surfaces;
@@ -74,22 +74,26 @@ inline LayerType Layer::getLayerType() const
     return m_layerType;
 }
 
-inline void Layer::setLayerType(LayerType lt)
+inline bool Layer::setLayerType(LayerType lt)
 {
-	if (m_layerType != lt)
-	{
-		renderPropertyChanged = true;
-	}
-    m_layerType = lt;
+    if (m_layerType != lt)
+    {
+        m_layerType = lt;
+        renderPropertyChanged = true;
+        return true;
+    }
+    return false;
 }
 
-inline void Layer::setLayerCapabilities(uint newCapabilities)
+inline bool Layer::setLayerCapabilities(uint newCapabilities)
 {
-	if (m_capabilities != newCapabilities)
-	{
-		renderPropertyChanged = true;
-	}
-    m_capabilities = newCapabilities;
+    if (m_capabilities != newCapabilities)
+    {
+        m_capabilities = newCapabilities;
+        renderPropertyChanged = true;
+        return true;
+    }
+    return false;
 }
 
 inline uint Layer::getCapabilities() const
@@ -97,24 +101,28 @@ inline uint Layer::getCapabilities() const
     return m_capabilities;
 }
 
-inline void Layer::addSurface(Surface* s)
+inline bool Layer::addSurface(Surface* s)
 {
     if (s->getContainingLayerId() == INVALID_ID)
     {
         m_surfaces.push_back(s);
         s->setContainingLayerId(getID());
         renderPropertyChanged = true;
+        return true;
     }
+    return false;
 }
 
-inline void Layer::removeSurface(Surface* s)
+inline bool Layer::removeSurface(Surface* s)
 {
     if (s->getContainingLayerId() == getID())
     {
         m_surfaces.remove(s);
         s->setContainingLayerId(INVALID_ID);
         renderPropertyChanged = true;
+        return true;
     }
+    return false;
 }
 
 inline SurfaceList& Layer::getAllSurfaces()
@@ -122,16 +130,21 @@ inline SurfaceList& Layer::getAllSurfaces()
     return m_surfaces;
 }
 
-inline void Layer::removeAllSurfaces()
+inline bool Layer::removeAllSurfaces()
 {
     SurfaceListConstIterator iter = m_surfaces.begin();
     SurfaceListConstIterator iterEnd = m_surfaces.end();
+
+    if(iter == iterEnd)
+        return false;
+
     for (; iter != iterEnd; ++iter)
     {
         (*iter)->setContainingLayerId(GraphicalObject::INVALID_ID);
     }
     m_surfaces.clear();
     renderPropertyChanged = true;
+    return true;
 }
 
 #endif /* _LAYER_H_ */

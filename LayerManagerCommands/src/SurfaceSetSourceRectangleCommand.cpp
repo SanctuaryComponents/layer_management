@@ -41,8 +41,7 @@ ExecutionResult SurfaceSetSourceRectangleCommand::execute(ICommandExecutor* exec
     if (surface)
     {
         const Rectangle rectangle(m_x, m_y, m_width, m_height);
-        surface->setSourceRegion(rectangle);
-        result = ExecutionSuccessRedraw;
+        result = surface->setSourceRegion(rectangle) ? ExecutionSuccessRedraw : ExecutionSuccess;
     }
 
     return result;

@@ -31,6 +31,7 @@ ExecutionResult ShaderDestroyCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());
     ShaderMap& shaderMap = scene.m_shaderMap;
+    ExecutionResult result = ExecutionFailed;
 
     // get shader by its ID
     ShaderMapIterator iter = shaderMap.find(m_id);
@@ -48,10 +49,10 @@ ExecutionResult ShaderDestroyCommand::execute(ICommandExecutor* executor)
     if (shader)
     {
         const SurfaceMap& surfaceMap = scene.getAllSurfaces();
-        removeShaderFromAllSurfaces(surfaceMap, shader);
+        result = removeShaderFromAllSurfaces(surfaceMap, shader) ? ExecutionSuccessRedraw : ExecutionSuccess;
 
         const LayerMap& layerMap = scene.getAllLayers();
-        removeShaderFromAllLayers(layerMap, shader);
+        result = removeShaderFromAllLayers(layerMap, shader) ? ExecutionSuccessRedraw : result;
 
         // remove shader from global shader list
         scene.m_shaderMap.erase(iter);
@@ -60,12 +61,13 @@ ExecutionResult ShaderDestroyCommand::execute(ICommandExecutor* executor)
         delete shader;
     }
 
-    return ExecutionSuccessRedraw;
+    return result;
 }
 
 /// detach shader from all surfaces, surface groups, etc... from surfaces
-void ShaderDestroyCommand::removeShaderFromAllSurfaces(const SurfaceMap & surfaceMap, Shader* shader)
+bool ShaderDestroyCommand::removeShaderFromAllSurfaces(const SurfaceMap & surfaceMap, Shader* shader)
 {
+    bool result = false;
     SurfaceMapConstIterator iter = surfaceMap.begin();
     SurfaceMapConstIterator iterEnd = surfaceMap.end();
     for (; iter != iterEnd; ++iter)
@@ -75,12 +77,16 @@ void ShaderDestroyCommand::removeShaderFromAllSurfaces(const SurfaceMap & surfac
         if (obj && obj->getShader() == shader)
         {
             obj->setShader(NULL);
+            result = true;
         }
     }
+
+    return result;
 }
 
-void ShaderDestroyCommand::removeShaderFromAllLayers(const LayerMap & layerMap, Shader *& shader)
+bool ShaderDestroyCommand::removeShaderFromAllLayers(const LayerMap & layerMap, Shader *& shader)
 {
+    bool result = false;
     LayerMapConstIterator iter = layerMap.begin();
     LayerMapConstIterator iterEnd = layerMap.end();
     for (; iter != iterEnd; ++iter)
@@ -90,8 +96,11 @@ void ShaderDestroyCommand::removeShaderFromAllLayers(const LayerMap & layerMap, 
         if (obj && obj->getShader()==shader)
         {
             obj->setShader(NULL);
+            result = true;
         }
     }
+
+    return result;
 }
 
 unsigned int ShaderDestroyCommand::getShaderID() const

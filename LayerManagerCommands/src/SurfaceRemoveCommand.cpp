@@ -33,12 +33,11 @@ ExecutionResult SurfaceRemoveCommand::execute(ICommandExecutor* executor)
 
     ExecutionResult result = ExecutionFailed;
 
-	Surface* surface = scene.getSurface(m_idToRemove);
-	if (surface)
-	{
-		scene.removeSurface(surface);
-		result = ExecutionSuccessRedraw;
-	}
+    Surface* surface = scene.getSurface(m_idToRemove);
+    if (surface)
+    {
+        result = scene.removeSurface(surface) ? ExecutionSuccessRedraw : ExecutionSuccess;
+    }
 
     return result;
 }

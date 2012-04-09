@@ -42,8 +42,7 @@ ExecutionResult LayerSetDestinationRectangleCommand::execute(ICommandExecutor* e
     if (layer)
     {
         const Rectangle rectangle(m_x, m_y, m_width, m_height);
-        layer->setDestinationRegion(rectangle);
-        result = ExecutionSuccessRedraw;
+        result = layer->setDestinationRegion(rectangle) ? ExecutionSuccessRedraw : ExecutionSuccess;
     }
 
     return result;

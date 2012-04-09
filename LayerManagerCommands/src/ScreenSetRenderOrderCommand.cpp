@@ -31,7 +31,6 @@ ExecutionResult ScreenSetRenderOrderCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());
     ExecutionResult result = ExecutionFailed;
-    IRenderer* renderer = *((executor->getRendererList())->begin());
 
     // check for doubles
     for (unsigned int i = 0; i < m_length; i++)
@@ -56,9 +55,14 @@ ExecutionResult ScreenSetRenderOrderCommand::execute(ICommandExecutor* executor)
     //                return false;
     //        } // TODO insert again later
 
+    if (scene.getCurrentRenderOrder().size() != 0)
+    {
+        IRenderer* renderer = *((executor->getRendererList())->begin());
+        renderer->forceCompositionWindowSystem();
+        result = ExecutionSuccessRedraw;
+    }
+
     scene.getCurrentRenderOrder().clear();
-    result = ExecutionSuccessRedraw;
-    renderer->forceCompositionWindowSystem();
 
     LOG_DEBUG("ScreenSetRenderOrderCommand", "Length to set: " << m_length);
 
@@ -73,6 +77,7 @@ ExecutionResult ScreenSetRenderOrderCommand::execute(ICommandExecutor* executor)
             result = ExecutionSuccessRedraw;
         }
     }
+
     return result;
 }
 

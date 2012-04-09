@@ -41,8 +41,7 @@ ExecutionResult LayerSetSourceRectangleCommand::execute(ICommandExecutor* execut
     if (layer)
     {
         const Rectangle rectangle(m_x, m_y, m_width, m_height);
-        layer->setSourceRegion(rectangle);
-        result = ExecutionSuccessRedraw;
+        result = layer->setSourceRegion(rectangle) ? ExecutionSuccessRedraw : ExecutionSuccess;
     }
 
     return result;

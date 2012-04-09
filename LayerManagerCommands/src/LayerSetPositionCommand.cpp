@@ -38,8 +38,7 @@ ExecutionResult LayerSetPositionCommand::execute(ICommandExecutor* executor)
 
     if (layer)
     {
-        layer->setPosition(m_x, m_y);
-        result = ExecutionSuccessRedraw;
+        result = layer->setPosition(m_x, m_y) ? ExecutionSuccessRedraw : ExecutionSuccess;
     }
     return result;
 }

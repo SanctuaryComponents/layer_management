@@ -38,8 +38,7 @@ ExecutionResult SurfaceSetVisibilityCommand::execute(ICommandExecutor* executor)
     if (surface)
     {
         LOG_DEBUG("SurfaceSetVisibilityCommand", "setting visibility: " << m_visibility << " of id " << m_idtoSet);
-        surface->setVisibility(m_visibility);
-        result = ExecutionSuccessRedraw;
+        result = surface->setVisibility(m_visibility) ? ExecutionSuccessRedraw : ExecutionSuccess;
     }
 
     return result;

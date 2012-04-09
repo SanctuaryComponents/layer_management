@@ -64,8 +64,7 @@ ExecutionResult SurfaceSetShaderCommand::execute(ICommandExecutor* executor)
             // shaderId==0 detaches the custom shader
             // (shader is supposed to be NULL in this case)
 
-            object->setShader(shader);
-            result = ExecutionSuccessRedraw;
+            result = object->setShader(shader) ? ExecutionSuccessRedraw : ExecutionSuccess;
         }
         else
         {

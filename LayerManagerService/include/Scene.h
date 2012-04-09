@@ -58,8 +58,8 @@ public:
     virtual LayerGroup *createLayerGroup(const uint id);
     virtual SurfaceGroup *createSurfaceGroup(const uint id);
 
-    virtual void removeLayer(Layer* layer);
-    virtual void removeSurface(Surface* surface);
+    virtual bool removeLayer(Layer* layer);
+    virtual bool removeSurface(Surface* surface);
     virtual void removeSurfaceNativeContent(Surface* surface);
     virtual Layer* getLayer(const uint id) const;
     virtual Surface* getSurface(const uint id) const;

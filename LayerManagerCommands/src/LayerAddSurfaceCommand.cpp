@@ -38,17 +38,17 @@ ExecutionResult LayerAddSurfaceCommand::execute(ICommandExecutor* executor)
 
     if (layer != NULL && surface != NULL)
     {
-        unsigned int layer_id = surface->getContainingLayerId();
-        if (layer_id != GraphicalObject::INVALID_ID)
+        if (layer->addSurface(surface))
         {
-            LOG_WARNING("LayerAddSurfaceCommand","surface : id [ " << m_surfaceid << " ] already belongs to layer : id [ " << layer_id << " ]");
+            LOG_DEBUG("LayerAddSurfaceCommand","Adding surface(" << m_surfaceid << ")" << surface->getID() << " to layer(" << m_layerid << ") " << layer->getID());
+            LOG_DEBUG("LayerAddSurfaceCommand", "Layer now has #surfaces:" << layer->getAllSurfaces().size());
+            result = surface->hasNativeContent() ? ExecutionSuccessRedraw : ExecutionSuccess;
         }
         else
         {
-            LOG_DEBUG("LayerAddSurfaceCommand","add surface(" << m_surfaceid << ")" << surface->getID() << " to layer(" << m_layerid << ") " << layer->getID());
-            layer->addSurface(surface);
-            LOG_DEBUG("LayerAddSurfaceCommand", "Layer now has #surfaces:" << layer->getAllSurfaces().size());
-            result = ExecutionSuccessRedraw;
+            unsigned int layer_id = surface->getContainingLayerId();
+            LOG_WARNING("LayerAddSurfaceCommand","surface : id [ " << m_surfaceid << " ] already belongs to layer : id [ " << layer_id << " ]");
+            result = (m_layerid == layer_id) ? ExecutionSuccess : ExecutionFailed;
         }
     }
 

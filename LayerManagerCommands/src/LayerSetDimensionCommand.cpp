@@ -38,8 +38,7 @@ ExecutionResult LayerSetDimensionCommand::execute(ICommandExecutor* executor)
 
     if (layer)
     {
-        layer->setDimension(m_width, m_height);
-        result = ExecutionSuccessRedraw;
+        result = layer->setDimension(m_width, m_height) ? ExecutionSuccessRedraw : ExecutionSuccess;
     }
 
     return result;

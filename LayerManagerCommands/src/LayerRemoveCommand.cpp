@@ -36,13 +36,16 @@ ExecutionResult LayerRemoveCommand::execute(ICommandExecutor* executor)
     Layer* layer = scene.getLayer(m_idToRemove);
     if (layer)
     {
-        if (scene.isLayerInCurrentRenderOrder(m_idToRemove))
+        if (scene.removeLayer(layer))
         {
             IRenderer* renderer = *((executor->getRendererList())->begin());
             renderer->forceCompositionWindowSystem();
+            result = ExecutionSuccessRedraw;
         }
-        scene.removeLayer(layer);
-        result = ExecutionSuccessRedraw;
+        else
+        {
+            result = ExecutionSuccess;
+        }
     }
 
     return result;

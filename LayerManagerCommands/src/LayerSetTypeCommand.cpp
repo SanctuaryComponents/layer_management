@@ -40,8 +40,7 @@ ExecutionResult LayerSetTypeCommand::execute(ICommandExecutor* executor)
     if (layer)
     {
         LOG_DEBUG("LayerSetTypeCommand", "setting type: " << m_layerType << " of layer id " << m_idtoSet);
-        layer->setLayerType(m_layerType);
-        result = ExecutionSuccessRedraw;
+        result = layer->setLayerType(m_layerType) ? ExecutionSuccessRedraw : ExecutionSuccess;
     }
 
     return result;

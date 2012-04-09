@@ -38,8 +38,7 @@ ExecutionResult LayergroupSetVisibilityCommand::execute(ICommandExecutor* execut
     if (layergroup)
     {
         LOG_DEBUG("LayergroupSetVisibilityCommand", "setting visibility: " << m_visibility << " of id " << m_idtoSet);
-        layergroup->setVisibility(m_visibility);
-        result = ExecutionSuccessRedraw;
+        result = layergroup->setVisibility(m_visibility) ? ExecutionSuccessRedraw : ExecutionSuccess;
     }
 
     return result;

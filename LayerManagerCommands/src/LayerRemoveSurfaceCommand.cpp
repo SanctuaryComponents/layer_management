@@ -38,8 +38,7 @@ ExecutionResult LayerRemoveSurfaceCommand::execute(ICommandExecutor* executor)
 
     if (layer && surface)
     {
-        layer->removeSurface(surface);
-        result = ExecutionSuccessRedraw;
+        result = layer->removeSurface(surface) ? ExecutionSuccessRedraw : ExecutionSuccess;
     }
 
     return result;

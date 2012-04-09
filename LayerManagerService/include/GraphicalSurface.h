@@ -40,29 +40,35 @@ public:
     /**
      * @brief Set Orientation value
      * @param[in] newOrientation the new value. Multiples of 90 degrees. (0->0°, 1->90°, 2->180°,3->279°)
+     * @return TRUE if the new orientation value is not equal to the current orientation value
+     *         FALSE if they are equal
      */
-    void setOrientation(OrientationType newOrientation);
+    bool setOrientation(OrientationType newOrientation);
 
     OrientationType getOrientation() const;
 
     /**
      * @brief Set Source Viewport (only use portion of source graphics)
      * @param[in] newSource Rectangle defining position and size within surface (clip from the left)
+     * @return TRUE if the new source rectangle is not equal to the current source rectangle
+     *         FALSE if they are equal
      */
-    void setSourceRegion(const Rectangle& newSource);
+    bool setSourceRegion(const Rectangle& newSource);
 
     const Rectangle& getSourceRegion() const;
 
     /**
      * Set Destination Viewport (Scale output)
      * @param[in] newDestination Rectangle defining destination position and size
+     * @return TRUE if the new destination rectangle is not equal to the current destination rectangle
+     *         FALSE if they are equal
      */
-    void setDestinationRegion(const Rectangle& newDestination);
+    bool setDestinationRegion(const Rectangle& newDestination);
 
-    void setPosition(const unsigned int& x, const unsigned int& y);
+    bool setPosition(const unsigned int& x, const unsigned int& y);
 
     Vector2 getPosition();
-    void setDimension(const unsigned int& width, const unsigned int& height);
+    bool setDimension(const unsigned int& width, const unsigned int& height);
 
     const Rectangle& getDestinationRegion() const;
     Vector2 getDimension();
@@ -125,13 +131,15 @@ inline GraphicalSurface::GraphicalSurface(int externalId,ObjectType type)
 {
 }
 
-inline void GraphicalSurface::setOrientation(OrientationType newOrientation)
+inline bool GraphicalSurface::setOrientation(OrientationType newOrientation)
 {
-	if (m_orientation != newOrientation)
-	{
-		renderPropertyChanged = true;
-	}
-	m_orientation = newOrientation;
+    if (m_orientation != newOrientation)
+    {
+        m_orientation = newOrientation;
+        renderPropertyChanged = true;
+        return true;
+    }
+    return false;
 }
 
 inline OrientationType GraphicalSurface::getOrientation() const
@@ -139,34 +147,43 @@ inline OrientationType GraphicalSurface::getOrientation() const
     return m_orientation;
 }
 
-inline void GraphicalSurface::setSourceRegion(const Rectangle& newSource)
+inline bool GraphicalSurface::setSourceRegion(const Rectangle& newSource)
 {
-	if (!(m_sourceViewport == newSource))
-	{
-		renderPropertyChanged = true;
-	}
-	m_sourceViewport = newSource;}
+    if (!(m_sourceViewport == newSource))
+    {
+        m_sourceViewport = newSource;
+        renderPropertyChanged = true;
+        return true;
+    }
+    return false;
+}
 
 inline const Rectangle& GraphicalSurface::getSourceRegion() const
 {
     return m_sourceViewport;
 }
 
-inline void GraphicalSurface::setDestinationRegion(const Rectangle& newDestination)
+inline bool GraphicalSurface::setDestinationRegion(const Rectangle& newDestination)
 {
-	if (!(m_destinationViewport == newDestination))
-	{
-		renderPropertyChanged = true;
-	}
-	m_destinationViewport = newDestination;}
+    if (!(m_destinationViewport == newDestination))
+    {
+        m_destinationViewport = newDestination;
+        renderPropertyChanged = true;
+        return true;
+    }
+    return false;
+}
 
-inline void GraphicalSurface::setPosition(const unsigned int& x, const unsigned int& y)
+inline bool GraphicalSurface::setPosition(const unsigned int& x, const unsigned int& y)
 {
-	if (m_destinationViewport.x != x || m_destinationViewport.y != y)
-	{
-		renderPropertyChanged = true;
-	}
-	m_destinationViewport.x = x; m_destinationViewport.y = y;
+    if (m_destinationViewport.x != x || m_destinationViewport.y != y)
+    {
+        m_destinationViewport.x = x;
+        m_destinationViewport.y = y;
+        renderPropertyChanged = true;
+        return true;
+    }
+    return false;
 }
 
 inline Vector2 GraphicalSurface::getPosition()
@@ -174,13 +191,16 @@ inline Vector2 GraphicalSurface::getPosition()
     return Vector2(m_destinationViewport.x,m_destinationViewport.y);
 }
 
-inline void GraphicalSurface::setDimension(const unsigned int& width, const unsigned int& height)
+inline bool GraphicalSurface::setDimension(const unsigned int& width, const unsigned int& height)
 {
-	if (m_destinationViewport.width != width || m_destinationViewport.height != height)
-	{
-		renderPropertyChanged = true;
-	}
-	m_destinationViewport.width = width; m_destinationViewport.height = height;
+    if (m_destinationViewport.width != width || m_destinationViewport.height != height)
+    {
+        m_destinationViewport.width = width;
+        m_destinationViewport.height = height;
+        renderPropertyChanged = true;
+        return true;
+    }
+    return false;
 }
 
 inline const Rectangle& GraphicalSurface::getDestinationRegion() const

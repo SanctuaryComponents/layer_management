@@ -38,8 +38,7 @@ ExecutionResult SurfacegroupSetOpacityCommand::execute(ICommandExecutor* executo
     if (surfacegroup)
     {
         LOG_DEBUG("SurfacegroupSetOpacityCommand","new opacity " << m_opacity << " for id: " << m_id);
-        surfacegroup->setOpacity(m_opacity);
-        result = ExecutionSuccessRedraw;
+        result = surfacegroup->setOpacity(m_opacity) ? ExecutionSuccessRedraw : ExecutionSuccess;
     }
 
     return result;

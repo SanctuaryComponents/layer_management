@@ -209,16 +209,21 @@ void Scene::removeLayerFromAllLayerGroups(Layer* layer)
 }
 
 /// \brief take layer out of list of layers
-void Scene::removeLayer(Layer* layer)
+bool Scene::removeLayer(Layer* layer)
 {
+    bool result = false;
+
     if (layer != NULL)
     {
+        result = isLayerInCurrentRenderOrder(layer->getID());
         layer->removeAllSurfaces();
         m_currentRenderOrder.remove(layer);
         m_layerMap.erase(layer->getID());
         removeLayerFromAllLayerGroups(layer);
         delete layer;
     }
+
+    return result;
 }
 
 /// \brief remove surface from all surfacegroups it might be part of
@@ -235,8 +240,10 @@ void Scene::removeSurfaceFromAllSurfaceGroups(Surface* surface)
 }
 
 /// \brief take surface out of list of surfaces
-void Scene::removeSurface(Surface* surface)
+bool Scene::removeSurface(Surface* surface)
 {
+    bool result = false;
+
     if (surface != NULL)
     {
         uint surfaceId = surface->getID();
@@ -247,7 +254,7 @@ void Scene::removeSurface(Surface* surface)
             Layer* layer = getLayer(layerId);
             if (layer != NULL)
             {
-                layer->removeSurface(surface);
+                result = layer->removeSurface(surface);
             }
         }
 
@@ -256,6 +263,8 @@ void Scene::removeSurface(Surface* surface)
 
         delete surface;
     }
+
+    return result;
 }
 /// \brief take removing applied native content
 void Scene::removeSurfaceNativeContent(Surface* surface)
