@@ -24,7 +24,7 @@
 #include "BaseRenderer.h"
 #include "LayerList.h"
 #include "GraphicSystems/GLESGraphicSystem.h"
-#include "WindowSystems/WaylandWindowSystem.h"
+#include "WindowSystems/WaylandBaseWindowSystem.h"
 
 class WaylandGLESRenderer : public BaseRenderer
 {
@@ -42,7 +42,7 @@ public:
     Shader* createShader(const string* vertexName, const string* fragmentName);
 
 private:
-    WaylandWindowSystem* m_pWindowSystem;
+    WaylandBaseWindowSystem* m_pWindowSystem;
     GLESGraphicsystem* m_pGraphicSystem;
     uint m_width;
     uint m_height;

@@ -1,6 +1,7 @@
 /***************************************************************************
  *
  * Copyright 2010,2011 BMW Car IT GmbH
+ * Copyright (C) 2011 DENSO CORPORATION and Robert Bosch Car Multimedia Gmbh
  *
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -76,6 +77,12 @@
 // use OpenGL ES 2.0 / Wayland renderer
 #cmakedefine WITH_WAYLAND
 
+// use fbdev for wayland backend
+#cmakedefine WITH_WAYLAND_FBDEV
+
+// use x11 for wayland backend
+#cmakedefine WITH_WAYLAND_X11
+
 // use xthreads library
 #cmakedefine WITH_XTHREADS
 
@@ -102,5 +109,7 @@
     LOG_DEBUG("Config", "WITH_TESTS          = ${WITH_TESTS}"); \
     LOG_DEBUG("Config", "WITH_X11_GLES       = ${WITH_X11_GLES}"); \
     LOG_DEBUG("Config", "WITH_WAYLAND        = ${WITH_WAYLAND}"); \
+    LOG_DEBUG("Config", "WITH_WAYLAND_FBDEV  = ${WITH_WAYLAND_FBDEV}"); \
+    LOG_DEBUG("Config", "WITH_WAYLAND_X11    = ${WITH_WAYLAND_X11}"); \
     LOG_DEBUG("Config", "WITH_XTHREADS       = ${WITH_XTHREADS}"); \
     LOG_DEBUG("Config", "WITH_DLT            = ${WITH_DLT}");

@@ -23,6 +23,9 @@
 #include "Shader.h"
 #include "ShaderProgramGLES.h"
 #include "TextureBinders/WaylandCopyGLES.h"
+#include "TextureBinders/WaylandEglImage.h"
+#include "WindowSystems/WaylandFbdevWindowSystem.h"
+#include "WindowSystems/WaylandX11WindowSystem.h"
 
 WaylandGLESRenderer::WaylandGLESRenderer(Scene* pScene)
 : BaseRenderer(pScene)
@@ -42,10 +45,22 @@ bool WaylandGLESRenderer::start(int width, int height, const char* displayname)
     m_width = width;
     m_height = height;
     // create Wayland windows, register as composite manager etc
-    m_pWindowSystem = new WaylandWindowSystem(displayname, width, height, m_pScene);
+    m_pWindowSystem = NULL;
+#ifdef WITH_WAYLAND_FBDEV
+    m_pWindowSystem = new WaylandFbdevWindowSystem(displayname, width, height, m_pScene);
+#endif
+#ifdef WITH_WAYLAND_X11
+    m_pWindowSystem = new WaylandX11WindowSystem(displayname, width, height, m_pScene);
+#endif
+    if( m_pWindowSystem == NULL )
+    {
+    LOG_ERROR("WaylandGLESRenderer", "Window system is not specified. Consider to specify WITH_WAYLAND_X11 or WITH_WAYLAND_FBDEV");
+    goto fail; // TODO bad style
+    }
+
     m_pGraphicSystem = new GLESGraphicsystem(width,height, ShaderProgramGLES::createProgram);
 
-    if (!m_pWindowSystem->init((BaseGraphicSystem<int, int>*) m_pGraphicSystem))
+    if (!m_pWindowSystem->init((BaseGraphicSystem<EGLNativeDisplayType, EGLNativeWindowType>*) m_pGraphicSystem))
     {
         goto fail; // TODO bad style
     }
@@ -63,7 +78,7 @@ bool WaylandGLESRenderer::start(int width, int height, const char* displayname)
     binder = new WaylandCopyGLES(eglDisplayhandle, nativeDisplayHandle);
 #else // WITH_FORCE_COPY
 #ifdef EGL_NATIVE_PIXMAP_KHR
-    //binder = new WaylandEglImage(eglDisplayhandle, nativeDisplayHandle); // TODO Not supported yet
+    binder = new WaylandEglImage(eglDisplayhandle, nativeDisplayHandle);
 #else // EGL_NATIVE_PIXMAP_KHR
     binder = new WaylandCopyGLES(eglDisplayhandle, nativeDisplayHandle);
 #endif // EGL_NATIVE_PIXMAP_KHR

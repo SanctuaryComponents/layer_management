@@ -41,7 +41,6 @@ option (WITH_EGL_EXAMPLE    "Build EGL_EXAMPLE / X11"                           
 option (WITH_WL_EXAMPLE     "Build EGL_EXAMPLE / Wayland"                         OFF)
 option (WITH_DESKTOP        "Build for Desktop / GLX"                             OFF)
 option (WITH_GLX_LIB        "Build development library for GLX Based Renderers"   OFF)
-option (WITH_WAYLAND        "Build for Desktop / Wayland(GLX)"                    OFF)
 option (WITH_GLX_EXAMPLE    "Build GLX_EXAMPLE "                                  OFF)
 option (WITH_INPUT_EVENTS   "Activate input events handling"                      OFF)
 option (WITH_FORCE_COPY     "Force Software Copy of Pixmaps"                      OFF)
@@ -49,6 +48,9 @@ option (WITH_XTHREADS       "Build with usage of X11 Threading"                 
 option (WITH_CLIENTEXAMPLES "Build client examples "                              ON )
 option (WITH_TESTS          "Build Available Tests "                              OFF)
 option (WITH_DLT            "Build with DLT support "                             OFF)
+option (WITH_WAYLAND        "Build plugin of Wayland GBS"                         OFF)
+option (WITH_WAYLAND_FBDEV  "Build Wayland with FBDEV backend"                    OFF)
+option (WITH_WAYLAND_X11    "Build Wayland with X11 backend"                      OFF)
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 
@@ -80,6 +82,12 @@ if (WITH_DESKTOP)
 endif(WITH_DESKTOP)     
 
 if (WITH_WAYLAND)
+    if (NOT WITH_WAYLAND_FBDEV AND NOT WITH_WAYLAND_X11)
+        message(FATAL_ERROR "Consider to specify WITH_WAYLAND_FBDEV or WITH_WAYLAND_X11")
+    endif(NOT WITH_WAYLAND_FBDEV AND NOT WITH_WAYLAND_X11)
+    if (WITH_WAYLAND_FBDEV AND WITH_WAYLAND_X11)
+        message(FATAL_ERROR "WITH_WAYLAND_FBDEV and WITH_WAYLAND_X11 can't be specified at the same time")
+    endif(WITH_WAYLAND_FBDEV AND WITH_WAYLAND_X11)
     add_subdirectory (LayerManagerPlugins/Renderers/Platform/WaylandGLESRenderer)
 endif(WITH_WAYLAND)     
 

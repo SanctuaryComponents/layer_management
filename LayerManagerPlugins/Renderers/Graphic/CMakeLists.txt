@@ -122,9 +122,12 @@ set(GRAPHIC_LIB_NAME LayerManagerGraphicWaylandGLESv2)
 file(GLOB SOURCES 
         ../Base/src/BaseRenderer.cpp 
         src/GraphicSystems/GLESGraphicSystem.cpp
-        src/WindowSystems/WaylandWindowSystem.cpp  
+        src/WindowSystems/WaylandBaseWindowSystem.cpp
+        src/WindowSystems/WaylandFbdevWindowSystem.cpp
+        src/WindowSystems/WaylandX11WindowSystem.cpp
         src/WindowSystems/WaylandServerinfoProtocol.cpp  
         src/TextureBinders/WaylandCopyGLES.cpp
+        src/TextureBinders/WaylandEglImage.cpp
         src/Transformation/ViewportTransform.cpp
         )
 
@@ -149,12 +152,19 @@ file(GLOB GRAPHIC_PLATFORM_INCLUDES
 
 file(GLOB GRAPHIC_WINDOWSYSTEMS_INCLUDES 
     include/WindowSystems/BaseWindowSystem.h
-    include/WindowSystems/WaylandWindowSystem.h
+    include/WindowSystems/WaylandBaseWindowSystem.h
+    include/WindowSystems/WaylandFbdevWindowSystem.h
+    include/WindowSystems/WaylandX11WindowSystem.h
 )
 
 file(GLOB GRAPHIC_TRANSFORM_INCLUDES 
     include/Transformation/ViewportTransform.h
 )
+
+if (WITH_WAYLAND_X11)
+find_package(X11 REQUIRED)
+include_directories(${X11_INCLUDE_DIR})
+endif (WITH_WAYLAND_X11)
 
 endif(WITH_WAYLAND)
 
@@ -191,6 +201,9 @@ if (WITH_WAYLAND)
 find_package (Wayland)
 include_directories(${WAYLAND_SERVER_INCLUDE_DIR})
 set(LIBS ${LIBS} ${WAYLAND_SERVER_LIBRARIES})
+if (WITH_WAYLAND_X11)
+set(LIBS ${LIBS} ${X11_X11_LIB})
+endif (WITH_WAYLAND_X11)
 else(WITH_WAYLAND)
 set(LIBS ${LIBS} ${CMAKE_THREAD_LIBS_INIT} ${X11_X11_LIB} ${X11_Xcomposite_LIB} ${X11_Xdamage_LIB} ${GRAPHIC_NATIVE_LIBS} LayerManagerUtils )
 endif(WITH_WAYLAND)

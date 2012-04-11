@@ -36,6 +36,11 @@ NAMES wayland-server
 PATHS /usr/lib /usr/local/lib
 )
 
+FIND_LIBRARY(WAYLAND_EGL_LIBRARIES
+NAMES wayland-egl
+PATHS /usr/lib /usr/local/lib
+)
+
 FIND_PATH(FFI_INCLUDE_DIR /ffi.h
 /usr/include /usr/local/include /usr/include/i386-linux-gnu
 )
@@ -52,6 +57,7 @@ IF(WAYLAND_CLIENT_LIBRARIES AND WAYLAND_SERVER_LIBRARIES)
     message(STATUS "Found Wayland-Client includes: ${WAYLAND_CLIENT_INCLUDE_DIR}")
     message(STATUS "Found Wayland-Server libs: ${WAYLAND_SERVER_LIBRARIES}")
     message(STATUS "Found Wayland-Server includes: ${WAYLAND_SERVER_INCLUDE_DIR}")
+    message(STATUS "Found Wayland-Egl libs: ${WAYLAND_EGL_LIBRARIES}")
     message(STATUS "Found ffi need by Wayland libs: ${FFI_LIBRARIES}")
     message(STATUS "Found ffi need by Wayland includes: ${FFI_INCLUDE_DIR}")
 ENDIF(WAYLAND_CLIENT_LIBRARIES AND WAYLAND_SERVER_LIBRARIES)
@@ -61,6 +67,7 @@ MARK_AS_ADVANCED(
   WAYLAND_CLIENT_LIBRARIES
   WAYLAND_SERVER_INCLUDE_DIR
   WAYLAND_SERVER_LIBRARIES
+  WAYLAND_EGL_LIBRARIES
   FFI_INCLUDE_DIR
   FFI_LIBRARIES
 )
