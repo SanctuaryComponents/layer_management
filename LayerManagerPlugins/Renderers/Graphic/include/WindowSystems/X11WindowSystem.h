@@ -79,6 +79,7 @@ private:
     bool m_initialized;
     bool m_success;
     X11WindowSystemStates m_systemState;
+    char* m_displayEnvironment;
 
 protected:
     Display* x11Display;

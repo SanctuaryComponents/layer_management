@@ -50,6 +50,7 @@ X11WindowSystem::X11WindowSystem(const char* displayname, int width, int height,
 , m_initialized(false)
 , m_success(false)
 , m_systemState(IDLE_STATE)
+, m_displayEnvironment(NULL)
 , windowWidth(width)
 , windowHeight(height)
 {
@@ -86,15 +87,15 @@ XVisualInfo* X11WindowSystem::getDefaultVisual(Display *dpy)
 
 bool X11WindowSystem::OpenDisplayConnection()
 {
-    const char* displayEnvironment = getenv("DISPLAY");
+    m_displayEnvironment = getenv("DISPLAY");
 
-    if  (displayEnvironment == NULL )
+    if  (m_displayEnvironment == NULL )
     {
-        displayEnvironment = ":0.0";
-        setenv("DISPLAY",displayEnvironment,1);
+        m_displayEnvironment = ":0.0";
+        setenv("DISPLAY",m_displayEnvironment,1);
     }
 
-    x11Display = XOpenDisplay(displayEnvironment);
+    x11Display = XOpenDisplay(m_displayEnvironment);
     if (!x11Display)
     {
         LOG_ERROR("X11WindowSystem", "Couldn't open default display!");
@@ -944,7 +945,7 @@ void X11WindowSystem::wakeUpRendererThread()
     LOG_DEBUG("X11WindowSystem", "Sending dummy event to wake up renderer thread");
     if (NULL == displaySignal )
     {
-        displaySignal = XOpenDisplay(":0");
+        displaySignal = XOpenDisplay(m_displayEnvironment);
     }
     XExposeEvent ev = { Expose, 0, 1, displaySignal, CompositorWindow, 0, 0, 100, 100, 0 };
     XLockDisplay(displaySignal);
