@@ -25,5 +25,5 @@
 typedef std::list<Surface*> SurfaceList;
 typedef std::list<Surface*>::iterator SurfaceListIterator;
 typedef std::list<Surface*>::const_iterator SurfaceListConstIterator;
-
+typedef std::list<Surface*>::const_reverse_iterator SurfaceListConstReverseIterator;
 #endif // _SURFACELIST_H_

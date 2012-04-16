@@ -402,46 +402,46 @@ void Scene::getLayerGroupIDs(uint* length, uint** array) const
  */
 Surface* Scene::getSurfaceAt(unsigned int *x, unsigned int *y, double minOpacity)
 {
-	Surface* surf;
-	SurfaceListConstIterator currentSurf;
-	LayerListConstReverseIterator currentLayer;
-	unsigned int x_SurfCoordinate, y_SurfCoordinate;
+    Surface* surf;
+    SurfaceListConstReverseIterator currentSurf;
+    LayerListConstReverseIterator currentLayer;
+    unsigned int x_SurfCoordinate, y_SurfCoordinate;
 
-	surf = NULL;
+    surf = NULL;
 
-	/* Need to browse for all layers. 1st layer of m_currentRenderOrder is rendered
-	 * on bottom, last one is rendrered on top. So we have to reverse iterate */
-	for (currentLayer = m_currentRenderOrder.rbegin();
-	     currentLayer != m_currentRenderOrder.rend() && surf == NULL;
-	     currentLayer++)
-	{
-		if ( ((*currentLayer)->visibility) && ((*currentLayer)->getOpacity() >= minOpacity) )
-		{
-			if ((*currentLayer)->isInside(*x, *y))
-			{
-				x_SurfCoordinate = *x;
-				y_SurfCoordinate = *y;
-				(*currentLayer)->DestToSourceCoordinates(&x_SurfCoordinate, &y_SurfCoordinate, false);
-				/* Need to browse for all surfaces */
-				for (currentSurf = (*currentLayer)->getAllSurfaces().begin();
-				     currentSurf != (*currentLayer)->getAllSurfaces().end() && surf == NULL;
-				     currentSurf++)
-				{
-					if ( ((*currentSurf)->visibility) && ((*currentSurf)->getOpacity() >= minOpacity) )
-					{
-						if ((*currentSurf)->isInside(x_SurfCoordinate, y_SurfCoordinate))
-						{
-							surf = *currentSurf;
-							(*currentSurf)->DestToSourceCoordinates(&x_SurfCoordinate, &y_SurfCoordinate, false);
-							*x = x_SurfCoordinate;
-							*y = y_SurfCoordinate;
-						}
-					}
-				}
-			}
-		}
-	}
-	return surf;
+    /* Need to browse for all layers. 1st layer of m_currentRenderOrder is rendered
+     * on bottom, last one is rendrered on top. So we have to reverse iterate */
+    for (currentLayer = m_currentRenderOrder.rbegin();
+         currentLayer != m_currentRenderOrder.rend() && surf == NULL;
+         currentLayer++)
+    {
+        if ( ((*currentLayer)->visibility) && ((*currentLayer)->getOpacity() >= minOpacity) )
+        {
+            if ((*currentLayer)->isInside(*x, *y))
+            {
+                x_SurfCoordinate = *x;
+                y_SurfCoordinate = *y;
+                (*currentLayer)->DestToSourceCoordinates(&x_SurfCoordinate, &y_SurfCoordinate, false);
+                /* Need to browse for all surfaces */
+                for (currentSurf = (*currentLayer)->getAllSurfaces().rbegin();
+                     currentSurf != (*currentLayer)->getAllSurfaces().rend() && surf == NULL;
+                     currentSurf++)
+                {
+                    if ( ((*currentSurf)->hasNativeContent()) && ((*currentSurf)->visibility) && ((*currentSurf)->getOpacity() >= minOpacity) )
+                    {
+                        if ((*currentSurf)->isInside(x_SurfCoordinate, y_SurfCoordinate))
+                        {
+                            surf = *currentSurf;
+                            (*currentSurf)->DestToSourceCoordinates(&x_SurfCoordinate, &y_SurfCoordinate, false);
+                            *x = x_SurfCoordinate;
+                            *y = y_SurfCoordinate;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return surf;
 }
 
 bool Scene::isLayerInCurrentRenderOrder(const uint id)
