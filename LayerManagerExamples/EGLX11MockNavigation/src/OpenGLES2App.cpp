@@ -63,7 +63,7 @@ OpenGLES2App::~OpenGLES2App()
 
 void OpenGLES2App::mainloop()
 {
-	unsigned int startTimeInMS = GetTickCount();
+    unsigned int startTimeInMS = GetTickCount();
     unsigned int frameStartTimeInMS = 0;
     unsigned int renderTimeInMS = 0;
     unsigned int frameEndTimeInMS = 0;
@@ -182,20 +182,20 @@ bool OpenGLES2App::createEGLContext()
     EGLint eglstatus = eglGetError();
     if (!m_eglContextStruct.eglDisplay)
     {
-    	cout << "Error: eglGetDisplay() failed.\n";
+        cout << "Error: eglGetDisplay() failed.\n";
     }
 
     EGLint iMajorVersion, iMinorVersion;
     if (!eglInitialize(m_eglContextStruct.eglDisplay, &iMajorVersion,
             &iMinorVersion))
     {
-    	cout << "Error: eglInitialize() failed.\n";
+        cout << "Error: eglInitialize() failed.\n";
     }
     eglBindAPI(EGL_OPENGL_ES_API);
     eglstatus = eglGetError();
     if (eglstatus != EGL_SUCCESS)
     {
-    	cout << "Error: eglBindAPI() failed.\n";
+        cout << "Error: eglBindAPI() failed.\n";
     }
 
     EGLint pi32ConfigAttribs[] = { EGL_SURFACE_TYPE, EGL_WINDOW_BIT, EGL_RENDERABLE_TYPE,
@@ -204,7 +204,7 @@ bool OpenGLES2App::createEGLContext()
 
     if (!eglChooseConfig(m_eglContextStruct.eglDisplay, pi32ConfigAttribs, &m_eglContextStruct.eglConfig, 1, &iConfigs) || (iConfigs != 1))
     {
-    	cout << "Error: eglChooseConfig() failed.\n";
+        cout << "Error: eglChooseConfig() failed.\n";
     }
 
     m_eglContextStruct.eglSurface = eglCreateWindowSurface(
@@ -214,7 +214,7 @@ bool OpenGLES2App::createEGLContext()
 
     if (eglstatus != EGL_SUCCESS)
     {
-    	cout << "Error: eglCreateWindowSurface() failed.\n";
+        cout << "Error: eglCreateWindowSurface() failed.\n";
     }
 
     EGLint contextAttribs[] = { EGL_CONTEXT_CLIENT_VERSION, 2, EGL_NONE };
@@ -226,7 +226,7 @@ bool OpenGLES2App::createEGLContext()
     eglstatus = eglGetError();
     if (eglstatus != EGL_SUCCESS)
     {
-    	cout << "Error: eglCreateContext() failed.\n";
+        cout << "Error: eglCreateContext() failed.\n";
     }
 
     eglMakeCurrent(m_eglContextStruct.eglDisplay,
@@ -236,7 +236,7 @@ bool OpenGLES2App::createEGLContext()
     eglstatus = eglGetError();
     if (eglstatus != EGL_SUCCESS)
     {
-    	cout << "Error: eglMakeCurrent() failed.\n";
+        cout << "Error: eglMakeCurrent() failed.\n";
     }
 
     return result;
