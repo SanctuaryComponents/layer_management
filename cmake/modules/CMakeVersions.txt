@@ -17,18 +17,33 @@
 #
 ############################################################################
 
-SET( ${PROJECT_NAME}_MAJOR_VERSION 0 )
-SET( ${PROJECT_NAME}_MINOR_VERSION 9 )
-SET( ${PROJECT_NAME}_PATCH_LEVEL 6 )
+set( ${PROJECT_NAME}_MAJOR_VERSION 0 )
+set( ${PROJECT_NAME}_MINOR_VERSION 9 )
+set( ${PROJECT_NAME}_PATCH_LEVEL 6 )
 
-SET(VERSION ${${PROJECT_NAME}_MAJOR_VERSION}.${${PROJECT_NAME}_MINOR_VERSION}.${${PROJECT_NAME}_PATCH_LEVEL})
+set(VERSION ${${PROJECT_NAME}_MAJOR_VERSION}.${${PROJECT_NAME}_MINOR_VERSION}.${${PROJECT_NAME}_PATCH_LEVEL})
+
 if(NOT DEFINED ILM_VERSION)
+
 execute_process(COMMAND git describe --tags WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} 
+                RESULT_VARIABLE RESULT_VAR
                 OUTPUT_VARIABLE ILM_VERSION 
-                OUTPUT_STRIP_TRAILING_WHITESPACE)
-string(REPLACE "-" "_" ILM_VERSION ${ILM_VERSION} )
+                OUTPUT_STRIP_TRAILING_WHITESPACE
+                ERROR_QUIET)
+
+if(NOT "${RESULT_VAR}" STREQUAL 0)
+
+message(STATUS "Unable launch automatic version build! Using default version!")
+set(ILM_VERSION ${VERSION})
+
+else(NOT "${RESULT_VAR}" STREQUAL 0)
+
+string(REPLACE "-" "_" ILM_VERSION ${ILM_VERSION})
+
+endif(NOT "${RESULT_VAR}" STREQUAL 0)
+
 endif(NOT DEFINED ILM_VERSION)
-                
+                                
 set(LICENSE "APACHE 2.0")
 
 set(GENIVI_PROJECT_VERSION ${VERSION})
