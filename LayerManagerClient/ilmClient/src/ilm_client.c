@@ -87,6 +87,8 @@ ilmErrorTypes ilm_init()
                 }
             }
         }
+    } else {
+        result = ILM_SUCCESS; 
     }
     return result;
 }
@@ -127,15 +129,15 @@ ilmErrorTypes ilm_getPropertiesOfSurface(t_ilm_uint surfaceID, struct ilmSurface
     _ilm_setup_param(&param[14], DBUS_TYPE_UINT32,
             &pSurfaceProperties->frameCounter);
 
-	/* Setup message to send */
-	DBusMessage *message;
-	message = _ilm_dbus_method_call(g_ilm_client->dbus_connection,"GetPropertiesOfSurface",param,1);
-	if (!message)
-	{
-		  ILM_ERROR("ilm_getPropertiesOfSurface","IPC Method call not possible can't setup remote message\n");
-		  return ILM_ERROR_ON_CONNECTION;
-	}
-	ILM_CHECK_METHOD_ERROR(message);
+    /* Setup message to send */
+    DBusMessage *message;
+    message = _ilm_dbus_method_call(g_ilm_client->dbus_connection,"GetPropertiesOfSurface",param,1);
+    if (!message)
+    {
+          ILM_ERROR("ilm_getPropertiesOfSurface","IPC Method call not possible can't setup remote message\n");
+          return ILM_ERROR_ON_CONNECTION;
+    }
+    ILM_CHECK_METHOD_ERROR(message);
 
     // read the parameters
     returnValue = _ilm_get_dbus_basic_elements(message, 14, &param[1]);
@@ -175,15 +177,15 @@ ilmErrorTypes ilm_getPropertiesOfLayer(t_ilm_uint layerID, struct ilmLayerProper
     _ilm_setup_param(&param[13], DBUS_TYPE_BOOLEAN,
             &pLayerProperties->visibility);
 
-	/* Setup message to send */
-	DBusMessage *message;
-	message = _ilm_dbus_method_call(g_ilm_client->dbus_connection,"GetPropertiesOfLayer", param, 1);
-	if (!message)
-	{
-		  ILM_ERROR("ilm_getPropertiesOfLayer","IPC Method call not possible can't setup remote message\n");
-		  return ILM_ERROR_ON_CONNECTION;
-	}
-	ILM_CHECK_METHOD_ERROR(message);
+    /* Setup message to send */
+    DBusMessage *message;
+    message = _ilm_dbus_method_call(g_ilm_client->dbus_connection,"GetPropertiesOfLayer", param, 1);
+    if (!message)
+    {
+          ILM_ERROR("ilm_getPropertiesOfLayer","IPC Method call not possible can't setup remote message\n");
+          return ILM_ERROR_ON_CONNECTION;
+    }
+    ILM_CHECK_METHOD_ERROR(message);
 
     if (!message)
     {
@@ -1326,6 +1328,7 @@ ilmErrorTypes ilm_surfaceSetNativeContent(t_ilm_nativehandle nativehandle, t_ilm
     if (message)
     {
         ILM_CHECK_METHOD_ERROR(message);
+        result = ILM_SUCCESS;
         _ilm_close_dbus_method_call(message);
     }
     else
