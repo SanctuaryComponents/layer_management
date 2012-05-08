@@ -31,7 +31,7 @@ extern "C" {
 /**
  * \brief Initializes the IVI LayerManagement Client.
  * \ingroup ilmClient
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if a connection can not be established to the services.
  */
 ilmErrorTypes ilm_init();
@@ -42,7 +42,7 @@ ilmErrorTypes ilm_init();
  * \param[in] screenID Screen Indentifier as a Number from 0 .. MaxNumber of Screens
  * \param[out] pWidth pointer where width of screen should be stored
  * \param[out] pHeight pointer where height of screen should be stored
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not get the resolution.
  */
 ilmErrorTypes ilm_getScreenResolution(t_ilm_uint screenID, t_ilm_uint* pWidth, t_ilm_uint* pHeight);
@@ -52,7 +52,7 @@ ilmErrorTypes ilm_getScreenResolution(t_ilm_uint screenID, t_ilm_uint* pWidth, t
  * \ingroup ilmClient
  * \param[in] surfaceID surface Indentifier as a Number from 0 .. MaxNumber of Surfaces
  * \param[out] pSurfaceProperties pointer where the surface properties should be stored
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not get the resolution.
  */
 ilmErrorTypes ilm_getPropertiesOfSurface(t_ilm_uint surfaceID, struct ilmSurfaceProperties* pSurfaceProperties);
@@ -62,7 +62,7 @@ ilmErrorTypes ilm_getPropertiesOfSurface(t_ilm_uint surfaceID, struct ilmSurface
  * \ingroup ilmClient
  * \param[in] layerID layer Indentifier as a Number from 0 .. MaxNumber of Layer
  * \param[out] pLayerProperties pointer where the layer properties should be stored
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not get the resolution.
  */
 ilmErrorTypes ilm_getPropertiesOfLayer(t_ilm_uint layerID, struct ilmLayerProperties* pLayerProperties);
@@ -72,7 +72,7 @@ ilmErrorTypes ilm_getPropertiesOfLayer(t_ilm_uint layerID, struct ilmLayerProper
  * \ingroup ilmClient
  * \param[in] screenID id of the screen, where the number of Hardware Layers should be returned
  * \param[out] pNumberOfHardwareLayers pointer where the number of hardware layers should be stored
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not get the resolution.
  */
 ilmErrorTypes ilm_getNumberOfHardwareLayers(t_ilm_uint screenID, t_ilm_uint* pNumberOfHardwareLayers);
@@ -82,7 +82,7 @@ ilmErrorTypes ilm_getNumberOfHardwareLayers(t_ilm_uint screenID, t_ilm_uint* pNu
  * \ingroup ilmClient
  * \param[out] pNumberOfIDs pointer where the number of Screen Ids should be returned
  * \param[out] ppIDs pointer to array where the IDs should be stored
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not get the resolution.
  */
 ilmErrorTypes ilm_getScreenIDs(t_ilm_uint* pNumberOfIDs, t_ilm_uint** ppIDs);
@@ -90,7 +90,7 @@ ilmErrorTypes ilm_getScreenIDs(t_ilm_uint* pNumberOfIDs, t_ilm_uint** ppIDs);
 /**
  * \brief Destroys the IVI LayerManagement Client.
  * \ingroup ilmClient
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not be closed or was not initialized.
  */
 ilmErrorTypes ilm_destroy();
@@ -101,7 +101,7 @@ ilmErrorTypes ilm_destroy();
  * \param[out] pLength Pointer where length of ids array should be stored
  * \param[out] ppArray Array where the ids should be stored,
  *                     the array will be allocated inside
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_getLayerIDs(t_ilm_int* pLength,t_ilm_layer** ppArray);
@@ -113,7 +113,7 @@ ilmErrorTypes ilm_getLayerIDs(t_ilm_int* pLength,t_ilm_layer** ppArray);
  * \param[out] pLength Pointer where length of ids array should be stored
  * \param[out] ppArray Array where the ids should be stored,
  *                     the array will be allocated inside
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_getLayerIDsOnScreen(t_ilm_uint screenID, t_ilm_int* pLength,t_ilm_layer** ppArray);
@@ -124,7 +124,7 @@ ilmErrorTypes ilm_getLayerIDsOnScreen(t_ilm_uint screenID, t_ilm_int* pLength,t_
  * \param[out] pLength Pointer where length of ids array should be stored
  * \param[out] ppArray Array where the ids should be stored,
  *                     the array will be allocated inside
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_getSurfaceIDs(t_ilm_int* pLength,t_ilm_surface** ppArray);
@@ -135,7 +135,7 @@ ilmErrorTypes ilm_getSurfaceIDs(t_ilm_int* pLength,t_ilm_surface** ppArray);
  * \param[out] pLength Pointer where array length of ids should be stored
  * \param[out] ppArray Array where the id should be stored,
  *                     the array will be allocated inside
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_getLayerGroupIDs(t_ilm_int* pLength,t_ilm_layergroup** ppArray);
@@ -146,7 +146,7 @@ ilmErrorTypes ilm_getLayerGroupIDs(t_ilm_int* pLength,t_ilm_layergroup** ppArray
  * \param[out] pLength Pointer where array length of ids should be stored
  * \param[out] ppArray Array where the id should be stored,
  *                     the array will be allocated inside
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_getSurfaceGroupIDs(t_ilm_int* pLength,t_ilm_surfacegroup** ppArray);
@@ -158,7 +158,7 @@ ilmErrorTypes ilm_getSurfaceGroupIDs(t_ilm_int* pLength,t_ilm_surfacegroup** ppA
  * \param[out] pLength Pointer where the array length of ids should be stored
  * \param[out] ppArray Array where the surface id should be stored,
  *                     the array will be allocated inside
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_getSurfaceIDsOnLayer(t_ilm_layer layer,t_ilm_int* pLength,t_ilm_surface** ppArray);
@@ -169,7 +169,7 @@ ilmErrorTypes ilm_getSurfaceIDsOnLayer(t_ilm_layer layer,t_ilm_int* pLength,t_il
  * \ingroup ilmClient
  * \param[out] pLayerId pointer where the id should be/is stored. It is possible
  *                      to set a id from outside, 0 will create a new id.
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_layerCreate(t_ilm_layer* pLayerId);
@@ -184,7 +184,7 @@ ilmErrorTypes ilm_layerCreate(t_ilm_layer* pLayerId);
  * \param[in] height    vertical dimension of the layer
  *                      
 * 
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_layerCreateWithDimension(t_ilm_layer* pLayerId, t_ilm_uint width, t_ilm_uint height);
@@ -193,7 +193,7 @@ ilmErrorTypes ilm_layerCreateWithDimension(t_ilm_layer* pLayerId, t_ilm_uint wid
  * \brief Removes a layer which is currently managed by the service
  * \ingroup ilmClient
  * \param[in] layerId Layer to be removed
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_layerRemove(t_ilm_layer layerId);
@@ -203,7 +203,7 @@ ilmErrorTypes ilm_layerRemove(t_ilm_layer layerId);
  * \ingroup ilmClient
  * \param[in] layerId Id of layer which should host the surface.
  * \param[in] surfaceId Id of surface which should be added to the layer.
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_layerAddSurface(t_ilm_layer layerId, t_ilm_surface surfaceId);
@@ -213,7 +213,7 @@ ilmErrorTypes ilm_layerAddSurface(t_ilm_layer layerId, t_ilm_surface surfaceId);
  * \ingroup ilmClient
  * \param[in] layerId Id of the layer which contains the surface.
  * \param[in] surfaceId Id of the surface which should be removed from the layer.
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_layerRemoveSurface(t_ilm_layer layerId, t_ilm_surface surfaceId);
@@ -224,7 +224,7 @@ ilmErrorTypes ilm_layerRemoveSurface(t_ilm_layer layerId, t_ilm_surface surfaceI
  * \param[in] layerId Id of the layer.
  * \param[out] pLayerType pointer to the layerType where the result should be stored.
  * \note ilmLayerType for information on supported types
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_layerGetType(t_ilm_layer layerId, ilmLayerType* pLayerType);
@@ -234,8 +234,8 @@ ilmErrorTypes ilm_layerGetType(t_ilm_layer layerId, ilmLayerType* pLayerType);
  * surfaces will not be rendered.
  * \ingroup ilmClient
  * \param[in] layerId Id of the layer.
- * \param[in] newVisibility ILM_TRUE sets layer visible, ILM_FALSE disables the visibility.
- * \return ILM_TRUE if the method call was successful
+ * \param[in] newVisibility ILM_SUCCESS sets layer visible, ILM_FALSE disables the visibility.
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_layerSetVisibility(t_ilm_layer layerId, t_ilm_bool newVisibility);
@@ -246,9 +246,9 @@ ilmErrorTypes ilm_layerSetVisibility(t_ilm_layer layerId, t_ilm_bool newVisibili
  * \ingroup ilmClient
  * \param[in] layerId Id of layer.
  * \param[out] pVisibility pointer where the visibility of the layer should be stored
- *                         ILM_TRUE if the Layer is visible,
+ *                         ILM_SUCCESS if the Layer is visible,
  *                         ILM_FALSE if the visibility is disabled.
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_layerGetVisibility(t_ilm_layer layerId,t_ilm_bool *pVisibility);
@@ -259,7 +259,7 @@ ilmErrorTypes ilm_layerGetVisibility(t_ilm_layer layerId,t_ilm_bool *pVisibility
  * \param[in] layerId Id of the layer.
  * \param[in] opacity 0.0 means the layer is fully transparent,
  *                    1.0 means the layer is fully opaque
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_layerSetOpacity(t_ilm_layer layerId, t_ilm_float opacity);
@@ -271,7 +271,7 @@ ilmErrorTypes ilm_layerSetOpacity(t_ilm_layer layerId, t_ilm_float opacity);
  * \param[out] pOpacity pointer where the layer opacity should be stored.
  *                      0.0 means the layer is fully transparent,
  *                      1.0 means the layer is fully opaque
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_layerGetOpacity(t_ilm_layer layerId, t_ilm_float *pOpacity);
@@ -284,7 +284,7 @@ ilmErrorTypes ilm_layerGetOpacity(t_ilm_layer layerId, t_ilm_float *pOpacity);
  * \param[in] y vertical start position of the used area
  * \param[in] width width of the area
  * \param[in] height height of the area
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_layerSetSourceRectangle(t_ilm_layer layerId, t_ilm_uint x, t_ilm_uint y, t_ilm_uint width, t_ilm_uint height);
@@ -297,7 +297,7 @@ ilmErrorTypes ilm_layerSetSourceRectangle(t_ilm_layer layerId, t_ilm_uint x, t_i
  * \param[in] y vertical start position of the used area
  * \param[in] width width of the area
  * \param[in] height height of the area
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_layerSetDestinationRectangle(t_ilm_layer layerId, t_ilm_int x, t_ilm_int y, t_ilm_int width, t_ilm_int height);
@@ -308,7 +308,7 @@ ilmErrorTypes ilm_layerSetDestinationRectangle(t_ilm_layer layerId, t_ilm_int x,
  * \param[in] layerId Id of layer.
  * \param[out] pDimension pointer to an array where the dimension should be stored.
  *                       dimension[0]=width, dimension[1]=height
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_layerGetDimension(t_ilm_layer layerId, t_ilm_uint *pDimension);
@@ -319,7 +319,7 @@ ilmErrorTypes ilm_layerGetDimension(t_ilm_layer layerId, t_ilm_uint *pDimension)
  * \param[in] layerId Id of layer.
  * \param[in] pDimension pointer to an array where the dimension is stored.
  *                       dimension[0]=width, dimension[1]=height
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_layerSetDimension(t_ilm_layer layerId, t_ilm_uint *pDimension);
@@ -330,7 +330,7 @@ ilmErrorTypes ilm_layerSetDimension(t_ilm_layer layerId, t_ilm_uint *pDimension)
  * \param[in] layerId Id of layer.
  * \param[out] pPosition pointer to an array where the position should be stored.
  *                       dimension[0]=width, dimension[1]=height
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_layerGetPosition(t_ilm_layer layerId, t_ilm_uint *pPosition);
@@ -341,7 +341,7 @@ ilmErrorTypes ilm_layerGetPosition(t_ilm_layer layerId, t_ilm_uint *pPosition);
  * \param[in] layerId Id of layer.
  * \param[in] pPosition pointer to an array where the position is stored.
  *                      dimension[0]=x, dimension[1]=y
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_layerSetPosition(t_ilm_layer layerId, t_ilm_uint *pPosition);
@@ -352,7 +352,7 @@ ilmErrorTypes ilm_layerSetPosition(t_ilm_layer layerId, t_ilm_uint *pPosition);
  * \param[in] layerId Id of layer.
  * \param[in] orientation Orientation of the layer.
  * \note ilmOrientation for more information on orientation values
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_layerSetOrientation(t_ilm_layer layerId, ilmOrientation orientation);
@@ -363,7 +363,7 @@ ilmErrorTypes ilm_layerSetOrientation(t_ilm_layer layerId, ilmOrientation orient
  * \param[in] layerId Id of layer.
  * \param[out] pOrientation Address where orientation of the layer should be stored.
  * \note ilmOrientation for more information on orientation values
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_layerGetOrientation(t_ilm_layer layerId, ilmOrientation *pOrientation);
@@ -374,7 +374,7 @@ ilmErrorTypes ilm_layerGetOrientation(t_ilm_layer layerId, ilmOrientation *pOrie
  * \param[in] layerId Id of layer.
  * \param[in] pColor array of the color value which is defined in red,green, blue
  * \todo This method is currently not implemented.
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_layerSetChromaKey(t_ilm_layer layerId, t_ilm_int* pColor);
@@ -385,7 +385,7 @@ ilmErrorTypes ilm_layerSetChromaKey(t_ilm_layer layerId, t_ilm_int* pColor);
  * \param[in] layerId Id of layer.
  * \param[in] pSurfaceId array of surface ids
  * \param[in] number Number of elements in the given array of ids
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_layerSetRenderOrder(t_ilm_layer layerId, t_ilm_layer *pSurfaceId, t_ilm_int number);
@@ -395,7 +395,7 @@ ilmErrorTypes ilm_layerSetRenderOrder(t_ilm_layer layerId, t_ilm_layer *pSurface
  * \ingroup ilmClient
  * \param[in] layerId Id of the layer to obtain the capabilities of
  * \param[out] pCapabilities The address where the capabilites are returned
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_layerGetCapabilities(t_ilm_layer layerId, t_ilm_layercapabilities *pCapabilities);
@@ -405,7 +405,7 @@ ilmErrorTypes ilm_layerGetCapabilities(t_ilm_layer layerId, t_ilm_layercapabilit
  * \ingroup ilmClient
  * \param[in] layerType The layertype to obtain the capabilities of
  * \param[out] pCapabilities The address where the capabilites are returned
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_layerTypeGetCapabilities(ilmLayerType layerType, t_ilm_layercapabilities *pCapabilities);
@@ -414,7 +414,7 @@ ilmErrorTypes ilm_layerTypeGetCapabilities(ilmLayerType layerType, t_ilm_layerca
  * \brief Create a layergroup
  * \ingroup ilmClient
  * \param[out] pLayergroup The id of the created layergroup is returned in this parameter
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_layergroupCreate(t_ilm_layergroup *pLayergroup);
@@ -423,7 +423,7 @@ ilmErrorTypes ilm_layergroupCreate(t_ilm_layergroup *pLayergroup);
  * \brief Remove a layergroup
  * \ingroup ilmClient
  * \param[in] layergroup The layergroup to be removed
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_layergroupRemove(t_ilm_layergroup layergroup);
@@ -433,7 +433,7 @@ ilmErrorTypes ilm_layergroupRemove(t_ilm_layergroup layergroup);
  * \ingroup ilmClient
  * \param[in] group The layergroup to add the layer
  * \param[in] layer The layer to add to the group
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_layergroupAddLayer(t_ilm_layergroup group, t_ilm_layer layer);
@@ -445,7 +445,7 @@ ilmErrorTypes ilm_layergroupAddLayer(t_ilm_layergroup group, t_ilm_layer layer);
  * \param[in] layer The layer to be removed from the group
  *
  *
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_layergroupRemoveLayer(t_ilm_layergroup layergroup, t_ilm_layer layer);
@@ -455,8 +455,8 @@ ilmErrorTypes ilm_layergroupRemoveLayer(t_ilm_layergroup layergroup, t_ilm_layer
  * surfaces will not be rendered.
  * \ingroup ilmClient
  * \param[in] layergroup Id of the layergroup to set the visibility of
- * \param[in] newVisibility ILM_TRUE sets layergroup visible, ILM_FALSE disables the visibility.
- * \return ILM_TRUE if the method call was successful
+ * \param[in] newVisibility ILM_SUCCESS sets layergroup visible, ILM_FALSE disables the visibility.
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_layergroupSetVisibility(t_ilm_layergroup layergroup, t_ilm_bool newVisibility);
@@ -467,7 +467,7 @@ ilmErrorTypes ilm_layergroupSetVisibility(t_ilm_layergroup layergroup, t_ilm_boo
  * \param[in] group Id of the layergroup to set the opacity of.
  * \param[in] opacity 0.0 means the layergroup is fully transparent,
  *                    1.0 means the layergroup is fully opaque
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_layergroupSetOpacity(t_ilm_layergroup group, t_ilm_float opacity);
@@ -482,7 +482,7 @@ ilmErrorTypes ilm_layergroupSetOpacity(t_ilm_layergroup group, t_ilm_float opaci
  * \param[in] pSurfaceId The value pSurfaceId points to is used as ID for new surface;
  * \param[out] pSurfaceId The ID of the newly created surface is returned in this parameter
  *
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_surfaceCreate(t_ilm_nativehandle nativehandle, t_ilm_int width, t_ilm_int height, ilmPixelFormat pixelFormat, t_ilm_surface *pSurfaceId);
@@ -492,7 +492,7 @@ ilmErrorTypes ilm_surfaceCreate(t_ilm_nativehandle nativehandle, t_ilm_int width
  * \ingroup ilmClient
  * \param[in] pSurfaceId The value pSurfaceId points to is used as ID for new surface;
  * \param[out] pSurfaceId The ID of the newly created surface is returned in this parameter
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_surfaceInitialize(t_ilm_surface *pSurfaceId);
@@ -505,7 +505,7 @@ ilmErrorTypes ilm_surfaceInitialize(t_ilm_surface *pSurfaceId);
  * \param[in] height The original height of the surface
  * \param[in] pixelFormat The pixelformat to be used for the surface
  * \param[in] surfaceId The ID of the surface
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_surfaceSetNativeContent(t_ilm_nativehandle nativehandle, t_ilm_int width, t_ilm_int height, ilmPixelFormat pixelFormat, t_ilm_surface surfaceId);
@@ -514,7 +514,7 @@ ilmErrorTypes ilm_surfaceSetNativeContent(t_ilm_nativehandle nativehandle, t_ilm
  * \brief Remove a surface
  * \ingroup ilmClient
  * \param[in] surfaceId The id of the surface to be removed
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_surfaceRemove(const t_ilm_surface surfaceId);
@@ -523,8 +523,8 @@ ilmErrorTypes ilm_surfaceRemove(const t_ilm_surface surfaceId);
  * \brief Set the visibility of a surface. If a surface is not visible it will not be rendered.
  * \ingroup ilmClient
  * \param[in] surfaceId Id of the surface to set the visibility of
- * \param[in] newVisibility ILM_TRUE sets surface visible, ILM_FALSE disables the visibility.
- * \return ILM_TRUE if the method call was successful
+ * \param[in] newVisibility ILM_SUCCESS sets surface visible, ILM_FALSE disables the visibility.
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_surfaceSetVisibility(t_ilm_surface surfaceId, t_ilm_bool newVisibility);
@@ -535,9 +535,9 @@ ilmErrorTypes ilm_surfaceSetVisibility(t_ilm_surface surfaceId, t_ilm_bool newVi
  * \ingroup ilmClient
  * \param[in] surfaceId Id of the surface to get the visibility of.
  * \param[out] pVisibility pointer where the visibility of a surface should be stored
- *                         ILM_TRUE if the surface is visible,
+ *                         ILM_SUCCESS if the surface is visible,
  *                         ILM_FALSE if the visibility is disabled.
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_surfaceGetVisibility(t_ilm_surface surfaceId, t_ilm_bool *pVisibility);
@@ -548,7 +548,7 @@ ilmErrorTypes ilm_surfaceGetVisibility(t_ilm_surface surfaceId, t_ilm_bool *pVis
  * \param surfaceId Id of the surface to set the opacity of.
  * \param opacity 0.0 means the surface is fully transparent,
  *                1.0 means the surface is fully opaque
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_surfaceSetOpacity(const t_ilm_surface surfaceId, t_ilm_float opacity);
@@ -560,7 +560,7 @@ ilmErrorTypes ilm_surfaceSetOpacity(const t_ilm_surface surfaceId, t_ilm_float o
  * \param[out] pOpacity pointer where the surface opacity should be stored.
  *                      0.0 means the surface is fully transparent,
  *                      1.0 means the surface is fully opaque
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_surfaceGetOpacity(const t_ilm_surface surfaceId, t_ilm_float *pOpacity);
@@ -573,7 +573,7 @@ ilmErrorTypes ilm_surfaceGetOpacity(const t_ilm_surface surfaceId, t_ilm_float *
  * \param[in] y vertical start position of the used area
  * \param[in] width width of the area
  * \param[in] height height of the area
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_surfaceSetSourceRectangle(t_ilm_surface surfaceId, t_ilm_int x, t_ilm_int y, t_ilm_int width, t_ilm_int height);
@@ -586,7 +586,7 @@ ilmErrorTypes ilm_surfaceSetSourceRectangle(t_ilm_surface surfaceId, t_ilm_int x
  * \param[in] y vertical start position of the used area
  * \param[in] width width of the area
  * \param[in] height height of the area
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_surfaceSetDestinationRectangle(t_ilm_surface surfaceId, t_ilm_int x, t_ilm_int y, t_ilm_int width, t_ilm_int height);
@@ -599,7 +599,7 @@ ilmErrorTypes ilm_surfaceSetDestinationRectangle(t_ilm_surface surfaceId, t_ilm_
  *                        dimension[0]=width, dimension[1]=height
  *
  *
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_surfaceGetDimension(t_ilm_surface surfaceId, t_ilm_uint *pDimension);
@@ -610,7 +610,7 @@ ilmErrorTypes ilm_surfaceGetDimension(t_ilm_surface surfaceId, t_ilm_uint *pDime
  * \param[in] surfaceId Id of surface.
  * \param[in] pDimension pointer to an array where the dimension is stored.
  *                       dimension[0]=width, dimension[1]=height
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_surfaceSetDimension(t_ilm_surface surfaceId, t_ilm_uint *pDimension);
@@ -621,7 +621,7 @@ ilmErrorTypes ilm_surfaceSetDimension(t_ilm_surface surfaceId, t_ilm_uint *pDime
  * \param[in] surfaceId Id of surface.
  * \param[out] pPosition pointer to an array where the position should be stored.
  *                       position[0]=x, position[1]=y
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_surfaceGetPosition(t_ilm_surface surfaceId, t_ilm_uint *pPosition);
@@ -632,7 +632,7 @@ ilmErrorTypes ilm_surfaceGetPosition(t_ilm_surface surfaceId, t_ilm_uint *pPosit
  * \param[in] surfaceId Id of surface.
  * \param[in] pPosition pointer to an array where the position is stored.
  *                      position[0]=x, position[1]=y
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_surfaceSetPosition(t_ilm_surface surfaceId, t_ilm_uint *pPosition);
@@ -643,7 +643,7 @@ ilmErrorTypes ilm_surfaceSetPosition(t_ilm_surface surfaceId, t_ilm_uint *pPosit
  * \param[in] surfaceId Id of surface.
  * \param[in] orientation Orientation of the surface.
  * \note ilmOrientation for information about orientation values
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_surfaceSetOrientation(t_ilm_surface surfaceId, ilmOrientation orientation);
@@ -654,7 +654,7 @@ ilmErrorTypes ilm_surfaceSetOrientation(t_ilm_surface surfaceId, ilmOrientation 
  * \param[in]  surfaceId Id of surface.
  * \param[out] pOrientation Address where orientation of the surface should be stored.
  * \note ilmOrientation for information about orientation values
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_surfaceGetOrientation(t_ilm_surface surfaceId, ilmOrientation *pOrientation);
@@ -665,7 +665,7 @@ ilmErrorTypes ilm_surfaceGetOrientation(t_ilm_surface surfaceId, ilmOrientation 
  * \param[in] surfaceId Id of surface.
  * \param[out] pPixelformat Pointer where the pixelformat of the surface should be stored
  * \note ilmPixelFormat for information about pixel format values
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_surfaceGetPixelformat(t_ilm_layer surfaceId, ilmPixelFormat *pPixelformat);
@@ -676,7 +676,7 @@ ilmErrorTypes ilm_surfaceGetPixelformat(t_ilm_layer surfaceId, ilmPixelFormat *p
  * \param[in] surfaceId Id of the surface to set the chromakey of.
  * \param[in] pColor array of the color value which is defined in red, green, blue
  * \todo This method is currently not implemented.
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_surfaceSetChromaKey(t_ilm_surface surfaceId, t_ilm_int* pColor);
@@ -685,7 +685,7 @@ ilmErrorTypes ilm_surfaceSetChromaKey(t_ilm_surface surfaceId, t_ilm_int* pColor
  * \brief Inform that a certain rectangle of a surface has been invalidated and must consequently be redrawn
  * \ingroup ilmClient
  * \param[in] surfaceId Id of the surface
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_surfaceInvalidateRectangle(t_ilm_surface surfaceId);
@@ -694,7 +694,7 @@ ilmErrorTypes ilm_surfaceInvalidateRectangle(t_ilm_surface surfaceId);
  * \brief Create a surfacegroup
  * \ingroup ilmClient
  * \param[in] pSurfacegroup The created surfacegroup is returned in this parameter
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_surfacegroupCreate(t_ilm_surfacegroup *pSurfacegroup);
@@ -703,7 +703,7 @@ ilmErrorTypes ilm_surfacegroupCreate(t_ilm_surfacegroup *pSurfacegroup);
 *  \brief Remove a surfacegroup
  * \ingroup ilmClient
  * \param[in] surfacegroup The surfacegroup to be removed
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_surfacegroupRemove(t_ilm_surfacegroup surfacegroup);
@@ -713,7 +713,7 @@ ilmErrorTypes ilm_surfacegroupRemove(t_ilm_surfacegroup surfacegroup);
  * \ingroup ilmClient
  * \param[in] surfacegroup The surfacegroup to add the surface
  * \param[in] surface The surface to add to the group
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_surfacegroupAddSurface(t_ilm_surfacegroup surfacegroup, t_ilm_surface surface);
@@ -723,7 +723,7 @@ ilmErrorTypes ilm_surfacegroupAddSurface(t_ilm_surfacegroup surfacegroup, t_ilm_
  * \ingroup ilmClient
  * \param[in] surfacegroup The surfacegroup to remove the surface from
  * \param[in] surface The surface to be removed from the group
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_surfacegroupRemoveSurface(t_ilm_surfacegroup surfacegroup, t_ilm_surface surface);
@@ -733,8 +733,8 @@ ilmErrorTypes ilm_surfacegroupRemoveSurface(t_ilm_surfacegroup surfacegroup, t_i
  * surfaces will not be rendered.
  * \ingroup ilmClient
  * \param[in] surfacegroup Id of the surfacegroup to set the visibility of
- * \param[in] newVisibility ILM_TRUE sets surfacegroup visible, ILM_FALSE disables the visibility.
- * \return ILM_TRUE if the method call was successful
+ * \param[in] newVisibility ILM_SUCCESS sets surfacegroup visible, ILM_FALSE disables the visibility.
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_surfacegroupSetVisibility(t_ilm_surfacegroup surfacegroup, t_ilm_bool newVisibility);
@@ -745,7 +745,7 @@ ilmErrorTypes ilm_surfacegroupSetVisibility(t_ilm_surfacegroup surfacegroup, t_i
  * \param[in] surfacegroup Id of the surfacegroup to set the opacity of.
  * \param[in] opacity 0.0 means the surfacegroup is fully transparent,
  *                    1.0 means the surfacegroup is fully opaque
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_surfacegroupSetOpacity(t_ilm_surfacegroup surfacegroup, t_ilm_float opacity);
@@ -756,7 +756,7 @@ ilmErrorTypes ilm_surfacegroupSetOpacity(t_ilm_surfacegroup surfacegroup, t_ilm_
  * \param[in] display Id of display to set the given order of layers.
  * \param[in] pLayerId array of layer ids
  * \param[in] number number of layerids in the given array
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_displaySetRenderOrder(t_ilm_display display, t_ilm_layer *pLayerId, const t_ilm_uint number);
@@ -767,7 +767,7 @@ ilmErrorTypes ilm_displaySetRenderOrder(t_ilm_display display, t_ilm_layer *pLay
  * \ingroup ilmClient
  * \param[in] screen Id of screen where screenshot should be taken
  * \param[in] filename Location where the screenshot should be stored
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_takeScreenshot(t_ilm_uint screen, t_ilm_const_string filename);
@@ -778,7 +778,7 @@ ilmErrorTypes ilm_takeScreenshot(t_ilm_uint screen, t_ilm_const_string filename)
  * \ingroup ilmClient
  * \param[in] filename Location where the screenshot should be stored
  * \param[in] layerid Identifier of the layer to take the screenshot of
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_takeLayerScreenshot(t_ilm_const_string filename, t_ilm_layer layerid);
@@ -789,7 +789,7 @@ ilmErrorTypes ilm_takeLayerScreenshot(t_ilm_const_string filename, t_ilm_layer l
  * \ingroup ilmClient
  * \param[in] filename Location where the screenshot should be stored
  * \param[in] surfaceid Identifier of the surface to take the screenshot of
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_takeSurfaceScreenshot(t_ilm_const_string filename, t_ilm_surface surfaceid);
@@ -797,7 +797,7 @@ ilmErrorTypes ilm_takeSurfaceScreenshot(t_ilm_const_string filename, t_ilm_surfa
 /**
  * \brief Commit all changes and executed commands since last commit.
  * \ingroup ilmClient
- * \return ILM_TRUE if the method call was successful
+ * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_commitChanges();
