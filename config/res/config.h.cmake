@@ -17,6 +17,9 @@
  * limitations under the License.
  *
  ****************************************************************************/
+#ifndef __CONFIG_H__
+#define __CONFIG_H__
+
 #include "Log.h"
 
 // Auto-generated. Do not modify.
@@ -113,3 +116,5 @@
     LOG_DEBUG("Config", "WITH_WAYLAND_X11    = ${WITH_WAYLAND_X11}"); \
     LOG_DEBUG("Config", "WITH_XTHREADS       = ${WITH_XTHREADS}"); \
     LOG_DEBUG("Config", "WITH_DLT            = ${WITH_DLT}");
+
+#endif // __CONFIG_H__
