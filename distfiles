@@ -6,6 +6,7 @@ LayerManagerCommands/.*
 LayerManagerService/.*
 LayerManagerPlugins/Communicators/DBUSCommunicator/.*
 LayerManagerPlugins/Renderers/.*
+config/.*
 cmake/.*
 configure
 CMakeLists.txt
