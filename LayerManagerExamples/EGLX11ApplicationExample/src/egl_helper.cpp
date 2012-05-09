@@ -125,11 +125,9 @@ t_ilm_bool createX11Context(t_ilm_int width, t_ilm_int height)
 
 t_ilm_bool createEGLContext(t_ilm_int width, t_ilm_int height)
 {
-    t_ilm_bool result = ILM_TRUE;
     g_eglContextStruct.eglDisplay = NULL;
     g_eglContextStruct.eglSurface = NULL;
     g_eglContextStruct.eglContext = NULL;
-    ilmErrorTypes error = ILM_FAILED;
 
     g_eglContextStruct.eglDisplay = eglGetDisplay((EGLNativeDisplayType) g_x11ContextStruct.x11Display); // TODO: remove all C style casts in C++ code; use C++ casts
     EGLint eglstatus = eglGetError();
@@ -194,39 +192,27 @@ t_ilm_bool createEGLContext(t_ilm_int width, t_ilm_int height)
     t_ilm_layer layerid = (t_ilm_layer)LAYER_EXAMPLE_GLES_APPLICATIONS;
     t_ilm_surface surfaceid = (t_ilm_surface)SURFACE_EXAMPLE_EGLX11_APPLICATION;
 
-    // TODO: if (error == ILM_FAILED) return ILM_FALSE;
-
     printf("create a surface %lu\n", (t_ilm_nativehandle) g_x11ContextStruct.x11Window);
-    error = ilm_surfaceCreate( (t_ilm_nativehandle) g_x11ContextStruct.x11Window, width, height,
+    ilm_surfaceCreate( (t_ilm_nativehandle) g_x11ContextStruct.x11Window, width, height,
             ILM_PIXELFORMAT_RGBA_8888, &surfaceid);
 
-    // TODO: if (error == ILM_FAILED) return ILM_FALSE;
-
     printf("set surface dest region\n");
-    error = ilm_surfaceSetDestinationRectangle(surfaceid, 0, 0, width, height);
-
-    // TODO: if (error == ILM_FAILED) return ILM_FALSE;
+    ilm_surfaceSetDestinationRectangle(surfaceid, 0, 0, width, height);
 
     printf("set surface src region\n");
-    error = ilm_surfaceSetSourceRectangle(surfaceid, 0, 0, width, height);
-
-    // TODO: if (error == ILM_FAILED) return ILM_FALSE;
+    ilm_surfaceSetSourceRectangle(surfaceid, 0, 0, width, height);
 
     printf("add surface to layer\n");
-    error = ilm_layerAddSurface(layerid, surfaceid);
-    printf("Set surface visible\n");
-    error = ilm_surfaceSetVisibility(surfaceid, ILM_TRUE);
-    printf("Set surface opacity\n");
-    error = ilm_surfaceSetOpacity(surfaceid, 0.75f);
+    ilm_layerAddSurface(layerid, surfaceid);
 
-    //if (error == ILM_FAILED) return ILM_FALSE;
+    printf("Set surface visible\n");
+    ilm_surfaceSetVisibility(surfaceid, ILM_TRUE);
+
+    printf("Set surface opacity\n");
+    ilm_surfaceSetOpacity(surfaceid, 0.75f);
 
     printf("commit\n");
-    error = ilm_commitChanges();
-
-    //if (error == ILM_FAILED) return ILM_FALSE;
-
-    return result;
+    return (ILM_SUCCESS == ilm_commitChanges()) ? ILM_TRUE : ILM_FALSE;
 }
 
 void destroyEglContext()

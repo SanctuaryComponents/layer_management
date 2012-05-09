@@ -902,8 +902,10 @@ init_complete:
 
 void X11WindowSystem::ManageXInputEvent(XEvent *pevent)
 {
-    XEvent* currentEvent = pevent;
+    (void)pevent;
+
 #ifdef WITH_INPUT_EVENTS
+    XEvent* currentEvent = pevent;
     Surface * surf;
     int *pX = NULL;
     int *pY = NULL;
@@ -930,8 +932,8 @@ void X11WindowSystem::ManageXInputEvent(XEvent *pevent)
         pevent->xany.window = surf->getNativeContent();
         XSendEvent(x11Display, currentEvent->xany.window, false, 0, currentEvent);
     }
-#endif
     currentEvent = NULL;
+#endif
 }
 
 

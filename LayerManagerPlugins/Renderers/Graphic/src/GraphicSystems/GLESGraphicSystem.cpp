@@ -54,16 +54,13 @@ GLESGraphicsystem::GLESGraphicsystem(int windowWidth, int windowHeight, PfnShade
 
 void GLESGraphicsystem::activateGraphicContext()
 {
-    EGLBoolean eglStatus = false;
-    eglStatus = eglMakeCurrent(m_eglDisplay, m_eglSurface, m_eglSurface, m_eglContext);
-    
+    eglMakeCurrent(m_eglDisplay, m_eglSurface, m_eglSurface, m_eglContext);
 }
 
 void GLESGraphicsystem::releaseGraphicContext() 
 {
-    EGLBoolean eglStatus = false;
-    eglStatus = eglMakeCurrent(m_eglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
-}   
+    eglMakeCurrent(m_eglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+}
 
 bool GLESGraphicsystem::init(EGLNativeDisplayType display, EGLNativeWindowType NativeWindow)
 {
@@ -137,8 +134,7 @@ bool GLESGraphicsystem::init(EGLNativeDisplayType display, EGLNativeWindowType N
     }
     LOG_INFO("GLESGraphicsystem", "EGL make current ...");
     // Make the context and surface current for rendering
-    EGLBoolean eglStatus = false;
-    eglStatus = eglMakeCurrent(m_eglDisplay, m_eglSurface, m_eglSurface, m_eglContext);
+    eglMakeCurrent(m_eglDisplay, m_eglSurface, m_eglSurface, m_eglContext);
     LOG_INFO("GLESGraphicsystem", "made current");
 
     eglSwapInterval(m_eglDisplay, 1); // TODO: does not seem to work

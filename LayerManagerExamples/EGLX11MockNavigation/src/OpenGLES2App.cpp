@@ -244,8 +244,6 @@ bool OpenGLES2App::createEGLContext()
 
 bool OpenGLES2App::setupLayerMangement(SurfaceConfiguration* config)
 {
-    ilmErrorTypes error = ILM_FAILED;
-
     // register surfaces to layermanager
     t_ilm_layer layerid = (t_ilm_layer)config->layerId;//LAYER_EXAMPLE_GLES_APPLICATIONS;
     t_ilm_surface surfaceid = (t_ilm_surface)config->surfaceId;//SURFACE_EXAMPLE_EGLX11_APPLICATION;
@@ -253,28 +251,26 @@ bool OpenGLES2App::setupLayerMangement(SurfaceConfiguration* config)
     int height = config->surfaceHeight;
 
     cout << "creating surface " << surfaceid << "\n";
-    error = ilm_surfaceCreate( (t_ilm_nativehandle) m_x11ContextStruct.x11Window, width, height,
+    ilm_surfaceCreate( (t_ilm_nativehandle) m_x11ContextStruct.x11Window, width, height,
             ILM_PIXELFORMAT_RGBA_8888, &surfaceid);
 
     cout << "set surface " << surfaceid << " dest region " << 0 << ", " << 0 << ", " << width << ", " << height << "\n";
-    error = ilm_surfaceSetDestinationRectangle(surfaceid, 0, 0, width, height);
+    ilm_surfaceSetDestinationRectangle(surfaceid, 0, 0, width, height);
 
     cout << "set surface " << surfaceid << " src region " << 0 << ", " << 0 << ", " << width << ", " << height << "\n";
-    error = ilm_surfaceSetSourceRectangle(surfaceid, 0, 0, width, height);
+    ilm_surfaceSetSourceRectangle(surfaceid, 0, 0, width, height);
 
     cout << "Set surface " << surfaceid << " visible\n";
-    error = ilm_surfaceSetVisibility(surfaceid, ILM_TRUE);
+    ilm_surfaceSetVisibility(surfaceid, ILM_TRUE);
 
     cout << "Set surface " << surfaceid << " opacity 1.0\n";
-    error = ilm_surfaceSetOpacity(surfaceid, 1.0f);
+    ilm_surfaceSetOpacity(surfaceid, 1.0f);
 
     cout << "add surface " << surfaceid << " to layer " << layerid << "\n";
-    error = ilm_layerAddSurface(layerid, surfaceid);
+    ilm_layerAddSurface(layerid, surfaceid);
 
     cout << "commit\n";
-    error = ilm_commitChanges();
-
-    return ILM_TRUE;
+    return (ILM_SUCCESS == ilm_commitChanges()) ? true : false;
 }
 
 void OpenGLES2App::destroyEglContext()

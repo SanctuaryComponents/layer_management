@@ -117,9 +117,10 @@ void Log::debug (LogContext logContext, const std::string& moduleName, const std
 
 void Log::log(LogContext logContext, LOG_MODES logMode, const std::string& moduleName, const std::basic_string<char>& output)
 {
+    (void)logContext;
+
     std::string logString[LOG_MAX_LEVEL] = {"","ERROR","INFO","WARNING","DEBUG"};
     std::string logOutLevelString = logString[LOG_INFO];
-    LogContext currentContext = logContext;
     pthread_mutex_lock(&m_LogBufferMutex);
     if ( logMode < LOG_MAX_LEVEL ) 
     {
@@ -136,11 +137,10 @@ void Log::log(LogContext logContext, LOG_MODES logMode, const std::string& modul
 #ifdef WITH_DLT
     if ( dltLogLevel >= logMode ) 
     {
-        LogToDltDaemon(currentContext, logMode, moduleName, output);
+        LogToDltDaemon(logContext, logMode, moduleName, output);
     }   
 #endif    
     pthread_mutex_unlock(&m_LogBufferMutex);
-    currentContext = NULL;
 }
 
 void Log::LogToFile(std::string logMode, const std::string& moduleName,const std::basic_string<char>& output)

@@ -445,10 +445,8 @@ DBusHandlerResult DBUSCommunicator::processMessageFunc(DBusConnection* conn,DBus
 
 void DBUSCommunicator::unregisterMessageFunc(DBusConnection* conn, void *user_data)
 {
-    DBusConnection* connection = NULL;
-    DBUSCommunicator* cominstance = NULL;
-    connection = conn;
-    cominstance = (DBUSCommunicator*)user_data;
+    (void)conn;
+    (void)user_data;
 }
 
 void DBUSCommunicator::ListLayersOfLayergroup(DBusConnection* conn, DBusMessage* msg)
