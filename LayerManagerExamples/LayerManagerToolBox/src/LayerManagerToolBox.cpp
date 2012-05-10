@@ -353,9 +353,8 @@ bool fillDimension(char * param, t_ilm_int *pArray)
         /*convert the last value*/
         if ( pos == std::string::npos && i==3 ) 
         {
-            tempString = pRes.substr(0);
-            printf("Dim param %s\n",tempString.c_str());        
-            tempArray[i++] = atoi(tempString.c_str());
+            printf("Dim param %s\n",pRes.c_str());
+            tempArray[i++] = atoi(pRes.c_str());
         }
     }
     if (i<4) 
