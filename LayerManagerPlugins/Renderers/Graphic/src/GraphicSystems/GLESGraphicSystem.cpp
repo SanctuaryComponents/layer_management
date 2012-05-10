@@ -369,7 +369,7 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
         LOG_ERROR("GLESGraphicsystem", "GL Error occured :" << glErrorCode );
     };
 
-    delete textureCoordinates;
+    delete[] textureCoordinates;
 }
 
 bool GLESGraphicsystem::initOpenGLES(EGLint displayWidth, EGLint displayHeight)

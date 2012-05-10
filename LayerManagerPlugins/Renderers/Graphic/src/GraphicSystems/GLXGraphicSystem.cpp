@@ -369,7 +369,7 @@ void GLXGraphicsystem::renderSurface(Surface* currentSurface)
     };    
     currentSurface->frameCounter++;    
     currentSurface->drawCounter++;    
-    delete textureCoordinates;
+    delete[] textureCoordinates;
 }
 
 void GLXGraphicsystem::saveScreenShotOfFramebuffer(std::string fileToSave)
