@@ -872,15 +872,18 @@ void parseCommandLine(t_param_struct* param_struct, int argc, char **argv)
 
 int main(int argc, char **argv)
 {
-    t_param_struct* pStruct = new t_param_struct();
+    t_param_struct* pStruct = NULL;
     if (argc == 1) 
     {
         printUsage();
         return (-1);
     }
 
+    pStruct = new t_param_struct();
+
     if (ILM_SUCCESS != init_toolbox(pStruct))
     {
+        delete pStruct;
         return -1;
     }
     parseCommandLine(pStruct,argc, (char**) argv);
