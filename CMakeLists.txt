@@ -54,6 +54,8 @@ option (WITH_WAYLAND_X11    "Build Wayland with X11 backend"                    
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 
+add_subdirectory(cmake/optionalFeatures)
+
 add_subdirectory(config)
 
 if (WITH_DESKTOP)
