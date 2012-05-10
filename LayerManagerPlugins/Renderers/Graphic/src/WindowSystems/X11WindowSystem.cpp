@@ -63,6 +63,10 @@ X11WindowSystem::X11WindowSystem(const char* displayname, int width, int height,
 
 X11WindowSystem::~X11WindowSystem()
 {
+    if (windowVis)
+    {
+        delete windowVis;
+    }
 }
 
 XVisualInfo* X11WindowSystem::getDefaultVisual(Display *dpy)
@@ -74,7 +78,7 @@ XVisualInfo* X11WindowSystem::getDefaultVisual(Display *dpy)
         if (!XMatchVisualInfo( dpy, 0, windowVis->depth, TrueColor, windowVis))
         {
             LOG_ERROR("X11WindowSystem", "Error: Required visual not found\n");
-            XFree(windowVis);
+            delete windowVis;
             return NULL;
         }
     }
@@ -976,7 +980,7 @@ void X11WindowSystem::cleanup(){
 
     if (windowVis)
     {
-        XFree(windowVis);
+        delete windowVis;
     }
 
 #ifdef WITH_XTHREADS
