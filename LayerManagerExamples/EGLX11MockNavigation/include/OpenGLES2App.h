@@ -31,6 +31,10 @@ struct SurfaceConfiguration
     unsigned int surfaceId;
     unsigned int surfaceWidth;
     unsigned int surfaceHeight;
+    unsigned int surfacePosX;
+    unsigned int surfacePosY;
+    float opacity;
+    bool nosky;
 };
 
 class OpenGLES2App

@@ -30,11 +30,6 @@ using std::endl;
 
 #define RUNTIME_IN_MS() (GetTickCount() - startTimeInMS)
 
-// Max width and height of the window
-#define LAYER_WIDTH    800
-#define LAYER_HEIGHT   480
-
-
 OpenGLES2App::OpenGLES2App(float fps, float animationSpeed, SurfaceConfiguration* config)
 : m_framesPerSecond(fps)
 , m_animationSpeed(animationSpeed)
@@ -45,7 +40,14 @@ OpenGLES2App::OpenGLES2App(float fps, float animationSpeed, SurfaceConfiguration
     createEGLContext();
     setupLayerMangement(config);
 
-    glClearColor(0.2f, 0.2f, 0.5f, 1.0f);
+    if (config->nosky)
+    {
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    }
+    else
+    {
+        glClearColor(0.2f, 0.2f, 0.5f, 1.0f);
+    }
     glDisable(GL_BLEND);
 
     glClearDepthf(1.0f);
@@ -249,13 +251,16 @@ bool OpenGLES2App::setupLayerMangement(SurfaceConfiguration* config)
     t_ilm_surface surfaceid = (t_ilm_surface)config->surfaceId;//SURFACE_EXAMPLE_EGLX11_APPLICATION;
     int width = config->surfaceWidth;
     int height = config->surfaceHeight;
+    int posX = config->surfacePosX;
+    int posY = config->surfacePosY;
+    float opacity = config->opacity;
 
     cout << "creating surface " << surfaceid << "\n";
     ilm_surfaceCreate( (t_ilm_nativehandle) m_x11ContextStruct.x11Window, width, height,
             ILM_PIXELFORMAT_RGBA_8888, &surfaceid);
 
-    cout << "set surface " << surfaceid << " dest region " << 0 << ", " << 0 << ", " << width << ", " << height << "\n";
-    ilm_surfaceSetDestinationRectangle(surfaceid, 0, 0, width, height);
+    cout << "set surface " << surfaceid << " dest region " << posX << ", " << posY << ", " << width << ", " << height << "\n";
+    ilm_surfaceSetDestinationRectangle(surfaceid, posX, posY, width, height);
 
     cout << "set surface " << surfaceid << " src region " << 0 << ", " << 0 << ", " << width << ", " << height << "\n";
     ilm_surfaceSetSourceRectangle(surfaceid, 0, 0, width, height);
@@ -263,8 +268,8 @@ bool OpenGLES2App::setupLayerMangement(SurfaceConfiguration* config)
     cout << "Set surface " << surfaceid << " visible\n";
     ilm_surfaceSetVisibility(surfaceid, ILM_TRUE);
 
-    cout << "Set surface " << surfaceid << " opacity 1.0\n";
-    ilm_surfaceSetOpacity(surfaceid, 1.0f);
+    cout << "Set surface " << surfaceid << " opacity " << opacity << "\n";
+    ilm_surfaceSetOpacity(surfaceid, opacity);
 
     cout << "add surface " << surfaceid << " to layer " << layerid << "\n";
     ilm_layerAddSurface(layerid, surfaceid);
