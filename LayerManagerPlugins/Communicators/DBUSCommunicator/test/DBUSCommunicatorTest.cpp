@@ -115,7 +115,6 @@ TEST_F(DBUSCommunicatorTest, ListAllLayerIDS) {
 
 TEST_F(DBUSCommunicatorTest, listAlllayerGroupIDS) {
     std::list<int> defaultlist;
-    // Sets the default return value for type Bar.
     DefaultValue<Scene*>::Set((Scene*) &this->layerlist);
     DefaultValue<std::list<int> >::Set(defaultlist);
     EXPECT_CALL(this->layerlist, getLayerGroupIDs(NotNull(),NotNull()) ).Times(1);
@@ -124,7 +123,6 @@ TEST_F(DBUSCommunicatorTest, listAlllayerGroupIDS) {
 
 TEST_F(DBUSCommunicatorTest, listAllSurfaceGroupIDS) {
     std::list<int> defaultlist;
-    // Sets the default return value for type Bar.
     DefaultValue<Scene*>::Set((Scene*) &this->layerlist);
     DefaultValue<std::list<int> >::Set(defaultlist);
     EXPECT_CALL(this->layerlist, getSurfaceGroupIDs(NotNull(),NotNull() )).Times(1);
@@ -135,7 +133,6 @@ TEST_F(DBUSCommunicatorTest, listSurfacesOfSurfacegroup) {
 
     std::list<int> defaultlist;
     DefaultValue<Scene*>::Set((Scene*) &this->layerlist);
-    // Sets the default return value for type Bar.
     DefaultValue<std::list<int> >::Set(defaultlist);
     DefaultValue<SurfaceGroup*>::Set(new SurfaceGroup());
     EXPECT_CALL(this->layerlist, getSurfaceGroup(Eq(84567u) )).Times(1);
@@ -146,7 +143,6 @@ TEST_F(DBUSCommunicatorTest, listSurfacesOfSurfacegroup) {
 TEST_F(DBUSCommunicatorTest, listlayersOflayergroup) {
 
     std::list<int> defaultlist;
-    // Sets the default return value for type Bar.
     DefaultValue<Scene*>::Set((Scene*) &this->layerlist);
     DefaultValue<std::list<int> >::Set(defaultlist);
     DefaultValue<LayerGroup*>::Set(new LayerGroup());

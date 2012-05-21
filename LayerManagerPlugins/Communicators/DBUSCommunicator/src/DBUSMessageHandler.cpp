@@ -63,6 +63,7 @@ DBUSMessageHandler::~DBUSMessageHandler()
         LOG_ERROR("DBUSMessageHandler","there was an dbus error");
     }
     dbus_connection_unregister_object_path(m_pConnection,DBUS_SERVICE_OBJECT_PATH);
+    
     LOG_INFO("DBUSMessageHandler","Ask about owner name");
     dbus_bus_name_has_owner(m_pConnection, DBUS_SERVICE_PREFIX, &err);
     errorset = dbus_error_is_set(&err);
@@ -85,6 +86,11 @@ bool DBUSMessageHandler::registerMessageFilter(  DBusHandleMessageFunction fMess
     return result;
 }
 
+void DBUSMessageHandler::unregisterMessageFilter(  DBusHandleMessageFunction fMessageFunc,
+                                                 void* comInstance )
+{
+    dbus_connection_remove_filter ( m_pConnection , fMessageFunc, comInstance);
+}
 
 bool DBUSMessageHandler::registerPathFunction(  DBusObjectPathMessageFunction fMessageFunc,
                                                 DBusObjectPathUnregisterFunction fUnregisterFunc, 

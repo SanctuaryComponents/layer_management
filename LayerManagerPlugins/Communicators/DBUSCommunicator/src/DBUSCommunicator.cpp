@@ -173,15 +173,22 @@ bool DBUSCommunicator::start()
         } 
     }
     LOG_INFO("DBUSCommunicator", "Started dbus connector");
+    m_running = true;
     return result;
 }
 
 void DBUSCommunicator::stop()
 {
     LOG_INFO("DBUSCommunicator","stopping");
-
-    // deregister dbus messaging implicitly by deleting messageHandler
-    delete g_pDbusMessage;
+    if (m_running) 
+    {
+        g_pDbusMessage->unregisterMessageFilter(DBUSCommunicator::processMessageFunc,this);
+        // deregister dbus messaging implicitly by deleting messageHandler
+    }
+    if (g_pDbusMessage != NULL) 
+    {
+        delete g_pDbusMessage;
+    }
 }
 
 void DBUSCommunicator::ServiceConnect(DBusConnection* conn, DBusMessage* msg)
@@ -202,6 +209,7 @@ void DBUSCommunicator::ServiceDisconnect(DBusConnection* conn, DBusMessage* msg)
     g_pDbusMessage->initReceive(msg);
     char* owner = strdup(dbus_message_get_sender(msg));
     RemoveApplicationReference(owner);
+    RemoveClientWatch(conn,owner);
     g_pDbusMessage->initReply(msg);
     g_pDbusMessage->closeReply();
 }
@@ -740,7 +748,7 @@ void DBUSCommunicator::CreateLayer(DBusConnection* conn, DBusMessage* msg)
     (void)conn; // TODO: remove, only prevents warning
 
     uint id = GraphicalObject::INVALID_ID;
-	// use resolution of default screen as default width and height of layers
+    // use resolution of default screen as default width and height of layers
     uint* resolution = m_executor->getScreenResolution(DEFAULT_SCREEN);
     bool status = m_executor->execute(new LayerCreateCommand(resolution[0], resolution[1], &id));
     if (status)
@@ -762,7 +770,7 @@ void DBUSCommunicator::CreateLayerFromId(DBusConnection* conn, DBusMessage* msg)
     uint id = GraphicalObject::INVALID_ID;
     g_pDbusMessage->initReceive(msg);
     id = g_pDbusMessage->getUInt();
-	// use resolution of default screen as default width and height of layers
+    // use resolution of default screen as default width and height of layers
     uint* resolution = m_executor->getScreenResolution(DEFAULT_SCREEN);
     bool status = m_executor->execute(new LayerCreateCommand(resolution[0], resolution[1], &id));
     if (status)
@@ -1969,11 +1977,27 @@ void DBUSCommunicator::AddClientWatch(DBusConnection *conn, char* sender)
     }
 }
 
+void DBUSCommunicator::RemoveClientWatch(DBusConnection *conn, char* sender) 
+{
+    DBusError err;
+    dbus_error_init(&err);
+    char rule[1024];
+    sprintf(rule,"type='signal',sender='%s',interface='%s',member='%s',arg0='%s'",DBUS_INTERFACE_DBUS,DBUS_INTERFACE_DBUS,"NameOwnerChanged",sender);
+    
+    dbus_bus_remove_match(conn,rule,&err);
+    if (dbus_error_is_set(&err))
+    {
+        LOG_ERROR("DBUSCommunicator", "Could not remove client watch "<< err.message);
+        dbus_error_free(&err);
+    }
+}
+
 DBusHandlerResult DBUSCommunicator::delegateMessage(DBusConnection* conn, DBusMessage* msg) 
 {
     DBusHandlerResult result = DBUS_HANDLER_RESULT_HANDLED;
     LOG_DEBUG("DBUSCommunicator","message received");
     const char *n = dbus_message_get_member(msg);
+    char* owner = strdup(dbus_message_get_sender(msg));
     bool found = false;
     int i = 0;
 
@@ -2014,6 +2038,7 @@ DBusHandlerResult DBUSCommunicator::delegateMessage(DBusConnection* conn, DBusMe
         } else if ( *newName == '\0' ) 
         {
             LOG_DEBUG("DBUSCommunicator","Client Disconnect detected " << name);
+            RemoveClientWatch(conn,owner);
             RemoveApplicationReference(name);
         }
     }

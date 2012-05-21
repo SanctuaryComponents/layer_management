@@ -190,6 +190,7 @@ public:
 
 private:
     void AddClientWatch(DBusConnection *conn, char* sender);
+    void RemoveClientWatch(DBusConnection *conn, char* sender);
     void RemoveApplicationReference(char* owner);
     static DBusHandlerResult processMessageFunc(DBusConnection* conn,DBusMessage* msg, void *user_data);
     static void unregisterMessageFunc(DBusConnection* conn, void *user_data);
