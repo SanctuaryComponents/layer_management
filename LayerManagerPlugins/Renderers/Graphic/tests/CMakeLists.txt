@@ -19,20 +19,39 @@
 
 cmake_minimum_required (VERSION 2.6)
 
-include_directories (".")
-include_directories ("../include")
-include_directories ("${PROJECT_SOURCE_DIR}/LayerManagerService/include")
-include_directories ("${PROJECT_SOURCE_DIR}/LayerManagerUtils/include")
-
-
 find_package (Threads)
-set(LIBS ${LIBS} ${CMAKE_THREAD_LIBS_INIT} LayerManagerUtils)
 
-file(GLOB LM_SOURCES ../../../../LayerManagerService/src/Scene.cpp ../../../../LayerManagerService/src/GraphicalSurface.cpp ../../../../LayerManagerService/src/LogicalGraphicsObject.cpp)
+include_directories(
+    "."
+    "../include"
+    "${PROJECT_SOURCE_DIR}/LayerManagerService/include"
+    "${PROJECT_SOURCE_DIR}/LayerManagerUtils/include"
+)
+
+set(LIBS
+    ${LIBS}
+    ${CMAKE_THREAD_LIBS_INIT}
+    LayerManagerUtils
+)
+
+file(GLOB LM_SOURCES
+    ${PROJECT_SOURCE_DIR}/LayerManagerService/src/Scene.cpp
+    ${PROJECT_SOURCE_DIR}/LayerManagerService/src/GraphicalSurface.cpp
+    ${PROJECT_SOURCE_DIR}/LayerManagerService/src/GraphicalObject.cpp
+    ${PROJECT_SOURCE_DIR}/LayerManagerService/src/LogicalGraphicsObject.cpp
+)
 
 enable_testing()
-add_executable(ViewportTransformTest ${LM_SOURCES} ../src/Transformation/ViewportTransform.cpp ViewportTransformTest.cpp)
-target_link_libraries(ViewportTransformTest ${LIBS} gtest)
 
+add_executable(ViewportTransformTest
+    ${LM_SOURCES}
+    ../src/Transformation/ViewportTransform.cpp
+    ViewportTransformTest.cpp
+)
+
+target_link_libraries(ViewportTransformTest
+    ${LIBS}
+    gtest
+)
 
 add_test(ViewportTransformations ViewportTransformTest)

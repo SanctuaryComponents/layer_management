@@ -168,10 +168,10 @@ endif (WITH_WAYLAND_X11)
 
 endif(WITH_WAYLAND)
 
-#if (WITH_TESTS)
-#    enable_testing()
-#    add_subdirectory (tests)
-#endif(WITH_TESTS)
+if (WITH_TESTS)
+    enable_testing()
+    add_subdirectory (tests)
+endif(WITH_TESTS)
 
 add_library(${GRAPHIC_LIB_NAME} SHARED ${SOURCES})
 
