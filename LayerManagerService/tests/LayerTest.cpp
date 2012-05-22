@@ -54,7 +54,7 @@ TEST_F(LayerTest, defaultConstructor)
     EXPECT_EQ(0, layer.OriginalSourceWidth);
 
     /// make sure, Layer has default visibility
-    EXPECT_EQ(false, layer.getVisibility());
+    EXPECT_FALSE(layer.getVisibility());
 
     /// make sure, Layer has default opacity
     EXPECT_DOUBLE_EQ(1.0, layer.getOpacity());
@@ -64,17 +64,17 @@ TEST_F(LayerTest, defaultConstructor)
 
     /// make sure, Layer has default source rectangle
     const Rectangle& srcRect = layer.getSourceRegion();
-    EXPECT_EQ(0, srcRect.height);
-    EXPECT_EQ(0, srcRect.width);
-    EXPECT_EQ(0, srcRect.x);
-    EXPECT_EQ(0, srcRect.y);
+    EXPECT_EQ((uint)0, srcRect.height);
+    EXPECT_EQ((uint)0, srcRect.width);
+    EXPECT_EQ((uint)0, srcRect.x);
+    EXPECT_EQ((uint)0, srcRect.y);
 
     /// make sure, Layer has default destination rectangle
     const Rectangle& destRect = layer.getDestinationRegion();
-    EXPECT_EQ(0, destRect.height);
-    EXPECT_EQ(0, destRect.width);
-    EXPECT_EQ(0, destRect.x);
-    EXPECT_EQ(0, destRect.y);
+    EXPECT_EQ((uint)0, destRect.height);
+    EXPECT_EQ((uint)0, destRect.width);
+    EXPECT_EQ((uint)0, destRect.x);
+    EXPECT_EQ((uint)0, destRect.y);
 
     /// make sure, layer layer has default type
     EXPECT_EQ(Software_2D, layer.getLayerType());
@@ -96,7 +96,7 @@ TEST_F(LayerTest, specialConstructor)
     EXPECT_EQ(0, layer.OriginalSourceWidth);
 
     /// make sure, Layer has default visibility
-    EXPECT_EQ(false, layer.getVisibility());
+    EXPECT_FALSE(layer.getVisibility());
 
     /// make sure, Layer has default opacity
     EXPECT_DOUBLE_EQ(1.0, layer.getOpacity());
@@ -106,17 +106,17 @@ TEST_F(LayerTest, specialConstructor)
 
     /// make sure, Layer has default source rectangle
     const Rectangle& srcRect = layer.getSourceRegion();
-    EXPECT_EQ(0, srcRect.height);
-    EXPECT_EQ(0, srcRect.width);
-    EXPECT_EQ(0, srcRect.x);
-    EXPECT_EQ(0, srcRect.y);
+    EXPECT_EQ((uint)0, srcRect.height);
+    EXPECT_EQ((uint)0, srcRect.width);
+    EXPECT_EQ((uint)0, srcRect.x);
+    EXPECT_EQ((uint)0, srcRect.y);
 
     /// make sure, Layer has default destination rectangle
     const Rectangle& destRect = layer.getDestinationRegion();
-    EXPECT_EQ(0, destRect.height);
-    EXPECT_EQ(0, destRect.width);
-    EXPECT_EQ(0, destRect.x);
-    EXPECT_EQ(0, destRect.y);
+    EXPECT_EQ((uint)0, destRect.height);
+    EXPECT_EQ((uint)0, destRect.width);
+    EXPECT_EQ((uint)0, destRect.x);
+    EXPECT_EQ((uint)0, destRect.y);
 
     /// make sure, layer layer has default type
     EXPECT_EQ(Software_2D, layer.getLayerType());
@@ -157,7 +157,7 @@ TEST_F(LayerTest, setLayerCapabilities)
     unsigned int expectedCapabilities = LayerScalable | LayerOrientable;
 
     /// make sure, layer has default capabilities set
-    EXPECT_EQ(0, m_pLayer->getCapabilities());
+    EXPECT_EQ((uint)0, m_pLayer->getCapabilities());
 
     /// enable expected capabilities of layer
     m_pLayer->setLayerCapabilities(expectedCapabilities);
@@ -169,7 +169,7 @@ TEST_F(LayerTest, setLayerCapabilities)
     m_pLayer->setLayerCapabilities(0);
 
     /// make sure, the capabilities of layer were updated
-    EXPECT_EQ(0, m_pLayer->getCapabilities());
+    EXPECT_EQ((uint)0, m_pLayer->getCapabilities());
 }
 
 TEST_F(LayerTest, getCapabilities)
@@ -177,7 +177,7 @@ TEST_F(LayerTest, getCapabilities)
     unsigned int expectedCapabilities = LayerScalable | LayerOrientable;
 
     /// make sure, layer has default capabilities set
-    EXPECT_EQ(0, m_pLayer->getCapabilities());
+    EXPECT_EQ((uint)0, m_pLayer->getCapabilities());
 
     /// enable expected capabilities of layer
     m_pLayer->setLayerCapabilities(expectedCapabilities);
@@ -188,72 +188,72 @@ TEST_F(LayerTest, getCapabilities)
 
 TEST_F(LayerTest, addSurface)
 {
-    unsigned int expectedSurfaceId;
+    unsigned int expectedSurfaceId = 32;
     Surface surface(expectedSurfaceId);
 
     /// make sure, layer contains no surfaces
     SurfaceList& slist = m_pLayer->getAllSurfaces();
-    EXPECT_EQ(0, slist.size());
+    EXPECT_EQ((uint)0, slist.size());
 
     /// add surface to layer
     m_pLayer->addSurface(&surface);
 
     /// make sure, layer contains one surface
     slist = m_pLayer->getAllSurfaces();
-    EXPECT_EQ(1, slist.size());
+    EXPECT_EQ((uint)1, slist.size());
 }
 
 TEST_F(LayerTest, addSurface_twice)
 {
-    unsigned int expectedSurfaceId;
+    unsigned int expectedSurfaceId = 33;
     Surface surface(expectedSurfaceId);
 
     /// make sure, layer contains no surfaces
     SurfaceList& slist = m_pLayer->getAllSurfaces();
-    EXPECT_EQ(0, slist.size());
+    EXPECT_EQ((uint)0, slist.size());
 
     /// add surface to layer
     m_pLayer->addSurface(&surface);
 
     /// make sure, layer contains one surface
     slist = m_pLayer->getAllSurfaces();
-    EXPECT_EQ(1, slist.size());
+    EXPECT_EQ((uint)1, slist.size());
 
     /// add surface to layer again
     m_pLayer->addSurface(&surface);
 
     /// make sure, layer still contains one surface
     slist = m_pLayer->getAllSurfaces();
-    EXPECT_EQ(1, slist.size());
+    EXPECT_EQ((uint)1, slist.size());
 }
 
 TEST_F(LayerTest, addSurface_alreadyOnOtherLayer)
 {
-    unsigned int expectedSurfaceId;
+    unsigned int expectedSurfaceId = 34;
     Surface surface(expectedSurfaceId);
     Layer layer;
 
     /// make sure, layer contains no surfaces
     SurfaceList& slist = m_pLayer->getAllSurfaces();
-    EXPECT_EQ(0, slist.size());
+    EXPECT_EQ((uint)0, slist.size());
 
     /// add surface to layer
     m_pLayer->addSurface(&surface);
 
     /// make sure, layer contains one surface
     slist = m_pLayer->getAllSurfaces();
-    EXPECT_EQ(1, slist.size());
+    EXPECT_EQ((uint)1, slist.size());
 
     /// add surface to other layer
     layer.addSurface(&surface);
 
     /// make sure, layer still contains one surface
     slist = m_pLayer->getAllSurfaces();
-    EXPECT_EQ(1, slist.size());
+    EXPECT_EQ((uint)1, slist.size());
 
     /// make sure, other layer contains no surfaces
     slist = layer.getAllSurfaces();
-    EXPECT_EQ(0, slist.size());
+    EXPECT_EQ((uint)0, slist.size());
 }
 
 TEST_F(LayerTest, removeSurface)
@@ -262,7 +262,7 @@ TEST_F(LayerTest, removeSurface)
 
     /// make sure, layer contains no surfaces
     SurfaceList& slist = m_pLayer->getAllSurfaces();
-    EXPECT_EQ(0, slist.size());
+    EXPECT_EQ((uint)0, slist.size());
 
     /// add 3 surfaces to layer
     m_pLayer->addSurface(&s1);
@@ -271,7 +271,7 @@ TEST_F(LayerTest, removeSurface)
 
     /// make sure, layer contains the 3 surfaces
     slist = m_pLayer->getAllSurfaces();
-    EXPECT_EQ(3, slist.size());
+    EXPECT_EQ((uint)3, slist.size());
     SurfaceListIterator iter = slist.begin();
     EXPECT_EQ(&s1, *iter++);
     EXPECT_EQ(&s2, *iter++);
@@ -284,7 +284,7 @@ TEST_F(LayerTest, removeSurface)
 
     /// make sure, layer contains 1 surface
     slist = m_pLayer->getAllSurfaces();
-    EXPECT_EQ(1, slist.size());
+    EXPECT_EQ((uint)1, slist.size());
     iter = slist.begin();
     EXPECT_EQ(&s2, *iter++);
     EXPECT_EQ(slist.end(), iter);
@@ -294,7 +294,7 @@ TEST_F(LayerTest, removeSurface)
 
     /// make sure, layer contains no surfaces
     slist = m_pLayer->getAllSurfaces();
-    EXPECT_EQ(0, slist.size());
+    EXPECT_EQ((uint)0, slist.size());
     EXPECT_EQ(slist.end(), slist.begin());
 }
 
@@ -304,7 +304,7 @@ TEST_F(LayerTest, getAllSurfaces)
 
     /// make sure, getAllSurfaces returns empty list, if layer contains no surfaces
     SurfaceList& slist = m_pLayer->getAllSurfaces();
-    EXPECT_EQ(0, slist.size());
+    EXPECT_EQ((uint)0, slist.size());
 
     /// add 5 surfaces to layer
     m_pLayer->addSurface(&s1);
@@ -315,7 +315,7 @@ TEST_F(LayerTest, getAllSurfaces)
 
     /// check if all added surfaces are returned by getAllSurfaces
     slist = m_pLayer->getAllSurfaces();
-    EXPECT_EQ(5, slist.size());
+    EXPECT_EQ((uint)5, slist.size());
     SurfaceListIterator iter = slist.begin();
     EXPECT_EQ(&s1, *iter++);
     EXPECT_EQ(&s2, *iter++);
@@ -331,7 +331,7 @@ TEST_F(LayerTest, removeAllSurfaces)
 
     /// make sure, getAllSurfaces returns empty list, if layer contains no surfaces
     SurfaceList& slist = m_pLayer->getAllSurfaces();
-    EXPECT_EQ(0, slist.size());
+    EXPECT_EQ((uint)0, slist.size());
 
     /// add 5 surfaces to layer
     m_pLayer->addSurface(&s1);
@@ -342,14 +342,14 @@ TEST_F(LayerTest, removeAllSurfaces)
 
     /// make sure, layer contains 5 surfaces
     slist = m_pLayer->getAllSurfaces();
-    EXPECT_EQ(5, slist.size());
+    EXPECT_EQ((uint)5, slist.size());
 
     /// remove all surfaces from layer
     m_pLayer->removeAllSurfaces();
 
     /// make sure, layer contains no surfaces
     slist = m_pLayer->getAllSurfaces();
-    EXPECT_EQ(0, slist.size());
+    EXPECT_EQ((uint)0, slist.size());
 
     /// add 3 surfaces to layer
     m_pLayer->addSurface(&s1);
@@ -358,13 +358,13 @@ TEST_F(LayerTest, removeAllSurfaces)
 
     /// make sure, layer contains 3 surfaces
     slist = m_pLayer->getAllSurfaces();
-    EXPECT_EQ(3, slist.size());
+    EXPECT_EQ((uint)3, slist.size());
 
     /// remove all surfaces from layer
     m_pLayer->removeAllSurfaces();
 
     /// make sure, layer contains no surfaces
     slist = m_pLayer->getAllSurfaces();
-    EXPECT_EQ(0, slist.size());
+    EXPECT_EQ((uint)0, slist.size());
 }
 

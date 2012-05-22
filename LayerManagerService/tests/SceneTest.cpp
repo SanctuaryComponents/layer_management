@@ -49,11 +49,11 @@ TEST_F(SceneTest, createLayer)
     uint size;
     uint* array;
     Layer* pLayer;
-    int expected = 91;
+    uint expected = 91;
 
     /// make sure, scene contains no layers
     m_pScene->getLayerIDs(&size, &array);
-    ASSERT_EQ(0, size) << "Scene should contain 0 layers";
+    ASSERT_EQ((uint)0, size) << "Scene should contain 0 layers";
 
     /// create layer with expected id
     pLayer = m_pScene->createLayer(expected);
@@ -64,11 +64,11 @@ TEST_F(SceneTest, createLayer)
 
     /// make sure, scene contains one layer
     m_pScene->getLayerIDs(&size, &array);
-    ASSERT_EQ(1, size) << "Scene should contain 1 layer";
+    ASSERT_EQ((uint)1, size) << "Scene should contain 1 layer";
 
     /// make sure, layer contains no surfaces
     SurfaceList& slist = pLayer->getAllSurfaces();
-    EXPECT_EQ(0, slist.size());
+    EXPECT_EQ((uint)0, slist.size());
 }
 
 TEST_F(SceneTest, createLayer_invalidId)
@@ -79,7 +79,7 @@ TEST_F(SceneTest, createLayer_invalidId)
 
     /// make sure, scene contains no layers
     m_pScene->getLayerIDs(&size, &array);
-    ASSERT_EQ(0, size) << "Scene should contain 0 layers";
+    ASSERT_EQ((uint)0, size) << "Scene should contain 0 layers";
 
     /// create layer with invalid id
     pLayer = m_pScene->createLayer(GraphicalObject::INVALID_ID);
@@ -90,14 +90,14 @@ TEST_F(SceneTest, createLayer_invalidId)
 
     /// make sure, scene contains one layer
     m_pScene->getLayerIDs(&size, &array);
-    ASSERT_EQ(1, size) << "Scene should contain 1 layer";
+    ASSERT_EQ((uint)1, size) << "Scene should contain 1 layer";
 }
 
 TEST_F(SceneTest, createLayer_twice)
 {
     uint size;
     uint* array;
-    int expected = 55;
+    uint expected = 55;
     double expectedOpacity = 0.322;
     Layer* pLayer1;
     Layer* pLayer2;
@@ -108,7 +108,7 @@ TEST_F(SceneTest, createLayer_twice)
 
     /// make sure, scene contains one layer
     m_pScene->getLayerIDs(&size, &array);
-    ASSERT_EQ(1, size) << "Scene should contain 1 layer";
+    ASSERT_EQ((uint)1, size) << "Scene should contain 1 layer";
 
     /// try to create existing layer 55, handle to existing layer should be returned
     pLayer2 = m_pScene->createLayer(expected);
@@ -116,7 +116,7 @@ TEST_F(SceneTest, createLayer_twice)
 
     /// make sure, scene still contains one layer
     m_pScene->getLayerIDs(&size, &array);
-    ASSERT_EQ(1, size) << "Scene should contain 1 layer";
+    ASSERT_EQ((uint)1, size) << "Scene should contain 1 layer";
 
     /// change opacity using first layer handle
     pLayer1->setOpacity(expectedOpacity);
@@ -130,11 +130,11 @@ TEST_F(SceneTest, createSurface)
     uint size;
     uint* array;
     Surface* pSurface;
-    int expected = 131;
+    uint expected = 131;
 
     /// make sure, scene contains no surfaces
     m_pScene->getSurfaceIDs(&size, &array);
-    ASSERT_EQ(0, size) << "Scene should contain 0 surfaces";
+    ASSERT_EQ((uint)0, size) << "Scene should contain 0 surfaces";
 
     /// create surface with expected id
     pSurface = m_pScene->createSurface(expected);
@@ -145,7 +145,7 @@ TEST_F(SceneTest, createSurface)
 
     /// make sure, scene contains one surface
     m_pScene->getSurfaceIDs(&size, &array);
-    ASSERT_EQ(1, size) << "Scene should contain 1 surface";
+    ASSERT_EQ((uint)1, size) << "Scene should contain 1 surface";
 
     /// make sure, surface was not added to any layer
     EXPECT_EQ(GraphicalObject::INVALID_ID, pSurface->getContainingLayerId());
@@ -159,7 +159,7 @@ TEST_F(SceneTest, createSurface_invalidId)
 
     /// make sure, scene contains no surfaces
     m_pScene->getSurfaceIDs(&size, &array);
-    ASSERT_EQ(0, size) << "Scene should contain 0 surfaces";
+    ASSERT_EQ((uint)0, size) << "Scene should contain 0 surfaces";
 
     /// create surface with invalid id
     pSurface = m_pScene->createSurface(GraphicalObject::INVALID_ID);
@@ -170,7 +170,7 @@ TEST_F(SceneTest, createSurface_invalidId)
 
     /// make sure, scene contains one surface
     m_pScene->getSurfaceIDs(&size, &array);
-    ASSERT_EQ(1, size) << "Scene should contain 1 surface";
+    ASSERT_EQ((uint)1, size) << "Scene should contain 1 surface";
 }
 
 TEST_F(SceneTest, createSurface_twice)
@@ -179,12 +179,12 @@ TEST_F(SceneTest, createSurface_twice)
     uint* array;
     Surface* pSurface1;
     Surface* pSurface2;
-    int expected = 135;
+    uint expected = 135;
     double expectedOpacity = 0.718;
 
     /// make sure, scene contains no surfaces
     m_pScene->getSurfaceIDs(&size, &array);
-    ASSERT_EQ(0, size) << "Scene should contain 0 surfaces";
+    ASSERT_EQ((uint)0, size) << "Scene should contain 0 surfaces";
 
     /// create surface with expected id
     pSurface1 = m_pScene->createSurface(expected);
@@ -195,7 +195,7 @@ TEST_F(SceneTest, createSurface_twice)
 
     /// make sure, scene contains one surface
     m_pScene->getSurfaceIDs(&size, &array);
-    ASSERT_EQ(1, size) << "Scene should contain 1 surface";
+    ASSERT_EQ((uint)1, size) << "Scene should contain 1 surface";
 
     /// create surface with expected id again
     pSurface2 = m_pScene->createSurface(expected);
@@ -206,7 +206,7 @@ TEST_F(SceneTest, createSurface_twice)
 
     /// make sure, scene still contains one surface
     m_pScene->getSurfaceIDs(&size, &array);
-    ASSERT_EQ(1, size) << "Scene should contain 1 surface";
+    ASSERT_EQ((uint)1, size) << "Scene should contain 1 surface";
 
     /// change opacity using first surface handle
     pSurface1->setOpacity(expectedOpacity);
@@ -217,7 +217,7 @@ TEST_F(SceneTest, createSurface_twice)
 
 TEST_F(SceneTest, createLayerGroup)
 {
-    unsigned int expectedId = 167;
+    uint expectedId = 167;
     LayerGroup* pLayerGroup;
 
     /// make sure, expected layer group does not exist
@@ -234,8 +234,8 @@ TEST_F(SceneTest, createLayerGroup)
 
 TEST_F(SceneTest, createLayerGroup_twice)
 {
-    unsigned int expectedLayerGroupId = 169;
-    unsigned int expectedLayerId = 170;
+    uint expectedLayerGroupId = 169;
+    uint expectedLayerId = 170;
     LayerGroup* pLayerGroup1;
     LayerGroup* pLayerGroup2;
     Layer layer(expectedLayerId);
@@ -262,7 +262,7 @@ TEST_F(SceneTest, createLayerGroup_twice)
 
     /// make sure, layer can be accessed in layer group using 2nd handle
     const LayerList& llist = pLayerGroup2->getList();
-    EXPECT_EQ(1, llist.size());
+    EXPECT_EQ((uint)1, llist.size());
     LayerListConstIterator iter = llist.begin();
     EXPECT_EQ(expectedLayerId, (*iter)->getID());
     EXPECT_EQ(llist.end(), ++iter);
@@ -270,7 +270,7 @@ TEST_F(SceneTest, createLayerGroup_twice)
 
 TEST_F(SceneTest, createSurfaceGroup)
 {
-    unsigned int expectedSurfaceGroupId = 172;
+    uint expectedSurfaceGroupId = 172;
     SurfaceGroup* pSurfaceGroup;
 
     /// make sure, expected Surface group does not exist
@@ -287,8 +287,8 @@ TEST_F(SceneTest, createSurfaceGroup)
 }
 TEST_F(SceneTest, createSurfaceGroup_twice)
 {
-    unsigned int expectedSurfaceGroupId = 172;
-    unsigned int expectedSurfaceId = 173;
+    uint expectedSurfaceGroupId = 172;
+    uint expectedSurfaceId = 173;
     SurfaceGroup* pSurfaceGroup1;
     SurfaceGroup* pSurfaceGroup2;
     Surface Surface(expectedSurfaceId);
@@ -315,7 +315,7 @@ TEST_F(SceneTest, createSurfaceGroup_twice)
 
     /// make sure, Surface can be accessed in Surface group using 2nd handle
     const SurfaceList& llist = pSurfaceGroup2->getList();
-    EXPECT_EQ(1, llist.size());
+    EXPECT_EQ((uint)1, llist.size());
     SurfaceListConstIterator iter = llist.begin();
     EXPECT_EQ(expectedSurfaceId, (*iter)->getID());
     EXPECT_EQ(llist.end(), ++iter);
@@ -323,7 +323,7 @@ TEST_F(SceneTest, createSurfaceGroup_twice)
 
 TEST_F(SceneTest, removeLayer)
 {
-    unsigned int expectedLayerId = 188;
+    uint expectedLayerId = 188;
     Layer* pLayer;
 
     /// create layer
@@ -342,7 +342,7 @@ TEST_F(SceneTest, removeLayer)
 
 TEST_F(SceneTest, removeSurface)
 {
-    unsigned int expectedSurfaceId = 189;
+    uint expectedSurfaceId = 189;
     Surface* pSurface;
 
     /// create Surface
@@ -361,7 +361,7 @@ TEST_F(SceneTest, removeSurface)
 
 TEST_F(SceneTest, getLayer)
 {
-    unsigned int expectedLayerId = 198;
+    uint expectedLayerId = 198;
     Layer* pLayer;
 
     /// try to get non existing layer
@@ -383,7 +383,7 @@ TEST_F(SceneTest, getLayer)
 
 TEST_F(SceneTest, getSurface)
 {
-    unsigned int expectedSurfaceId = 198;
+    uint expectedSurfaceId = 198;
     Surface* pSurface;
 
     /// try to get non existing Surface
@@ -405,7 +405,7 @@ TEST_F(SceneTest, getSurface)
 
 TEST_F(SceneTest, getSurfaceGroup)
 {
-    unsigned int expectedSurfaceGroupId = 198;
+    uint expectedSurfaceGroupId = 198;
     SurfaceGroup* pSurfaceGroup;
 
     /// try to get non existing SurfaceGroup
@@ -427,7 +427,7 @@ TEST_F(SceneTest, getSurfaceGroup)
 
 TEST_F(SceneTest, getLayerGroup)
 {
-    unsigned int expectedLayerGroupId = 203;
+    uint expectedLayerGroupId = 203;
     LayerGroup* pLayerGroup;
 
     /// try to get non existing LayerGroup
@@ -458,7 +458,7 @@ TEST_F(SceneTest, getLayerIDs)
 
     /// make sure, scene contains no layers
     m_pScene->getLayerIDs(&size, &array);
-    ASSERT_EQ(0, size);
+    ASSERT_EQ((uint)0, size);
 
     /// create 4 layers in scene
     m_pScene->createLayer(layerId1);
@@ -468,7 +468,7 @@ TEST_F(SceneTest, getLayerIDs)
 
     /// make sure, scene contains these 4 layers
     m_pScene->getLayerIDs(&size, &array);
-    ASSERT_EQ(4, size);
+    ASSERT_EQ((uint)4, size);
     EXPECT_EQ(layerId1, array[0]);
     EXPECT_EQ(layerId2, array[1]);
     EXPECT_EQ(layerId3, array[2]);
@@ -491,7 +491,7 @@ TEST_F(SceneTest, getLayerIDsOfScreen)
 
     /// make sure, scene contains no layers
     m_pScene->getLayerIDs(&size, &array);
-    ASSERT_EQ(0, size);
+    ASSERT_EQ((uint)0, size);
 
     /// create 4 layers in scene, but dont add them to render order
     l1 = m_pScene->createLayer(layerId1);
@@ -501,7 +501,7 @@ TEST_F(SceneTest, getLayerIDsOfScreen)
 
     /// make sure, scene contains these 4 layers
     m_pScene->getLayerIDs(&size, &array);
-    ASSERT_EQ(4, size);
+    ASSERT_EQ((uint)4, size);
     EXPECT_EQ(layerId1, array[0]);
     EXPECT_EQ(layerId2, array[1]);
     EXPECT_EQ(layerId3, array[2]);
@@ -509,7 +509,7 @@ TEST_F(SceneTest, getLayerIDsOfScreen)
 
     /// make sure, screen still has no layers applied
     m_pScene->getLayerIDsOfScreen(screenId, &size, &array);
-    ASSERT_EQ(0, size);
+    ASSERT_EQ((uint)0, size);
 
     /// add 3 layers to screen
     LayerList& llist = m_pScene->getCurrentRenderOrder();
@@ -519,7 +519,7 @@ TEST_F(SceneTest, getLayerIDsOfScreen)
 
     /// make sure, screen now has 3 layers
     m_pScene->getLayerIDsOfScreen(screenId, &size, &array);
-    ASSERT_EQ(3, size);
+    ASSERT_EQ((uint)3, size);
     EXPECT_EQ(l1->getID(), array[0]);
     EXPECT_EQ(l3->getID(), array[1]);
     EXPECT_EQ(l4->getID(), array[2]);
@@ -529,7 +529,7 @@ TEST_F(SceneTest, getLayerIDsOfScreen)
 
     /// make sure, screen now has 4 layers
     m_pScene->getLayerIDsOfScreen(screenId, &size, &array);
-    ASSERT_EQ(4, size);
+    ASSERT_EQ((uint)4, size);
     EXPECT_EQ(l1->getID(), array[0]);
     EXPECT_EQ(l3->getID(), array[1]);
     EXPECT_EQ(l4->getID(), array[2]);
@@ -547,7 +547,7 @@ TEST_F(SceneTest, getSurfaceIDs)
 
     /// make sure, scene contains no surfaces
     m_pScene->getSurfaceIDs(&size, &array);
-    ASSERT_EQ(0, size);
+    ASSERT_EQ((uint)0, size);
 
     /// create 4 surfaces in scene
     m_pScene->createSurface(surfaceId1);
@@ -557,7 +557,7 @@ TEST_F(SceneTest, getSurfaceIDs)
 
     /// make sure, scene contains these 4 surfaces
     m_pScene->getSurfaceIDs(&size, &array);
-    ASSERT_EQ(4, size);
+    ASSERT_EQ((uint)4, size);
     EXPECT_EQ(surfaceId1, array[0]);
     EXPECT_EQ(surfaceId2, array[1]);
     EXPECT_EQ(surfaceId3, array[2]);
@@ -575,7 +575,7 @@ TEST_F(SceneTest, getLayerGroupIDs)
 
     /// make sure, scene contains no layergroups
     m_pScene->getLayerGroupIDs(&size, &array);
-    ASSERT_EQ(0, size);
+    ASSERT_EQ((uint)0, size);
 
     /// create 4 layergroups in scene
     m_pScene->createLayerGroup(layergroupId1);
@@ -585,7 +585,7 @@ TEST_F(SceneTest, getLayerGroupIDs)
 
     /// make sure, scene contains these 4 layergroups
     m_pScene->getLayerGroupIDs(&size, &array);
-    ASSERT_EQ(4, size);
+    ASSERT_EQ((uint)4, size);
     EXPECT_EQ(layergroupId1, array[0]);
     EXPECT_EQ(layergroupId2, array[1]);
     EXPECT_EQ(layergroupId3, array[2]);
@@ -603,7 +603,7 @@ TEST_F(SceneTest, getSurfaceGroupIDs)
 
     /// make sure, scene contains no surfacegroups
     m_pScene->getSurfaceGroupIDs(&size, &array);
-    ASSERT_EQ(0, size);
+    ASSERT_EQ((uint)0, size);
 
     /// create 4 surfacegroups in scene
     m_pScene->createSurfaceGroup(surfacegroupId1);
@@ -613,7 +613,7 @@ TEST_F(SceneTest, getSurfaceGroupIDs)
 
     /// make sure, scene contains these 4 surfacegroups
     m_pScene->getSurfaceGroupIDs(&size, &array);
-    ASSERT_EQ(4, size);
+    ASSERT_EQ((uint)4, size);
     EXPECT_EQ(surfacegroupId1, array[0]);
     EXPECT_EQ(surfacegroupId2, array[1]);
     EXPECT_EQ(surfacegroupId3, array[2]);
@@ -641,7 +641,7 @@ TEST_F(SceneTest, getCurrentRenderOrder)
 
 TEST_F(SceneTest, removeSurfaceGroup)
 {
-    unsigned int expectedSurfaceGroupId = 172;
+    uint expectedSurfaceGroupId = 172;
     SurfaceGroup* pSurfaceGroup;
 
     /// create expected Surface group
@@ -662,7 +662,7 @@ TEST_F(SceneTest, removeSurfaceGroup)
 
 TEST_F(SceneTest, removeLayerGroup)
 {
-    unsigned int expectedLayerGroupId = 172;
+    uint expectedLayerGroupId = 172;
     LayerGroup* pLayerGroup;
 
     /// create expected Layer group
@@ -683,15 +683,15 @@ TEST_F(SceneTest, removeLayerGroup)
 
 TEST_F(SceneTest, getAllSurfaces)
 {
-    unsigned int expectedId1 = 241;
-    unsigned int expectedId2 = 242;
-    unsigned int expectedId3 = 243;
+    uint expectedId1 = 241;
+    uint expectedId2 = 242;
+    uint expectedId3 = 243;
     Surface* s1;
     Surface* s2;
     Surface* s3;
 
     /// try to get surfaces, when no surfaces exist in scene
-    ASSERT_EQ(0, m_pScene->getAllSurfaces().size());
+    ASSERT_EQ((uint)0, m_pScene->getAllSurfaces().size());
 
     /// add 3 surfaces to scene
     s1 = m_pScene->createSurface(expectedId1);
@@ -700,11 +700,11 @@ TEST_F(SceneTest, getAllSurfaces)
 
     /// get all surfaces
     const SurfaceMap& smap1 = m_pScene->getAllSurfaces();
-    ASSERT_EQ(3, smap1.size());
+    ASSERT_EQ((uint)3, smap1.size());
     // order is undefined here, but each surface must be contained once
-    EXPECT_EQ(1, smap1.count(expectedId1));
-    EXPECT_EQ(1, smap1.count(expectedId2));
-    EXPECT_EQ(1, smap1.count(expectedId3));
+    EXPECT_EQ((uint)1, smap1.count(expectedId1));
+    EXPECT_EQ((uint)1, smap1.count(expectedId2));
+    EXPECT_EQ((uint)1, smap1.count(expectedId3));
 
     /// remove 2 surfaces again
     m_pScene->removeSurface(s1);
@@ -712,8 +712,9 @@ TEST_F(SceneTest, getAllSurfaces)
 
     /// check, if the remaining surface is the expected one
     const SurfaceMap& smap2 = m_pScene->getAllSurfaces();
-    ASSERT_EQ(1, smap2.size());
-    EXPECT_EQ(1, smap2.count(expectedId2));
+    ASSERT_EQ((uint)1, smap2.size());
+    EXPECT_EQ((uint)1, smap2.count(expectedId2));
+    EXPECT_EQ(s2, smap2.at(expectedId2));
 }
 
 TEST_F(SceneTest, getSurfaceAt)
@@ -831,30 +832,30 @@ TEST_F(SceneTest, getSurfaceAt)
 
     x = P1.x;
     y = P1.y;
-    s = m_pScene->getSurfaceAt(&x, &y, 0.5);
+    s = m_pScene->getSurfaceAt(&x, &y, minOpacity);
     ASSERT_TRUE(s);
     EXPECT_EQ(surface1.getID(), s->getID());
 
     x = P2.x;
     y = P2.y;
-    s = m_pScene->getSurfaceAt(&x, &y, 0.5);
+    s = m_pScene->getSurfaceAt(&x, &y, minOpacity);
     EXPECT_FALSE(s);
 
     x = P3.x;
     y = P3.y;
-    s = m_pScene->getSurfaceAt(&x, &y, 0.5);
+    s = m_pScene->getSurfaceAt(&x, &y, minOpacity);
     ASSERT_TRUE(s);
     EXPECT_EQ(surface2.getID(), s->getID());
 
     x = P4.x;
     y = P4.y;
-    s = m_pScene->getSurfaceAt(&x, &y, 0.5);
+    s = m_pScene->getSurfaceAt(&x, &y, minOpacity);
     ASSERT_TRUE(s);
     EXPECT_EQ(surface3.getID(), s->getID());
 
     x = P5.x;
     y = P5.y;
-    s = m_pScene->getSurfaceAt(&x, &y, 0.5);
+    s = m_pScene->getSurfaceAt(&x, &y, minOpacity);
     ASSERT_TRUE(s);
     EXPECT_EQ(surface2.getID(), s->getID());
 
@@ -882,29 +883,29 @@ TEST_F(SceneTest, getSurfaceAt)
 
     x = P1.x;
     y = P1.y;
-    s = m_pScene->getSurfaceAt(&x, &y, 0.5);
+    s = m_pScene->getSurfaceAt(&x, &y, minOpacity);
     ASSERT_TRUE(s);
     EXPECT_EQ(surface1.getID(), s->getID());
 
     x = P2.x;
     y = P2.y;
-    s = m_pScene->getSurfaceAt(&x, &y, 0.5);
+    s = m_pScene->getSurfaceAt(&x, &y, minOpacity);
     EXPECT_FALSE(s);
 
     x = P3.x;
     y = P3.y;
-    s = m_pScene->getSurfaceAt(&x, &y, 0.5);
+    s = m_pScene->getSurfaceAt(&x, &y, minOpacity);
     EXPECT_FALSE(s);
 
     x = P4.x;
     y = P4.y;
-    s = m_pScene->getSurfaceAt(&x, &y, 0.5);
+    s = m_pScene->getSurfaceAt(&x, &y, minOpacity);
     ASSERT_TRUE(s);
     EXPECT_EQ(surface1.getID(), s->getID());
 
     x = P5.x;
     y = P5.y;
-    s = m_pScene->getSurfaceAt(&x, &y, 0.5);
+    s = m_pScene->getSurfaceAt(&x, &y, minOpacity);
     ASSERT_TRUE(s);
     EXPECT_EQ(surface1.getID(), s->getID());
 
@@ -932,29 +933,29 @@ TEST_F(SceneTest, getSurfaceAt)
 
     x = P1.x;
     y = P1.y;
-    s = m_pScene->getSurfaceAt(&x, &y, 0.5);
+    s = m_pScene->getSurfaceAt(&x, &y, minOpacity);
     ASSERT_TRUE(s);
     EXPECT_EQ(surface1.getID(), s->getID());
 
     x = P2.x;
     y = P2.y;
-    s = m_pScene->getSurfaceAt(&x, &y, 0.5);
+    s = m_pScene->getSurfaceAt(&x, &y, minOpacity);
     EXPECT_FALSE(s);
 
     x = P3.x;
     y = P3.y;
-    s = m_pScene->getSurfaceAt(&x, &y, 0.5);
+    s = m_pScene->getSurfaceAt(&x, &y, minOpacity);
     EXPECT_FALSE(s);
 
     x = P4.x;
     y = P4.y;
-    s = m_pScene->getSurfaceAt(&x, &y, 0.5);
+    s = m_pScene->getSurfaceAt(&x, &y, minOpacity);
     ASSERT_TRUE(s);
     EXPECT_EQ(surface1.getID(), s->getID());
 
     x = P5.x;
     y = P5.y;
-    s = m_pScene->getSurfaceAt(&x, &y, 0.5);
+    s = m_pScene->getSurfaceAt(&x, &y, minOpacity);
     ASSERT_TRUE(s);
     EXPECT_EQ(surface1.getID(), s->getID());
 
@@ -982,30 +983,30 @@ TEST_F(SceneTest, getSurfaceAt)
 
     x = P1.x;
     y = P1.y;
-    s = m_pScene->getSurfaceAt(&x, &y, 0.5);
+    s = m_pScene->getSurfaceAt(&x, &y, minOpacity);
     ASSERT_TRUE(s);
     EXPECT_EQ(surface1.getID(), s->getID());
 
     x = P2.x;
     y = P2.y;
-    s = m_pScene->getSurfaceAt(&x, &y, 0.5);
+    s = m_pScene->getSurfaceAt(&x, &y, minOpacity);
     EXPECT_FALSE(s);
 
     x = P3.x;
     y = P3.y;
-    s = m_pScene->getSurfaceAt(&x, &y, 0.5);
+    s = m_pScene->getSurfaceAt(&x, &y, minOpacity);
     ASSERT_TRUE(s);
     EXPECT_EQ(surface2.getID(), s->getID());
 
     x = P4.x;
     y = P4.y;
-    s = m_pScene->getSurfaceAt(&x, &y, 0.5);
+    s = m_pScene->getSurfaceAt(&x, &y, minOpacity);
     ASSERT_TRUE(s);
     EXPECT_EQ(surface1.getID(), s->getID());
 
     x = P5.x;
     y = P5.y;
-    s = m_pScene->getSurfaceAt(&x, &y, 0.5);
+    s = m_pScene->getSurfaceAt(&x, &y, minOpacity);
     ASSERT_TRUE(s);
     EXPECT_EQ(surface2.getID(), s->getID());
 }
@@ -1022,7 +1023,7 @@ TEST_F(SceneTest, isLayerInCurrentRenderOrder)
 
     /// make sure, scene contains the new layers
     m_pScene->getLayerIDs(&size, &array);
-    ASSERT_EQ(1, size);
+    ASSERT_EQ((uint)1, size);
     EXPECT_EQ(layerId1, array[0]);
 
     /// make sure, layer is not in render order
