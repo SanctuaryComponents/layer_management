@@ -25,6 +25,9 @@
 #include "EGL/egl.h"
 #include "Log.h"
 #include "Shader.h"
+
+class IlmMatrix;
+
 /* uncomment if layer drawing needed */
 /* #define DRAW_LAYER_DEBUG */
 class GLESGraphicsystem: public BaseGraphicSystem<EGLNativeDisplayType, EGLNativeWindowType>
@@ -59,7 +62,8 @@ public:
     }
 
     virtual void renderSurface(Surface* surface);
-    virtual Shader *pickOptimizedShader(Shader* currentShader, const ShaderProgram::CommonUniforms curUniforms);
+    virtual Shader *pickOptimizedShader(Shader* currentShader, const ShaderProgram::CommonUniforms& curUniforms);
+	virtual void applyLayerMatrix(IlmMatrix& matrix);
 
 protected:
     int m_windowWidth;

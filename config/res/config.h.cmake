@@ -92,6 +92,9 @@
 // use automotive dlt for logging
 #cmakedefine WITH_DLT
 
+// use wayland-drm compositor
+#cmakedefine WITH_WAYLAND_DRM
+
 //-----------------------------------------------------------------------------
 // human readable report
 //-----------------------------------------------------------------------------
@@ -114,6 +117,7 @@
     LOG_DEBUG("Config", "WITH_WAYLAND        = ${WITH_WAYLAND}"); \
     LOG_DEBUG("Config", "WITH_WAYLAND_FBDEV  = ${WITH_WAYLAND_FBDEV}"); \
     LOG_DEBUG("Config", "WITH_WAYLAND_X11    = ${WITH_WAYLAND_X11}"); \
+    LOG_DEBUG("Config", "WITH_WAYLAND_DRM    = ${WITH_WAYLAND_DRM}"); \
     LOG_DEBUG("Config", "WITH_XTHREADS       = ${WITH_XTHREADS}"); \
     LOG_DEBUG("Config", "WITH_DLT            = ${WITH_DLT}");
 

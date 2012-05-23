@@ -19,6 +19,7 @@
 ****************************************************************************/
 
 #include "TextureBinders/WaylandEglImage.h"
+#include "config.h"
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
 #include <GLES2/gl2ext.h>
@@ -85,8 +86,15 @@ void WaylandEglImage::createClientBuffer(Surface* surface)
         LOG_DEBUG("WaylandEglImage", "creating EGL Image from client buffer");
         if (nativeSurface->eglImage)
         {
+#ifdef WITH_WAYLAND_DRM
+            if (nativeSurface->texture){
+                glBindTexture(GL_TEXTURE_2D, 0);
+                glDeleteTextures(1,&nativeSurface->texture);
+            }
+#else
             m_pfEglDestroyImageKHR(m_eglDisplay, nativeSurface->eglImage);
             glDeleteTextures(1,&nativeSurface->texture);
+#endif // WITH_WAYLAND_DRM
             nativeSurface->eglImage = 0;
             nativeSurface->texture = 0;
         }

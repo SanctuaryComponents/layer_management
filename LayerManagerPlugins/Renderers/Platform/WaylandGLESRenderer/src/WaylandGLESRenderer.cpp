@@ -24,8 +24,16 @@
 #include "ShaderProgramGLES.h"
 #include "TextureBinders/WaylandCopyGLES.h"
 #include "TextureBinders/WaylandEglImage.h"
+#ifdef WITH_WAYLAND_FBDEV
 #include "WindowSystems/WaylandFbdevWindowSystem.h"
+#endif // WITH_WAYLAND_FBDEV
+#ifdef WITH_WAYLAND_X11
 #include "WindowSystems/WaylandX11WindowSystem.h"
+#endif // WITH_WAYLAND_X11
+#ifdef WITH_WAYLAND_DRM
+#include "WindowSystems/WaylandDrmWindowSystem.h"
+#include "GraphicSystems/DrmGLESGraphicSystem.h"
+#endif // WITH_WAYLAND_DRM
 
 WaylandGLESRenderer::WaylandGLESRenderer(Scene* pScene)
 : BaseRenderer(pScene)
@@ -52,13 +60,20 @@ bool WaylandGLESRenderer::start(int width, int height, const char* displayname)
 #ifdef WITH_WAYLAND_X11
     m_pWindowSystem = new WaylandX11WindowSystem(displayname, width, height, m_pScene);
 #endif
+#ifdef WITH_WAYLAND_DRM
+    m_pWindowSystem = new WaylandDrmWindowSystem(displayname, width, height, m_pScene);
+#endif
     if( m_pWindowSystem == NULL )
     {
     LOG_ERROR("WaylandGLESRenderer", "Window system is not specified. Consider to specify WITH_WAYLAND_X11 or WITH_WAYLAND_FBDEV");
     goto fail; // TODO bad style
     }
 
+#ifdef WITH_WAYLAND_DRM
+    m_pGraphicSystem = new DrmGLESGraphicSystem(width,height, ShaderProgramGLES::createProgram);
+#else
     m_pGraphicSystem = new GLESGraphicsystem(width,height, ShaderProgramGLES::createProgram);
+#endif
 
     if (!m_pWindowSystem->init((BaseGraphicSystem<EGLNativeDisplayType, EGLNativeWindowType>*) m_pGraphicSystem))
     {

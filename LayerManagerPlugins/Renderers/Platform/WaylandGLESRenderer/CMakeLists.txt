@@ -40,6 +40,7 @@ add_library(WaylandGLESRenderer SHARED ${SOURCES})
 
 find_package(Wayland REQUIRED)
 include_directories(${WAYLAND_SERVER_INCLUDE_DIR})
+include_directories(${DRM_INCLUDE_DIR})
 
 find_package(EGL REQUIRED)
 include_directories(${EGL_INCLUDE_DIR})

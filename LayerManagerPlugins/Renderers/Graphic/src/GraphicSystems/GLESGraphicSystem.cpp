@@ -230,7 +230,7 @@ void GLESGraphicsystem::endLayer()
 }
 
 //this is a particularly simple function currently, but it will likely be expanded as more shaders and effects are implemented.
-Shader *GLESGraphicsystem::pickOptimizedShader(Shader* currentShader, const ShaderProgram::CommonUniforms curUniforms)
+Shader *GLESGraphicsystem::pickOptimizedShader(Shader* currentShader, const ShaderProgram::CommonUniforms& curUniforms)
 {
     Shader * retShader = currentShader;
 
@@ -242,6 +242,11 @@ Shader *GLESGraphicsystem::pickOptimizedShader(Shader* currentShader, const Shad
 
     return retShader;
 
+}
+
+void GLESGraphicsystem::applyLayerMatrix(IlmMatrix& matrix)
+{
+    IlmMatrixRotateZ(matrix, m_currentLayer->getOrientation() * 90.0f);
 }
 
 void GLESGraphicsystem::renderSurface(Surface* surface)
@@ -285,7 +290,7 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
     ViewportTransform::transformRectangleToTextureCoordinates(targetSurfaceSource, surface->OriginalSourceWidth, surface->OriginalSourceHeight, textureCoordinates);
 
     glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-    IlmMatrixRotateZ(layerMatrix, m_currentLayer->getOrientation() * 90.0f);
+	applyLayerMatrix(layerMatrix);
     // update all common uniforms, scale values to display size
     uniforms.x = (float)targetSurfaceDestination.x / m_displayWidth;
     uniforms.y = (float)targetSurfaceDestination.y / m_displayHeight;;

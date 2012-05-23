@@ -51,6 +51,7 @@ option (WITH_DLT            "Build with DLT support "                           
 option (WITH_WAYLAND        "Build plugin of Wayland GBS"                         OFF)
 option (WITH_WAYLAND_FBDEV  "Build Wayland with FBDEV backend"                    OFF)
 option (WITH_WAYLAND_X11    "Build Wayland with X11 backend"                      OFF)
+option (WITH_WAYLAND_DRM    "Build Wayland with drm backend"                      OFF)
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 
@@ -84,9 +85,9 @@ if (WITH_DESKTOP)
 endif(WITH_DESKTOP)     
 
 if (WITH_WAYLAND)
-    if (NOT WITH_WAYLAND_FBDEV AND NOT WITH_WAYLAND_X11)
-        message(FATAL_ERROR "Consider to specify WITH_WAYLAND_FBDEV or WITH_WAYLAND_X11")
-    endif(NOT WITH_WAYLAND_FBDEV AND NOT WITH_WAYLAND_X11)
+    if (NOT WITH_WAYLAND_FBDEV AND NOT WITH_WAYLAND_X11 AND NOT WITH_WAYLAND_DRM)
+        message(FATAL_ERROR "Consider to specify WITH_WAYLAND_FBDEV or WITH_WAYLAND_X11 or WITH_WAYLAND_DRM")
+    endif(NOT WITH_WAYLAND_FBDEV AND NOT WITH_WAYLAND_X11 AND NOT WITH_WAYLAND_DRM)
     if (WITH_WAYLAND_FBDEV AND WITH_WAYLAND_X11)
         message(FATAL_ERROR "WITH_WAYLAND_FBDEV and WITH_WAYLAND_X11 can't be specified at the same time")
     endif(WITH_WAYLAND_FBDEV AND WITH_WAYLAND_X11)

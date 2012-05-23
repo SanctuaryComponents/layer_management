@@ -58,7 +58,7 @@ class WaylandBaseWindowSystem: public BaseWindowSystem
 {
 public:
     WaylandBaseWindowSystem(const char* displayname, int width, int height, Scene* pScene);
-    ~WaylandBaseWindowSystem();
+    virtual ~WaylandBaseWindowSystem();
     bool init(BaseGraphicSystem<EGLNativeDisplayType, EGLNativeWindowType>* sys);
     bool start();
     void stop();

@@ -47,6 +47,7 @@ file(GLOB GRAPHIC_BASE_INCLUDES
 file(GLOB GRAPHIC_GRAPHICSYSTEM_INCLUDES 
     include/GraphicSystems/BaseGraphicSystem.h
     include/GraphicSystems/GLESGraphicSystem.h
+	include/GraphicSystems/DrmGLESGraphicSystem.h
 )
 
 file(GLOB GRAPHIC_TEXTUREBINDERS_INCLUDES 
@@ -119,17 +120,41 @@ endif(WITH_GLX_LIB)
 if (WITH_WAYLAND) 
 set(GRAPHIC_LIB_NAME LayerManagerGraphicWaylandGLESv2)
 
+if (WITH_WAYLAND_FBDEV)
 file(GLOB SOURCES 
         ../Base/src/BaseRenderer.cpp 
         src/GraphicSystems/GLESGraphicSystem.cpp
         src/WindowSystems/WaylandBaseWindowSystem.cpp
         src/WindowSystems/WaylandFbdevWindowSystem.cpp
+        src/WindowSystems/WaylandServerinfoProtocol.cpp
+        src/TextureBinders/WaylandCopyGLES.cpp
+        src/TextureBinders/WaylandEglImage.cpp
+        src/Transformation/ViewportTransform.cpp
+        )
+elseif (WITH_WAYLAND_X11)
+file(GLOB SOURCES
+        ../Base/src/BaseRenderer.cpp
+        src/GraphicSystems/GLESGraphicSystem.cpp
+        src/WindowSystems/WaylandBaseWindowSystem.cpp
         src/WindowSystems/WaylandX11WindowSystem.cpp
         src/WindowSystems/WaylandServerinfoProtocol.cpp  
         src/TextureBinders/WaylandCopyGLES.cpp
         src/TextureBinders/WaylandEglImage.cpp
         src/Transformation/ViewportTransform.cpp
         )
+elseif (WITH_WAYLAND_DRM)
+file(GLOB SOURCES
+        ../Base/src/BaseRenderer.cpp
+        src/GraphicSystems/GLESGraphicSystem.cpp
+        src/GraphicSystems/DrmGLESGraphicSystem.cpp
+        src/WindowSystems/WaylandBaseWindowSystem.cpp
+        src/WindowSystems/WaylandDrmWindowSystem.cpp
+        src/WindowSystems/WaylandServerinfoProtocol.cpp
+        src/TextureBinders/WaylandCopyGLES.cpp
+        src/TextureBinders/WaylandEglImage.cpp
+        src/Transformation/ViewportTransform.cpp
+        )
+endif ()
 
 file(GLOB GRAPHIC_BASE_INCLUDES 
     ../Base/include/*.h
@@ -138,6 +163,7 @@ file(GLOB GRAPHIC_BASE_INCLUDES
 file(GLOB GRAPHIC_GRAPHICSYSTEM_INCLUDES 
     include/GraphicSystems/BaseGraphicSystem.h
     include/GraphicSystems/GLESGraphicSystem.h
+    include/GraphicSystems/DrmGLESGraphicSystem.h
 )
 
 file(GLOB GRAPHIC_TEXTUREBINDERS_INCLUDES 
@@ -155,6 +181,7 @@ file(GLOB GRAPHIC_WINDOWSYSTEMS_INCLUDES
     include/WindowSystems/WaylandBaseWindowSystem.h
     include/WindowSystems/WaylandFbdevWindowSystem.h
     include/WindowSystems/WaylandX11WindowSystem.h
+    include/WindowSystems/WaylandDrmWindowSystem.h
 )
 
 file(GLOB GRAPHIC_TRANSFORM_INCLUDES 
@@ -197,15 +224,24 @@ include_directories(${GLX_INCLUDE_DIR})
 set(GRAPHIC_NATIVE_LIBS ${GLX_LIBRARIES})
 endif(WITH_GLX_LIB)
 
+set(GRAPHIC_DRM_LIBS ${UDEV_LIBRARIES} ${GBM_LIBRARIES} ${DRM_LIBRARIES})
+
 if (WITH_WAYLAND)
-find_package (Wayland)
-include_directories(${WAYLAND_SERVER_INCLUDE_DIR})
-set(LIBS ${LIBS} ${WAYLAND_SERVER_LIBRARIES})
-if (WITH_WAYLAND_X11)
-set(LIBS ${LIBS} ${X11_X11_LIB})
-endif (WITH_WAYLAND_X11)
+	find_package (Wayland)
+	include_directories(${WAYLAND_SERVER_INCLUDE_DIR})
+	if (WITH_WAYLAND_DRM)
+		find_package (DRM)
+		include_directories(${DRM_INCLUDE_DIR})
+		set(LIBS ${LIBS} ${GRAPHIC_NATIVE_LIBS} ${GRAPHIC_DRM_LIBS} ${WAYLAND_SERVER_LIBRARIES} ${WAYLAND_EGL_LIBRARIES})
+		target_link_libraries(${GRAPHIC_LIB_NAME} ${LIBS})
+	else (WITH_WAYLAND_DRM)
+		set(LIBS ${LIBS} ${WAYLAND_SERVER_LIBRARIES})
+	endif (WITH_WAYLAND_DRM)
+	if (WITH_WAYLAND_X11)
+		set(LIBS ${LIBS} ${X11_X11_LIB})
+	endif (WITH_WAYLAND_X11)
 else(WITH_WAYLAND)
-set(LIBS ${LIBS} ${CMAKE_THREAD_LIBS_INIT} ${X11_X11_LIB} ${X11_Xcomposite_LIB} ${X11_Xdamage_LIB} ${GRAPHIC_NATIVE_LIBS} LayerManagerUtils )
+	set(LIBS ${LIBS} ${CMAKE_THREAD_LIBS_INIT} ${X11_X11_LIB} ${X11_Xcomposite_LIB} ${X11_Xdamage_LIB} ${GRAPHIC_NATIVE_LIBS} LayerManagerUtils )
 endif(WITH_WAYLAND)
 target_link_libraries(${GRAPHIC_LIB_NAME} ${LIBS})
 
