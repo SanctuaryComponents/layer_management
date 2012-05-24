@@ -20,240 +20,389 @@
 
 cmake_minimum_required (VERSION 2.6)
 
-include_directories ("include")
-include_directories ("../Base/include")
-include_directories ("${PROJECT_SOURCE_DIR}/config")
-include_directories ("${PROJECT_SOURCE_DIR}/LayerManagerService/include")
-link_directories ("${PROJECT_SOURCE_DIR}/LayerManagerService/bin")
-include_directories ("${PROJECT_SOURCE_DIR}/LayerManagerUtils/include")
-link_directories ("${PROJECT_SOURCE_DIR}/LayerManagerUtils/bin")
+#===========================================================================
+# Common
+#===========================================================================
 
-if (WITH_GLESv2_LIB AND NOT WITH_WAYLAND) 
-set(GRAPHIC_LIB_NAME LayerManagerGraphicGLESv2)
-file(GLOB SOURCES 
-        ../Base/src/BaseRenderer.cpp 
-        src/GraphicSystems/GLESGraphicSystem.cpp
-        src/WindowSystems/X11WindowSystem.cpp  
-        src/TextureBinders/X11Copy.cpp
-        src/TextureBinders/X11CopyGLES.cpp
-        src/TextureBinders/X11EglImage.cpp
-        src/Transformation/ViewportTransform.cpp
-        )
-
-file(GLOB GRAPHIC_BASE_INCLUDES 
-    ../Base/include/*.h
+include_directories(
+    "include"
+    "../Base/include"
+    "${PROJECT_SOURCE_DIR}/config"
+    "${PROJECT_SOURCE_DIR}/LayerManagerService/include"
+    "${PROJECT_SOURCE_DIR}/LayerManagerService/bin"
+    "${PROJECT_SOURCE_DIR}/LayerManagerUtils/include"
+    "${PROJECT_SOURCE_DIR}/LayerManagerUtils/bin"
 )
 
-file(GLOB GRAPHIC_GRAPHICSYSTEM_INCLUDES 
-    include/GraphicSystems/BaseGraphicSystem.h
-    include/GraphicSystems/GLESGraphicSystem.h
-	include/GraphicSystems/DrmGLESGraphicSystem.h
-)
+#===========================================================================
+if (WITH_GLESv2_LIB)
+#===========================================================================
 
-file(GLOB GRAPHIC_TEXTUREBINDERS_INCLUDES 
-    include/TextureBinders/ITextureBinder.h
-    include/TextureBinders/X11Copy.h
-    include/TextureBinders/X11CopyGLES.h
-    include/TextureBinders/X11EglImage.h
-)
+    set(GRAPHIC_LIB_NAME LayerManagerGraphicGLESv2)
 
-file(GLOB GRAPHIC_PLATFORM_INCLUDES 
-    include/PlatformSurfaces/XPlatformSurface.h
-    include/PlatformSurfaces/EglXPlatformSurface.h
-)
+    find_package(X11 REQUIRED)
+    find_package(EGL REQUIRED)
+    find_package(GLESv2 REQUIRED)
+    find_package(Threads)
 
-file(GLOB GRAPHIC_WINDOWSYSTEMS_INCLUDES 
-    include/WindowSystems/BaseWindowSystem.h
-    include/WindowSystems/X11WindowSystem.h
-)
+    include_directories(
+        ${X11_INCLUDE_DIR}
+        ${EGL_INCLUDE_DIR}
+        ${GLESv2_INCLUDE_DIR}
+    )
 
-file(GLOB GRAPHIC_TRANSFORM_INCLUDES 
-    include/Transformation/ViewportTransform.h
-)
+    set(SOURCES 
+            ../Base/src/BaseRenderer.cpp 
+            src/GraphicSystems/GLESGraphicSystem.cpp
+            src/WindowSystems/X11WindowSystem.cpp  
+            src/TextureBinders/X11Copy.cpp
+            src/TextureBinders/X11CopyGLES.cpp
+            src/TextureBinders/X11EglImage.cpp
+            src/Transformation/ViewportTransform.cpp
+            )
+   
+    set(LIBS
+        ${CMAKE_THREAD_LIBS_INIT}
+        ${X11_X11_LIB}
+        ${X11_Xcomposite_LIB}
+        ${X11_Xdamage_LIB}
+        ${EGL_LIBRARY}
+        ${GLESv2_LIBRARIES}
+        LayerManagerUtils
+    )
 
-endif(WITH_GLESv2_LIB AND NOT WITH_WAYLAND) 
+    add_library(${GRAPHIC_LIB_NAME} SHARED ${SOURCES})
 
+    target_link_libraries(${GRAPHIC_LIB_NAME} ${LIBS})
+    
+    add_dependencies(${GRAPHIC_LIB_NAME}
+        LayerManagerService
+        LayerManagerUtils
+    )
+
+    set(GRAPHIC_GRAPHICSYSTEM_INCLUDES 
+        include/GraphicSystems/BaseGraphicSystem.h
+        include/GraphicSystems/GLESGraphicSystem.h
+    )
+    
+    set(GRAPHIC_TEXTUREBINDERS_INCLUDES 
+        include/TextureBinders/ITextureBinder.h
+        include/TextureBinders/X11Copy.h
+        include/TextureBinders/X11CopyGLES.h
+        include/TextureBinders/X11EglImage.h
+    )
+    
+    set(GRAPHIC_PLATFORM_INCLUDES 
+        include/PlatformSurfaces/XPlatformSurface.h
+        include/PlatformSurfaces/EglXPlatformSurface.h
+    )
+    
+    set(GRAPHIC_WINDOWSYSTEMS_INCLUDES 
+        include/WindowSystems/BaseWindowSystem.h
+        include/WindowSystems/X11WindowSystem.h
+    )
+    
+    install(TARGETS
+                ${GRAPHIC_LIB_NAME}
+            DESTINATION
+                lib
+    )
+    
+    install(FILES
+                ${GRAPHIC_GRAPHICSYSTEM_INCLUDES}
+            DESTINATION
+                include/layermanager/graphic/GraphicSystems
+    )
+    
+    install(FILES
+                ${GRAPHIC_TEXTUREBINDERS_INCLUDES}
+            DESTINATION
+                include/layermanager/graphic/TextureBinders
+    )
+    
+    install(FILES
+                ${GRAPHIC_PLATFORM_INCLUDES}
+            DESTINATION
+                include/layermanager/graphic/PlatformSurfaces
+    )
+
+    install(FILES
+                ${GRAPHIC_WINDOWSYSTEMS_INCLUDES}
+            DESTINATION
+                include/layermanager/graphic/WindowSystems
+    )
+
+    install(FILES
+                include/Transformation/ViewportTransform.h
+            DESTINATION
+                include/layermanager/graphic/Transformation
+    )
+
+    install(FILES
+                ../Base/include/BaseRenderer.h
+                ../Base/include/RenderUtil.h
+            DESTINATION
+                include/layermanager/graphic/Base
+    )
+
+endif(WITH_GLESv2_LIB) 
+
+
+#===========================================================================
 if (WITH_GLX_LIB) 
-set(GRAPHIC_LIB_NAME LayerManagerGraphicGLX)
-file(GLOB SOURCES 
-    ../Base/src/BaseRenderer.cpp 
-    src/GraphicSystems/GLXGraphicSystem.cpp
-    src/WindowSystems/X11WindowSystem.cpp  
-    src/TextureBinders/X11TextureFromPixmap.cpp
-    src/TextureBinders/X11CopyGLX.cpp
-    src/TextureBinders/X11Copy.cpp
-    src/Transformation/ViewportTransform.cpp    
-)
+#===========================================================================
 
-file(GLOB GRAPHIC_BASE_INCLUDES 
-    ../Base/include/*.h
-)
+    set(GRAPHIC_LIB_NAME LayerManagerGraphicGLX)
 
-file(GLOB GRAPHIC_WINDOWSYSTEMS_INCLUDES 
-    include/WindowSystems/BaseWindowSystem.h
-    include/WindowSystems/X11WindowSystem.h
-)
+    find_package(X11 REQUIRED)
+    find_package(GLX REQUIRED)
+    find_package(Threads)
 
+    include_directories(
+        ${X11_INCLUDE_DIR}
+        ${GLX_INCLUDE_DIR}
+    )
 
-file(GLOB GRAPHIC_GRAPHICSYSTEM_INCLUDES 
-    include/GraphicSystems/BaseGraphicSystem.h
-    include/GraphicSystems/GLXGraphicsystem.h
-)
+    set(SOURCES 
+        ../Base/src/BaseRenderer.cpp 
+        src/GraphicSystems/GLXGraphicSystem.cpp
+        src/WindowSystems/X11WindowSystem.cpp  
+        src/TextureBinders/X11TextureFromPixmap.cpp
+        src/TextureBinders/X11CopyGLX.cpp
+        src/TextureBinders/X11Copy.cpp
+        src/Transformation/ViewportTransform.cpp    
+    )
 
-file(GLOB GRAPHIC_TEXTUREBINDERS_INCLUDES 
-    include/TextureBinders/ITextureBinder.h
-    include/TextureBinders/X11Copy.h    
-    include/TextureBinders/X11CopyGLX.h
-    include/TextureBinders/X11TextureFromPixmap.h
-)
+    set(LIBS
+        ${CMAKE_THREAD_LIBS_INIT}
+        ${X11_X11_LIB}
+        ${X11_Xcomposite_LIB}
+        ${X11_Xdamage_LIB}
+        ${GLX_LIBRARIES}
+        LayerManagerUtils
+    )
+    
+    add_library(${GRAPHIC_LIB_NAME} SHARED ${SOURCES})
 
-file(GLOB GRAPHIC_PLATFORM_INCLUDES 
-    include/PlatformSurfaces/XPlatformSurface.h
-    include/PlatformSurfaces/GLXPlatformSurface.h
-)        
-file(GLOB GRAPHIC_TRANSFORM_INCLUDES 
-    include/Transformation/ViewportTransform.h
-)
+    install(TARGETS
+                ${GRAPHIC_LIB_NAME}
+            DESTINATION
+                lib
+    )
+    
+    install(FILES
+                include/GraphicSystems/BaseGraphicSystem.h
+                include/GraphicSystems/GLXGraphicsystem.h
+            DESTINATION
+                include/layermanager/graphic/GraphicSystems
+    )
+    
+    install(FILES
+                include/TextureBinders/ITextureBinder.h
+                include/TextureBinders/X11Copy.h
+                include/TextureBinders/X11CopyGLX.h
+                include/TextureBinders/X11TextureFromPixmap.h
+            DESTINATION
+                include/layermanager/graphic/TextureBinders
+    )
+    
+    install(FILES
+                include/PlatformSurfaces/XPlatformSurface.h
+                include/PlatformSurfaces/GLXPlatformSurface.h
+            DESTINATION
+                include/layermanager/graphic/PlatformSurfaces
+    )
+    
+    install(FILES
+                include/WindowSystems/BaseWindowSystem.h
+                include/WindowSystems/X11WindowSystem.h
+            DESTINATION
+                include/layermanager/graphic/WindowSystems
+    )
+
+    install(FILES
+                include/Transformation/ViewportTransform.h
+            DESTINATION
+                include/layermanager/graphic/Transformation
+    )
+
+    install(FILES
+                ../Base/include/BaseRenderer.h
+                ../Base/include/RenderUtil.h
+            DESTINATION
+                include/layermanager/graphic/Base
+    )
 
 endif(WITH_GLX_LIB)
 
+
+#===========================================================================
 if (WITH_WAYLAND) 
-set(GRAPHIC_LIB_NAME LayerManagerGraphicWaylandGLESv2)
+#===========================================================================
 
-if (WITH_WAYLAND_FBDEV)
-file(GLOB SOURCES 
-        ../Base/src/BaseRenderer.cpp 
-        src/GraphicSystems/GLESGraphicSystem.cpp
-        src/WindowSystems/WaylandBaseWindowSystem.cpp
-        src/WindowSystems/WaylandFbdevWindowSystem.cpp
-        src/WindowSystems/WaylandServerinfoProtocol.cpp
-        src/TextureBinders/WaylandCopyGLES.cpp
-        src/TextureBinders/WaylandEglImage.cpp
-        src/Transformation/ViewportTransform.cpp
+    find_package(Wayland)
+
+    set(LIBS
+            ${LIBS}
+            ${WAYLAND_SERVER_LIBRARIES}
+            ${WAYLAND_CLIENT_LIBRARIES}
+    )
+    
+    include_directories(${WAYLAND_SERVER_INCLUDE_DIR})
+
+    #=======================================================================
+    if (WITH_WAYLAND_X11)
+    #=======================================================================
+
+        set(GRAPHIC_LIB_NAME LayerManagerGraphicWaylandGLESv2)
+
+        find_package(X11 REQUIRED)
+        
+        include_directories(${X11_INCLUDE_DIR})
+        
+        set(LIBS
+                ${LIBS}
+                ${X11_X11_LIB}
         )
-elseif (WITH_WAYLAND_X11)
-file(GLOB SOURCES
-        ../Base/src/BaseRenderer.cpp
-        src/GraphicSystems/GLESGraphicSystem.cpp
-        src/WindowSystems/WaylandBaseWindowSystem.cpp
-        src/WindowSystems/WaylandX11WindowSystem.cpp
-        src/WindowSystems/WaylandServerinfoProtocol.cpp  
-        src/TextureBinders/WaylandCopyGLES.cpp
-        src/TextureBinders/WaylandEglImage.cpp
-        src/Transformation/ViewportTransform.cpp
+        
+        set(SOURCES
+            ../Base/src/BaseRenderer.cpp
+            src/GraphicSystems/GLESGraphicSystem.cpp
+            src/WindowSystems/WaylandBaseWindowSystem.cpp
+            src/WindowSystems/WaylandX11WindowSystem.cpp
+            src/WindowSystems/WaylandServerinfoProtocol.cpp  
+            src/TextureBinders/WaylandCopyGLES.cpp
+            src/TextureBinders/WaylandEglImage.cpp
+            src/Transformation/ViewportTransform.cpp
         )
-elseif (WITH_WAYLAND_DRM)
-file(GLOB SOURCES
-        ../Base/src/BaseRenderer.cpp
-        src/GraphicSystems/GLESGraphicSystem.cpp
-        src/GraphicSystems/DrmGLESGraphicSystem.cpp
-        src/WindowSystems/WaylandBaseWindowSystem.cpp
-        src/WindowSystems/WaylandDrmWindowSystem.cpp
-        src/WindowSystems/WaylandServerinfoProtocol.cpp
-        src/TextureBinders/WaylandCopyGLES.cpp
-        src/TextureBinders/WaylandEglImage.cpp
-        src/Transformation/ViewportTransform.cpp
+        
+    endif (WITH_WAYLAND_X11)
+    
+    #=======================================================================
+    if (WITH_WAYLAND_FBDEV)
+    #=======================================================================
+
+        set(GRAPHIC_LIB_NAME LayerManagerGraphicWaylandGLESv2)
+
+        file(GLOB SOURCES 
+            ../Base/src/BaseRenderer.cpp
+            src/GraphicSystems/GLESGraphicSystem.cpp
+            src/WindowSystems/WaylandBaseWindowSystem.cpp
+            src/WindowSystems/WaylandX11WindowSystem.cpp
+            src/WindowSystems/WaylandServerinfoProtocol.cpp  
+            src/TextureBinders/WaylandCopyGLES.cpp
+            src/TextureBinders/WaylandEglImage.cpp
+            src/Transformation/ViewportTransform.cpp
         )
-endif ()
 
-file(GLOB GRAPHIC_BASE_INCLUDES 
-    ../Base/include/*.h
-)
+    endif (WITH_WAYLAND_FBDEV)
+    
+    #=======================================================================
+    if (WITH_WAYLAND_DRM)
+    #=======================================================================
 
-file(GLOB GRAPHIC_GRAPHICSYSTEM_INCLUDES 
-    include/GraphicSystems/BaseGraphicSystem.h
-    include/GraphicSystems/GLESGraphicSystem.h
-    include/GraphicSystems/DrmGLESGraphicSystem.h
-)
+        set(GRAPHIC_LIB_NAME LayerManagerGraphicWaylandGLESv2)
 
-file(GLOB GRAPHIC_TEXTUREBINDERS_INCLUDES 
-    include/TextureBinders/ITextureBinder.h
-    include/TextureBinders/WaylandCopyGLES.h
-)
+        find_package (DRM REQUIRED)
+        
+        include_directories(${DRM_INCLUDE_DIR})
+        
+        set(LIBS
+                ${LIBS}
+                ${GRAPHIC_NATIVE_LIBS}
+                ${UDEV_LIBRARIES}
+                ${GBM_LIBRARIES}
+                ${DRM_LIBRARIES}
+                ${WAYLAND_EGL_LIBRARIES}
+        )
+        
 
-file(GLOB GRAPHIC_PLATFORM_INCLUDES 
-    include/PlatformSurfaces/WaylandPlatformSurface.h
-    include/PlatformSurfaces/EglWaylandPlatformSurface.h
-)
+        file(GLOB SOURCES
+            ../Base/src/BaseRenderer.cpp
+            src/GraphicSystems/GLESGraphicSystem.cpp
+            src/GraphicSystems/DrmGLESGraphicSystem.cpp
+            src/WindowSystems/WaylandBaseWindowSystem.cpp
+            src/WindowSystems/WaylandDrmWindowSystem.cpp
+            src/WindowSystems/WaylandServerinfoProtocol.cpp
+            src/TextureBinders/WaylandCopyGLES.cpp
+            src/TextureBinders/WaylandEglImage.cpp
+            src/Transformation/ViewportTransform.cpp
+        )
 
-file(GLOB GRAPHIC_WINDOWSYSTEMS_INCLUDES 
-    include/WindowSystems/BaseWindowSystem.h
-    include/WindowSystems/WaylandBaseWindowSystem.h
-    include/WindowSystems/WaylandFbdevWindowSystem.h
-    include/WindowSystems/WaylandX11WindowSystem.h
-    include/WindowSystems/WaylandDrmWindowSystem.h
-)
+    endif (WITH_WAYLAND_DRM)
 
-file(GLOB GRAPHIC_TRANSFORM_INCLUDES 
-    include/Transformation/ViewportTransform.h
-)
 
-if (WITH_WAYLAND_X11)
-find_package(X11 REQUIRED)
-include_directories(${X11_INCLUDE_DIR})
-endif (WITH_WAYLAND_X11)
+    #=======================================================================
+    # common
+    #=======================================================================
+
+    add_library(${GRAPHIC_LIB_NAME} SHARED ${SOURCES})
+    
+    target_link_libraries(${GRAPHIC_LIB_NAME} ${LIBS})
+
+    install(TARGETS
+                ${GRAPHIC_LIB_NAME}
+            DESTINATION
+                lib
+    )
+
+    install(FILES
+                include/GraphicSystems/BaseGraphicSystem.h
+                include/GraphicSystems/GLESGraphicSystem.h
+                include/GraphicSystems/DrmGLESGraphicSystem.h
+            DESTINATION
+                include/layermanager/graphic/GraphicSystems
+    )
+
+    install(FILES
+                include/TextureBinders/ITextureBinder.h
+                include/TextureBinders/WaylandCopyGLES.h
+                include/TextureBinders/WaylandNullTexture.h
+            DESTINATION
+                include/layermanager/graphic/TextureBinders
+    )
+
+    install(FILES
+                include/PlatformSurfaces/WaylandPlatformSurface.h
+                include/PlatformSurfaces/EglWaylandPlatformSurface.h
+            DESTINATION
+                include/layermanager/graphic/PlatformSurfaces
+    )
+
+    install(FILES
+                include/WindowSystems/BaseWindowSystem.h
+                include/WindowSystems/WaylandBaseWindowSystem.h
+                include/WindowSystems/WaylandFbdevWindowSystem.h
+                include/WindowSystems/WaylandX11WindowSystem.h
+                include/WindowSystems/WaylandDrmWindowSystem.h
+            DESTINATION
+                include/layermanager/graphic/WindowSystems
+    )
+
+    install(FILES
+                include/Transformation/ViewportTransform.h
+            DESTINATION
+                include/layermanager/graphic/Transformation
+    )
+
+    install(FILES
+                ../Base/include/BaseRenderer.h
+                ../Base/include/RenderUtil.h
+            DESTINATION
+                include/layermanager/graphic/Base
+    )
 
 endif(WITH_WAYLAND)
+
+
+#===========================================================================
+# Tests
+#===========================================================================
 
 if (WITH_TESTS)
+
     enable_testing()
     add_subdirectory (tests)
+    
 endif(WITH_TESTS)
-
-add_library(${GRAPHIC_LIB_NAME} SHARED ${SOURCES})
-
-if (NOT WITH_WAYLAND)
-find_package(X11 REQUIRED)
-include_directories(${X11_INCLUDE_DIR})
-find_package (Threads)
-endif (NOT WITH_WAYLAND)
-
-if (WITH_GLESv2_LIB) 
-find_package(EGL REQUIRED)
-include_directories(${EGL_INCLUDE_DIR})
-
-find_package(GLESv2 REQUIRED)
-include_directories(${GLESv2_INCLUDE_DIR})
-
-set(GRAPHIC_NATIVE_LIBS ${EGL_LIBRARY} ${GLESv2_LIBRARIES})
-endif (WITH_GLESv2_LIB)
-
-if (WITH_GLX_LIB) 
-find_package(GLX REQUIRED)
-include_directories(${GLX_INCLUDE_DIR})
-set(GRAPHIC_NATIVE_LIBS ${GLX_LIBRARIES})
-endif(WITH_GLX_LIB)
-
-set(GRAPHIC_DRM_LIBS ${UDEV_LIBRARIES} ${GBM_LIBRARIES} ${DRM_LIBRARIES})
-
-if (WITH_WAYLAND)
-	find_package (Wayland)
-	include_directories(${WAYLAND_SERVER_INCLUDE_DIR})
-	if (WITH_WAYLAND_DRM)
-		find_package (DRM)
-		include_directories(${DRM_INCLUDE_DIR})
-		set(LIBS ${LIBS} ${GRAPHIC_NATIVE_LIBS} ${GRAPHIC_DRM_LIBS} ${WAYLAND_SERVER_LIBRARIES} ${WAYLAND_EGL_LIBRARIES})
-		target_link_libraries(${GRAPHIC_LIB_NAME} ${LIBS})
-	else (WITH_WAYLAND_DRM)
-		set(LIBS ${LIBS} ${WAYLAND_SERVER_LIBRARIES})
-	endif (WITH_WAYLAND_DRM)
-	if (WITH_WAYLAND_X11)
-		set(LIBS ${LIBS} ${X11_X11_LIB})
-	endif (WITH_WAYLAND_X11)
-else(WITH_WAYLAND)
-	set(LIBS ${LIBS} ${CMAKE_THREAD_LIBS_INIT} ${X11_X11_LIB} ${X11_Xcomposite_LIB} ${X11_Xdamage_LIB} ${GRAPHIC_NATIVE_LIBS} LayerManagerUtils )
-endif(WITH_WAYLAND)
-target_link_libraries(${GRAPHIC_LIB_NAME} ${LIBS})
-
-
-add_dependencies(${GRAPHIC_LIB_NAME} LayerManagerService)
-add_dependencies(${GRAPHIC_LIB_NAME} LayerManagerUtils)
-
-install (TARGETS ${GRAPHIC_LIB_NAME} DESTINATION lib)
-install (FILES ${GRAPHIC_BASE_INCLUDES} DESTINATION include/layermanager/graphic/Base)
-install (FILES ${GRAPHIC_GRAPHICSYSTEM_INCLUDES} DESTINATION include/layermanager/graphic/GraphicSystems)
-install (FILES ${GRAPHIC_TEXTUREBINDERS_INCLUDES} DESTINATION include/layermanager/graphic/TextureBinders)
-install (FILES ${GRAPHIC_TRANSFORM_INCLUDES} DESTINATION include/layermanager/graphic/Transformation)
-install (FILES ${GRAPHIC_PLATFORM_INCLUDES} DESTINATION include/layermanager/graphic/PlatformSurfaces)
-install (FILES ${GRAPHIC_WINDOWSYSTEMS_INCLUDES} DESTINATION include/layermanager/graphic/WindowSystems)
 

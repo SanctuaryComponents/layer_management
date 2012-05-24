@@ -43,15 +43,15 @@ file(GLOB LM_SOURCES
 
 enable_testing()
 
-add_executable(ViewportTransformTest
+add_executable(ViewportTransform_Test
     ${LM_SOURCES}
     ../src/Transformation/ViewportTransform.cpp
     ViewportTransformTest.cpp
 )
 
-target_link_libraries(ViewportTransformTest
+target_link_libraries(ViewportTransform_Test
     ${LIBS}
     gtest
 )
 
-add_test(ViewportTransformations ViewportTransformTest)
+add_test(ViewportTransformations ViewportTransform_Test)

@@ -48,24 +48,57 @@ option (WITH_XTHREADS       "Build with usage of X11 Threading"                 
 option (WITH_CLIENTEXAMPLES "Build client examples "                              ON )
 option (WITH_TESTS          "Build Available Tests "                              OFF)
 option (WITH_DLT            "Build with DLT support "                             OFF)
-option (WITH_WAYLAND        "Build plugin of Wayland GBS"                         OFF)
 option (WITH_WAYLAND_FBDEV  "Build Wayland with FBDEV backend"                    OFF)
 option (WITH_WAYLAND_X11    "Build Wayland with X11 backend"                      OFF)
 option (WITH_WAYLAND_DRM    "Build Wayland with drm backend"                      OFF)
+
+# check and resolve option dependencies
+# make sure, only one walynad based renderer was selected
+
+if (WITH_DESKTOP)
+    set (WITH_GLX_LIB ON CACHE BOOL "Build development library for GLX Based Renderers" FORCE)
+endif(WITH_DESKTOP)
+
+if (WITH_X11_GLES)
+    set (WITH_GLESv2_LIB ON CACHE BOOL "Build development library for GLES2 Based Renderers" FORCE)
+endif(WITH_X11_GLES)
+
+set(NumberOfWaylandRenderers 0)
+
+if (WITH_WAYLAND_X11)
+    set (WITH_GLESv2_LIB ON CACHE BOOL "Build development library for GLES2 Based Renderers" FORCE)
+    set (WITH_WAYLAND ON)
+    MATH(EXPR NumberOfWaylandRenderers "${NumberOfWaylandRenderers} + 1")
+endif(WITH_WAYLAND_X11)
+
+if (WITH_WAYLAND_FBDEV)
+    set (WITH_GLESv2_LIB ON CACHE BOOL "Build development library for GLES2 Based Renderers" FORCE)
+    set (WITH_WAYLAND ON)
+    MATH(EXPR NumberOfWaylandRenderers "${NumberOfWaylandRenderers} + 1")
+endif(WITH_WAYLAND_FBDEV)
+
+if (WITH_WAYLAND_DRM)
+    set (WITH_GLESv2_LIB ON CACHE BOOL "Build development library for GLES2 Based Renderers" FORCE)
+    set (WITH_WAYLAND ON)
+    MATH(EXPR NumberOfWaylandRenderers "${NumberOfWaylandRenderers} + 1")
+endif(WITH_WAYLAND_DRM)
+
+if (WITH_WAYLAND_VIVANTE_GAL)
+    set (WITH_WAYLAND ON)
+    MATH(EXPR NumberOfWaylandRenderers "${NumberOfWaylandRenderers} + 1")
+endif(WITH_WAYLAND_VIVANTE_GAL)
+
+if(NumberOfWaylandRenderers GREATER 1) 
+    MESSAGE(FATAL_ERROR "More than one Wayland based renderer was selected. This is not supported.")
+endif(NumberOfWaylandRenderers GREATER 1)
+
+
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 
 add_subdirectory(cmake/optionalFeatures)
 
 add_subdirectory(config)
-
-if (WITH_DESKTOP)
-    set (WITH_GLX_LIB ON CACHE STRING "" FORCE)
-endif(WITH_DESKTOP)     
-
-if (WITH_X11_GLES OR WITH_WAYLAND)
-    set (WITH_GLESv2_LIB ON CACHE STRING "" FORCE)
-endif(WITH_X11_GLES OR WITH_WAYLAND)
 
 include_directories ("${PROJECT_SOURCE_DIR}/3rdParty/")
 
@@ -75,28 +108,23 @@ add_subdirectory (LayerManagerClient/ilmClient)
 add_subdirectory (LayerManagerCommands)
 add_subdirectory (LayerManagerService)
 add_subdirectory (LayerManagerUtils)
-
-if (WITH_GLESv2_LIB OR WITH_GLX_LIB)
-    add_subdirectory (LayerManagerPlugins/Renderers/Graphic)
-endif(WITH_GLESv2_LIB OR WITH_GLX_LIB)
+add_subdirectory (LayerManagerPlugins/Renderers/Graphic)
 
 if (WITH_DESKTOP)
     add_subdirectory (LayerManagerPlugins/Renderers/Platform/GLXRenderer)
 endif(WITH_DESKTOP)     
 
 if (WITH_WAYLAND)
-    if (NOT WITH_WAYLAND_FBDEV AND NOT WITH_WAYLAND_X11 AND NOT WITH_WAYLAND_DRM)
-        message(FATAL_ERROR "Consider to specify WITH_WAYLAND_FBDEV or WITH_WAYLAND_X11 or WITH_WAYLAND_DRM")
-    endif(NOT WITH_WAYLAND_FBDEV AND NOT WITH_WAYLAND_X11 AND NOT WITH_WAYLAND_DRM)
-    if (WITH_WAYLAND_FBDEV AND WITH_WAYLAND_X11)
-        message(FATAL_ERROR "WITH_WAYLAND_FBDEV and WITH_WAYLAND_X11 can't be specified at the same time")
-    endif(WITH_WAYLAND_FBDEV AND WITH_WAYLAND_X11)
-    add_subdirectory (LayerManagerPlugins/Renderers/Platform/WaylandGLESRenderer)
-endif(WITH_WAYLAND)     
+    if (WITH_WAYLAND_VIVANTE_GAL)
+        add_subdirectory (LayerManagerPlugins/Renderers/Platform/WaylandVivanteRenderer)
+    else (WITH_WAYLAND_VIVANTE_GAL)
+        add_subdirectory (LayerManagerPlugins/Renderers/Platform/WaylandGLESRenderer)
+    endif (WITH_WAYLAND_VIVANTE_GAL)
+endif(WITH_WAYLAND)
 
 if (WITH_X11_GLES)
     add_subdirectory (LayerManagerPlugins/Renderers/Platform/X11GLESRenderer)
-endif(WITH_X11_GLES)   
+endif(WITH_X11_GLES)
 
 if (WITH_EGL_EXAMPLE)
     add_subdirectory (LayerManagerExamples/EGLX11ApplicationExample)

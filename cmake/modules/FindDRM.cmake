@@ -37,7 +37,7 @@ PATHS /usr/lib
 )
 
 FIND_PATH(DRM_INCLUDE_DIR /drm.h
-/usr/include/drm /usr/include/libdrm
+/usr/include/libdrm /usr/include/drm
 )
 
 FIND_LIBRARY(DRM_LIBRARIES

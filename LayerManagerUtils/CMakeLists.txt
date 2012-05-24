@@ -19,24 +19,76 @@
 
 cmake_minimum_required (VERSION 2.6)
 
-include_directories ("include")
-include_directories ("${PROJECT_SOURCE_DIR}/config")
-if (WITH_DLT)
-find_package(AutomotiveDlt REQUIRED)
-include_directories(${DLT_INCLUDE_DIR})
-endif (WITH_DLT)
+project(LayerManagerUtils)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
-add_library(LayerManagerUtils STATIC src/Bitmap.cpp src/IlmMatrix.cpp src/Log.cpp src/LogMessageBuffer.cpp)
-install (FILES include/Log.h include/LogMessageBuffer.h include/IlmMatrix.h include/Bitmap.h DESTINATION include/layermanager)
 
-install (TARGETS LayerManagerUtils ARCHIVE DESTINATION lib/layermanager/static)
+add_library(${PROJECT_NAME} STATIC
+    src/Bitmap.cpp
+    src/IlmMatrix.cpp
+    src/Log.cpp
+    src/LogMessageBuffer.cpp
+)
+
+set(INCLUDE_DIRS
+    "include"
+    "${CMAKE_SOURCE_DIR}/config"
+)
+
+set(LIBS
+    ${LIBS}
+)
+
+if (WITH_DLT)
+
+    find_package(AutomotiveDlt REQUIRED)
+    
+    set(INCLUDE_DIRS
+        ${INCLUDE_DIRS}
+        ${DLT_INCLUDE_DIR}
+    )
+    
+    set(LIBS
+        ${LIBS}
+        ${DLT_LIBRARY}
+    )
+    
+    target_link_libraries(${PROJECT_NAME} ${LIBS})
+    
+endif (WITH_DLT)
+
+include_directories(${INCLUDE_DIRS})
+
+install(FILES
+            include/Log.h
+            include/LogMessageBuffer.h
+            include/IlmMatrix.h
+            include/Bitmap.h
+        DESTINATION
+            include/layermanager
+)
+
+install(TARGETS
+            ${PROJECT_NAME}
+        DESTINATION
+            lib/layermanager/static
+)
 
 if (WITH_TESTS)
 
-add_executable(UtilsTest tests/BitmapTest.cpp tests/LogTest.cpp)
-target_link_libraries(UtilsTest LayerManagerUtils gtest pthread ${DLT_LIBRARY})
-enable_testing()
-add_test(Utilities UtilsTest)
+    add_executable(${PROJECT_NAME}_Test
+        tests/BitmapTest.cpp
+        tests/LogTest.cpp
+    )
 
+    target_link_libraries(${PROJECT_NAME}_Test
+        LayerManagerUtils
+        gtest
+        pthread
+        ${DLT_LIBRARY}
+    )
+    
+    enable_testing()
+    add_test(${PROJECT_NAME} ${PROJECT_NAME}_Test)
+    
 endif(WITH_TESTS) 

@@ -42,7 +42,7 @@ file(GLOB LM_SOURCES "${PROJECT_SOURCE_DIR}/LayerManagerService/src/Scene.cpp"
 
 file(GLOB DBUSCommunicator_SOURCES "../src/*.cpp")
 
-add_executable(DBUSCommunicatorTest DBUSCommunicatorTest.cpp ${LM_SOURCES} ${DBUSCommunicator_SOURCES})
-target_link_libraries(DBUSCommunicatorTest gmock LayerManagerCommands ${LIBS})
+add_executable(DBUSCommunicator_Test DBUSCommunicatorTest.cpp ${LM_SOURCES} ${DBUSCommunicator_SOURCES})
+target_link_libraries(DBUSCommunicator_Test gmock LayerManagerCommands ${LIBS})
 
-add_test(DBUSCommunicatorTest DBUSCommunicatorTest)
+add_test(DBUSCommunicator DBUSCommunicator_Test)
