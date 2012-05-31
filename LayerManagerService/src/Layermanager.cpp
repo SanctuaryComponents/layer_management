@@ -51,6 +51,16 @@ Layermanager::~Layermanager()
     {
         delete m_pCommunicatorList;
     }
+
+    if (m_pSceneProviderList)
+    {
+        delete m_pSceneProviderList;
+    }
+
+    if (m_pApplicationReferenceMap)
+    {
+        delete m_pApplicationReferenceMap;
+    }
 }
 
 uint Layermanager::getLayerTypeCapabilities(const LayerType layertype) const

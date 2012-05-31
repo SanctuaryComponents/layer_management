@@ -97,10 +97,12 @@ bool DBUSMessageHandler::registerPathFunction(  DBusObjectPathMessageFunction fM
                                                 void* comInstance)
 {
     bool result = true;
-    m_objectPathVTable.unregister_function = fUnregisterFunc;
-    m_objectPathVTable.message_function = fMessageFunc;        
+    DBusObjectPathVTable objectPathVTable;
+    memset(&objectPathVTable, 0, sizeof(objectPathVTable));
+    objectPathVTable.unregister_function = fUnregisterFunc;
+    objectPathVTable.message_function = fMessageFunc;
     
-    if (!dbus_connection_register_object_path(m_pConnection,DBUS_SERVICE_OBJECT_PATH,&m_objectPathVTable, comInstance) )
+    if (!dbus_connection_register_object_path(m_pConnection, DBUS_SERVICE_OBJECT_PATH, &objectPathVTable, comInstance) )
     {
         result = false;
     }    
@@ -158,7 +160,7 @@ void DBUSMessageHandler::ReplyError(DBusMessage* msg, const char* errorname, con
 
 char* DBUSMessageHandler::getString()
 {
-    char* param;
+    char* param = NULL;
 
     if (DBUS_TYPE_STRING != dbus_message_iter_get_arg_type(&m_MessageIter))
     {
@@ -174,7 +176,7 @@ char* DBUSMessageHandler::getString()
 
 dbus_bool_t DBUSMessageHandler::getBool()
 {
-    dbus_bool_t boolparam;
+    dbus_bool_t boolparam = FALSE;
 
     if (DBUS_TYPE_BOOLEAN != dbus_message_iter_get_arg_type(&m_MessageIter))
     {
@@ -190,7 +192,7 @@ dbus_bool_t DBUSMessageHandler::getBool()
 
 char DBUSMessageHandler::getByte()
 {
-    char param;
+    char param = 0;
 
     if (DBUS_TYPE_BYTE != dbus_message_iter_get_arg_type(&m_MessageIter))
     {
@@ -206,7 +208,7 @@ char DBUSMessageHandler::getByte()
 
 dbus_uint32_t DBUSMessageHandler::getUInt()
 {
-    dbus_uint32_t param;
+    dbus_uint32_t param = 0;
 
     if (DBUS_TYPE_UINT32 != dbus_message_iter_get_arg_type(&m_MessageIter))
     {
@@ -222,7 +224,7 @@ dbus_uint32_t DBUSMessageHandler::getUInt()
 
 double DBUSMessageHandler::getDouble()
 {
-    double param;
+    double param = 0.0;
 
     if (DBUS_TYPE_DOUBLE != dbus_message_iter_get_arg_type(&m_MessageIter))
     {

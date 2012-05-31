@@ -26,6 +26,8 @@
 #include "GraphicSystems/GLESGraphicSystem.h"
 #include "WindowSystems/WaylandBaseWindowSystem.h"
 
+class ITextureBinder;
+
 class WaylandGLESRenderer : public BaseRenderer
 {
 public:
@@ -47,6 +49,7 @@ private:
     GLESGraphicsystem* m_pGraphicSystem;
     uint m_width;
     uint m_height;
+    ITextureBinder* m_binder;
 };
 
 #endif /* _WAYLANDGLESRENDERER_H_*/

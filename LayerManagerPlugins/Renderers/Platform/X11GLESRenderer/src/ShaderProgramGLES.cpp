@@ -33,9 +33,11 @@ ShaderProgram* ShaderProgramGLES::createProgram(const std::string& vertName, con
     const char* pluginLookupPath = getenv("LM_PLUGIN_PATH");
     if  (pluginLookupPath != NULL ) 
     {
-        strcpy(defaultShaderDir,pluginLookupPath);
-    } else {
-        strcpy(defaultShaderDir,"/usr/lib/layermanager");
+        strncpy(defaultShaderDir, pluginLookupPath, sizeof(defaultShaderDir) - 1);
+    }
+    else
+    {
+        strncpy(defaultShaderDir,"/usr/lib/layermanager", sizeof(defaultShaderDir));
     }
     strcat(defaultShaderDir,"/renderer");
 

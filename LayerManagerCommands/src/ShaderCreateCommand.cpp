@@ -43,8 +43,8 @@ ExecutionResult ShaderCreateCommand::execute(ICommandExecutor* executor)
         if (renderer)
         {
             shader = renderer->createShader(&m_vertName, &m_fragName);
+            break;
         }
-        break;
     }
     if (shader)
     {

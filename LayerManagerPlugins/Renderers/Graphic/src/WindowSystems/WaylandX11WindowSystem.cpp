@@ -47,6 +47,11 @@
 
 WaylandX11WindowSystem::WaylandX11WindowSystem(const char* displayname, int width, int height, Scene* pScene)
 : WaylandBaseWindowSystem(displayname, width, height, pScene)
+, m_x11Window(0)
+, m_x11Display(0)
+, m_x11Screen(0)
+, m_x11Visual(0)
+, m_x11Colormap(0)
 {
     LOG_DEBUG("WaylandX11WindowSystem", "creating WaylandX11WindowSystem width:" << width << " height:" << height);
 }
@@ -85,7 +90,7 @@ bool WaylandX11WindowSystem::initGraphicSystem()
 bool WaylandX11WindowSystem::createNativeContext()
 {
     bool result = true;
-    Window rootWindow = NULL;
+    Window rootWindow = 0;
     XSetWindowAttributes windowAttributes;
     unsigned int windowMask = 0;
     int colorDepth = 0;

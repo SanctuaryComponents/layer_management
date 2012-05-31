@@ -44,6 +44,14 @@ static char* RenderUtilLoadShaderFile(const char *szFilename)
 
     fseek(pFile, 0, SEEK_END);
     long size = ftell(pFile);
+
+    if (size < 0)
+    {
+        LOG_ERROR("RenderUtilLoadShaderFile","Unable get size of ShaderFile " << szFilename);
+        fclose(pFile);
+        return(NULL);
+    }
+
     fseek(pFile, 0, SEEK_SET);
 
     char *pBuffer = new char[size+1];

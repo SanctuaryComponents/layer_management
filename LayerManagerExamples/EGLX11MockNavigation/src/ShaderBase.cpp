@@ -41,7 +41,7 @@ ShaderBase::~ShaderBase()
 
 bool ShaderBase::initShader()
 {
-    t_ilm_bool result = ILM_TRUE;
+    GLint glResult = GL_FALSE;
 
     // Create the fragment shader object
     fragmentShaderId = glCreateShader(GL_FRAGMENT_SHADER);
@@ -53,9 +53,9 @@ bool ShaderBase::initShader()
     // Compile the source code of fragment shader
     glCompileShader(fragmentShaderId);
 
-    glGetShaderiv(fragmentShaderId, GL_COMPILE_STATUS, (GLint*) &result);
+    glGetShaderiv(fragmentShaderId, GL_COMPILE_STATUS, &glResult);
 
-    if (!result)
+    if (glResult == GL_FALSE)
     {
         t_ilm_int infoLength, numberChars;
         glGetShaderiv(fragmentShaderId, GL_INFO_LOG_LENGTH, &infoLength);
@@ -80,9 +80,9 @@ bool ShaderBase::initShader()
     // Compile the source code of fragment shader
     glCompileShader(vertexShaderId);
 
-    glGetShaderiv(vertexShaderId, GL_COMPILE_STATUS, (GLint*) &result);
+    glGetShaderiv(vertexShaderId, GL_COMPILE_STATUS, &glResult);
 
-    if (!result)
+    if (glResult == GL_FALSE)
     {
         t_ilm_int infoLength, numberChars;
         glGetShaderiv(vertexShaderId, GL_INFO_LOG_LENGTH, &infoLength);
@@ -106,9 +106,9 @@ bool ShaderBase::initShader()
 
     glLinkProgram(shaderProgramId);
 
-    glGetProgramiv(shaderProgramId, GL_LINK_STATUS, (GLint*) &result);
+    glGetProgramiv(shaderProgramId, GL_LINK_STATUS, &glResult);
 
-    if (!result)
+    if (glResult == GL_FALSE)
     {
         t_ilm_int infoLength, numberChars;
         glGetShaderiv(shaderProgramId, GL_INFO_LOG_LENGTH, &infoLength);
@@ -128,16 +128,9 @@ bool ShaderBase::initShader()
 
     m_uniformProjectionMatrix = glGetUniformLocation(shaderProgramId, "u_projectionMatrix");
 
-    if (result)
-    {
-    	cout << "Shader setup complete.\n";
-    }
-    else
-    {
-    	cout << "Shader setup failed.\n";
-    }
+    cout << "Shader setup complete.\n";
 
-    return result;
+    return ILM_TRUE;
 }
 
 bool ShaderBase::destroyShader()

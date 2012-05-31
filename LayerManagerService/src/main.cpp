@@ -93,6 +93,7 @@ T* getCreateFunction(string libname)
     if (!libraryHandle || dlopen_error)
     {
         LOG_ERROR("LayerManagerService", "dlopen failed: " << dlopen_error);
+        free(libraryHandle);
         return 0;
     }
 
@@ -118,6 +119,10 @@ T* getCreateFunction(string libname)
     {
         LOG_ERROR("LayerManagerService", "Failed to load shared lib entry point: " << dlsym_error);
     }
+
+    // TODO: free these resources on shutdown
+    //dlclose(libraryHandle);
+    //free(libraryHandle);
 
     return createFunction;
 }
@@ -206,8 +211,8 @@ void loadScenePlugins(SceneProviderList& sceneProviderList, ICommandExecutor* ex
     for (uint dirIndex = 0; dirIndex < gScenePluginDirectoriesCount; ++dirIndex)
     {
         char directoryName[1024];
-        strcpy(directoryName,gPluginLookupPath);
-        strcat(directoryName,gScenePluginDirectories[dirIndex]);
+        strncpy(directoryName, gPluginLookupPath, sizeof(directoryName) - 1);
+        strncat(directoryName, gScenePluginDirectories[dirIndex], sizeof(directoryName) - 1 - strlen(directoryName));
         LOG_DEBUG("LayerManagerService", "Searching for SceneProviders in: " << directoryName);
         getSharedLibrariesFromDirectory(sharedLibraryNameList, directoryName);
     }
@@ -253,8 +258,8 @@ void loadCommunicatorPlugins(CommunicatorList& communicatorList, ICommandExecuto
     for (uint dirIndex = 0; dirIndex < gCommunicatorPluginDirectoriesCount; ++dirIndex)
     {
         char directoryName[1024];
-        strcpy(directoryName,gPluginLookupPath);
-        strcat(directoryName,gCommunicatorPluginDirectories[dirIndex]);
+        strncpy(directoryName, gPluginLookupPath, sizeof(directoryName) - strlen(directoryName));
+        strncat(directoryName, gCommunicatorPluginDirectories[dirIndex], sizeof(directoryName) -strlen(directoryName));
         LOG_DEBUG("LayerManagerService", "Searching for communicator in: " << directoryName);
         getSharedLibrariesFromDirectory(sharedLibraryNameList, directoryName);
     }
@@ -299,8 +304,8 @@ void loadRendererPlugins(RendererList& rendererList, IScene* pScene)
     for (uint dirIndex = 0; dirIndex < gRendererPluginDirectoriesCount; ++dirIndex)
     {
         char directoryName[1024];
-        strcpy(directoryName,gPluginLookupPath);
-        strcat(directoryName,gRendererPluginDirectories[dirIndex]);        
+        strncpy(directoryName, gPluginLookupPath, sizeof(directoryName) - 1);
+        strncat(directoryName, gRendererPluginDirectories[dirIndex], sizeof(directoryName) - 1 - strlen(directoryName));
         LOG_DEBUG("LayerManagerService", "Searching for renderer in: " << directoryName);
         getSharedLibrariesFromDirectory(sharedLibraryNameList, directoryName);
     }

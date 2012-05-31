@@ -30,12 +30,11 @@ ShaderDestroyCommand::ShaderDestroyCommand(unsigned int shaderid)
 ExecutionResult ShaderDestroyCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());
-    ShaderMap& shaderMap = scene.m_shaderMap;
     ExecutionResult result = ExecutionFailed;
 
     // get shader by its ID
-    ShaderMapIterator iter = shaderMap.find(m_id);
-    ShaderMapIterator iterEnd = shaderMap.end();
+    ShaderMapIterator iter = scene.m_shaderMap.find(m_id);
+    ShaderMapIterator iterEnd = scene.m_shaderMap.end();
 
     if (iter == iterEnd)
     {

@@ -107,16 +107,26 @@ extern "C" {
 
 WaylandBaseWindowSystem::WaylandBaseWindowSystem(const char* displayname, int width, int height, Scene* pScene)
 : BaseWindowSystem(pScene)
+, m_wlDisplay(NULL)
+, renderThread(0)
+, run_lock()
+, graphicSystem(NULL)
+, m_wlShm(NULL)
 , m_initialized(false)
 , m_takeScreenshot(ScreenShotNone)
 , m_displayname(displayname)
 , m_success(false)
 , m_systemState(IDLE_STATE)
 , m_manageConnectionId(256)
+, m_screenShotFile()
+, m_screenShotSurfaceID(0)
+, m_screenShotLayerID(0)
 , m_debugMode(false)
 , m_error(false)
 , m_width(width)
 , m_height(height)
+, m_listFrameCallback()
+, m_connectionList()
 {
     LOG_DEBUG("WaylandBaseWindowSystem", "creating WaylandBaseWindowSystem width:" << width << " height:" << height);
 

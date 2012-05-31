@@ -26,11 +26,16 @@
 #include "Bitmap.h"
 
 GLXGraphicsystem::GLXGraphicsystem(int WindowWidth, int WindowHeight)
+: m_windowWidth(WindowWidth)
+, m_windowHeight(WindowHeight)
+, m_x11display(0)
+, m_window(0)
+, m_context(0)
+, m_currentLayer(0)
+, m_zerocopy(false)
+
 {
     LOG_DEBUG("GLXGraphicsystem", "creating GLXGraphicsystem");
-    this->m_windowHeight = WindowHeight;
-    this->m_windowWidth = WindowWidth;
-    m_zerocopy = false;
 }
 
 GLXGraphicsystem::~GLXGraphicsystem()
@@ -324,7 +329,7 @@ void GLXGraphicsystem::renderSurface(Surface* currentSurface)
 
     ViewportTransform::applyLayerSource(layerSourceRegion, targetSurfaceSource, targetSurfaceDestination);
     ViewportTransform::applyLayerDestination(layerDestinationRegion, layerSourceRegion, targetSurfaceDestination);
-    float* textureCoordinates = new float[4];
+    float textureCoordinates[4];
     ViewportTransform::transformRectangleToTextureCoordinates(targetSurfaceSource, currentSurface->OriginalSourceWidth, currentSurface->OriginalSourceHeight, textureCoordinates);
     
     glPushMatrix();
@@ -366,10 +371,9 @@ void GLXGraphicsystem::renderSurface(Surface* currentSurface)
     if ( GL_NO_ERROR != glErrorCode )
     {
         LOG_ERROR("GLXGraphicsystem", "GL Error occured :" << glErrorCode );
-    };    
-    currentSurface->frameCounter++;    
-    currentSurface->drawCounter++;    
-    delete[] textureCoordinates;
+    }
+    currentSurface->frameCounter++;
+    currentSurface->drawCounter++;
 }
 
 void GLXGraphicsystem::saveScreenShotOfFramebuffer(std::string fileToSave)

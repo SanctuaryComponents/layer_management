@@ -36,11 +36,10 @@ private:
     vec3f m_position;
     vec3f m_target;
     IlmMatrix m_viewProjectionMatrix;
-	IlmMatrix m_translationMatrix;
-	IlmMatrix m_rotationMatrix;
-	IlmMatrix m_projectionMatrix;
-	IlmMatrix m_identityMatrix;
-	IlmMatrix eyeMatrix;
+    IlmMatrix m_translationMatrix;
+    IlmMatrix m_rotationMatrix;
+    IlmMatrix m_projectionMatrix;
+    IlmMatrix m_identityMatrix;
 };
 
 #endif

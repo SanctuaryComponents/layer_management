@@ -86,11 +86,12 @@ ShaderUniform* ShaderUniform::createFromStringDescription(
     }
 
     // get element count
-    int count;
-    if ((iss >> count).fail())
+    unsigned int count = 0;
+    iss >> count;
+    if (iss.fail())
     {
         // failed to parse element count
-        LOG_ERROR("Shader Uniform","Fail to parse element count " << count);
+        LOG_ERROR("Shader Uniform","Fail to parse element count.");
         return NULL;
     }
 
@@ -109,8 +110,9 @@ ShaderUniform* ShaderUniform::createFromStringDescription(
     size_t numValuesExpected = count * m_vectorSizesOfDataTypes[type];
     for (size_t i = 0; i < numValuesExpected; i++)
     {
-        float value;
-        if ((iss >> value).fail())
+        float value = 0.0;
+        iss >> value;
+        if (iss.fail())
         {
             // failed to parse value
             LOG_ERROR("Shader Uniform","Fail to parse value " << value);

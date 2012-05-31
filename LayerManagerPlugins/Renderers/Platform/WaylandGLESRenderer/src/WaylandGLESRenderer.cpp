@@ -41,6 +41,7 @@ WaylandGLESRenderer::WaylandGLESRenderer(Scene* pScene)
 , m_pGraphicSystem(0)
 , m_width(0)
 , m_height(0)
+, m_binder(0)
 {
     LOG_DEBUG("WaylandGLESRenderer", "Creating Renderer");
 }
@@ -49,7 +50,7 @@ bool WaylandGLESRenderer::start(int width, int height, const char* displayname)
 {
     struct wl_display* nativeDisplayHandle = NULL;
     EGLDisplay eglDisplayhandle = NULL;
-    ITextureBinder* binder = NULL;
+    m_binder = NULL;
     m_width = width;
     m_height = height;
     // create Wayland windows, register as composite manager etc
@@ -90,17 +91,17 @@ bool WaylandGLESRenderer::start(int width, int height, const char* displayname)
     eglDisplayhandle = m_pGraphicSystem->getEGLDisplay();
 
 #ifdef WITH_FORCE_COPY
-    binder = new WaylandCopyGLES(eglDisplayhandle, nativeDisplayHandle);
+    m_binder = new WaylandCopyGLES(eglDisplayhandle, nativeDisplayHandle);
 #else // WITH_FORCE_COPY
 #ifdef EGL_NATIVE_PIXMAP_KHR
-    binder = new WaylandEglImage(eglDisplayhandle, nativeDisplayHandle);
+    m_binder = new WaylandEglImage(eglDisplayhandle, nativeDisplayHandle);
 #else // EGL_NATIVE_PIXMAP_KHR
-    binder = new WaylandCopyGLES(eglDisplayhandle, nativeDisplayHandle);
+    m_binder = new WaylandCopyGLES(eglDisplayhandle, nativeDisplayHandle);
 #endif // EGL_NATIVE_PIXMAP_KHR
 #endif // WITH_FORCE_COPY
-    if ( binder && nativeDisplayHandle && eglDisplayhandle)
+    if (m_binder && nativeDisplayHandle && eglDisplayhandle)
     {
-        m_pGraphicSystem->setTextureBinder(binder);
+        m_pGraphicSystem->setTextureBinder(m_binder);
 
         if (!m_pWindowSystem->start())
         {
@@ -122,6 +123,10 @@ bool WaylandGLESRenderer::start(int width, int height, const char* displayname)
 void WaylandGLESRenderer::stop()
 {
     m_pWindowSystem->stop();
+    if(m_binder)
+    {
+        delete m_binder;
+    }
 }
 
 void WaylandGLESRenderer::doScreenShot(std::string fileToSave)

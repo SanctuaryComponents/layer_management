@@ -42,7 +42,6 @@ private:
 
 private:
     Camera m_camera;
-    int lastUpdateTime;
     int m_houseCount;
     list<IRenderable*> m_renderList;
     list<IUpdateable*> m_updateList;

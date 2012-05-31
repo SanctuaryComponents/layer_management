@@ -30,6 +30,8 @@ X11GLXRenderer::X11GLXRenderer(Scene* pScene)
 : BaseRenderer(pScene)
 , m_pWindowSystem(0)
 , m_pGraphicSystem(0)
+, m_width(0)
+, m_height(0)
 {
 }
 
@@ -50,25 +52,30 @@ bool X11GLXRenderer::start(int width, int height, const char* displayname)
     if ( m_pWindowSystem->init(m_pGraphicSystem ) )
     {
         Display* x11Display = m_pWindowSystem->getNativeDisplayHandle();
-        GLXFBConfig *currentConfig = m_pGraphicSystem->GetMatchingPixmapConfig(x11Display);
-        if (x11Display != NULL && currentConfig != NULL )
+        if (x11Display)
         {
-            LOG_INFO("X11GLXRenderer", "Initialization successfull.");
+            GLXFBConfig *currentConfig = m_pGraphicSystem->GetMatchingPixmapConfig(x11Display);
+            if (currentConfig)
+            {
+                LOG_INFO("X11GLXRenderer", "Initialization successful.");
 #ifdef WITH_FORCE_COPY
-            binder = new X11CopyGLX(x11Display);
-#else // WITH_FORCE_COPY
-            if ( m_pGraphicSystem->isZeroCopyEnabled() == true ) 
-            {
-                binder = new X11TextureFromPixmap(x11Display, *currentConfig);
-            } else {
                 binder = new X11CopyGLX(x11Display);
-            }
+#else // WITH_FORCE_COPY
+                if (m_pGraphicSystem->isZeroCopyEnabled())
+                {
+                    binder = new X11TextureFromPixmap(x11Display, *currentConfig);
+                }
+                else
+                {
+                    binder = new X11CopyGLX(x11Display);
+                }
 #endif // WITH_FORCE_COPY
-            if ( binder != NULL ) 
-            {
-                m_pGraphicSystem->setTextureBinder(binder);
-                result = m_pWindowSystem->start();
-            } 
+                if ( binder != NULL )
+                {
+                    m_pGraphicSystem->setTextureBinder(binder);
+                    result = m_pWindowSystem->start();
+                }
+            }
         }
     }
     return result;
@@ -136,7 +143,7 @@ uint* X11GLXRenderer::getScreenIDs(uint* length)
 
 void X11GLXRenderer::signalWindowSystemRedraw()
 {
-	m_pWindowSystem->signalRedrawEvent();
+    m_pWindowSystem->signalRedrawEvent();
 }
 
 void X11GLXRenderer::forceCompositionWindowSystem()
@@ -145,7 +152,7 @@ void X11GLXRenderer::forceCompositionWindowSystem()
 }
 
 extern "C" IRenderer* createX11GLXRenderer(Scene* pScene) {
-	return new X11GLXRenderer(pScene);
+    return new X11GLXRenderer(pScene);
 }
 
 extern "C" void destroyX11GLXRenderer(X11GLXRenderer* p)

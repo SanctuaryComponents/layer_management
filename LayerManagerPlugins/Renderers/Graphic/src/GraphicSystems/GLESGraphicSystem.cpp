@@ -47,7 +47,23 @@ static const float vertices[8 * 12] =
 GLESGraphicsystem::GLESGraphicsystem(int windowWidth, int windowHeight, PfnShaderProgramCreator shaderProgram)
 : m_windowWidth(windowWidth)
 , m_windowHeight(windowHeight)
+, m_nativeDisplay(0)
+, m_nativeWindow(0)
 , m_shaderCreatorFunc(shaderProgram)
+, m_eglConfig(0)
+, m_eglContext(0)
+, m_eglSurface(0)
+, m_eglDisplay(0)
+, m_vbo(0)
+, m_displayWidth(0)
+, m_displayHeight(0)
+, m_blendingStatus(false)
+, m_defaultShader(0)
+, m_defaultShaderNoUniformAlpha(0)
+, m_currentLayer(0)
+#ifdef DRAW_LAYER_DEBUG
+, m_layerShader(0)
+#endif
 {
     LOG_DEBUG("GLESGraphicsystem", "creating GLESGraphicsystem");
 }
@@ -286,7 +302,7 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
 
     ViewportTransform::applyLayerSource(layerSourceRegion, targetSurfaceSource, targetSurfaceDestination);
     ViewportTransform::applyLayerDestination(layerDestinationRegion, layerSourceRegion, targetSurfaceDestination);
-    float* textureCoordinates = new float[4];
+    float textureCoordinates[4];
     ViewportTransform::transformRectangleToTextureCoordinates(targetSurfaceSource, surface->OriginalSourceWidth, surface->OriginalSourceHeight, textureCoordinates);
 
     glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
@@ -373,8 +389,6 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
     {
         LOG_ERROR("GLESGraphicsystem", "GL Error occured :" << glErrorCode );
     };
-
-    delete[] textureCoordinates;
 }
 
 bool GLESGraphicsystem::initOpenGLES(EGLint displayWidth, EGLint displayHeight)

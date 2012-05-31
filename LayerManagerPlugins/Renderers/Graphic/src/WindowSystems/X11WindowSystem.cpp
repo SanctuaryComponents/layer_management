@@ -42,17 +42,35 @@ bool    X11WindowSystem::m_xerror = false;
 X11WindowSystem::X11WindowSystem(const char* displayname, int width, int height, Scene* pScene,GetVisualInfoFunction func)
 : BaseWindowSystem(pScene)
 , takeScreenshot(ScreenShotNone)
+, screenShotFile()
+, screenShotSurfaceID(0)
+, screenShotLayerID()
 , displayname(displayname)
 , getVisualFunc(func)
 , debugMode(false)
 , resolutionWidth(width)
 , resolutionHeight(height)
+, composite_event(0)
+, composite_error(0)
+, composite_major(0)
+, composite_minor(0)
+, damage_event(0)
+, damage_error(0)
+, damage_major(0)
+, damage_minor(0)
+, m_running(false)
 , m_initialized(false)
 , m_success(false)
 , m_systemState(IDLE_STATE)
 , m_displayEnvironment(NULL)
+, x11Display(0)
+, renderThread(0)
 , windowWidth(width)
 , windowHeight(height)
+, CompositorWindow(0)
+, windowVis(0)
+, run_lock()
+, graphicSystem(0)
 {
     LOG_DEBUG("X11WindowSystem", "creating X11WindowSystem");
 
@@ -374,18 +392,20 @@ void X11WindowSystem::NewWindow(Surface* surface, Window window)
         char* name;
         status = XFetchName(x11Display, window, &name);
         LOG_DEBUG("X11WindowSystem", "Got window name");
-        if (status >= Success)
+        if (status >= Success && name)
         {
-            LOG_DEBUG("X11WindowSystem", "Found window: " << window << "  " << name);
+            LOG_DEBUG("X11WindowSystem", "Found window: " << window << " " << name);
             char GuiTitle[]  = "Layermanager Remote GUI\0";
-            if (name != NULL && strcmp(name,GuiTitle)==0)
+            if (strcmp(name,GuiTitle)==0)
             {
                 LOG_DEBUG("X11WindowSystem", "Found gui window: repositioning it");
                 XCompositeUnredirectWindow(x11Display,window,CompositeRedirectManual);
                 XMoveWindow(x11Display, window, 50, 500);
                 XMapRaised(x11Display, window);
             }
-        }else {
+        }
+        else
+        {
             LOG_DEBUG("X11WindowSystem", "Error fetching window name");
         }
         LOG_DEBUG("X11WindowSystem","Creating New Damage for window - " << window);

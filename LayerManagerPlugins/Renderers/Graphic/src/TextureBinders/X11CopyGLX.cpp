@@ -26,7 +26,7 @@
 
 bool X11CopyGLX::bindSurfaceTexture(Surface* surface)
 {
-    XPlatformSurface* nativeSurface = (XPlatformSurface*)surface->platform;
+    XPlatformSurface* nativeSurface = NULL;
     Pixmap pixmap = 0;
     GLenum targetType = GL_BGRA;
     GLenum sourceType = GL_RGBA;

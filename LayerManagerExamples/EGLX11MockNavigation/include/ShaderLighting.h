@@ -29,8 +29,6 @@ public:
 	virtual void use(vec3f* position, vec4f* color);
 
 private:
-	vec3f* m_pPosition;
-	vec4f* m_pColor;
 	int m_uniformModelMatrix;
 	int m_uniformColor;
 };

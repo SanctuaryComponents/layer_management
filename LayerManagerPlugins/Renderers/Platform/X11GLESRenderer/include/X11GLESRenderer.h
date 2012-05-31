@@ -46,6 +46,7 @@ private:
     GLESGraphicsystem* m_pGraphicSystem;
     uint m_width;
     uint m_height;
+    ITextureBinder* m_binder;
 };
 
 #endif /* _X11GLESRENDERER_H_*/

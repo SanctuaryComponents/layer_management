@@ -36,6 +36,7 @@ Camera::Camera(vec3f position, vec3f target, float viewportWidth, float viewport
                         0.1f,                          // near
                         1000.0f,                       // far
                         viewportWidth/viewportHeight); // aspect ratio
+    m_viewProjectionMatrix = m_identityMatrix;
 }
 
 Camera::~Camera()

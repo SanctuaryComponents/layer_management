@@ -295,15 +295,15 @@ void showSurfaceProperties(t_param_struct *pStruct)
     printf("\tRendered frames\t: %i\n\n",surfaceProperties.frameCounter);    
 }
 
-
-
 bool fillLayerRenderOrder(char * param, t_param_struct* pStruct)
 {
     bool result = true;
     char * pRes = new char[strlen(param)+1];
     strcpy(pRes,param);
     int i = 0;
-    pRes = strtok (pRes,",");
+    char* tokens = strtok (pRes,",");
+    delete[] pRes;
+    pRes = tokens;
     while (pRes != NULL)
     {
         pRes = strtok (NULL, ",");
@@ -321,7 +321,10 @@ bool fillLayerRenderOrder(char * param, t_param_struct* pStruct)
         pStruct->layerro = new t_ilm_layer[i];
         pStruct->layerro_length = i;
         i = 0;
-        pRes = strtok (pRes,",");
+        tokens = strtok (pRes,",");
+        delete[] pRes;
+        pRes = tokens;
+
         printf("Set Renderorder : [\n");
         while (pRes != NULL)
         {
@@ -346,7 +349,7 @@ bool fillDimension(char * param, t_ilm_int *pArray)
     while (pos != std::string::npos)
     {
         std::string tempString = pRes.substr(0,pos);
-        printf("Dim param %s\n",tempString.c_str());        
+        printf("Dim param %s\n",tempString.c_str());
         tempArray[i++] = atoi(tempString.c_str());
         pRes = pRes.substr(pos+1);
         pos = pRes.find(",");
@@ -589,32 +592,34 @@ ilmErrorTypes listLayer(t_param_struct* param_struct)
     int i=0;
     if ( param_struct->screenid != -1 )
     {
-        error = ilm_getLayerIDsOnScreen(param_struct->screenid, &layerLength,&layerIds);
-    } else {
+        error = ilm_getLayerIDsOnScreen(param_struct->screenid, &layerLength, &layerIds);
+    }
+    else
+    {
         error = ilm_getLayerIDs(&layerLength,&layerIds);
     }
     if (layerLength > 0 && error == ILM_SUCCESS) 
     { 
-        printf("List Layer Ids for screen %i\n[\n",param_struct->screenid);
+        printf("List Layer Ids for screen %i\n[\n", param_struct->screenid);
         for (i=0;i<layerLength;i++) 
         {   
             t_ilm_int surfaceLength=0;
             t_ilm_surface* surfaceIds = NULL;
             int j=0;
             printf("\tLayer : 0x%08x\n",layerIds[i]);
-            ilm_getSurfaceIDsOnLayer(layerIds[i], &surfaceLength,&surfaceIds);
+            ilm_getSurfaceIDsOnLayer(layerIds[i], &surfaceLength, &surfaceIds);
             if (surfaceLength > 0 ) 
             {    
                 for (j=0;j<surfaceLength;j++) 
                 {   
                     printf("\t\tSurface : 0x%08x\n",surfaceIds[j]);
                 }
-                delete[] surfaceIds;
             }
+            delete[] surfaceIds;
         }
         printf("]\n");
-        delete [] layerIds;
     }
+    delete [] layerIds;
     return error;
 }
 
@@ -632,9 +637,9 @@ ilmErrorTypes listSurface(t_param_struct* param_struct)
         {   
             printf("\tSurface : 0x%08x\n",surfaceIds[j]);
         }
-        delete[] surfaceIds;
         printf("]\n");
     }
+    delete[] surfaceIds;
     return error;
 }
 

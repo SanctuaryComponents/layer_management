@@ -2046,6 +2046,9 @@ DBusHandlerResult DBUSCommunicator::delegateMessage(DBusConnection* conn, DBusMe
     {
         result = DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
+
+    free(owner);
+
     return result;
 }
 
