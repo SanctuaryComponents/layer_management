@@ -46,7 +46,7 @@ int main (int argc, const char * argv[])
     IntArgument height("height", DEFAULT_HEIGHT, argc, argv);
     IntArgument posx("posx", DEFAULT_POS_X, argc, argv);
     IntArgument posy("posy", DEFAULT_POS_Y, argc, argv);
-    FloatArgument opacity("opacity", DEFAULT_FPS, argc, argv);
+    FloatArgument opacity("opacity", DEFAULT_OPACITY, argc, argv);
     BoolArgument nosky("nosky", DEFAULT_NOSKY, argc, argv);
     BoolArgument help("help", DEFAULT_HELP, argc, argv);
     
