@@ -118,7 +118,7 @@ protected:
     void Redraw();
     void shutdownCompositor();
     Surface* getSurfaceFromNativeSurface(struct native_surface* nativeSurface);
-    void checkForNewSurface();
+    void checkForNewSurfaceNativeContent();
     void calculateFps();
     void calculateSurfaceFps(Surface *currentSurface, float time) ;
     void printDebug();
