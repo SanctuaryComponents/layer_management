@@ -294,7 +294,6 @@ void WaylandBaseWindowSystem::calculateFps()
 
 void WaylandBaseWindowSystem::CheckRedrawAllLayers()
 {
-    graphicSystem->activateGraphicContext();
     std::list<Layer*> layers = m_pScene->getCurrentRenderOrder();
     for(std::list<Layer*>::const_iterator current = layers.begin(); current != layers.end(); current++)
     {
@@ -303,7 +302,6 @@ void WaylandBaseWindowSystem::CheckRedrawAllLayers()
         graphicSystem->checkRenderLayer();
         graphicSystem->endLayer();
     }
-    graphicSystem->releaseGraphicContext();
 }
 
 void WaylandBaseWindowSystem::RedrawAllLayers()
@@ -396,24 +394,41 @@ void WaylandBaseWindowSystem::Screenshot()
 {
     /*LOG_INFO("WaylandBaseWindowSystem","Locking List");*/
     m_pScene->lockScene();
-    graphicSystem->clearBackground();
     graphicSystem->activateGraphicContext();
+    graphicSystem->clearBackground();
 
-    if (m_takeScreenshot==ScreenshotOfDisplay){
-    LOG_DEBUG("WaylandBaseWindowSystem", "Taking screenshot");
-        RedrawAllLayers();
-    }else if(m_takeScreenshot==ScreenshotOfLayer){
+    if (m_takeScreenshot==ScreenshotOfDisplay)
+    {
+        LOG_DEBUG("WaylandBaseWindowSystem", "Taking screenshot");
+        std::list<Layer*> layers = m_pScene->getCurrentRenderOrder();
+
+        for(std::list<Layer*>::const_iterator current = layers.begin(); current != layers.end(); current++)
+        {
+            if ((*current)->getLayerType() != Hardware)
+            {
+                graphicSystem->beginLayer(*current);
+                graphicSystem->renderSWLayer();
+                graphicSystem->endLayer();
+            }
+        }
+    }
+    else if(m_takeScreenshot==ScreenshotOfLayer)
+    {
         LOG_DEBUG("WaylandBaseWindowSystem", "Taking screenshot of layer");
         Layer* currentLayer = m_pScene->getLayer(m_screenShotLayerID);
+
         if (currentLayer!=NULL){
             graphicSystem->beginLayer(currentLayer);
             graphicSystem->renderSWLayer();
             graphicSystem->endLayer();
         }
-    }else if(m_takeScreenshot==ScreenshotOfSurface){
+    }
+    else if(m_takeScreenshot==ScreenshotOfSurface)
+    {
         LOG_DEBUG("WaylandBaseWindowSystem", "Taking screenshot of surface");
         Layer* currentLayer = m_pScene->getLayer(m_screenShotLayerID);
         Surface* currentSurface = m_pScene->getSurface(m_screenShotSurfaceID);
+
         if (currentLayer!=NULL && currentSurface!=NULL){
             graphicSystem->beginLayer(currentLayer);
             graphicSystem->renderSurface(currentSurface);

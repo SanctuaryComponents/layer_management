@@ -589,7 +589,6 @@ void X11WindowSystem::calculateFps()
 
 void X11WindowSystem::CheckRedrawAllLayers()
 {
-    graphicSystem->activateGraphicContext();
     std::list<Layer*> layers = m_pScene->getCurrentRenderOrder();
     for(std::list<Layer*>::const_iterator current = layers.begin(); current != layers.end(); current++)
     {
@@ -598,7 +597,6 @@ void X11WindowSystem::CheckRedrawAllLayers()
         graphicSystem->checkRenderLayer();
         graphicSystem->endLayer();
     }
-    graphicSystem->releaseGraphicContext();
 }
 
 void X11WindowSystem::RedrawAllLayers()
@@ -674,23 +672,40 @@ void X11WindowSystem::Screenshot()
 {
     /*LOG_INFO("X11WindowSystem","Locking List");*/
     m_pScene->lockScene();
-    graphicSystem->clearBackground();
     graphicSystem->activateGraphicContext();
-    if (takeScreenshot==ScreenshotOfDisplay){
-    LOG_DEBUG("X11WindowSystem", "Taking screenshot");
-        RedrawAllLayers();
-    }else if(takeScreenshot==ScreenshotOfLayer){
+    graphicSystem->clearBackground();
+    if (takeScreenshot==ScreenshotOfDisplay)
+    {
+        LOG_DEBUG("X11WindowSystem", "Taking screenshot");
+        std::list<Layer*> layers = m_pScene->getCurrentRenderOrder();
+
+        for(std::list<Layer*>::const_iterator current = layers.begin(); current != layers.end(); current++)
+        {
+            if ((*current)->getLayerType() != Hardware)
+            {
+                graphicSystem->beginLayer(*current);
+                graphicSystem->renderSWLayer();
+                graphicSystem->endLayer();
+            }
+        }
+    }
+    else if(takeScreenshot==ScreenshotOfLayer)
+    {
         LOG_DEBUG("X11WindowSystem", "Taking screenshot of layer");
         Layer* currentLayer = m_pScene->getLayer(screenShotLayerID);
+
         if (currentLayer!=NULL){
             graphicSystem->beginLayer(currentLayer);
             graphicSystem->renderSWLayer();
             graphicSystem->endLayer();
         }
-    }else if(takeScreenshot==ScreenshotOfSurface){
+    }
+    else if(takeScreenshot==ScreenshotOfSurface)
+    {
         LOG_DEBUG("X11WindowSystem", "Taking screenshot of surface");
         Layer* currentLayer = m_pScene->getLayer(screenShotLayerID);
         Surface* currentSurface = m_pScene->getSurface(screenShotSurfaceID);
+
         if (currentLayer!=NULL && currentSurface!=NULL){
             graphicSystem->beginLayer(currentLayer);
             graphicSystem->renderSurface(currentSurface);
