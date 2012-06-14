@@ -310,15 +310,16 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
     glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
     applyLayerMatrix(layerMatrix);
     // update all common uniforms, scale values to display size
+    // offsets are generated w.r.t lower left corner (following GL conventions)
     uniforms.x = targetSurfaceDestination.x / m_displayWidth;
-    uniforms.y = targetSurfaceDestination.y / m_displayHeight;;
+    uniforms.y = 1.0f - (targetSurfaceDestination.y + targetSurfaceDestination.height) / m_displayHeight;;
     uniforms.width = targetSurfaceDestination.width / m_displayWidth;
     uniforms.height = targetSurfaceDestination.height / m_displayHeight;
     uniforms.opacity = (surface)->getOpacity() * m_currentLayer->getOpacity();
     uniforms.texRange[0] = (textureCoordinates[1]-textureCoordinates[0]);
     uniforms.texRange[1] = (textureCoordinates[3]-textureCoordinates[2]);
     uniforms.texOffset[0] = textureCoordinates[0];
-    uniforms.texOffset[1] = -textureCoordinates[2];
+    uniforms.texOffset[1] = textureCoordinates[2];
     uniforms.texUnit = 0;
     uniforms.matrix = &layerMatrix.f[0];
 

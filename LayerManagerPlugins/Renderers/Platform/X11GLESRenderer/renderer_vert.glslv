@@ -23,7 +23,7 @@ attribute highp vec2 aTexCoords;
 
 uniform mediump mat4 uMatrix;
 // normalized window position
-// (0, 0 is upper left,  1, 1 is lower right)
+// (0, 0 is lower left,  1, 1 is upper right)
 uniform mediump float uX;
 uniform mediump float uY;
 
@@ -42,13 +42,18 @@ varying mediump vec2 vTexout;
 
 void main()
 {
-	// Get the size correct. Multiply by 2 because -1 to +1 is mapped to 
-	// the viewport
-	highp vec4 position;
-	position.xy = 2.0 * aPosition.xy * vec2( uWidth, uHeight);  			// rechte seite des fensters: volle breite sonst 0
-	position.xy += vec2(uX * 2.0 - 1.0, 1.0 - ((uY + uHeight)* 2.0)); 		// linke seite des fensters                 
-	position.zw = vec2(0.0, 1.0);
-	
-	gl_Position = uMatrix*position;
-	vTexout = vec2(uTexOffset.x + uTexRange.x * aTexCoords.x,1.0-(uTexOffset.y + aTexCoords.y*uTexRange.y+(1.0-uTexRange.y)));
+    highp vec4 position;
+
+    // Apply offset and range
+    position.xy = vec2(uX + uWidth * aPosition.x,  uY + uHeight * aPosition.y);
+
+    // Convert from [0, 1] to [-1, 1]
+    position.xy = 2.0 * position.xy - 1.0;
+
+    position.zw = vec2(0.0, 1.0);
+
+    gl_Position = uMatrix * position;
+
+    // Invert t coordinates as textures provided by window systems are stored top-down instead of the GL convention of bottom-up
+    vTexout = vec2(uTexOffset.x + uTexRange.x * aTexCoords.x, uTexOffset.y + uTexRange.y * (1.0 - aTexCoords.y));
 }
