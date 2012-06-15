@@ -1,6 +1,6 @@
 ############################################################################
 # 
-# Copyright 2010, 2011 BMW Car IT GmbH
+# Copyright 2010-2012 BMW Car IT GmbH
 # 
 # 
 # Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -19,26 +19,50 @@
 
 cmake_minimum_required (VERSION 2.6)
 
-include_directories ("include")
+find_package(Threads)
 
-add_library(ilmClient SHARED src/ilm_client_priv.c src/ilm_client.c)
+include_directories(
+    "include"
+    "${CMAKE_SOURCE_DIR}/config/include"
+    "${CMAKE_SOURCE_DIR}/LayerManagerPlugins/IpcModules/IpcModuleLoader/include"
+    "${CMAKE_SOURCE_DIR}/LayerManagerService/include"
+)
 
-find_package(DBUS REQUIRED)
-include_directories(${DBUS_INCLUDE_DIR})
-include_directories(${DBUS_ARCH_INCLUDE_DIR})
+add_library(ilmClient SHARED
+    src/generic_ilm_client.c
+)
 
-set(LIBS ${LIBS} ${DBUS_LIBRARY})
+add_dependencies(ilmClient
+    IpcModuleLoader
+)
+
+set(LIBS
+    ${LIBS}
+    IpcModuleLoader
+    ${CMAKE_THREAD_LIBS_INIT}
+)
+
 target_link_libraries(ilmClient ${LIBS})
 
-install (TARGETS ilmClient LIBRARY DESTINATION lib)
-install (FILES include/ilm_client.h include/ilm_types.h include/ilm_client_platform.h DESTINATION include/ilm)
+install (
+    TARGETS             ilmClient
+    LIBRARY DESTINATION lib
+)
+
+install (
+    FILES       include/ilm_client.h
+                include/ilm_types.h
+                include/ilm_client_platform.h
+    DESTINATION include/ilm
+)
 
 if (WITH_TESTS)
-enable_testing()
 
-add_executable(ilmClient_Test tests/IlmCommandTest.cpp)
-target_link_libraries(ilmClient_Test ilmClient ${LIBS} gtest)
-
-add_test(ilmClient ilmClient_Test )
+    enable_testing()
+    
+    add_executable(ilmClient_Test tests/IlmCommandTest.cpp)
+    target_link_libraries(ilmClient_Test ilmClient ${LIBS} gtest)
+    
+    add_test(ilmClient ilmClient_Test )
 
 endif(WITH_TESTS) 

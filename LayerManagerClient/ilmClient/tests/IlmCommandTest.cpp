@@ -52,28 +52,28 @@ public:
     }
 
     void removeAll(){
-        t_ilm_layer* layers;
+        t_ilm_layer* layers = NULL;
         t_ilm_int numLayer=0;
         ilm_getLayerIDs(&numLayer, &layers);
         for (t_ilm_int i=0; i<numLayer; i++ ){
             ilm_layerRemove(layers[i]);
         };
 
-        t_ilm_surface* surfaces;
+        t_ilm_surface* surfaces = NULL;
         t_ilm_int numSurfaces=0;
         ilm_getSurfaceIDs(&numSurfaces, &surfaces);
         for (t_ilm_int i=0; i<numSurfaces; i++ ){
             ilm_surfaceRemove(surfaces[i]);
         };
 
-        t_ilm_layergroup* layergroups;
+        t_ilm_layergroup* layergroups = NULL;
         t_ilm_int numLayergroup=0;
         ilm_getLayerGroupIDs(&numLayergroup, &layergroups);
         for (t_ilm_int i=0; i<numLayergroup; i++ ){
             ilm_layergroupRemove(layergroups[i]);
         };
 
-        t_ilm_surfacegroup* surfacegroups;
+        t_ilm_surfacegroup* surfacegroups = NULL;
         t_ilm_int numSurfacegroup=0;
         ilm_getSurfaceGroupIDs(&numSurfacegroup, &surfacegroups);
         for (t_ilm_int i=0; i<numSurfacegroup; i++ ){
