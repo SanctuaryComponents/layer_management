@@ -194,4 +194,15 @@ struct ilmLayerProperties
     t_ilm_bool visibility;        /*!< visibility value of the layer */
 };
 
+
+enum IpcMessageType
+{
+    IpcMessageTypeNone = 0,
+    IpcMessageTypeCommand,
+    //IpcMessageTypeConnect,
+    IpcMessageTypeDisconnect,
+    IpcMessageTypeNotification,
+    IpcMessageTypeError
+};
+
 #endif // _ILM_TYPES_H_

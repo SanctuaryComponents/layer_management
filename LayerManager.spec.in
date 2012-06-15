@@ -51,6 +51,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/layermanager/libLayerScene.so
 %dir %_libdir/layermanager/communicator
 %{_libdir}/layermanager/communicator/libDBUSCommunicator.so
+%{_libdir}/layermanager/ipcmodules/*.so
 %{_libdir}/libLayerManagerCommands.so
 %{_libdir}/libLayerManagerGraphicGLESv2.so
 %dir %_libdir/layermanager/renderer
@@ -77,6 +78,8 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Mon Jun 11 2012 Timo Lotterbach <Timo.Lotterbach@bmw-carit.de> 0.9.6
+- added IpcModules
 * Fri Aug 26 2011 Michael Schuldt <Michael.Schuldt@bmw-carit.de> 0.9.1
 - Missing install target for libLayerManagerGraphicGLESv2.so added
 - Missing install target for LayerManagerService.conf added

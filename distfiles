@@ -6,6 +6,7 @@ LayerManagerCommands/.*
 LayerManagerService/.*
 LayerManagerPlugins/Communicators/DBUSCommunicator/.*
 LayerManagerPlugins/Renderers/.*
+LayerManagerPlugins/IpcModules/.*
 config/.*
 cmake/.*
 configure

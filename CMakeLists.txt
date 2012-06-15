@@ -1,6 +1,6 @@
 ############################################################################
 # 
-# Copyright 2010, 2011 BMW Car IT GmbH  
+# Copyright 2010-2012 BMW Car IT GmbH  
 # Copyright (C) 2011 DENSO CORPORATION and Robert Bosch Car Multimedia Gmbh
 # 
 # 
@@ -104,6 +104,7 @@ include_directories ("${PROJECT_SOURCE_DIR}/3rdParty/")
 
 add_subdirectory (3rdParty)
 add_subdirectory (LayerManagerPlugins/Communicators/DBUSCommunicator)
+add_subdirectory (LayerManagerPlugins/IpcModules)
 add_subdirectory (LayerManagerClient/ilmClient)
 add_subdirectory (LayerManagerCommands)
 add_subdirectory (LayerManagerService)
