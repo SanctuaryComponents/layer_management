@@ -566,6 +566,10 @@ void GenericCommunicator::GetPropertiesOfSurface()
         m_ipcModule.appendUint(orientation);
         m_ipcModule.appendBool(surface->getVisibility());
         m_ipcModule.appendUint(surface->frameCounter);
+        m_ipcModule.appendUint(surface->drawCounter);
+        m_ipcModule.appendUint(surface->updateCounter);
+        m_ipcModule.appendUint(surface->getPixelFormat());
+        m_ipcModule.appendUint(surface->getNativeContent());
         m_ipcModule.sendMessage();
     }
     else
@@ -600,6 +604,7 @@ void GenericCommunicator::GetPropertiesOfLayer()
         m_ipcModule.appendUint(dest.height);
         m_ipcModule.appendUint(orientation);
         m_ipcModule.appendBool(layer->getVisibility());
+        m_ipcModule.appendUint(layer->getLayerType());
         m_ipcModule.sendMessage();
     }
     else

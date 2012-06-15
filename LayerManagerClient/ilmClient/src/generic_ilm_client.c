@@ -109,7 +109,11 @@ ilmErrorTypes ilm_getPropertiesOfSurface(t_ilm_uint surfaceID, struct ilmSurface
         && gIpcModule.getUint(&pSurfaceProperties->destHeight)
         && gIpcModule.getUint(&pSurfaceProperties->orientation)
         && gIpcModule.getBool(&pSurfaceProperties->visibility)
-        && gIpcModule.getUint(&pSurfaceProperties->frameCounter))
+        && gIpcModule.getUint(&pSurfaceProperties->frameCounter)
+        && gIpcModule.getUint(&pSurfaceProperties->drawCounter)
+        && gIpcModule.getUint(&pSurfaceProperties->updateCounter)
+        && gIpcModule.getUint(&pSurfaceProperties->pixelformat)
+        && gIpcModule.getUint(&pSurfaceProperties->nativeSurface))
     {
         returnValue = ILM_SUCCESS;
     }
@@ -140,7 +144,8 @@ ilmErrorTypes ilm_getPropertiesOfLayer(t_ilm_uint layerID, struct ilmLayerProper
         && gIpcModule.getUint(&pLayerProperties->destWidth)
         && gIpcModule.getUint(&pLayerProperties->destHeight)
         && gIpcModule.getUint(&pLayerProperties->orientation)
-        && gIpcModule.getBool(&pLayerProperties->visibility))
+        && gIpcModule.getBool(&pLayerProperties->visibility)
+        && gIpcModule.getUint(&pLayerProperties->type))
     {
         returnValue = ILM_SUCCESS;
     }
