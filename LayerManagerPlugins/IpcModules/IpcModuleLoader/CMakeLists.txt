@@ -19,5 +19,35 @@
 
 cmake_minimum_required (VERSION 2.6)
 
-add_subdirectory(IpcModuleLoader)
-add_subdirectory(DbusIpcModule)
+include_directories(
+    "include"
+    "${CMAKE_SOURCE_DIR}/LayerManagerClient/ilmClient/include"
+    "${CMAKE_SOURCE_DIR}/LayerManagerPlugins/IpcModules/IpcModuleLoader/include"
+)
+
+add_library(IpcModuleLoader SHARED
+    src/IpcModuleLoader.c
+)
+
+set(LIBS
+    dl
+    ${LIBS}
+)
+target_link_libraries(IpcModuleLoader ${LIBS})
+
+install (
+    TARGETS             IpcModuleLoader
+    LIBRARY DESTINATION lib
+)
+         
+install (
+    FILES       include/IpcModule.h
+    DESTINATION include/ilm
+)
+
+if (WITH_TESTS)
+#    enable_testing()
+#    add_executable(IpcModuleLoader_Test tests/IlmCommandTest.cpp)
+#    target_link_libraries(IpcModuleLoader_Test IpcModuleLoader ${LIBS} gtest)
+#    add_test(IpcModuleLoader IpcModuleLoader_Test )
+endif(WITH_TESTS) 
