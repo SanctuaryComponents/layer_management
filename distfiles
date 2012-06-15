@@ -5,6 +5,7 @@ LayerManagerUtils/.*
 LayerManagerCommands/.*
 LayerManagerService/.*
 LayerManagerPlugins/Communicators/DBUSCommunicator/.*
+LayerManagerPlugins/Communicators/GenericCommunicator/.*
 LayerManagerPlugins/Renderers/.*
 LayerManagerPlugins/IpcModules/.*
 config/.*

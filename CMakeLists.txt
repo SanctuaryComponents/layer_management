@@ -103,6 +103,7 @@ add_subdirectory(config)
 include_directories ("${PROJECT_SOURCE_DIR}/3rdParty/")
 
 add_subdirectory (3rdParty)
+add_subdirectory (LayerManagerPlugins/Communicators/GenericCommunicator)
 add_subdirectory (LayerManagerPlugins/Communicators/DBUSCommunicator)
 add_subdirectory (LayerManagerPlugins/IpcModules)
 add_subdirectory (LayerManagerClient/ilmClient)
