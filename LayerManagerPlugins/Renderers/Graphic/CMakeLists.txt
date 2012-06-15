@@ -1,6 +1,6 @@
 ############################################################################
 # 
-# Copyright 2010, 2011 BMW Car IT GmbH 
+# Copyright 2010-2012 BMW Car IT GmbH 
 # Copyright (C) 2011 DENSO CORPORATION and Robert Bosch Car Multimedia Gmbh
 # 
 # 
@@ -29,9 +29,7 @@ include_directories(
     "../Base/include"
     "${PROJECT_SOURCE_DIR}/config"
     "${PROJECT_SOURCE_DIR}/LayerManagerService/include"
-    "${PROJECT_SOURCE_DIR}/LayerManagerService/bin"
     "${PROJECT_SOURCE_DIR}/LayerManagerUtils/include"
-    "${PROJECT_SOURCE_DIR}/LayerManagerUtils/bin"
 )
 
 #===========================================================================

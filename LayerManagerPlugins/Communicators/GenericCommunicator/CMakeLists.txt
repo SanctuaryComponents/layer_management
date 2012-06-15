@@ -27,9 +27,7 @@ include_directories(
     "${PROJECT_SOURCE_DIR}/LayerManagerService/include"
     "${PROJECT_SOURCE_DIR}/LayerManagerUtils/include"
     "${PROJECT_SOURCE_DIR}/LayerManagerCommands/include"
-    "${PROJECT_SOURCE_DIR}/LayerManagerPlugins/Communicators/GenericCommunicatorClient/include"
     "${PROJECT_SOURCE_DIR}/LayerManagerPlugins/IpcModules/IpcModuleLoader/include"
-    "${PROJECT_SOURCE_DIR}/LayerManagerPlugins/IpcModules/DBUSIpcModule/include"
 )
 
 set(LIBS

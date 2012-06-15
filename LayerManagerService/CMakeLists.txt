@@ -1,6 +1,6 @@
 ############################################################################
 # 
-# Copyright 2010, 2011 BMW Car IT GmbH
+# Copyright 2010-2012 BMW Car IT GmbH
 # 
 # 
 # Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -29,9 +29,6 @@ include_directories ("include")
 include_directories ("${PROJECT_SOURCE_DIR}/config")
 include_directories ("${PROJECT_SOURCE_DIR}/LayerManagerUtils/include")
 include_directories ("${PROJECT_SOURCE_DIR}/LayerManagerCommands/include")
-
-link_directories ("${PROJECT_SOURCE_DIR}/LayerManagerUtils/bin")
-link_directories ("${PROJECT_SOURCE_DIR}/LayerManagerCommands")
 
 file(GLOB LM_SOURCES src/*.cpp src/shader/*.cpp)
 file(GLOB LM_INCLUDES include/*.h)

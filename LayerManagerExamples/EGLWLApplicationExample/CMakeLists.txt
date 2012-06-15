@@ -1,6 +1,6 @@
 ############################################################################
 # 
-# Copyright 2010, 2011 BMW Car IT GmbH 
+# Copyright 2010-2012 BMW Car IT GmbH 
 # Copyright (C) 2011 DENSO CORPORATION and Robert Bosch Car Multimedia Gmbh
 # 
 # 
@@ -24,8 +24,6 @@ include_directories ("include")
 include_directories ("../../LayerManagerClient/ilmClient/include")
 include_directories ("../LayerSceneDescriptionExample/include")
 include_directories ("../../LayerManagerUtils/include")
-
-link_directories ("${PROJECT_SOURCE_DIR}/LayerManagerUtils/bin")
 
 add_executable(EGLWLApplicationExample src/egl_helper.cpp src/eglWL_application.cpp src/gles2application.cpp src/WaylandServerinfoProtocol.cpp)
 

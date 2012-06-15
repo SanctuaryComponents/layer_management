@@ -1,6 +1,6 @@
 ############################################################################
 # 
-# Copyright 2010, 2011 BMW Car IT GmbH 
+# Copyright 2010-2012 BMW Car IT GmbH 
 # Copyright (C) 2011 DENSO CORPORATION and Robert Bosch Car Multimedia Gmbh
 # 
 # 
@@ -33,10 +33,6 @@ include_directories(
     "../../LayerManagerClient/ilmClient/include"
     "../LayerSceneDescriptionExample/include"
     "../../LayerManagerUtils/include"
-)
-
-link_directories(
-    "${PROJECT_SOURCE_DIR}/LayerManagerUtils/bin"
 )
 
 set (HEADER_FILES

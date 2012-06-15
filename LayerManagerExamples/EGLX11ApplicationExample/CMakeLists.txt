@@ -1,6 +1,6 @@
 ############################################################################
 # 
-# Copyright 2010, 2011 BMW Car IT GmbH 
+# Copyright 2010-2012 BMW Car IT GmbH 
 # 
 # 
 # Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -23,8 +23,6 @@ include_directories ("include")
 include_directories ("../../LayerManagerClient/ilmClient/include")
 include_directories ("../LayerSceneDescriptionExample/include")
 include_directories ("../../LayerManagerUtils/include")
-
-link_directories ("${PROJECT_SOURCE_DIR}/LayerManagerUtils/bin")
 
 add_executable(EGLX11ApplicationExample src/egl_helper.cpp src/eglX11_application.cpp src/gles2application.cpp)
 

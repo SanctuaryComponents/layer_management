@@ -1,6 +1,6 @@
 ############################################################################
 # 
-# Copyright 2010, 2011 BMW Car IT GmbH 
+# Copyright 2010-2012 BMW Car IT GmbH 
 # 
 # 
 # Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -31,10 +31,6 @@ include_directories(
     "../../LayerManagerClient/ilmClient/include"
     "../LayerSceneDescriptionExample/include"
     "../../LayerManagerUtils/include"
-)
-
-link_directories(
-    "${PROJECT_SOURCE_DIR}/LayerManagerUtils/bin"
 )
 
 set (HEADER_FILES
