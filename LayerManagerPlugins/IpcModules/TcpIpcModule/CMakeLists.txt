@@ -19,22 +19,34 @@
 
 cmake_minimum_required (VERSION 2.6)
 
-add_subdirectory(IpcModuleLoader)
+project (TcpIpcModule)
 
-#==============================================================================
-# TCP Socket IPC MODULE
-#==============================================================================
-option (WITH_IPC_MODULE_TCP "Build with TCP Ipc Module" OFF)
+include_directories(
+    include
+    ${CMAKE_SOURCE_DIR}/LayerManagerClient/ilmClient/include
+    ${CMAKE_SOURCE_DIR}/LayerManagerPlugins/IpcModules/IpcModuleLoader/include
+)
 
-if (WITH_IPC_MODULE_TCP)
-    add_subdirectory(TcpIpcModule)
-endif (WITH_IPC_MODULE_TCP)
+add_library(${PROJECT_NAME} SHARED
+    src/append.c
+    src/get.c
+    src/initialization.c
+    src/message.c
+)
 
-#==============================================================================
-# DBUS IPC MODULE
-#==============================================================================
-option (WITH_IPC_MODULE_DBUS "Build with D-Bus Ipc Module" ON)
+set(LIBS
+    ${LIBS}
+)
 
-if (WITH_IPC_MODULE_DBUS)
-    add_subdirectory(DbusIpcModule)
-endif (WITH_IPC_MODULE_DBUS)
+target_link_libraries(${PROJECT_NAME} ${LIBS})
+
+install (TARGETS             ${PROJECT_NAME}
+         LIBRARY DESTINATION lib/layermanager/ipcmodules
+)
+
+if (WITH_TESTS)
+    add_executable(${PROJECT_NAME}_Test tests/LoopbackTest.cpp)
+    target_link_libraries(${PROJECT_NAME}_Test ${LIBS} IpcModuleLoader gtest gmock pthread)
+    enable_testing()
+    add_test(${PROJECT_NAME} ${PROJECT_NAME}_Test)
+endif(WITH_TESTS) 
