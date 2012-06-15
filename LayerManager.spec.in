@@ -72,6 +72,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/EGLX11ApplicationExample
 %{_bindir}/LayerManagerClientExample
 %{_bindir}/LayerManagerToolBox
+%{_bindir}/LayerManagerControl
 %{_bindir}/EGLX11MockNavigation
 
 /etc/dbus-1/session.d/LayerManagerService.conf
