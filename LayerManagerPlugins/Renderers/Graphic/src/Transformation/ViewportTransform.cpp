@@ -38,86 +38,64 @@ bool ViewportTransform::isFullyCropped(const Rectangle& surfaceDestination, cons
 
 void ViewportTransform::applyLayerSource(const Rectangle& layerSource, Rectangle& surfaceSource, Rectangle& surfaceDestination)
 {
-    Rectangle regionBeforeTransformation = surfaceDestination;
-    uint sourceRegionWidthBeforeTransformation = surfaceSource.width;
+    int cropamount = 0;
+    float surfaceInverseScaleX = (float)surfaceSource.width / surfaceDestination.width;
+    float surfaceInverseScaleY = (float)surfaceSource.height / surfaceDestination.height;
 
     // X
 
-    // crop surface from lower side if it is outside the cropregion of the layer
-    if (regionBeforeTransformation.x < layerSource.x)
-    { // partly outside lower end
-        // crop a part of the destination region
-        surfaceDestination.width -= layerSource.x-regionBeforeTransformation.x;
-
-        if ( surfaceDestination.x < layerSource.x )
-            surfaceDestination.x = 0;
-        else
-            surfaceDestination.x -= layerSource.x;
-
-        // crop a proportional part of the source region
-        surfaceSource.x += (float)(layerSource.x-regionBeforeTransformation.x)/regionBeforeTransformation.width * sourceRegionWidthBeforeTransformation;
-        surfaceSource.width -= (float)(layerSource.x-regionBeforeTransformation.x)/regionBeforeTransformation.width * sourceRegionWidthBeforeTransformation;
-    }
-    // crop surface from higher side if some part of surface lies beyond the cropregion of the layer
-    if(regionBeforeTransformation.x+regionBeforeTransformation.width > layerSource.x+layerSource.width)
-    { // partially outside higher end
-        // crop a part of the surfaces geometry that extended beyond layer cropregion
-        uint cropamount = regionBeforeTransformation.x+regionBeforeTransformation.width-layerSource.x-layerSource.width;
+    // Crop from left
+    cropamount = layerSource.x - surfaceDestination.x;
+    if (cropamount > 0)
+    {
+        surfaceDestination.x = 0;
         surfaceDestination.width -= cropamount;
 
-        if (surfaceDestination.x < layerSource.x )
-            surfaceDestination.x = 0;
-        else
-            surfaceDestination.x -= layerSource.x;
-
-        surfaceSource.width -= (float)(cropamount)/(regionBeforeTransformation.width)*sourceRegionWidthBeforeTransformation;
+        // crop a proportional part of the source region
+        surfaceSource.x += (float)cropamount * surfaceInverseScaleX;
+        surfaceSource.width -= (float)cropamount * surfaceInverseScaleX;
     }
-    // if surface is completely within the cropregion then just move it by the amount cropped from the lower end of the layer
-    if (regionBeforeTransformation.x >= layerSource.x && regionBeforeTransformation.x+regionBeforeTransformation.width <= layerSource.x+layerSource.width)
+    else
     {
-        if (surfaceDestination.x < layerSource.x )
-            surfaceDestination.x = 0;
-        else
-            surfaceDestination.x -= layerSource.x;
+        surfaceDestination.x -= layerSource.x;
     }
 
-    // y
-
-    // crop surface from lower side if it is outside the cropregion of the layer
-    if (regionBeforeTransformation.y < layerSource.y)
-    { // partly outside lower end
-        // crop a part of the destination region
-        surfaceDestination.height -= layerSource.y-regionBeforeTransformation.y;
-
-        if ( surfaceDestination.y < layerSource.y )
-            surfaceDestination.y = 0;
-        else
-            surfaceDestination.y -= layerSource.y;
+    // Crop from right
+    cropamount = surfaceDestination.x + surfaceDestination.width - layerSource.width;
+    if (cropamount > 0)
+    {
+        surfaceDestination.width -= cropamount;
 
         // crop a proportional part of the source region
-        surfaceSource.y += (float)(layerSource.y-regionBeforeTransformation.y)/regionBeforeTransformation.height * surfaceSource.height;
-        surfaceSource.height -= (float)(layerSource.y-regionBeforeTransformation.y)/regionBeforeTransformation.height * surfaceSource.height;
+        surfaceSource.width -= (float)cropamount * surfaceInverseScaleX;
     }
-    // crop surface from higher side if some part of surface lies beyond the cropregion of the layer
-    if(regionBeforeTransformation.y+regionBeforeTransformation.height > layerSource.y+layerSource.height)
-    { // partially outside higher end
-        // crop a part of the surfaces geometry that eytended beyond layer cropregion
-        surfaceDestination.height -= regionBeforeTransformation.y+regionBeforeTransformation.height-layerSource.y-layerSource.height;
 
-        if (surfaceDestination.y < layerSource.y )
-            surfaceDestination.y = 0;
-        else
-            surfaceDestination.y -= layerSource.y;
+    // Y
 
-        surfaceSource.height -= regionBeforeTransformation.y+regionBeforeTransformation.height-layerSource.y-layerSource.height;
-    }
-    // if surface is completely within the cropregion then just move it by the amount cropped from the lower end of the layer
-    if (regionBeforeTransformation.y >= layerSource.y && regionBeforeTransformation.y+regionBeforeTransformation.height <= layerSource.y+layerSource.height)
+    // Crop from top
+    cropamount = layerSource.y - surfaceDestination.y;
+    if (cropamount > 0)
     {
-        if (surfaceDestination.y < layerSource.y )
-            surfaceDestination.y = 0;
-        else
-            surfaceDestination.y -= layerSource.y;
+        surfaceDestination.y = 0;
+        surfaceDestination.height -= cropamount;
+
+        // crop a proportional part of the source region
+        surfaceSource.y += (float)cropamount * surfaceInverseScaleY;
+        surfaceSource.height -= (float)cropamount * surfaceInverseScaleY;
+    }
+    else
+    {
+        surfaceDestination.y -= layerSource.y;
+    }
+
+    // Crop from bottom
+    cropamount = surfaceDestination.y + surfaceDestination.height - layerSource.height;
+    if (cropamount > 0)
+    {
+        surfaceDestination.height -= cropamount;
+
+        // crop a proportional part of the source region
+        surfaceSource.height -= (float)cropamount * surfaceInverseScaleY;
     }
 }
 
