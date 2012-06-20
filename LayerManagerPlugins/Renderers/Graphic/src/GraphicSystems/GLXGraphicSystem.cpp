@@ -319,30 +319,31 @@ void GLXGraphicsystem::renderSurface(Surface* currentSurface)
 {
 //    LOG_DEBUG("GLXGraphicsystem", "renderSurface " << currentSurface->getID() );
     GLenum glErrorCode = GL_NO_ERROR;
-    const Rectangle &layerDestinationRegion = (m_currentLayer)->getDestinationRegion();
-    const Rectangle &layerSourceRegion = (m_currentLayer)->getSourceRegion();
-    
-    Rectangle targetSurfaceSource = currentSurface->getSourceRegion();
-    Rectangle targetSurfaceDestination = currentSurface->getDestinationRegion();
 
     // check if surface is cropped completely, if so then skip rendering
-    if (ViewportTransform::isFullyCropped(targetSurfaceDestination, layerSourceRegion ) )
+    if (ViewportTransform::isFullyCropped(currentSurface->getDestinationRegion(), m_currentLayer->getSourceRegion() ) )
         return; // skip rendering of this surface, because it is cropped by layer source region
+
+    const FloatRectangle layerSourceRegion = m_currentLayer->getSourceRegion();
+    const FloatRectangle layerDestinationRegion = m_currentLayer->getDestinationRegion();
+
+    FloatRectangle targetSurfaceSource = currentSurface->getSourceRegion();
+    FloatRectangle targetSurfaceDestination = currentSurface->getDestinationRegion();
 
     ViewportTransform::applyLayerSource(layerSourceRegion, targetSurfaceSource, targetSurfaceDestination);
     ViewportTransform::applyLayerDestination(layerDestinationRegion, layerSourceRegion, targetSurfaceDestination);
     float textureCoordinates[4];
     ViewportTransform::transformRectangleToTextureCoordinates(targetSurfaceSource, currentSurface->OriginalSourceWidth, currentSurface->OriginalSourceHeight, textureCoordinates);
-    
+
     glPushMatrix();
-    if (false == m_binder->bindSurfaceTexture(currentSurface)) 
-    {   
-        /* skip render surface if not bind successfully */        
+    if (false == m_binder->bindSurfaceTexture(currentSurface))
+    {
+        /* skip render surface if not bind successfully */
         return;
     }
 //    glPushMatrix();
     glColor4f(1.0f,1.0f,1.0f,currentSurface->opacity*(m_currentLayer)->opacity);
-       
+
     glBegin(GL_QUADS);
 
 //    LOG_DEBUG("GLXGraphicsystem","rendersurface: src" << src.x << " " << src.y << " " << src.width << " " << src.height );

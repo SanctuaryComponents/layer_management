@@ -295,12 +295,12 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
         // use layer shader if no custom shader is assigned to this surface
         shader = layerShader;
     }
-    const Rectangle& layerDestinationRegion = (m_currentLayer)->getDestinationRegion();
-    const Rectangle& layerSourceRegion = (m_currentLayer)->getSourceRegion();
 
-    // these variables contain the current calculated values of the surface
-    Rectangle targetSurfaceSource = surface->getSourceRegion();
-    Rectangle targetSurfaceDestination = surface->getDestinationRegion();
+    const FloatRectangle layerSourceRegion = m_currentLayer->getSourceRegion();
+    const FloatRectangle layerDestinationRegion = m_currentLayer->getDestinationRegion();
+
+    FloatRectangle targetSurfaceSource = surface->getSourceRegion();
+    FloatRectangle targetSurfaceDestination = surface->getDestinationRegion();
 
     ViewportTransform::applyLayerSource(layerSourceRegion, targetSurfaceSource, targetSurfaceDestination);
     ViewportTransform::applyLayerDestination(layerDestinationRegion, layerSourceRegion, targetSurfaceDestination);
@@ -308,12 +308,12 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
     ViewportTransform::transformRectangleToTextureCoordinates(targetSurfaceSource, surface->OriginalSourceWidth, surface->OriginalSourceHeight, textureCoordinates);
 
     glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-	applyLayerMatrix(layerMatrix);
+    applyLayerMatrix(layerMatrix);
     // update all common uniforms, scale values to display size
-    uniforms.x = (float)targetSurfaceDestination.x / m_displayWidth;
-    uniforms.y = (float)targetSurfaceDestination.y / m_displayHeight;;
-    uniforms.width = (float)targetSurfaceDestination.width / m_displayWidth;
-    uniforms.height = (float)targetSurfaceDestination.height / m_displayHeight;
+    uniforms.x = targetSurfaceDestination.x / m_displayWidth;
+    uniforms.y = targetSurfaceDestination.y / m_displayHeight;;
+    uniforms.width = targetSurfaceDestination.width / m_displayWidth;
+    uniforms.height = targetSurfaceDestination.height / m_displayHeight;
     uniforms.opacity = (surface)->getOpacity() * m_currentLayer->getOpacity();
     uniforms.texRange[0] = (textureCoordinates[1]-textureCoordinates[0]);
     uniforms.texRange[1] = (textureCoordinates[3]-textureCoordinates[2]);

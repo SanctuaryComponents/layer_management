@@ -36,24 +36,24 @@ bool ViewportTransform::isFullyCropped(const Rectangle& surfaceDestination, cons
     return false;
 }
 
-void ViewportTransform::applyLayerSource(const Rectangle& layerSource, Rectangle& surfaceSource, Rectangle& surfaceDestination)
+void ViewportTransform::applyLayerSource(const FloatRectangle& layerSource, FloatRectangle& surfaceSource, FloatRectangle& surfaceDestination)
 {
-    int cropamount = 0;
-    float surfaceInverseScaleX = (float)surfaceSource.width / surfaceDestination.width;
-    float surfaceInverseScaleY = (float)surfaceSource.height / surfaceDestination.height;
+    float cropamount = 0;
+    float surfaceInverseScaleX = surfaceSource.width / surfaceDestination.width;
+    float surfaceInverseScaleY = surfaceSource.height / surfaceDestination.height;
 
     // X
 
     // Crop from left
     cropamount = layerSource.x - surfaceDestination.x;
-    if (cropamount > 0)
+    if (cropamount > 0.0f)
     {
-        surfaceDestination.x = 0;
+        surfaceDestination.x = 0.0f;
         surfaceDestination.width -= cropamount;
 
         // crop a proportional part of the source region
-        surfaceSource.x += (float)cropamount * surfaceInverseScaleX;
-        surfaceSource.width -= (float)cropamount * surfaceInverseScaleX;
+        surfaceSource.x += cropamount * surfaceInverseScaleX;
+        surfaceSource.width -= cropamount * surfaceInverseScaleX;
     }
     else
     {
@@ -62,26 +62,26 @@ void ViewportTransform::applyLayerSource(const Rectangle& layerSource, Rectangle
 
     // Crop from right
     cropamount = surfaceDestination.x + surfaceDestination.width - layerSource.width;
-    if (cropamount > 0)
+    if (cropamount > 0.0f)
     {
         surfaceDestination.width -= cropamount;
 
         // crop a proportional part of the source region
-        surfaceSource.width -= (float)cropamount * surfaceInverseScaleX;
+        surfaceSource.width -= cropamount * surfaceInverseScaleX;
     }
 
     // Y
 
     // Crop from top
     cropamount = layerSource.y - surfaceDestination.y;
-    if (cropamount > 0)
+    if (cropamount > 0.0f)
     {
-        surfaceDestination.y = 0;
+        surfaceDestination.y = 0.0f;
         surfaceDestination.height -= cropamount;
 
         // crop a proportional part of the source region
-        surfaceSource.y += (float)cropamount * surfaceInverseScaleY;
-        surfaceSource.height -= (float)cropamount * surfaceInverseScaleY;
+        surfaceSource.y += cropamount * surfaceInverseScaleY;
+        surfaceSource.height -= cropamount * surfaceInverseScaleY;
     }
     else
     {
@@ -90,53 +90,53 @@ void ViewportTransform::applyLayerSource(const Rectangle& layerSource, Rectangle
 
     // Crop from bottom
     cropamount = surfaceDestination.y + surfaceDestination.height - layerSource.height;
-    if (cropamount > 0)
+    if (cropamount > 0.0f)
     {
         surfaceDestination.height -= cropamount;
 
         // crop a proportional part of the source region
-        surfaceSource.height -= (float)cropamount * surfaceInverseScaleY;
+        surfaceSource.height -= cropamount * surfaceInverseScaleY;
     }
 }
 
-void ViewportTransform::applyLayerDestination(const Rectangle& layerDestination, const Rectangle& layerSource, Rectangle& regionToScale)
+void ViewportTransform::applyLayerDestination(const FloatRectangle& layerDestination, const FloatRectangle& layerSource, FloatRectangle& regionToScale)
 {
-    // scale position proportional to change in layer size
-    regionToScale.x *= (float)layerDestination.width/layerSource.width;
+    float scaleX = layerDestination.width / layerSource.width;
+    float scaleY = layerDestination.height / layerSource.height;
+
+    // scale position proportional to change in float*layer size
+    regionToScale.x *= scaleX;
     // scale width proportional to change in layer size
-    regionToScale.width *= (float)layerDestination.width/layerSource.width;
+    regionToScale.width *= scaleX;
     // after scaling, move surface because its position should be relative to moved layer
-    regionToScale.x+=layerDestination.x;
+    regionToScale.x += layerDestination.x;
 
     // scale position proportional to change in layer size
-    regionToScale.y *= (float)layerDestination.height/layerSource.height;
+    regionToScale.y *= scaleY;
     // scale width proportional to change in layer size
-    regionToScale.height *= (float)layerDestination.height/layerSource.height;
+    regionToScale.height *= scaleY;
     // after scaling, move surface because its position should be relative to moved layer
-    regionToScale.y+=layerDestination.y;
+    regionToScale.y += layerDestination.y;
 }
 
-void ViewportTransform::transformRectangleToTextureCoordinates(const Rectangle& rectangle, uint originalWidth, uint originalHeight, float* textureCoordinates)
+void ViewportTransform::transformRectangleToTextureCoordinates(const FloatRectangle& rectangle, const float originalWidth, const float originalHeight, float* textureCoordinates)
 {
-    float originalWidthAsFloat = originalWidth;
-    float originalHeightAsFloat = originalHeight;
+    // move texture coordinate proportional to the cropped pixels
+    float percentageCroppedFromLeftSide = rectangle.x / originalWidth;
+    textureCoordinates[0] = percentageCroppedFromLeftSide;
 
     // move texture coordinate proportional to the cropped pixels
-    float percentageCroppedFromLowerSide_U = rectangle.x/originalWidthAsFloat;
-    textureCoordinates[0] = percentageCroppedFromLowerSide_U;
-
-    // move texture coordinate proportional to the cropped pixels
-    uint newRightSide = rectangle.x+rectangle.width;
-    float percentageCroppedFromRightSide = (originalWidthAsFloat-newRightSide)/originalWidthAsFloat;
-    textureCoordinates[1] = 1.0f-percentageCroppedFromRightSide ;
+    uint newRightSide = rectangle.x + rectangle.width;
+    float percentageCroppedFromRightSide = (originalWidth - newRightSide) / originalWidth;
+    textureCoordinates[1] = 1.0f - percentageCroppedFromRightSide;
 
     // the same for Y
     // move texture coordinate proportional to the cropped pixels
-    float percentageCroppedFromTopSideV = ((float)rectangle.y/originalHeightAsFloat);
-    textureCoordinates[2] = percentageCroppedFromTopSideV;
+    float percentageCroppedFromTopSide = rectangle.y / originalHeight;
+    textureCoordinates[2] = percentageCroppedFromTopSide;
 
     // move texture coordinate proportional to the cropped pixels
-    int newBottomSide = rectangle.y+rectangle.height;
-    float percentageCroppedFromBottomSide = (float)(originalHeightAsFloat-newBottomSide)/originalHeightAsFloat;
-    textureCoordinates[3] = 1.0f-percentageCroppedFromBottomSide ;
+    int newBottomSide = rectangle.y + rectangle.height;
+    float percentageCroppedFromBottomSide = (originalHeight - newBottomSide) / originalHeight;
+    textureCoordinates[3] = 1.0f - percentageCroppedFromBottomSide;
 }

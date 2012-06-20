@@ -52,4 +52,37 @@ public:
     }
 };
 
+class FloatRectangle
+{
+public:
+    FloatRectangle()
+    : x(0.0f)
+    , y(0.0f)
+    , width(0.0f)
+    , height(0.0f)
+    {
+    }
+
+    FloatRectangle(float x, float y, float width, float height)
+    : x(x)
+    , y(y)
+    , width(width)
+    , height(height)
+    {
+    }
+
+    FloatRectangle(const Rectangle& rhs)
+    : x(rhs.x)
+    , y(rhs.y)
+    , width(rhs.width)
+    , height(rhs.height)
+    {
+    }
+
+    float x;
+    float y;
+    float width;
+    float height;
+};
+
 #endif /* _RECTANGLE_H_ */
