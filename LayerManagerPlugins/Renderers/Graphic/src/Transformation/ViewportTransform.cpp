@@ -128,12 +128,12 @@ void ViewportTransform::transformRectangleToTextureCoordinates(const FloatRectan
     // move texture coordinate proportional to the cropped pixels
     uint newRightSide = rectangle.x + rectangle.width;
     float percentageCroppedFromRightSide = (originalWidth - newRightSide) / originalWidth;
-    textureCoordinates[1] = 1.0f - percentageCroppedFromRightSide;
+    textureCoordinates[2] = 1.0f - percentageCroppedFromRightSide;
 
     // the same for Y
     // move texture coordinate proportional to the cropped pixels
     float percentageCroppedFromTopSide = rectangle.y / originalHeight;
-    textureCoordinates[2] = percentageCroppedFromTopSide;
+    textureCoordinates[1] = percentageCroppedFromTopSide;
 
     // move texture coordinate proportional to the cropped pixels
     int newBottomSide = rectangle.y + rectangle.height;

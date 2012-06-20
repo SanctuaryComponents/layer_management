@@ -316,10 +316,10 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
     uniforms.width = targetSurfaceDestination.width / m_displayWidth;
     uniforms.height = targetSurfaceDestination.height / m_displayHeight;
     uniforms.opacity = (surface)->getOpacity() * m_currentLayer->getOpacity();
-    uniforms.texRange[0] = (textureCoordinates[1]-textureCoordinates[0]);
-    uniforms.texRange[1] = (textureCoordinates[3]-textureCoordinates[2]);
+    uniforms.texRange[0] = (textureCoordinates[2]-textureCoordinates[0]);
+    uniforms.texRange[1] = (textureCoordinates[3]-textureCoordinates[1]);
     uniforms.texOffset[0] = textureCoordinates[0];
-    uniforms.texOffset[1] = textureCoordinates[2];
+    uniforms.texOffset[1] = textureCoordinates[1];
     uniforms.texUnit = 0;
     uniforms.matrix = &layerMatrix.f[0];
 

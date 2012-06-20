@@ -73,8 +73,8 @@ TEST_F(ViewportTransformTest, doLayerSRCSurfaceCroppedFromLeft){
     float* textureCoordinates = new float[4];
     ViewportTransform::transformRectangleToTextureCoordinates(targetSurfaceSrc, surfaceOriginalWidth, surfaceOriginalHeight, textureCoordinates);
     ASSERT_EQ(0.5,textureCoordinates[0]);
-    ASSERT_EQ(1.0,textureCoordinates[1]);
-    ASSERT_EQ(0.5,textureCoordinates[2]);
+    ASSERT_EQ(1.0,textureCoordinates[2]);
+    ASSERT_EQ(0.5,textureCoordinates[1]);
     ASSERT_EQ(1.0,textureCoordinates[3]);
     ASSERT_EQ(0.0, targetSurfaceDest.x);
     ASSERT_EQ(10.0, targetSurfaceDest.width);
@@ -93,8 +93,8 @@ TEST_F(ViewportTransformTest, doLayerSRCSurfaceCroppedFromRight){
     float* textureCoordinates = new float[4];
     ViewportTransform::transformRectangleToTextureCoordinates(targetSurfaceSrc, surfaceOriginalWidth, surfaceOriginalHeight, textureCoordinates);
     ASSERT_EQ(0,textureCoordinates[0]);
-    ASSERT_EQ(0.75,textureCoordinates[1]);
-    ASSERT_EQ(0,textureCoordinates[2]);
+    ASSERT_EQ(0.75,textureCoordinates[2]);
+    ASSERT_EQ(0,textureCoordinates[1]);
     ASSERT_EQ(0.75,textureCoordinates[3]);
     ASSERT_EQ(20.0, targetSurfaceDest.x);
     ASSERT_EQ(15.0, targetSurfaceDest.width);
@@ -113,8 +113,8 @@ TEST_F(ViewportTransformTest, doLayerSRCSurfaceCroppedFromBothSides){
     float* textureCoordinates = new float[4];
     ViewportTransform::transformRectangleToTextureCoordinates(targetSurfaceSrc, surfaceOriginalWidth, surfaceOriginalHeight, textureCoordinates);
     ASSERT_EQ(0.25,textureCoordinates[0]);
-    ASSERT_EQ(0.75,textureCoordinates[1]);
-    ASSERT_EQ(0.25,textureCoordinates[2]);
+    ASSERT_EQ(0.75,textureCoordinates[2]);
+    ASSERT_EQ(0.25,textureCoordinates[1]);
     ASSERT_EQ(0.75,textureCoordinates[3]);
     ASSERT_EQ(0.0, targetSurfaceDest.x);
     ASSERT_EQ(10.0, targetSurfaceDest.width);
@@ -136,8 +136,8 @@ TEST_F(ViewportTransformTest, doLayerDESTScaleUp){
     float* textureCoordinates = new float[4];
     ViewportTransform::transformRectangleToTextureCoordinates(targetSurfaceSrc, surfaceOriginalWidth, surfaceOriginalHeight, textureCoordinates);
     ASSERT_EQ(0.0,textureCoordinates[0]);
-    ASSERT_EQ(1.0,textureCoordinates[1]);
-    ASSERT_EQ(0.0,textureCoordinates[2]);
+    ASSERT_EQ(1.0,textureCoordinates[2]);
+    ASSERT_EQ(0.0,textureCoordinates[1]);
     ASSERT_EQ(1.0,textureCoordinates[3]);
     ASSERT_EQ(80.0, targetSurfaceDest.x);
     ASSERT_EQ(300.0, targetSurfaceDest.width);
@@ -157,8 +157,8 @@ TEST_F(ViewportTransformTest, doLayerDESTScaleDown){
     float* textureCoordinates = new float[4];
     ViewportTransform::transformRectangleToTextureCoordinates(targetSurfaceSrc, surfaceOriginalWidth, surfaceOriginalHeight, textureCoordinates);
     ASSERT_EQ(0.0,textureCoordinates[0]);
-    ASSERT_EQ(1.0,textureCoordinates[1]);
-    ASSERT_EQ(0.0,textureCoordinates[2]);
+    ASSERT_EQ(1.0,textureCoordinates[2]);
+    ASSERT_EQ(0.0,textureCoordinates[1]);
     ASSERT_EQ(1.0,textureCoordinates[3]);
     ASSERT_EQ(51.0, targetSurfaceDest.x);
     ASSERT_EQ(10.0, targetSurfaceDest.width);
@@ -178,8 +178,8 @@ TEST_F(ViewportTransformTest, doLayerSRCTransformationTest1){
     float* textureCoordinates = new float[4];
     ViewportTransform::transformRectangleToTextureCoordinates(targetSurfaceSrc, surfaceOriginalWidth, surfaceOriginalHeight, textureCoordinates);
     ASSERT_NEAR(0.5,textureCoordinates[0],0.01);
-    ASSERT_NEAR(1.0,textureCoordinates[1],0.01);
-    ASSERT_NEAR(0.5,textureCoordinates[2],0.01);
+    ASSERT_NEAR(1.0,textureCoordinates[2],0.01);
+    ASSERT_NEAR(0.5,textureCoordinates[1],0.01);
     ASSERT_NEAR(1.0,textureCoordinates[3],0.01);
     ASSERT_EQ(0.0, targetSurfaceDest.x);
     ASSERT_EQ(5.0, targetSurfaceDest.width);
@@ -198,8 +198,8 @@ TEST_F(ViewportTransformTest, doLayerSRCTransformationTest2){
     float* textureCoordinates = new float[4];
     ViewportTransform::transformRectangleToTextureCoordinates(targetSurfaceSrc, surfaceOriginalWidth, surfaceOriginalHeight, textureCoordinates);
     ASSERT_NEAR(0.0,textureCoordinates[0],0.01);
-    ASSERT_NEAR(1.0,textureCoordinates[1],0.01);
-    ASSERT_NEAR(0.0,textureCoordinates[2],0.01);
+    ASSERT_NEAR(1.0,textureCoordinates[2],0.01);
+    ASSERT_NEAR(0.0,textureCoordinates[1],0.01);
     ASSERT_NEAR(1.0,textureCoordinates[3],0.01);
     ASSERT_EQ(5.0, targetSurfaceDest.x);
     ASSERT_EQ(30.0, targetSurfaceDest.width);
@@ -218,8 +218,8 @@ TEST_F(ViewportTransformTest, doLayerSRCTransformationTest3){
     float* textureCoordinates = new float[4];
     ViewportTransform::transformRectangleToTextureCoordinates(targetSurfaceSrc, surfaceOriginalWidth, surfaceOriginalHeight, textureCoordinates);
     ASSERT_NEAR(0.0,textureCoordinates[0],0.01);
-    ASSERT_NEAR(0.5,textureCoordinates[1],0.01);
-    ASSERT_NEAR(0.0,textureCoordinates[2],0.01);
+    ASSERT_NEAR(0.5,textureCoordinates[2],0.01);
+    ASSERT_NEAR(0.0,textureCoordinates[1],0.01);
     ASSERT_NEAR(0.5,textureCoordinates[3],0.01);
     ASSERT_EQ(45.0, targetSurfaceDest.x);
     ASSERT_EQ(5.0, targetSurfaceDest.width);
@@ -238,8 +238,8 @@ TEST_F(ViewportTransformTest, doLayerSRCTransformationTest4){
     float* textureCoordinates = new float[4];
     ViewportTransform::transformRectangleToTextureCoordinates(targetSurfaceSrc, surfaceOriginalWidth, surfaceOriginalHeight, textureCoordinates);
     ASSERT_NEAR(0.25,textureCoordinates[0],0.01);
-    ASSERT_NEAR(0.75,textureCoordinates[1],0.01);
-    ASSERT_NEAR(0.25,textureCoordinates[2],0.01);
+    ASSERT_NEAR(0.75,textureCoordinates[2],0.01);
+    ASSERT_NEAR(0.25,textureCoordinates[1],0.01);
     ASSERT_NEAR(0.75,textureCoordinates[3],0.01);
     ASSERT_EQ(0.0, targetSurfaceDest.x);
     ASSERT_EQ(50.0, targetSurfaceDest.width);
@@ -260,8 +260,8 @@ TEST_F(ViewportTransformTest, doLayerSRCTransformationTest5){
     float* textureCoordinates = new float[4];
     ViewportTransform::transformRectangleToTextureCoordinates(targetSurfaceSrc, surfaceOriginalWidth, surfaceOriginalHeight, textureCoordinates);
     ASSERT_NEAR(0.0,textureCoordinates[0],0.01);
-    ASSERT_NEAR(1.0,textureCoordinates[1],0.01);
-    ASSERT_NEAR(0.0,textureCoordinates[2],0.01);
+    ASSERT_NEAR(1.0,textureCoordinates[2],0.01);
+    ASSERT_NEAR(0.0,textureCoordinates[1],0.01);
     ASSERT_NEAR(1.0,textureCoordinates[3],0.01);
     ASSERT_EQ(20.0, targetSurfaceDest.x);
     ASSERT_EQ(20.0, targetSurfaceDest.width);
@@ -281,8 +281,8 @@ TEST_F(ViewportTransformTest, doLayerDESTTransformationTest1){
     float* textureCoordinates = new float[4];
     ViewportTransform::transformRectangleToTextureCoordinates(targetSurfaceSrc, surfaceOriginalWidth, surfaceOriginalHeight, textureCoordinates);
     ASSERT_NEAR(0.0,textureCoordinates[0],0.01);
-    ASSERT_NEAR(1.0,textureCoordinates[1],0.01);
-    ASSERT_NEAR(0.0,textureCoordinates[2],0.01);
+    ASSERT_NEAR(1.0,textureCoordinates[2],0.01);
+    ASSERT_NEAR(0.0,textureCoordinates[1],0.01);
     ASSERT_NEAR(1.0,textureCoordinates[3],0.01);
     ASSERT_EQ(0.0, targetSurfaceDest.x);
     ASSERT_EQ(100.0, targetSurfaceDest.width);
@@ -302,8 +302,8 @@ TEST_F(ViewportTransformTest, doLayerDESTTransformationTest2){
     float* textureCoordinates = new float[4];
     ViewportTransform::transformRectangleToTextureCoordinates(targetSurfaceSrc, surfaceOriginalWidth, surfaceOriginalHeight, textureCoordinates);
     ASSERT_NEAR(0.0,textureCoordinates[0],0.01);
-    ASSERT_NEAR(1.0,textureCoordinates[1],0.01);
-    ASSERT_NEAR(0.0,textureCoordinates[2],0.01);
+    ASSERT_NEAR(1.0,textureCoordinates[2],0.01);
+    ASSERT_NEAR(0.0,textureCoordinates[1],0.01);
     ASSERT_NEAR(1.0,textureCoordinates[3],0.01);
     ASSERT_EQ(0.0, targetSurfaceDest.x);
     ASSERT_EQ(200.0, targetSurfaceDest.width);
@@ -323,11 +323,11 @@ TEST_F(ViewportTransformTest, doLayerDESTTransformationTest3){
     float* textureCoordinates = new float[4];
     ViewportTransform::transformRectangleToTextureCoordinates(targetSurfaceSrc, surfaceOriginalWidth, surfaceOriginalHeight, textureCoordinates);
     ASSERT_NEAR(0.0,textureCoordinates[0],0.01);
-    ASSERT_NEAR(1.0,textureCoordinates[1],0.01);
+    ASSERT_NEAR(1.0,textureCoordinates[2],0.01);
+    ASSERT_NEAR(0.0,textureCoordinates[1],0.01);
+    ASSERT_NEAR(1.0,textureCoordinates[3],0.01);
     ASSERT_EQ(50.0, targetSurfaceDest.x);
     ASSERT_EQ(200.0, targetSurfaceDest.width);
-    ASSERT_NEAR(0.0,textureCoordinates[2],0.01);
-    ASSERT_NEAR(1.0,textureCoordinates[3],0.01);
     ASSERT_EQ(50.0, targetSurfaceDest.y);
     ASSERT_EQ(200.0, targetSurfaceDest.height);
 }
@@ -344,11 +344,11 @@ TEST_F(ViewportTransformTest, doLayerDESTTransformationTest4){
     float* textureCoordinates = new float[4];
     ViewportTransform::transformRectangleToTextureCoordinates(targetSurfaceSrc, surfaceOriginalWidth, surfaceOriginalHeight, textureCoordinates);
     ASSERT_NEAR(0.0,textureCoordinates[0],0.01);
-    ASSERT_NEAR(1.0,textureCoordinates[1],0.01);
+    ASSERT_NEAR(1.0,textureCoordinates[2],0.01);
+    ASSERT_NEAR(0.0,textureCoordinates[1],0.01);
+    ASSERT_NEAR(1.0,textureCoordinates[3],0.01);
     ASSERT_EQ(150.0, targetSurfaceDest.x);
     ASSERT_EQ(100.0, targetSurfaceDest.width);
-    ASSERT_NEAR(0.0,textureCoordinates[2],0.01);
-    ASSERT_NEAR(1.0,textureCoordinates[3],0.01);
     ASSERT_EQ(150.0, targetSurfaceDest.y);
     ASSERT_EQ(100.0, targetSurfaceDest.height);
 }
@@ -371,8 +371,8 @@ TEST_F(ViewportTransformTest, completeExample1){
     ASSERT_EQ(30.0,targetSurfaceSrc.y);
     ASSERT_EQ(10.0,targetSurfaceSrc.height);
     ASSERT_NEAR(0.5,textureCoordinates[0],0.01);
-    ASSERT_NEAR(0.66,textureCoordinates[1],0.01);
-    ASSERT_NEAR(0.5,textureCoordinates[2],0.01);
+    ASSERT_NEAR(0.66,textureCoordinates[2],0.01);
+    ASSERT_NEAR(0.5,textureCoordinates[1],0.01);
     ASSERT_NEAR(0.66,textureCoordinates[3],0.01);
 
     ASSERT_EQ(0.0,targetSurfaceDest.x);
@@ -384,11 +384,11 @@ TEST_F(ViewportTransformTest, completeExample1){
     ViewportTransform::transformRectangleToTextureCoordinates(targetSurfaceSrc, surfaceOriginalWidth, surfaceOriginalHeight, textureCoordinates);
     ASSERT_EQ(120.0,targetSurfaceDest.width);
     ASSERT_EQ(0.0,targetSurfaceDest.x);
-    ASSERT_NEAR(0.5,textureCoordinates[0],0.01);
-    ASSERT_NEAR(0.66,textureCoordinates[1],0.01);
     ASSERT_EQ(120.0,targetSurfaceDest.height);
     ASSERT_EQ(0.0,targetSurfaceDest.y);
-    ASSERT_NEAR(0.5,textureCoordinates[2],0.01);
+    ASSERT_NEAR(0.5,textureCoordinates[0],0.01);
+    ASSERT_NEAR(0.66,textureCoordinates[2],0.01);
+    ASSERT_NEAR(0.5,textureCoordinates[1],0.01);
     ASSERT_NEAR(0.66,textureCoordinates[3],0.01);
 
 }
@@ -409,11 +409,11 @@ TEST_F(ViewportTransformTest, completeExample2){
 
     ASSERT_EQ(200.0,targetSurfaceDest.width);
     ASSERT_EQ(0.0,targetSurfaceDest.x);
-    ASSERT_NEAR(0.0,textureCoordinates[0],0.01);
-    ASSERT_NEAR(1.0,textureCoordinates[1],0.01);
     ASSERT_EQ(200.0,targetSurfaceDest.height);
     ASSERT_EQ(0.0,targetSurfaceDest.y);
-    ASSERT_NEAR(0.0,textureCoordinates[2],0.01);
+    ASSERT_NEAR(0.0,textureCoordinates[0],0.01);
+    ASSERT_NEAR(1.0,textureCoordinates[2],0.01);
+    ASSERT_NEAR(0.0,textureCoordinates[1],0.01);
     ASSERT_NEAR(1.0,textureCoordinates[3],0.01);
 }
 
@@ -433,11 +433,11 @@ TEST_F(ViewportTransformTest, completeExample3){
 
     ASSERT_EQ(200.0,targetSurfaceDest.width);
     ASSERT_EQ(0.0,targetSurfaceDest.x);
-    ASSERT_NEAR(0.5,textureCoordinates[0],0.01);
-    ASSERT_NEAR(1.0,textureCoordinates[1],0.01);
     ASSERT_EQ(200.0,targetSurfaceDest.height);
     ASSERT_EQ(0.0,targetSurfaceDest.y);
-    ASSERT_NEAR(0.5,textureCoordinates[2],0.01);
+    ASSERT_NEAR(0.5,textureCoordinates[0],0.01);
+    ASSERT_NEAR(1.0,textureCoordinates[2],0.01);
+    ASSERT_NEAR(0.5,textureCoordinates[1],0.01);
     ASSERT_NEAR(1.0,textureCoordinates[3],0.01);
 }
 
@@ -457,11 +457,11 @@ TEST_F(ViewportTransformTest, completeExample4){
 
     ASSERT_EQ(200.0,targetSurfaceDest.width);
     ASSERT_EQ(50.0,targetSurfaceDest.x);
-    ASSERT_NEAR(0.5,textureCoordinates[0],0.01);
-    ASSERT_NEAR(1.0,textureCoordinates[1],0.01);
     ASSERT_EQ(200.0,targetSurfaceDest.height);
     ASSERT_EQ(50.0,targetSurfaceDest.y);
-    ASSERT_NEAR(0.5,textureCoordinates[2],0.01);
+    ASSERT_NEAR(0.5,textureCoordinates[0],0.01);
+    ASSERT_NEAR(1.0,textureCoordinates[2],0.01);
+    ASSERT_NEAR(0.5,textureCoordinates[1],0.01);
     ASSERT_NEAR(1.0,textureCoordinates[3],0.01);
 }
 
@@ -482,11 +482,11 @@ TEST_F(ViewportTransformTest, completeExample5){
 
     ASSERT_EQ(0.0,targetSurfaceDest.x);
     ASSERT_EQ(220.0,targetSurfaceDest.width);
-    ASSERT_NEAR(0.3125,textureCoordinates[0],0.01);
-    ASSERT_NEAR(1.0,textureCoordinates[1],0.01);
     ASSERT_EQ(0.0,targetSurfaceDest.y);
     ASSERT_EQ(220.0,targetSurfaceDest.height);
-    ASSERT_NEAR(0.3125,textureCoordinates[2],0.01);
+    ASSERT_NEAR(0.3125,textureCoordinates[0],0.01);
+    ASSERT_NEAR(1.0,textureCoordinates[2],0.01);
+    ASSERT_NEAR(0.3125,textureCoordinates[1],0.01);
     ASSERT_NEAR(1.0,textureCoordinates[3],0.01);
 }
 
@@ -515,8 +515,8 @@ TEST_F(ViewportTransformTest, completeExample6){
     ASSERT_EQ(320.0,targetSurfaceSrc.height);
 
     ASSERT_NEAR(0.0,textureCoordinates[0],0.01);
-    ASSERT_NEAR(1.0,textureCoordinates[1],0.01);
-    ASSERT_NEAR(0.0,textureCoordinates[2],0.01);
+    ASSERT_NEAR(1.0,textureCoordinates[2],0.01);
+    ASSERT_NEAR(0.0,textureCoordinates[1],0.01);
     ASSERT_NEAR(1.0,textureCoordinates[3],0.01);
 }
 
@@ -546,8 +546,8 @@ TEST_F(ViewportTransformTest, completeExample7){
     float* textureCoordinates = new float[4];
     ViewportTransform::transformRectangleToTextureCoordinates(targetSurfaceSrc, surfaceOriginalWidth, surfaceOriginalHeight, textureCoordinates);
     ASSERT_NEAR(0.3125,textureCoordinates[0],0.01);
-    ASSERT_NEAR(0.5625,textureCoordinates[1],0.01);
-    ASSERT_NEAR(0.0,textureCoordinates[2],0.01);
+    ASSERT_NEAR(0.5625,textureCoordinates[2],0.01);
+    ASSERT_NEAR(0.0,textureCoordinates[1],0.01);
     ASSERT_NEAR(1.0,textureCoordinates[3],0.01);
 }
 
@@ -576,8 +576,8 @@ TEST_F(ViewportTransformTest, completeExample8){
     float* textureCoordinates = new float[4];
     ViewportTransform::transformRectangleToTextureCoordinates(targetSurfaceSrc, surfaceOriginalWidth, surfaceOriginalHeight, textureCoordinates);
     ASSERT_NEAR(0.003125,textureCoordinates[0],0.01);
-    ASSERT_NEAR(1.0,textureCoordinates[1],0.01);
-    ASSERT_NEAR(0.0,textureCoordinates[2],0.01);
+    ASSERT_NEAR(1.0,textureCoordinates[2],0.01);
+    ASSERT_NEAR(0.0,textureCoordinates[1],0.01);
     ASSERT_NEAR(1.0,textureCoordinates[3],0.01);
 }
 
@@ -602,8 +602,8 @@ TEST_F(ViewportTransformTest, layersourceZoomOnTwoSurfaces){
     float* textureCoordinates = new float[4];
     ViewportTransform::transformRectangleToTextureCoordinates(targetSurface1Src, surfaceOriginalWidth, surfaceOriginalHeight, textureCoordinates);
     ASSERT_NEAR(0.25,textureCoordinates[0],0.01);
-    ASSERT_NEAR(1.0,textureCoordinates[1],0.01);
-    ASSERT_NEAR(0.0,textureCoordinates[2],0.01);
+    ASSERT_NEAR(1.0,textureCoordinates[2],0.01);
+    ASSERT_NEAR(0.0,textureCoordinates[1],0.01);
     ASSERT_NEAR(1.0,textureCoordinates[3],0.01);
 
     FloatRectangle targetSurface2Src = FloatRectangle(0, 0, 800, 480);
@@ -621,8 +621,8 @@ TEST_F(ViewportTransformTest, layersourceZoomOnTwoSurfaces){
     float* textureCoordinates2 = new float[4];
     ViewportTransform::transformRectangleToTextureCoordinates(targetSurface2Src, surfaceOriginalWidth, surfaceOriginalHeight, textureCoordinates2);
     ASSERT_NEAR(0,textureCoordinates2[0],0.01);
-    ASSERT_NEAR(0.75,textureCoordinates2[1],0.01);
-    ASSERT_NEAR(0.0,textureCoordinates2[2],0.01);
+    ASSERT_NEAR(0.75,textureCoordinates2[2],0.01);
+    ASSERT_NEAR(0.0,textureCoordinates2[1],0.01);
     ASSERT_NEAR(1.0,textureCoordinates2[3],0.01);
 }
 

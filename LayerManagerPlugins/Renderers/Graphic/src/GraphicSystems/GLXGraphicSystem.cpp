@@ -356,15 +356,15 @@ void GLXGraphicsystem::renderSurface(Surface* currentSurface)
     glVertex2d((float)targetSurfaceDestination.x/m_windowWidth*2-1,  1-(float)(targetSurfaceDestination.y+targetSurfaceDestination.height)/m_windowHeight*2);
 
     // bottom right
-    glTexCoord2f(textureCoordinates[1],textureCoordinates[3]);
+    glTexCoord2f(textureCoordinates[2],textureCoordinates[3]);
     glVertex2d( (float)(targetSurfaceDestination.x+targetSurfaceDestination.width)/m_windowWidth*2-1, 1-(float)(targetSurfaceDestination.y+targetSurfaceDestination.height)/m_windowHeight*2);
 
     // top right
-    glTexCoord2f(textureCoordinates[1], textureCoordinates[2]);
+    glTexCoord2f(textureCoordinates[2], textureCoordinates[1]);
     glVertex2d((float)(targetSurfaceDestination.x+targetSurfaceDestination.width)/m_windowWidth*2-1, 1-(float)targetSurfaceDestination.y/m_windowHeight*2);
 
     // top left
-    glTexCoord2f(textureCoordinates[0], textureCoordinates[2]);
+    glTexCoord2f(textureCoordinates[0], textureCoordinates[1]);
     glVertex2d((float)targetSurfaceDestination.x/m_windowWidth*2-1 ,  1-(float)targetSurfaceDestination.y/m_windowHeight*2);
     glEnd();
 
