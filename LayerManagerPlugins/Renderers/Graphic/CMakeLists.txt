@@ -270,8 +270,7 @@ if (WITH_WAYLAND)
             src/WindowSystems/WaylandBaseWindowSystem.cpp
             src/WindowSystems/WaylandX11WindowSystem.cpp
             src/WindowSystems/WaylandServerinfoProtocol.cpp  
-            src/TextureBinders/WaylandCopyGLES.cpp
-            src/TextureBinders/WaylandEglImage.cpp
+            src/TextureBinders/WaylandGLESTexture.cpp
             src/Transformation/ViewportTransform.cpp
         )
         
@@ -294,8 +293,7 @@ if (WITH_WAYLAND)
             src/WindowSystems/WaylandBaseWindowSystem.cpp
             src/WindowSystems/WaylandFbdevWindowSystem.cpp
             src/WindowSystems/WaylandServerinfoProtocol.cpp  
-            src/TextureBinders/WaylandCopyGLES.cpp
-            src/TextureBinders/WaylandEglImage.cpp
+            src/TextureBinders/WaylandGLESTexture.cpp
             src/Transformation/ViewportTransform.cpp
         )
 
@@ -328,8 +326,7 @@ if (WITH_WAYLAND)
             src/WindowSystems/WaylandBaseWindowSystem.cpp
             src/WindowSystems/WaylandDrmWindowSystem.cpp
             src/WindowSystems/WaylandServerinfoProtocol.cpp
-            src/TextureBinders/WaylandCopyGLES.cpp
-            src/TextureBinders/WaylandEglImage.cpp
+            src/TextureBinders/WaylandGLESTexture.cpp
             src/Transformation/ViewportTransform.cpp
         )
 
@@ -360,8 +357,7 @@ if (WITH_WAYLAND)
 
     install(FILES
                 include/TextureBinders/ITextureBinder.h
-                include/TextureBinders/WaylandCopyGLES.h
-                include/TextureBinders/WaylandEglImage.h
+                include/TextureBinders/WaylandGLESTexture.h
             DESTINATION
                 include/layermanager/graphic/TextureBinders
     )

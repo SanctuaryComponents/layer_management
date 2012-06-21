@@ -22,8 +22,7 @@
 #include "config.h"
 #include "Shader.h"
 #include "ShaderProgramGLES.h"
-#include "TextureBinders/WaylandCopyGLES.h"
-#include "TextureBinders/WaylandEglImage.h"
+#include "TextureBinders/WaylandGLESTexture.h"
 #ifdef WITH_WAYLAND_FBDEV
 #include "WindowSystems/WaylandFbdevWindowSystem.h"
 #endif // WITH_WAYLAND_FBDEV
@@ -90,15 +89,7 @@ bool WaylandGLESRenderer::start(int width, int height, const char* displayname)
 
     eglDisplayhandle = m_pGraphicSystem->getEGLDisplay();
 
-#ifdef WITH_FORCE_COPY
-    m_binder = new WaylandCopyGLES(eglDisplayhandle, nativeDisplayHandle);
-#else // WITH_FORCE_COPY
-#ifdef EGL_NATIVE_PIXMAP_KHR
-    m_binder = new WaylandEglImage(eglDisplayhandle, nativeDisplayHandle);
-#else // EGL_NATIVE_PIXMAP_KHR
-    m_binder = new WaylandCopyGLES(eglDisplayhandle, nativeDisplayHandle);
-#endif // EGL_NATIVE_PIXMAP_KHR
-#endif // WITH_FORCE_COPY
+    m_binder = new WaylandGLESTexture(eglDisplayhandle, nativeDisplayHandle);
     if (m_binder && nativeDisplayHandle && eglDisplayhandle)
     {
         m_pGraphicSystem->setTextureBinder(m_binder);

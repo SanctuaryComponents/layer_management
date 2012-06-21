@@ -1,6 +1,6 @@
 /***************************************************************************
  *
- * Copyright 2010,2011 BMW Car IT GmbH
+ * Copyright 2010, 2011 BMW Car IT GmbH
  * Copyright (C) 2011 DENSO CORPORATION and Robert Bosch Car Multimedia Gmbh
  *
  *
@@ -18,8 +18,8 @@
  *
  ****************************************************************************/
 
-#ifndef _WAYLANDEGLIMAGE_H_
-#define _WAYLANDEGLIMAGE_H_
+#ifndef _WAYLANDGLESTEXTURE_H_
+#define _WAYLANDGLESTEXTURE_H_
 
 #include "TextureBinders/ITextureBinder.h"
 #include <EGL/egl.h>
@@ -27,13 +27,13 @@
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
 
-class WaylandEglImage: public ITextureBinder
+class WaylandGLESTexture: public ITextureBinder
 {
 public:
     virtual PlatformSurface* createPlatformSurface(Surface* surface);
 
-    WaylandEglImage(EGLDisplay eglDisplay, struct wl_display* wlDisplay);
-    ~WaylandEglImage();
+    WaylandGLESTexture(EGLDisplay eglDisplay, struct wl_display* waylandDisplay);
+    ~WaylandGLESTexture();
     bool bindSurfaceTexture(Surface* surface);
     bool unbindSurfaceTexture(Surface* surface);
     void createClientBuffer(Surface* surface);
@@ -47,4 +47,4 @@ private:
     struct wl_display* m_wlDisplay;
 };
 
-#endif /* _WAYLANDEGLIMAGE_H_ */
+#endif /* _WAYLANDGLESTEXTURE_H_ */
