@@ -311,7 +311,7 @@ void WaylandBaseWindowSystem::CheckRedrawAllLayers()
 void WaylandBaseWindowSystem::RedrawAllLayers()
 {
     std::list<Layer*> layers = m_pScene->getCurrentRenderOrder();
-	bool bRedraw = m_damaged || (m_systemState == REDRAW_STATE);
+    bool bRedraw = m_forceComposition || m_damaged || (m_systemState == REDRAW_STATE);
 
     // m_damaged represents that SW composition is required
     // At this point if a layer has damaged = true then it must be a HW layer that needs update.
@@ -327,7 +327,7 @@ void WaylandBaseWindowSystem::RedrawAllLayers()
     {
         if ((*current)->getLayerType() == Hardware)
         {
-            if ((*current)->damaged)
+            if (m_forceComposition || (*current)->damaged)
             {
                 renderHWLayer(*current);
                 (*current)->damaged = false;
@@ -377,7 +377,7 @@ void WaylandBaseWindowSystem::Redraw()
 
     m_pScene->unlockScene();
 
-    if (m_damaged || (m_systemState == REDRAW_STATE))
+    if (m_forceComposition || m_damaged || (m_systemState == REDRAW_STATE))
     {
         // TODO: This block won't be executed for HW only changes
         // Is that acceptable?
@@ -389,6 +389,7 @@ void WaylandBaseWindowSystem::Redraw()
         calculateFps();
 
         /* Reset the damage flag, all is up to date */
+        m_forceComposition = false;
         m_damaged = false;
         m_systemState = IDLE_STATE;
     }

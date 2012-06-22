@@ -148,7 +148,7 @@ void X11GLXRenderer::signalWindowSystemRedraw()
 
 void X11GLXRenderer::forceCompositionWindowSystem()
 {
-    m_pWindowSystem->m_damaged = true;
+    m_pWindowSystem->m_forceComposition = true;
 }
 
 extern "C" IRenderer* createX11GLXRenderer(Scene* pScene) {

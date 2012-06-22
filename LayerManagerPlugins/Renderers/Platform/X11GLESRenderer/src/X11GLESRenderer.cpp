@@ -158,18 +158,18 @@ void X11GLESRenderer::signalWindowSystemRedraw()
 
 void X11GLESRenderer::forceCompositionWindowSystem()
 {
-    m_pWindowSystem->m_damaged = true;
+    m_pWindowSystem->m_forceComposition = true;
 }
 
 Shader* X11GLESRenderer::createShader(const string* vertexName, const string* fragmentName)
 {
     Shader *result = NULL;
     m_pWindowSystem->setSystemState(WAKEUP_STATE);
-    m_pWindowSystem->wakeUpRendererThread();    
+    m_pWindowSystem->wakeUpRendererThread();
     m_pGraphicSystem->activateGraphicContext();
     result = Shader::createShader(*vertexName,*fragmentName);
     m_pGraphicSystem->releaseGraphicContext();
-    m_pWindowSystem->setSystemState(IDLE_STATE);   
+    m_pWindowSystem->setSystemState(IDLE_STATE);
     return result;
 }
 

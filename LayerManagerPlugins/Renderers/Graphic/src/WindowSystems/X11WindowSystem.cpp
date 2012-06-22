@@ -610,7 +610,7 @@ void X11WindowSystem::RedrawAllLayers()
     // m_damaged represents that SW composition is required
     // At this point if a layer has damaged = true then it must be a HW layer that needs update.
     // A SW layer which needs update will make m_damaged = true
-    if (m_damaged)
+    if (m_forceComposition || m_damaged)
     {
         graphicSystem->activateGraphicContext();
         graphicSystem->clearBackground();
@@ -619,20 +619,20 @@ void X11WindowSystem::RedrawAllLayers()
     {
         if ((*current)->getLayerType() == Hardware)
         {
-            if ((*current)->damaged)
+            if (m_forceComposition || (*current)->damaged)
             {
                 renderHWLayer(*current);
                 (*current)->damaged = false;
             }
         }
-        else if (m_damaged)
+        else if (m_forceComposition || m_damaged)
         {
             graphicSystem->beginLayer(*current);
             graphicSystem->renderSWLayer();
             graphicSystem->endLayer();
         }
     }
-    if (m_damaged)
+    if (m_forceComposition || m_damaged)
     {
         graphicSystem->swapBuffers();
         graphicSystem->releaseGraphicContext();
@@ -656,7 +656,7 @@ void X11WindowSystem::Redraw()
 
     m_pScene->unlockScene();
 
-    if (m_damaged)
+    if (m_forceComposition || m_damaged)
     {
         // TODO: This block won't be executed for HW only changes
         // Is that acceptable?
@@ -668,6 +668,7 @@ void X11WindowSystem::Redraw()
         calculateFps();
 
         /* Reset the damage flag, all is up to date */
+        m_forceComposition = false;
         m_damaged = false;
     }
 }

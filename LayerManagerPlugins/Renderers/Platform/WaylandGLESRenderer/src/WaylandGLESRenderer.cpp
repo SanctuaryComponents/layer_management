@@ -146,7 +146,7 @@ uint WaylandGLESRenderer::getNumberOfHardwareLayers(uint screenID)
 uint* WaylandGLESRenderer::getScreenResolution(uint screenID)
 {
     uint screen_id;
-    screen_id = screenID;   
+    screen_id = screenID;
     // TODO provide value of real screen here
     uint * resolution = new uint[2];
     resolution[0] = m_width;
@@ -158,7 +158,7 @@ uint* WaylandGLESRenderer::getScreenIDs(uint* length)
 {
     // TODO necessary to implement
     uint* screenIDS = new uint[1];
-	screenIDS[0] = 0;
+    screenIDS[0] = 0;
     *length = 1;
     return screenIDS;
 }
@@ -170,18 +170,18 @@ void WaylandGLESRenderer::signalWindowSystemRedraw()
 
 void WaylandGLESRenderer::forceCompositionWindowSystem()
 {
-    m_pWindowSystem->m_damaged = true;
+    m_pWindowSystem->m_forceComposition = true;
 }
 
 Shader* WaylandGLESRenderer::createShader(const string* vertexName, const string* fragmentName)  
 {
     Shader *result = NULL;
     m_pWindowSystem->setSystemState(WAKEUP_STATE);
-    m_pWindowSystem->wakeUpRendererThread();    
+    m_pWindowSystem->wakeUpRendererThread();
     m_pGraphicSystem->activateGraphicContext();
     result = Shader::createShader(*vertexName,*fragmentName);
     m_pGraphicSystem->releaseGraphicContext();
-    m_pWindowSystem->setSystemState(IDLE_STATE);   
+    m_pWindowSystem->setSystemState(IDLE_STATE);
     return result;
 }
 

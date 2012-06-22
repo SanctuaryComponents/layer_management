@@ -254,7 +254,7 @@ void GLXGraphicsystem::checkRenderLayer()
 
     m_currentLayer->damaged = false;
 
-    if (!(m_baseWindowSystem->m_damaged && m_currentLayer->getLayerType() != Hardware))
+    if (!m_baseWindowSystem->m_forceComposition && (!m_baseWindowSystem->m_damaged || m_currentLayer->getLayerType() == Hardware))
     {
         if (m_currentLayer->renderPropertyChanged)
         {

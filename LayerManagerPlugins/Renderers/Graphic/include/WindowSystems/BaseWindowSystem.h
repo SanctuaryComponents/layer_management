@@ -47,6 +47,7 @@ protected:
 
 public:
     bool m_damaged;
+    bool m_forceComposition;
 };
 
 #endif /* _BASEWINDOWSYSTEM_H_ */
