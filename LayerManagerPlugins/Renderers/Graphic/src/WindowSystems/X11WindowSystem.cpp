@@ -92,7 +92,7 @@ XVisualInfo* X11WindowSystem::getDefaultVisual(Display *dpy)
     XVisualInfo* windowVis = new XVisualInfo();
     if (windowVis)
     {
-        windowVis->depth = 32;//DefaultDepth(dpy, 0);
+        windowVis->depth = DefaultDepth(dpy, DefaultScreen(dpy));
         if (!XMatchVisualInfo( dpy, 0, windowVis->depth, TrueColor, windowVis))
         {
             LOG_ERROR("X11WindowSystem", "Error: Required visual not found\n");
@@ -471,7 +471,7 @@ bool X11WindowSystem::CreatePixmapsForAllWindows()
 {
     bool result = true;
     LOG_DEBUG("X11WindowSystem", "redirecting all windows");
-    Window root = RootWindow(x11Display, 0);
+    Window root = RootWindow(x11Display, DefaultScreen(x11Display));
     XCompositeRedirectSubwindows(x11Display,root,CompositeRedirectManual);
     XSync(x11Display,0);
     return result;
@@ -482,7 +482,7 @@ bool X11WindowSystem::CreateCompositorWindow()
     LOG_DEBUG("X11WindowSystem", "Get root window");
     bool result = true;
     CompositorWindow = None;
-    Window root = RootWindow(x11Display,0);
+    Window root = RootWindow(x11Display, DefaultScreen(x11Display));
 
     LOG_DEBUG("X11WindowSystem", "Creating Compositor Window");
 
@@ -1041,7 +1041,7 @@ void X11WindowSystem::cleanup(){
     LOG_DEBUG("X11WindowSystem", "Cleanup");
     if (None != CompositorWindow)
     {
-        Window root = RootWindow(x11Display, 0);
+        Window root = RootWindow(x11Display, DefaultScreen(x11Display));
         XCompositeUnredirectSubwindows(x11Display,root,CompositeRedirectManual);
         XDestroyWindow(x11Display,CompositorWindow);
     }

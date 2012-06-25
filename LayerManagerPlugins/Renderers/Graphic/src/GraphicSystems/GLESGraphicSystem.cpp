@@ -153,7 +153,7 @@ bool GLESGraphicsystem::init(EGLNativeDisplayType display, EGLNativeWindowType N
     eglMakeCurrent(m_eglDisplay, m_eglSurface, m_eglSurface, m_eglContext);
     LOG_INFO("GLESGraphicsystem", "made current");
 
-    eglSwapInterval(m_eglDisplay, 1); // TODO: does not seem to work
+    eglSwapInterval(m_eglDisplay, 1);
 
     if (!initOpenGLES(m_windowWidth, m_windowHeight))
     {
