@@ -83,11 +83,6 @@ if (WITH_WAYLAND_DRM)
     MATH(EXPR NumberOfWaylandRenderers "${NumberOfWaylandRenderers} + 1")
 endif(WITH_WAYLAND_DRM)
 
-if (WITH_WAYLAND_VIVANTE_GAL)
-    set (WITH_WAYLAND ON)
-    MATH(EXPR NumberOfWaylandRenderers "${NumberOfWaylandRenderers} + 1")
-endif(WITH_WAYLAND_VIVANTE_GAL)
-
 if(NumberOfWaylandRenderers GREATER 1) 
     MESSAGE(FATAL_ERROR "More than one Wayland based renderer was selected. This is not supported.")
 endif(NumberOfWaylandRenderers GREATER 1)
