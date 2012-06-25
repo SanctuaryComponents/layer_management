@@ -230,6 +230,10 @@ void WaylandBaseWindowSystem::checkForNewSurface()
             {
                 allocatePlatformSurface(*currentS);
             }
+            else // While we are at it, also cleanup any stale native content
+            {
+                deallocatePlatformSurface(*currentS);
+            }
         }
     }
     m_pScene->unlockScene();
@@ -1159,6 +1163,24 @@ void WaylandBaseWindowSystem::allocatePlatformSurface(Surface* surface)
         }
     }
     LOG_INFO("WaylandBaseWindowSystem","allocatePlatformSurface end");
+}
+
+void WaylandBaseWindowSystem::deallocatePlatformSurface(Surface* surface)
+{
+    LOG_DEBUG("WaylandBaseWindowSystem","deallocatePlatformSurface begin");
+    WaylandPlatformSurface* nativeSurface = (WaylandPlatformSurface*)surface->platform;
+    if (nativeSurface)
+    {
+        LOG_DEBUG("WaylandBaseWindowSystem","destroyingnative surface");
+#if 0 // TODO
+        graphicSystem->getTextureBinder()->destroyClientBuffer(surface);
+
+        surface->renderPropertyChanged = true;
+        delete surface->platform;
+        surface->platform = NULL;
+#endif
+    }
+    LOG_DEBUG("WaylandBaseWindowSystem","deallocatePlatformSurface end");
 }
 
 void WaylandBaseWindowSystem::doScreenShot(std::string fileName)

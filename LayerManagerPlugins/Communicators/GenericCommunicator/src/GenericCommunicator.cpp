@@ -78,6 +78,7 @@ GenericCommunicator::GenericCommunicator(ICommandExecutor* executor)
         { "InitializeSurface",                &GenericCommunicator::InitializeSurface },
         { "InitializeSurfaceFromId",          &GenericCommunicator::InitializeSurfaceFromId },
         { "SetSurfaceNativeContent",          &GenericCommunicator::SetSurfaceNativeContent },
+        { "RemoveSurfaceNativeContent",       &GenericCommunicator::RemoveSurfaceNativeContent },
         { "RemoveSurface",                    &GenericCommunicator::RemoveSurface },
         { "CreateLayer",                      &GenericCommunicator::CreateLayer },
         { "CreateLayerFromId",                &GenericCommunicator::CreateLayerFromId },
@@ -725,6 +726,23 @@ void GenericCommunicator::SetSurfaceNativeContent()
     PixelFormat pf = (PixelFormat) pixelformat;
 
     t_ilm_bool status = m_executor->execute(new SurfaceSetNativeContentCommand(id, handle, pf, width, height));
+    if (status)
+    {
+        m_ipcModule.createMessage((char*)__FUNCTION__);
+        m_ipcModule.sendMessage();
+    }
+    else
+    {
+        m_ipcModule.sendError(RESSOURCE_ALREADY_INUSE);
+    }
+}
+
+void GenericCommunicator::RemoveSurfaceNativeContent()
+{
+    uint id = 0;
+    m_ipcModule.getUint(&id);
+
+    t_ilm_bool status = m_executor->execute(new SurfaceRemoveNativeContentCommand(id));
     if (status)
     {
         m_ipcModule.createMessage((char*)__FUNCTION__);

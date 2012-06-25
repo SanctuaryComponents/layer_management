@@ -511,6 +511,15 @@ ilmErrorTypes ilm_surfaceInitialize(t_ilm_surface *pSurfaceId);
 ilmErrorTypes ilm_surfaceSetNativeContent(t_ilm_nativehandle nativehandle, t_ilm_int width, t_ilm_int height, ilmPixelFormat pixelFormat, t_ilm_surface surfaceId);
 
 /**
+ * \brief Remove the native content of a surface
+ * \ingroup ilmClient
+ * \param[in] surfaceId The ID of the surface
+ * \return ILM_SUCCESS if the method call was successful
+ * \return ILM_FAILED if the client can not call the method on the service.
+ */
+ilmErrorTypes ilm_surfaceRemoveNativeContent(t_ilm_surface surfaceId);
+
+/**
  * \brief Remove a surface
  * \ingroup ilmClient
  * \param[in] surfaceId The id of the surface to be removed

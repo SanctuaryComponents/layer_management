@@ -55,6 +55,7 @@ public:
     Display* getNativeDisplayHandle();
     Window getCompositorNativeWindowHandle();
     virtual void allocatePlatformSurface(Surface *surface);
+    virtual void deallocatePlatformSurface(Surface *surface);
     void doScreenShot(std::string fileName);
     void doScreenShotOfLayer(std::string fileName, const uint id);
     void doScreenShotOfSurface(std::string fileName, const uint id, const uint layer_id);

@@ -67,6 +67,7 @@ public:
     WaylandWindowSystemStates getSystemState();
     struct wl_display* getNativeDisplayHandle();
     virtual void allocatePlatformSurface(Surface *surface);
+    virtual void deallocatePlatformSurface(Surface *surface);
     void doScreenShot(std::string fileName);
     void doScreenShotOfLayer(std::string fileName, const uint id);
     void doScreenShotOfSurface(std::string fileName, const uint id, const uint layer_id);

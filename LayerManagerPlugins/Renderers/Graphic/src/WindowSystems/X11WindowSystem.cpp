@@ -237,6 +237,10 @@ void X11WindowSystem::checkForNewSurfaceNativeContent()
             {
                 allocatePlatformSurface(*currentS);
             }
+            else // While we are at it, also cleanup any stale native content
+            {
+                deallocatePlatformSurface(*currentS);
+            }
         }
     }
     m_pScene->unlockScene();
@@ -1118,6 +1122,27 @@ void X11WindowSystem::allocatePlatformSurface(Surface* surface)
         MapWindow(surface->getNativeContent());
     }
     LOG_DEBUG("X11WindowSystem","allocatePlatformSurface end");
+}
+
+void X11WindowSystem::deallocatePlatformSurface(Surface* surface)
+{
+    LOG_DEBUG("X11WindowSystem","deallocatePlatformSurface begin");
+    XPlatformSurface* nativeSurface = (XPlatformSurface*)surface->platform;
+    if (nativeSurface)
+    {
+        LOG_DEBUG("X11WindowSystem","destroyingnative surface");
+        graphicSystem->getTextureBinder()->destroyClientBuffer(surface);
+
+        if (nativeSurface->pixmap)
+        {
+            int result = XFreePixmap(x11Display, nativeSurface->pixmap);
+        }
+
+        surface->renderPropertyChanged = true;
+        delete surface->platform;
+        surface->platform = NULL;
+    }
+    LOG_DEBUG("X11WindowSystem","deallocatePlatformSurface end");
 }
 
 void X11WindowSystem::doScreenShot(std::string fileName)

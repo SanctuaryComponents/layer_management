@@ -117,6 +117,7 @@ void generateString(char* msgBuffer)
         { "InitializeSurface",                "",      "u"              },
         { "InitializeSurfaceFromId",          "u",     "u"              },
         { "SetSurfaceNativeContent",          "uuuuu", ""               },
+        { "RemoveSurfaceNativeContent",       "u",     ""               },
         { "RemoveSurface",                    "u",     ""               },
         { "CreateLayer",                      "",      "u"              },
         { "CreateLayerFromId",                "u",     "u"              },

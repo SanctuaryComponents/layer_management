@@ -956,6 +956,23 @@ ilmErrorTypes ilm_surfaceSetNativeContent(t_ilm_nativehandle nativehandle, t_ilm
     return returnValue;
 }
 
+ilmErrorTypes ilm_surfaceRemoveNativeContent(t_ilm_surface surfaceId)
+{
+    LOG_ENTER_FUNCTION;
+    ilmErrorTypes returnValue = ILM_FAILED;
+
+    if (gIpcModule.createMessage("RemoveSurfaceNativeContent\0")
+        && gIpcModule.appendUint(surfaceId)
+        && gIpcModule.sendMessage()
+        && gIpcModule.receiveMessage(gReceiveTimeout)
+        && !gIpcModule.isErrorMessage())
+    {
+        returnValue = ILM_SUCCESS;
+    }
+
+    return returnValue;
+}
+
 ilmErrorTypes ilm_surfaceRemove(t_ilm_surface surfaceId)
 {
     LOG_ENTER_FUNCTION;

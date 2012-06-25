@@ -86,6 +86,7 @@
 #include "LayerDumpCommand.h"
 #include "SurfaceDumpCommand.h"
 #include "SurfaceSetNativeContentCommand.h"
+#include "SurfaceRemoveNativeContentCommand.h"
 
 
 class GenericCommunicator;
@@ -135,6 +136,7 @@ public:
     void InitializeSurfaceFromId();
     void CreateSurfaceFromId();
     void SetSurfaceNativeContent();
+    void RemoveSurfaceNativeContent();
     void RemoveSurface();
     void CreateLayer();
     void CreateLayerFromId();
