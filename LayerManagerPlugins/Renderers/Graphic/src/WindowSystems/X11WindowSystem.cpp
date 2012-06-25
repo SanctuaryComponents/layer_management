@@ -331,7 +331,9 @@ void X11WindowSystem::MapWindow(Window window)
             surface->OriginalSourceWidth = winWidth;
             surface->renderPropertyChanged = true;
 
+            graphicSystem->activateGraphicContext();
             graphicSystem->getTextureBinder()->createClientBuffer(surface);
+            graphicSystem->releaseGraphicContext();
             XSync(x11Display, 0);
 
             LOG_DEBUG("X11WindowSystem", "Mapping Surface " << surface->getID() << " to window " << window);
@@ -369,7 +371,9 @@ void X11WindowSystem::UnMapWindow(Window window)
 
 
         LOG_DEBUG("X11WindowSystem", "Destroying ClientBuffer");
+        graphicSystem->activateGraphicContext();
         graphicSystem->getTextureBinder()->destroyClientBuffer(surface);
+        graphicSystem->releaseGraphicContext();
         XSync(x11Display, 0);
 
         LOG_DEBUG("X11WindowSystem", "Removing X Pixmap");
@@ -457,7 +461,9 @@ void X11WindowSystem::DestroyWindow(Window window)
             LOG_WARNING("X11WindowSystem", "Could not find surface for window " << window);
             return;
         }
+        graphicSystem->activateGraphicContext();
         graphicSystem->getTextureBinder()->destroyClientBuffer(surface);
+        graphicSystem->releaseGraphicContext();
         LOG_DEBUG("X11WindowSystem", "Unmapping window " << window);
         UnMapWindow(window);
         LOG_DEBUG("X11WindowSystem", "Remove Native Content from Surface " << surface->getID());

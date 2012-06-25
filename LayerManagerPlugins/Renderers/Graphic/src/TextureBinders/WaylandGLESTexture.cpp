@@ -92,11 +92,6 @@ bool WaylandGLESTexture::bindSurfaceTexture(Surface* surface)
             {
                 LOG_DEBUG("WaylandGLESTexture", "nativeSurface->eglImage:"<<nativeSurface->eglImage);
                 glBindTexture(GL_TEXTURE_2D, nativeSurface->texture);
-                glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,     GL_CLAMP_TO_EDGE);
-                glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,     GL_CLAMP_TO_EDGE);
-                glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                m_pfGLEglImageTargetTexture2DOES(GL_TEXTURE_2D, nativeSurface->eglImage);
                 return true;
             }
         }
@@ -162,7 +157,13 @@ void WaylandGLESTexture::createClientBuffer(Surface* surface)
             {
                 nativeSurface->eglImage = eglImage;
                 glGenTextures(1,&nativeSurface->texture);
-            }
+                glBindTexture(GL_TEXTURE_2D, nativeSurface->texture);
+                glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,     GL_CLAMP_TO_EDGE);
+                glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,     GL_CLAMP_TO_EDGE);
+                glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                m_pfGLEglImageTargetTexture2DOES(GL_TEXTURE_2D, nativeSurface->eglImage);
+           }
         }
     }
 }

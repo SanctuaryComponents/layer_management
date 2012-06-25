@@ -511,7 +511,9 @@ void WaylandBaseWindowSystem::destroySurfaceCallback(struct wl_resource* resourc
             delete ilmSurface->platform;
             ilmSurface->platform = NULL;
         }
+        windowSystem->graphicSystem->activateGraphicContext();
         windowSystem->graphicSystem->getTextureBinder()->destroyClientBuffer(ilmSurface);
+        windowSystem->graphicSystem->releaseGraphicContext();
     }
 
     wl_list_remove(&nativeSurface->link);
@@ -566,7 +568,9 @@ void WaylandBaseWindowSystem::attachBufferToNativeSurface(struct wl_buffer* buff
     WaylandPlatformSurface* nativePlatformSurface = (WaylandPlatformSurface*)ilmSurface->platform;
     if (0 != nativePlatformSurface)
     {
+        windowSystem->graphicSystem->activateGraphicContext();
         windowSystem->graphicSystem->getTextureBinder()->createClientBuffer(ilmSurface);
+        windowSystem->graphicSystem->releaseGraphicContext();
         LOG_DEBUG("WaylandBaseWindowSystem","nativePlatformSurface->enable");
         nativePlatformSurface->enableRendering();
     }
@@ -1174,7 +1178,9 @@ void WaylandBaseWindowSystem::deallocatePlatformSurface(Surface* surface)
     {
         LOG_DEBUG("WaylandBaseWindowSystem","destroyingnative surface");
 #if 0 // TODO
+        graphicSystem->activateGraphicContext();
         graphicSystem->getTextureBinder()->destroyClientBuffer(surface);
+        graphicSystem->releaseGraphicContext();
 
         surface->renderPropertyChanged = true;
         delete surface->platform;

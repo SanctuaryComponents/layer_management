@@ -48,15 +48,7 @@ bool X11EglImage::bindSurfaceTexture(Surface* surface)
     if (nativeSurface && nativeSurface->isReadyForRendering())
     {
         glBindTexture(GL_TEXTURE_2D, nativeSurface->texture);
-        if (nativeSurface->eglImage)
-        {
-            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,     GL_CLAMP_TO_EDGE);
-            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,     GL_CLAMP_TO_EDGE);
-            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            m_pfGLEglImageTargetTexture2DOES(GL_TEXTURE_2D, nativeSurface->eglImage);
-            return true;
-        }
+        return true;
     }
     return false;
 }
@@ -104,6 +96,12 @@ void X11EglImage::createClientBuffer(Surface* surface)
         {
             nativeSurface->eglImage = eglImage;
             glGenTextures(1,&nativeSurface->texture);
+            glBindTexture(GL_TEXTURE_2D, nativeSurface->texture);
+            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,     GL_CLAMP_TO_EDGE);
+            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,     GL_CLAMP_TO_EDGE);
+            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            m_pfGLEglImageTargetTexture2DOES(GL_TEXTURE_2D, nativeSurface->eglImage);
         }
     }
 }
