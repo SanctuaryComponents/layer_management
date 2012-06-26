@@ -108,7 +108,7 @@ SurfaceGroup* Scene::createSurfaceGroup(const uint surfaceGroupId)
         }
         else
         {
-            LOG_DEBUG("Scene","SurfaceGroup with id [ " << surfaceGroupId << " ] " << " already exists ");
+            newSurfaceGroup =  m_surfaceGroupMap.at(surfaceGroupId);
         }
     }
     return newSurfaceGroup;
@@ -133,7 +133,7 @@ LayerGroup* Scene::createLayerGroup(const uint layerGroupId)
         }
         else
         {
-            LOG_DEBUG("Scene","LayerGroup with id [ " << layerGroupId << " ] " << " already exists " );
+            newLayerGroup = m_layerGroupMap.at(layerGroupId);
         }
     }
     return newLayerGroup;
