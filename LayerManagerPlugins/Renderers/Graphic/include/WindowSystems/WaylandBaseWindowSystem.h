@@ -32,9 +32,8 @@
 #include "WindowSystems/BaseWindowSystem.h"
 #include "GraphicSystems/BaseGraphicSystem.h"
 #include "Surface.h"
-#include <EGL/egl.h>
-#include <EGL/eglext.h>
 #include <wayland-server.h>
+#include <wayland-client.h>
 #include "PlatformSurfaces/WaylandPlatformSurface.h"
 #include "Log.h"
 #include "ScreenShotType.h"
@@ -59,7 +58,7 @@ class WaylandBaseWindowSystem: public BaseWindowSystem
 public:
     WaylandBaseWindowSystem(const char* displayname, int width, int height, Scene* pScene);
     virtual ~WaylandBaseWindowSystem();
-    bool init(BaseGraphicSystem<EGLNativeDisplayType, EGLNativeWindowType>* sys);
+    bool init(BaseGraphicSystem<void*, void*>* sys);
     bool start();
     void stop();
     void signalRedrawEvent();
@@ -74,14 +73,21 @@ public:
 
 protected:
     struct wl_display* m_wlDisplay;
+    struct wl_display* m_wlDisplayClient;
+    struct wl_compositor* m_wlCompositorClient;
+    struct wl_global_listener* m_wlCompositorGlobalListener;
+    struct wl_surface* m_wlSurfaceClient;
     pthread_t renderThread;
     pthread_mutex_t run_lock;
-    BaseGraphicSystem<EGLNativeDisplayType, EGLNativeWindowType>* graphicSystem;
+    BaseGraphicSystem<void*, void*>* graphicSystem;
     virtual void CheckRedrawAllLayers();
     virtual void RedrawAllLayers();
     virtual void renderHWLayer(Layer* layer);
     virtual bool initCompositor();
     struct wl_shm* m_wlShm;
+    struct wl_global* m_serverInfoGlobal;
+    void* m_serverInfo;
+    struct wl_global* m_wlCompositorGlobal;
     virtual bool createNativeContext() = 0;
     virtual bool initGraphicSystem() = 0;
 
@@ -99,12 +105,9 @@ protected:
     int m_width;
     int m_height;
 
-    struct wl_list m_listFrameCallback;	// TODO:confirm:what's this
-    struct wl_event_source* m_idleSource; // TODO:confirm:what's this
-    int m_idleTime; // TODO:confirm:what's this
+    struct wl_list m_listFrameCallback;
 
     void createServerinfo(WaylandBaseWindowSystem* windowSystem);
-    void addIdleEventRepaint();	// TODO:confirm:what's this
     struct native_surface* createNativeSurface();
     void postReleaseBuffer(struct wl_buffer *buffer);
     void attachBufferToNativeSurface(struct wl_buffer* buffer, struct wl_surface* surface); // ADIT TODO:reconfirm!!
@@ -115,14 +118,17 @@ protected:
     void shutdownCompositor();
     Surface* getSurfaceFromNativeSurface(struct native_surface* nativeSurface);
     void checkForNewSurface();
+    void calculateFps();
+    void calculateSurfaceFps(Surface *currentSurface, float time) ;
     void printDebug();
     void* eventLoop();
 
     static void bindCompositor(struct wl_client* client, void* data, uint32_t version, uint32_t id);
     static int signalEventOnTerm(int signal_number, void *data);
     static void destroyListenerSurfaceBuffer(struct wl_listener* listener, struct wl_resource* resource, uint32_t time);
-    static int timerEventIdle(void *data);
     static void idleEventRepaint(void *data);
+    bool createWaylandClient();
+    void releaseWaylandClient();
 
 public:
     static void serverinfoIFCreateConnection(struct wl_client *client, struct wl_resource *resource);
@@ -131,6 +137,8 @@ public:
     static void destroySurfaceCallback(struct wl_resource* resource);
     static void destroyFrameCallback(struct wl_resource *resource);
     static void* eventLoopCallback(void* ptr);
+    static void bindDisplayClient(struct wl_display* display, uint32_t id, const char* interface, uint32_t version, void* data);
+    static void surfaceListenerFrame(void* data, struct wl_callback* callback, uint32_t time);
 
     // wl_surface interface
     static void surfaceIFDestroy(struct wl_client *client, struct wl_resource *resource);

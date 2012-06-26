@@ -30,6 +30,10 @@
 #ifndef _WAYLANDX11WINDOWSYSTEM_H_
 #define _WAYLANDX11WINDOWSYSTEM_H_
 #include "WindowSystems/WaylandBaseWindowSystem.h"
+#include "X11/Xlib.h"
+#include <X11/Xutil.h>
+#include <EGL/egl.h>
+#include <EGL/eglext.h>
 
 class WaylandX11WindowSystem: public WaylandBaseWindowSystem
 {

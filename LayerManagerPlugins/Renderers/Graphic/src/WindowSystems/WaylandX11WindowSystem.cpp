@@ -63,7 +63,7 @@ bool WaylandX11WindowSystem::initGraphicSystem()
     LOG_DEBUG("WaylandX11WindowSystem", "initGraphicSystem IN");
 
     //. create egl context
-    status = graphicSystem->init((EGLNativeDisplayType)m_x11Display, (EGLNativeWindowType)m_x11Window);
+    status = graphicSystem->init((void*)m_x11Display, (void*)m_x11Window);
     if (false == status)
     {
         LOG_ERROR("WaylandX11WindowSystem", "failed to init graphicSystem");

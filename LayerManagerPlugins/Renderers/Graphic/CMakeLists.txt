@@ -261,6 +261,7 @@ if (WITH_WAYLAND)
         set(LIBS
                 ${LIBS}
                 ${X11_X11_LIB}
+                ${WAYLAND_EGL_LIBRARIES}
         )
         
         set(SOURCES
@@ -282,11 +283,16 @@ if (WITH_WAYLAND)
 
         set(GRAPHIC_LIB_NAME LayerManagerGraphicWaylandGLESv2)
 
+        set(LIBS
+                ${LIBS}
+                ${WAYLAND_EGL_LIBRARIES}
+        )
+
         file(GLOB SOURCES 
             ../Base/src/BaseRenderer.cpp
             src/GraphicSystems/GLESGraphicSystem.cpp
             src/WindowSystems/WaylandBaseWindowSystem.cpp
-            src/WindowSystems/WaylandX11WindowSystem.cpp
+            src/WindowSystems/WaylandFbdevWindowSystem.cpp
             src/WindowSystems/WaylandServerinfoProtocol.cpp  
             src/TextureBinders/WaylandCopyGLES.cpp
             src/TextureBinders/WaylandEglImage.cpp
@@ -355,7 +361,7 @@ if (WITH_WAYLAND)
     install(FILES
                 include/TextureBinders/ITextureBinder.h
                 include/TextureBinders/WaylandCopyGLES.h
-                include/TextureBinders/WaylandNullTexture.h
+                include/TextureBinders/WaylandEglImage.h
             DESTINATION
                 include/layermanager/graphic/TextureBinders
     )

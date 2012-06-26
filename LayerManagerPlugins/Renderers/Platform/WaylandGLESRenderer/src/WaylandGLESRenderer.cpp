@@ -76,7 +76,7 @@ bool WaylandGLESRenderer::start(int width, int height, const char* displayname)
     m_pGraphicSystem = new GLESGraphicsystem(width,height, ShaderProgramGLES::createProgram);
 #endif
 
-    if (!m_pWindowSystem->init((BaseGraphicSystem<EGLNativeDisplayType, EGLNativeWindowType>*) m_pGraphicSystem))
+    if (!m_pWindowSystem->init((BaseGraphicSystem<void*, void*>*) m_pGraphicSystem))
     {
         goto fail; // TODO bad style
     }

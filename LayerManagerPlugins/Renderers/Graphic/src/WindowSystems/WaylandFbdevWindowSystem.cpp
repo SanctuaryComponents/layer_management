@@ -54,7 +54,7 @@ WaylandFbdevWindowSystem::WaylandFbdevWindowSystem(const char* displayname, int 
 
 bool WaylandFbdevWindowSystem::initGraphicSystem()
 {
-    return graphicSystem->init((EGLNativeDisplayType)m_fdFB, (EGLNativeWindowType)NULL);
+    return graphicSystem->init((void*)m_fdFB, (void*)NULL);
 }
 
 bool WaylandFbdevWindowSystem::createNativeContext()

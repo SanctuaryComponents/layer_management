@@ -58,7 +58,7 @@ WaylandDrmWindowSystem::~WaylandDrmWindowSystem()
 bool WaylandDrmWindowSystem::initGraphicSystem()
 {
 	graphicSystem->setBaseWindowSystem(this);
-    return graphicSystem->init((EGLNativeDisplayType)m_gbm, (EGLNativeWindowType)NULL);
+    return graphicSystem->init((void*)m_gbm, (void*)NULL);
 }
 
 bool WaylandDrmWindowSystem::createNativeContext()
