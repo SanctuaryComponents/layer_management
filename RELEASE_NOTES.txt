@@ -1,3 +1,34 @@
+Version 0.9.7_rc
+-------------
+This version includes the following enhancements.
+
+Bugfixes :
+
+- fixes link script in example applications
+- Composition is not anymore forced for every redraw request
+- Example Script updated
+- ilmClient : documentation fixed
+- fix of several compiler warnings and memory leaks
+- fix several issues detected by coverity 
+- additional fixes inside of the reference compositor 
+
+Improvements:
+
+- X11 backend for wayland
+- DRM backend for wayland
+- Introducing generic communication approach
+- Introducing Communicator Reference Implementation based in tcp/ip sockets
+- Introducing generic hw layer support
+- Introducing default version handling
+- Introducing default toolchain file
+- Introducing SurfaceRemoveNativeContentCommand
+- Profiling/Coverage options for gcc introduced
+- New features added to MockNavigation
+- New properties valuse added to layer/surfaceGetProperties
+- Adding new LayerManagerControl example program
+
+
+
 Version 0.9.6
 -------------
 This version includes the following enhancements.
