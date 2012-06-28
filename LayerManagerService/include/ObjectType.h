@@ -20,16 +20,18 @@
 #ifndef _GRAPHICALOBJECTTYPE_H_
 #define _GRAPHICALOBJECTTYPE_H_
 
+#include "ilm_types.h"
+
 /**
  * Enumeration of possible graphicalObjectTypes
  */
 enum ObjectType
 {
-    TypeSurface = 0,
-    TypeLayer = 1,
-    TypeSurfaceGroup = 2,
-    TypeLayerGroup =3,
-    TypeMax = 4
+    TypeSurface = ILM_SURFACE,
+    TypeLayer = ILM_LAYER,
+    TypeSurfaceGroup = ILM_SURFACEGROUP,
+    TypeLayerGroup = ILM_LAYERGROUP,
+    TypeMax
 };
 
 #endif /* _GRAPHICALOBJECTTYPE_H_ */

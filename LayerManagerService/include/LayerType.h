@@ -20,15 +20,17 @@
 #ifndef _LAYERTYPE_H_
 #define _LAYERTYPE_H_
 
+#include "ilm_types.h"
+
 /**
  * Enumeration of possible LayerTypes
  */
 enum LayerType
 {
-    Unknown = 0,
-    Hardware = 1,
-    Software_2D = 2,
-    Software_2_5D = 3
+    Unknown = ILM_LAYERTYPE_UNKNOWN,
+    Hardware = ILM_LAYERTYPE_HARDWARE,
+    Software_2D = ILM_LAYERTYPE_SOFTWARE2D,
+    Software_2_5D = ILM_LAYERTYPE_SOFTWARE2_5D
 };
 
 #endif /* _LAYERTYPE_H_ */

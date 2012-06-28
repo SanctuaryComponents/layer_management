@@ -20,16 +20,18 @@
 #ifndef _ORIENTATION_H
 #define _ORIENTATION_H
 
+#include "ilm_types.h"
+
 /**
  * Enumeration of possible orientations. Orientation in this context means Rotation.
  * Surfaces and Layers can be rotated for composition. Values mean clockwise rotation.
  */
 enum OrientationType
 {
-    Zero = 0,
-    Ninety = 1,
-    OneEighty = 2,
-    TwoSeventy = 3
+    Zero = ILM_ZERO,
+    Ninety = ILM_NINETY,
+    OneEighty = ILM_ONEHUNDREDEIGHTY,
+    TwoSeventy = ILM_TWOHUNDREDSEVENTY
 };
 
 #endif /* _ORIENTATION_H */
