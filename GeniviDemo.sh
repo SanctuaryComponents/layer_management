@@ -19,9 +19,11 @@
 ############################################################################
 
 export LD_LIBRARY_PATH=/usr/lib:/usr/local/lib
+export LM_PLUGIN_PATH=/usr/local/lib/layermanager
 export DISPLAY=:0.0
 PIDSURFACE1=/tmp/surface1.pid
 PIDSURFACE2=/tmp/surface2.pid
+PIDLM=/tmp/surface3.pid
 
 start_egl_example_application()
 {
@@ -38,6 +40,13 @@ start_mock_example_application()
 }
 
 
+start_layermanager()
+{
+    LayerManagerService -c4 -f0 -w1280 -h480 &
+    pidofdlt=`ps aux | grep LayerManagerService  | grep -v grep | awk '{print $2}'`
+    echo $pidofdlt > $PIDLM
+}
+
 killprocess()
 {
     if [ -f $1 ]; then
@@ -51,6 +60,12 @@ stop()
     killprocess $PIDSURFACE2
 }
 
+stop_layermanager() 
+{
+    killprocess $PIDLM
+}
+
+
 start()
 {
     start_egl_example_application
@@ -61,15 +76,20 @@ case "$1" in
     start)
         start
         ;;
+    start_lm)
+        start_layermanager
+        ;;
     start_example_application)
         start_example_application
         ;;
     stop)
         stop
         ;;
-
+    stop_lm)
+        stop_layermanager
+        ;;       
     *)
-        echo "Usage: $0 {start|start_example_application|stop}"
+        echo "Usage: $0 {start|start_lm|start_example_application|stop|stop_lm}"
         ;;
 esac
 exit 0
