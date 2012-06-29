@@ -319,7 +319,7 @@ void GenericCommunicator::ScreenShot()
 {
     uint screenid = 0;
     m_ipcModule.getUint(&screenid);
-    char filename[256];
+    char filename[1024];
     m_ipcModule.getString(filename);
 
     t_ilm_bool status = m_executor->execute(new ScreenDumpCommand(filename, screenid));
@@ -336,7 +336,7 @@ void GenericCommunicator::ScreenShot()
 
 void GenericCommunicator::ScreenShotOfLayer()
 {
-    char filename[256];
+    char filename[1024];
     m_ipcModule.getString(filename);
     uint layerid = 0;
     m_ipcModule.getUint(&layerid);
@@ -355,7 +355,7 @@ void GenericCommunicator::ScreenShotOfLayer()
 
 void GenericCommunicator::ScreenShotOfSurface()
 {
-    char filename[256];
+    char filename[1024];
     m_ipcModule.getString(filename);
     uint id = 0;
     m_ipcModule.getUint(&id);
@@ -1822,9 +1822,9 @@ void GenericCommunicator::CommitChanges()
 
 void GenericCommunicator::CreateShader()
 {
-    char* vertname = NULL;
+    char vertname[1024];
+    char fragname[1024];
     m_ipcModule.getString(vertname);
-    char* fragname = NULL;
     m_ipcModule.getString(fragname);
     uint id = 0;
 
