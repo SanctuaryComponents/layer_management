@@ -97,12 +97,12 @@ t_ilm_bool sendError(t_ilm_const_string desc)
     if (!gpDbusState->isClient)
     {
         t_ilm_uint serial = 0;
-        DBusMessage* msg = dbus_message_new_error(gpCurrentMessage->pMessage,
+        DBusMessage* errorMsg = dbus_message_new_error(gpCurrentMessage->pMessage,
                                                           DBUS_SERVICE_ERROR,
                                                           desc);
 
         if (!dbus_connection_send(gpDbusState->connection,
-                                  msg,
+                                  errorMsg,
                                   &serial))
         {
             printf("DBUSIpcModule: Out Of Memory!\n");
@@ -111,8 +111,8 @@ t_ilm_bool sendError(t_ilm_const_string desc)
         dbus_connection_flush(gpDbusState->connection);
 
         // free the reply
-        dbus_message_unref(gpCurrentMessage->pMessage);
-        gpCurrentMessage->pMessage = NULL;
+        dbus_message_unref(errorMsg);
+        errorMsg = NULL;
     }
 
     return returnValue;
