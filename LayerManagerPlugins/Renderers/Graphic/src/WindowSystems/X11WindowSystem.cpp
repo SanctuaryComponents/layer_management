@@ -1142,7 +1142,7 @@ void X11WindowSystem::deallocatePlatformSurface(Surface* surface)
 
         if (nativeSurface->pixmap)
         {
-            int result = XFreePixmap(x11Display, nativeSurface->pixmap);
+            XFreePixmap(x11Display, nativeSurface->pixmap);
         }
 
         surface->renderPropertyChanged = true;
