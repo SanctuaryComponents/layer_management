@@ -68,17 +68,17 @@ TEST_F(SurfaceTest, defaultConstructor)
 
     /// make sure, surface has default source rectangle
     const Rectangle& srcRect = surface.getSourceRegion();
-    EXPECT_EQ(0, srcRect.height);
-    EXPECT_EQ(0, srcRect.width);
-    EXPECT_EQ(0, srcRect.x);
-    EXPECT_EQ(0, srcRect.y);
+    EXPECT_EQ(0u, srcRect.height);
+    EXPECT_EQ(0u, srcRect.width);
+    EXPECT_EQ(0u, srcRect.x);
+    EXPECT_EQ(0u, srcRect.y);
 
     /// make sure, surface has default destination rectangle
     const Rectangle& destRect = surface.getDestinationRegion();
-    EXPECT_EQ(0, destRect.height);
-    EXPECT_EQ(0, destRect.width);
-    EXPECT_EQ(0, destRect.x);
-    EXPECT_EQ(0, destRect.y);
+    EXPECT_EQ(0u, destRect.height);
+    EXPECT_EQ(0u, destRect.width);
+    EXPECT_EQ(0u, destRect.x);
+    EXPECT_EQ(0u, destRect.y);
 
     /// make sure, surface has no native content associated
     EXPECT_FALSE(m_pSurface->hasNativeContent());
@@ -113,17 +113,17 @@ TEST_F(SurfaceTest, specialConstructor)
 
     /// make sure, surface has default source rectangle
     const Rectangle& srcRect = surface.getSourceRegion();
-    EXPECT_EQ(0, srcRect.height);
-    EXPECT_EQ(0, srcRect.width);
-    EXPECT_EQ(0, srcRect.x);
-    EXPECT_EQ(0, srcRect.y);
+    EXPECT_EQ(0u, srcRect.height);
+    EXPECT_EQ(0u, srcRect.width);
+    EXPECT_EQ(0u, srcRect.x);
+    EXPECT_EQ(0u, srcRect.y);
 
     /// make sure, surface has default destination rectangle
     const Rectangle& destRect = surface.getDestinationRegion();
-    EXPECT_EQ(0, destRect.height);
-    EXPECT_EQ(0, destRect.width);
-    EXPECT_EQ(0, destRect.x);
-    EXPECT_EQ(0, destRect.y);
+    EXPECT_EQ(0u, destRect.height);
+    EXPECT_EQ(0u, destRect.width);
+    EXPECT_EQ(0u, destRect.x);
+    EXPECT_EQ(0u, destRect.y);
 
     /// make sure, surface has no native content associated
     EXPECT_FALSE(m_pSurface->hasNativeContent());
@@ -256,14 +256,14 @@ TEST_F(SurfaceTest, setNativeContent)
 
     /// make sure, surface has 1st expected native content associated
     EXPECT_TRUE(m_pSurface->hasNativeContent());
-    EXPECT_EQ(expectedNativeHandle1, m_pSurface->getNativeContent());
+    EXPECT_EQ((long)expectedNativeHandle1, m_pSurface->getNativeContent());
 
     /// set 2nd expected native content of surface
     m_pSurface->setNativeContent(expectedNativeHandle2);
 
     /// make sure, surface still has 1st expected native content associated
     EXPECT_TRUE(m_pSurface->hasNativeContent());
-    EXPECT_EQ(expectedNativeHandle1, m_pSurface->getNativeContent());
+    EXPECT_EQ((long)expectedNativeHandle1, m_pSurface->getNativeContent());
 
     /// remove native content of surface
     m_pSurface->removeNativeContent();
@@ -273,7 +273,7 @@ TEST_F(SurfaceTest, setNativeContent)
 
     /// make sure, surface has 2nd expected native content associated
     EXPECT_TRUE(m_pSurface->hasNativeContent());
-    EXPECT_EQ(expectedNativeHandle2, m_pSurface->getNativeContent());
+    EXPECT_EQ((long)expectedNativeHandle2, m_pSurface->getNativeContent());
 }
 
 TEST_F(SurfaceTest, getNativeContent)
@@ -289,7 +289,7 @@ TEST_F(SurfaceTest, getNativeContent)
 
     /// make sure, surface has 1st expected native content associated
     EXPECT_TRUE(m_pSurface->hasNativeContent());
-    EXPECT_EQ(expectedNativeHandle1, m_pSurface->getNativeContent());
+    EXPECT_EQ((long)expectedNativeHandle1, m_pSurface->getNativeContent());
 
     /// remove native content of surface
     m_pSurface->removeNativeContent();
@@ -299,5 +299,5 @@ TEST_F(SurfaceTest, getNativeContent)
 
     /// make sure, surface has 2nd expected native content associated
     EXPECT_TRUE(m_pSurface->hasNativeContent());
-    EXPECT_EQ(expectedNativeHandle2, m_pSurface->getNativeContent());
+    EXPECT_EQ((long)expectedNativeHandle2, m_pSurface->getNativeContent());
 }

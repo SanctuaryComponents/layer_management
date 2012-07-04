@@ -64,7 +64,7 @@ TEST_F(GraphicalGroupTest, defaultConstructor_Layer)
     ASSERT_TRUE(pLayerGroup);
 
     /// make sure, layer group is initially empty
-    EXPECT_EQ(0, pLayerGroup->getList().size());
+    EXPECT_EQ(0u, pLayerGroup->getList().size());
 
     // cleanup
     if (pLayerGroup)
@@ -84,7 +84,7 @@ TEST_F(GraphicalGroupTest, defaultConstructor_Surface)
     ASSERT_TRUE(pSurfaceGroup);
 
     /// make sure, surface group is initially empty
-    EXPECT_EQ(0, pSurfaceGroup->getList().size());
+    EXPECT_EQ(0u, pSurfaceGroup->getList().size());
 
     // cleanup
     if (pSurfaceGroup)
@@ -109,7 +109,7 @@ TEST_F(GraphicalGroupTest, specialConstructor_Layer)
     EXPECT_EQ(expectedId, pLayerGroup->getID());
 
     /// make sure, layer group is initially empty
-    EXPECT_EQ(0, pLayerGroup->getList().size());
+    EXPECT_EQ(0u, pLayerGroup->getList().size());
 
     // cleanup
     if (pLayerGroup)
@@ -134,7 +134,7 @@ TEST_F(GraphicalGroupTest, specialConstructor_Surface)
     EXPECT_EQ(expectedId, pSurfaceGroup->getID());
 
     /// make sure, surface group is initially empty
-    EXPECT_EQ(0, pSurfaceGroup->getList().size());
+    EXPECT_EQ(0u, pSurfaceGroup->getList().size());
 
     // cleanup
     if (pSurfaceGroup)
@@ -326,7 +326,7 @@ TEST_F(GraphicalGroupTest, setOpacity_Surface)
 TEST_F(GraphicalGroupTest, getList_Layer)
 {
     /// make sure, list is empty
-    EXPECT_EQ(0, m_pLayerGroup->getList().size());
+    EXPECT_EQ(0u, m_pLayerGroup->getList().size());
 
     /// add 3 layers to graphical group
     Layer l1, l2, l3;
@@ -335,26 +335,26 @@ TEST_F(GraphicalGroupTest, getList_Layer)
     m_pLayerGroup->addElement(&l3);
 
     /// make sure, list not contains 3 elements
-    EXPECT_EQ(3, m_pLayerGroup->getList().size());
+    EXPECT_EQ(3u, m_pLayerGroup->getList().size());
 
     /// remove 2 layers from graphical group
     m_pLayerGroup->removeElement(&l2);
     m_pLayerGroup->removeElement(&l3);
 
     /// make sure, list not contains 1 element
-    EXPECT_EQ(1, m_pLayerGroup->getList().size());
+    EXPECT_EQ(1u, m_pLayerGroup->getList().size());
 
     /// remove last layers from graphical group
     m_pLayerGroup->removeElement(&l1);
 
     /// make sure, list is empty
-    EXPECT_EQ(0, m_pLayerGroup->getList().size());
+    EXPECT_EQ(0u, m_pLayerGroup->getList().size());
 }
 
 TEST_F(GraphicalGroupTest, getList_Surface)
 {
     /// make sure, list is empty
-    EXPECT_EQ(0, m_pSurfaceGroup->getList().size());
+    EXPECT_EQ(0u, m_pSurfaceGroup->getList().size());
 
     /// add 3 surfaces to graphical group
     Surface l1, l2, l3;
@@ -363,33 +363,33 @@ TEST_F(GraphicalGroupTest, getList_Surface)
     m_pSurfaceGroup->addElement(&l3);
 
     /// make sure, list not contains 3 elements
-    EXPECT_EQ(3, m_pSurfaceGroup->getList().size());
+    EXPECT_EQ(3u, m_pSurfaceGroup->getList().size());
 
     /// remove 2 surfaces from graphical group
     m_pSurfaceGroup->removeElement(&l2);
     m_pSurfaceGroup->removeElement(&l3);
 
     /// make sure, list not contains 1 element
-    EXPECT_EQ(1, m_pSurfaceGroup->getList().size());
+    EXPECT_EQ(1u, m_pSurfaceGroup->getList().size());
 
     /// remove last surfaces from graphical group
     m_pSurfaceGroup->removeElement(&l1);
 
     /// make sure, list is empty
-    EXPECT_EQ(0, m_pSurfaceGroup->getList().size());
+    EXPECT_EQ(0u, m_pSurfaceGroup->getList().size());
 }
 
 TEST_F(GraphicalGroupTest, addElement_Layer)
 {
     /// make sure, list is empty
-    EXPECT_EQ(0, m_pLayerGroup->getList().size());
+    EXPECT_EQ(0u, m_pLayerGroup->getList().size());
 
     /// add 1 layer to graphical group
     Layer l1;
     m_pLayerGroup->addElement(&l1);
 
     /// make sure, list not contains 1 element
-    EXPECT_EQ(1, m_pLayerGroup->getList().size());
+    EXPECT_EQ(1u, m_pLayerGroup->getList().size());
 
     /// add 2 layers to graphical group
     Layer l2, l3;
@@ -397,20 +397,20 @@ TEST_F(GraphicalGroupTest, addElement_Layer)
     m_pLayerGroup->addElement(&l3);
 
     /// make sure, list contains 3 element
-    EXPECT_EQ(3, m_pLayerGroup->getList().size());
+    EXPECT_EQ(3u, m_pLayerGroup->getList().size());
 }
 
 TEST_F(GraphicalGroupTest, addElement_Surface)
 {
     /// make sure, list is empty
-    EXPECT_EQ(0, m_pSurfaceGroup->getList().size());
+    EXPECT_EQ(0u, m_pSurfaceGroup->getList().size());
 
     /// add 1 surface to graphical group
     Surface l1;
     m_pSurfaceGroup->addElement(&l1);
 
     /// make sure, list not contains 1 element
-    EXPECT_EQ(1, m_pSurfaceGroup->getList().size());
+    EXPECT_EQ(1u, m_pSurfaceGroup->getList().size());
 
     /// add 2 surfaces to graphical group
     Surface l2, l3;
@@ -418,13 +418,13 @@ TEST_F(GraphicalGroupTest, addElement_Surface)
     m_pSurfaceGroup->addElement(&l3);
 
     /// make sure, list contains 3 element
-    EXPECT_EQ(3, m_pSurfaceGroup->getList().size());
+    EXPECT_EQ(3u, m_pSurfaceGroup->getList().size());
 }
 
 TEST_F(GraphicalGroupTest, removeElement_Layer)
 {
     /// make sure, list is empty
-    EXPECT_EQ(0, m_pLayerGroup->getList().size());
+    EXPECT_EQ(0u, m_pLayerGroup->getList().size());
 
     /// add 3 layers to graphical group
     Layer l1, l2, l3;
@@ -433,26 +433,26 @@ TEST_F(GraphicalGroupTest, removeElement_Layer)
     m_pLayerGroup->addElement(&l3);
 
     /// make sure, list not contains 3 elements
-    EXPECT_EQ(3, m_pLayerGroup->getList().size());
+    EXPECT_EQ(3u, m_pLayerGroup->getList().size());
 
     /// remove 2 layers from graphical group
     m_pLayerGroup->removeElement(&l2);
     m_pLayerGroup->removeElement(&l3);
 
     /// make sure, list not contains 1 element
-    EXPECT_EQ(1, m_pLayerGroup->getList().size());
+    EXPECT_EQ(1u, m_pLayerGroup->getList().size());
 
     /// remove last layers from graphical group
     m_pLayerGroup->removeElement(&l1);
 
     /// make sure, list is empty
-    EXPECT_EQ(0, m_pLayerGroup->getList().size());
+    EXPECT_EQ(0u, m_pLayerGroup->getList().size());
 }
 
 TEST_F(GraphicalGroupTest, removeElement_Surface)
 {
     /// make sure, list is empty
-    EXPECT_EQ(0, m_pSurfaceGroup->getList().size());
+    EXPECT_EQ(0u, m_pSurfaceGroup->getList().size());
 
     /// add 3 surfaces to graphical group
     Surface l1, l2, l3;
@@ -461,20 +461,20 @@ TEST_F(GraphicalGroupTest, removeElement_Surface)
     m_pSurfaceGroup->addElement(&l3);
 
     /// make sure, list not contains 3 elements
-    EXPECT_EQ(3, m_pSurfaceGroup->getList().size());
+    EXPECT_EQ(3u, m_pSurfaceGroup->getList().size());
 
     /// remove 2 surfaces from graphical group
     m_pSurfaceGroup->removeElement(&l2);
     m_pSurfaceGroup->removeElement(&l3);
 
     /// make sure, list not contains 1 element
-    EXPECT_EQ(1, m_pSurfaceGroup->getList().size());
+    EXPECT_EQ(1u, m_pSurfaceGroup->getList().size());
 
     /// remove last surfaces from graphical group
     m_pSurfaceGroup->removeElement(&l1);
 
     /// make sure, list is empty
-    EXPECT_EQ(0, m_pSurfaceGroup->getList().size());
+    EXPECT_EQ(0u, m_pSurfaceGroup->getList().size());
 }
 
 TEST_F(GraphicalGroupTest, DISABLED_getShader)

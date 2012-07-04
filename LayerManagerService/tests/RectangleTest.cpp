@@ -27,10 +27,10 @@ TEST(RectangleTest, defaultConstructor)
     Rectangle rect;
 
     /// check default properties of rectangle
-    EXPECT_EQ(0, rect.x);
-    EXPECT_EQ(0, rect.y);
-    EXPECT_EQ(0, rect.width);
-    EXPECT_EQ(0, rect.height);
+    EXPECT_EQ(0u, rect.x);
+    EXPECT_EQ(0u, rect.y);
+    EXPECT_EQ(0u, rect.width);
+    EXPECT_EQ(0u, rect.height);
 }
 
 TEST(RectangleTest, specialConstructor)
@@ -39,10 +39,10 @@ TEST(RectangleTest, specialConstructor)
     Rectangle rect(1, 2, 3, 4);
 
     /// check specified properties of rectangle
-    EXPECT_EQ(1, rect.x);
-    EXPECT_EQ(2, rect.y);
-    EXPECT_EQ(3, rect.width);
-    EXPECT_EQ(4, rect.height);
+    EXPECT_EQ(1u, rect.x);
+    EXPECT_EQ(2u, rect.y);
+    EXPECT_EQ(3u, rect.width);
+    EXPECT_EQ(4u, rect.height);
 }
 
 TEST(RectangleTest, assignOperator)
