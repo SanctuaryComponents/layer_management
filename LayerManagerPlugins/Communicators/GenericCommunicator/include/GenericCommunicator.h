@@ -202,14 +202,12 @@ public:
     void SetUniforms();
 
 private:
-    IpcModule m_ipcModule;
-    CallBackTable m_callBackTable;
-    // TODO: void AddClientWatch(DBusConnection *conn, char* sender);
     void RemoveApplicationReference(char* owner);
 
-
+private:
+    IpcModule m_ipcModule;
+    CallBackTable m_callBackTable;
     bool m_running;
-
 };
 
 #endif /* _DBUSCOMMUNICATOR_H_ */

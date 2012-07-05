@@ -171,6 +171,8 @@ bool GenericCommunicator::start()
     }
     LOG_DEBUG("GenericCommunicator", "Initializing IpcModule success.");
 
+    m_running = ILM_TRUE;
+
     return ILM_TRUE;
 }
 
@@ -179,7 +181,10 @@ void GenericCommunicator::stop()
     LOG_ENTER_FUNCTION;
     LOG_INFO("GenericCommunicator","stopping");
 
-    m_ipcModule.destroy();
+    if (m_running)
+    {
+        m_ipcModule.destroy();
+    }
 }
 
 void GenericCommunicator::process(int timeout_ms)
