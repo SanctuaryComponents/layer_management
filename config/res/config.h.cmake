@@ -20,8 +20,6 @@
 #ifndef __CONFIG_H__
 #define __CONFIG_H__
 
-#include "Log.h"
-
 // Auto-generated. Do not modify.
 // Variables configured by CMake build system
 
@@ -98,27 +96,36 @@
 //-----------------------------------------------------------------------------
 // human readable report
 //-----------------------------------------------------------------------------
-#define printConfiguration() \
-    LOG_INFO ("Config", "Build Version       = " << ILM_VERSION); \
-    LOG_DEBUG("Config", "Build Type          = " << CMAKE_BUILD_TYPE); \
-    LOG_DEBUG("Config", "Compiler Flags      = " << CMAKE_CXX_FLAGS); \
-    LOG_DEBUG("Config", "Install Prefix      = " << CMAKE_INSTALL_PREFIX); \
-    LOG_DEBUG("Config", "WITH_CLIENTEXAMPLES = ${WITH_CLIENTEXAMPLES}"); \
-    LOG_DEBUG("Config", "WITH_DESKTOP        = ${WITH_DESKTOP}"); \
-    LOG_DEBUG("Config", "WITH_EGL_EXAMPLE    = ${WITH_EGL_EXAMPLE}"); \
-    LOG_DEBUG("Config", "WITH_WL_EXAMPLE     = ${WITH_WL_EXAMPLE}"); \
-    LOG_DEBUG("Config", "WITH_FORCE_COPY     = ${WITH_FORCE_COPY}"); \
-    LOG_DEBUG("Config", "WITH_GLESv2_LIB     = ${WITH_GLESv2_LIB}"); \
-    LOG_DEBUG("Config", "WITH_GLX_EXAMPLE    = ${WITH_GLX_EXAMPLE}"); \
-    LOG_DEBUG("Config", "WITH_GLX_LIB        = ${WITH_GLX_LIB}"); \
-    LOG_DEBUG("Config", "WITH_INPUT_EVENTS   = ${WITH_INPUT_EVENTS}"); \
-    LOG_DEBUG("Config", "WITH_TESTS          = ${WITH_TESTS}"); \
-    LOG_DEBUG("Config", "WITH_X11_GLES       = ${WITH_X11_GLES}"); \
-    LOG_DEBUG("Config", "WITH_WAYLAND        = ${WITH_WAYLAND}"); \
-    LOG_DEBUG("Config", "WITH_WAYLAND_FBDEV  = ${WITH_WAYLAND_FBDEV}"); \
-    LOG_DEBUG("Config", "WITH_WAYLAND_X11    = ${WITH_WAYLAND_X11}"); \
-    LOG_DEBUG("Config", "WITH_WAYLAND_DRM    = ${WITH_WAYLAND_DRM}"); \
-    LOG_DEBUG("Config", "WITH_XTHREADS       = ${WITH_XTHREADS}"); \
-    LOG_DEBUG("Config", "WITH_DLT            = ${WITH_DLT}");
+#define DEBUG_FLAG 1
+#define INFO_FLAG  2
+
+typedef struct
+{
+	int type;
+	const char* description;
+} buildConfigurationFlag;
+
+#define buildConfigurationFlags \
+{ INFO_FLAG,  "Build Version       = ${ILM_VERSION}"          }, \
+{ DEBUG_FLAG, "Build Type          = ${CMAKE_BUILD_TYPE}"     }, \
+{ DEBUG_FLAG, "Compiler Flags      = ${CMAKE_CXX_FLAGS}"      }, \
+{ DEBUG_FLAG, "Install Prefix      = ${CMAKE_INSTALL_PREFIX}" }, \
+{ DEBUG_FLAG, "WITH_CLIENTEXAMPLES = ${WITH_CLIENTEXAMPLES}"  }, \
+{ DEBUG_FLAG, "WITH_DESKTOP        = ${WITH_DESKTOP}"         }, \
+{ DEBUG_FLAG, "WITH_EGL_EXAMPLE    = ${WITH_EGL_EXAMPLE}"     }, \
+{ DEBUG_FLAG, "WITH_WL_EXAMPLE     = ${WITH_WL_EXAMPLE}"      }, \
+{ DEBUG_FLAG, "WITH_FORCE_COPY     = ${WITH_FORCE_COPY}"      }, \
+{ DEBUG_FLAG, "WITH_GLESv2_LIB     = ${WITH_GLESv2_LIB}"      }, \
+{ DEBUG_FLAG, "WITH_GLX_EXAMPLE    = ${WITH_GLX_EXAMPLE}"     }, \
+{ DEBUG_FLAG, "WITH_GLX_LIB        = ${WITH_GLX_LIB}"         }, \
+{ DEBUG_FLAG, "WITH_INPUT_EVENTS   = ${WITH_INPUT_EVENTS}"    }, \
+{ DEBUG_FLAG, "WITH_TESTS          = ${WITH_TESTS}"           }, \
+{ DEBUG_FLAG, "WITH_X11_GLES       = ${WITH_X11_GLES}"        }, \
+{ DEBUG_FLAG, "WITH_WAYLAND        = ${WITH_WAYLAND}"         }, \
+{ DEBUG_FLAG, "WITH_WAYLAND_FBDEV  = ${WITH_WAYLAND_FBDEV}"   }, \
+{ DEBUG_FLAG, "WITH_WAYLAND_X11    = ${WITH_WAYLAND_X11}"     }, \
+{ DEBUG_FLAG, "WITH_WAYLAND_DRM    = ${WITH_WAYLAND_DRM}"     }, \
+{ DEBUG_FLAG, "WITH_XTHREADS       = ${WITH_XTHREADS}"        }, \
+{ DEBUG_FLAG, "WITH_DLT            = ${WITH_DLT}"             }
 
 #endif // __CONFIG_H__

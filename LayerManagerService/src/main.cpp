@@ -413,9 +413,23 @@ int main(int argc, char **argv)
 
     parseCommandLine(argc, (char**) argv);
     char* pluginLookupPath = getenv("LM_PLUGIN_PATH");
-    LOG_INFO("LayerManagerService", "Starting Layermanager.");
+    LOG_INFO("LayerManagerService", "Starting Layermanager (version: " << ILM_VERSION << ")");
 
-    printConfiguration();
+    buildConfigurationFlag configFlags[] = { buildConfigurationFlags };
+    int configFlagCount = sizeof(configFlags) / sizeof(configFlags[0]);
+    for (int i = 0; i < configFlagCount; ++i)
+    {
+        buildConfigurationFlag& flag = configFlags[i];
+        switch (flag.type)
+        {
+        case DEBUG_FLAG:
+            LOG_DEBUG("LayerManagerService", flag.description);
+            break;
+        case INFO_FLAG:
+            LOG_INFO("LayerManagerService", flag.description);
+            break;
+        }
+    }
 
     if  (pluginLookupPath != NULL ) 
     {
