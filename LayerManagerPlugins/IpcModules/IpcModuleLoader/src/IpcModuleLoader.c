@@ -18,6 +18,7 @@
  ****************************************************************************/
 #include "IpcModuleLoader.h"
 #include "IpcModule.h"
+#include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <dlfcn.h>
@@ -35,7 +36,7 @@
 //=============================================================================
 // global variables
 //=============================================================================
-const char* gDefaultPluginLookupPath = "/usr/lib/layermanager";
+const char* gDefaultPluginLookupPath = CMAKE_INSTALL_PREFIX"/lib/layermanager";
 const char* gCommunicatorPluginDirectory = "/ipcmodules";
 
 
@@ -82,8 +83,8 @@ t_ilm_bool loadSymbolTable(struct IpcModule* ipcModule, char* path, char* file)
         { "getUintArray",    (void**)&ipcModule->getUintArray }
     };
 
-    const int apiFunctionCount = sizeof (ApiFunctionTable) / sizeof(struct ApiFunction);
-    int symbolCount = 0;
+    const unsigned int apiFunctionCount = sizeof (ApiFunctionTable) / sizeof(struct ApiFunction);
+    unsigned int symbolCount = 0;
 
     strcat(fullFilePath, path);
     strcat(fullFilePath, "/");

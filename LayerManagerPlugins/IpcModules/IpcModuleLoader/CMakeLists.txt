@@ -21,6 +21,8 @@ cmake_minimum_required (VERSION 2.6)
 
 include_directories(
     "include"
+    "${PROJECT_SOURCE_DIR}/config"
+    "${PROJECT_SOURCE_DIR}/LayerManagerUtils/include"
     "${CMAKE_SOURCE_DIR}/LayerManagerClient/ilmClient/include"
     "${CMAKE_SOURCE_DIR}/LayerManagerPlugins/IpcModules/IpcModuleLoader/include"
 )

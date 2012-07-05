@@ -45,7 +45,7 @@ typedef list<string>::iterator tFileListIterator;
 
 
 const char* displayName = ":0";
-const char* gPluginLookupPath = "/usr/lib/layermanager";
+const char* gPluginLookupPath = CMAKE_INSTALL_PREFIX"/lib/layermanager";
 int displayWidth = 1280; // default value, override with -w argument
 int displayHeight = 480; // default value, override with -h argument
 
