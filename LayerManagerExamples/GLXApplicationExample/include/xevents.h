@@ -20,17 +20,13 @@
 #ifndef _XEVENTS_H_
 #define _XEVENTS_H_
 
-#include "config.h"
- 
-#ifdef WITH_INPUT_EVENTS
-
+#include "config.h" 
 #include <X11/Xlib.h>
 #include "ilm_client.h"
 
 void xeventInitialiaze(Display* dpy, t_ilm_surface surfaceid, t_ilm_int x, t_ilm_int y, t_ilm_int width, t_ilm_int height);
 void parseXEventsNonBlocking();
 
-#endif // WITH_INPUT_EVENTS
 
 #endif // _XEVENTS_H_
 

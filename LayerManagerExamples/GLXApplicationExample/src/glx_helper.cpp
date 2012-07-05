@@ -162,9 +162,7 @@ t_ilm_bool createGLXContext(t_ilm_int width, t_ilm_int height)
     printf("Set surface opacity\n");
     ilm_surfaceSetOpacity(surfaceid, 0.75f);
 
-#ifdef WITH_INPUT_EVENTS
     xeventInitialiaze(g_x11ContextStruct.x11Display, surfaceid, 0, 0, width, height);
-#endif
 
     printf("commit\n");
     // commit will indicate error, if any command failed

@@ -50,9 +50,6 @@ set (WITH_FORCE_COPY OFF CACHE STRING "" FORCE)
 # Disable compilation of unit test
 set (WITH_TESTS OFF CACHE STRING "" FORCE)
 
-# Enable Input Event handling
-set (WITH_INPUT_EVENTS ON CACHE STRING "" FORCE)
-
 # Enable XThreads to post signals over different threads - switching polling to push notification
 set (WITH_XTRHEADS ON CACHE STRING "" FORCE)
 

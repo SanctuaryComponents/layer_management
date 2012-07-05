@@ -42,7 +42,6 @@ option (WITH_WL_EXAMPLE     "Build EGL_EXAMPLE / Wayland"                       
 option (WITH_DESKTOP        "Build for Desktop / GLX"                             OFF)
 option (WITH_GLX_LIB        "Build development library for GLX Based Renderers"   OFF)
 option (WITH_GLX_EXAMPLE    "Build GLX_EXAMPLE "                                  OFF)
-option (WITH_INPUT_EVENTS   "Activate input events handling"                      OFF)
 option (WITH_FORCE_COPY     "Force Software Copy of Pixmaps"                      OFF)
 option (WITH_XTHREADS       "Build with usage of X11 Threading"                   ON )
 option (WITH_CLIENTEXAMPLES "Build client examples "                              ON )

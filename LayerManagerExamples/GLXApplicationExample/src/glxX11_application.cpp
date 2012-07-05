@@ -71,9 +71,7 @@ int main()
     {
         draw(33);
         usleep(1000);
-#ifdef WITH_INPUT_EVENTS
 		parseXEventsNonBlocking();
-#endif
     }
 
     destroyGLXContext();

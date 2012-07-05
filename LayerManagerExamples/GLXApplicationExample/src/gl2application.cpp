@@ -78,12 +78,8 @@ t_ilm_bool initGlApplication(GLuint width, GLuint height)
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-#ifdef WITH_INPUT_EVENTS
 	/* Make the background visible so that we can click on it */
 	glClearColor(.2f, .4f, .5f, 1.0f);
-#else
-    glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
-#endif
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
 

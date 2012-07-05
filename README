@@ -203,10 +203,6 @@ Supported Build Options
   Option: -DWITH_XTHREADS=ON or
           -DWITH_XTHREADS=OFF
 
-- Build with INPUT EVENT support, switches input forwarding of events on
-  Option: -DWITH_INPUT_EVENTS=ON or
-          -DWITH_INPUT_EVENTS=OFF
-
 - Build available tests
   Option: -DWITH_TESTS=ON or
           -DWITH_TESTS=OFF

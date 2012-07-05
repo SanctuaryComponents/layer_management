@@ -495,11 +495,7 @@ bool X11WindowSystem::CreateCompositorWindow()
     XSetWindowAttributes attr;
     // draw a black background the full size of the resolution
     attr.override_redirect = True;
-#ifdef WITH_INPUT_EVENTS
     attr.event_mask =  ExposureMask | StructureNotifyMask | ButtonPressMask | ButtonReleaseMask | Button1MotionMask;
-#else
-    attr.event_mask = ExposureMask | StructureNotifyMask;
-#endif
     attr.background_pixel = 0;
     attr.border_pixel = 0;
     windowVis = getVisualFunc(x11Display);
@@ -902,12 +898,12 @@ init_complete:
                 //           else
                 //               renderer->DestroyWindow(event.xreparent.window);
                 break;
-#ifdef WITH_INPUT_EVENTS
+
             case ButtonPress:
             case ButtonRelease:
             case MotionNotify:
                 break;
-#endif
+
             default:
                 if (event.type == this->damage_event + XDamageNotify)
                 {

@@ -66,9 +66,6 @@
 // Build development library for GLX Based Renderers
 #cmakedefine WITH_GLX_LIB
 
-// enable input event handling
-#cmakedefine WITH_INPUT_EVENTS
-
 // build unit tests for all projects
 #cmakedefine WITH_TESTS
 
@@ -118,7 +115,6 @@ typedef struct
 { DEBUG_FLAG, "WITH_GLESv2_LIB     = ${WITH_GLESv2_LIB}"      }, \
 { DEBUG_FLAG, "WITH_GLX_EXAMPLE    = ${WITH_GLX_EXAMPLE}"     }, \
 { DEBUG_FLAG, "WITH_GLX_LIB        = ${WITH_GLX_LIB}"         }, \
-{ DEBUG_FLAG, "WITH_INPUT_EVENTS   = ${WITH_INPUT_EVENTS}"    }, \
 { DEBUG_FLAG, "WITH_TESTS          = ${WITH_TESTS}"           }, \
 { DEBUG_FLAG, "WITH_X11_GLES       = ${WITH_X11_GLES}"        }, \
 { DEBUG_FLAG, "WITH_WAYLAND        = ${WITH_WAYLAND}"         }, \
