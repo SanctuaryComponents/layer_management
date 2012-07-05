@@ -214,18 +214,6 @@ public:
     virtual const SurfaceMap getAllSurfaces() const = 0;
 
     /**
-     * \brief Get the topmost, visible surface at screen position x,y in scene.
-     * \ingroup SceneAPI
-     * \param[in] x x position in screen coordinates.
-     * \param[out] x x position in surface coordinates
-     * \param[in] y y position in screen coordinates.
-     * \param[out] y y position in surface coordinates
-     * \param[in] minOpacity minimum opacity for surface to be considered
-     * \return pointer to surface
-     */
-    virtual Surface* getSurfaceAt(unsigned int *x, unsigned int *y, double minOpacity) = 0;
-
-    /**
      * \brief Check, if layer is in render order.
      * \ingroup SceneAPI
      * \param[in] id layer id

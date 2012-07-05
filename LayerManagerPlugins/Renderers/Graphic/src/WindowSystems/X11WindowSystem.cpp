@@ -905,9 +905,7 @@ init_complete:
 #ifdef WITH_INPUT_EVENTS
             case ButtonPress:
             case ButtonRelease:
-
             case MotionNotify:
-                ManageXInputEvent(&event);
                 break;
 #endif
             default:
@@ -976,43 +974,6 @@ init_complete:
     this->cleanup();
     LOG_DEBUG("X11WindowSystem", "Renderer thread finished");
     return NULL;
-}
-
-
-void X11WindowSystem::ManageXInputEvent(XEvent *pevent)
-{
-    (void)pevent;
-
-#ifdef WITH_INPUT_EVENTS
-    XEvent* currentEvent = pevent;
-    Surface * surf;
-    int *pX = NULL;
-    int *pY = NULL;
-
-    switch (currentEvent->type)
-    {
-        case ButtonRelease:
-        case ButtonPress:
-            pX = &(((XButtonEvent*)currentEvent)->x);
-            pY = &(((XButtonEvent*)currentEvent)->y);
-            break;
-
-        case MotionNotify:
-            pX = &(((XMotionEvent*)currentEvent)->x);
-            pY = &(((XMotionEvent*)currentEvent)->y);
-            break;
-        default:
-            break;
-    }
-
-    surf = m_pScene->getSurfaceAt((unsigned int *) pX, (unsigned int *) pY, 0.1);
-    if (surf != NULL)
-    {
-        pevent->xany.window = surf->getNativeContent();
-        XSendEvent(x11Display, currentEvent->xany.window, false, 0, currentEvent);
-    }
-    currentEvent = NULL;
-#endif
 }
 
 

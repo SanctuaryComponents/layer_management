@@ -127,7 +127,7 @@ private:
     static int error(Display *dpy, XErrorEvent *ev);
 
     static bool m_xerror;
-    void ManageXInputEvent(XEvent *pevent);
+
 
     friend void * X11eventLoopCallback(void *);
 };

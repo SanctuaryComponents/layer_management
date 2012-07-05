@@ -393,66 +393,6 @@ void Scene::getLayerGroupIDs(uint* length, uint** array) const
     }
 }
 
-/**
- * \brief:
- * Return the first Surface located below a specific coordinate, and for which
- * the opacity is above a certain level. Also translate the input coordinates
- * which are display wide into surface wide coordinates.
- *
- * This function is mainly used to dispatch mouse events to the underlying
- * window. For this, we need to know to what is the layer / surface under the
- * (x,y) mouse pointer.
- *
- * @param[in] x x position in the scene
- * @param[out] x x position in the surface coordinate system
- * @param[in] y y position in the scene
- * @param[out] y y position in the surface coordinate system
- * @param[in] minOpacity Minimal opacity that a surface should have to be elected
- */
-Surface* Scene::getSurfaceAt(unsigned int *x, unsigned int *y, double minOpacity)
-{
-    Surface* surf;
-    SurfaceListConstReverseIterator currentSurf;
-    LayerListConstReverseIterator currentLayer;
-    unsigned int x_SurfCoordinate, y_SurfCoordinate;
-
-    surf = NULL;
-
-    /* Need to browse for all layers. 1st layer of m_currentRenderOrder is rendered
-     * on bottom, last one is rendrered on top. So we have to reverse iterate */
-    for (currentLayer = m_currentRenderOrder.rbegin();
-         currentLayer != m_currentRenderOrder.rend() && surf == NULL;
-         currentLayer++)
-    {
-        if ( ((*currentLayer)->visibility) && ((*currentLayer)->getOpacity() >= minOpacity) )
-        {
-            if ((*currentLayer)->isInside(*x, *y))
-            {
-                x_SurfCoordinate = *x;
-                y_SurfCoordinate = *y;
-                (*currentLayer)->DestToSourceCoordinates(&x_SurfCoordinate, &y_SurfCoordinate, false);
-                /* Need to browse for all surfaces */
-                for (currentSurf = (*currentLayer)->getAllSurfaces().rbegin();
-                     currentSurf != (*currentLayer)->getAllSurfaces().rend() && surf == NULL;
-                     currentSurf++)
-                {
-                    if ( ((*currentSurf)->hasNativeContent()) && ((*currentSurf)->visibility) && ((*currentSurf)->getOpacity() >= minOpacity) )
-                    {
-                        if ((*currentSurf)->isInside(x_SurfCoordinate, y_SurfCoordinate))
-                        {
-                            surf = *currentSurf;
-                            (*currentSurf)->DestToSourceCoordinates(&x_SurfCoordinate, &y_SurfCoordinate, false);
-                            *x = x_SurfCoordinate;
-                            *y = y_SurfCoordinate;
-                        }
-                    }
-                }
-            }
-        }
-    }
-    return surf;
-}
-
 bool Scene::isLayerInCurrentRenderOrder(const uint id)
 {
     LayerListConstIterator iter = m_currentRenderOrder.begin();

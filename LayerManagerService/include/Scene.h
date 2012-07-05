@@ -79,7 +79,6 @@ public:
     virtual void removeSurfaceGroup(SurfaceGroup *surface);
     virtual void removeLayerGroup(LayerGroup *layer);
     virtual const SurfaceMap getAllSurfaces() const;
-    virtual Surface* getSurfaceAt(unsigned int *x, unsigned int *y, double minOpacity);
     virtual bool isLayerInCurrentRenderOrder(const uint id);
 
 private:
