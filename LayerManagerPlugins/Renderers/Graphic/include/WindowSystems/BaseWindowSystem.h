@@ -25,9 +25,10 @@
 class BaseWindowSystem
 {
 public:
-    BaseWindowSystem(Scene* pScene)
+    BaseWindowSystem(Scene* pScene, InputManager* pInputManager )
     : m_pScene(pScene)
-	, m_damaged(false)
+    , m_pInputManager(pInputManager)
+    , m_damaged(false)
     {
     }
 
@@ -44,6 +45,7 @@ public:
 
 protected:
     Scene* m_pScene;
+    InputManager* m_pInputManager;
 
 public:
     bool m_damaged;

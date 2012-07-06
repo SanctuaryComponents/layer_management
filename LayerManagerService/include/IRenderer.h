@@ -24,6 +24,10 @@
 #include "LayerType.h"
 #include "Shader.h"
 
+
+class InputManager;
+
+
 /**
  * Abstract Base of all CompositingControllers, ie Renderers.
  * \defgroup RendererAPI Layer Management Renderer API
@@ -138,6 +142,13 @@ public:
      * \ingroup    RendererAPI
      */
     virtual void forceCompositionWindowSystem() = 0;
+
+    /**
+      * \brief      Get the InputManager associated to the Scene
+      * \ingroup    RendererAPI
+      */
+    virtual InputManager* getInputManager() const = 0;
 };
 
 #endif /* _IRENDERER_H_ */
+

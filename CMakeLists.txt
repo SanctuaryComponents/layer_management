@@ -94,6 +94,7 @@ add_subdirectory(cmake/optionalFeatures)
 
 add_subdirectory(config)
 
+include_directories ("${PROJECT_SOURCE_DIR}/config")
 include_directories ("${PROJECT_SOURCE_DIR}/3rdParty/")
 # ilm_types are used internally to LM, so we can include them by default
 include_directories ("${PROJECT_SOURCE_DIR}/LayerManagerClient/ilmClient/include")

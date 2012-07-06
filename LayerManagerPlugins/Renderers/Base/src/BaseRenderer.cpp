@@ -19,6 +19,7 @@
 
 #include "LayerCapabilities.h"
 #include "BaseRenderer.h"
+#include "InputManager.h"
 #include "Log.h"
 
 bool BaseRenderer::debugMode = true;
@@ -26,6 +27,7 @@ bool BaseRenderer::debugMode = true;
 BaseRenderer::BaseRenderer(Scene* pScene) : m_pScene(pScene)
 {
     LOG_DEBUG("BaseRenderer", "Creating Renderer");
+    m_pInputManager = new InputManager(pScene);
 }
 
 BaseRenderer::~BaseRenderer()

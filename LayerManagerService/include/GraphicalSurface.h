@@ -98,7 +98,7 @@ public:
      * @return TRUE if the coordinates have been translated
      *         FALSE if an error occured, exp: The position is not in the destination region
      */
-    bool DestToSourceCoordinates(unsigned int *x, unsigned int *y, bool check) const;
+    bool DestToSourceCoordinates(int *x, int *y, bool check) const;
 
     int OriginalSourceWidth;
     int OriginalSourceHeight;    

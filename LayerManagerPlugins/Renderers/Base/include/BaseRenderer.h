@@ -37,10 +37,12 @@ public:
 
     virtual void doScreenShot(std::string fileToSave) = 0;
     virtual uint getLayerTypeCapabilities(LayerType layerType);
+    virtual InputManager* getInputManager() const {return m_pInputManager;}
     virtual Shader* createShader(const string* vertexName, const string* fragmentName); 
 
 protected:
     Scene* m_pScene;
+    InputManager* m_pInputManager;
 
 private:
     static bool debugMode;

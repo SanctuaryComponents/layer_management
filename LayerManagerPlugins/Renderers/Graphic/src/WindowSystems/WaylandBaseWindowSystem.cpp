@@ -114,7 +114,7 @@ extern "C" {
 }
 
 WaylandBaseWindowSystem::WaylandBaseWindowSystem(const char* displayname, int width, int height, Scene* pScene)
-: BaseWindowSystem(pScene)
+: BaseWindowSystem(pScene, NULL)
 , m_wlDisplay(NULL)
 , m_wlDisplayClient(NULL)
 , m_wlCompositorClient(NULL)

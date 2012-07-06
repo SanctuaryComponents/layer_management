@@ -28,7 +28,7 @@ class NullWindowSystem: public BaseWindowSystem
 {
 public:
     NullWindowSystem(Scene* pScene, int width, int height)
-    : BaseWindowSystem(pScene)
+    : BaseWindowSystem(pScene, NULL)
     , windowWidth(width)
     , windowHeight(height)
     , resolutionWidth(width)

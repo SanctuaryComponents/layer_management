@@ -40,7 +40,7 @@ const char X11WindowSystem::CompositorWindowTitle[] = "LayerManager";
 bool    X11WindowSystem::m_xerror = false;
 
 X11WindowSystem::X11WindowSystem(const char* displayname, int width, int height, Scene* pScene,GetVisualInfoFunction func)
-: BaseWindowSystem(pScene)
+: BaseWindowSystem(pScene, NULL)
 , takeScreenshot(ScreenShotNone)
 , screenShotFile()
 , screenShotSurfaceID(0)

@@ -61,7 +61,7 @@ bool GraphicalSurface::isInside(unsigned int x_DestCoordinateSyst, unsigned int 
  *  - rotation (not yet implemented)
  *
  */
-bool GraphicalSurface::DestToSourceCoordinates(unsigned int *x, unsigned int *y, bool check) const
+bool GraphicalSurface::DestToSourceCoordinates(int *x, int *y, bool check) const
 {
 	bool 	ret;
 	int   	TVxD, TVyD;  /* Translation vector x,y in destination system */	
