@@ -18,6 +18,7 @@
 ****************************************************************************/
 
 #include "ShaderProgramGLES.h"
+#include "config.h"
 #include <GLES2/gl2ext.h>
 #include <RenderUtil.h>
 #include <Log.h>
@@ -37,7 +38,7 @@ ShaderProgram* ShaderProgramGLES::createProgram(const std::string& vertName, con
     }
     else
     {
-        strncpy(defaultShaderDir,"/usr/lib/layermanager", sizeof(defaultShaderDir));
+        strncpy(defaultShaderDir, CMAKE_INSTALL_PREFIX"/lib/layermanager", sizeof(defaultShaderDir));
     }
     strcat(defaultShaderDir,"/renderer");
 
