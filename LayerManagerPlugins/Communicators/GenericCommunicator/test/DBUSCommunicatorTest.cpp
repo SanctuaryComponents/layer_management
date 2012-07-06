@@ -821,8 +821,8 @@ TEST_F(DBUSCommunicatorTest, CreateShader) {
     EXPECT_CALL(this->mockCommandExecutor, execute(ShaderCreateCommandEq(std::string("test123.glslv"),std::string("differentshader.glslv")))).Times(1);
     ASSERT_NE(-1, system((DBUSCOMMAND + std::string("CreateShader string:test123.glslv string:differentshader.glslv")).c_str()));
 
-    EXPECT_CALL(this->mockCommandExecutor, execute(ShaderCreateCommandEq(std::string("/usr/lib/shadertest.glslv"),std::string("foobar")))).Times(1);
-    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("CreateShader string:/usr/lib/shadertest.glslv string:foobar")).c_str()));
+    EXPECT_CALL(this->mockCommandExecutor, execute(ShaderCreateCommandEq(std::string("/test/path/shadertest.glslv"),std::string("foobar")))).Times(1);
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("CreateShader string:/test/path/shadertest.glslv string:foobar")).c_str()));
 }
 
 MATCHER_P(ShaderDestroyCommandEq, id, "%(*)s") {

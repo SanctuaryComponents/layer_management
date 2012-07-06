@@ -19,7 +19,10 @@
 ############################################################################
 
 export LD_LIBRARY_PATH=/usr/lib:/usr/local/lib
-export LM_PLUGIN_PATH=/usr/local/lib/layermanager
+
+# set plugin path, if installation path is not used
+#export LM_PLUGIN_PATH=/usr/local/lib/layermanager
+
 export DISPLAY=:0.0
 PIDSURFACE1=/tmp/surface1.pid
 PIDSURFACE2=/tmp/surface2.pid

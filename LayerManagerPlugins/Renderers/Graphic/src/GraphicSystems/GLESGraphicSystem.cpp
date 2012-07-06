@@ -24,6 +24,8 @@
 #include "GLES2/gl2.h"
 #include "Bitmap.h"
 #include "Transformation/ViewportTransform.h"
+#include "config.h"
+#include <string>
 
 static const float vertices[8 * 12] =
 { 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0,
@@ -403,11 +405,19 @@ bool GLESGraphicsystem::initOpenGLES(EGLint displayWidth, EGLint displayHeight)
     m_defaultShaderNoUniformAlpha = Shader::createShader("default", "default_no_uniform_alpha");
 
 #ifdef DRAW_LAYER_DEBUG
-    m_layerShader = Shader::createShader("/usr/lib/layermanager/renderer/renderer_layer.glslv", "/usr/lib/layermanager/renderer/renderer_layer.glslf");
-    if (m_layerShader==0)
+    std::string pluginLookupPath = getenv("LM_PLUGIN_PATH");
+    std::string vertexShaderPath;
+    std::string fragmentShaderPath;
+
+    if (pluginLookupPath.empty())
     {
-        m_layerShader = Shader::createShader("/usr/local/lib/layermanager/renderer/renderer_layer.glslv", "/usr/local/lib/layermanager/renderer/renderer_layer.glslf");
+        pluginLookupPath = CMAKE_INSTALL_PREFIX"/lib/layermanager";
     }
+
+    vertexShaderPath   = pluginLookupPath + "/renderer/renderer_layer.glslv";
+    fragmentShaderPath = pluginLookupPath + "/renderer/renderer_layer.glslf";
+
+    m_layerShader = Shader::createShader(vertexShaderPath, fragmentShaderPath);
 #endif
     if (
       !m_defaultShader || !m_defaultShaderNoUniformAlpha
