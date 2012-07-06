@@ -46,6 +46,7 @@ public:
     unsigned int getCapabilities() const;
     bool addSurface(Surface* s);
     bool removeSurface(Surface* s);
+    void applySurfaceTransform();
     SurfaceList& getAllSurfaces();
     bool removeAllSurfaces();
 
@@ -145,6 +146,19 @@ inline bool Layer::removeAllSurfaces()
     m_surfaces.clear();
     renderPropertyChanged = true;
     return true;
+}
+
+inline void Layer::applySurfaceTransform()
+{
+	SurfaceListConstIterator iter = m_surfaces.begin();
+	SurfaceListConstIterator iterEnd = m_surfaces.end();
+	if(iter != iterEnd) 
+	{
+		for (; iter != iterEnd; ++iter)
+		{
+			(*iter)->calculateTargetDestination(getSourceRegion(),getDestinationRegion());
+		}
+	}
 }
 
 #endif /* _LAYER_H_ */

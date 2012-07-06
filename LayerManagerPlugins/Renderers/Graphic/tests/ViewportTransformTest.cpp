@@ -21,7 +21,7 @@
 #include "Rectangle.h"
 #include "Surface.h"
 #include "Layer.h"
-#include "Transformation/ViewportTransform.h"
+#include "ViewportTransform.h"
 #include "Scene.h"
 
 class ViewportTransformTest : public ::testing::Test {

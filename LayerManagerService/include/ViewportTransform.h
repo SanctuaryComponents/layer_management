@@ -17,9 +17,38 @@
  *
  ****************************************************************************/
 
-#include "Transformation/ViewportTransform.h"
+#ifndef _VIEWPORT_TRANSFORM_H_
+#define _VIEWPORT_TRANSFORM_H_
 
-bool ViewportTransform::isFullyCropped(const Rectangle& surfaceDestination, const Rectangle& layerSource)
+class ViewportTransform
+{
+public:
+
+    /*
+     * Returns true if surface is completely cropped by the given layer source region
+     */
+    static bool isFullyCropped(const Rectangle& surfaceDestination, const Rectangle& layerSource);
+
+    /*
+     * Apply Source View of Layer to the given surface source and destination regions, ie cropping surface parts to layer source view
+     */
+    static void applyLayerSource(const FloatRectangle& layerSource, FloatRectangle& surfaceSource, FloatRectangle& surfaceDestination);
+
+    /*
+     * Apply Destination View of Layer to the given surface destination region, ie scale and movement relative to scaling and position of layer
+     */
+    static void applyLayerDestination(const FloatRectangle& layerDestination, const FloatRectangle& layerSource, FloatRectangle& regionToScale);
+
+    /*
+     * Calculate Texture Coordinates as relation of the given rectangle to original values.
+     * Example: x position of 10 with an original width of 40 will yield a texture coordinate of 10/40=0.25f.
+     * This function expects textureCoordinates to be an allocated float array of size 4, in which the texture coordinates will be returned.
+     */
+    static void transformRectangleToTextureCoordinates(const FloatRectangle& rectangle, const float originalWidth, const float originalHeight, float* textureCoordinates);
+};
+
+
+inline bool ViewportTransform::isFullyCropped(const Rectangle& surfaceDestination, const Rectangle& layerSource)
 {
     // is surface completely to the right of layer source region?
     if (surfaceDestination.x >= layerSource.x + layerSource.width )
@@ -36,7 +65,7 @@ bool ViewportTransform::isFullyCropped(const Rectangle& surfaceDestination, cons
     return false;
 }
 
-void ViewportTransform::applyLayerSource(const FloatRectangle& layerSource, FloatRectangle& surfaceSource, FloatRectangle& surfaceDestination)
+inline void ViewportTransform::applyLayerSource(const FloatRectangle& layerSource, FloatRectangle& surfaceSource, FloatRectangle& surfaceDestination)
 {
     float cropamount = 0;
     float surfaceInverseScaleX = surfaceSource.width / surfaceDestination.width;
@@ -99,7 +128,7 @@ void ViewportTransform::applyLayerSource(const FloatRectangle& layerSource, Floa
     }
 }
 
-void ViewportTransform::applyLayerDestination(const FloatRectangle& layerDestination, const FloatRectangle& layerSource, FloatRectangle& regionToScale)
+inline void ViewportTransform::applyLayerDestination(const FloatRectangle& layerDestination, const FloatRectangle& layerSource, FloatRectangle& regionToScale)
 {
     float scaleX = layerDestination.width / layerSource.width;
     float scaleY = layerDestination.height / layerSource.height;
@@ -119,7 +148,7 @@ void ViewportTransform::applyLayerDestination(const FloatRectangle& layerDestina
     regionToScale.y += layerDestination.y;
 }
 
-void ViewportTransform::transformRectangleToTextureCoordinates(const FloatRectangle& rectangle, const float originalWidth, const float originalHeight, float* textureCoordinates)
+inline void ViewportTransform::transformRectangleToTextureCoordinates(const FloatRectangle& rectangle, const float originalWidth, const float originalHeight, float* textureCoordinates)
 {
     // move texture coordinate proportional to the cropped pixels
     float percentageCroppedFromLeftSide = rectangle.x / originalWidth;
@@ -140,3 +169,5 @@ void ViewportTransform::transformRectangleToTextureCoordinates(const FloatRectan
     float percentageCroppedFromBottomSide = (originalHeight - newBottomSide) / originalHeight;
     textureCoordinates[3] = 1.0f - percentageCroppedFromBottomSide;
 }
+
+#endif /* _VIEWPORT_TRANSFORM_H_ */

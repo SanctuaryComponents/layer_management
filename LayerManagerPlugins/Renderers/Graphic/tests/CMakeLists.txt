@@ -45,7 +45,6 @@ enable_testing()
 
 add_executable(ViewportTransform_Test
     ${LM_SOURCES}
-    ../src/Transformation/ViewportTransform.cpp
     ViewportTransformTest.cpp
 )
 

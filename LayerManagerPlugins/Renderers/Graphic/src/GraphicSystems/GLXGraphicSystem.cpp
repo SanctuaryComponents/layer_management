@@ -21,7 +21,7 @@
 #include <string.h>
 #include "TextureBinders/X11CopyGLX.h"
 #include "TextureBinders/X11TextureFromPixmap.h"
-#include "Transformation/ViewportTransform.h"
+#include "ViewportTransform.h"
 
 #include "Bitmap.h"
 
@@ -319,19 +319,14 @@ void GLXGraphicsystem::renderSurface(Surface* currentSurface)
 {
 //    LOG_DEBUG("GLXGraphicsystem", "renderSurface " << currentSurface->getID() );
     GLenum glErrorCode = GL_NO_ERROR;
-
-    // check if surface is cropped completely, if so then skip rendering
-    if (ViewportTransform::isFullyCropped(currentSurface->getDestinationRegion(), m_currentLayer->getSourceRegion() ) )
+    
+    if (currentSurface->isCropped())
         return; // skip rendering of this surface, because it is cropped by layer source region
+        
+    // check if surface is cropped completely, if so then skip rendering
+    FloatRectangle targetSurfaceSource = currentSurface->getTargetSourceRegion();
+    FloatRectangle targetSurfaceDestination = currentSurface->getTargetDestinationRegion();
 
-    const FloatRectangle layerSourceRegion = m_currentLayer->getSourceRegion();
-    const FloatRectangle layerDestinationRegion = m_currentLayer->getDestinationRegion();
-
-    FloatRectangle targetSurfaceSource = currentSurface->getSourceRegion();
-    FloatRectangle targetSurfaceDestination = currentSurface->getDestinationRegion();
-
-    ViewportTransform::applyLayerSource(layerSourceRegion, targetSurfaceSource, targetSurfaceDestination);
-    ViewportTransform::applyLayerDestination(layerDestinationRegion, layerSourceRegion, targetSurfaceDestination);
     float textureCoordinates[4];
     ViewportTransform::transformRectangleToTextureCoordinates(targetSurfaceSource, currentSurface->OriginalSourceWidth, currentSurface->OriginalSourceHeight, textureCoordinates);
 

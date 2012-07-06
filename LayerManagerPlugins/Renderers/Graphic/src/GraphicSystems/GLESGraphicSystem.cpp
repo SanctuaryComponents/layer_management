@@ -23,7 +23,7 @@
 #include "EGL/egl.h"
 #include "GLES2/gl2.h"
 #include "Bitmap.h"
-#include "Transformation/ViewportTransform.h"
+#include "ViewportTransform.h"
 #include "config.h"
 #include <string>
 
@@ -274,7 +274,7 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
 //  LOG_DEBUG("GLESGraphicsystem", "renderSurface " << surface->getID());
     GLenum glErrorCode = GL_NO_ERROR;
     // check if surface is cropped completely, if so then skip rendering
-    if (ViewportTransform::isFullyCropped(surface->getDestinationRegion(), m_currentLayer->getSourceRegion() ) )
+    if (surface->isCropped())
         return; // skip rendering of this surface, because it is cropped by layer source region
 
     GLint index = 0;
@@ -298,14 +298,10 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
         shader = layerShader;
     }
 
-    const FloatRectangle layerSourceRegion = m_currentLayer->getSourceRegion();
-    const FloatRectangle layerDestinationRegion = m_currentLayer->getDestinationRegion();
 
-    FloatRectangle targetSurfaceSource = surface->getSourceRegion();
-    FloatRectangle targetSurfaceDestination = surface->getDestinationRegion();
+    FloatRectangle targetSurfaceSource = surface->getTargetSourceRegion();
+    FloatRectangle targetSurfaceDestination = surface->getTargetDestinationRegion();
 
-    ViewportTransform::applyLayerSource(layerSourceRegion, targetSurfaceSource, targetSurfaceDestination);
-    ViewportTransform::applyLayerDestination(layerDestinationRegion, layerSourceRegion, targetSurfaceDestination);
     float textureCoordinates[4];
     ViewportTransform::transformRectangleToTextureCoordinates(targetSurfaceSource, surface->OriginalSourceWidth, surface->OriginalSourceHeight, textureCoordinates);
 

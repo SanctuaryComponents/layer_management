@@ -56,7 +56,6 @@ if (WITH_GLESv2_LIB)
             src/TextureBinders/X11Copy.cpp
             src/TextureBinders/X11CopyGLES.cpp
             src/TextureBinders/X11EglImage.cpp
-            src/Transformation/ViewportTransform.cpp
             )
    
     set(LIBS
@@ -131,12 +130,6 @@ if (WITH_GLESv2_LIB)
     )
 
     install(FILES
-                include/Transformation/ViewportTransform.h
-            DESTINATION
-                include/layermanager/graphic/Transformation
-    )
-
-    install(FILES
                 ../Base/include/BaseRenderer.h
                 ../Base/include/RenderUtil.h
             DESTINATION
@@ -168,7 +161,6 @@ if (WITH_GLX_LIB)
         src/TextureBinders/X11TextureFromPixmap.cpp
         src/TextureBinders/X11CopyGLX.cpp
         src/TextureBinders/X11Copy.cpp
-        src/Transformation/ViewportTransform.cpp    
     )
 
     set(LIBS
@@ -220,11 +212,6 @@ if (WITH_GLX_LIB)
                 include/layermanager/graphic/WindowSystems
     )
 
-    install(FILES
-                include/Transformation/ViewportTransform.h
-            DESTINATION
-                include/layermanager/graphic/Transformation
-    )
 
     install(FILES
                 ../Base/include/BaseRenderer.h
@@ -273,7 +260,6 @@ if (WITH_WAYLAND)
             src/WindowSystems/WaylandX11WindowSystem.cpp
             src/WindowSystems/WaylandServerinfoProtocol.cpp  
             src/TextureBinders/WaylandGLESTexture.cpp
-            src/Transformation/ViewportTransform.cpp
         )
         
     endif (WITH_WAYLAND_X11)
@@ -296,7 +282,6 @@ if (WITH_WAYLAND)
             src/WindowSystems/WaylandFbdevWindowSystem.cpp
             src/WindowSystems/WaylandServerinfoProtocol.cpp  
             src/TextureBinders/WaylandGLESTexture.cpp
-            src/Transformation/ViewportTransform.cpp
         )
 
     endif (WITH_WAYLAND_FBDEV)
@@ -329,7 +314,6 @@ if (WITH_WAYLAND)
             src/WindowSystems/WaylandDrmWindowSystem.cpp
             src/WindowSystems/WaylandServerinfoProtocol.cpp
             src/TextureBinders/WaylandGLESTexture.cpp
-            src/Transformation/ViewportTransform.cpp
         )
 
     endif (WITH_WAYLAND_DRM)
@@ -379,12 +363,6 @@ if (WITH_WAYLAND)
                 include/WindowSystems/WaylandDrmWindowSystem.h
             DESTINATION
                 include/layermanager/graphic/WindowSystems
-    )
-
-    install(FILES
-                include/Transformation/ViewportTransform.h
-            DESTINATION
-                include/layermanager/graphic/Transformation
     )
 
     install(FILES
