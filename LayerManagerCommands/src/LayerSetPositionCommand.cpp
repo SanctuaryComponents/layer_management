@@ -39,6 +39,7 @@ ExecutionResult LayerSetPositionCommand::execute(ICommandExecutor* executor)
     if (layer)
     {
         result = layer->setPosition(m_x, m_y) ? ExecutionSuccessRedraw : ExecutionSuccess;
+		layer->applySurfaceTransform();        
     }
     return result;
 }

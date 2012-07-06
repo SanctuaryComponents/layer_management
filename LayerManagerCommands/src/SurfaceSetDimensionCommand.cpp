@@ -34,11 +34,15 @@ ExecutionResult SurfaceSetDimensionCommand::execute(ICommandExecutor* executor)
 
     ExecutionResult result = ExecutionFailed;
 
-    GraphicalSurface* surface = scene.getSurface(m_id);
-
+    Surface* surface = scene.getSurface(m_id);
     if (surface)
     {
+		unsigned int layerid = surface->getContainingLayerId();
         result = surface->setDimension(m_width, m_height) ? ExecutionSuccessRedraw : ExecutionSuccess;
+        if ( layerid != Surface::INVALID_ID ) 
+        { 			
+			surface->calculateTargetDestination(scene.getLayer(layerid)->getSourceRegion(),scene.getLayer(layerid)->getDestinationRegion());
+		}		        
     }
 
     return result;

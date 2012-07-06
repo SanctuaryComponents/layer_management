@@ -43,6 +43,7 @@ ExecutionResult LayerSetDestinationRectangleCommand::execute(ICommandExecutor* e
     {
         const Rectangle rectangle(m_x, m_y, m_width, m_height);
         result = layer->setDestinationRegion(rectangle) ? ExecutionSuccessRedraw : ExecutionSuccess;
+		layer->applySurfaceTransform();
     }
 
     return result;

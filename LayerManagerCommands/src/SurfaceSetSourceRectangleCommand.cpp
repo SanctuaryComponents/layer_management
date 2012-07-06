@@ -37,11 +37,15 @@ ExecutionResult SurfaceSetSourceRectangleCommand::execute(ICommandExecutor* exec
     ExecutionResult result = ExecutionFailed;
 
     Surface* surface = scene.getSurface(m_id);
-
     if (surface)
     {
+		unsigned int layerid = surface->getContainingLayerId();
         const Rectangle rectangle(m_x, m_y, m_width, m_height);
         result = surface->setSourceRegion(rectangle) ? ExecutionSuccessRedraw : ExecutionSuccess;
+        if ( layerid != Surface::INVALID_ID ) 
+        { 			
+			surface->calculateTargetDestination(scene.getLayer(layerid)->getSourceRegion(),scene.getLayer(layerid)->getDestinationRegion());
+		}	        
     }
 
     return result;

@@ -50,6 +50,7 @@ ExecutionResult LayerAddSurfaceCommand::execute(ICommandExecutor* executor)
             LOG_WARNING("LayerAddSurfaceCommand","surface : id [ " << m_surfaceid << " ] already belongs to layer : id [ " << layer_id << " ]");
             result = (m_layerid == layer_id) ? ExecutionSuccess : ExecutionFailed;
         }
+		surface->calculateTargetDestination(layer->getSourceRegion(),layer->getDestinationRegion());
     }
 
     return result;
