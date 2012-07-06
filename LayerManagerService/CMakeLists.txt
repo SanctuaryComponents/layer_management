@@ -59,6 +59,7 @@ enable_testing()
 add_executable(LayerManagerService_Test
     tests/SceneTest.cpp
     tests/LayermanagerTest.cpp
+    tests/InputManagerTest.cpp
     tests/GraphicalObjectTest.cpp
     tests/GraphicalGroupTest.cpp
     tests/GraphicalSurfaceTest.cpp
@@ -73,6 +74,7 @@ add_executable(LayerManagerService_Test
     src/GraphicalObject.cpp
     src/GraphicalSurface.cpp
     src/Layermanager.cpp
+    src/InputManager.cpp
     src/Scene.cpp
     src/shader/Shader.cpp
     src/shader/ShaderProgram.cpp
