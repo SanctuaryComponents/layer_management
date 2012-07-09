@@ -98,6 +98,17 @@ typedef enum e_ilmOrientation
 } ilmOrientation;
 
 /**
+ * \brief Identifier of different input device types. Can be used as a bitmask.
+ * \ingroup ilmClient
+ */
+typedef unsigned int ilmInputDevice;
+#define ILM_INPUT_DEVICE_KEYBOARD   ((ilmInputDevice) 1 << 0)
+#define ILM_INPUT_DEVICE_POINTER    ((ilmInputDevice) 1 << 1)
+#define ILM_INPUT_DEVICE_TOUCH      ((ilmInputDevice) 1 << 2)
+#define ILM_INPUT_DEVICE_ALL        ((ilmInputDevice) ~0)
+
+
+/**
  * \brief Typedef for representing a layer
  * \ingroup ilmClient
  **/
@@ -157,24 +168,25 @@ typedef t_ilm_const_char* t_ilm_const_string;
  **/
 struct ilmSurfaceProperties
 {
-    t_ilm_float opacity;         /*!< opacity value of the surface */
-    t_ilm_uint sourceX;          /*!< x source position value of the surface */
-    t_ilm_uint sourceY;          /*!< y source position value of the surface */
-    t_ilm_uint sourceWidth;      /*!< source width value of the surface */
-    t_ilm_uint sourceHeight;     /*!< source height value of the surface */
-    t_ilm_uint origSourceWidth;  /*!< original source width value of the surface */
-    t_ilm_uint origSourceHeight; /*!< original source height value of the surface */
-    t_ilm_uint destX;            /*!< x destination position value of the surface */
-    t_ilm_uint destY;            /*!< y desitination position value of the surface */
-    t_ilm_uint destWidth;        /*!< destination width value of the surface */
-    t_ilm_uint destHeight;       /*!< destination height value of the surface */
-    ilmOrientation orientation;  /*!< orientation value of the surface */
-    t_ilm_bool visibility;       /*!< visibility value of the surface */
-    t_ilm_uint frameCounter;     /*!< already rendered frames of surface */
-    t_ilm_uint drawCounter;      /*!< content updates of surface */
-    t_ilm_uint updateCounter;    /*!< content updates of surface */
-    t_ilm_uint pixelformat;      /*!< pixel format of surface */
-    t_ilm_uint nativeSurface;    /*!< native surface handle of surface */
+    t_ilm_float opacity;                    /*!< opacity value of the surface */
+    t_ilm_uint sourceX;                     /*!< x source position value of the surface */
+    t_ilm_uint sourceY;                     /*!< y source position value of the surface */
+    t_ilm_uint sourceWidth;                 /*!< source width value of the surface */
+    t_ilm_uint sourceHeight;                /*!< source height value of the surface */
+    t_ilm_uint origSourceWidth;             /*!< original source width value of the surface */
+    t_ilm_uint origSourceHeight;            /*!< original source height value of the surface */
+    t_ilm_uint destX;                       /*!< x destination position value of the surface */
+    t_ilm_uint destY;                       /*!< y desitination position value of the surface */
+    t_ilm_uint destWidth;                   /*!< destination width value of the surface */
+    t_ilm_uint destHeight;                  /*!< destination height value of the surface */
+    ilmOrientation orientation;             /*!< orientation value of the surface */
+    t_ilm_bool visibility;                  /*!< visibility value of the surface */
+    t_ilm_uint frameCounter;                /*!< already rendered frames of surface */
+    t_ilm_uint drawCounter;                 /*!< content updates of surface */
+    t_ilm_uint updateCounter;               /*!< content updates of surface */
+    t_ilm_uint pixelformat;                 /*!< pixel format of surface */
+    t_ilm_uint nativeSurface;               /*!< native surface handle of surface */
+    ilmInputDevice inputDevicesAcceptance;  /*!< bitmask of ilmInputDevice from which the surface can accept input events */
 };
 
 /**

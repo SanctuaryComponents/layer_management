@@ -37,11 +37,11 @@ class Surface;
  * @brief Identifier for the different type of input devices supported by LayerManager.
  *        Fields can be used as a bit mask
  */
-typedef unsigned int InputDevice;
-#define INPUT_DEVICE_KEYBOARD   ((InputDevice) 1 << 0)
-#define INPUT_DEVICE_POINTER    ((InputDevice) 1 << 1)
-#define INPUT_DEVICE_TOUCH      ((InputDevice) 1 << 2)
-#define INPUT_DEVICE_ALL        ((InputDevice) ~0)
+typedef ilmInputDevice InputDevice;
+#define INPUT_DEVICE_KEYBOARD   ((InputDevice) ILM_INPUT_DEVICE_KEYBOARD)
+#define INPUT_DEVICE_POINTER    ((InputDevice) ILM_INPUT_DEVICE_POINTER)
+#define INPUT_DEVICE_TOUCH      ((InputDevice) ILM_INPUT_DEVICE_TOUCH)
+#define INPUT_DEVICE_ALL        ((InputDevice) ILM_INPUT_DEVICE_ALL)
 
 
 /**

@@ -87,7 +87,9 @@
 #include "SurfaceDumpCommand.h"
 #include "SurfaceSetNativeContentCommand.h"
 #include "SurfaceRemoveNativeContentCommand.h"
-
+#include "SurfaceSetKeyboardFocusCommand.h"
+#include "SurfaceGetKeyboardFocusCommand.h"
+#include "SurfaceUpdateInputEventAcceptance.h"
 
 class GenericCommunicator;
 class DBusConnection;
@@ -200,6 +202,9 @@ public:
     void DestroyShader();
     void SetShader();
     void SetUniforms();
+    void SetKeyboardFocusOn();
+    void GetKeyboardFocusSurfaceId();
+    void UpdateInputEventAcceptanceOn();
 
 private:
     void RemoveApplicationReference(char* owner);

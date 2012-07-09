@@ -803,6 +803,53 @@ ilmErrorTypes ilm_takeLayerScreenshot(t_ilm_const_string filename, t_ilm_layer l
  */
 ilmErrorTypes ilm_takeSurfaceScreenshot(t_ilm_const_string filename, t_ilm_surface surfaceid);
 
+
+/**
+ * \brief Set the keyboard focus on a certain surface
+ * To receive keyboard events, 2 conditions must be fulfilled:
+ *  1- The surface must accept events from keyboard. See ilm_UpdateInputEventAcceptanceOn
+ *  2- The keyboard focus must be set on that surface
+ * 
+ * \ingroup ilmClient
+ * \param[in] surfaceId Identifier of the surface to set the keyboard focus on.
+ * \return ILM_SUCCESS if the method call was successful
+ * \return ILM_FAILED if the client can not call the method on the service.
+ */
+ilmErrorTypes ilm_SetKeyboardFocusOn(t_ilm_surface surfaceId);
+
+
+/**
+ * \brief Get the indentifier of the surface which hold the keyboard focus
+ * 
+ * \ingroup ilmClient
+ * \param[out] pSurfaceId Pointer on the a surface identifier
+ * \return ILM_SUCCESS if the method call was successful
+ * \return ILM_FAILED if the client can not call the method on the service.
+ */
+ilmErrorTypes ilm_GetKeyboardFocusSurfaceId(t_ilm_surface* pSurfaceId);
+
+
+/**
+ * \brief Set from which kind of devices the surface can accept input events.
+ * By default, a surface accept input events from all kind of devices (keyboards, pointer, ...)
+ * By calling this function, you can adjust surface preferences. Note that this function only
+ * adjust the acceptance for the specified devices. Non specified are keept untouched.
+ * 
+ * Typicall use case for this function is when dealing with pointer or touch events.
+ * Those are normally dispatched to the first visible surface below the coordinate.
+ * If you want a different behavior (i.e. forward events to an other surface below the coordinate,
+ * you can set all above surfaces to refuse input events)
+ *
+ * \ingroup ilmClient
+ * \param[in] surfaceId Identifier of the surface to set the keyboard focus on.
+ * \param[in] devices Bitmask of ilmInputDevice
+ * \param[in] acceptance Indicate if the surface accept or reject input events from the specified devices
+ *
+ * \return ILM_SUCCESS if the method call was successful
+ * \return ILM_FAILED if the client can not call the method on the service.
+ */
+ilmErrorTypes ilm_UpdateInputEventAcceptanceOn(t_ilm_surface surfaceId, ilmInputDevice devices, t_ilm_bool acceptance);
+
 /**
  * \brief Commit all changes and executed commands since last commit.
  * \ingroup ilmClient

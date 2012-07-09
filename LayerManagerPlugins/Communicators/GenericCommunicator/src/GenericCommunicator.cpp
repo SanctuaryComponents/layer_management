@@ -137,6 +137,9 @@ GenericCommunicator::GenericCommunicator(ICommandExecutor* executor)
         { "DestroyShader",                    &GenericCommunicator::DestroyShader },
         { "SetShader",                        &GenericCommunicator::SetShader },
         { "SetUniforms",                      &GenericCommunicator::SetUniforms },
+        { "SetKeyboardFocusOn",               &GenericCommunicator::SetKeyboardFocusOn },
+        { "GetKeyboardFocusSurfaceId",        &GenericCommunicator::GetKeyboardFocusSurfaceId },
+        { "UpdateInputEventAcceptanceOn",     &GenericCommunicator::UpdateInputEventAcceptanceOn }
     };
 
     int entryCount = sizeof(manager_methods) / sizeof(MethodTable);
@@ -576,6 +579,7 @@ void GenericCommunicator::GetPropertiesOfSurface()
         m_ipcModule.appendUint(surface->updateCounter);
         m_ipcModule.appendUint(surface->getPixelFormat());
         m_ipcModule.appendUint(surface->getNativeContent());
+        m_ipcModule.appendUint(surface->getInputEventAcceptanceOnDevices());
         m_ipcModule.sendMessage();
     }
     else
@@ -1892,6 +1896,69 @@ void GenericCommunicator::SetUniforms()
     //m_ipcModule.getStringArray(&uniforms);
 
     t_ilm_bool status = m_executor->execute(new ShaderSetUniformsCommand(id, uniforms));
+    if (status)
+    {
+        m_ipcModule.createMessage((char*)__FUNCTION__);
+        m_ipcModule.sendMessage();
+    }
+    else
+    {
+        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+    }
+}
+
+void GenericCommunicator::SetKeyboardFocusOn()
+{
+    uint surfaceId = 0;
+
+    m_ipcModule.getUint(&surfaceId);
+
+    t_ilm_bool status = m_executor->execute(new SurfaceSetKeyboardFocusCommand(surfaceId));
+    if (status)
+    {
+        m_ipcModule.createMessage((char*)__FUNCTION__);
+        m_ipcModule.sendMessage();
+    }
+    else
+    {
+        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+    }
+}
+
+
+void GenericCommunicator::GetKeyboardFocusSurfaceId()
+{
+    uint surfaceId;
+    
+    t_ilm_bool status = m_executor->execute(new SurfaceGetKeyboardFocusCommand(&surfaceId));
+    if (status)
+    {
+        m_ipcModule.createMessage((char*)__FUNCTION__);
+        m_ipcModule.appendUint(surfaceId);
+        m_ipcModule.sendMessage();
+    }
+    else
+    {
+        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+    }
+    
+    
+}
+
+
+void GenericCommunicator::UpdateInputEventAcceptanceOn()
+{
+    uint surfaceId = 0;
+        uint udevices = 0;
+        InputDevice devices;
+        t_ilm_bool accept;
+
+    m_ipcModule.getUint(&surfaceId);
+    m_ipcModule.getUint(&udevices);
+    m_ipcModule.getBool(&accept);
+
+    devices = (InputDevice) udevices;
+    t_ilm_bool status = m_executor->execute(new SurfaceUpdateInputEventAcceptance(surfaceId, devices, accept));
     if (status)
     {
         m_ipcModule.createMessage((char*)__FUNCTION__);

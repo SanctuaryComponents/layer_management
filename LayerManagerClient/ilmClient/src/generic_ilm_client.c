@@ -113,7 +113,8 @@ ilmErrorTypes ilm_getPropertiesOfSurface(t_ilm_uint surfaceID, struct ilmSurface
         && gIpcModule.getUint(&pSurfaceProperties->drawCounter)
         && gIpcModule.getUint(&pSurfaceProperties->updateCounter)
         && gIpcModule.getUint(&pSurfaceProperties->pixelformat)
-        && gIpcModule.getUint(&pSurfaceProperties->nativeSurface))
+        && gIpcModule.getUint(&pSurfaceProperties->nativeSurface)
+        && gIpcModule.getUint(&pSurfaceProperties->inputDevicesAcceptance))
     {
         returnValue = ILM_SUCCESS;
     }
@@ -1474,6 +1475,63 @@ ilmErrorTypes ilm_takeSurfaceScreenshot(t_ilm_const_string filename, t_ilm_surfa
 
     return returnValue;
 }
+
+
+ilmErrorTypes ilm_SetKeyboardFocusOn(t_ilm_surface surfaceId)
+{
+    LOG_ENTER_FUNCTION;
+    ilmErrorTypes returnValue = ILM_FAILED;
+    
+    if (gIpcModule.createMessage("SetKeyboardFocusOn\0")
+        && gIpcModule.appendUint(surfaceId)
+        && gIpcModule.sendMessage()
+        && gIpcModule.receiveMessage(gReceiveTimeout)
+        && !gIpcModule.isErrorMessage())
+    {
+        returnValue = ILM_SUCCESS;
+    }
+    
+    return returnValue;
+}
+
+
+ilmErrorTypes ilm_GetKeyboardFocusSurfaceId(t_ilm_surface* pSurfaceId)
+{
+    LOG_ENTER_FUNCTION;
+    ilmErrorTypes returnValue = ILM_FAILED;
+    
+    if (gIpcModule.createMessage("GetKeyboardFocusSurfaceId\0")
+    && gIpcModule.sendMessage()
+    && gIpcModule.receiveMessage(gReceiveTimeout)
+    && !gIpcModule.isErrorMessage()
+    && gIpcModule.getUint(pSurfaceId))
+    {
+        returnValue = ILM_SUCCESS;
+    }
+
+     return returnValue;
+}
+
+
+
+ilmErrorTypes ilm_UpdateInputEventAcceptanceOn(t_ilm_surface surfaceId, ilmInputDevice devices, t_ilm_bool acceptance)
+{
+    LOG_ENTER_FUNCTION;
+    ilmErrorTypes returnValue = ILM_FAILED;
+    
+    if (gIpcModule.createMessage("UpdateInputEventAcceptanceOn\0")
+        && gIpcModule.appendUint(surfaceId)
+        && gIpcModule.appendUint(devices)
+        && gIpcModule.appendBool(acceptance)
+        && gIpcModule.sendMessage()
+        && gIpcModule.receiveMessage(gReceiveTimeout)
+        && !gIpcModule.isErrorMessage())
+    {
+        returnValue = ILM_SUCCESS;
+    }
+}
+
+
 
 ilmErrorTypes ilm_commitChanges()
 {
