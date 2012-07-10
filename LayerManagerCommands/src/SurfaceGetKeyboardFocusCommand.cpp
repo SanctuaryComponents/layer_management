@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010,2011 BMW Car IT GmbH
+* Copyright 2012 Valeo
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -48,7 +48,7 @@ ExecutionResult SurfaceGetKeyboardFocusCommand::execute(ICommandExecutor* execut
             }
         }
     }
-    
+
     *m_pSurfId = (result == ExecutionSuccess) ? surfId : GraphicalObject::INVALID_ID;
     return result;
 }

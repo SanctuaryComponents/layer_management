@@ -890,3 +890,49 @@ TEST_F(IlmCommandTest, ilm_layergroupCreate_ilm_layergroupRemove_ilm_layergroupA
     ASSERT_EQ(length,0);
 
 }
+
+TEST_F(IlmCommandTest, ilm_keyboard_focus)
+{
+    uint surface;
+    uint surface1 = 36;
+    uint surface2 = 44;
+
+    ilm_surfaceCreate(0,0,0,ILM_PIXELFORMAT_RGBA_8888,&surface1);
+    ilm_surfaceCreate(0,0,0,ILM_PIXELFORMAT_RGBA_8888,&surface2);
+
+    ilm_GetKeyboardFocusSurfaceId(&surface);
+    EXPECT_EQ(0xFFFFFFFF, surface);
+
+    ilm_SetKeyboardFocusOn(surface1);
+    ilm_GetKeyboardFocusSurfaceId(&surface);
+    EXPECT_EQ(surface1, surface);
+}
+
+
+TEST_F(IlmCommandTest, ilm_input_event_acceptance)
+{
+    uint surface;
+    uint surface1 = 36;
+    uint surface2 = 44;
+    ilmSurfaceProperties surfaceProperties;
+
+    ilm_surfaceCreate(0,0,0,ILM_PIXELFORMAT_RGBA_8888,&surface1);
+    ilm_surfaceCreate(0,0,0,ILM_PIXELFORMAT_RGBA_8888,&surface2);
+
+    ilm_getPropertiesOfSurface(surface1, &surfaceProperties);
+    EXPECT_EQ(ILM_INPUT_DEVICE_ALL, surfaceProperties.inputDevicesAcceptance);
+
+    ilm_UpdateInputEventAcceptanceOn(surface1, (ilmInputDevice) (ILM_INPUT_DEVICE_KEYBOARD | ILM_INPUT_DEVICE_POINTER), false);
+    ilm_commitChanges();
+
+
+    ilm_getPropertiesOfSurface(surface1, &surfaceProperties);
+    EXPECT_FALSE(surfaceProperties.inputDevicesAcceptance & ILM_INPUT_DEVICE_KEYBOARD);
+    EXPECT_FALSE(surfaceProperties.inputDevicesAcceptance & ILM_INPUT_DEVICE_POINTER);
+    EXPECT_TRUE(surfaceProperties.inputDevicesAcceptance & ILM_INPUT_DEVICE_TOUCH);
+
+    ilm_SetKeyboardFocusOn(surface1);
+    ilm_GetKeyboardFocusSurfaceId(&surface);
+    EXPECT_NE(surface1, surface);
+}
+

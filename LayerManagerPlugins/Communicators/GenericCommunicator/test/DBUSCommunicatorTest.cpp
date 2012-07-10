@@ -875,4 +875,49 @@ TEST_F(DBUSCommunicatorTest, DISABLED_ShaderSetUniformsCommand) {
     ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetUniforms uint32:17346 array:string:\"teststring foobar\"")).c_str()));
 }
 
+
+
+MATCHER_P(SetKeyboardFocusOnCommandEq, surfId, "%(*)s"){
+    return ((SurfaceSetKeyboardFocusCommand*)arg)->m_surfId == surfId;
+}
+
+TEST_F(DBUSCommunicatorTest, SetKeyboardFocusOn)
+{
+    EXPECT_CALL(this->mockCommandExecutor, execute(SetKeyboardFocusOnCommandEq(42u))).Times(1);
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetKeyboardFocusOn uint32:42")).c_str()));
+}
+
+
+
+MATCHER(GetKeyboardFocusSurfaceIdCommandEq, "%(*)s"){
+    return ((SurfaceGetKeyboardFocusCommand*)arg)->m_pSurfId != NULL;
+}
+
+TEST_F(DBUSCommunicatorTest, GetKeyboardFocusSurfaceId)
+{
+
+    EXPECT_CALL(this->mockCommandExecutor, execute(GetKeyboardFocusSurfaceIdCommandEq())).Times(1);
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("GetKeyboardFocusSurfaceId")).c_str()));
+}
+
+
+MATCHER_P3(UpdateInputEventAcceptanceOnCommandEq, surfId, devices, acceptance, "%(*)s"){
+    return (
+                (((SurfaceUpdateInputEventAcceptance*)arg)->m_surfId == surfId)
+             && (((SurfaceUpdateInputEventAcceptance*)arg)->m_devices == devices)
+             && (((SurfaceUpdateInputEventAcceptance*)arg)->m_accept == acceptance)
+           );
+}
+
+TEST_F(DBUSCommunicatorTest, UpdateInputEventAcceptanceOn)
+{
+    EXPECT_CALL(this->mockCommandExecutor, execute(UpdateInputEventAcceptanceOnCommandEq(42u, (InputDevice)1, true))).Times(1);
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("UpdateInputEventAcceptanceOn uint32:42 uint32:1 boolean:true")).c_str()));
+
+    EXPECT_CALL(this->mockCommandExecutor, execute(UpdateInputEventAcceptanceOnCommandEq(1000u, (InputDevice)10, false))).Times(1);
+    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("UpdateInputEventAcceptanceOn uint32:1000 uint32:10 boolean:false")).c_str()));
+}
+
+
+
 #endif /* DBUSCommunicatorTest_H_ */

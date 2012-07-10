@@ -72,6 +72,10 @@ class SurfaceUpdateInputEventAcceptance : public BaseCommandSynchronous
         const unsigned int m_surfId;
         const InputDevice m_devices;
         const bool m_accept;
+
+
+    // for unit testing
+    template <typename surfaceid_type, typename devices_type, typename acceptance_type> friend class UpdateInputEventAcceptanceOnCommandEqMatcherP3;
 };
 
 #endif  /* ! _SURFACEUPDATEINPUTEVENTACCEPTANCE_H_ */

@@ -1481,7 +1481,7 @@ ilmErrorTypes ilm_SetKeyboardFocusOn(t_ilm_surface surfaceId)
 {
     LOG_ENTER_FUNCTION;
     ilmErrorTypes returnValue = ILM_FAILED;
-    
+
     if (gIpcModule.createMessage("SetKeyboardFocusOn\0")
         && gIpcModule.appendUint(surfaceId)
         && gIpcModule.sendMessage()
@@ -1490,7 +1490,7 @@ ilmErrorTypes ilm_SetKeyboardFocusOn(t_ilm_surface surfaceId)
     {
         returnValue = ILM_SUCCESS;
     }
-    
+
     return returnValue;
 }
 
@@ -1499,7 +1499,7 @@ ilmErrorTypes ilm_GetKeyboardFocusSurfaceId(t_ilm_surface* pSurfaceId)
 {
     LOG_ENTER_FUNCTION;
     ilmErrorTypes returnValue = ILM_FAILED;
-    
+
     if (gIpcModule.createMessage("GetKeyboardFocusSurfaceId\0")
     && gIpcModule.sendMessage()
     && gIpcModule.receiveMessage(gReceiveTimeout)
@@ -1518,7 +1518,7 @@ ilmErrorTypes ilm_UpdateInputEventAcceptanceOn(t_ilm_surface surfaceId, ilmInput
 {
     LOG_ENTER_FUNCTION;
     ilmErrorTypes returnValue = ILM_FAILED;
-    
+
     if (gIpcModule.createMessage("UpdateInputEventAcceptanceOn\0")
         && gIpcModule.appendUint(surfaceId)
         && gIpcModule.appendUint(devices)
@@ -1529,6 +1529,8 @@ ilmErrorTypes ilm_UpdateInputEventAcceptanceOn(t_ilm_surface surfaceId, ilmInput
     {
         returnValue = ILM_SUCCESS;
     }
+
+    return returnValue;
 }
 
 

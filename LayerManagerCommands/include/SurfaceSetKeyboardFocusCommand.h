@@ -56,6 +56,10 @@ class SurfaceSetKeyboardFocusCommand : public BaseCommandSynchronous
     
     private:
         const unsigned int m_surfId;
+
+
+    // for unit testing
+    template <typename surfaceid_type> friend class SetKeyboardFocusOnCommandEqMatcherP;
 };
 
 #endif  /* ! _SURFACESETKEYBOARDFOCUSCOMMAND_H_ */
