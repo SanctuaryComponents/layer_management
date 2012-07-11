@@ -20,6 +20,7 @@
 #include "Expression.h"
 #include "ExpressionInterpreter.h"
 #include <iostream>
+#include <cstring>
 #include <signal.h> // signal
 
 using namespace std;
@@ -474,5 +475,70 @@ COMMAND("get communicator performance")
     signal(SIGALRM, SIG_DFL);
 
     cout << (runs/runtimeInSec) << " transactions/second\n";
+}
+
+//=============================================================================
+COMMAND("set surface <surfaceid> keyboard focus")
+//=============================================================================
+{
+    if (ilm_SetKeyboardFocusOn(input->getUint("surfaceid")) != ILM_SUCCESS)
+    {
+        cerr << "Error during communication" << endl;
+    }
+}
+
+//=============================================================================
+COMMAND("get keyboard focus")
+//=============================================================================
+{
+    t_ilm_surface surfaceId;
+    if (ilm_GetKeyboardFocusSurfaceId(&surfaceId) == ILM_SUCCESS)
+    {
+        cout << "keyboardFocusSurfaceId == " << surfaceId << endl;
+    }
+    else
+    {
+        cerr << "Error during communication" << endl;
+    }
+}
+
+//=============================================================================
+COMMAND("set surface <surfaceid> accept <acceptance> input events from devices <kbd:pointer:touch>")
+//=============================================================================
+{
+    t_ilm_surface surfaceId;
+    ilmInputDevice devices;
+    t_ilm_bool acceptance;
+    char* str;
+    char* tok;
+
+    devices = (ilmInputDevice)0;
+    surfaceId = input->getUint("surfaceid");
+    acceptance = input->getBool("acceptance");
+    str = new char [input->getString("kbd:pointer:touch").size()+1];
+    strcpy (str, input->getString("kbd:pointer:touch").c_str());
+    tok = strtok(str, ":");
+    while (tok != NULL)
+    {
+        if (!strcmp(tok, "kbd"))
+        {
+            devices |= ILM_INPUT_DEVICE_KEYBOARD;
+        }
+        else if (!strcmp(tok, "pointer"))
+        {
+            devices |= ILM_INPUT_DEVICE_POINTER;
+        }
+        else if (!strcmp(tok, "touch"))
+        {
+          devices |= ILM_INPUT_DEVICE_TOUCH;
+        }
+        else
+        {
+          cerr << "Unknown devices specified." << endl;
+        }
+        tok = strtok(NULL, ":");
+    }
+    ilm_UpdateInputEventAcceptanceOn(surfaceId, devices, acceptance);
+    ilm_commitChanges();
 }
 
