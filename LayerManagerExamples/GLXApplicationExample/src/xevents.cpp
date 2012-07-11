@@ -17,6 +17,7 @@
  *
  ****************************************************************************/
 
+#include <iostream>
 #include "xevents.h"
 
 
@@ -82,7 +83,7 @@ void xeventInitialiaze(Display* dpy, t_ilm_surface surfaceid, t_ilm_int x, t_ilm
 	g_surfPosY = y;
 	g_surfWidthOrig = width;
 	g_surfHeightOrig = height;
-	
+
 	g_x11Display = dpy;
 	g_surfaceid = surfaceid;
 	g_surfMoveDirection = move_right;
@@ -116,6 +117,14 @@ void parseXEventsNonBlocking()
 				}
 				break;
 
+			case KeyPress:
+				std::cout << "Key press : " << ((XKeyEvent *) &e)->keycode << std::endl;
+				break;
+
+			case KeyRelease:
+				std::cout << "Key release : " << ((XKeyEvent *) &e)->keycode << std::endl;
+				break;
+
 			default:
 				break;
 		}
@@ -143,7 +152,7 @@ static void moveSurface()
 		surfWidth = (t_ilm_int) surfaceProperties.destWidth;
 		surfHeight = (t_ilm_int) surfaceProperties.destHeight;
 	}
-	
+
 	// Do the real job
 	switch (g_surfMoveDirection)
 	{
@@ -155,7 +164,7 @@ static void moveSurface()
 				g_surfMoveDirection = move_down;
 			}
 			break;
-			
+
 		case move_down:
 			g_surfPosY += SURFACE_MOVE_STEP;
 			if (g_surfPosY >= (t_ilm_int) (screenHeight - surfHeight))
@@ -164,7 +173,7 @@ static void moveSurface()
 				g_surfMoveDirection = move_left;
 			}
 			break;
-			
+
 		case move_left:
 			g_surfPosX -= SURFACE_MOVE_STEP;
 			if (g_surfPosX <= 0)
@@ -173,7 +182,7 @@ static void moveSurface()
 				g_surfMoveDirection = move_up;
 			}
 			break;
-			
+
 		case move_up:
 			g_surfPosY -= SURFACE_MOVE_STEP;
 			if (g_surfPosY <= 0)
@@ -182,7 +191,7 @@ static void moveSurface()
 				g_surfMoveDirection = move_right;
 			}
 			break;
-		
+
 		default:
 			break;
 	}
