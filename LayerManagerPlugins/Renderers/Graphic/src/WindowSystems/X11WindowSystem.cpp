@@ -39,8 +39,8 @@ int     X11WindowSystem::damage_opcode;
 const char X11WindowSystem::CompositorWindowTitle[] = "LayerManager";
 bool    X11WindowSystem::m_xerror = false;
 
-X11WindowSystem::X11WindowSystem(const char* displayname, int width, int height, Scene* pScene,GetVisualInfoFunction func)
-: BaseWindowSystem(pScene, NULL)
+X11WindowSystem::X11WindowSystem(const char* displayname, int width, int height, Scene* pScene,InputManager* pInputManager,GetVisualInfoFunction func)
+: BaseWindowSystem(pScene, pInputManager)
 , takeScreenshot(ScreenShotNone)
 , screenShotFile()
 , screenShotSurfaceID(0)
@@ -495,7 +495,13 @@ bool X11WindowSystem::CreateCompositorWindow()
     XSetWindowAttributes attr;
     // draw a black background the full size of the resolution
     attr.override_redirect = True;
-    attr.event_mask =  ExposureMask | StructureNotifyMask | ButtonPressMask | ButtonReleaseMask | Button1MotionMask;
+    attr.event_mask =     ExposureMask
+                        | StructureNotifyMask
+                        | ButtonPressMask
+                        | ButtonReleaseMask
+                        | Button1MotionMask
+                        | KeyPressMask
+                        | KeyReleaseMask;
     attr.background_pixel = 0;
     attr.border_pixel = 0;
     windowVis = getVisualFunc(x11Display);
@@ -899,10 +905,28 @@ init_complete:
                 //               renderer->DestroyWindow(event.xreparent.window);
                 break;
 
-            case ButtonPress:
-            case ButtonRelease:
-            case MotionNotify:
+            // Keyboard
+            case KeyPress:
+                ManageXInputEvent(INPUT_DEVICE_KEYBOARD, INPUT_STATE_PRESSED, &event);
                 break;
+            case KeyRelease:
+                 ManageXInputEvent(INPUT_DEVICE_KEYBOARD, INPUT_STATE_RELEASED, &event);
+                break;
+
+            // Pointer
+            case ButtonPress:
+                ManageXInputEvent(INPUT_DEVICE_POINTER, INPUT_STATE_PRESSED, &event);
+                break;
+            case ButtonRelease:
+                ManageXInputEvent(INPUT_DEVICE_POINTER, INPUT_STATE_RELEASED, &event);
+                break;
+            case MotionNotify:
+                ManageXInputEvent(INPUT_DEVICE_POINTER, INPUT_STATE_MOTION, &event);
+                break;
+
+            // Touch
+            // TODO. See @ref<X11WindowSystem-MultiTouch> at the end of this file
+
 
             default:
                 if (event.type == this->damage_event + XDamageNotify)
@@ -970,6 +994,49 @@ init_complete:
     this->cleanup();
     LOG_DEBUG("X11WindowSystem", "Renderer thread finished");
     return NULL;
+}
+
+
+void X11WindowSystem::ManageXInputEvent(InputDevice type, InputEventState state, XEvent *pevent)
+ {
+    Surface * surf;
+
+    switch (type)
+    {
+        case INPUT_DEVICE_KEYBOARD:
+        {
+            surf = m_pInputManager->reportKeyboardEvent(state, ((XKeyEvent *) pevent)->keycode);
+            if (surf != NULL)
+            {
+                pevent->xany.window = surf->getNativeContent();
+                XSendEvent(x11Display, pevent->xany.window, false, 0, pevent);
+            }
+        }
+        break;
+
+        case INPUT_DEVICE_POINTER:
+        {
+            Point p = {state, ((XButtonEvent*)pevent)->x, ((XButtonEvent*)pevent)->y};
+            surf = m_pInputManager->reportPointerEvent(p);
+            if (surf != NULL)
+            {
+                ((XButtonEvent*)pevent)->x = p.x;
+                ((XButtonEvent*)pevent)->y = p.y;
+                pevent->xany.window = surf->getNativeContent();
+                XSendEvent(x11Display, pevent->xany.window, false, 0, pevent);
+            }
+        }
+        break;
+
+        case INPUT_DEVICE_TOUCH:
+            /* TODO */
+            break;
+
+
+        default:
+        case INPUT_DEVICE_ALL:
+            break;
+    }
 }
 
 
@@ -1129,4 +1196,26 @@ void X11WindowSystem::doScreenShotOfSurface(std::string fileName, const uint id,
     screenShotSurfaceID = id;
     screenShotLayerID = layer_id;
 }
+
+
+
+/**
+ * @subsection <X11WindowSystem-MultiTouch> (Multi Touch)
+ *
+ *   X11 multi touch is not yet supported by Layer Manager.
+ *
+ *   TODO to add support:
+ *     - Move all event management to xi2
+ *     - For multi touch, make sure XInput protocol is > 2.2
+ *         -> Via cmake ==> ?
+ *         -> At runtime ==> http://who-t.blogspot.fr/2011/12/multitouch-in-x-getting-events.html
+ *     - Register for XIDirectTouch. (No plan (yet?) to support XIDependentTouch)
+ *     - Call m_pInputManager->reportTouchEvent() from ManageXInputEvent() to translate screen wide touch coordinates into surface wide coordinates
+ *     - Forward the event to the native handle of the surface returned by m_pInputManager->reportTouchEvent()
+ *
+ *   Further reading:
+ *     + XInput 2.x protocol : ftp://www.x.org/pub/xorg/current/doc/inputproto/XI2proto.txt
+ *     + LWN article : http://lwn.net/Articles/475886/
+ *
+ */
 

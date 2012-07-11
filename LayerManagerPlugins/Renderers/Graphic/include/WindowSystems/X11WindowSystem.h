@@ -42,7 +42,7 @@ typedef enum x11WindowSystemStates
 class X11WindowSystem: public BaseWindowSystem
 {
 public:
-    X11WindowSystem(const char* displayname, int width, int height, Scene* pScene, GetVisualInfoFunction func = X11WindowSystem::getDefaultVisual);
+    X11WindowSystem(const char* displayname, int width, int height, Scene* pScene, InputManager* pInputManager, GetVisualInfoFunction func = X11WindowSystem::getDefaultVisual);
     virtual ~X11WindowSystem();
     bool init(BaseGraphicSystem<Display*, Window>* sys);
     bool start();
@@ -125,6 +125,7 @@ private:
     void printDebug();
     void* EventLoop();
     static int error(Display *dpy, XErrorEvent *ev);
+    void ManageXInputEvent(InputDevice type, InputEventState state, XEvent *pevent);
 
     static bool m_xerror;
 

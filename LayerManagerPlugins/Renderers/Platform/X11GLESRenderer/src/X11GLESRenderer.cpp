@@ -44,7 +44,7 @@ bool X11GLESRenderer::start(int width, int height, const char* displayname)
     m_width = width;
     m_height = height;
     // create X11 windows, register as composite manager etc
-    m_pWindowSystem = new X11WindowSystem(displayname, width, height, m_pScene);
+    m_pWindowSystem = new X11WindowSystem(displayname, width, height, m_pScene, m_pInputManager);
     m_pGraphicSystem = new GLESGraphicsystem(width,height, ShaderProgramGLES::createProgram);
 
     if (!m_pWindowSystem->init(m_pGraphicSystem))
