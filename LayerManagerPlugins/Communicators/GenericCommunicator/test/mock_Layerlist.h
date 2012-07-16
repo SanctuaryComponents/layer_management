@@ -20,8 +20,10 @@
 #ifndef MockLayerList_H_
 #define MockLayerList_H_
 
+#include "Scene.h"
 #include <list>
 #include <gmock/gmock.h>  // Brings in Google Mock.
+
 class MockLayerList : public Scene {
  public:
   MOCK_METHOD1(createLayer, Layer*(unsigned int));
@@ -41,8 +43,6 @@ class MockLayerList : public Scene {
   MOCK_CONST_METHOD2(getSurfaceGroupIDs, void(unsigned int*,unsigned int**));
   MOCK_METHOD0(lockScene, void());
   MOCK_METHOD0(unlockScene, void());
-
-
 };
 
 #endif /* MockLayerList_H_ */

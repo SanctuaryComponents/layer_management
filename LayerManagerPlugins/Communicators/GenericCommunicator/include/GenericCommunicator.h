@@ -16,8 +16,8 @@
  * limitations under the License.
  *
  ****************************************************************************/
-#ifndef _DBUSCOMMUNICATOR_H_
-#define _DBUSCOMMUNICATOR_H_
+#ifndef __GENERICCOMMUNICATOR_H__
+#define __GENERICCOMMUNICATOR_H__
 
 /**
  * \defgroup GenericCommunicator Generic Communicator API
@@ -26,75 +26,17 @@
 #include "ICommunicator.h"
 #include "Log.h"
 #include "IpcModuleLoader.h"
-
-#include "ICommandExecutor.h"
-#include "IApplicationReference.h"
-#include "ApplicationReferenceMap.h"
-#include "CommitCommand.h"
-#include "LayerCreateCommand.h"
-#include "LayergroupCreateCommand.h"
-#include "SurfaceCreateCommand.h"
-#include "SurfacegroupCreateCommand.h"
-#include "SurfaceGetDimensionCommand.h"
-#include "LayerGetDimensionCommand.h"
-#include "SurfaceGetOpacityCommand.h"
-#include "LayerGetOpacityCommand.h"
-#include "SurfaceGetPixelformatCommand.h"
-#include "LayerGetVisibilityCommand.h"
-#include "SurfaceGetVisibilityCommand.h"
-#include "LayerAddSurfaceCommand.h"
-#include "LayerRemoveSurfaceCommand.h"
-#include "LayerRemoveCommand.h"
-#include "SurfaceRemoveCommand.h"
-#include "LayergroupRemoveCommand.h"
-#include "SurfacegroupRemoveCommand.h"
-#include "SurfaceGetOrientationCommand.h"
-#include "LayerGetOrientationCommand.h"
-#include "LayergroupAddLayerCommand.h"
-#include "LayergroupRemoveLayerCommand.h"
-#include "LayerSetDestinationRectangleCommand.h"
-#include "SurfaceSetDestinationRectangleCommand.h"
-#include "LayerSetOpacityCommand.h"
-#include "LayergroupSetOpacityCommand.h"
-#include "SurfaceSetOpacityCommand.h"
-#include "SurfacegroupSetOpacityCommand.h"
-#include "LayerSetSourceRectangleCommand.h"
-#include "SurfaceSetSourceRectangleCommand.h"
-#include "LayerSetOrientationCommand.h"
-#include "SurfaceSetOrientationCommand.h"
-#include "SurfacegroupAddSurfaceCommand.h"
-#include "SurfacegroupRemoveSurfaceCommand.h"
-#include "LayerSetVisibilityCommand.h"
-#include "SurfaceSetVisibilityCommand.h"
-#include "LayergroupSetVisibilityCommand.h"
-#include "SurfacegroupSetVisibilityCommand.h"
-#include "DebugCommand.h"
-#include "ExitCommand.h"
-#include "ScreenSetRenderOrderCommand.h"
-#include "LayerSetRenderOrderCommand.h"
-#include "LayerSetDimensionCommand.h"
-#include "SurfaceSetDimensionCommand.h"
-#include "LayerSetPositionCommand.h"
-#include "SurfaceSetPositionCommand.h"
-#include "LayerGetPositionCommand.h"
-#include "SurfaceGetPositionCommand.h"
-#include "ShaderCreateCommand.h"
-#include "ShaderDestroyCommand.h"
-#include "SurfaceSetShaderCommand.h"
-#include "ShaderSetUniformsCommand.h"
-#include "ScreenDumpCommand.h"
-#include "LayerDumpCommand.h"
-#include "SurfaceDumpCommand.h"
-#include "SurfaceSetNativeContentCommand.h"
-#include "SurfaceRemoveNativeContentCommand.h"
-#include "SurfaceSetKeyboardFocusCommand.h"
-#include "SurfaceGetKeyboardFocusCommand.h"
-#include "SurfaceUpdateInputEventAcceptance.h"
+#include "ObjectType.h"
+#include <map>
+#include <list>
+#include <string>
 
 class GenericCommunicator;
-class DBusConnection;
-class DBusMessage;
+class GraphicalObject;
 
+//=============================================================================
+// internal types
+//=============================================================================
 typedef void (GenericCommunicator::*CallBackMethod)(void);
 
 struct MethodTable
@@ -105,6 +47,10 @@ struct MethodTable
 
 typedef std::map<std::string,MethodTable> CallBackTable;
 
+
+//=============================================================================
+// interface
+//=============================================================================
 class GenericCommunicator: public ICommunicator
 {
 public:
@@ -114,6 +60,8 @@ public:
     virtual void stop();
     virtual void process(int timeout_ms);
     virtual void setdebug(bool onoff);
+
+private:
     void ServiceConnect();
     void ServiceDisconnect();
     void Debug();
@@ -215,4 +163,4 @@ private:
     bool m_running;
 };
 
-#endif /* _DBUSCOMMUNICATOR_H_ */
+#endif // __GENERICCOMMUNICATOR_H__

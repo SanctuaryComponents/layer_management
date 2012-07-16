@@ -20,6 +20,68 @@
 #include "ilm_types.h"
 #include "Log.h"
 
+#include "ICommandExecutor.h"
+#include "CommitCommand.h"
+#include "LayerCreateCommand.h"
+#include "LayergroupCreateCommand.h"
+#include "SurfaceCreateCommand.h"
+#include "SurfacegroupCreateCommand.h"
+#include "SurfaceGetDimensionCommand.h"
+#include "LayerGetDimensionCommand.h"
+#include "SurfaceGetOpacityCommand.h"
+#include "LayerGetOpacityCommand.h"
+#include "SurfaceGetPixelformatCommand.h"
+#include "LayerGetVisibilityCommand.h"
+#include "SurfaceGetVisibilityCommand.h"
+#include "LayerAddSurfaceCommand.h"
+#include "LayerRemoveSurfaceCommand.h"
+#include "LayerRemoveCommand.h"
+#include "SurfaceRemoveCommand.h"
+#include "LayergroupRemoveCommand.h"
+#include "SurfacegroupRemoveCommand.h"
+#include "SurfaceGetOrientationCommand.h"
+#include "LayerGetOrientationCommand.h"
+#include "LayergroupAddLayerCommand.h"
+#include "LayergroupRemoveLayerCommand.h"
+#include "LayerSetDestinationRectangleCommand.h"
+#include "SurfaceSetDestinationRectangleCommand.h"
+#include "LayerSetOpacityCommand.h"
+#include "LayergroupSetOpacityCommand.h"
+#include "SurfaceSetOpacityCommand.h"
+#include "SurfacegroupSetOpacityCommand.h"
+#include "LayerSetSourceRectangleCommand.h"
+#include "SurfaceSetSourceRectangleCommand.h"
+#include "LayerSetOrientationCommand.h"
+#include "SurfaceSetOrientationCommand.h"
+#include "SurfacegroupAddSurfaceCommand.h"
+#include "SurfacegroupRemoveSurfaceCommand.h"
+#include "LayerSetVisibilityCommand.h"
+#include "SurfaceSetVisibilityCommand.h"
+#include "LayergroupSetVisibilityCommand.h"
+#include "SurfacegroupSetVisibilityCommand.h"
+#include "DebugCommand.h"
+#include "ExitCommand.h"
+#include "ScreenSetRenderOrderCommand.h"
+#include "LayerSetRenderOrderCommand.h"
+#include "LayerSetDimensionCommand.h"
+#include "SurfaceSetDimensionCommand.h"
+#include "LayerSetPositionCommand.h"
+#include "SurfaceSetPositionCommand.h"
+#include "LayerGetPositionCommand.h"
+#include "SurfaceGetPositionCommand.h"
+#include "ShaderCreateCommand.h"
+#include "ShaderDestroyCommand.h"
+#include "SurfaceSetShaderCommand.h"
+#include "ShaderSetUniformsCommand.h"
+#include "ScreenDumpCommand.h"
+#include "LayerDumpCommand.h"
+#include "SurfaceDumpCommand.h"
+#include "SurfaceSetNativeContentCommand.h"
+#include "SurfaceRemoveNativeContentCommand.h"
+#include "SurfaceSetKeyboardFocusCommand.h"
+#include "SurfaceGetKeyboardFocusCommand.h"
+#include "SurfaceUpdateInputEventAcceptance.h"
+
 #include <stdbool.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -34,23 +96,10 @@ const char* INVALID_ARGUMENT = "Invalid argument";
 const char* RESSOURCE_NOT_FOUND = "Ressource not found";
 
 
-//=============================================================================
-// logging
-//=============================================================================
-#define LOG_ENTER_FUNCTION printf("      --> GenericCommunicator::%s()\n", __FUNCTION__)
-//#define LOG_ENTER_FUNCTION
-
-#include <sstream>
-using std::stringstream;
-
-#include <string>
-using std::string;
-
 GenericCommunicator::GenericCommunicator(ICommandExecutor* executor)
 : ICommunicator(executor)
 , m_running(ILM_FALSE)
 {
-    LOG_ENTER_FUNCTION;
 
     MethodTable manager_methods[] =
     {
@@ -157,8 +206,7 @@ GenericCommunicator::GenericCommunicator(ICommandExecutor* executor)
 
 bool GenericCommunicator::start()
 {
-    LOG_ENTER_FUNCTION;
-    LOG_DEBUG("GenericCommunicator", "Starting up dbus connector");
+    LOG_DEBUG("GenericCommunicator", "Starting up IpcModules.");
 
     if (!loadIpcModule(&m_ipcModule))
     {
@@ -181,7 +229,6 @@ bool GenericCommunicator::start()
 
 void GenericCommunicator::stop()
 {
-    LOG_ENTER_FUNCTION;
     LOG_INFO("GenericCommunicator","stopping");
 
     if (m_running)
@@ -200,17 +247,15 @@ void GenericCommunicator::process(int timeout_ms)
     switch(messageType)
     {
     case IpcMessageTypeCommand:
-        if (m_callBackTable.count(name))
+        if (m_callBackTable.end() != m_callBackTable.find(name))
         {
-            LOG_DEBUG("GenericCommunicator", "Received message " << name
-                      << " (type=command" << ", sender=" << sender << ")");
+            LOG_DEBUG("GenericCommunicator", "Received command " << name << " from " << sender);
             CallBackMethod method = m_callBackTable[name].function;
             (this->*method)();
         }
         else
         {
-            LOG_WARNING("GenericCommunicator", "Received unknown message " << name
-                        << " (type=command" << ", sender=" << sender << ")");
+            LOG_WARNING("GenericCommunicator", "Received unknown command " << name << " from " << sender);
         }
         break;
 
@@ -226,16 +271,14 @@ void GenericCommunicator::process(int timeout_ms)
         break;
 
     case IpcMessageTypeError:
-        LOG_DEBUG("GenericCommunicator", "Received message " << name
-                  << " (type=error" << ", sender=" << sender << ")");
+        LOG_DEBUG("GenericCommunicator", "Received error message " << name << " from " << sender);
         break;
 
     case IpcMessageTypeNone:
         break;
 
     default:
-        LOG_DEBUG("GenericCommunicator", "Received message " << name
-                  << " (type=unknown" << ", sender=" << sender << ")");
+        LOG_DEBUG("GenericCommunicator", "Received unknown data from " << sender);
         break;
     }
 }
@@ -1888,7 +1931,8 @@ void GenericCommunicator::SetShader()
 
 void GenericCommunicator::SetUniforms()
 {
-    uint id = 0; m_ipcModule.getUint(&id);
+    uint id = 0;
+    m_ipcModule.getUint(&id);
 
     std::vector<string> uniforms;
 
