@@ -30,32 +30,35 @@
 //=============================================================================
 // type definitions
 //=============================================================================
-struct SocketState
+// this data is transferred via socket
+struct SocketMessagePaket
 {
-    t_ilm_bool isClient;
-    int server;
-    int client;
-    struct sockaddr_in serverAddrIn;
-    struct sockaddr_in clientAddrIn;
-    fd_set monitoredSockets;
-    int monitoredSocketMax;
-};
-
-struct SocketMessage
-{
-    int size;
-    int type;
+    int  size;
+    int  type;
     char data[SOCKET_MAX_MESSAGE_SIZE];
 };
 
+// wraps socket message with management information
+struct SocketMessage
+{
+    unsigned int              index;
+    int                       sender;
+    char                      name[128];
+    struct SocketMessagePaket paket;
+};
+
+// contains all state information
 struct State
 {
-    struct SocketState socket;
-    struct SocketMessage message;
-    unsigned int writeIndex;
-    unsigned int readIndex;
-    int senderSocket;
-    char messageName[128];
+    t_ilm_bool            isClient;
+    int                   socket;
+    struct sockaddr_in    serverAddrIn;
+    struct sockaddr_in    clientAddrIn;
+    fd_set                monitoredSockets;
+    int                   monitoredSocketMax;
+    struct SocketMessage  outgoingMessage;
+    struct SocketMessage  incomingMessage[SOCKET_MESSAGE_BUFFER_COUNT];
+    t_ilm_int             incomingQueueIndex;
 };
 
 
@@ -63,15 +66,6 @@ struct State
 // global variables
 //=============================================================================
 struct State gState;
-
-
-//=============================================================================
-// logging / debugging
-//=============================================================================
-//#define LOG_ENTER_FUNCTION printf("      --> TcpSocketIpcModule::%s()\n", __FUNCTION__)
-#define LOG_ENTER_FUNCTION
-
-void printMessage();
 
 
 #endif // __SOCKETSHARED_H__

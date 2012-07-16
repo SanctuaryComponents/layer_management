@@ -25,16 +25,15 @@
 
 t_ilm_bool init(t_ilm_bool isClient)
 {
-    LOG_ENTER_FUNCTION;
     t_ilm_bool result = ILM_TRUE;
 
-    struct SocketState* sock = &gState.socket;
+    gState.incomingQueueIndex = SOCKET_MESSAGE_BUFFER_COUNT - 1;
 
-    sock->isClient = isClient;
+    gState.isClient = isClient;
 
-    sock->server = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+    gState.socket = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
 
-    if (sock->server < 0)
+    if (gState.socket < 0)
     {
         printf("TcpIpcModule: socket()...failed\n");
         result = ILM_FALSE;
@@ -47,11 +46,11 @@ t_ilm_bool init(t_ilm_bool isClient)
         port = atoi(portString);
     }
 
-    sock->serverAddrIn.sin_family = AF_INET;
-    sock->serverAddrIn.sin_port = htons(port);
-    memset(&(sock->serverAddrIn.sin_zero), '\0', 8);
+    gState.serverAddrIn.sin_family = AF_INET;
+    gState.serverAddrIn.sin_port = htons(port);
+    memset(&(gState.serverAddrIn.sin_zero), '\0', 8);
 
-    if (sock->isClient)  // Client
+    if (gState.isClient)  // Client
     {
         const char* hostname = getenv(ENV_TCP_HOST);
         if (!hostname)
@@ -68,12 +67,12 @@ t_ilm_bool init(t_ilm_bool isClient)
         }
         else
         {
-            memcpy(&sock->serverAddrIn.sin_addr.s_addr, server->h_addr, server->h_length);
+            memcpy(&gState.serverAddrIn.sin_addr.s_addr, server->h_addr, server->h_length);
         }
 
-        if (0 != connect(sock->server,
-                         (struct sockaddr *) &sock->serverAddrIn,
-                         sizeof(sock->serverAddrIn)))
+        if (0 != connect(gState.socket,
+                         (struct sockaddr *) &gState.serverAddrIn,
+                         sizeof(gState.serverAddrIn)))
         {
             result = ILM_FALSE;
         }
@@ -82,32 +81,32 @@ t_ilm_bool init(t_ilm_bool isClient)
                 hostname, port,
                 (ILM_TRUE == result) ? "established" : "failed");
 
-        FD_SET(sock->server, &sock->monitoredSockets);
-        sock->monitoredSocketMax = sock->server;
+        FD_SET(gState.socket, &gState.monitoredSockets);
+        gState.monitoredSocketMax = gState.socket;
     }
     else  // LayerManagerService
     {
         int on = 1;
-        setsockopt(sock->server, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
+        setsockopt(gState.socket, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
 
-        sock->serverAddrIn.sin_addr.s_addr = htonl(INADDR_ANY);
+        gState.serverAddrIn.sin_addr.s_addr = htonl(INADDR_ANY);
 
-        if (0 > bind(sock->server,
-                    (struct sockaddr *) &sock->serverAddrIn,
-                     sizeof(sock->serverAddrIn)))
+        if (0 > bind(gState.socket,
+                    (struct sockaddr *) &gState.serverAddrIn,
+                     sizeof(gState.serverAddrIn)))
         {
             printf("TcpIpcModule: bind()...failed\n");
             result = ILM_FALSE;
         }
 
-        if (listen(sock->server, SOCKET_MAX_PENDING_CONNECTIONS) < 0)
+        if (listen(gState.socket, SOCKET_MAX_PENDING_CONNECTIONS) < 0)
         {
             printf("TcpIpcModule: listen()...failed\n");
             result = ILM_FALSE;
         }
 
-        FD_SET(sock->server, &sock->monitoredSockets);
-        sock->monitoredSocketMax = sock->server;
+        FD_SET(gState.socket, &gState.monitoredSockets);
+        gState.monitoredSocketMax = gState.socket;
 
         printf("TcpIpcModule: listening to TCP port: %d\n", port);
     }
@@ -117,11 +116,10 @@ t_ilm_bool init(t_ilm_bool isClient)
 
 t_ilm_bool destroy()
 {
-    LOG_ENTER_FUNCTION;
     int socketNumber;
-    for (socketNumber = 0; socketNumber <= gState.socket.monitoredSocketMax; ++socketNumber)
+    for (socketNumber = 0; socketNumber <= gState.monitoredSocketMax; ++socketNumber)
     {
-        if (FD_ISSET(socketNumber, &gState.socket.monitoredSockets))
+        if (FD_ISSET(socketNumber, &gState.monitoredSockets))
         {
             printf("TcpIpcModule: Closing socket %d\n", socketNumber);
             close(socketNumber);

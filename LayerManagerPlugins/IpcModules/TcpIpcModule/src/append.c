@@ -25,21 +25,28 @@
 
 t_ilm_bool appendGenericValue(const char protocolType, const char size, const void* value)
 {
-    LOG_ENTER_FUNCTION;
+    struct SocketMessage* msg = &gState.outgoingMessage;
 
-    // TODO: size check: is message size reached?
+    // size check: is message size reached
+    if (sizeof(msg->paket) - sizeof(msg->paket.data)  // header
+        + msg->index + size                           // + data
+        > SOCKET_MAX_MESSAGE_SIZE)
+    {
+        pritnf("Error: max message size exceeded.\n");
+        return ILM_FALSE;
+    }
 
     // append protocol type
-    gState.message.data[gState.writeIndex] = protocolType;
-    gState.writeIndex += sizeof(protocolType);
+    msg->paket.data[msg->index] = protocolType;
+    msg->index += sizeof(protocolType);
 
     // append size of data
-    gState.message.data[gState.writeIndex] = size;
-    gState.writeIndex += sizeof(size);
+    msg->paket.data[msg->index] = size;
+    msg->index += sizeof(size);
 
     // append data
-    memcpy(&gState.message.data[gState.writeIndex], value, size);
-    gState.writeIndex += size;
+    memcpy(&msg->paket.data[msg->index], value, size);
+    msg->index += size;
 
     return ILM_TRUE;
 }
@@ -75,18 +82,19 @@ t_ilm_bool appendString(t_ilm_const_string value)
 
 t_ilm_bool appendGenericArray(const char arraySize, const char protocolType, const char size, const void* value)
 {
-    LOG_ENTER_FUNCTION;
     t_ilm_bool result = ILM_TRUE;
+
+    struct SocketMessage* msg = &gState.outgoingMessage;
 
     // TODO: size check: is message size reached?
 
     // append array type
-    gState.message.data[gState.writeIndex] = SOCKET_MESSAGE_TYPE_ARRAY;
-    gState.writeIndex += sizeof(protocolType);
+    msg->paket.data[msg->index] = SOCKET_MESSAGE_TYPE_ARRAY;
+    msg->index += sizeof(protocolType);
 
     // append size of array
-    gState.message.data[gState.writeIndex] = arraySize;
-    gState.writeIndex += sizeof(arraySize);
+    msg->paket.data[msg->index] = arraySize;
+    msg->index += sizeof(arraySize);
 
     // append data for each array entry
     char i = 0;

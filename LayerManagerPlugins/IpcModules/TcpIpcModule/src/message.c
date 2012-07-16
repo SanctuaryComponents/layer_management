@@ -27,7 +27,7 @@
 // prototypes
 //=============================================================================
 t_ilm_bool acceptClientConnection();
-int receiveFromSocket();
+void receiveFromSocket(int socketNumber);
 
 
 //=============================================================================
@@ -35,42 +35,38 @@ int receiveFromSocket();
 //=============================================================================
 t_ilm_bool createMessage(t_ilm_const_string name)
 {
-    LOG_ENTER_FUNCTION;
+    memset(&gState.outgoingMessage, 0, sizeof(gState.outgoingMessage));
 
-    memset(&gState.message, 0, sizeof(gState.message));
-
-    gState.message.type = SOCKET_MESSAGE_TYPE_NORMAL;
-    gState.readIndex = 0;
-    gState.writeIndex = 0;
+    gState.outgoingMessage.paket.type = SOCKET_MESSAGE_TYPE_NORMAL;
+    gState.outgoingMessage.index = 0;
 
     return appendString(name);
 }
 
 t_ilm_bool sendMessage()
 {
-    LOG_ENTER_FUNCTION;
     int activesocket = 0;
     int sentBytes = 0;
     int retVal = 0;
 
-    int headerSize = sizeof(gState.message) - sizeof(gState.message.data);
-    gState.message.size = gState.writeIndex + headerSize;
+    int headerSize = sizeof(gState.outgoingMessage.paket) - sizeof(gState.outgoingMessage.paket.data);
+    gState.outgoingMessage.paket.size = gState.outgoingMessage.index + headerSize;
 
-    if (gState.socket.isClient)
+    if (gState.isClient)
     {
-        activesocket = gState.socket.server;
+        activesocket = gState.socket;
     }
     else
     {
-        activesocket = gState.senderSocket;
+        activesocket = gState.incomingMessage[gState.incomingQueueIndex].sender;
     }
 
-    int sendSize = gState.message.size;
+    int sendSize = gState.outgoingMessage.paket.size;
 
     do
     {
         retVal += send(activesocket,
-                       &gState.message + sentBytes,
+                       &gState.outgoingMessage.paket + sentBytes,
                        sendSize - sentBytes,
                        0);
         sentBytes += retVal;
@@ -83,12 +79,10 @@ t_ilm_bool sendMessage()
 
 t_ilm_bool sendError(t_ilm_const_string desc)
 {
-    LOG_ENTER_FUNCTION;
-
-    gState.message.type = SOCKET_MESSAGE_TYPE_ERROR;
+    gState.outgoingMessage.paket.type = SOCKET_MESSAGE_TYPE_ERROR;
 
     // reset content to error description
-    gState.writeIndex = 0;
+    gState.outgoingMessage.index = 0;
     appendString(desc);
 
     return sendMessage();
@@ -96,19 +90,22 @@ t_ilm_bool sendError(t_ilm_const_string desc)
 
 enum IpcMessageType receiveMessage(t_ilm_int timeoutInMs)
 {
-    LOG_ENTER_FUNCTION;
     enum IpcMessageType result = IpcMessageTypeNone;
 
-    gState.readIndex = 0;
-    gState.writeIndex = 0;
+    // switch to next receive buffer
+    gState.incomingQueueIndex = ++gState.incomingQueueIndex % SOCKET_MESSAGE_BUFFER_COUNT;
 
-    fd_set readFds = gState.socket.monitoredSockets;
+    struct SocketMessage* msg = &gState.incomingMessage[gState.incomingQueueIndex];
+
+    msg->index = 0;
+
+    fd_set readFds = gState.monitoredSockets;
 
     struct timeval timeoutValue;
     timeoutValue.tv_sec = timeoutInMs / 1000;
     timeoutValue.tv_usec = (timeoutInMs % 1000) * 1000;
 
-    int numberOfFdsReady = select(gState.socket.monitoredSocketMax + 1, &readFds, 0, 0, &timeoutValue);
+    int numberOfFdsReady = select(gState.monitoredSocketMax + 1, &readFds, 0, 0, &timeoutValue);
 
     if (-1  == numberOfFdsReady)
     {
@@ -117,13 +114,13 @@ enum IpcMessageType receiveMessage(t_ilm_int timeoutInMs)
     else if (0 < numberOfFdsReady)
     {
         int socketNumber;
-        for (socketNumber = 0; socketNumber <= gState.socket.monitoredSocketMax; ++socketNumber)
+        for (socketNumber = 0; socketNumber <= gState.monitoredSocketMax; ++socketNumber)
         {
             if (FD_ISSET(socketNumber, &readFds))
             {
-                if (!gState.socket.isClient)
+                if (!gState.isClient)
                 {
-                    if (gState.socket.server == socketNumber)
+                    if (gState.socket == socketNumber)
                     {
                         // New client connected
                         acceptClientConnection();
@@ -132,22 +129,21 @@ enum IpcMessageType receiveMessage(t_ilm_int timeoutInMs)
                     }
 
                     // receive data from socket
-                    gState.senderSocket = socketNumber;
-                    receiveFromSocket();
+                    receiveFromSocket(socketNumber);
 
-                    if(gState.message.size > 0)
+                    if(msg->paket.size > 0)
                     {
                         // new message from client
-                        getString(gState.messageName);
+                        getString(msg->name);
                         result = IpcMessageTypeCommand;
                         continue;
                     }
 
-                    if(gState.message.size == 0)
+                    if(msg->paket.size == 0)
                     {
                         // client disconnected
                         close(socketNumber);
-                        FD_CLR(socketNumber, &gState.socket.monitoredSockets);
+                        FD_CLR(socketNumber, &gState.monitoredSockets);
                         result = IpcMessageTypeDisconnect;
                         continue;
                     }
@@ -155,15 +151,14 @@ enum IpcMessageType receiveMessage(t_ilm_int timeoutInMs)
                     // error
                     const char* errorMsg = (char*)strerror(errno);
                     printf("      --> TcpIpcModule: Error receiving data from socket %d (%s)\n",
-                           gState.senderSocket, errorMsg);
+                           msg->sender, errorMsg);
                     result = IpcMessageTypeError;
                 }
                 else
                 {
                     // receive LayerManager response
-                    gState.senderSocket = socketNumber;
-                    receiveFromSocket(gState.senderSocket);
-                    getString(gState.messageName);
+                    receiveFromSocket(socketNumber);
+                    getString(msg->name);
                     result = IpcMessageTypeCommand;
                 }
             }
@@ -175,21 +170,18 @@ enum IpcMessageType receiveMessage(t_ilm_int timeoutInMs)
 
 t_ilm_const_string getMessageName()
 {
-    LOG_ENTER_FUNCTION;
-    return gState.messageName;
+    return gState.incomingMessage[gState.incomingQueueIndex].name;
 }
 
 t_ilm_bool isErrorMessage()
 {
-    LOG_ENTER_FUNCTION;
-    return (SOCKET_MESSAGE_TYPE_ERROR == gState.message.type);
+    return (SOCKET_MESSAGE_TYPE_ERROR == gState.incomingMessage[gState.incomingQueueIndex].paket.type);
 }
 
 t_ilm_const_string getSenderName()
 {
-    LOG_ENTER_FUNCTION;
     char buffer[16];
-    sprintf(buffer, "socket %d", gState.senderSocket);
+    sprintf(buffer, "socket %d", gState.incomingMessage[gState.incomingQueueIndex].sender);
     return strdup(buffer);
 }
 
@@ -198,112 +190,50 @@ t_ilm_const_string getSenderName()
 //=============================================================================
 t_ilm_bool acceptClientConnection()
 {
-    LOG_ENTER_FUNCTION;
-
     t_ilm_bool result = ILM_TRUE;
-    unsigned int clientlen = sizeof(gState.socket.clientAddrIn);
+    unsigned int clientlen = sizeof(gState.clientAddrIn);
 
-    gState.socket.client = accept(gState.socket.server, (struct sockaddr *) &gState.socket.clientAddrIn, &clientlen);
+    int clientSocket = accept(gState.socket, (struct sockaddr *) &gState.clientAddrIn, &clientlen);
 
-    if (gState.socket.client < 0)
+    if (clientSocket < 0)
     {
         printf("TcpIpcModule: accept() failed.\n");
         result = ILM_FALSE;
     }
 
-    FD_SET(gState.socket.client, &gState.socket.monitoredSockets);
-    gState.socket.monitoredSocketMax = (gState.socket.monitoredSocketMax > gState.socket.client) ? gState.socket.monitoredSocketMax : gState.socket.client;
+    FD_SET(clientSocket, &gState.monitoredSockets);
+    gState.monitoredSocketMax = (gState.monitoredSocketMax > clientSocket) ? gState.monitoredSocketMax : clientSocket;
 
     return result;
 }
 
-int receiveFromSocket()
+void receiveFromSocket(int socketNumber)
 {
-    LOG_ENTER_FUNCTION;
     int receivedBytes = 0;
     int retVal = 0;
 
-    // receive header in first run (contains message size)
-    gState.message.size = sizeof(gState.message) - sizeof(gState.message.data);
+    struct SocketMessage* msg = &gState.incomingMessage[gState.incomingQueueIndex];
 
-    char* messageBuffer = (char*)&gState.message;
+    msg->sender = socketNumber;
+
+    // receive header in first run (contains message size)
+    msg->paket.size = sizeof(msg->paket) - sizeof(msg->paket.data);
+
+    char* messageBuffer = (char*)&msg->paket;
 
     do
     {
-        retVal = recv(gState.senderSocket,
+        retVal = recv(msg->sender,
                       &messageBuffer[receivedBytes],
-                      gState.message.size - receivedBytes,
+                      msg->paket.size - receivedBytes,
                       0);
         receivedBytes += retVal;
-    } while ((retVal > 0) && (receivedBytes < gState.message.size));
+    } while ((retVal > 0) && (receivedBytes < msg->paket.size));
 
     if (0 == retVal)
     {
         // client disconnect
-        gState.message.size = 0;
-    }
-}
-
-
-//=============================================================================
-// logging / debugging
-//=============================================================================
-void printMessage()
-{
-    LOG_ENTER_FUNCTION;
-
-    printf("          --> Message type: %s\n", (gState.message.type == SOCKET_MESSAGE_TYPE_NORMAL) ? "normal" : "error");
-    printf("          --> Message size: %d\n", gState.message.size);
-
-    int i = 0;
-
-    char headersize = sizeof(gState.message) - sizeof(gState.message.data);
-
-    // iterate over message data
-    while (i < gState.message.size - headersize)
-    {
-        // read type information
-        char type  = gState.message.data[i++];
-        char datasize = gState.message.data[i++];
-
-        // set pointer to value data
-        char* data = &gState.message.data[i];
-
-        // print data
-        switch (type)
-        {
-        case SOCKET_MESSAGE_TYPE_ARRAY:
-            printf("          --> Array, %d entries:\n", datasize);
-            datasize = 0;
-            break;
-
-        case SOCKET_MESSAGE_TYPE_STRING:
-            printf("          --> String: '%s' (%d bytes)\n", data, datasize);
-            break;
-
-        case SOCKET_MESSAGE_TYPE_UINT:
-            printf("          --> UInt: %u (%d bytes)\n", *(t_ilm_uint*)data, datasize);
-            break;
-
-        case SOCKET_MESSAGE_TYPE_INT:
-            printf("          --> Int: %d (%d bytes)\n", *(t_ilm_int*)data, datasize);
-            break;
-
-        case SOCKET_MESSAGE_TYPE_DOUBLE:
-            printf("          --> Double: %lf (%d bytes)\n", *(t_ilm_float*)data, datasize);
-            break;
-
-        case SOCKET_MESSAGE_TYPE_BOOL:
-            printf("          --> Bool: %d (%d bytes)\n", *data, datasize);
-            break;
-
-        default:
-            printf("          --> Unknown type (%s), %d bytes\n", (char*)&type, datasize);
-            break;
-        }
-
-        // skip already processed data
-        i += datasize;
+        msg->paket.size = 0;
     }
 }
 

@@ -27,33 +27,34 @@
 
 t_ilm_bool getGenericValue(void* value, const char protocolType, const char expectedSize)
 {
-    LOG_ENTER_FUNCTION;
     t_ilm_bool result = ILM_FALSE;
 
+    struct SocketMessage* msg = &gState.incomingMessage[gState.incomingQueueIndex];
+
     // get protocol value from message
-    char readType = gState.message.data[gState.readIndex];
-    gState.readIndex += sizeof(readType);
+    char readType = msg->paket.data[msg->index];
+    msg->index += sizeof(readType);
 
     // if type mismatch, return to previous state, return with error
     if (readType != protocolType)
     {
-        gState.readIndex -= sizeof(readType);
+        msg->index -= sizeof(readType);
         printf("command value type mismatch: expected '%s', got '%s'.\n",
                &protocolType, &readType);
         return ILM_FALSE;
     }
 
     // get size of value
-    char size = gState.message.data[gState.readIndex];
-    gState.readIndex += sizeof(size);
+    char size = msg->paket.data[msg->index];
+    msg->index += sizeof(size);
 
     // if size mismatch, return to previous state, return with error
     // exception: strings have varying length
     if (protocolType != SOCKET_MESSAGE_TYPE_STRING
         && size != expectedSize)
     {
-        gState.readIndex -= sizeof(readType);
-        gState.readIndex -= sizeof(size);
+        msg->index -= sizeof(readType);
+        msg->index -= sizeof(size);
         printf("command value size mismatch for type '%s': "
                "expected %d bytes, got %d bytes.\n",
                &protocolType, expectedSize, size);
@@ -61,8 +62,8 @@ t_ilm_bool getGenericValue(void* value, const char protocolType, const char expe
     }
 
     // copy data to caller
-    memcpy(value, &gState.message.data[gState.readIndex], size);
-    gState.readIndex += size;
+    memcpy(value, &msg->paket.data[msg->index], size);
+    msg->index += size;
 
     // if value is string, add end of string
     if (protocolType == SOCKET_MESSAGE_TYPE_STRING)
@@ -76,31 +77,26 @@ t_ilm_bool getGenericValue(void* value, const char protocolType, const char expe
 
 t_ilm_bool getUint(t_ilm_uint* value)
 {
-    LOG_ENTER_FUNCTION;
     return getGenericValue(value, SOCKET_MESSAGE_TYPE_UINT, sizeof(t_ilm_uint));
 }
 
 t_ilm_bool getInt(t_ilm_int* value)
 {
-    LOG_ENTER_FUNCTION;
     return getGenericValue(value, SOCKET_MESSAGE_TYPE_INT, sizeof(t_ilm_int));
 }
 
 t_ilm_bool getBool(t_ilm_bool* value)
 {
-    LOG_ENTER_FUNCTION;
     return getGenericValue(value, SOCKET_MESSAGE_TYPE_BOOL, sizeof(t_ilm_bool));
 }
 
 t_ilm_bool getDouble(t_ilm_float* value)
 {
-    LOG_ENTER_FUNCTION;
     return getGenericValue(value, SOCKET_MESSAGE_TYPE_DOUBLE, sizeof(t_ilm_float));
 }
 
 t_ilm_bool getString(char* value)
 {
-    LOG_ENTER_FUNCTION;
     return getGenericValue(value, SOCKET_MESSAGE_TYPE_STRING, sizeof(t_ilm_const_string));
 }
 
@@ -110,25 +106,26 @@ t_ilm_bool getString(char* value)
 
 t_ilm_bool getGenericArray(t_ilm_int* arraySize, void** value, const char protocolType, const char expectedSize)
 {
-    LOG_ENTER_FUNCTION;
     t_ilm_bool result = ILM_TRUE;
 
+    struct SocketMessage* msg = &gState.incomingMessage[gState.incomingQueueIndex];
+
     // get protocol value from message
-    char readType = gState.message.data[gState.readIndex];
-    gState.readIndex += sizeof(readType);
+    char readType = msg->paket.data[msg->index];
+    msg->index += sizeof(readType);
 
     // if type mismatch, return to previous state, return with error
     if (readType != SOCKET_MESSAGE_TYPE_ARRAY)
     {
-        gState.readIndex -= sizeof(readType);
+        msg->index -= sizeof(readType);
         printf("command value type mismatch: expected '%c', got '%s'.\n",
                SOCKET_MESSAGE_TYPE_ARRAY, &readType);
         return ILM_FALSE;
     }
 
     // get size of array
-    *arraySize = gState.message.data[gState.readIndex];
-    gState.readIndex += sizeof(gState.message.data[gState.readIndex]);
+    *arraySize = msg->paket.data[msg->index];
+    msg->index += sizeof(msg->paket.data[msg->index]);
 
     // create array for result and set callers pointer
     *value = malloc(*arraySize * expectedSize);
@@ -145,13 +142,11 @@ t_ilm_bool getGenericArray(t_ilm_int* arraySize, void** value, const char protoc
 
 t_ilm_bool getIntArray(t_ilm_int** valueArray, t_ilm_int* arraySize)
 {
-    LOG_ENTER_FUNCTION;
     return getGenericArray(arraySize, (void**)valueArray, SOCKET_MESSAGE_TYPE_INT, sizeof(t_ilm_int));
 }
 
 t_ilm_bool getUintArray(t_ilm_uint** valueArray, t_ilm_int* arraySize)
 {
-    LOG_ENTER_FUNCTION;
     return getGenericArray(arraySize, (void**)valueArray, SOCKET_MESSAGE_TYPE_UINT, sizeof(t_ilm_uint));
 }
 
