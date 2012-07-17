@@ -21,10 +21,14 @@
 #include <stdio.h>
 #include <stdlib.h>  // getenv
 #include <string.h>  // memset
+#include <signal.h>
 
 
 t_ilm_bool init(t_ilm_bool isClient)
 {
+    // ignore broken pipe, if clients disconnect, handled in receive()
+    signal(SIGPIPE, SIG_IGN);
+
     t_ilm_bool result = ILM_TRUE;
 
     gState.incomingQueueIndex = SOCKET_MESSAGE_BUFFER_COUNT - 1;
@@ -125,6 +129,10 @@ t_ilm_bool destroy()
             close(socketNumber);
         }
     }
+
+    // return to default signal handling
+    signal(SIGPIPE, SIG_DFL);
+
     return ILM_TRUE;
 }
 
