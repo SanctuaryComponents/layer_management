@@ -182,6 +182,8 @@ if (WITH_GLX_LIB)
     
     add_library(${GRAPHIC_LIB_NAME} SHARED ${SOURCES})
 
+    target_link_libraries(${GRAPHIC_LIB_NAME} ${LIBS})
+
     install(TARGETS
                 ${GRAPHIC_LIB_NAME}
             DESTINATION
