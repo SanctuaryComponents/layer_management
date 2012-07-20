@@ -121,7 +121,6 @@ t_ilm_bool createX11Context(t_ilm_int width, t_ilm_int height)
 
 t_ilm_bool createGLXContext(t_ilm_int width, t_ilm_int height)
 {
-    t_ilm_bool result = ILM_TRUE;
     int glxMajor;
     int glxMinor;
 
@@ -144,45 +143,34 @@ t_ilm_bool createGLXContext(t_ilm_int width, t_ilm_int height)
     t_ilm_layer layerid = (t_ilm_layer) LAYER_EXAMPLE_X_APPLICATIONS; // TODO: remove all C stylec asts in C++ code
     t_ilm_surface surfaceid = (t_ilm_surface) SURFACE_EXAMPLE_GLXX11_APPLICATION;
 
-    //if (error == ILM_FAILED) return ILM_FALSE;
-
     printf("create a surface %lu\n", (t_ilm_nativehandle) (g_x11ContextStruct.x11Window));
 
-    ilmErrorTypes error = ilm_surfaceCreate((t_ilm_nativehandle) g_x11ContextStruct.x11Window, width, height, ILM_PIXELFORMAT_RGBA_8888, &surfaceid);
-
-    //if (error == ILM_FAILED) return ILM_FALSE;
+    ilm_surfaceCreate((t_ilm_nativehandle) g_x11ContextStruct.x11Window, width, height, ILM_PIXELFORMAT_RGBA_8888, &surfaceid);
 
     printf("set surface dest region\n");
-    error = ilm_surfaceSetDestinationRectangle(surfaceid, 0, 0, width, height);
-
-    //if (error == ILM_FAILED) return ILM_FALSE;
+    ilm_surfaceSetDestinationRectangle(surfaceid, 0, 0, width, height);
 
     printf("set surface src region\n");
-    error = ilm_surfaceSetSourceRectangle(surfaceid, 0, 0, width, height);
-
-    //if (error == ILM_FAILED) return ILM_FALSE;
+    ilm_surfaceSetSourceRectangle(surfaceid, 0, 0, width, height);
 
     printf("add surface to layer\n");
-    error = ilm_layerAddSurface(layerid, surfaceid);
+    ilm_layerAddSurface(layerid, surfaceid);
 
     printf("Set surface visible\n");
-    error = ilm_surfaceSetVisibility(surfaceid, ILM_TRUE);
+    ilm_surfaceSetVisibility(surfaceid, ILM_TRUE);
 
     printf("Set surface opacity\n");
-    error = ilm_surfaceSetOpacity(surfaceid, 0.75f);
-
-    //if (error == ILM_FAILED) return ILM_FALSE;
+    ilm_surfaceSetOpacity(surfaceid, 0.75f);
 
 #ifdef WITH_INPUT_EVENTS
     xeventInitialiaze(g_x11ContextStruct.x11Display, surfaceid, 0, 0, width, height);
 #endif
 
     printf("commit\n");
-    error = ilm_commitChanges();
+    // commit will indicate error, if any command failed
+    ilmErrorTypes error = ilm_commitChanges();
 
-    //if (error == ILM_FAILED) return ILM_FALSE;
-
-    return result;
+    return (error != ILM_FAILED) ? ILM_TRUE : ILM_FALSE;
 }
 
 void destroyGLXContext()

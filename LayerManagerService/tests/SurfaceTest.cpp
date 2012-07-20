@@ -55,7 +55,7 @@ TEST_F(SurfaceTest, defaultConstructor)
     EXPECT_EQ(0, surface.OriginalSourceWidth);
 
     /// make sure, surface has default visibility
-    EXPECT_EQ(false, surface.getVisibility());
+    EXPECT_FALSE(surface.getVisibility());
 
     /// make sure, surface has default opacity
     EXPECT_DOUBLE_EQ(1.0, surface.getOpacity());
@@ -100,7 +100,7 @@ TEST_F(SurfaceTest, specialConstructor)
     EXPECT_EQ(0, surface.OriginalSourceWidth);
 
     /// make sure, surface has default visibility
-    EXPECT_EQ(false, surface.getVisibility());
+    EXPECT_FALSE(surface.getVisibility());
 
     /// make sure, surface has default opacity
     EXPECT_DOUBLE_EQ(1.0, surface.getOpacity());

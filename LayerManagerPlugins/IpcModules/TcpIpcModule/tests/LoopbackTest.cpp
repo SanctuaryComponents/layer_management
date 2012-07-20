@@ -39,7 +39,7 @@ public:
         unsigned int* base = (unsigned int*)ipcModule;
         for (int i = 0; i < apiEntryCount; ++i)
         {
-            ASSERT_NE(0, base[i]);
+            ASSERT_NE(0u, base[i]);
         }
     }
 

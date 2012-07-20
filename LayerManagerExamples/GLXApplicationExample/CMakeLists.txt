@@ -39,7 +39,7 @@ find_package (OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
 
 find_package(X11 REQUIRED)
-include_directories(X11_INCLUDE_DIR)
+include_directories(${X11_INCLUDE_DIR})
 
 set(LIBS ${LIBS} ${OPENGL_LIBRARIES} ${X11_LIBRARIES} LayerManagerUtils) 
 target_link_libraries(GLX11ApplicationExample ${LIBS} ilmClient)
