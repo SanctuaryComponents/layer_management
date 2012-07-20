@@ -730,7 +730,7 @@ extern "C" void WaylandBaseWindowSystem::compositorIFCreateSurface
         break;
     }
 
-    windowSystem->checkForNewSurface();
+    windowSystem->checkForNewSurfaceNativeContent();
     wl_client_add_resource(client, &surface->surface.resource);
     LOG_DEBUG("WaylandBaseWindowSystem", "compositorIFCreateSurface OUT");
 }
