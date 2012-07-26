@@ -143,6 +143,7 @@ endif(WITH_CLIENTEXAMPLES)
 if (WITH_WL_EXAMPLE)
     add_subdirectory (LayerManagerExamples/EGLWLApplicationExample)
     add_subdirectory (LayerManagerExamples/EGLWLMockNavigation)
+    add_subdirectory (LayerManagerExamples/WLChromakeyExample)
 endif(WITH_WL_EXAMPLE)
 
 # enable ctest if building with tests
