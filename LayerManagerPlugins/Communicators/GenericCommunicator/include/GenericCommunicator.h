@@ -1,6 +1,7 @@
 /***************************************************************************
  *
  * Copyright 2012 BMW Car IT GmbH
+ * Copyright (C) 2012 DENSO CORPORATION and Robert Bosch Car Multimedia Gmbh
  *
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -153,6 +154,7 @@ private:
     void SetKeyboardFocusOn();
     void GetKeyboardFocusSurfaceId();
     void UpdateInputEventAcceptanceOn();
+    void SetSurfaceChromaKey();
 
 private:
     void RemoveApplicationReference(char* owner);

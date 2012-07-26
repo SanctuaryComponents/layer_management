@@ -1,6 +1,7 @@
 /***************************************************************************
  *
  * Copyright 2010,2011 BMW Car IT GmbH
+ * Copyright (C) 2012 DENSO CORPORATION and Robert Bosch Car Multimedia Gmbh
  *
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -52,6 +53,38 @@ public:
     double getOpacity() const;
 
     /**
+     * @brief Set chroma key enabled value
+     * @param[in] newEnabled The new ChromaKey enable (true) or disable (false)
+     * @return TRUE if the new ChromaKey Enabled Value are not equal to the current Value
+     *         FALSE if they are equal
+     */
+    virtual bool setChromaKeyEnabled(bool newEnabled);
+
+    /**
+     * @brief Get chroma key enabled value
+     * @return The current chromakey enable (true) or disable (false)
+     */
+    bool getChromaKeyEnabled() const;
+
+    /**
+     * @brief Set chroma key
+     * @param[in] newRed The new Red Value between 0 and 255
+     * @param[in] newGreen The new Green Value between 0 and 255
+     * @param[in] newBlue The new Blue Value between 0 and 255
+     * @return TRUE if the new ChromaKey Values are not equal to the current ChromaKey Values
+     *         FALSE if they are equal
+     */
+    virtual bool setChromaKey(unsigned char newRed, unsigned char newGreen, unsigned char newBlue);
+
+    /**
+     * @brief Get chroma key values
+     * @param[out] The current Red Value between 0 and 255
+     * @param[out] The current Green Value between 0 and 255
+     * @param[out] The current Blue Value between 0 and 255
+     */
+    void getChromaKey(unsigned char& red, unsigned char& green, unsigned char& blue) const;
+
+    /**
      * Set the visibility
      * @param[in] newVisibility set this object visible (true) or invisible (false)
      * @return TRUE if the new visiblity value is not equal to the current visibility value
@@ -92,6 +125,10 @@ public:
     Shader* shader;
     double opacity;
     bool visibility;
+    bool chromaKeyEnabled;
+    unsigned char chromaKeyRed;
+    unsigned char chromaKeyGreen;
+    unsigned char chromaKeyBlue;
 
 protected:
     unsigned int graphicInternalId;
@@ -108,6 +145,10 @@ inline GraphicalObject::GraphicalObject(ObjectType type, double opacity, bool vi
 , shader(0)
 , opacity(opacity)
 , visibility(visibility)
+, chromaKeyEnabled(false)
+, chromaKeyRed(0)
+, chromaKeyGreen(0)
+, chromaKeyBlue(0)
 , graphicInternalId(nextGraphicId[type]++)
 {
     graphicExternalId = graphicInternalId;
@@ -120,6 +161,10 @@ inline GraphicalObject::GraphicalObject(int externalId, ObjectType type, double 
 , shader(0)
 , opacity(opacity)
 , visibility(visibility)
+, chromaKeyEnabled(false)
+, chromaKeyRed(0)
+, chromaKeyGreen(0)
+, chromaKeyBlue(0)
 , graphicInternalId(nextGraphicId[type]++)
 , graphicExternalId(externalId)
 {
@@ -155,6 +200,42 @@ inline bool GraphicalObject::setVisibility(bool newVisibility)
 inline bool GraphicalObject::getVisibility() const
 {
     return visibility;
+}
+
+inline bool GraphicalObject::setChromaKeyEnabled(bool newEnabled)
+{
+    if (chromaKeyEnabled != newEnabled)
+    {
+        chromaKeyEnabled = newEnabled;
+        renderPropertyChanged = true;
+        return true;
+    }
+    return false;
+}
+
+inline bool GraphicalObject::getChromaKeyEnabled() const
+{
+    return chromaKeyEnabled;
+}
+
+inline bool GraphicalObject::setChromaKey(unsigned char newRed, unsigned char newGreen, unsigned char newBlue)
+{
+    if ((chromaKeyRed != newRed) || (chromaKeyGreen != newGreen) || (chromaKeyBlue != newBlue))
+    {
+        chromaKeyRed = newRed;
+        chromaKeyGreen = newGreen;
+        chromaKeyBlue = newBlue;
+        renderPropertyChanged = true;
+        return true;
+    }
+    return false;
+}
+
+inline void GraphicalObject::getChromaKey(unsigned char& red, unsigned char& green, unsigned char& blue) const
+{
+    red = chromaKeyRed;
+    green = chromaKeyGreen;
+    blue = chromaKeyBlue;
 }
 
 inline unsigned int GraphicalObject::getID()

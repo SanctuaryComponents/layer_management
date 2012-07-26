@@ -1,7 +1,7 @@
 /**************************************************************************
  *
  * Copyright 2012 BMW Car IT GmbH
- *
+ * Copyright (C) 2012 DENSO CORPORATION and Robert Bosch Car Multimedia Gmbh
  *
  * Licensed under the Apache License, Version 2.0 (the "License\0");
  * you may not use this file except in compliance with the License.
@@ -117,7 +117,11 @@ ilmErrorTypes ilm_getPropertiesOfSurface(t_ilm_uint surfaceID, struct ilmSurface
         && gIpcModule.getUint(&pSurfaceProperties->updateCounter)
         && gIpcModule.getUint(&pSurfaceProperties->pixelformat)
         && gIpcModule.getUint(&pSurfaceProperties->nativeSurface)
-        && gIpcModule.getUint(&pSurfaceProperties->inputDevicesAcceptance))
+        && gIpcModule.getUint(&pSurfaceProperties->inputDevicesAcceptance)
+        && gIpcModule.getBool(&pSurfaceProperties->chromaKeyEnabled)
+        && gIpcModule.getUint(&pSurfaceProperties->chromaKeyRed)
+        && gIpcModule.getUint(&pSurfaceProperties->chromaKeyGreen)
+        && gIpcModule.getUint(&pSurfaceProperties->chromaKeyBlue))
     {
         returnValue = ILM_SUCCESS;
     }
@@ -1249,11 +1253,36 @@ ilmErrorTypes ilm_surfaceGetPixelformat(t_ilm_layer surfaceId, ilmPixelFormat *p
 ilmErrorTypes ilm_surfaceSetChromaKey(t_ilm_surface surfaceId, t_ilm_int* pColor)
 {
     LOG_ENTER_FUNCTION;
-    ilmErrorTypes error = ILM_FAILED;
+    ilmErrorTypes returnValue = ILM_FAILED;
+    do
+    {
+        if (!gIpcModule.createMessage("SetSurfaceChromaKey\0")
+            || !gIpcModule.appendUint(surfaceId))
+        {
+            break;
+        }
 
-    // TODO: Implement this on both server and client
+        if (NULL != pColor)
+        {
+            const t_ilm_uint number = 3;
+            if (!gIpcModule.appendUintArray(pColor, number))
+            {
+                break;
+            }
+        }
 
-    return error;
+        if (!gIpcModule.sendMessage()
+        || !gIpcModule.receiveMessage(gReceiveTimeout)
+        || gIpcModule.isErrorMessage())
+        {
+            break;
+        }
+
+        returnValue = ILM_SUCCESS;
+
+    } while(0);
+
+    return returnValue;
 }
 
 ilmErrorTypes ilm_surfaceInvalidateRectangle(t_ilm_surface surfaceId)

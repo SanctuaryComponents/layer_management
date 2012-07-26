@@ -1,5 +1,6 @@
 /***************************************************************************
  * Copyright 2012 BMW Car IT GmbH
+ * Copyright (C) 2012 DENSO CORPORATION and Robert Bosch Car Multimedia Gmbh
  *
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -81,6 +82,7 @@
 #include "SurfaceSetKeyboardFocusCommand.h"
 #include "SurfaceGetKeyboardFocusCommand.h"
 #include "SurfaceUpdateInputEventAcceptance.h"
+#include "SurfaceSetChromaKeyCommand.h"
 
 #include <stdbool.h>
 #include <unistd.h>
@@ -188,7 +190,8 @@ GenericCommunicator::GenericCommunicator(ICommandExecutor* executor)
         { "SetUniforms",                      &GenericCommunicator::SetUniforms },
         { "SetKeyboardFocusOn",               &GenericCommunicator::SetKeyboardFocusOn },
         { "GetKeyboardFocusSurfaceId",        &GenericCommunicator::GetKeyboardFocusSurfaceId },
-        { "UpdateInputEventAcceptanceOn",     &GenericCommunicator::UpdateInputEventAcceptanceOn }
+        { "UpdateInputEventAcceptanceOn",     &GenericCommunicator::UpdateInputEventAcceptanceOn },
+        { "SetSurfaceChromaKey",              &GenericCommunicator::SetSurfaceChromaKey },
     };
 
     int entryCount = sizeof(manager_methods) / sizeof(MethodTable);
@@ -603,6 +606,10 @@ void GenericCommunicator::GetPropertiesOfSurface()
         Rectangle dest = surface->getDestinationRegion();
         Rectangle src = surface->getSourceRegion();
         OrientationType orientation = surface->getOrientation();
+        unsigned char chromaKeyRed = 0;
+        unsigned char chromaKeyGreen = 0;
+        unsigned char chromaKeyBlue = 0;
+        surface->getChromaKey(chromaKeyRed, chromaKeyGreen, chromaKeyBlue);
 
         m_ipcModule.createMessage((char*)__FUNCTION__);
         m_ipcModule.appendDouble(surface->getOpacity());
@@ -624,6 +631,10 @@ void GenericCommunicator::GetPropertiesOfSurface()
         m_ipcModule.appendUint(surface->getPixelFormat());
         m_ipcModule.appendUint(surface->getNativeContent());
         m_ipcModule.appendUint(surface->getInputEventAcceptanceOnDevices());
+        m_ipcModule.appendBool(surface->getChromaKeyEnabled());
+        m_ipcModule.appendUint(chromaKeyRed);
+        m_ipcModule.appendUint(chromaKeyGreen);
+        m_ipcModule.appendUint(chromaKeyBlue);
         m_ipcModule.sendMessage();
     }
     else
@@ -2004,6 +2015,27 @@ void GenericCommunicator::UpdateInputEventAcceptanceOn()
 
     devices = (InputDevice) udevices;
     t_ilm_bool status = m_executor->execute(new SurfaceUpdateInputEventAcceptance(surfaceId, devices, accept));
+    if (status)
+    {
+        m_ipcModule.createMessage((char*)__FUNCTION__);
+        m_ipcModule.sendMessage();
+    }
+    else
+    {
+        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+    }
+}
+
+void GenericCommunicator::SetSurfaceChromaKey()
+{
+    uint* array = NULL;
+    int length = 0;
+    uint surfaceid = 0;
+
+    m_ipcModule.getUint(&surfaceid);
+    m_ipcModule.getUintArray(&array, &length);
+
+    t_ilm_bool status = m_executor->execute(new SurfaceSetChromaKeyCommand(surfaceid, array, length));
     if (status)
     {
         m_ipcModule.createMessage((char*)__FUNCTION__);

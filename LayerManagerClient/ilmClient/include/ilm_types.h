@@ -1,6 +1,7 @@
 /***************************************************************************
 *
 * Copyright 2010,2011 BMW Car IT GmbH
+* Copyright (C) 2012 DENSO CORPORATION and Robert Bosch Car Multimedia Gmbh
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -187,6 +188,10 @@ struct ilmSurfaceProperties
     t_ilm_uint pixelformat;                 /*!< pixel format of surface */
     t_ilm_uint nativeSurface;               /*!< native surface handle of surface */
     ilmInputDevice inputDevicesAcceptance;  /*!< bitmask of ilmInputDevice from which the surface can accept input events */
+    t_ilm_bool chromaKeyEnabled;            /*!< chromakey validness of the surface */
+    t_ilm_uint chromaKeyRed;                /*!< chromakey's red value of the surface */
+    t_ilm_uint chromaKeyGreen;              /*!< chromakey's green value of the surface */
+    t_ilm_uint chromaKeyBlue;               /*!< chromakey's blue value of the surface */
 };
 
 /**
