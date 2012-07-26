@@ -1,6 +1,7 @@
 /***************************************************************************
 *
 * Copyright 2010 BMW Car IT GmbH
+* Copyright (C) 2012 DENSO CORPORATION and Robert Bosch Car Multimedia Gmbh
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -57,7 +58,16 @@ ShaderProgram* ShaderProgramGLES::createProgram(const std::string& vertName, con
         strcpy(fragmentShaderLocation,defaultShaderDir);
         strcat(vertexShaderLocation,"/renderer_vert.glslv");
         strcat(fragmentShaderLocation,"/renderer_frag_no_ualpha.glslf");
-        progHandle = RenderUtilLoadShaderSources(vertexShaderLocation,fragmentShaderLocation, GL_TRUE);    }
+        progHandle = RenderUtilLoadShaderSources(vertexShaderLocation,fragmentShaderLocation, GL_TRUE);
+    }
+    else if (vertName=="default" && fragName=="default_add_uniform_chromakey")
+    {
+        strcpy(vertexShaderLocation,defaultShaderDir);
+        strcpy(fragmentShaderLocation,defaultShaderDir);
+        strcat(vertexShaderLocation,"/renderer_vert.glslv");
+        strcat(fragmentShaderLocation,"/renderer_frag_add_uchromakey.glslf");
+        progHandle = RenderUtilLoadShaderSources(vertexShaderLocation,fragmentShaderLocation, GL_TRUE);
+    }
 	else
 	{
 		// load shader sources from file, compile and link them:

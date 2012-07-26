@@ -1,6 +1,7 @@
 /***************************************************************************
  *
  * Copyright 2010,2011 BMW Car IT GmbH
+ * Copyright (C) 2012 DENSO CORPORATION and Robert Bosch Car Multimedia Gmbh
  *
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -62,6 +63,7 @@ GLESGraphicsystem::GLESGraphicsystem(int windowWidth, int windowHeight, PfnShade
 , m_blendingStatus(false)
 , m_defaultShader(0)
 , m_defaultShaderNoUniformAlpha(0)
+, m_defaultShaderAddUniformChromaKey(0)
 , m_currentLayer(0)
 #ifdef DRAW_LAYER_DEBUG
 , m_layerShader(0)
@@ -298,14 +300,33 @@ Shader *GLESGraphicsystem::pickOptimizedShader(Shader* currentShader, const Shad
 {
     Shader * retShader = currentShader;
 
-    if (currentShader == m_defaultShader && curUniforms.opacity == 1.0f)
+    LOG_DEBUG("GLESGraphicsystem", "shader:currentShader");
+    do
     {
-      //no need for multiply in shader, just use texture
-      retShader = m_defaultShaderNoUniformAlpha;
-    }
+        if (currentShader != m_defaultShader)
+        {
+        LOG_DEBUG("GLESGraphicsystem", "shader:default");
+            break;
+        }
+
+        if (false == curUniforms.chromaKeyEnabled)
+        {
+            if (curUniforms.opacity == 1.0f)
+            {
+                //no need for multiply in shader, just use texture
+                retShader = m_defaultShaderNoUniformAlpha;
+        LOG_DEBUG("GLESGraphicsystem", "shader:defaultShaderNoUniformAlpha");
+            }
+        }
+        else
+        {
+            // Add chromakey to default fragment shader
+            retShader = m_defaultShaderAddUniformChromaKey;
+        LOG_DEBUG("GLESGraphicsystem", "shader:defaultShaderAddUniformChromaKey");
+        }
+    } while(0);
 
     return retShader;
-
 }
 
 void GLESGraphicsystem::applyLayerMatrix(IlmMatrix& matrix)
@@ -363,7 +384,17 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
     uniforms.texOffset[1] = textureCoordinates[1];
     uniforms.texUnit = 0;
     uniforms.matrix = &layerMatrix.f[0];
-
+    uniforms.chromaKeyEnabled = (surface)->getChromaKeyEnabled();
+    if (true == uniforms.chromaKeyEnabled)
+    {
+        unsigned char red = 0;
+        unsigned char green = 0;
+        unsigned char blue = 0;
+        (surface)->getChromaKey(red, green, blue);
+        uniforms.chromaKey[0] = (float)red / 255.0f;
+        uniforms.chromaKey[1] = (float)green / 255.0f;
+        uniforms.chromaKey[2] = (float)blue / 255.0f;
+    }
 
     //We only know about specific Shaders, only do this if we start with the defaultShader
     if (shader == m_defaultShader && uniforms.opacity == 1.0f)
@@ -440,6 +471,7 @@ bool GLESGraphicsystem::initOpenGLES(EGLint displayWidth, EGLint displayHeight)
     ShaderProgramFactory::setCreatorFunc(m_shaderCreatorFunc);
     m_defaultShader = Shader::createShader("default", "default");
     m_defaultShaderNoUniformAlpha = Shader::createShader("default", "default_no_uniform_alpha");
+    m_defaultShaderAddUniformChromaKey= Shader::createShader("default", "default_add_uniform_chromakey");
 
 #ifdef DRAW_LAYER_DEBUG
     std::string pluginLookupPath = getenv("LM_PLUGIN_PATH");
@@ -457,7 +489,7 @@ bool GLESGraphicsystem::initOpenGLES(EGLint displayWidth, EGLint displayHeight)
     m_layerShader = Shader::createShader(vertexShaderPath, fragmentShaderPath);
 #endif
     if (
-      !m_defaultShader || !m_defaultShaderNoUniformAlpha
+      !m_defaultShader || !m_defaultShaderNoUniformAlpha || !m_defaultShaderAddUniformChromaKey
 #ifdef DRAW_LAYER_DEBUG
     || !m_layerShader
 #endif

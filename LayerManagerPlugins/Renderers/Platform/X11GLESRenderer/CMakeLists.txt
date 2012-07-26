@@ -1,6 +1,7 @@
 ############################################################################
 # 
 # Copyright 2010-2012 BMW Car IT GmbH 
+# Copyright (C) 2012 DENSO CORPORATION and Robert Bosch Car Multimedia Gmbh
 # 
 # 
 # Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -53,6 +54,7 @@ add_dependencies(X11GLESRenderer LayerManagerGraphicGLESv2)
 install (TARGETS X11GLESRenderer DESTINATION lib/layermanager/renderer)
 install (FILES renderer_frag.glslf DESTINATION lib/layermanager/renderer)
 install (FILES renderer_frag_no_ualpha.glslf DESTINATION lib/layermanager/renderer)
+install (FILES renderer_frag_add_uchromakey.glslf DESTINATION lib/layermanager/renderer)
 install (FILES renderer_layer.glslf DESTINATION lib/layermanager/renderer)
 install (FILES renderer_layer.glslv DESTINATION lib/layermanager/renderer)
 install (FILES renderer_vert.glslv DESTINATION lib/layermanager/renderer)

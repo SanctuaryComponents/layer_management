@@ -1,6 +1,7 @@
 /***************************************************************************
  *
  * Copyright 2010,2011 BMW Car IT GmbH
+ * Copyright (C) 2012 DENSO CORPORATION and Robert Bosch Car Multimedia Gmbh
  *
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -84,6 +85,7 @@ protected:
     EGLBoolean m_blendingStatus;
     Shader* m_defaultShader;
     Shader* m_defaultShaderNoUniformAlpha;
+    Shader* m_defaultShaderAddUniformChromaKey;
     Layer* m_currentLayer;
 #ifdef DRAW_LAYER_DEBUG
     Shader* m_layerShader;

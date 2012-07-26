@@ -1,6 +1,7 @@
 /***************************************************************************
  *
  * Copyright 2010,2011 BMW Car IT GmbH
+ * Copyright (C) 2012 DENSO CORPORATION and Robert Bosch Car Multimedia Gmbh
  *
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -85,6 +86,7 @@ ShaderProgram::ShaderProgram(const string& vertFileName, const string& fragFileN
 , m_texOffsetLoc(0)
 , m_texUnitLoc(0)
 , m_matrixLoc(0)
+, m_chromaKeyLoc(0)
 {
     // void
 }
@@ -150,6 +152,10 @@ void ShaderProgram::loadCommonUniforms(const CommonUniforms& uniforms) const
     {
         uniformMatrix4fv(m_matrixLoc, 1, false, uniforms.matrix);
     }
+    if (m_chromaKeyLoc>= 0)
+    {
+        uniform3fv(m_chromaKeyLoc, 1, uniforms.chromaKey);
+    }
 }
 
 void ShaderProgram::updateCommonUniformLocations(void)
@@ -164,5 +170,6 @@ void ShaderProgram::updateCommonUniformLocations(void)
     m_texOffsetLoc = getUniformLocation("uTexOffset");
     m_texUnitLoc = getUniformLocation("uTexUnit");
     m_matrixLoc = getUniformLocation("uMatrix");
+    m_chromaKeyLoc = getUniformLocation("uChromaKey");
 }
 

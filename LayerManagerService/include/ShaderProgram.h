@@ -1,6 +1,7 @@
 /***************************************************************************
 *
 * Copyright 2010,2011 BMW Car IT GmbH
+* Copyright (C) 2012 DENSO CORPORATION and Robert Bosch Car Multimedia Gmbh
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -53,6 +54,8 @@ public:
         float texOffset[2];
         int texUnit;
         float* matrix;
+        float chromaKey[3];
+        bool chromaKeyEnabled;
     };
 
     /**
@@ -163,6 +166,7 @@ private:
     int m_texOffsetLoc;
     int m_texUnitLoc;
     int m_matrixLoc;
+    int m_chromaKeyLoc;
     /// global list of programs
     static ShaderProgramList m_programList;
 };
