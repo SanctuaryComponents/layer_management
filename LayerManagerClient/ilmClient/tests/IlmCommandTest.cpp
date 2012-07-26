@@ -1,6 +1,7 @@
 /***************************************************************************
  *
  * Copyright 2010,2011 BMW Car IT GmbH
+ * Copyright (C) 2012 DENSO CORPORATION and Robert Bosch Car Multimedia Gmbh
  *
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,7 +22,6 @@
  *
  *     ilm_displaySetRenderOrder
  *     ilm_surfaceInvalidateRectangle
- *     ilm_surfaceSetChromaKey
  *     ilm_layerSetChromaKey
  *     ilm_layerSetRenderOrder
  *     ilm_getNumberOfHardwareLayers
@@ -617,8 +617,9 @@ TEST_F(IlmCommandTest, ilm_layerAddSurface_ilm_layerRemoveSurface_ilm_getSurface
     ASSERT_EQ(length,0);
 }
 
-TEST_F(IlmCommandTest, ilm_getPropertiesOfSurface_ilm_surfaceSetSourceRectangle_ilm_surfaceSetDestinationRectangle) {
+TEST_F(IlmCommandTest, ilm_getPropertiesOfSurface_ilm_surfaceSetSourceRectangle_ilm_surfaceSetDestinationRectangle_ilm_surfaceSetChromaKey) {
     t_ilm_uint surface;
+    t_ilm_int chromaKey[3] = {3, 22, 111};
     ilm_surfaceCreate(0,0,0,ILM_PIXELFORMAT_RGBA_8888,&surface);
     ilm_commitChanges();
 
@@ -627,6 +628,7 @@ TEST_F(IlmCommandTest, ilm_getPropertiesOfSurface_ilm_surfaceSetSourceRectangle_
     ilm_surfaceSetDestinationRectangle(surface,54,47,947,9);
     ilm_surfaceSetOrientation(surface,ILM_NINETY);
     ilm_surfaceSetVisibility(surface,true);
+    ilm_surfaceSetChromaKey(surface,&chromaKey[0]);
     ilm_commitChanges();
 
     ilmSurfaceProperties surfaceProperties;
@@ -642,12 +644,17 @@ TEST_F(IlmCommandTest, ilm_getPropertiesOfSurface_ilm_surfaceSetSourceRectangle_
     ASSERT_EQ(9u, surfaceProperties.destHeight);
     ASSERT_EQ(ILM_NINETY, surfaceProperties.orientation);
     ASSERT_TRUE( surfaceProperties.visibility);
+    ASSERT_TRUE( surfaceProperties.chromaKeyEnabled);
+    ASSERT_EQ(3u, surfaceProperties.chromaKeyRed);
+    ASSERT_EQ(22u, surfaceProperties.chromaKeyGreen);
+    ASSERT_EQ(111u, surfaceProperties.chromaKeyBlue);
 
     ilm_surfaceSetOpacity(surface,0.436);
     ilm_surfaceSetSourceRectangle(surface,784,546,235,78);
     ilm_surfaceSetDestinationRectangle(surface,536,5372,3,4316);
     ilm_surfaceSetOrientation(surface,ILM_TWOHUNDREDSEVENTY);
     ilm_surfaceSetVisibility(surface,false);
+    ilm_surfaceSetChromaKey(surface,NULL);
     ilm_commitChanges();
 
     ilmSurfaceProperties surfaceProperties2;
@@ -663,6 +670,7 @@ TEST_F(IlmCommandTest, ilm_getPropertiesOfSurface_ilm_surfaceSetSourceRectangle_
     ASSERT_EQ(4316u, surfaceProperties2.destHeight);
     ASSERT_EQ(ILM_TWOHUNDREDSEVENTY, surfaceProperties2.orientation);
     ASSERT_FALSE(surfaceProperties2.visibility);
+    ASSERT_FALSE(surfaceProperties2.chromaKeyEnabled);
 }
 
 TEST_F(IlmCommandTest, ilm_getPropertiesOfLayer_ilm_layerSetSourceRectangle_ilm_layerSetDestinationRectangle) {

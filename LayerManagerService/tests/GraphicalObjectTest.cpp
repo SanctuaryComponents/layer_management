@@ -1,6 +1,7 @@
 /***************************************************************************
  *
  * Copyright 2010,2011 BMW Car IT GmbH
+ * Copyright (C) 2012 DENSO CORPORATION and Robert Bosch Car Multimedia Gmbh
  *
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -72,6 +73,13 @@ TEST_F(GraphicalObjectTest, constructor_SurfaceWithoutId)
 {
     unsigned int expectedOpacity = 0.3;
     unsigned int expectedVisibility = 0;
+    unsigned int expectedChromaKeyEnabled = 0;
+    unsigned char expectedChromaKeyRed = 0;
+    unsigned char expectedChromaKeyGreen = 0;
+    unsigned char expectedChromaKeyBlue = 0;
+    unsigned char chromaKeyRed = 3;
+    unsigned char chromaKeyGreen = 22;
+    unsigned char chromaKeyBlue = 111;
 
     /// Create graphical object of type surface without specific id
     GraphicalObject surface(TypeSurface, expectedOpacity, expectedVisibility);
@@ -84,6 +92,15 @@ TEST_F(GraphicalObjectTest, constructor_SurfaceWithoutId)
 
     /// make sure, surface has expected visibility
     EXPECT_EQ(expectedVisibility, surface.getVisibility());
+
+    /// make sure, surface has expected chromaKeyEnabled
+    EXPECT_EQ(expectedChromaKeyEnabled, surface.getChromaKeyEnabled());
+
+    /// make sure, surface has expected chromaKey
+    surface.getChromaKey(chromaKeyRed, chromaKeyGreen, chromaKeyBlue);
+    EXPECT_EQ(expectedChromaKeyRed, chromaKeyRed);
+    EXPECT_EQ(expectedChromaKeyGreen, chromaKeyGreen);
+    EXPECT_EQ(expectedChromaKeyBlue, chromaKeyBlue);
 }
 
 TEST_F(GraphicalObjectTest, constructor_LayerWithId)
@@ -110,6 +127,13 @@ TEST_F(GraphicalObjectTest, constructor_SurfaceWithId)
     unsigned int expectedOpacity = 0.7;
     unsigned int expectedVisibility = 1;
     unsigned int expectedId = 411;
+    unsigned int expectedChromaKeyEnabled = 0;
+    unsigned char expectedChromaKeyRed = 0;
+    unsigned char expectedChromaKeyGreen = 0;
+    unsigned char expectedChromaKeyBlue = 0;
+    unsigned char chromaKeyRed = 3;
+    unsigned char chromaKeyGreen = 22;
+    unsigned char chromaKeyBlue = 111;
 
     /// Create graphical object of type surface without specific id
     GraphicalObject surface(expectedId, TypeSurface, expectedOpacity, expectedVisibility);
@@ -122,6 +146,15 @@ TEST_F(GraphicalObjectTest, constructor_SurfaceWithId)
 
     /// make sure, surface has expected visibility
     EXPECT_EQ(expectedVisibility, surface.getVisibility());
+
+    /// make sure, surface has expected chromaKeyEnabled
+    EXPECT_EQ(expectedChromaKeyEnabled, surface.getChromaKeyEnabled());
+
+    /// make sure, surface has expected chromaKey
+    surface.getChromaKey(chromaKeyRed, chromaKeyGreen, chromaKeyBlue);
+    EXPECT_EQ(expectedChromaKeyRed, chromaKeyRed);
+    EXPECT_EQ(expectedChromaKeyGreen, chromaKeyGreen);
+    EXPECT_EQ(expectedChromaKeyBlue, chromaKeyBlue);
 }
 
 TEST_F(GraphicalObjectTest, setOpacity_Layer)
@@ -266,6 +299,90 @@ TEST_F(GraphicalObjectTest, getID_Surface)
 
     /// make sure, graphical object has expected id
     EXPECT_EQ(expectedSurfaceId, surface.getID());
+}
+
+TEST_F(GraphicalObjectTest, setChromaKeyEnabled_Surface)
+{
+    /// set surface to enable chromakey
+    m_pSurface->setChromaKeyEnabled(true);
+
+    /// make sure, surface has expected chromakey enabled
+    EXPECT_TRUE(m_pSurface->getChromaKeyEnabled());
+
+    /// set surface to disable chromakey
+    m_pSurface->setChromaKeyEnabled(false);
+
+    /// make sure, surface has expected
+    EXPECT_FALSE(m_pSurface->getChromaKeyEnabled());
+}
+
+TEST_F(GraphicalObjectTest, getChromaKeyEnabled_Surface)
+{
+    /// set surface to enable chromakey
+    m_pSurface->setChromaKeyEnabled(true);
+
+    /// make sure, surface has expected chromakey enabled
+    EXPECT_TRUE(m_pSurface->getChromaKeyEnabled());
+
+    /// set surface to disable chromakey
+    m_pSurface->setChromaKeyEnabled(false);
+
+    /// make sure, surface has expected chromakey enabled
+    EXPECT_FALSE(m_pSurface->getChromaKeyEnabled());
+}
+
+TEST_F(GraphicalObjectTest, setChromaKey_Surface)
+{
+    unsigned char expectedChromaKeyRed   = 3;
+    unsigned char expectedChromaKeyGreen = 22;
+    unsigned char expectedChromaKeyBlue  = 111;
+    unsigned char chromaKeyRed = 0xFF;
+    unsigned char chromaKeyGreen = 0xFF;
+    unsigned char chromaKeyBlue = 0xFF;
+
+    /// make sure, surface has default chromakey
+    m_pSurface->getChromaKey(chromaKeyRed, chromaKeyGreen, chromaKeyBlue);
+    EXPECT_EQ(0, chromaKeyRed);
+    EXPECT_EQ(0, chromaKeyGreen);
+    EXPECT_EQ(0, chromaKeyBlue);
+
+    /// set chromakey of surface to expected value
+    m_pSurface->setChromaKey(expectedChromaKeyRed,
+                             expectedChromaKeyGreen,
+                             expectedChromaKeyBlue);
+
+    /// make sure, surface has expected chromakey
+    m_pSurface->getChromaKey(chromaKeyRed, chromaKeyGreen, chromaKeyBlue);
+    EXPECT_EQ(expectedChromaKeyRed, chromaKeyRed);
+    EXPECT_EQ(expectedChromaKeyGreen, chromaKeyGreen);
+    EXPECT_EQ(expectedChromaKeyBlue, chromaKeyBlue);
+}
+
+TEST_F(GraphicalObjectTest, getChromaKey_Surface)
+{
+    unsigned char expectedChromaKeyRed   = 3;
+    unsigned char expectedChromaKeyGreen = 22;
+    unsigned char expectedChromaKeyBlue  = 111;
+    unsigned char chromaKeyRed = 0xFF;
+    unsigned char chromaKeyGreen = 0xFF;
+    unsigned char chromaKeyBlue = 0xFF;
+
+    /// make sure, surface has default chromakey
+    m_pSurface->getChromaKey(chromaKeyRed, chromaKeyGreen, chromaKeyBlue);
+    EXPECT_EQ(0, chromaKeyRed);
+    EXPECT_EQ(0, chromaKeyGreen);
+    EXPECT_EQ(0, chromaKeyBlue);
+
+    /// set chromakey of surface to expected value
+    m_pSurface->setChromaKey(expectedChromaKeyRed,
+                             expectedChromaKeyGreen,
+                             expectedChromaKeyBlue);
+
+    /// make sure, surface has expected chromakey
+    m_pSurface->getChromaKey(chromaKeyRed, chromaKeyGreen, chromaKeyBlue);
+    EXPECT_EQ(expectedChromaKeyRed, chromaKeyRed);
+    EXPECT_EQ(expectedChromaKeyGreen, chromaKeyGreen);
+    EXPECT_EQ(expectedChromaKeyBlue, chromaKeyBlue);
 }
 
 TEST_F(GraphicalObjectTest, DISABLED_setShader)
