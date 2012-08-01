@@ -166,10 +166,13 @@ Shader* X11GLESRenderer::createShader(const string* vertexName, const string* fr
     Shader *result = NULL;
     m_pWindowSystem->setSystemState(WAKEUP_STATE);
     m_pWindowSystem->wakeUpRendererThread();
+    m_pScene->unlockScene();
+    while (m_pWindowSystem->getSystemState() != IDLE_STATE);
     m_pGraphicSystem->activateGraphicContext();
     result = Shader::createShader(*vertexName,*fragmentName);
     m_pGraphicSystem->releaseGraphicContext();
-    m_pWindowSystem->setSystemState(IDLE_STATE);
+    m_pWindowSystem->setSystemState(WAKEUP_STATE);
+    m_pScene->lockScene();
     return result;
 }
 
