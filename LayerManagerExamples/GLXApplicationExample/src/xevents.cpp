@@ -17,7 +17,11 @@
  *
  ****************************************************************************/
 
+#include <cassert>
 #include <iostream>
+
+#include "ilm_client.h"
+#include "LayerScene.h"
 #include "xevents.h"
 
 
@@ -79,14 +83,52 @@ static enum e_surfMove g_surfMoveDirection;
  */
 void xeventInitialiaze(Display* dpy, t_ilm_surface surfaceid, t_ilm_int x, t_ilm_int y, t_ilm_int width, t_ilm_int height)
 {
-	g_surfPosX = x;
-	g_surfPosY = y;
-	g_surfWidthOrig = width;
-	g_surfHeightOrig = height;
+    t_ilm_surface surf;
 
-	g_x11Display = dpy;
-	g_surfaceid = surfaceid;
-	g_surfMoveDirection = move_right;
+    g_surfPosX = x;
+    g_surfPosY = y;
+    g_surfWidthOrig = width;
+    g_surfHeightOrig = height;
+
+    g_x11Display = dpy;
+    g_surfaceid = surfaceid;
+    g_surfMoveDirection = move_right;
+
+    /***********************************************************************/
+    /* Deal with LayerManager Input Framework to demonstrate possibilities */
+
+    /*
+     * By default, a surface accept input events from all type of devices. (See type ilmInputDevice)
+     * It is anyway possible to override this setting device by device.
+     * Note1: ilmInputDevice can be used as a bit mask
+     * Note2: ilm_UpdateInputEventAcceptanceOn() is assynchronous
+     */
+
+    // Accept events from keyboard & mouse
+    ilm_UpdateInputEventAcceptanceOn(   SURFACE_EXAMPLE_GLXX11_APPLICATION,
+                                        ILM_INPUT_DEVICE_KEYBOARD | ILM_INPUT_DEVICE_POINTER,
+                                        ILM_TRUE);
+    // Refuse events from touch devices
+    ilm_UpdateInputEventAcceptanceOn(   SURFACE_EXAMPLE_GLXX11_APPLICATION,
+                                        ILM_INPUT_DEVICE_TOUCH,
+                                        ILM_FALSE);
+
+    // Apply the changes
+    ilm_commitChanges();
+
+
+    /*
+     * The keyboard is managed by a focus. Only the surface which has the focus will receive
+     * keyboard events. (if it is set to receive keyboard events)
+     * ilm_SetKeyboardFocusOn() can be used to control which surface has the keyboard focus
+     * ilm_GetKeyboardFocusSurfaceId() can be used to know which surface has the keyboard focus
+     * Note1: ilm_SetKeyboardFocusOn() & ilm_GetKeyboardFocusSurfaceId() are synchronous
+     */
+     ilm_SetKeyboardFocusOn(SURFACE_EXAMPLE_GLXX11_APPLICATION);
+
+     // Play with ilm_SetKeyboardFocusOn();
+     ilm_GetKeyboardFocusSurfaceId(&surf);
+     assert(SURFACE_EXAMPLE_GLXX11_APPLICATION == surf);
 }
 
 
