@@ -309,7 +309,6 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
     float textureCoordinates[4];
     ViewportTransform::transformRectangleToTextureCoordinates(targetSurfaceSource, surface->OriginalSourceWidth, surface->OriginalSourceHeight, textureCoordinates);
 
-    glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
     applyLayerMatrix(layerMatrix);
     // update all common uniforms, scale values to display size
     // offsets are generated w.r.t lower left corner (following GL conventions)
@@ -370,7 +369,6 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
     /* update all custom defined uniforms */
     shader->loadUniforms();
     /* Bind texture and set section */
-    glActiveTexture(GL_TEXTURE0);
     if (false == m_binder->bindSurfaceTexture(surface))
     {
         LOG_WARNING("GLESGraphicsystem", "Surface not successfully bind " << surface->getID());
@@ -387,7 +385,6 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
     surface->drawCounter++;
     glDrawArrays(GL_TRIANGLES, index, 6);
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
     m_binder->unbindSurfaceTexture(surface);
     glErrorCode = glGetError();
     if ( GL_NO_ERROR != glErrorCode )
@@ -446,6 +443,7 @@ bool GLESGraphicsystem::initOpenGLES(EGLint displayWidth, EGLint displayHeight)
         m_blendingStatus = true;
         glClearColor(0.0, 0.0, 0.0, 0.0);
         resize(displayWidth, displayHeight);
+        glActiveTexture(GL_TEXTURE0);
     }
     return result;
 }
