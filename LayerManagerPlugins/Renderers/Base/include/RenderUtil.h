@@ -109,8 +109,8 @@ static void RenderUtilShaderDebug(GLuint obj, GLenum status, const char* op)
         strncpy(errorMessage, "--- ",1024); // TODO: sizeof(errorMessage)
         strncat(errorMessage, op, 1000); // TODO: why 1000? dangerous
         strncat(errorMessage, " log ---", 8);
-        LOG_DEBUG("RenderUtilShaderDebug",errorMessage);
-        LOG_DEBUG("RenderUtilShaderDebug",str);
+        LOG_ERROR("RenderUtilShaderDebug",errorMessage);
+        LOG_ERROR("RenderUtilShaderDebug",str);
     }
 
     if (str)
@@ -134,8 +134,8 @@ static void RenderUtilShaderDebug(GLuint obj, GLenum status, const char* op)
                     strncpy(errorMessage, "--- ",1024);// TODO: sizeof(errorMessage)
                     strncat(errorMessage,op, 1000); // TODO: why 1000? dangerous
                     strncat(errorMessage, " log ---", 8);
-                    LOG_DEBUG("RenderUtilShaderDebug",errorMessage);
-                    LOG_DEBUG("RenderUtilShaderDebug",str);
+                    LOG_ERROR("RenderUtilShaderDebug",errorMessage);
+                    LOG_ERROR("RenderUtilShaderDebug",str);
                 }
                 delete[] str;
             }
@@ -151,21 +151,20 @@ static void RenderUtilShaderDebug(GLuint obj, GLenum status, const char* op)
         strncpy(errorMessage, "--- ",1024);// TODO: sizeof(errorMessage)
            strncat(errorMessage,op, 1000); // TODO: why 1000? dangerous
           strncat(errorMessage, " failed ---", 7);
-        LOG_DEBUG("RenderUtilShaderDebug",errorMessage);
+        LOG_ERROR("RenderUtilShaderDebug",errorMessage);
     }
 }
 
 // Take precompiled shader binaries and builds a shader program
-/* TODO currently unused
+
 static GLuint RenderUtilLoadShaderBinaries(
     const char* vertBin, GLuint vertBinSize,
     const char* fragBin, GLuint fragBinSize,
     GLuint binaryFormat,
     GLboolean debugging)
 {
-// Binary shaders not supportable for non-ES OpenGL
-#ifdef GL_ES_VERSION_2_0
-
+    LOG_DEBUG("RenderUtil","Loading shaders binaries. Size " << vertBinSize << " : " << fragBinSize );
+    // Binary shaders not supportable for non-ES OpenGL
     GLuint prog;
     GLuint vertShader;
     GLuint fragShader;
@@ -195,15 +194,13 @@ static GLuint RenderUtilLoadShaderBinaries(
 
     // Link the shader program
     glLinkProgram(prog);
-    if (debugging)
+    if (debugging) 
+    {
         RenderUtilShaderDebug(prog, GL_LINK_STATUS, "Program Link");
+    }
 
     return prog;
-#else  // GL_ES_VERSION_2_0
-    return 0;
-#endif // GL_ES_VERSION_2_0
 }
-*/
 
 // Takes shader source files, compiles them, and builds a shader program
 static GLuint RenderUtilLoadShaderSources(const char* vertFile, const char* fragFile, GLboolean debugging)
