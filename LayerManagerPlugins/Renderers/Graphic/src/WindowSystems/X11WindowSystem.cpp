@@ -59,7 +59,7 @@ X11WindowSystem::X11WindowSystem(const char* displayname, int width, int height,
 , damage_major(0)
 , damage_minor(0)
 , m_running(false)
-, m_initialized(false)
+/*, m_initialized(false)*/
 , m_success(false)
 , m_systemState(IDLE_STATE)
 , m_displayEnvironment(NULL)
@@ -76,7 +76,9 @@ X11WindowSystem::X11WindowSystem(const char* displayname, int width, int height,
 
     // init and take mutex, so windowsystem only does init phase until mutex is released again
     pthread_mutex_init(&run_lock, NULL);
-    pthread_mutex_lock(&run_lock);
+    pthread_cond_init(&run_condition,NULL);
+    pthread_cond_init(&init_condition,NULL);
+    pthread_mutex_init(&init_lock, NULL);
 }
 
 X11WindowSystem::~X11WindowSystem()
@@ -791,8 +793,9 @@ void * X11eventLoopCallback(void *ptr)
 void* X11WindowSystem::EventLoop()
 {
     // INITALIZATION
-    LOG_DEBUG("X11WindowSystem", "Enter thread");
-
+    LOG_INFO("X11WindowSystem", "XServer initialisation");
+    pthread_mutex_lock(&this->init_lock);
+    pthread_mutex_lock(&this->run_lock);
     bool status = true;
     bool checkRedraw = false;
 
@@ -810,15 +813,18 @@ void* X11WindowSystem::EventLoop()
     LOG_DEBUG("X11WindowSystem", "init xserver");
     status &= this->initXServer();
     if ( status == false ) goto init_complete;
+    LOG_INFO("X11WindowSystem", "XServer initialisation completed");
+    LOG_DEBUG("X11WindowSystem", "Graphicsystem initialisation");
     status &= this->graphicSystem->init(this->x11Display,this->CompositorWindow);
-
+    LOG_DEBUG("X11WindowSystem", "Graphicsystem initialisation complete");
 init_complete:
     this->m_success = status;
-    this->m_initialized = true;
-
+    pthread_cond_signal(&this->init_condition);
+    pthread_mutex_unlock(&this->init_lock);
     // Done with init, wait for lock to actually run (ie start/stop method called)
-    pthread_mutex_lock(&this->run_lock);
-
+    LOG_DEBUG("X11WindowSystem", "Waiting for startup");
+    pthread_cond_wait(&this->run_condition,&this->run_lock);
+    pthread_mutex_unlock(&this->run_lock);
     LOG_DEBUG("X11WindowSystem", "Starting Event loop");
     Layer* defaultLayer = 0;
 
@@ -832,7 +838,7 @@ init_complete:
         defaultLayer->setSourceRegion(Rectangle(0,0,this->resolutionWidth,this->resolutionHeight));
         this->m_pScene->getCurrentRenderOrder().push_back(defaultLayer);
     }
-    LOG_DEBUG("X11WindowSystem", "Enter render loop");
+    LOG_INFO("X11WindowSystem", "Enter render loop");
 
     // clear screen to avoid garbage on startup
     this->graphicSystem->clearBackground();
@@ -1095,33 +1101,41 @@ bool X11WindowSystem::init(BaseGraphicSystem<Display*,Window>* base)
 #endif //WITH_XTHREADS
     X11WindowSystem *renderer = this;
     graphicSystem = base;
+    LOG_INFO("X11WindowSystem","Initialization");    
+    pthread_mutex_lock(&init_lock);
     int status = pthread_create( &renderThread, NULL, X11eventLoopCallback, (void*) renderer);
     if (0 != status )
     {
+        pthread_mutex_unlock(&init_lock);
         return false;
     }
-
-    while (!m_initialized)
+    pthread_cond_wait(&init_condition,&init_lock);
+/*  while (!m_initialized)
     {
-        usleep(10000); // TODO
+        usleep(1000); // TODO
         LOG_DEBUG("X11WindowSystem","Waiting start complete " << m_initialized);
-    }
-    LOG_INFO("X11WindowSystem","Start complete " << m_initialized << " success " << m_success);
+    } 
+*/
+    pthread_mutex_unlock(&init_lock);
+    LOG_INFO("X11WindowSystem","Initialization complete success :" << m_success);
     return m_success;
 }
 
 bool X11WindowSystem::start()
 {
     bool result = true;
-    LOG_DEBUG("X11WindowSystem", "Starting / Creating thread");
+    pthread_mutex_lock(&this->run_lock);
+    LOG_DEBUG("X11WindowSystem", "Startup");
     // let thread actually run
     if ( m_xerror == false )
     {
         this->m_running = true;
-        pthread_mutex_unlock(&run_lock);
+        pthread_cond_signal(&this->run_condition);
+        pthread_mutex_unlock(&this->run_lock);
     } else {
         this->m_running = false;
-        pthread_mutex_unlock(&run_lock);
+        pthread_cond_signal(&this->run_condition);
+        pthread_mutex_unlock(&this->run_lock);
         result = false;
     }
     return result;
@@ -1130,10 +1144,12 @@ bool X11WindowSystem::start()
 void X11WindowSystem::stop()
 {
     LOG_INFO("X11WindowSystem","Stopping..");
+    pthread_mutex_lock(&this->run_lock);
     this->m_running = false;
     // needed if start was never called, we wake up thread, so it can immediatly finish
     this->signalRedrawEvent();
-    pthread_mutex_unlock(&run_lock);
+    pthread_cond_signal(&this->run_condition);
+    pthread_mutex_unlock(&this->run_lock);
     pthread_join(renderThread,NULL);
 }
 

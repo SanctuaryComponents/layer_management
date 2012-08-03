@@ -84,7 +84,7 @@ bool GLESGraphicsystem::init(EGLNativeDisplayType display, EGLNativeWindowType N
 {
     m_nativeDisplay = display;
     m_nativeWindow = NativeWindow;
-
+    LOG_INFO("GLESGraphicsystem", "Initialisation");
     EGLint iMajorVersion, iMinorVersion;
     LOG_DEBUG("GLESGraphicsystem", "Getting EGL Display with native display " << m_nativeDisplay);
     m_eglDisplay = eglGetDisplay(m_nativeDisplay);
@@ -150,17 +150,18 @@ bool GLESGraphicsystem::init(EGLNativeDisplayType display, EGLNativeWindowType N
         LOG_ERROR("GLESGraphicsystem","EGL couldn't create context\n");
         return false;
     }
-    LOG_INFO("GLESGraphicsystem", "EGL make current ...");
+    LOG_DEBUG("GLESGraphicsystem", "EGL make current ...");
     // Make the context and surface current for rendering
     eglMakeCurrent(m_eglDisplay, m_eglSurface, m_eglSurface, m_eglContext);
-    LOG_INFO("GLESGraphicsystem", "made current");
-
+    LOG_DEBUG("GLESGraphicsystem", "made current");
     eglSwapInterval(m_eglDisplay, 1);
 
     if (!initOpenGLES(m_windowWidth, m_windowHeight))
     {
+        LOG_ERROR("GLESGraphicsystem", "Initialisation failed");
         return false;
     }
+    LOG_INFO("GLESGraphicsystem", "Initialisation successfull");
     return true;
 }
 

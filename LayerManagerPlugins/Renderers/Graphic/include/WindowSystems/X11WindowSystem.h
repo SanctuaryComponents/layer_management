@@ -76,8 +76,8 @@ private:
     int damage_event, damage_error;
     int damage_major, damage_minor;
     static const char CompositorWindowTitle[];
-    bool m_running;
-    bool m_initialized;
+    bool m_running; 
+/*    bool m_initialized; */
     bool m_success;
     X11WindowSystemStates m_systemState;
     const char* m_displayEnvironment;
@@ -93,8 +93,11 @@ protected:
     Window CompositorWindow;
     XVisualInfo* windowVis;
     pthread_mutex_t run_lock;
-    BaseGraphicSystem<Display*, Window>* graphicSystem;
-    virtual bool initXServer();
+    pthread_mutex_t init_lock;
+    pthread_cond_t init_condition;
+    pthread_cond_t run_condition;
+    BaseGraphicSystem<Display*, Window>* graphicSystem;    
+    virtual bool initXServer(); 
     virtual void CheckRedrawAllLayers();
     virtual void RedrawAllLayers();
     virtual void renderHWLayer(Layer* layer);
