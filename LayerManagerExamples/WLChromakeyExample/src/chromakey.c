@@ -19,7 +19,7 @@
  ****************************************************************************/
 #include "wayland-client.h"
 #include "wayland-client-protocol.h"
-#include "ilm/ilm_client.h"
+#include "ilm_client.h"
 
 #include <math.h>
 #include <stdio.h>
