@@ -673,8 +673,9 @@ TEST_F(IlmCommandTest, ilm_getPropertiesOfSurface_ilm_surfaceSetSourceRectangle_
     ASSERT_FALSE(surfaceProperties2.chromaKeyEnabled);
 }
 
-TEST_F(IlmCommandTest, ilm_getPropertiesOfLayer_ilm_layerSetSourceRectangle_ilm_layerSetDestinationRectangle) {
+TEST_F(IlmCommandTest, ilm_getPropertiesOfLayer_ilm_layerSetSourceRectangle_ilm_layerSetDestinationRectangle_ilm_layerSetChromaKey) {
     t_ilm_uint layer;
+    t_ilm_int chromaKey[3] = {3, 22, 111};
     ilm_layerCreate(&layer);
     ilm_commitChanges();
 
@@ -683,6 +684,7 @@ TEST_F(IlmCommandTest, ilm_getPropertiesOfLayer_ilm_layerSetSourceRectangle_ilm_
     ilm_layerSetDestinationRectangle(layer,54,47,947,9);
     ilm_layerSetOrientation(layer,ILM_NINETY);
     ilm_layerSetVisibility(layer,true);
+    ilm_layerSetChromaKey(layer,chromaKey);
     ilm_commitChanges();
 
     ilmLayerProperties layerProperties1;
@@ -698,12 +700,17 @@ TEST_F(IlmCommandTest, ilm_getPropertiesOfLayer_ilm_layerSetSourceRectangle_ilm_
     ASSERT_EQ(9u, layerProperties1.destHeight);
     ASSERT_EQ(ILM_NINETY, layerProperties1.orientation);
     ASSERT_TRUE( layerProperties1.visibility);
+    ASSERT_TRUE(layerProperties1.chromaKeyEnabled);
+    ASSERT_EQ(3u,   layerProperties1.chromaKeyRed);
+    ASSERT_EQ(22u,  layerProperties1.chromaKeyGreen);
+    ASSERT_EQ(111u, layerProperties1.chromaKeyBlue);
 
     ilm_layerSetOpacity(layer,0.436);
     ilm_layerSetSourceRectangle(layer,784,546,235,78);
     ilm_layerSetDestinationRectangle(layer,536,5372,3,4316);
     ilm_layerSetOrientation(layer,ILM_TWOHUNDREDSEVENTY);
     ilm_layerSetVisibility(layer,false);
+    ilm_layerSetChromaKey(layer,NULL);
     ilm_commitChanges();
 
     ilmLayerProperties layerProperties2;
@@ -719,6 +726,7 @@ TEST_F(IlmCommandTest, ilm_getPropertiesOfLayer_ilm_layerSetSourceRectangle_ilm_
     ASSERT_EQ(4316u, layerProperties2.destHeight);
     ASSERT_EQ(ILM_TWOHUNDREDSEVENTY, layerProperties2.orientation);
     ASSERT_FALSE(layerProperties2.visibility);
+    ASSERT_FALSE(layerProperties2.chromaKeyEnabled);
 }
 
 TEST_F(IlmCommandTest, ilm_takeScreenshot) {

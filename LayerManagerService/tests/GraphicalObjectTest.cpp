@@ -108,6 +108,13 @@ TEST_F(GraphicalObjectTest, constructor_LayerWithId)
     unsigned int expectedOpacity = 0.7;
     unsigned int expectedVisibility = 1;
     unsigned int expectedId = 411;
+    unsigned int expectedChromaKeyEnabled = 0;
+    unsigned char expectedChromaKeyRed = 0;
+    unsigned char expectedChromaKeyGreen = 0;
+    unsigned char expectedChromaKeyBlue = 0;
+    unsigned char chromaKeyRed = 3;
+    unsigned char chromaKeyGreen = 22;
+    unsigned char chromaKeyBlue = 111;
 
     /// Create graphical object of type layer without specific id
     GraphicalObject layer(expectedId, TypeLayer, expectedOpacity, expectedVisibility);
@@ -120,6 +127,15 @@ TEST_F(GraphicalObjectTest, constructor_LayerWithId)
 
     /// make sure, layer has expected visibility
     EXPECT_EQ(expectedVisibility, layer.getVisibility());
+
+    /// make sure, layer has expected chromaKeyEnabled
+    EXPECT_EQ(expectedChromaKeyEnabled, layer.getChromaKeyEnabled());
+
+    /// make sure, layer has expected chromaKey
+    layer.getChromaKey(chromaKeyRed, chromaKeyGreen, chromaKeyBlue);
+    EXPECT_EQ(expectedChromaKeyRed, chromaKeyRed);
+    EXPECT_EQ(expectedChromaKeyGreen, chromaKeyGreen);
+    EXPECT_EQ(expectedChromaKeyBlue, chromaKeyBlue);
 }
 
 TEST_F(GraphicalObjectTest, constructor_SurfaceWithId)
@@ -383,6 +399,90 @@ TEST_F(GraphicalObjectTest, getChromaKey_Surface)
     EXPECT_EQ(expectedChromaKeyRed, chromaKeyRed);
     EXPECT_EQ(expectedChromaKeyGreen, chromaKeyGreen);
     EXPECT_EQ(expectedChromaKeyBlue, chromaKeyBlue);
+}
+
+TEST_F(GraphicalObjectTest, setChromaKeyEnabled_Layer)
+{
+    /// set layer to enable chromakey
+    m_pLayer->setChromaKeyEnabled(true);
+
+    /// make sure, layer has expected chromakey enabled
+    EXPECT_TRUE(m_pLayer->getChromaKeyEnabled());
+
+    /// set layer to disable chromakey
+    m_pLayer->setChromaKeyEnabled(false);
+
+    /// make sure, layer has expected
+    EXPECT_FALSE(m_pLayer->getChromaKeyEnabled());
+}
+
+TEST_F(GraphicalObjectTest, getChromaKeyEnabled_Layer)
+{
+    /// set layer to enable chromakey
+    m_pLayer->setChromaKeyEnabled(true);
+
+    /// make sure, layer has expected chromakey enabled
+    EXPECT_TRUE(m_pLayer->getChromaKeyEnabled());
+
+    /// set layer to disable chromakey
+    m_pLayer->setChromaKeyEnabled(false);
+
+    /// make sure, layer has expected chromakey enabled
+    EXPECT_FALSE(m_pLayer->getChromaKeyEnabled());
+}
+
+TEST_F(GraphicalObjectTest, setChromaKey_Layer)
+{
+    unsigned char expectedChromaKeyRed   = 3;
+    unsigned char expectedChromaKeyGreen = 22;
+    unsigned char expectedChromaKeyBlue  = 111;
+    unsigned char chromaKeyRed   = 0xFF;
+    unsigned char chromaKeyGreen = 0xFF;
+    unsigned char chromaKeyBlue  = 0xFF;
+
+    /// make sure, layer has default chromakey
+    m_pLayer->getChromaKey(chromaKeyRed, chromaKeyGreen, chromaKeyBlue);
+    EXPECT_EQ(0, chromaKeyRed);
+    EXPECT_EQ(0, chromaKeyGreen);
+    EXPECT_EQ(0, chromaKeyBlue);
+
+    /// set chromakey of layer to expected value
+    m_pLayer->setChromaKey(expectedChromaKeyRed,
+                           expectedChromaKeyGreen,
+                           expectedChromaKeyBlue);
+
+    /// make sure, layer has expected chromakey
+    m_pLayer->getChromaKey(chromaKeyRed, chromaKeyGreen, chromaKeyBlue);
+    EXPECT_EQ(expectedChromaKeyRed,   chromaKeyRed);
+    EXPECT_EQ(expectedChromaKeyGreen, chromaKeyGreen);
+    EXPECT_EQ(expectedChromaKeyBlue,  chromaKeyBlue);
+}
+
+TEST_F(GraphicalObjectTest, getChromaKey_Layer)
+{
+    unsigned char expectedChromaKeyRed   = 3;
+    unsigned char expectedChromaKeyGreen = 22;
+    unsigned char expectedChromaKeyBlue  = 111;
+    unsigned char chromaKeyRed   = 0xFF;
+    unsigned char chromaKeyGreen = 0xFF;
+    unsigned char chromaKeyBlue  = 0xFF;
+
+    /// make sure, layer has default chromakey
+    m_pLayer->getChromaKey(chromaKeyRed, chromaKeyGreen, chromaKeyBlue);
+    EXPECT_EQ(0, chromaKeyRed);
+    EXPECT_EQ(0, chromaKeyGreen);
+    EXPECT_EQ(0, chromaKeyBlue);
+
+    /// set chromakey of layer to expected value
+    m_pLayer->setChromaKey(expectedChromaKeyRed,
+                           expectedChromaKeyGreen,
+                           expectedChromaKeyBlue);
+
+    /// make sure, layer has expected chromakey
+    m_pLayer->getChromaKey(chromaKeyRed, chromaKeyGreen, chromaKeyBlue);
+    EXPECT_EQ(expectedChromaKeyRed,   chromaKeyRed);
+    EXPECT_EQ(expectedChromaKeyGreen, chromaKeyGreen);
+    EXPECT_EQ(expectedChromaKeyBlue,  chromaKeyBlue);
 }
 
 TEST_F(GraphicalObjectTest, DISABLED_setShader)
