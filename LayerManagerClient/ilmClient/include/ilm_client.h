@@ -373,7 +373,6 @@ ilmErrorTypes ilm_layerGetOrientation(t_ilm_layer layerId, ilmOrientation *pOrie
  * \ingroup ilmClient
  * \param[in] layerId Id of layer.
  * \param[in] pColor array of the color value which is defined in red,green, blue
- * \todo This method is currently not implemented.
  * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */

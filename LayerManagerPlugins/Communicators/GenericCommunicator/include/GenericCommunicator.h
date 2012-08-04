@@ -155,6 +155,7 @@ private:
     void GetKeyboardFocusSurfaceId();
     void UpdateInputEventAcceptanceOn();
     void SetSurfaceChromaKey();
+    void SetLayerChromaKey();
 
 private:
     void RemoveApplicationReference(char* owner);

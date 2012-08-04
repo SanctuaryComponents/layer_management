@@ -214,6 +214,10 @@ struct ilmLayerProperties
     ilmOrientation orientation;  /*!< orientation value of the layer */
     t_ilm_bool visibility;       /*!< visibility value of the layer */
     t_ilm_uint type;             /*!< type of layer */
+    t_ilm_bool chromaKeyEnabled; /*!< chromakey validness of the layer */
+    t_ilm_uint chromaKeyRed;     /*!< chromakey's red value of the layer */
+    t_ilm_uint chromaKeyGreen;   /*!< chromakey's green value of the layer */
+    t_ilm_uint chromaKeyBlue;    /*!< chromakey's blue value of the layer */
 };
 
 

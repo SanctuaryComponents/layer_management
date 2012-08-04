@@ -153,7 +153,12 @@ ilmErrorTypes ilm_getPropertiesOfLayer(t_ilm_uint layerID, struct ilmLayerProper
         && gIpcModule.getUint(&pLayerProperties->destHeight)
         && gIpcModule.getUint(&pLayerProperties->orientation)
         && gIpcModule.getBool(&pLayerProperties->visibility)
-        && gIpcModule.getUint(&pLayerProperties->type))
+        && gIpcModule.getUint(&pLayerProperties->type)
+        && gIpcModule.getBool(&pLayerProperties->chromaKeyEnabled)
+        && gIpcModule.getUint(&pLayerProperties->chromaKeyRed)
+        && gIpcModule.getUint(&pLayerProperties->chromaKeyGreen)
+        && gIpcModule.getUint(&pLayerProperties->chromaKeyBlue)
+        && gIpcModule.destroyMessage())        
     {
         returnValue = ILM_SUCCESS;
     }
@@ -683,12 +688,40 @@ ilmErrorTypes ilm_layerGetOrientation(t_ilm_layer layerId, ilmOrientation *pOrie
     return returnValue;
 }
 
-ilmErrorTypes ilm_layerSetChromaKey(t_ilm_layer layerId, t_ilm_int* color)
+ilmErrorTypes ilm_layerSetChromaKey(t_ilm_layer layerId, t_ilm_int* pColor)
 {
     LOG_ENTER_FUNCTION;
-    ilmErrorTypes error = ILM_FAILED;
-    // TODO: Implement this on both server and client
-    return error;
+    ilmErrorTypes returnValue = ILM_FAILED;
+
+    do
+    {
+        if (!gIpcModule.createMessage("SetLayerChromaKey\0")
+         || !gIpcModule.appendUint(layerId))
+        {
+            break;
+        }
+
+        if (pColor != NULL)
+        {
+            const t_ilm_uint n = 3;
+            if (!gIpcModule.appendUintArray(pColor, n))
+            {
+                break;
+            }
+        }
+
+        if (!gIpcModule.sendMessage()
+         || !gIpcModule.receiveMessage(gReceiveTimeout)
+         ||  gIpcModule.isErrorMessage())
+        {
+            break;
+        }
+
+        returnValue = ILM_SUCCESS;
+
+    } while (0);
+
+    return returnValue;
 }
 
 ilmErrorTypes ilm_layerSetRenderOrder(t_ilm_layer layerId, t_ilm_layer *pSurfaceId, t_ilm_int number)

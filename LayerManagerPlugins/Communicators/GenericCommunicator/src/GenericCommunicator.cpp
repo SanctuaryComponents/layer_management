@@ -83,6 +83,7 @@
 #include "SurfaceGetKeyboardFocusCommand.h"
 #include "SurfaceUpdateInputEventAcceptance.h"
 #include "SurfaceSetChromaKeyCommand.h"
+#include "LayerSetChromaKeyCommand.h"
 
 #include <stdbool.h>
 #include <unistd.h>
@@ -192,6 +193,7 @@ GenericCommunicator::GenericCommunicator(ICommandExecutor* executor)
         { "GetKeyboardFocusSurfaceId",        &GenericCommunicator::GetKeyboardFocusSurfaceId },
         { "UpdateInputEventAcceptanceOn",     &GenericCommunicator::UpdateInputEventAcceptanceOn },
         { "SetSurfaceChromaKey",              &GenericCommunicator::SetSurfaceChromaKey },
+        { "SetLayerChromaKey",                &GenericCommunicator::SetLayerChromaKey },
     };
 
     int entryCount = sizeof(manager_methods) / sizeof(MethodTable);
@@ -654,6 +656,10 @@ void GenericCommunicator::GetPropertiesOfLayer()
         Rectangle dest = layer->getDestinationRegion();
         Rectangle src = layer->getSourceRegion();
         OrientationType orientation = layer->getOrientation();
+        unsigned char chromaKeyRed = 0;
+        unsigned char chromaKeyGreen = 0;
+        unsigned char chromaKeyBlue = 0;
+        layer->getChromaKey(chromaKeyRed, chromaKeyGreen, chromaKeyBlue);
 
         m_ipcModule.createMessage((char*)__FUNCTION__);
         m_ipcModule.appendDouble(layer->getOpacity());
@@ -670,6 +676,10 @@ void GenericCommunicator::GetPropertiesOfLayer()
         m_ipcModule.appendUint(orientation);
         m_ipcModule.appendBool(layer->getVisibility());
         m_ipcModule.appendUint(layer->getLayerType());
+        m_ipcModule.appendBool(layer->getChromaKeyEnabled());
+        m_ipcModule.appendUint(chromaKeyRed);
+        m_ipcModule.appendUint(chromaKeyGreen);
+        m_ipcModule.appendUint(chromaKeyBlue);
         m_ipcModule.sendMessage();
     }
     else
@@ -2036,6 +2046,27 @@ void GenericCommunicator::SetSurfaceChromaKey()
     m_ipcModule.getUintArray(&array, &length);
 
     t_ilm_bool status = m_executor->execute(new SurfaceSetChromaKeyCommand(surfaceid, array, length));
+    if (status)
+    {
+        m_ipcModule.createMessage((char*)__FUNCTION__);
+        m_ipcModule.sendMessage();
+    }
+    else
+    {
+        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+    }
+}
+
+void GenericCommunicator::SetLayerChromaKey()
+{
+    uint* array = NULL;
+    int length = 0;
+    uint layerid = 0;
+
+    m_ipcModule.getUint(&layerid);
+    m_ipcModule.getUintArray(&array, &length);
+
+    t_ilm_bool status = m_executor->execute(new LayerSetChromaKeyCommand(layerid, array, length));
     if (status)
     {
         m_ipcModule.createMessage((char*)__FUNCTION__);
