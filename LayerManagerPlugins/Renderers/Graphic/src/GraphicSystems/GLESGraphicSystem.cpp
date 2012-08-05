@@ -56,6 +56,7 @@ GLESGraphicsystem::GLESGraphicsystem(int windowWidth, int windowHeight, PfnShade
 , m_eglConfig(0)
 , m_eglContext(0)
 , m_eglSurface(0)
+, m_eglPbufferSurface(0)
 , m_eglDisplay(0)
 , m_vbo(0)
 , m_displayWidth(0)
@@ -68,6 +69,7 @@ GLESGraphicsystem::GLESGraphicsystem(int windowWidth, int windowHeight, PfnShade
 #ifdef DRAW_LAYER_DEBUG
 , m_layerShader(0)
 #endif
+, m_texId(0)
 {
     LOG_DEBUG("GLESGraphicsystem", "creating GLESGraphicsystem");
 }
@@ -107,12 +109,10 @@ bool GLESGraphicsystem::init(EGLNativeDisplayType display, EGLNativeWindowType N
     eglBindAPI(EGL_OPENGL_ES_API);
 
     EGLint pi32ConfigAttribs[] = {
-            EGL_SURFACE_TYPE, EGL_WINDOW_BIT, EGL_RENDERABLE_TYPE,
-            EGL_OPENGL_ES2_BIT,
-            EGL_RED_SIZE,
-            8,
-            EGL_ALPHA_SIZE,
-            8,
+            EGL_SURFACE_TYPE,    EGL_WINDOW_BIT | EGL_PBUFFER_BIT,
+            EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+            EGL_RED_SIZE,        8,
+            EGL_ALPHA_SIZE,      8,
             EGL_NONE
     };
 
@@ -255,13 +255,27 @@ void GLESGraphicsystem::renderSWLayer(Layer *layer, bool clear)
 
     if ( layer->visibility && layer->opacity > 0.0 )
     {
-        SurfaceList surfaces = layer->getAllSurfaces();
-        for(SurfaceListConstIterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++)
+        bool bChromaKeyEnabled = m_currentLayer->getChromaKeyEnabled();
+        if (bChromaKeyEnabled && !setupTextureForChromaKey())
+        {
+            LOG_WARNING("GLESGraphicsystem", "Failed to create Pbuffer. Layer chroma key to be disabled.");
+            bChromaKeyEnabled = false;
+        }
+
+        SurfaceList surfaces = m_currentLayer->getAllSurfaces();
+        for(std::list<Surface*>::const_iterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++)
         {
             if ((*currentS)->hasNativeContent() && (*currentS)->visibility && (*currentS)->opacity>0.0f)
             {
                 renderSurface(*currentS);
             }
+        }
+
+        if (bChromaKeyEnabled)
+        {
+            activateGraphicContext();
+            renderTempTexture();
+            destroyTempTexture();
         }
     }
 
@@ -560,3 +574,140 @@ void GLESGraphicsystem::saveScreenShotOfFramebuffer(std::string fileToSave)
     free(rgbbuffer);
 }
 
+bool GLESGraphicsystem::setupTextureForChromaKey()
+{
+    createPbufferSurface();
+    if (m_eglPbufferSurface == EGL_NO_SURFACE)
+    {
+        return false;
+    }
+
+    // Switch the current context to pbuffer surface
+    eglMakeCurrent(m_eglDisplay, m_eglPbufferSurface, m_eglPbufferSurface, m_eglContext);
+    createTempTexture();
+    return true;
+}
+
+void GLESGraphicsystem::createPbufferSurface()
+{
+    if (m_eglPbufferSurface != EGL_NO_SURFACE)
+    {
+        LOG_DEBUG("GLESGraphicsystem", "m_eglPbufferSurface is alread created");
+        return;
+    }
+
+    const FloatRectangle layerDestRegion = m_currentLayer->getDestinationRegion();
+    EGLint width  = static_cast<EGLint>(layerDestRegion.width);
+    EGLint height = static_cast<EGLint>(layerDestRegion.height);
+
+    EGLint pb_attrs[] = {
+        EGL_WIDTH,  width,
+        EGL_HEIGHT, height,
+        EGL_TEXTURE_FORMAT, EGL_TEXTURE_RGBA,
+        EGL_TEXTURE_TARGET, EGL_TEXTURE_2D,
+        EGL_NONE
+    };
+
+    m_eglPbufferSurface = eglCreatePbufferSurface(m_eglDisplay, m_eglConfig, pb_attrs);
+    if (m_eglPbufferSurface == EGL_NO_SURFACE)
+    {
+        LOG_ERROR("GLESGraphicsystem", "Failed to create EGL pbuffer: " << eglGetError());
+        return;
+    }
+}
+
+void GLESGraphicsystem::createTempTexture()
+{
+    glGenTextures(1, &m_texId);
+    glBindTexture(GL_TEXTURE_2D, m_texId);
+
+    if (!eglBindTexImage(m_eglDisplay, m_eglPbufferSurface, EGL_BACK_BUFFER))
+    {
+        LOG_ERROR("GLESGraphicsystem", "Failed to bind texture for chroma key layer");
+        glDeleteTextures(1, &m_texId);
+        return;
+    }
+
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+}
+
+void GLESGraphicsystem::destroyTempTexture()
+{
+    if (m_texId > 0)
+    {
+        glDeleteTextures(1, &m_texId);
+    }
+
+    if (m_eglPbufferSurface != EGL_NO_SURFACE)
+    {
+        eglReleaseTexImage(m_eglDisplay, m_eglPbufferSurface, EGL_BACK_BUFFER);
+        eglDestroySurface(m_eglDisplay, m_eglPbufferSurface);
+    }
+
+    m_texId = 0;
+    m_eglPbufferSurface = EGL_NO_SURFACE;
+}
+
+void GLESGraphicsystem::renderTempTexture()
+{
+    const FloatRectangle layerSourceRegion      = m_currentLayer->getSourceRegion();
+    const FloatRectangle layerDestinationRegion = m_currentLayer->getDestinationRegion();
+    float textureCoordinates[4];
+
+    ViewportTransform::transformRectangleToTextureCoordinates(
+        layerSourceRegion,
+        m_currentLayer->OriginalSourceWidth,
+        m_currentLayer->OriginalSourceHeight,
+        textureCoordinates);
+
+    ShaderProgram::CommonUniforms uniforms;
+    IlmMatrix layerMatrix;
+    IlmMatrixIdentity(layerMatrix);
+
+    uniforms.x = layerDestinationRegion.x / m_displayWidth;
+    uniforms.y = 1.0f - (layerDestinationRegion.y + layerDestinationRegion.height) / m_displayHeight;
+    uniforms.width   = layerDestinationRegion.width  / m_displayWidth;
+    uniforms.height  = layerDestinationRegion.height / m_displayHeight;
+    uniforms.opacity = m_currentLayer->getOpacity();
+    uniforms.texRange[0]  = textureCoordinates[2] - textureCoordinates[0];
+    uniforms.texRange[1]  = textureCoordinates[3] - textureCoordinates[1];
+    uniforms.texOffset[0] = textureCoordinates[0];
+    uniforms.texOffset[1] = textureCoordinates[1];
+    uniforms.texUnit = 0;
+    uniforms.matrix = layerMatrix.f;
+    uniforms.chromaKeyEnabled = m_currentLayer->getChromaKeyEnabled();
+    if (uniforms.chromaKeyEnabled == true) {
+        unsigned char red   = 0;
+        unsigned char green = 0;
+        unsigned char blue  = 0;
+        m_currentLayer->getChromaKey(red, green, blue);
+        uniforms.chromaKey[0] = (float)red   / 255.0f;
+        uniforms.chromaKey[1] = (float)green / 255.0f;
+        uniforms.chromaKey[2] = (float)blue  / 255.0f;
+    }
+
+    glEnable (GL_BLEND);
+
+    Shader* shader = m_currentLayer->getShader();
+    if (!shader) {
+        shader = m_defaultShader;
+    }
+    shader = pickOptimizedShader(shader, uniforms);
+    shader->use();
+    shader->loadCommonUniforms(uniforms);
+    shader->loadUniforms();
+
+    glBindTexture(GL_TEXTURE_2D, m_texId);
+
+    int orientation = m_currentLayer->getOrientation() % 4;
+    GLint index     = orientation * 12;
+    glDrawArrays(GL_TRIANGLES, index, 6);
+
+    GLenum glErrorCode = glGetError();
+    if ( GL_NO_ERROR != glErrorCode ) {
+        LOG_ERROR("GLESGraphicsystem", "GL Error occured in renderTempTexture:" << glErrorCode );
+    }
+}

@@ -70,6 +70,13 @@ public:
 	virtual void applyLayerMatrix(IlmMatrix& matrix);
 
 protected:
+    virtual bool setupTextureForChromaKey();
+    virtual void createPbufferSurface();
+    virtual void createTempTexture();
+    virtual void renderTempTexture();
+    virtual void destroyTempTexture();
+
+protected:
     int m_windowWidth;
     int m_windowHeight;
     EGLNativeDisplayType m_nativeDisplay;
@@ -78,6 +85,7 @@ protected:
     EGLConfig m_eglConfig;
     EGLContext m_eglContext;
     EGLSurface m_eglSurface;
+    EGLSurface m_eglPbufferSurface;
     EGLDisplay m_eglDisplay;
     uint m_vbo;
     EGLint m_displayWidth;
@@ -90,6 +98,7 @@ protected:
 #ifdef DRAW_LAYER_DEBUG
     Shader* m_layerShader;
 #endif
+    uint m_texId;
 private:
     void saveScreenShot();
 };
