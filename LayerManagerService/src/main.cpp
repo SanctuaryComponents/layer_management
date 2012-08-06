@@ -33,6 +33,7 @@
 #include <libgen.h> // basename
 #include <signal.h>
 #include <execinfo.h> // for stacktrace
+#include <sys/stat.h>
 
 #include <list>
 using std::list;
@@ -185,18 +186,36 @@ void getSharedLibrariesFromDirectory(tFileList& fileList, string dirName)
         unsigned char entryType = itemInDirectory->d_type;
         string entryName = itemInDirectory->d_name;
 
-        bool regularFile = (entryType == DT_REG);
-        bool linkToFile = (entryType == DT_LNK);
+        bool regularFile;
         bool sharedLibExtension = ("so" == entryName.substr(entryName.find_last_of(".") + 1));
 
-        if ((linkToFile || regularFile) && sharedLibExtension)
+        if ((entryType == DT_LNK) || (entryType == DT_UNKNOWN))
+        {
+            struct stat st;
+            string fpath = dirName + "/" + itemInDirectory->d_name;
+
+            if (!stat(fpath.c_str(), &st))
+                regularFile = S_ISREG(st.st_mode);
+            else
+            {
+                regularFile = false;
+                LOG_WARNING("LayerManagerService", "Could not stat() file " << fpath << ": " << errno);
+            }
+        }
+        else
+        {
+            regularFile = (entryType == DT_REG);
+        }
+
+
+        if (regularFile && sharedLibExtension)
         {
             LOG_DEBUG("LayerManagerService", "adding file " << entryName);
             fileList.push_back(dirName + "/" + entryName);
         }
         else
         {
-            LOG_DEBUG("LayerManagerService", "ignoring file " << entryName);
+            LOG_DEBUG("LayerManagerService", "ignoring file " << entryName);;
         }
     }
 
