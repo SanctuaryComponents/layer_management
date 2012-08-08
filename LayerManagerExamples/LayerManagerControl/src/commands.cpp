@@ -542,3 +542,54 @@ COMMAND("set surface <surfaceid> accept <acceptance> input events from devices <
     ilm_commitChanges();
 }
 
+//=============================================================================
+COMMAND("set surface <surfaceid> chromakey <red> <green> <blue>")
+//=============================================================================
+{
+    t_ilm_surface surface = input->getUint("surfaceid");
+    t_ilm_int color[3] =
+    {
+        input->getInt("red"),
+        input->getInt("green"),
+        input->getInt("blue")
+    };
+
+    ilm_surfaceSetChromaKey(surface, color);
+    ilm_commitChanges();
+}
+
+//=============================================================================
+COMMAND("set surface <surfaceid> chromakey disabled")
+//=============================================================================
+{
+    t_ilm_surface surface = input->getUint("surfaceid");
+    ilm_surfaceSetChromaKey(surface, NULL);
+    ilm_commitChanges();
+}
+
+//=============================================================================
+COMMAND("set layer <layerid> chromakey <red> <green> <blue>")
+//=============================================================================
+{
+    t_ilm_surface surface = input->getUint("layerid");
+    t_ilm_int color[3] =
+    {
+        input->getInt("red"),
+        input->getInt("green"),
+        input->getInt("blue")
+    };
+
+    ilm_layerSetChromaKey(surface, color);
+    ilm_commitChanges();
+}
+
+//=============================================================================
+COMMAND("set layer <layerid> chromakey disabled")
+//=============================================================================
+{
+    t_ilm_surface surface = input->getUint("layerid");
+    ilm_layerSetChromaKey(surface, NULL);
+    ilm_commitChanges();
+}
+
+

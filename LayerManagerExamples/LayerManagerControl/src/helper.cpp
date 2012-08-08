@@ -116,6 +116,10 @@ void printLayerProperties(unsigned int layerid, const char* prefix = "")
         break;
     }
 
+    cout << prefix << "- chromakey:            "
+         << (p.chromaKeyEnabled ? "enabled " : "disabled ")
+         << "(r=" << p.chromaKeyRed << ", g=" << p.chromaKeyGreen << ", b=" << p.chromaKeyBlue << ")\n";
+
     cout << prefix << "- surface render order: ";
     int surfaceCount = 0;
     unsigned int* surfaceArray = NULL;
@@ -228,6 +232,10 @@ void printSurfaceProperties(unsigned int surfaceid, const char* prefix = "")
     cout << prefix << "- has keyboard focus: "
          << (keyboardFocusSurfaceId == surfaceid ? "true" : "false")
          << "\n";
+
+    cout << prefix << "- chromakey:          "
+         << (p.chromaKeyEnabled ? "enabled " : "disabled ")
+         << "(r=" << p.chromaKeyRed << ", g=" << p.chromaKeyGreen << ", b=" << p.chromaKeyBlue << ")\n";
 
     cout << prefix << "- counters:           frame=" << p.frameCounter
                                        << ", draw=" << p.drawCounter
