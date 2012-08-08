@@ -215,6 +215,20 @@ void printSurfaceProperties(unsigned int surfaceid, const char* prefix = "")
     }
 
     cout << prefix << "- native surface:     " << p.nativeSurface << "\n";
+
+    cout << prefix << "- accepts input from: "
+         << (p.inputDevicesAcceptance & ILM_INPUT_DEVICE_KEYBOARD ? "keyboard " : "")
+         << (p.inputDevicesAcceptance & ILM_INPUT_DEVICE_POINTER ? "mouse " : "")
+         << (p.inputDevicesAcceptance & ILM_INPUT_DEVICE_TOUCH ? "touch " : "")
+         << "\n";
+
+    t_ilm_surface keyboardFocusSurfaceId;
+    ilm_GetKeyboardFocusSurfaceId(&keyboardFocusSurfaceId);
+
+    cout << prefix << "- has keyboard focus: "
+         << (keyboardFocusSurfaceId == surfaceid ? "true" : "false")
+         << "\n";
+
     cout << prefix << "- counters:           frame=" << p.frameCounter
                                        << ", draw=" << p.drawCounter
                                        << ", update=" << p.updateCounter << "\n";
