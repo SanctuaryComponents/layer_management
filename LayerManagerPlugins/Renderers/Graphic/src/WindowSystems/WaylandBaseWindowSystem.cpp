@@ -295,48 +295,35 @@ void WaylandBaseWindowSystem::calculateFps()
     // }
 }
 
-void WaylandBaseWindowSystem::CheckRedrawAllLayers()
+void WaylandBaseWindowSystem::RedrawAllLayers(bool clear, bool swap)
 {
-    std::list<Layer*> layers = m_pScene->getCurrentRenderOrder();
-    for(std::list<Layer*>::const_iterator current = layers.begin(); current != layers.end(); current++)
-    {
-        Layer* currentLayer = (Layer*)*current;
-        graphicSystem->beginLayer(currentLayer);
-        graphicSystem->checkRenderLayer();
-        graphicSystem->endLayer();
-    }
-}
+    LayerList layers = m_pScene->getCurrentRenderOrder();
+    LayerList swLayers;
+    // TODO: bRedraw is overly conservative if layers includes a hardware layer
+    bool bRedraw = m_forceComposition || needsRedraw(layers) || (m_systemState == REDRAW_STATE);
 
-void WaylandBaseWindowSystem::RedrawAllLayers()
-{
-    std::list<Layer*> layers = m_pScene->getCurrentRenderOrder();
-    bool bRedraw = m_forceComposition || m_damaged || (m_systemState == REDRAW_STATE);
-
-    // m_damaged represents that SW composition is required
-    // At this point if a layer has damaged = true then it must be a HW layer that needs update.
-    // A SW layer which needs update will make m_damaged = true
     if (bRedraw)
     {
         graphicSystem->activateGraphicContext();
 #ifndef WL_OMIT_CLEAR_GB
-        graphicSystem->clearBackground();
+        if (clear)
+        {
+            graphicSystem->clearBackground();
+        }
 #endif /* WL_OMIT_CLEAR_GB */
     }
     for(std::list<Layer*>::const_iterator current = layers.begin(); current != layers.end(); current++)
     {
         if ((*current)->getLayerType() == Hardware)
         {
-            if (m_forceComposition || (*current)->damaged)
+            if (m_forceComposition || graphicSystem->needsRedraw(*current))
             {
                 renderHWLayer(*current);
-                (*current)->damaged = false;
             }
         }
         else if (bRedraw)
         {
-            graphicSystem->beginLayer(*current);
-            graphicSystem->renderSWLayer();
-            graphicSystem->endLayer();
+            swLayers.push_back(*current);
         }
     }
     if (bRedraw)
@@ -345,15 +332,34 @@ void WaylandBaseWindowSystem::RedrawAllLayers()
         struct timeval tv_s;
         struct timeval tv_e;
         float timeSinceLastCalc = 0.0;
+        //glFinish();
         gettimeofday(&tv_s, NULL);
-        graphicSystem->swapBuffers();
+        graphicSystem->renderSWLayers(swLayers, false); // Already cleared
+        if (swap)
+        {
+            graphicSystem->swapBuffers();
+        }
+        //glFinish();
         gettimeofday(&tv_e, NULL);
         timeSinceLastCalc = (float)(tv_e.tv_sec-tv_s.tv_sec) + 0.000001*((float)(tv_e.tv_usec-tv_s.tv_usec));
         LOG_INFO("WaylandBaseWindowSystem", "swapBuffers" << timeSinceLastCalc);
 #else
-        graphicSystem->swapBuffers();
+        graphicSystem->renderSWLayers(swLayers, false); // Already cleared
+        if (swap)
+        {
+            graphicSystem->swapBuffers();
+        }
 #endif
         graphicSystem->releaseGraphicContext();
+
+        if (m_debugMode)
+        {
+            printDebug();
+        }
+
+        calculateFps();
+
+        m_systemState = IDLE_STATE;
     }
 }
 
@@ -371,27 +377,12 @@ void WaylandBaseWindowSystem::Redraw()
     /*LOG_INFO("WaylandBaseWindowSystem","Locking List");*/
     m_pScene->lockScene();
 
-    CheckRedrawAllLayers();
-    RedrawAllLayers();
+    RedrawAllLayers(true, true); // Clear and Swap
+    ClearDamage();
 
     m_pScene->unlockScene();
 
-    if (m_forceComposition || m_damaged || (m_systemState == REDRAW_STATE))
-    {
-        // TODO: This block won't be executed for HW only changes
-        // Is that acceptable?
-        if (m_debugMode)
-        {
-            printDebug();
-        }
-
-        calculateFps();
-
-        /* Reset the damage flag, all is up to date */
-        m_forceComposition = false;
-        m_damaged = false;
-        m_systemState = IDLE_STATE;
-    }
+    m_forceComposition = false;
 }
 
 void WaylandBaseWindowSystem::Screenshot()
@@ -399,49 +390,38 @@ void WaylandBaseWindowSystem::Screenshot()
     /*LOG_INFO("WaylandBaseWindowSystem","Locking List");*/
     m_pScene->lockScene();
     graphicSystem->activateGraphicContext();
-    graphicSystem->clearBackground();
 
-    if (m_takeScreenshot==ScreenshotOfDisplay)
+    if (m_takeScreenshot == ScreenshotOfDisplay)
     {
         LOG_DEBUG("WaylandBaseWindowSystem", "Taking screenshot");
-        std::list<Layer*> layers = m_pScene->getCurrentRenderOrder();
-
-        for(std::list<Layer*>::const_iterator current = layers.begin(); current != layers.end(); current++)
-        {
-            if ((*current)->getLayerType() != Hardware)
-            {
-                graphicSystem->beginLayer(*current);
-                graphicSystem->renderSWLayer();
-                graphicSystem->endLayer();
-            }
-        }
+        RedrawAllLayers(true, false); // Do clear, Don't swap
     }
-    else if(m_takeScreenshot==ScreenshotOfLayer)
+    else if(m_takeScreenshot == ScreenshotOfLayer)
     {
         LOG_DEBUG("WaylandBaseWindowSystem", "Taking screenshot of layer");
-        Layer* currentLayer = m_pScene->getLayer(m_screenShotLayerID);
+        Layer* layer = m_pScene->getLayer(m_screenShotLayerID);
 
-        if (currentLayer!=NULL){
-            graphicSystem->beginLayer(currentLayer);
-            graphicSystem->renderSWLayer();
-            graphicSystem->endLayer();
+        if (layer != NULL)
+        {
+            graphicSystem->renderSWLayer(layer, true); // Do clear
         }
     }
-    else if(m_takeScreenshot==ScreenshotOfSurface)
+    else if(m_takeScreenshot == ScreenshotOfSurface)
     {
         LOG_DEBUG("WaylandBaseWindowSystem", "Taking screenshot of surface");
-        Layer* currentLayer = m_pScene->getLayer(m_screenShotLayerID);
-        Surface* currentSurface = m_pScene->getSurface(m_screenShotSurfaceID);
+        Layer* layer = m_pScene->getLayer(m_screenShotLayerID);
+        Surface* surface = m_pScene->getSurface(m_screenShotSurfaceID);
 
-        if (currentLayer!=NULL && currentSurface!=NULL){
-            graphicSystem->beginLayer(currentLayer);
-            graphicSystem->renderSurface(currentSurface);
+        graphicSystem->clearBackground();
+        if (layer != NULL && surface != NULL)
+        {
+            graphicSystem->beginLayer(layer);
+            graphicSystem->renderSurface(surface);
             graphicSystem->endLayer();
         }
     }
 
     graphicSystem->saveScreenShotOfFramebuffer(m_screenShotFile);
-//  graphicSystem->swapBuffers();
     m_takeScreenshot = ScreenShotNone;
     LOG_DEBUG("WaylandBaseWindowSystem", "Done taking screenshot");
 

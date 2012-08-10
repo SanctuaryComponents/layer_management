@@ -595,49 +595,43 @@ void X11WindowSystem::calculateFps()
     }
 }
 
-void X11WindowSystem::CheckRedrawAllLayers()
+void X11WindowSystem::RedrawAllLayers(bool clear, bool swap)
 {
-    std::list<Layer*> layers = m_pScene->getCurrentRenderOrder();
-    for(std::list<Layer*>::const_iterator current = layers.begin(); current != layers.end(); current++)
-    {
-        Layer* currentLayer = (Layer*)*current;
-        graphicSystem->beginLayer(currentLayer);
-        graphicSystem->checkRenderLayer();
-        graphicSystem->endLayer();
-    }
-}
+    LayerList layers = m_pScene->getCurrentRenderOrder();
+    LayerList swLayers;
 
-void X11WindowSystem::RedrawAllLayers()
-{
-    std::list<Layer*> layers = m_pScene->getCurrentRenderOrder();
-
-    // m_damaged represents that SW composition is required
-    // At this point if a layer has damaged = true then it must be a HW layer that needs update.
-    // A SW layer which needs update will make m_damaged = true
-    if (m_forceComposition || m_damaged)
-    {
-        graphicSystem->clearBackground();
-    }
-    for(std::list<Layer*>::const_iterator current = layers.begin(); current != layers.end(); current++)
+    // Refresh HW Layers, find SW Layers
+    for(LayerListConstIterator current = layers.begin(); current != layers.end(); current++)
     {
         if ((*current)->getLayerType() == Hardware)
         {
-            if (m_forceComposition || (*current)->damaged)
+            // Redraw HW layers independently of other layers
+            if (m_forceComposition || graphicSystem->needsRedraw(*current))
             {
                 renderHWLayer(*current);
-                (*current)->damaged = false;
             }
         }
-        else if (m_forceComposition || m_damaged)
+        else
         {
-            graphicSystem->beginLayer(*current);
-            graphicSystem->renderSWLayer();
-            graphicSystem->endLayer();
+            swLayers.push_back(*current);
         }
     }
-    if (m_forceComposition || m_damaged)
+
+    if (m_forceComposition || graphicSystem->needsRedraw(swLayers))
     {
-        graphicSystem->swapBuffers();
+        graphicSystem->renderSWLayers(swLayers, clear);
+
+        if (swap)
+        {
+            graphicSystem->swapBuffers();
+        }
+
+        if (debugMode)
+        {
+            printDebug();
+        }
+
+        calculateFps();
     }
 }
 
@@ -649,78 +643,52 @@ void X11WindowSystem::renderHWLayer(Layer *layer)
 void X11WindowSystem::Redraw()
 {
     // draw all the layers
-    //graphicSystem->clearBackground();
     /*LOG_INFO("X11WindowSystem","Locking List");*/
     m_pScene->lockScene();
 
-    CheckRedrawAllLayers();
-    RedrawAllLayers();
+    RedrawAllLayers(true, true);  // Clear and Swap
+    ClearDamage();
 
     m_pScene->unlockScene();
 
-    if (m_forceComposition || m_damaged)
-    {
-        // TODO: This block won't be executed for HW only changes
-        // Is that acceptable?
-       if (debugMode)
-        {
-            printDebug();
-        }
-
-        calculateFps();
-
-        /* Reset the damage flag, all is up to date */
-        m_forceComposition = false;
-        m_damaged = false;
-    }
+    m_forceComposition = false;
 }
 
 void X11WindowSystem::Screenshot()
 {
     /*LOG_INFO("X11WindowSystem","Locking List");*/
     m_pScene->lockScene();
-    graphicSystem->clearBackground();
-    if (takeScreenshot==ScreenshotOfDisplay)
+    if (takeScreenshot == ScreenshotOfDisplay)
     {
         LOG_DEBUG("X11WindowSystem", "Taking screenshot");
-        std::list<Layer*> layers = m_pScene->getCurrentRenderOrder();
-
-        for(std::list<Layer*>::const_iterator current = layers.begin(); current != layers.end(); current++)
-        {
-            if ((*current)->getLayerType() != Hardware)
-            {
-                graphicSystem->beginLayer(*current);
-                graphicSystem->renderSWLayer();
-                graphicSystem->endLayer();
-            }
-        }
+        RedrawAllLayers(true, false);  // Do clear, Don't swap
     }
-    else if(takeScreenshot==ScreenshotOfLayer)
+    else if(takeScreenshot == ScreenshotOfLayer)
     {
         LOG_DEBUG("X11WindowSystem", "Taking screenshot of layer");
-        Layer* currentLayer = m_pScene->getLayer(screenShotLayerID);
+        Layer* layer = m_pScene->getLayer(screenShotLayerID);
 
-        if (currentLayer!=NULL){
-            graphicSystem->beginLayer(currentLayer);
-            graphicSystem->renderSWLayer();
-            graphicSystem->endLayer();
+        if (layer != NULL)
+        {
+            graphicSystem->renderSWLayer(layer, true); // Do clear
         }
     }
-    else if(takeScreenshot==ScreenshotOfSurface)
+    else if(takeScreenshot == ScreenshotOfSurface)
     {
         LOG_DEBUG("X11WindowSystem", "Taking screenshot of surface");
-        Layer* currentLayer = m_pScene->getLayer(screenShotLayerID);
-        Surface* currentSurface = m_pScene->getSurface(screenShotSurfaceID);
+        Layer* layer = m_pScene->getLayer(screenShotLayerID);
+        Surface* surface = m_pScene->getSurface(screenShotSurfaceID);
 
-        if (currentLayer!=NULL && currentSurface!=NULL){
-            graphicSystem->beginLayer(currentLayer);
-            graphicSystem->renderSurface(currentSurface);
+        graphicSystem->clearBackground();
+        if (layer != NULL && surface != NULL)
+        {
+            graphicSystem->beginLayer(layer);
+            graphicSystem->renderSurface(surface);
             graphicSystem->endLayer();
         }
     }
 
     graphicSystem->saveScreenShotOfFramebuffer(screenShotFile);
-//  graphicSystem->swapBuffers();
     takeScreenshot = ScreenShotNone;
     LOG_DEBUG("X11WindowSystem", "Done taking screenshot");
     m_pScene->unlockScene();
@@ -958,7 +926,7 @@ init_complete:
             this->m_systemState = IDLE_STATE;
 
             // check if we are supposed to take screenshot
-            if (this->takeScreenshot!=ScreenShotNone)
+            if (this->takeScreenshot != ScreenShotNone)
             {
                 this->Screenshot();
             }

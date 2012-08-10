@@ -81,8 +81,7 @@ protected:
     pthread_t renderThread;
     pthread_mutex_t run_lock;
     BaseGraphicSystem<void*, void*>* graphicSystem;
-    virtual void CheckRedrawAllLayers();
-    virtual void RedrawAllLayers();
+    virtual void RedrawAllLayers(bool clear, bool swap);
     virtual void renderHWLayer(Layer* layer);
     virtual bool initCompositor();
     struct wl_shm* m_wlShm;

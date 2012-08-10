@@ -44,6 +44,7 @@ public:
     virtual void doScreenShotOfSurface(std::string fileName, const uint id, const uint layer_id) = 0;
 
 protected:
+    virtual void ClearDamage();
     Scene* m_pScene;
     InputManager* m_pInputManager;
 

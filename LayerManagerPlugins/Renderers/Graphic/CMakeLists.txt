@@ -52,6 +52,7 @@ if (WITH_GLESv2_LIB)
     set(SOURCES 
             ../Base/src/BaseRenderer.cpp 
             src/GraphicSystems/GLESGraphicSystem.cpp
+            src/WindowSystems/BaseWindowSystem.cpp
             src/WindowSystems/X11WindowSystem.cpp  
             src/TextureBinders/X11Copy.cpp
             src/TextureBinders/X11CopyGLES.cpp
@@ -157,6 +158,7 @@ if (WITH_GLX_LIB)
     set(SOURCES 
         ../Base/src/BaseRenderer.cpp 
         src/GraphicSystems/GLXGraphicSystem.cpp
+        src/WindowSystems/BaseWindowSystem.cpp
         src/WindowSystems/X11WindowSystem.cpp  
         src/TextureBinders/X11TextureFromPixmap.cpp
         src/TextureBinders/X11CopyGLX.cpp
@@ -256,6 +258,7 @@ if (WITH_WAYLAND)
         set(SOURCES
             ../Base/src/BaseRenderer.cpp
             src/GraphicSystems/GLESGraphicSystem.cpp
+            src/WindowSystems/BaseWindowSystem.cpp
             src/WindowSystems/WaylandBaseWindowSystem.cpp
             src/WindowSystems/WaylandX11WindowSystem.cpp
             src/WindowSystems/WaylandServerinfoProtocol.cpp  
@@ -278,6 +281,7 @@ if (WITH_WAYLAND)
         file(GLOB SOURCES 
             ../Base/src/BaseRenderer.cpp
             src/GraphicSystems/GLESGraphicSystem.cpp
+            src/WindowSystems/BaseWindowSystem.cpp
             src/WindowSystems/WaylandBaseWindowSystem.cpp
             src/WindowSystems/WaylandFbdevWindowSystem.cpp
             src/WindowSystems/WaylandServerinfoProtocol.cpp  
@@ -310,6 +314,7 @@ if (WITH_WAYLAND)
             ../Base/src/BaseRenderer.cpp
             src/GraphicSystems/GLESGraphicSystem.cpp
             src/GraphicSystems/DrmGLESGraphicSystem.cpp
+            src/WindowSystems/BaseWindowSystem.cpp
             src/WindowSystems/WaylandBaseWindowSystem.cpp
             src/WindowSystems/WaylandDrmWindowSystem.cpp
             src/WindowSystems/WaylandServerinfoProtocol.cpp

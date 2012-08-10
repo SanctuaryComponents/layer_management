@@ -36,9 +36,12 @@ public:
         return m_zerocopy;
     }
     virtual void beginLayer(Layer* layer);
-    virtual void checkRenderLayer();
-    virtual void renderSWLayer();
     virtual void endLayer();
+
+    virtual bool needsRedraw(Layer *layer);
+    virtual bool needsRedraw(LayerList layers);
+    virtual void renderSWLayer(Layer *layer, bool clear);
+    virtual void renderSWLayers(LayerList layers, bool clear);
 
     virtual void clearBackground();
     virtual void swapBuffers();

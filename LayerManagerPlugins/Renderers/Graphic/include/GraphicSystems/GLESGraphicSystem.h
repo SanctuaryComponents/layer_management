@@ -47,9 +47,12 @@ public:
     virtual void swapBuffers();
 
     virtual void beginLayer(Layer* layer);
-    virtual void checkRenderLayer();
-    virtual void renderSWLayer();
     virtual void endLayer();
+
+    virtual bool needsRedraw(Layer *layer);
+    virtual bool needsRedraw(LayerList layers);
+    virtual void renderSWLayer(Layer* layer, bool clear);
+    virtual void renderSWLayers(LayerList layers, bool clear);
 
     virtual bool initOpenGLES(EGLint displayWidth, EGLint displayHeight);
     virtual void resize(EGLint displayWidth, EGLint displayHeight);

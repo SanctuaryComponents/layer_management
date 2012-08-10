@@ -248,65 +248,98 @@ void GLXGraphicsystem::beginLayer(Layer* currentLayer)
 /*    glTranslatef(layerDestination.x, layerDestination.y, 0.0); */
 }
 
-void GLXGraphicsystem::checkRenderLayer()
+// Reports whether a single layer is damaged/dirty
+// Can not account for possible occlusion by other layers
+bool GLXGraphicsystem::needsRedraw(Layer *layer)
 {
-    SurfaceList surfaces = m_currentLayer->getAllSurfaces();
-
-    m_currentLayer->damaged = false;
-
-    if (!m_baseWindowSystem->m_forceComposition && (!m_baseWindowSystem->m_damaged || m_currentLayer->getLayerType() == Hardware))
+    if (layer->renderPropertyChanged)
     {
-        if (m_currentLayer->renderPropertyChanged)
+        return true;
+    }
+
+    if (layer->visibility && layer->opacity > 0.0)
+    {
+        SurfaceList surfaces = layer->getAllSurfaces();
+        for(SurfaceListConstIterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++)
         {
-            m_currentLayer->damaged = true;
-        }
-        else if ((m_currentLayer)->visibility && (m_currentLayer)->opacity > 0.0)
-        {
-            for(std::list<Surface*>::const_iterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++)
+            if ((*currentS)->renderPropertyChanged)
             {
-                if ((*currentS)->renderPropertyChanged)
-                {
-                    m_currentLayer->damaged = true;
-                    break;
-                }
-                else if ((*currentS)->hasNativeContent() && (*currentS)->damaged && (*currentS)->visibility && (*currentS)->opacity>0.0f)
-                {
-                    m_currentLayer->damaged = true;
-                    break;
-                }
+                return true;
+            }
+
+            if ((*currentS)->hasNativeContent() && (*currentS)->damaged && (*currentS)->visibility && (*currentS)->opacity>0.0f)
+            {
+                return true;
             }
         }
-
-        // Preseve m_currentLayer->damaged for HW layers so that they can be updated independently
-        if (m_currentLayer->damaged && m_currentLayer->getLayerType() != Hardware)
-        {
-            m_baseWindowSystem->m_damaged = true;
-            m_currentLayer->damaged = false;
-        }
     }
-
-    for(std::list<Surface*>::const_iterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++)
-    {
-        (*currentS)->damaged = false;
-        (*currentS)->renderPropertyChanged = false;
-    }
-
-    m_currentLayer->renderPropertyChanged = false;
+    return false;
 }
 
-void GLXGraphicsystem::renderSWLayer()
+// Reports whether the passed in layers have visible damage or are otherwise
+// dirty because render properties changed.
+// Assumes that layers in the list belong to same composition. ie. damage to
+// one layer affects the others.  A warning is logged if the assumption is wrong.
+bool GLXGraphicsystem::needsRedraw(LayerList layers)
 {
-    if ( (m_currentLayer)->visibility && (m_currentLayer)->opacity > 0.0 )
+    // TODO: Ignore damage from completely obscured surfaces
+
+    for (LayerListConstIterator layer = layers.begin(); layer != layers.end(); layer++)
     {
-        SurfaceList surfaces = m_currentLayer->getAllSurfaces();
-        for(std::list<Surface*>::const_iterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++)
+        if ((*layer)->getLayerType() == Hardware && layers.size() > 1)
+        {
+            // Damage in a hardware layer should not imply a redraw in other layers
+            LOG_WARNING("GLXGraphicsystem", "needsRedraw() called with layers not in the same composition");
+        }
+
+        if (needsRedraw(*layer))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+void GLXGraphicsystem::renderSWLayer(Layer *layer, bool clear)
+{
+    if (clear)
+    {
+        clearBackground();
+    }
+
+    if ( layer->visibility && layer->opacity > 0.0 )
+    {
+        SurfaceList surfaces = layer->getAllSurfaces();
+        beginLayer(layer);
+        for(SurfaceListConstIterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++)
         {
             if ((*currentS)->hasNativeContent() && (*currentS)->visibility && (*currentS)->opacity>0.0f)
             {
-                Surface* currentSurface = (Surface*)*currentS;
-                renderSurface(currentSurface);
+                renderSurface(*currentS);
             }
         }
+        endLayer();
+    }
+}
+
+void GLXGraphicsystem::renderSWLayers(LayerList layers, bool clear)
+{
+    // This is a stub.
+    //
+    // TODO: render in a more optimal way
+    //   1. Turn off blending for first surface rendered
+    //   2. Don't clear when it's legal to avoid it
+    //         eg. a fullscreen opaque surface exists
+    //   3. Render multiple surfaces at time via multi-texturing
+    //   4. Remove fully obscured layers/surfaces
+    if (clear)
+    {
+        clearBackground();
+    }
+
+    for (LayerListConstIterator layer = layers.begin(); layer != layers.end(); layer++)
+    {
+        renderSWLayer(*layer, false); // Don't clear
     }
 }
 

@@ -35,9 +35,12 @@ public:
     {
     };
     virtual void beginLayer(Layer* layer) = 0;
-    virtual void checkRenderLayer() = 0;
-    virtual void renderSWLayer() = 0;
     virtual void endLayer() = 0;
+
+    virtual bool needsRedraw(Layer *layer) = 0;
+    virtual bool needsRedraw(LayerList layers) = 0;
+    virtual void renderSWLayer(Layer* layer, bool clear) = 0;
+    virtual void renderSWLayers(LayerList layers, bool clear) = 0;
 
     virtual void setBaseWindowSystem(BaseWindowSystem* windowSystem)
     {

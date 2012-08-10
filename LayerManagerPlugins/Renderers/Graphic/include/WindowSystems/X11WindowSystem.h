@@ -96,10 +96,9 @@ protected:
     pthread_mutex_t init_lock;
     pthread_cond_t init_condition;
     pthread_cond_t run_condition;
-    BaseGraphicSystem<Display*, Window>* graphicSystem;    
-    virtual bool initXServer(); 
-    virtual void CheckRedrawAllLayers();
-    virtual void RedrawAllLayers();
+    BaseGraphicSystem<Display*, Window>* graphicSystem;
+    virtual bool initXServer();
+    virtual void RedrawAllLayers(bool clear, bool swap);
     virtual void renderHWLayer(Layer* layer);
 
 private:
