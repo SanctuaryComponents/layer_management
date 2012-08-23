@@ -89,7 +89,7 @@ T* getCreateFunction(string libname)
     // open library
     void *libraryHandle;
     dlerror(); // Clear any existing error
-    libraryHandle = dlopen(libname.c_str(), RTLD_NOW /*LAZY*/);
+    libraryHandle = dlopen(libname.c_str(), RTLD_NOW | RTLD_GLOBAL /*LAZY*/);
     const char* dlopen_error = dlerror();
     if (!libraryHandle || dlopen_error)
     {
