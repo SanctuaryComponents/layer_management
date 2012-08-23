@@ -40,7 +40,6 @@
 #include <string.h>
 #include <unistd.h>
 #include <iomanip>
-
 #include "WindowSystems/WaylandServerinfoServerProtocol.h"
 
 extern "C" {
@@ -198,7 +197,7 @@ Surface* WaylandBaseWindowSystem::getSurfaceFromNativeSurface(struct native_surf
         {
             continue;
         }
-	WaylandPlatformSurface* nativePlatform = (WaylandPlatformSurface*)currentSurface->platform;
+    WaylandPlatformSurface* nativePlatform = (WaylandPlatformSurface*)currentSurface->platform;
         if (!nativePlatform)
         {
             continue;
@@ -451,9 +450,9 @@ void WaylandBaseWindowSystem::Screenshot()
     /*LOG_INFO("WaylandBaseWindowSystem","UnLocking List");*/
 }
 
-void WaylandBaseWindowSystem::destroyListenerSurfaceBuffer(struct wl_listener* listener, struct wl_resource* resource, uint32_t time)
+void WaylandBaseWindowSystem::destroyListenerSurfaceBuffer(struct wl_listener* listener,void *data)
 {
-    LOG_DEBUG("WaylandBaseWindowSystem", "destroyListenerSurfaceBuffer listener:" << listener << ", resource:" << resource << ", time:" << time);
+    LOG_DEBUG("WaylandBaseWindowSystem", "destroyListenerSurfaceBuffer listener:" << listener << "data :" << data);
     struct native_surface *es = container_of(listener, struct native_surface, buffer_destroy_listener);
 
     es->buffer = NULL;
@@ -462,13 +461,16 @@ void WaylandBaseWindowSystem::destroyListenerSurfaceBuffer(struct wl_listener* l
 struct native_surface* WaylandBaseWindowSystem::createNativeSurface()
 {
     LOG_DEBUG("WaylandBaseWindowSystem", "createNativeSurface IN");
-    struct native_surface* surface = (struct native_surface*)calloc(1, sizeof *surface);
+    struct native_surface* surface;
+    surface = (struct native_surface*)calloc(1, sizeof *surface);
     if (NULL == surface)
     {
         LOG_ERROR("WaylandBaseWindowSystem", "failed to create native surface");
         return NULL;
     }
-
+    
+    wl_signal_init(&surface->surface.resource.destroy_signal);
+    
     wl_list_init(&surface->link);
     wl_list_init(&surface->buffer_link);
 
@@ -479,7 +481,7 @@ struct native_surface* WaylandBaseWindowSystem::createNativeSurface()
     // surface->visual = NONE_VISUAL;
 
     surface->buffer = NULL;
-    surface->buffer_destroy_listener.func = destroyListenerSurfaceBuffer;
+    surface->buffer_destroy_listener.notify = destroyListenerSurfaceBuffer;
 
     LOG_DEBUG("WaylandBaseWindowSystem", "createNativeSurface OUT");
     return surface;
@@ -530,7 +532,7 @@ void WaylandBaseWindowSystem::destroySurfaceCallback(struct wl_resource* resourc
 extern "C" void WaylandBaseWindowSystem::surfaceIFDestroy(struct wl_client *client, struct wl_resource *resource)
 {
     LOG_DEBUG("WaylandBaseWindowSystem", "surfaceIFDestroy client:" << client << ", resource:" << resource);
-    wl_resource_destroy(resource, getTime());
+    wl_resource_destroy(resource);
 }
 
 void WaylandBaseWindowSystem::postReleaseBuffer(struct wl_buffer *buffer)
@@ -560,7 +562,6 @@ void WaylandBaseWindowSystem::attachBufferToNativeSurface(struct wl_buffer* buff
         LOG_ERROR("WaylandBaseWindowSystem", "failed to get surface for wl_surface");
         return;
     }
-    struct wl_list* surfaces_attached_to;
 
     ilmSurface->updateCounter++;
     ilmSurface->removeNativeContent();
@@ -592,10 +593,10 @@ void WaylandBaseWindowSystem::attachBufferToNativeSurface(struct wl_buffer* buff
         //break;
         //}
 
-        surfaces_attached_to = (wl_list*)buffer->user_data;
-
-        wl_list_remove(&nativeSurface->buffer_link);
-        wl_list_insert(surfaces_attached_to, &nativeSurface->buffer_link);
+        nativeSurface->buffer = buffer;
+        buffer->busy_count++;
+        wl_signal_add(&nativeSurface->buffer->resource.destroy_signal,
+              &nativeSurface->buffer_destroy_listener);
     }
     else {
         LOG_DEBUG("WaylandBaseWindowSystem", "wl buffer");
@@ -608,8 +609,8 @@ void WaylandBaseWindowSystem::attachBufferToNativeSurface(struct wl_buffer* buff
 }
 
 extern "C" void WaylandBaseWindowSystem::surfaceIFAttach(struct wl_client* client,
-	       struct wl_resource* resource,
-	       struct wl_resource* buffer_resource, int32_t x, int32_t y)
+           struct wl_resource* resource,
+           struct wl_resource* buffer_resource, int32_t x, int32_t y)
 {
     LOG_DEBUG("WaylandBaseWindowSystem", "surfaceIFAttach client:" << client << ", resource:" << resource << ", buffer_resource:" << buffer_resource << ", x:" << x << ", y:" << y);
     LOG_DEBUG("WaylandBaseWindowSystem", "surfaceIFAttach IN");
@@ -623,18 +624,14 @@ extern "C" void WaylandBaseWindowSystem::surfaceIFAttach(struct wl_client* clien
         wl_list_remove(&nativeSurface->buffer_destroy_listener.link);
     }
 
-    buffer->busy_count++;
-    nativeSurface->buffer = buffer;
-    wl_list_insert(nativeSurface->buffer->resource.destroy_listener_list.prev, &nativeSurface->buffer_destroy_listener.link);
-
     windowSystem->attachBufferToNativeSurface(buffer, &nativeSurface->surface);
 
     LOG_DEBUG("WaylandBaseWindowSystem", "surfaceIFAttach OUT");
 }
 
 extern "C" void WaylandBaseWindowSystem::surfaceIFDamage(struct wl_client *client,
-	       struct wl_resource *resource,
-	       int32_t x, int32_t y, int32_t width, int32_t height)
+           struct wl_resource *resource,
+           int32_t x, int32_t y, int32_t width, int32_t height)
 {
     LOG_DEBUG("WaylandBaseWindowSystem", "surfaceIFDamage client:" << client << ", resource:" << resource << ", x:" << x << ", y:" << y << ", width:" << width << ", height:" << height);
     LOG_DEBUG("WaylandBaseWindowSystem", "surfaceIFDamage IN");
@@ -661,7 +658,7 @@ extern "C" void WaylandBaseWindowSystem::destroyFrameCallback(struct wl_resource
 }
 
 extern "C" void WaylandBaseWindowSystem::surfaceIFFrame(struct wl_client *client,
-	      struct wl_resource *resource, uint32_t callback)
+          struct wl_resource *resource, uint32_t callback)
 {
     LOG_DEBUG("WaylandBaseWindowSystem", "surfaceIFFrame IN");
     struct native_frame_callback* cb;
@@ -685,7 +682,7 @@ extern "C" void WaylandBaseWindowSystem::surfaceIFFrame(struct wl_client *client
     wl_list_insert(windowSystem->m_listFrameCallback.prev, &cb->link);
 
     windowSystem->checkForNewSurfaceNativeContent();
-    idleEventRepaint(windowSystem);
+    idleEventRepaint(windowSystem); 
 
     LOG_DEBUG("WaylandBaseWindowSystem", "surfaceIFFrame OUT");
 }
@@ -694,11 +691,13 @@ extern "C" const struct wl_surface_interface g_surfaceInterface = {
     WaylandBaseWindowSystem::surfaceIFDestroy,
     WaylandBaseWindowSystem::surfaceIFAttach,
     WaylandBaseWindowSystem::surfaceIFDamage,
-    WaylandBaseWindowSystem::surfaceIFFrame
+    WaylandBaseWindowSystem::surfaceIFFrame,
+    NULL,
+    NULL
 };
 
 extern "C" void WaylandBaseWindowSystem::compositorIFCreateSurface
-		(struct wl_client *client, struct wl_resource* resource, uint32_t id)
+        (struct wl_client *client, struct wl_resource* resource, uint32_t id)
 {
     LOG_DEBUG("WaylandBaseWindowSystem", "compositorIFCreateSurface IN");
     WaylandBaseWindowSystem* windowSystem = static_cast<WaylandBaseWindowSystem*>( (WaylandBaseWindowSystem*) resource->data);
@@ -735,54 +734,10 @@ extern "C" void WaylandBaseWindowSystem::compositorIFCreateSurface
     LOG_DEBUG("WaylandBaseWindowSystem", "compositorIFCreateSurface OUT");
 }
 
-const static struct wl_compositor_interface g_compositorInterface = {
+const static struct wl_compositor_interface g_compositorInterface = 
+{
     WaylandBaseWindowSystem::compositorIFCreateSurface,
-};
-
-extern "C" void WaylandBaseWindowSystem::shmIFBufferCreated(struct wl_buffer *buffer)
-{
-    LOG_DEBUG("WaylandBaseWindowSystem", "shmIFBufferCreated IN");
-    struct wl_list* surfaces_attached_to;
-
-    surfaces_attached_to = (struct wl_list*)malloc(sizeof *surfaces_attached_to);
-    if (NULL == surfaces_attached_to)
-    {
-        buffer->user_data = NULL;
-        return;
-    }
-
-    wl_list_init(surfaces_attached_to);
-
-    buffer->user_data = surfaces_attached_to;
-    LOG_DEBUG("WaylandBaseWindowSystem", "shmIFBufferCreated OUT");
-}
-
-extern "C" void WaylandBaseWindowSystem::shmIFBufferDamaged(struct wl_buffer* buffer, int32_t x, int32_t y, int32_t width, int32_t height)
-{
-    LOG_DEBUG("WaylandBaseWindowSystem", "shmIFBufferDamaged buffer:" << buffer << ", x:" << x << ", y:" << y << ", width:" << width << ", height:" << height);
-}
-
-extern "C" void WaylandBaseWindowSystem::shmIFBufferDestroyed(struct wl_buffer *buffer)
-{
-    LOG_DEBUG("WaylandBaseWindowSystem", "shmIFBufferDestroyed IN");
-    struct wl_list* surfaces_attached_to = (struct wl_list*)buffer->user_data;
-    struct native_surface* nativeSurface;
-    struct native_surface* next;
-
-    wl_list_for_each_safe(nativeSurface, next, surfaces_attached_to, buffer_link)
-    {
-        wl_list_remove(&nativeSurface->buffer_link);
-        wl_list_init(&nativeSurface->buffer_link);
-    }
-
-    free(surfaces_attached_to);
-    LOG_DEBUG("WaylandBaseWindowSystem", "shmIFBufferDestroyed OUT");
-}
-
-const static struct wl_shm_callbacks g_shmCallbacks = {
-    WaylandBaseWindowSystem::shmIFBufferCreated,
-    WaylandBaseWindowSystem::shmIFBufferDamaged,
-    WaylandBaseWindowSystem::shmIFBufferDestroyed
+    NULL
 };
 
 /**
@@ -812,7 +767,7 @@ void WaylandBaseWindowSystem::repaint(int msecs)
     wl_list_for_each_safe(cb, cnext, &m_listFrameCallback, link)
     {
         wl_resource_post_event(&cb->resource, WL_CALLBACK_DONE, msecs);
-        wl_resource_destroy(&cb->resource, 0);
+        wl_resource_destroy(&cb->resource);
     }
     LOG_DEBUG("WaylandBaseWindowSystem", "repaint OUT");
 }
@@ -836,13 +791,7 @@ bool WaylandBaseWindowSystem::initCompositor()
         return false;
     }
     LOG_DEBUG("WaylandBaseWindowSystem", "wl_display_add_global:SUCCESS");
-
-    m_wlShm = wl_shm_init(m_wlDisplay, &g_shmCallbacks);
-    if (NULL == m_wlShm)
-    {
-        LOG_ERROR("WaylandBaseWindowSystem", "failed to init wl_shm");
-        return false;
-    }
+    wl_display_init_shm(m_wlDisplay);
 
     wl_list_init(&m_listFrameCallback);
 
@@ -860,16 +809,13 @@ void WaylandBaseWindowSystem::shutdownCompositor()
         wl_display_remove_global(m_wlDisplay, m_serverInfoGlobal);
         m_serverInfoGlobal = NULL;
     }
+
     if (NULL != m_serverInfo)
     {
         free(m_serverInfo);
         m_serverInfo = NULL;
     }
-    if (NULL != m_wlShm)
-    {
-        wl_shm_finish(m_wlShm);
-        m_wlShm = NULL;
-    }
+
     if (NULL != m_wlCompositorGlobal)
     {
         wl_display_remove_global(m_wlDisplay, m_wlCompositorGlobal);
@@ -955,11 +901,7 @@ void* WaylandBaseWindowSystem::eventLoop()
         // run the main event loop while rendering
         gettimeofday(&tv0, NULL);
         LOG_DEBUG("WaylandBaseWindowSystem", "Enter render loop");
-
-        // clear screen to avoid garbage on startup
-        this->graphicSystem->clearBackground();
-        this->graphicSystem->swapBuffers();
-
+       
         if (wl_display_add_socket(m_wlDisplay, NULL))
         {
             LOG_ERROR("WaylandBaseWindowSystem", "failed to add socket");
@@ -967,6 +909,12 @@ void* WaylandBaseWindowSystem::eventLoop()
                 this->m_initialized = false;
                 break;
         }
+        
+        // clear screen to avoid garbage on startup
+        this->graphicSystem->clearBackground();
+        this->graphicSystem->swapBuffers();
+
+ 
 
         wl_display_run(m_wlDisplay);
 
@@ -1157,7 +1105,7 @@ void WaylandBaseWindowSystem::allocatePlatformSurface(Surface* surface)
         if (0 != nativeSurface)
         {
             unsigned int surfaceId = surface->getNativeContent();
-            LOG_DEBUG("WaylandBaseWindowSystem","surface->getNativeContent()"<<surfaceId);
+            LOG_DEBUG("WaylandBaseWindowSystem","surface->getNativeContent() : " << surfaceId);
             nativeSurface->connectionId = (unsigned short)((surfaceId >> 16) & 0xFFFF);
             nativeSurface->surfaceId = (unsigned short)(surfaceId & 0xFFFF);
             surface->platform = nativeSurface;

@@ -63,7 +63,7 @@ public:
     void stop();
     void signalRedrawEvent();
     void wakeUpRendererThread();
-    void setSystemState(WaylandWindowSystemStates state);	// TODO:don't check state
+    void setSystemState(WaylandWindowSystemStates state);   // TODO:don't check state
     WaylandWindowSystemStates getSystemState();
     struct wl_display* getNativeDisplayHandle();
     virtual void allocatePlatformSurface(Surface *surface);
@@ -126,7 +126,7 @@ protected:
 
     static void bindCompositor(struct wl_client* client, void* data, uint32_t version, uint32_t id);
     static int signalEventOnTerm(int signal_number, void *data);
-    static void destroyListenerSurfaceBuffer(struct wl_listener* listener, struct wl_resource* resource, uint32_t time);
+    static void destroyListenerSurfaceBuffer(struct wl_listener* listener,void *data);
     static void idleEventRepaint(void *data);
     bool createWaylandClient();
     void releaseWaylandClient();
@@ -146,14 +146,9 @@ public:
     static void surfaceIFAttach(struct wl_client *client, struct wl_resource *resource, struct wl_resource *buffer_resource, int32_t x, int32_t y);
     static void surfaceIFDamage(struct wl_client *client, struct wl_resource *resource, int32_t x, int32_t y, int32_t width, int32_t height);
     static void surfaceIFFrame(struct wl_client *client, struct wl_resource *resource, uint32_t callback);
-
+    
     // wl_compositor interface
     static void compositorIFCreateSurface(struct wl_client *client, struct wl_resource* resource, uint32_t id);
-
-    // wl_shm interface
-    static void shmIFBufferCreated(struct wl_buffer *buffer);
-    static void shmIFBufferDamaged(struct wl_buffer *buffer, int32_t x, int32_t y, int32_t width, int32_t height);
-    static void shmIFBufferDestroyed(struct wl_buffer *buffer);
 
     struct wl_list m_connectionList;
 };
