@@ -300,7 +300,7 @@ void WaylandBaseWindowSystem::RedrawAllLayers(bool clear, bool swap)
     LayerList layers = m_pScene->getCurrentRenderOrder();
     LayerList swLayers;
     // TODO: bRedraw is overly conservative if layers includes a hardware layer
-    bool bRedraw = m_forceComposition || needsRedraw(layers) || (m_systemState == REDRAW_STATE);
+    bool bRedraw = m_forceComposition || graphicSystem->needsRedraw(layers) || (m_systemState == REDRAW_STATE);
 
     if (bRedraw)
     {
