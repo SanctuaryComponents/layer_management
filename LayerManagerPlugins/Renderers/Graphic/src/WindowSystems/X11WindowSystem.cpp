@@ -334,6 +334,7 @@ void X11WindowSystem::MapWindow(Window window)
             surface->renderPropertyChanged = true;
 
             graphicSystem->getTextureBinder()->createClientBuffer(surface);
+            x11surf->enableRendering();
             XSync(x11Display, 0);
 
             LOG_DEBUG("X11WindowSystem", "Mapping Surface " << surface->getID() << " to window " << window);
@@ -349,7 +350,7 @@ void X11WindowSystem::UnMapWindow(Window window)
     if (isWindowValid(window))
     {
         LOG_DEBUG("X11WindowSystem", "Unmapping surface from window " << window);
-        Surface* surface = getSurfaceForWindow(window);
+        Surface* surface = getSurfaceForWindow(window);        
         if (!surface)
         {
             LOG_WARNING("X11WindowSystem", "Could not unmap window " << window);
@@ -361,6 +362,7 @@ void X11WindowSystem::UnMapWindow(Window window)
             return;
         }
         XPlatformSurface* x11surf = (XPlatformSurface*)surface->platform;
+        x11surf->disableRendering();
         LOG_DEBUG("X11WindowSystem", "Unmapping surface " << surface->getID());
         if (!x11surf->isMapped)
         {
@@ -453,7 +455,7 @@ void X11WindowSystem::DestroyWindow(Window window)
     if (isWindowValid(window))
     {
         LOG_DEBUG("X11WindowSystem", "Destroying Surface for window " << window);
-        Surface* surface = getSurfaceForWindow(window);
+        Surface* surface = getSurfaceForWindow(window);        
         if (!surface)
         {
             LOG_WARNING("X11WindowSystem", "Could not find surface for window " << window);
@@ -464,6 +466,8 @@ void X11WindowSystem::DestroyWindow(Window window)
         UnMapWindow(window);
         LOG_DEBUG("X11WindowSystem", "Remove Native Content from Surface " << surface->getID());
         surface->removeNativeContent();
+        /* To force a recomposition of all surface which are behind of that surface inside the Layer RenderOrder */
+        surface->renderPropertyChanged = true;
         delete surface->platform;
         surface->platform = NULL;
     }
