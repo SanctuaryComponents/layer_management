@@ -41,11 +41,11 @@
 #define LAYER_CHROMAKEY   3500
 #define SURFACE_CHROMAKEY 6789
 
-#define CHECK_ILM_ERROR(S)		\
-	if ((S) != ILM_SUCCESS){	\
-		printf("%s (%d): ilm command failed.\n", __FILE__, __LINE__); \
-		break;					\
-	}							\
+#define CHECK_ILM_ERROR(S)      \
+    if ((S) != ILM_SUCCESS){    \
+        printf("%s (%d): ilm command failed.\n", __FILE__, __LINE__); \
+        break;                  \
+    }                           \
 
 /*****************************************************************************
  *  structure
@@ -135,6 +135,8 @@ event_mask_update(uint32_t mask, void* data)
  ****************************************************************************/
 static void createShmBuffer()
 {
+    struct wl_shm_pool *pool;
+
     char filename[] = "/tmp/wayland-shm-XXXXXX";
     int fd = -1;
     int size = 0;
@@ -160,12 +162,12 @@ static void createShmBuffer()
         return;
     }
 
-    g_wlContextStruct.wlBuffer = wl_shm_create_buffer(g_wlContextStruct.wlShm,
-                                                      fd,
-                                                      g_wlContextStruct.ctx_bmp->width,
-                                                      g_wlContextStruct.ctx_bmp->height,
-                                                      g_wlContextStruct.ctx_bmp->stride,
-                                                      WL_SHM_FORMAT_XRGB8888);
+    pool = wl_shm_create_pool(g_wlContextStruct.wlShm, fd, size);
+    g_wlContextStruct.wlBuffer = wl_shm_pool_create_buffer(pool, 0, g_wlContextStruct.ctx_bmp->width,
+                                                g_wlContextStruct.ctx_bmp->height,
+                                                g_wlContextStruct.ctx_bmp->stride,
+                                                WL_SHM_FORMAT_XRGB8888);
+
     if (NULL == g_wlContextStruct.wlBuffer)
     {
         fprintf(stderr, "wl_shm_create_buffer failed: %m\n");
@@ -173,7 +175,7 @@ static void createShmBuffer()
         return;
     }
     wl_surface_attach(g_wlContextStruct.wlSurface, g_wlContextStruct.wlBuffer, 0, 0);
-
+    wl_shm_pool_destroy(pool);
     close(fd);
 
     return;
@@ -236,10 +238,6 @@ static void drawImage(void)
            g_wlContextStruct.ctx_bmp->data,
            g_wlContextStruct.ctx_bmp->stride * g_wlContextStruct.ctx_bmp->height);
 
-    wl_buffer_damage(g_wlContextStruct.wlBuffer,
-                     0, 0,
-                     g_wlContextStruct.ctx_bmp->width,
-                     g_wlContextStruct.ctx_bmp->height);
     wl_surface_attach(g_wlContextStruct.wlSurface,
                       g_wlContextStruct.wlBuffer,
                       0, 0);
