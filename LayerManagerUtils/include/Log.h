@@ -40,7 +40,7 @@
 #include <iostream>
 #include <fstream>
 #include <pthread.h>
-
+#include <map>
 typedef enum {
     LOG_DISABLED = 0,
     LOG_ERROR = 1,
@@ -56,19 +56,35 @@ typedef enum {
   during the compiliation phase*/
 typedef void* LogContext;
 
+/* Diagnostic Injection Callback function to wrap dlt_injections for usage with c++ class names */
+typedef void (*diagnosticInjectionCallback)(unsigned int module_id, void *data, unsigned int length, void* userdata);
+
 class Log
 {
 public:
+    
+    typedef struct diagnosticCallbackData_t
+    {
+        unsigned int module_id;
+        void *userdata;
+        diagnosticInjectionCallback diagFunc;
+    } diagnosticCallbackData;
+    
+    typedef std::map<unsigned int, diagnosticCallbackData*> DiagnosticCallbackMap;
+    
     virtual ~Log();
     static LOG_MODES fileLogLevel;
     static LOG_MODES consoleLogLevel;
     static LOG_MODES dltLogLevel;
     static Log* getInstance();
+    static DiagnosticCallbackMap* getDiagnosticCallbackMap(){return getInstance()->m_diagnosticCallbackMap;};
     void warning (LogContext logContext, const std::string& moduleName, const std::basic_string<char>& output);
     void info (LogContext logContext, const std::string& moduleName, const std::basic_string<char>& output);
     void error (LogContext logContext, const std::string& moduleName, const std::basic_string<char>& output);
     void debug (LogContext logContext, const std::string& moduleName, const std::basic_string<char>& output);
     void log(LogContext logContext, LOG_MODES logMode, const std::string& moduleName, const std::basic_string<char>& output);
+    void registerDiagnosticInjectionCallback( unsigned int module_id, diagnosticInjectionCallback diagFunc, void* userdata );
+    void unregisterDiagnosticInjectionCallback( unsigned int module_id );
     LogContext getLogContext();
     static void closeInstance();
 private:
@@ -81,7 +97,9 @@ private:
     std::ofstream* m_fileStream;
     pthread_mutex_t m_LogBufferMutex;
     LogContext m_logContext;
-    static Log* m_instance;
+    static DiagnosticCallbackMap* m_diagnosticCallbackMap;
+    
+    static Log* m_instance;    
 };
 
 //#define LOG_ERROR(logcontext,module, message)

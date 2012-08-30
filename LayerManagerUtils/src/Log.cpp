@@ -43,6 +43,7 @@
 #endif
 
 Log* Log::m_instance = NULL;
+Log::DiagnosticCallbackMap* Log::m_diagnosticCallbackMap = NULL;
 LOG_MODES Log::fileLogLevel = LOG_DISABLED;
 LOG_MODES Log::consoleLogLevel = LOG_INFO;
 #ifdef WITH_DLT
@@ -51,11 +52,13 @@ LOG_MODES Log::dltLogLevel = LOG_DEBUG;
 LOG_MODES Log::dltLogLevel = LOG_DISABLED;
 #endif
 
+
 Log::Log()
 {
     // TODO Auto-generated constructor stub
     m_fileStream = new std::ofstream("/tmp/LayerManagerService.log");
     pthread_mutex_init(&m_LogBufferMutex, NULL);
+    Log::m_diagnosticCallbackMap = new Log::DiagnosticCallbackMap;
 #ifdef WITH_DLT
     m_logContext = new DltContext;    
     DLT_REGISTER_APP("LMSA","LayerManagerService");
@@ -72,6 +75,7 @@ Log* Log::getInstance()
     if ( m_instance == NULL ) 
     {
         m_instance = new Log();
+        
     }
     return m_instance;
 }
@@ -91,7 +95,10 @@ Log::~Log()
 #ifdef WITH_DLT
     DLT_UNREGISTER_CONTEXT(*((DltContext*)m_logContext));
     delete ((DltContext*)m_logContext);
-#endif    
+    DLT_UNREGISTER_APP();
+#endif
+    delete m_diagnosticCallbackMap;
+    m_diagnosticCallbackMap = NULL;
     m_logContext = NULL;
 }
 
@@ -187,6 +194,38 @@ LogContext Log::getLogContext()
 {
     return m_logContext;
 }
+#ifdef WITH_DLT
+int dlt_injection_callback(unsigned int module_id, void *data, unsigned int length)
+{
+    LOG_DEBUG("LOG","Injection for service " << module_id << " called");
+    Log::diagnosticCallbackData *cbData = (*Log::getDiagnosticCallbackMap())[module_id];
+    if ( NULL != cbData) 
+    {
+        cbData->diagFunc(module_id, data, length, cbData->userdata);
+    }
+    return 0;
+}
+#endif
+
+
+void Log::registerDiagnosticInjectionCallback( unsigned int module_id, diagnosticInjectionCallback diagFunc, void* userdata )
+{
+    Log::diagnosticCallbackData *cbData = new Log::diagnosticCallbackData;
+    cbData->module_id = module_id;
+    cbData->userdata = userdata;
+    cbData->diagFunc = diagFunc;
+    (*m_diagnosticCallbackMap)[module_id]=cbData;
+#ifdef WITH_DLT    
+    DLT_REGISTER_INJECTION_CALLBACK(*(DltContext*)m_logContext, module_id, dlt_injection_callback);
+#endif
+}
+    
+void Log::unregisterDiagnosticInjectionCallback( unsigned int module_id )
+{
+    m_diagnosticCallbackMap->erase(module_id);
+}
+
+
 
 #ifdef WITH_DLT    
 void Log::LogToDltDaemon(LogContext logContext, LOG_MODES logMode, const std::string& moduleName, const std::basic_string<char>& output)
