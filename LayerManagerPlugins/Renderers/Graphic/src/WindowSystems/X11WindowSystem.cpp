@@ -69,6 +69,7 @@ X11WindowSystem::X11WindowSystem(const char* displayname, int width, int height,
 , windowHeight(height)
 , CompositorWindow(0)
 , windowVis(0)
+, m_fpsinterval(10.0f)
 , run_lock()
 , graphicSystem(0)
 {
@@ -578,7 +579,7 @@ void X11WindowSystem::calculateFps()
     gettimeofday(&tv, NULL);
     timeSinceLastCalc = (float)(tv.tv_sec-tv0.tv_sec) + 0.000001*((float)(tv.tv_usec-tv0.tv_usec));
 
-    if (timeSinceLastCalc > 10.0f)
+    if (timeSinceLastCalc > m_fpsinterval)
     {
         FPS = ((float)(Frame)) / timeSinceLastCalc;
         char floatStringBuffer[256];

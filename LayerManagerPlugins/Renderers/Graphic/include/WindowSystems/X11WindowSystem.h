@@ -92,6 +92,7 @@ protected:
     //    Window background;
     Window CompositorWindow;
     XVisualInfo* windowVis;
+    float m_fpsinterval;    
     pthread_mutex_t run_lock;
     pthread_mutex_t init_lock;
     pthread_cond_t init_condition;
@@ -100,7 +101,8 @@ protected:
     virtual bool initXServer();
     virtual void RedrawAllLayers(bool clear, bool swap);
     virtual void renderHWLayer(Layer* layer);
-
+    virtual void calculateFps();
+    virtual void calculateSurfaceFps(Surface *currentSurface, float time) ;
 private:
     void cleanup();
     void Screenshot();
@@ -122,13 +124,11 @@ private:
     bool CreatePixmapsForAllWindows();
     bool CreateCompositorWindow();
     void UnredirectSpecialWIndows(Window w);
-    void calculateFps();
-    void calculateSurfaceFps(Surface *currentSurface, float time) ;
+
     void printDebug();
     void* EventLoop();
     static int error(Display *dpy, XErrorEvent *ev);
     void ManageXInputEvent(InputDevice type, InputEventState state, XEvent *pevent);
-
     static bool m_xerror;
 
 
