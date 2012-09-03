@@ -1,4 +1,4 @@
-Version 0.9.7_rc
+Version 0.9.7_rc2
 -------------
 This version includes the following enhancements.
 
@@ -9,7 +9,8 @@ Bugfixes :
 - Example Script updated
 - ilmClient : documentation fixed
 - fix of several compiler warnings and memory leaks
-- fix several issues detected by coverity 
+- fix several issues detected by coverity
+- fixing several warnings 
 - additional fixes inside of the reference compositor 
 
 Improvements:
@@ -22,12 +23,18 @@ Improvements:
 - Introducing default version handling
 - Introducing default toolchain file
 - Introducing SurfaceRemoveNativeContentCommand
+- Introducing new InputFramework and Example Applications
 - Profiling/Coverage options for gcc introduced
 - New features added to MockNavigation
 - New properties valuse added to layer/surfaceGetProperties
 - Adding new LayerManagerControl example program
-
-
+- Plugin will be now searched automatically in CMAKE_INSTALL_PREFIX location
+- Redundant Texture uploads removed
+- Activating Binary Shader support for platform dependent renderers
+- BaseGraphicSystem and BaseWindowSystems composition methods refactored
+- Wayland Backend is now running on wayland 0.95
+- Log has now diagnostic callback registration support
+- Imporving startup performance
 
 Version 0.9.6
 -------------
