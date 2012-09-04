@@ -281,6 +281,7 @@ void GenericCommunicator::process(int timeout_ms)
         LOG_DEBUG("GenericCommunicator", "Received unknown data from " << sender);
         break;
     }
+    m_ipcModule.destroyMessage();
 }
 
 void GenericCommunicator::setdebug(bool onoff)

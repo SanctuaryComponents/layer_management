@@ -49,11 +49,29 @@ t_ilm_bool createMessage(t_ilm_const_string name)
     }
     else
     {
-        gpCurrentMessage->pMessage = dbus_message_new_method_return(gpCurrentMessage->pMessage);
-        dbus_message_iter_init_append(gpCurrentMessage->pMessage, &gpCurrentMessage->iter);
+        gpCurrentMessage->pMessageReply = dbus_message_new_method_return(gpCurrentMessage->pMessage);
+        dbus_message_iter_init_append(gpCurrentMessage->pMessageReply, &gpCurrentMessage->iter);
         returnValue = ILM_TRUE;
     }
 
+    return returnValue;
+}
+
+
+t_ilm_bool destroyMessage()
+{
+    
+    t_ilm_bool returnValue = ILM_TRUE;
+    
+    /* Clean up message if existing */
+    
+    if (NULL!=gpCurrentMessage->pMessage)
+    {
+        dbus_message_unref(gpCurrentMessage->pMessage);
+        gpCurrentMessage->pMessage = NULL;
+        gpCurrentMessage->name = "";
+    }
+    
     return returnValue;
 }
 
@@ -72,19 +90,20 @@ t_ilm_bool sendMessage()
     }
     else
     {
-        t_ilm_int serial = dbus_message_get_serial(gpCurrentMessage->pMessage);
-        if (!dbus_connection_send(gpDbusState->connection, gpCurrentMessage->pMessage, &serial))
+        t_ilm_int serial = dbus_message_get_serial(gpCurrentMessage->pMessageReply);
+        if (!dbus_connection_send(gpDbusState->connection, gpCurrentMessage->pMessageReply, &serial))
         {
             printf("DBUSIpcModule: Out Of Memory!\n");
             exit(1);
         }
+        dbus_message_unref(gpCurrentMessage->pMessageReply);        
+        gpCurrentMessage->pMessageReply = NULL;        
     }
 
     dbus_connection_flush(gpDbusState->connection);
-
     dbus_message_unref(gpCurrentMessage->pMessage);
     gpCurrentMessage->pMessage = NULL;
-    gpCurrentMessage->name = "";
+    gpCurrentMessage->name = ""; 
 
     return returnValue;
 }

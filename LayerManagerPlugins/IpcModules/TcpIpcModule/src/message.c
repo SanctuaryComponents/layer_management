@@ -43,6 +43,15 @@ t_ilm_bool createMessage(t_ilm_const_string name)
     return appendString(name);
 }
 
+t_ilm_bool destroyMessage()
+{
+    t_ilm_bool returnValue = ILM_TRUE;
+    
+    /* to be implemented if needed */
+       
+    return returnValue;
+}
+
 t_ilm_bool sendMessage()
 {
     int activesocket = 0;

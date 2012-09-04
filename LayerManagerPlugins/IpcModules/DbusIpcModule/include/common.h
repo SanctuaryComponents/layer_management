@@ -37,6 +37,7 @@ typedef struct
     t_ilm_const_string name;
     t_ilm_const_string sender;
     DBusMessage* pMessage;
+    DBusMessage* pMessageReply;
     DBusMessageIter iter;
     DBusPendingCall* pPending;
 } dbusmessage;

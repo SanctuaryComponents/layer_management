@@ -32,6 +32,7 @@ struct IpcModule
 
     t_ilm_bool (*createMessage)(t_ilm_const_string);
     t_ilm_bool (*sendMessage)();
+    t_ilm_bool (*destroyMessage)();
     t_ilm_bool (*sendError)(t_ilm_const_string);
     enum IpcMessageType (*receiveMessage)(int); // timeout in ms
 

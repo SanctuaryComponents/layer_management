@@ -62,6 +62,7 @@ t_ilm_bool loadSymbolTable(struct IpcModule* ipcModule, char* path, char* file)
         { "destroy",         (void**)&ipcModule->destroy },
         { "createMessage",   (void**)&ipcModule->createMessage },
         { "sendMessage",     (void**)&ipcModule->sendMessage },
+        { "destroyMessage",  (void**)&ipcModule->destroyMessage },
         { "sendError",       (void**)&ipcModule->sendError },
         { "isErrorMessage",  (void**)&ipcModule->isErrorMessage },
         { "receiveMessage",  (void**)&ipcModule->receiveMessage },

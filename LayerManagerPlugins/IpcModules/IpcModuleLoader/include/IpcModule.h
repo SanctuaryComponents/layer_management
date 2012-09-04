@@ -32,6 +32,7 @@ t_ilm_bool destroy();
 //=============================================================================
 t_ilm_bool createMessage(t_ilm_const_string name);
 t_ilm_bool sendMessage();
+t_ilm_bool destroyMessage();
 t_ilm_bool sendError(t_ilm_const_string errorDescription);
 enum IpcMessageType receiveMessage(t_ilm_int timeoutInMs);
 

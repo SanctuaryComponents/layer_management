@@ -58,7 +58,8 @@ ilmErrorTypes ilm_init()
             && gIpcModule.createMessage("ServiceConnect")
             && gIpcModule.appendUint(pid)
             && gIpcModule.sendMessage()
-            && gIpcModule.receiveMessage(gReceiveTimeout))
+            && gIpcModule.receiveMessage(gReceiveTimeout)
+            && gIpcModule.destroyMessage())
         {
             result = ILM_SUCCESS;
         }
@@ -77,6 +78,7 @@ ilmErrorTypes ilm_destroy()
         && gIpcModule.appendUint(pid)
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
+        && gIpcModule.destroyMessage()
         && gIpcModule.destroy())
     {
         result = ILM_SUCCESS;
@@ -114,7 +116,8 @@ ilmErrorTypes ilm_getPropertiesOfSurface(t_ilm_uint surfaceID, struct ilmSurface
         && gIpcModule.getUint(&pSurfaceProperties->updateCounter)
         && gIpcModule.getUint(&pSurfaceProperties->pixelformat)
         && gIpcModule.getUint(&pSurfaceProperties->nativeSurface)
-        && gIpcModule.getUint(&pSurfaceProperties->inputDevicesAcceptance))
+        && gIpcModule.getUint(&pSurfaceProperties->inputDevicesAcceptance)
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -146,7 +149,8 @@ ilmErrorTypes ilm_getPropertiesOfLayer(t_ilm_uint layerID, struct ilmLayerProper
         && gIpcModule.getUint(&pLayerProperties->destHeight)
         && gIpcModule.getUint(&pLayerProperties->orientation)
         && gIpcModule.getBool(&pLayerProperties->visibility)
-        && gIpcModule.getUint(&pLayerProperties->type))
+        && gIpcModule.getUint(&pLayerProperties->type)
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -165,7 +169,8 @@ ilmErrorTypes ilm_getNumberOfHardwareLayers(t_ilm_uint screenID, t_ilm_uint* pNu
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
         && !gIpcModule.isErrorMessage()
-        && gIpcModule.getUint(pNumberOfHardwareLayers))
+        && gIpcModule.getUint(pNumberOfHardwareLayers)
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -185,7 +190,8 @@ ilmErrorTypes ilm_getScreenResolution(t_ilm_uint screenID, t_ilm_uint* pWidth, t
         && gIpcModule.receiveMessage(gReceiveTimeout)
         && !gIpcModule.isErrorMessage()
         && gIpcModule.getUint(pWidth)
-        && gIpcModule.getUint(pHeight))
+        && gIpcModule.getUint(pHeight)
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -203,7 +209,8 @@ ilmErrorTypes ilm_getLayerIDs(t_ilm_int* pLength, t_ilm_layer** ppArray)
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
         && !gIpcModule.isErrorMessage()
-        && gIpcModule.getUintArray(ppArray, pLength))
+        && gIpcModule.getUintArray(ppArray, pLength)
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -222,7 +229,8 @@ ilmErrorTypes ilm_getLayerIDsOnScreen(t_ilm_uint screenId, t_ilm_int* pLength, t
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
         && !gIpcModule.isErrorMessage()
-        && gIpcModule.getUintArray(ppArray, pLength))
+        && gIpcModule.getUintArray(ppArray, pLength)
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -240,7 +248,8 @@ ilmErrorTypes ilm_getSurfaceIDs(t_ilm_int* pLength, t_ilm_surface** ppArray)
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
         && !gIpcModule.isErrorMessage()
-        && gIpcModule.getUintArray(ppArray, pLength))
+        && gIpcModule.getUintArray(ppArray, pLength)
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -258,7 +267,8 @@ ilmErrorTypes ilm_getLayerGroupIDs(t_ilm_int* pLength, t_ilm_layergroup** ppArra
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
         && !gIpcModule.isErrorMessage()
-        && gIpcModule.getUintArray(ppArray, pLength))
+        && gIpcModule.getUintArray(ppArray, pLength)
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -276,7 +286,8 @@ ilmErrorTypes ilm_getSurfaceGroupIDs(t_ilm_int* pLength, t_ilm_surfacegroup** pp
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
         && !gIpcModule.isErrorMessage()
-        && gIpcModule.getUintArray(ppArray, pLength))
+        && gIpcModule.getUintArray(ppArray, pLength)
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -295,7 +306,8 @@ ilmErrorTypes ilm_getSurfaceIDsOnLayer(t_ilm_layer layer, t_ilm_int* pLength, t_
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
         && !gIpcModule.isErrorMessage()
-        && gIpcModule.getUintArray(ppArray, pLength))
+        && gIpcModule.getUintArray(ppArray, pLength)
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -315,7 +327,8 @@ ilmErrorTypes ilm_layerCreate(t_ilm_layer* pLayerId)
             && gIpcModule.sendMessage()
             && gIpcModule.receiveMessage(gReceiveTimeout)
             && !gIpcModule.isErrorMessage()
-            && gIpcModule.getUint(pLayerId))
+            && gIpcModule.getUint(pLayerId)
+            && gIpcModule.destroyMessage())
         {
             returnValue = ILM_SUCCESS;
         }
@@ -326,7 +339,8 @@ ilmErrorTypes ilm_layerCreate(t_ilm_layer* pLayerId)
             && gIpcModule.sendMessage()
             && gIpcModule.receiveMessage(gReceiveTimeout)
             && !gIpcModule.isErrorMessage()
-            && gIpcModule.getUint(pLayerId))
+            && gIpcModule.getUint(pLayerId)
+            && gIpcModule.destroyMessage())
         {
             returnValue = ILM_SUCCESS;
         }
@@ -349,7 +363,8 @@ ilmErrorTypes ilm_layerCreateWithDimension(t_ilm_layer* pLayerId, t_ilm_uint wid
             && gIpcModule.sendMessage()
             && gIpcModule.receiveMessage(gReceiveTimeout)
             && !gIpcModule.isErrorMessage()
-            && gIpcModule.getUint(pLayerId))
+            && gIpcModule.getUint(pLayerId)
+            && gIpcModule.destroyMessage())
         {
             returnValue = ILM_SUCCESS;
         }
@@ -362,7 +377,8 @@ ilmErrorTypes ilm_layerCreateWithDimension(t_ilm_layer* pLayerId, t_ilm_uint wid
             && gIpcModule.sendMessage()
             && gIpcModule.receiveMessage(gReceiveTimeout)
             && !gIpcModule.isErrorMessage()
-            && gIpcModule.getUint(pLayerId))
+            && gIpcModule.getUint(pLayerId)
+            && gIpcModule.destroyMessage())
         {
             returnValue = ILM_SUCCESS;
         }
@@ -380,7 +396,8 @@ ilmErrorTypes ilm_layerRemove(t_ilm_layer layerId)
         && gIpcModule.appendUint(layerId)
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
-        && !gIpcModule.isErrorMessage())
+        && !gIpcModule.isErrorMessage()
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -398,7 +415,8 @@ ilmErrorTypes ilm_layerAddSurface(t_ilm_layer layerId, t_ilm_surface surfaceId)
         && gIpcModule.appendUint(layerId)
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
-        && !gIpcModule.isErrorMessage())
+        && !gIpcModule.isErrorMessage()
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -416,7 +434,8 @@ ilmErrorTypes ilm_layerRemoveSurface(t_ilm_layer layerId, t_ilm_surface surfaceI
         && gIpcModule.appendUint(layerId)
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
-        && !gIpcModule.isErrorMessage())
+        && !gIpcModule.isErrorMessage()
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -435,7 +454,8 @@ ilmErrorTypes ilm_layerGetType(t_ilm_layer layerId, ilmLayerType* pLayerType)
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
         && !gIpcModule.isErrorMessage()
-        && gIpcModule.getUint(pLayerType))
+        && gIpcModule.getUint(pLayerType)
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -453,7 +473,8 @@ ilmErrorTypes ilm_layerSetVisibility(t_ilm_layer layerId, t_ilm_bool newVisibili
         && gIpcModule.appendBool(newVisibility)
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
-        && !gIpcModule.isErrorMessage())
+        && !gIpcModule.isErrorMessage()
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -472,7 +493,8 @@ ilmErrorTypes ilm_layerGetVisibility(t_ilm_layer layerId, t_ilm_bool *pVisibilit
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
         && !gIpcModule.isErrorMessage()
-        && gIpcModule.getBool(pVisibility))
+        && gIpcModule.getBool(pVisibility)
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -490,7 +512,8 @@ ilmErrorTypes ilm_layerSetOpacity(t_ilm_layer layerId, t_ilm_float opacity)
         && gIpcModule.appendDouble(opacity)
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
-        && !gIpcModule.isErrorMessage())
+        && !gIpcModule.isErrorMessage()
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -509,7 +532,8 @@ ilmErrorTypes ilm_layerGetOpacity(t_ilm_layer layerId, t_ilm_float *pOpacity)
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
         && !gIpcModule.isErrorMessage()
-        && gIpcModule.getDouble(pOpacity))
+        && gIpcModule.getDouble(pOpacity)
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -530,7 +554,8 @@ ilmErrorTypes ilm_layerSetSourceRectangle(t_ilm_layer layerId, t_ilm_uint x, t_i
         && gIpcModule.appendUint(height)
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
-        && !gIpcModule.isErrorMessage())
+        && !gIpcModule.isErrorMessage()
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -551,7 +576,8 @@ ilmErrorTypes ilm_layerSetDestinationRectangle(t_ilm_layer layerId, t_ilm_int x,
         && gIpcModule.appendUint(height)
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
-        && !gIpcModule.isErrorMessage())
+        && !gIpcModule.isErrorMessage()
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -571,7 +597,8 @@ ilmErrorTypes ilm_layerGetDimension(t_ilm_layer layerId, t_ilm_uint *pDimension)
         && gIpcModule.receiveMessage(gReceiveTimeout)
         && !gIpcModule.isErrorMessage()
         && gIpcModule.getUint(&pDimension[0])
-        && gIpcModule.getUint(&pDimension[1]))
+        && gIpcModule.getUint(&pDimension[1])
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -591,7 +618,8 @@ ilmErrorTypes ilm_layerSetDimension(t_ilm_layer layerId, t_ilm_uint *pDimension)
         && gIpcModule.appendUint(pDimension[1])
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
-        && !gIpcModule.isErrorMessage())
+        && !gIpcModule.isErrorMessage()
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -611,7 +639,8 @@ ilmErrorTypes ilm_layerGetPosition(t_ilm_layer layerId, t_ilm_uint *pPosition)
         && gIpcModule.receiveMessage(gReceiveTimeout)
         && !gIpcModule.isErrorMessage()
         && gIpcModule.getUint(&pPosition[0])
-        && gIpcModule.getUint(&pPosition[1]))
+        && gIpcModule.getUint(&pPosition[1])
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -631,7 +660,8 @@ ilmErrorTypes ilm_layerSetPosition(t_ilm_layer layerId, t_ilm_uint *pPosition)
         && gIpcModule.appendUint(pPosition[1])
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
-        && !gIpcModule.isErrorMessage())
+        && !gIpcModule.isErrorMessage()
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -649,7 +679,8 @@ ilmErrorTypes ilm_layerSetOrientation(t_ilm_layer layerId, ilmOrientation orient
         && gIpcModule.appendUint(orientation)
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
-        && !gIpcModule.isErrorMessage())
+        && !gIpcModule.isErrorMessage()
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -668,7 +699,8 @@ ilmErrorTypes ilm_layerGetOrientation(t_ilm_layer layerId, ilmOrientation *pOrie
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
         && !gIpcModule.isErrorMessage()
-        && gIpcModule.getUint(pOrientation))
+        && gIpcModule.getUint(pOrientation)
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -695,7 +727,8 @@ ilmErrorTypes ilm_layerSetRenderOrder(t_ilm_layer layerId, t_ilm_layer *pSurface
         && gIpcModule.appendUintArray(pSurfaceId, number)
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
-        && !gIpcModule.isErrorMessage())
+        && !gIpcModule.isErrorMessage()
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -714,7 +747,8 @@ ilmErrorTypes ilm_layerGetCapabilities(t_ilm_layer layerId, t_ilm_layercapabilit
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
         && !gIpcModule.isErrorMessage()
-        && gIpcModule.getUint(pCapabilities))
+        && gIpcModule.getUint(pCapabilities)
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -733,7 +767,8 @@ ilmErrorTypes ilm_layerTypeGetCapabilities(ilmLayerType layerType, t_ilm_layerca
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
         && !gIpcModule.isErrorMessage()
-        && gIpcModule.getUint(pCapabilities))
+        && gIpcModule.getUint(pCapabilities)
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -754,7 +789,8 @@ ilmErrorTypes ilm_layergroupCreate(t_ilm_layergroup *pLayergroup)
             && gIpcModule.sendMessage()
             && gIpcModule.receiveMessage(gReceiveTimeout)
             && !gIpcModule.isErrorMessage()
-            && gIpcModule.getUint(pLayergroup))
+            && gIpcModule.getUint(pLayergroup)
+            && gIpcModule.destroyMessage())
         {
             returnValue = ILM_SUCCESS;
         }
@@ -766,7 +802,8 @@ ilmErrorTypes ilm_layergroupCreate(t_ilm_layergroup *pLayergroup)
             && gIpcModule.sendMessage()
             && gIpcModule.receiveMessage(gReceiveTimeout)
             && !gIpcModule.isErrorMessage()
-            && gIpcModule.getUint(pLayergroup))
+            && gIpcModule.getUint(pLayergroup)
+            && gIpcModule.destroyMessage())
         {
             returnValue = ILM_SUCCESS;
         }
@@ -784,7 +821,8 @@ ilmErrorTypes ilm_layergroupRemove(t_ilm_layergroup group)
         && gIpcModule.appendUint(group)
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
-        && !gIpcModule.isErrorMessage())
+        && !gIpcModule.isErrorMessage()
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -802,7 +840,8 @@ ilmErrorTypes ilm_layergroupAddLayer(t_ilm_layergroup group, t_ilm_layer layer)
         && gIpcModule.appendUint(group)
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
-        && !gIpcModule.isErrorMessage())
+        && !gIpcModule.isErrorMessage()
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -820,7 +859,8 @@ ilmErrorTypes ilm_layergroupRemoveLayer(t_ilm_layergroup group, t_ilm_layer laye
         && gIpcModule.appendUint(group)
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
-        && !gIpcModule.isErrorMessage())
+        && !gIpcModule.isErrorMessage()
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -838,7 +878,8 @@ ilmErrorTypes ilm_layergroupSetVisibility(t_ilm_layergroup group, t_ilm_bool new
         && gIpcModule.appendBool(newVisibility)
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
-        && !gIpcModule.isErrorMessage())
+        && !gIpcModule.isErrorMessage()
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -856,7 +897,8 @@ ilmErrorTypes ilm_layergroupSetOpacity(t_ilm_layergroup group, t_ilm_float opaci
         && gIpcModule.appendDouble(opacity)
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
-        && !gIpcModule.isErrorMessage())
+        && !gIpcModule.isErrorMessage()
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -880,7 +922,8 @@ ilmErrorTypes ilm_surfaceCreate(t_ilm_nativehandle nativehandle, t_ilm_int width
             && gIpcModule.sendMessage()
             && gIpcModule.receiveMessage(gReceiveTimeout)
             && !gIpcModule.isErrorMessage()
-            && gIpcModule.getUint(pSurfaceId))
+            && gIpcModule.getUint(pSurfaceId)
+            && gIpcModule.destroyMessage())
         {
             returnValue = ILM_SUCCESS;
         }
@@ -895,7 +938,8 @@ ilmErrorTypes ilm_surfaceCreate(t_ilm_nativehandle nativehandle, t_ilm_int width
             && gIpcModule.sendMessage()
             && gIpcModule.receiveMessage(gReceiveTimeout)
             && !gIpcModule.isErrorMessage()
-            && gIpcModule.getUint(pSurfaceId))
+            && gIpcModule.getUint(pSurfaceId)
+            && gIpcModule.destroyMessage())
         {
             returnValue = ILM_SUCCESS;
         }
@@ -916,7 +960,8 @@ ilmErrorTypes ilm_surfaceInitialize(t_ilm_surface *pSurfaceId)
             && gIpcModule.sendMessage()
             && gIpcModule.receiveMessage(gReceiveTimeout)
             && !gIpcModule.isErrorMessage()
-            && gIpcModule.getUint(pSurfaceId))
+            && gIpcModule.getUint(pSurfaceId)
+            && gIpcModule.destroyMessage())
         {
             returnValue = ILM_SUCCESS;
         }
@@ -927,7 +972,8 @@ ilmErrorTypes ilm_surfaceInitialize(t_ilm_surface *pSurfaceId)
             && gIpcModule.sendMessage()
             && gIpcModule.receiveMessage(gReceiveTimeout)
             && !gIpcModule.isErrorMessage()
-            && gIpcModule.getUint(pSurfaceId))
+            && gIpcModule.getUint(pSurfaceId)
+            && gIpcModule.destroyMessage())
         {
             returnValue = ILM_SUCCESS;
         }
@@ -949,7 +995,8 @@ ilmErrorTypes ilm_surfaceSetNativeContent(t_ilm_nativehandle nativehandle, t_ilm
         && gIpcModule.appendUint(pixelFormat)
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
-        && !gIpcModule.isErrorMessage())
+        && !gIpcModule.isErrorMessage()
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -966,7 +1013,8 @@ ilmErrorTypes ilm_surfaceRemoveNativeContent(t_ilm_surface surfaceId)
         && gIpcModule.appendUint(surfaceId)
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
-        && !gIpcModule.isErrorMessage())
+        && !gIpcModule.isErrorMessage()
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -983,7 +1031,8 @@ ilmErrorTypes ilm_surfaceRemove(t_ilm_surface surfaceId)
         && gIpcModule.appendUint(surfaceId)
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
-        && !gIpcModule.isErrorMessage())
+        && !gIpcModule.isErrorMessage()
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -1001,7 +1050,8 @@ ilmErrorTypes ilm_surfaceSetVisibility(t_ilm_surface surfaceId, t_ilm_bool newVi
         && gIpcModule.appendBool(newVisibility)
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
-        && !gIpcModule.isErrorMessage())
+        && !gIpcModule.isErrorMessage()
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -1020,7 +1070,8 @@ ilmErrorTypes ilm_surfaceGetVisibility(t_ilm_surface surfaceId, t_ilm_bool *pVis
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
         && !gIpcModule.isErrorMessage()
-        && gIpcModule.getBool(pVisibility))
+        && gIpcModule.getBool(pVisibility)
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -1038,7 +1089,8 @@ ilmErrorTypes ilm_surfaceSetOpacity(t_ilm_surface surfaceId, t_ilm_float opacity
         && gIpcModule.appendDouble(opacity)
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
-        && !gIpcModule.isErrorMessage())
+        && !gIpcModule.isErrorMessage()
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -1057,7 +1109,8 @@ ilmErrorTypes ilm_surfaceGetOpacity(t_ilm_surface surfaceId, t_ilm_float *pOpaci
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
         && !gIpcModule.isErrorMessage()
-        && gIpcModule.getDouble(pOpacity))
+        && gIpcModule.getDouble(pOpacity)
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -1078,7 +1131,8 @@ ilmErrorTypes ilm_surfaceSetSourceRectangle(t_ilm_surface surfaceId, t_ilm_int x
         && gIpcModule.appendUint(height)
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
-        && !gIpcModule.isErrorMessage())
+        && !gIpcModule.isErrorMessage()
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -1099,7 +1153,8 @@ ilmErrorTypes ilm_surfaceSetDestinationRectangle(t_ilm_surface surfaceId, t_ilm_
         && gIpcModule.appendUint(height)
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
-        && !gIpcModule.isErrorMessage())
+        && !gIpcModule.isErrorMessage()
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -1119,7 +1174,8 @@ ilmErrorTypes ilm_surfaceGetDimension(t_ilm_surface surfaceId, t_ilm_uint *pDime
         && gIpcModule.receiveMessage(gReceiveTimeout)
         && !gIpcModule.isErrorMessage()
         && gIpcModule.getUint(&pDimension[0])
-        && gIpcModule.getUint(&pDimension[1]))
+        && gIpcModule.getUint(&pDimension[1])
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -1139,7 +1195,8 @@ ilmErrorTypes ilm_surfaceSetDimension(t_ilm_surface surfaceId, t_ilm_uint *pDime
         && gIpcModule.appendUint(pDimension[1])
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
-        && !gIpcModule.isErrorMessage())
+        && !gIpcModule.isErrorMessage()
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -1159,7 +1216,8 @@ ilmErrorTypes ilm_surfaceGetPosition(t_ilm_surface surfaceId, t_ilm_uint *pPosit
         && gIpcModule.receiveMessage(gReceiveTimeout)
         && !gIpcModule.isErrorMessage()
         && gIpcModule.getUint(&pPosition[0])
-        && gIpcModule.getUint(&pPosition[1]))
+        && gIpcModule.getUint(&pPosition[1])
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -1179,7 +1237,8 @@ ilmErrorTypes ilm_surfaceSetPosition(t_ilm_surface surfaceId, t_ilm_uint *pPosit
         && gIpcModule.appendUint(pPosition[1])
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
-        && !gIpcModule.isErrorMessage())
+        && !gIpcModule.isErrorMessage()
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -1197,7 +1256,8 @@ ilmErrorTypes ilm_surfaceSetOrientation(t_ilm_surface surfaceId, ilmOrientation 
         && gIpcModule.appendUint(orientation)
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
-        && !gIpcModule.isErrorMessage())
+        && !gIpcModule.isErrorMessage()
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -1216,7 +1276,8 @@ ilmErrorTypes ilm_surfaceGetOrientation(t_ilm_surface surfaceId, ilmOrientation 
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
         && !gIpcModule.isErrorMessage()
-        && gIpcModule.getUint(pOrientation))
+        && gIpcModule.getUint(pOrientation)
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -1235,7 +1296,8 @@ ilmErrorTypes ilm_surfaceGetPixelformat(t_ilm_layer surfaceId, ilmPixelFormat *p
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
         && !gIpcModule.isErrorMessage()
-        && gIpcModule.getUint(pPixelformat))
+        && gIpcModule.getUint(pPixelformat)
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -1275,7 +1337,8 @@ ilmErrorTypes ilm_surfacegroupCreate(t_ilm_surfacegroup *pSurfacegroup)
             && gIpcModule.sendMessage()
             && gIpcModule.receiveMessage(gReceiveTimeout)
             && !gIpcModule.isErrorMessage()
-            && gIpcModule.getUint(pSurfacegroup))
+            && gIpcModule.getUint(pSurfacegroup)
+            && gIpcModule.destroyMessage())
         {
             returnValue = ILM_SUCCESS;
         }
@@ -1287,7 +1350,8 @@ ilmErrorTypes ilm_surfacegroupCreate(t_ilm_surfacegroup *pSurfacegroup)
             && gIpcModule.sendMessage()
             && gIpcModule.receiveMessage(gReceiveTimeout)
             && !gIpcModule.isErrorMessage()
-            && gIpcModule.getUint(pSurfacegroup))
+            && gIpcModule.getUint(pSurfacegroup)
+            && gIpcModule.destroyMessage())
         {
             returnValue = ILM_SUCCESS;
         }
@@ -1305,7 +1369,8 @@ ilmErrorTypes ilm_surfacegroupRemove(t_ilm_surfacegroup group)
         && gIpcModule.appendUint(group)
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
-        && !gIpcModule.isErrorMessage())
+        && !gIpcModule.isErrorMessage()
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -1323,7 +1388,8 @@ ilmErrorTypes ilm_surfacegroupAddSurface(t_ilm_surfacegroup group, t_ilm_surface
         && gIpcModule.appendUint(group)
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
-        && !gIpcModule.isErrorMessage())
+        && !gIpcModule.isErrorMessage()
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -1341,7 +1407,8 @@ ilmErrorTypes ilm_surfacegroupRemoveSurface(t_ilm_surfacegroup group, t_ilm_surf
         && gIpcModule.appendUint(group)
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
-        && !gIpcModule.isErrorMessage())
+        && !gIpcModule.isErrorMessage()
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -1359,7 +1426,8 @@ ilmErrorTypes ilm_surfacegroupSetVisibility(t_ilm_surfacegroup group, t_ilm_bool
         && gIpcModule.appendBool(newVisibility)
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
-        && !gIpcModule.isErrorMessage())
+        && !gIpcModule.isErrorMessage()
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -1377,7 +1445,8 @@ ilmErrorTypes ilm_surfacegroupSetOpacity(t_ilm_surfacegroup group, t_ilm_float o
         && gIpcModule.appendDouble(opacity)
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
-        && !gIpcModule.isErrorMessage())
+        && !gIpcModule.isErrorMessage()
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -1396,7 +1465,8 @@ ilmErrorTypes ilm_displaySetRenderOrder(t_ilm_display display, t_ilm_layer *pLay
         && gIpcModule.appendUint(display)
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
-        && !gIpcModule.isErrorMessage())
+        && !gIpcModule.isErrorMessage()
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -1414,7 +1484,8 @@ ilmErrorTypes ilm_getScreenIDs(t_ilm_uint* pNumberOfIDs, t_ilm_uint** ppIDs)
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
         && !gIpcModule.isErrorMessage()
-        && gIpcModule.getUintArray(ppIDs, pNumberOfIDs))
+        && gIpcModule.getUintArray(ppIDs, pNumberOfIDs)
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -1432,7 +1503,8 @@ ilmErrorTypes ilm_takeScreenshot(t_ilm_uint screen, t_ilm_const_string filename)
         && gIpcModule.appendString(filename)
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
-        && !gIpcModule.isErrorMessage())
+        && !gIpcModule.isErrorMessage()
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -1450,7 +1522,8 @@ ilmErrorTypes ilm_takeLayerScreenshot(t_ilm_const_string filename, t_ilm_layer l
         && gIpcModule.appendUint(layerid)
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
-        && !gIpcModule.isErrorMessage())
+        && !gIpcModule.isErrorMessage()
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -1468,7 +1541,8 @@ ilmErrorTypes ilm_takeSurfaceScreenshot(t_ilm_const_string filename, t_ilm_surfa
         && gIpcModule.appendUint(surfaceid)
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
-        && !gIpcModule.isErrorMessage())
+        && !gIpcModule.isErrorMessage()
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -1486,7 +1560,8 @@ ilmErrorTypes ilm_SetKeyboardFocusOn(t_ilm_surface surfaceId)
         && gIpcModule.appendUint(surfaceId)
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
-        && !gIpcModule.isErrorMessage())
+        && !gIpcModule.isErrorMessage()
+        && gIpcModule.destroyMessage())
     {
         returnValue = ILM_SUCCESS;
     }
@@ -1504,7 +1579,9 @@ ilmErrorTypes ilm_GetKeyboardFocusSurfaceId(t_ilm_surface* pSurfaceId)
     && gIpcModule.sendMessage()
     && gIpcModule.receiveMessage(gReceiveTimeout)
     && !gIpcModule.isErrorMessage()
-    && gIpcModule.getUint(pSurfaceId))
+    && gIpcModule.getUint(pSurfaceId)
+    && gIpcModule.destroyMessage()
+    )
     {
         returnValue = ILM_SUCCESS;
     }
@@ -1525,7 +1602,9 @@ ilmErrorTypes ilm_UpdateInputEventAcceptanceOn(t_ilm_surface surfaceId, ilmInput
         && gIpcModule.appendBool(acceptance)
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
-        && !gIpcModule.isErrorMessage())
+        && !gIpcModule.isErrorMessage()
+        && gIpcModule.destroyMessage()        
+        )
     {
         returnValue = ILM_SUCCESS;
     }
@@ -1543,7 +1622,9 @@ ilmErrorTypes ilm_commitChanges()
     if (gIpcModule.createMessage("CommitChanges\0")
         && gIpcModule.sendMessage()
         && gIpcModule.receiveMessage(gReceiveTimeout)
-        && !gIpcModule.isErrorMessage())
+        && !gIpcModule.isErrorMessage()
+        && gIpcModule.destroyMessage()
+        )
     {
         returnValue = ILM_SUCCESS;
     }
