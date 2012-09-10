@@ -94,16 +94,16 @@
 
 #define DEFAULT_SCREEN 0
 
-const char* RESSOURCE_ALREADY_INUSE = "Ressource already in use";
+const char* RESOURCE_ALREADY_INUSE = "Ressource already in use";
 const char* INVALID_ARGUMENT = "Invalid argument";
-const char* RESSOURCE_NOT_FOUND = "Ressource not found";
+const char* RESOURCE_NOT_FOUND = "Ressource not found";
+const char* NOT_IMPLEMENTED = "Feature not implemented";
 
 
 GenericCommunicator::GenericCommunicator(ICommandExecutor* executor)
 : ICommunicator(executor)
 , m_running(ILM_FALSE)
 {
-
     MethodTable manager_methods[] =
     {
         { "ServiceConnect",                   &GenericCommunicator::ServiceConnect },
@@ -194,6 +194,10 @@ GenericCommunicator::GenericCommunicator(ICommandExecutor* executor)
         { "UpdateInputEventAcceptanceOn",     &GenericCommunicator::UpdateInputEventAcceptanceOn },
         { "SetSurfaceChromaKey",              &GenericCommunicator::SetSurfaceChromaKey },
         { "SetLayerChromaKey",                &GenericCommunicator::SetLayerChromaKey },
+        { "LayerAddNotification",             &GenericCommunicator::LayerAddNotification },
+        { "SurfaceAddNotification",           &GenericCommunicator::SurfaceAddNotification },
+        { "LayerRemoveNotification",          &GenericCommunicator::LayerRemoveNotification },
+        { "SurfaceRemoveNotification",        &GenericCommunicator::SurfaceRemoveNotification }
     };
 
     int entryCount = sizeof(manager_methods) / sizeof(MethodTable);
@@ -207,6 +211,8 @@ GenericCommunicator::GenericCommunicator(ICommandExecutor* executor)
             LOG_DEBUG("GenericCommunicator", "registered callback for " << method->name);
         }
     }
+
+    memset(&m_ipcModule, 0, sizeof(m_ipcModule));
 }
 
 bool GenericCommunicator::start()
@@ -220,7 +226,7 @@ bool GenericCommunicator::start()
     }
     LOG_DEBUG("GenericCommunicator", "Loading IpcModule success.");
 
-    if (!m_ipcModule.init(ILM_FALSE))
+    if (!m_ipcModule.initServiceMode())
     {
         LOG_ERROR("GenericCommunicator", "Initializing IpcModule failed.");
         return ILM_FALSE;
@@ -244,10 +250,16 @@ void GenericCommunicator::stop()
 
 void GenericCommunicator::process(int timeout_ms)
 {
-    enum IpcMessageType messageType = m_ipcModule.receiveMessage(timeout_ms);
+    t_ilm_message message = m_ipcModule.receive(timeout_ms);
+    if (!message)
+    {
+        return;
+    }
 
-    t_ilm_const_string name = m_ipcModule.getMessageName();
-    t_ilm_const_string sender = m_ipcModule.getSenderName();
+    t_ilm_message_type messageType = m_ipcModule.getMessageType(message);
+    t_ilm_const_string name = m_ipcModule.getMessageName(message);
+    t_ilm_const_string sender = m_ipcModule.getSenderName(message);
+    t_ilm_client_handle senderHandle = m_ipcModule.getSenderHandle(message);
 
     switch(messageType)
     {
@@ -256,37 +268,56 @@ void GenericCommunicator::process(int timeout_ms)
         {
             LOG_DEBUG("GenericCommunicator", "Received command " << name << " from " << sender);
             CallBackMethod method = m_callBackTable[name].function;
-            (this->*method)();
+            (this->*method)(message);
         }
         else
         {
             LOG_WARNING("GenericCommunicator", "Received unknown command " << name << " from " << sender);
         }
+        processNotificationQueue();
+        break;
+
+    case IpcMessageTypeConnect:
+        LOG_DEBUG("GenericCommunicator", "client " << sender << " connected");
         break;
 
     case IpcMessageTypeDisconnect:
-        LOG_DEBUG("GenericCommunicator", "Received message " << name
-                  << " (type=disconnect" << ", sender=" << sender << ")");
-        ServiceDisconnect();
-        break;
+        LOG_DEBUG("GenericCommunicator", "client " << sender << " disconnected");
+        {
+            const LayerMap& layers = m_executor->getScene()->getAllLayers();
+            LayerMapConstIterator layerIter =  layers.begin();
+            LayerMapConstIterator layerIterEnd = layers.end();
+            for (; layerIter != layerIterEnd; ++layerIter)
+            {
+                Layer* layer = layerIter->second;
+                layer->removeNotification(senderHandle);
+            }
 
-    case IpcMessageTypeNotification:
-        LOG_DEBUG("GenericCommunicator", "Received message " << name
-                  << " (type=notification" << ", sender=" << sender << ")");
+            const SurfaceMap& surfaces = m_executor->getScene()->getAllSurfaces();
+            SurfaceMapConstIterator surfaceIter =  surfaces.begin();
+            SurfaceMapConstIterator surfaceIterEnd = surfaces.end();
+            for (; surfaceIter != surfaceIterEnd; ++surfaceIter)
+            {
+                Surface* surface = surfaceIter->second;
+                surface->removeNotification(senderHandle);
+            }
+        }
         break;
 
     case IpcMessageTypeError:
         LOG_DEBUG("GenericCommunicator", "Received error message " << name << " from " << sender);
         break;
 
+    case IpcMessageTypeShutdown:
     case IpcMessageTypeNone:
         break;
 
     default:
-        LOG_DEBUG("GenericCommunicator", "Received unknown data from " << sender);
+        LOG_DEBUG("GenericCommunicator", "Received unknown data from "
+                  << sender << "(Message type: " << messageType << ")");
         break;
     }
-    m_ipcModule.destroyMessage();
+    m_ipcModule.destroyMessage(message);
 }
 
 void GenericCommunicator::setdebug(bool onoff)
@@ -294,21 +325,31 @@ void GenericCommunicator::setdebug(bool onoff)
     (void)onoff; // TODO: remove, only prevents warning
 }
 
-void GenericCommunicator::ServiceConnect()
+void GenericCommunicator::ServiceConnect(t_ilm_message message)
 {
     LOG_DEBUG("GenericCommunicator", "ServiceConnect called");
+
+    t_ilm_message response;
+    t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     u_int32_t processId = 0;
-    m_ipcModule.getUint(&processId);
-    char* owner = strdup(m_ipcModule.getSenderName());
+
+    m_ipcModule.getUint(message, &processId);
+    char* owner = strdup(m_ipcModule.getSenderName(message));
+
     m_executor->addApplicationReference(new IApplicationReference(owner,processId));
-    m_ipcModule.createMessage((char*)__FUNCTION__);
-    m_ipcModule.sendMessage();
+
+    response = m_ipcModule.createResponse(message);
+    m_ipcModule.sendToClients(response, &clientHandle, 1);
+    m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::ServiceDisconnect()
+void GenericCommunicator::ServiceDisconnect(t_ilm_message message)
 {
     LOG_DEBUG("GenericCommunicator", "ServiceDisconnect called");
-    char* owner = strdup(m_ipcModule.getSenderName());
+
+    t_ilm_message response;
+    t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
+    char* owner = strdup(m_ipcModule.getSenderName(message));
     long int ownerHash = IApplicationReference::generateApplicationHash(owner);
     ApplicationReferenceMap* refmap = m_executor->getApplicationReferenceMap();
 
@@ -321,187 +362,213 @@ void GenericCommunicator::ServiceDisconnect()
         m_executor->removeApplicationReference(registeredApp);
     }
 
-    m_ipcModule.createMessage((char*)__FUNCTION__);
-    m_ipcModule.sendMessage();
+    response = m_ipcModule.createResponse(message);
+    m_ipcModule.sendToClients(response, &clientHandle, 1);
+    m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::Debug()
+void GenericCommunicator::Debug(t_ilm_message message)
 {
+    t_ilm_message response;
+    t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     t_ilm_bool param = ILM_FALSE;
-    m_ipcModule.getBool(&param);
+    m_ipcModule.getBool(message, &param);
 
     t_ilm_bool status = m_executor->execute(new DebugCommand(param));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
     }
     else
     {
-        m_ipcModule.sendError(INVALID_ARGUMENT);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, INVALID_ARGUMENT);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::GetScreenResolution()
+void GenericCommunicator::GetScreenResolution(t_ilm_message message)
 {
+    t_ilm_message response;
+    t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint screenid = 0;
-    m_ipcModule.getUint(&screenid);
+    m_ipcModule.getUint(message, &screenid);
     uint* resolution = m_executor->getScreenResolution(screenid);
-    m_ipcModule.createMessage((char*)__FUNCTION__);
-    m_ipcModule.appendUint(resolution[0]);
-    m_ipcModule.appendUint(resolution[1]);
-    m_ipcModule.sendMessage();
+
+    response = m_ipcModule.createResponse(message);
+    m_ipcModule.appendUint(response, resolution[0]);
+    m_ipcModule.appendUint(response, resolution[1]);
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::GetNumberOfHardwareLayers()
+void GenericCommunicator::GetNumberOfHardwareLayers(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint screenid = 0;
-    m_ipcModule.getUint(&screenid);
+    m_ipcModule.getUint(message, &screenid);
     uint numberOfHardwareLayers = m_executor->getNumberOfHardwareLayers(screenid);
-    m_ipcModule.createMessage((char*)__FUNCTION__);
-    m_ipcModule.appendUint(numberOfHardwareLayers);
-    m_ipcModule.sendMessage();
+    response = m_ipcModule.createResponse(message);
+    m_ipcModule.appendUint(response, numberOfHardwareLayers);
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::GetScreenIDs()
+void GenericCommunicator::GetScreenIDs(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint length = 0;
     uint* IDs = m_executor->getScreenIDs(&length);
-    m_ipcModule.createMessage((char*)__FUNCTION__);
-    m_ipcModule.appendUintArray(IDs, length);
-    m_ipcModule.sendMessage();
+    response = m_ipcModule.createResponse(message);
+    m_ipcModule.appendUintArray(response, IDs, length);
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::ScreenShot()
+void GenericCommunicator::ScreenShot(t_ilm_message message)
 {
+    t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
+    t_ilm_message response;
     uint screenid = 0;
-    m_ipcModule.getUint(&screenid);
     char filename[1024];
-    m_ipcModule.getString(filename);
+
+    m_ipcModule.getUint(message, &screenid);
+    m_ipcModule.getString(message, filename);
 
     t_ilm_bool status = m_executor->execute(new ScreenDumpCommand(filename, screenid));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
     }
     else
     {
-        m_ipcModule.sendError(INVALID_ARGUMENT);
+        response = m_ipcModule.createErrorResponse(message);
+        m_ipcModule.appendString(response, INVALID_ARGUMENT);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1);
+    m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::ScreenShotOfLayer()
+void GenericCommunicator::ScreenShotOfLayer(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     char filename[1024];
-    m_ipcModule.getString(filename);
+    m_ipcModule.getString(message, filename);
     uint layerid = 0;
-    m_ipcModule.getUint(&layerid);
+    m_ipcModule.getUint(message, &layerid);
 
     t_ilm_bool status = m_executor->execute(new LayerDumpCommand(filename, layerid));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::ScreenShotOfSurface()
+void GenericCommunicator::ScreenShotOfSurface(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     char filename[1024];
-    m_ipcModule.getString(filename);
+    m_ipcModule.getString(message, filename);
     uint id = 0;
-    m_ipcModule.getUint(&id);
+    m_ipcModule.getUint(message, &id);
     t_ilm_bool status = m_executor->execute(new SurfaceDumpCommand(filename, id));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::ListAllLayerIDS()
+void GenericCommunicator::ListAllLayerIDS(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint* array = NULL;
     uint length = 0;
     m_executor->getScene()->lockScene();
     m_executor->getScene()->getLayerIDs(&length, &array);
-    m_ipcModule.createMessage((char*)__FUNCTION__);
-    m_ipcModule.appendUintArray(array, length);
-    m_ipcModule.sendMessage();
     m_executor->getScene()->unlockScene();
+    response = m_ipcModule.createResponse(message);
+    m_ipcModule.appendUintArray(response, array, length);
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::ListAllLayerIDsOnScreen()
+void GenericCommunicator::ListAllLayerIDsOnScreen(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint screenID = 0;
-    m_ipcModule.getUint(&screenID);
+    m_ipcModule.getUint(message, &screenID);
 
     uint* array = NULL;
     uint length = 0;
     m_executor->getScene()->lockScene();
     t_ilm_bool status = m_executor->getScene()->getLayerIDsOfScreen(screenID, &length, &array);
+    m_executor->getScene()->unlockScene();
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.appendUintArray(array, length);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
+        m_ipcModule.appendUintArray(response, array, length);
     }
     else
     {
-        m_ipcModule.sendError(INVALID_ARGUMENT);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, INVALID_ARGUMENT);
     }
-    m_executor->getScene()->unlockScene();
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::ListAllSurfaceIDS()
+void GenericCommunicator::ListAllSurfaceIDS(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint* array = NULL;
     uint length = 0;
     m_executor->getScene()->lockScene();
     m_executor->getScene()->getSurfaceIDs(&length, &array);
-    m_ipcModule.createMessage((char*)__FUNCTION__);
-    m_ipcModule.appendUintArray(array, length);
-    m_ipcModule.sendMessage();
     m_executor->getScene()->unlockScene();
+    response = m_ipcModule.createResponse(message);
+    m_ipcModule.appendUintArray(response, array, length);
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::ListAllLayerGroupIDS()
+void GenericCommunicator::ListAllLayerGroupIDS(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint* array = NULL;
     uint length = 0;
     m_executor->getScene()->lockScene();
     m_executor->getScene()->getLayerGroupIDs(&length, &array);
-    m_ipcModule.createMessage((char*)__FUNCTION__);
-    m_ipcModule.appendUintArray(array, length);
-    m_ipcModule.sendMessage();
     m_executor->getScene()->unlockScene();
+    response = m_ipcModule.createResponse(message);
+    m_ipcModule.appendUintArray(response, array, length);
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::ListAllSurfaceGroupIDS()
+void GenericCommunicator::ListAllSurfaceGroupIDS(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint* array = NULL;
     uint length = 0;
     m_executor->getScene()->lockScene();
     m_executor->getScene()->getSurfaceGroupIDs(&length, &array);
-    m_ipcModule.createMessage((char*)__FUNCTION__);
-    m_ipcModule.appendUintArray(array, length);
-    m_ipcModule.sendMessage();
     m_executor->getScene()->unlockScene();
+    response = m_ipcModule.createResponse(message);
+    m_ipcModule.appendUintArray(response, array, length);
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::ListSurfacesOfSurfacegroup()
+void GenericCommunicator::ListSurfacesOfSurfacegroup(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint id = 0;
-    m_ipcModule.getUint(&id);
+    m_ipcModule.getUint(message, &id);
     m_executor->getScene()->lockScene();
     SurfaceGroup* sg = m_executor->getScene()->getSurfaceGroup(id);
     if (NULL != sg)
@@ -510,7 +577,6 @@ void GenericCommunicator::ListSurfacesOfSurfacegroup()
         uint length = surfaces.size();
         uint* array = new uint[length];
         uint arrayPos = 0;
-        m_ipcModule.createMessage((char*)__FUNCTION__);
 
         for (std::list<Surface*>::const_iterator it = surfaces.begin(); it != surfaces.end(); ++it)
         {
@@ -518,22 +584,25 @@ void GenericCommunicator::ListSurfacesOfSurfacegroup()
             array[arrayPos] = s->getID();
             ++arrayPos;
         }
-
-        m_ipcModule.appendUintArray(array, length);
-
-        m_ipcModule.sendMessage();
         m_executor->getScene()->unlockScene();
+
+        response = m_ipcModule.createResponse(message);
+        m_ipcModule.appendUintArray(response, array, length);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        m_executor->getScene()->unlockScene();
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::ListLayersOfLayergroup()
+void GenericCommunicator::ListLayersOfLayergroup(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint id = 0;
-    m_ipcModule.getUint(&id);
+    m_ipcModule.getUint(message, &id);
     m_executor->getScene()->lockScene();
     LayerGroup* sg = m_executor->getScene()->getLayerGroup(id);
     if (NULL != sg)
@@ -544,29 +613,31 @@ void GenericCommunicator::ListLayersOfLayergroup()
         uint* array = new uint[length];
         uint arrayPos = 0;
 
-        m_ipcModule.createMessage((char*)__FUNCTION__);
         for (std::list<Layer*>::const_iterator it = layers.begin(); it != layers.end(); ++it)
         {
             Layer* l = *it;
             array[arrayPos] = l->getID();
             ++arrayPos;
         }
-
-        m_ipcModule.appendUintArray(array, length);
-
-        m_ipcModule.sendMessage();
         m_executor->getScene()->unlockScene();
+
+        response = m_ipcModule.createResponse(message);
+        m_ipcModule.appendUintArray(response, array, length);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        m_executor->getScene()->unlockScene();
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::ListSurfaceofLayer()
+void GenericCommunicator::ListSurfaceofLayer(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint id = 0;
-    m_ipcModule.getUint(&id);
+    m_ipcModule.getUint(message, &id);
     m_executor->getScene()->lockScene();
     Layer* layer = m_executor->getScene()->getLayer(id);
     if (layer != NULL)
@@ -577,30 +648,31 @@ void GenericCommunicator::ListSurfaceofLayer()
         uint* array = new uint[length];
         uint arrayPos = 0;
 
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-
         for (std::list<Surface*>::const_iterator it = surfaces.begin(); it != surfaces.end(); ++it)
         {
             Surface* s = *it;
             array[arrayPos] = s->getID();
             ++arrayPos;
         }
+        m_executor->getScene()->unlockScene();
 
-        m_ipcModule.appendUintArray(array, length);
-
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
+        m_ipcModule.appendUintArray(response, array, length);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        m_executor->getScene()->unlockScene();
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
-    m_executor->getScene()->unlockScene();
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::GetPropertiesOfSurface()
+void GenericCommunicator::GetPropertiesOfSurface(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint id = 0;
-    m_ipcModule.getUint(&id);
+    m_ipcModule.getUint(message, &id);
 
     Surface* surface = m_executor->getScene()->getSurface(id);
     if (surface != NULL)
@@ -613,42 +685,44 @@ void GenericCommunicator::GetPropertiesOfSurface()
         unsigned char chromaKeyBlue = 0;
         surface->getChromaKey(chromaKeyRed, chromaKeyGreen, chromaKeyBlue);
 
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.appendDouble(surface->getOpacity());
-        m_ipcModule.appendUint(src.x);
-        m_ipcModule.appendUint(src.y);
-        m_ipcModule.appendUint(src.width);
-        m_ipcModule.appendUint(src.height);
-        m_ipcModule.appendUint(surface->OriginalSourceWidth);
-        m_ipcModule.appendUint(surface->OriginalSourceHeight);
-        m_ipcModule.appendUint(dest.x);
-        m_ipcModule.appendUint(dest.y);
-        m_ipcModule.appendUint(dest.width);
-        m_ipcModule.appendUint(dest.height);
-        m_ipcModule.appendUint(orientation);
-        m_ipcModule.appendBool(surface->getVisibility());
-        m_ipcModule.appendUint(surface->frameCounter);
-        m_ipcModule.appendUint(surface->drawCounter);
-        m_ipcModule.appendUint(surface->updateCounter);
-        m_ipcModule.appendUint(surface->getPixelFormat());
-        m_ipcModule.appendUint(surface->getNativeContent());
-        m_ipcModule.appendUint(surface->getInputEventAcceptanceOnDevices());
-        m_ipcModule.appendBool(surface->getChromaKeyEnabled());
-        m_ipcModule.appendUint(chromaKeyRed);
-        m_ipcModule.appendUint(chromaKeyGreen);
-        m_ipcModule.appendUint(chromaKeyBlue);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
+        m_ipcModule.appendDouble(response, surface->getOpacity());
+        m_ipcModule.appendUint(response, src.x);
+        m_ipcModule.appendUint(response, src.y);
+        m_ipcModule.appendUint(response, src.width);
+        m_ipcModule.appendUint(response, src.height);
+        m_ipcModule.appendUint(response, surface->OriginalSourceWidth);
+        m_ipcModule.appendUint(response, surface->OriginalSourceHeight);
+        m_ipcModule.appendUint(response, dest.x);
+        m_ipcModule.appendUint(response, dest.y);
+        m_ipcModule.appendUint(response, dest.width);
+        m_ipcModule.appendUint(response, dest.height);
+        m_ipcModule.appendUint(response, orientation);
+        m_ipcModule.appendBool(response, surface->getVisibility());
+        m_ipcModule.appendUint(response, surface->frameCounter);
+        m_ipcModule.appendUint(response, surface->drawCounter);
+        m_ipcModule.appendUint(response, surface->updateCounter);
+        m_ipcModule.appendUint(response, surface->getPixelFormat());
+        m_ipcModule.appendUint(response, surface->getNativeContent());
+        m_ipcModule.appendUint(response, surface->getInputEventAcceptanceOnDevices());
+        m_ipcModule.appendBool(response, surface->getChromaKeyEnabled());
+        m_ipcModule.appendUint(response, chromaKeyRed);
+        m_ipcModule.appendUint(response, chromaKeyGreen);
+        m_ipcModule.appendUint(response, chromaKeyBlue);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::GetPropertiesOfLayer()
+void GenericCommunicator::GetPropertiesOfLayer(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint id = 0;
-    m_ipcModule.getUint(&id);
+    m_ipcModule.getUint(message, &id);
 
     Layer* layer = m_executor->getScene()->getLayer(id);
     if (layer != NULL)
@@ -661,1302 +735,1484 @@ void GenericCommunicator::GetPropertiesOfLayer()
         unsigned char chromaKeyBlue = 0;
         layer->getChromaKey(chromaKeyRed, chromaKeyGreen, chromaKeyBlue);
 
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.appendDouble(layer->getOpacity());
-        m_ipcModule.appendUint(src.x);
-        m_ipcModule.appendUint(src.y);
-        m_ipcModule.appendUint(src.width);
-        m_ipcModule.appendUint(src.height);
-        m_ipcModule.appendUint(layer->OriginalSourceWidth);
-        m_ipcModule.appendUint(layer->OriginalSourceHeight);
-        m_ipcModule.appendUint(dest.x);
-        m_ipcModule.appendUint(dest.y);
-        m_ipcModule.appendUint(dest.width);
-        m_ipcModule.appendUint(dest.height);
-        m_ipcModule.appendUint(orientation);
-        m_ipcModule.appendBool(layer->getVisibility());
-        m_ipcModule.appendUint(layer->getLayerType());
-        m_ipcModule.appendBool(layer->getChromaKeyEnabled());
-        m_ipcModule.appendUint(chromaKeyRed);
-        m_ipcModule.appendUint(chromaKeyGreen);
-        m_ipcModule.appendUint(chromaKeyBlue);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
+        m_ipcModule.appendDouble(response, layer->getOpacity());
+        m_ipcModule.appendUint(response, src.x);
+        m_ipcModule.appendUint(response, src.y);
+        m_ipcModule.appendUint(response, src.width);
+        m_ipcModule.appendUint(response, src.height);
+        m_ipcModule.appendUint(response, layer->OriginalSourceWidth);
+        m_ipcModule.appendUint(response, layer->OriginalSourceHeight);
+        m_ipcModule.appendUint(response, dest.x);
+        m_ipcModule.appendUint(response, dest.y);
+        m_ipcModule.appendUint(response, dest.width);
+        m_ipcModule.appendUint(response, dest.height);
+        m_ipcModule.appendUint(response, orientation);
+        m_ipcModule.appendBool(response, layer->getVisibility());
+        m_ipcModule.appendUint(response, layer->getLayerType());
+        m_ipcModule.appendBool(response, layer->getChromaKeyEnabled());
+        m_ipcModule.appendUint(response, chromaKeyRed);
+        m_ipcModule.appendUint(response, chromaKeyGreen);
+        m_ipcModule.appendUint(response, chromaKeyBlue);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::CreateSurface()
+void GenericCommunicator::CreateSurface(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint handle = 0;
-    m_ipcModule.getUint(&handle);
     uint width = 0;
-    m_ipcModule.getUint(&width);
     uint height = 0;
-    m_ipcModule.getUint(&height);
     uint pixelformat = 0;
-    m_ipcModule.getUint(&pixelformat);
-    PixelFormat pf = (PixelFormat) pixelformat;
-
-    //LOG_DEBUG("GenericCommunicator::CreateSurface","pixelformat: " << pixelformat);
+    PixelFormat pf = PIXELFORMAT_UNKNOWN;
     uint id = GraphicalObject::INVALID_ID;
-    /* First of all create the surface */
-    t_ilm_bool status = m_executor->execute(new SurfaceCreateCommand(&id));
-    /* after that apply the native content */
-    status &= m_executor->execute(new SurfaceSetNativeContentCommand(id, handle, pf, width, height));    
-    if (status)
-    {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.appendUint(id);
-        m_ipcModule.sendMessage();
-    }
-    else
-    {
-        m_ipcModule.sendError(RESSOURCE_ALREADY_INUSE);
-    }
-}
 
-void GenericCommunicator::CreateSurfaceFromId()
-{
-    uint handle = 0;
-    m_ipcModule.getUint(&handle);
-    uint width = 0;
-    m_ipcModule.getUint(&width);
-    uint height = 0;
-    m_ipcModule.getUint(&height);
-    uint pixelformat = 0;
-    m_ipcModule.getUint(&pixelformat);
-    PixelFormat pf = (PixelFormat) pixelformat;
+    m_ipcModule.getUint(message, &handle);
+    m_ipcModule.getUint(message, &width);
+    m_ipcModule.getUint(message, &height);
+    m_ipcModule.getUint(message, &pixelformat);
 
-    //LOG_DEBUG("GenericCommunicator::CreateSurface","pixelformat: " << pixelformat);
-    uint id = 0;
-    m_ipcModule.getUint(&id);
+    pf = (PixelFormat) pixelformat;
+
 
     // First of all create the surface
     t_ilm_bool status = m_executor->execute(new SurfaceCreateCommand(&id));
+
     // after that apply the native content
-    status &= m_executor->execute(new SurfaceSetNativeContentCommand(id, handle, pf, width, height));    
+    status &= m_executor->execute(new SurfaceSetNativeContentCommand(id, handle, pf, width, height));
 
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.appendUint(id);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
+        m_ipcModule.appendUint(response, id);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_ALREADY_INUSE);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_ALREADY_INUSE);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::InitializeSurface()
+void GenericCommunicator::CreateSurfaceFromId(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
+    uint handle = 0;
+    uint width = 0;
+    uint height = 0;
+    uint pixelformat = 0;
+    PixelFormat pf = PIXELFORMAT_UNKNOWN;
+    uint id = 0;
+
+    m_ipcModule.getUint(message, &handle);
+    m_ipcModule.getUint(message, &width);
+    m_ipcModule.getUint(message, &height);
+    m_ipcModule.getUint(message, &pixelformat);
+    m_ipcModule.getUint(message, &id);
+
+    pf = (PixelFormat) pixelformat;
+
+    // First of all create the surface
+    t_ilm_bool status = m_executor->execute(new SurfaceCreateCommand(&id));
+
+    // after that apply the native content
+    status &= m_executor->execute(new SurfaceSetNativeContentCommand(id, handle, pf, width, height));
+
+    if (status)
+    {
+        response = m_ipcModule.createResponse(message);
+        m_ipcModule.appendUint(response, id);
+    }
+    else
+    {
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_ALREADY_INUSE);
+    }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
+}
+
+void GenericCommunicator::InitializeSurface(t_ilm_message message)
+{
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint id = GraphicalObject::INVALID_ID;
 
     t_ilm_bool status = m_executor->execute(new SurfaceCreateCommand(&id));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.appendUint(id);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
+        m_ipcModule.appendUint(response, id);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_ALREADY_INUSE);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_ALREADY_INUSE);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::InitializeSurfaceFromId()
+void GenericCommunicator::InitializeSurfaceFromId(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint id = 0;
-    m_ipcModule.getUint(&id);
+    m_ipcModule.getUint(message, &id);
     t_ilm_bool status = m_executor->execute(new SurfaceCreateCommand(&id));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.appendUint(id);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
+        m_ipcModule.appendUint(response, id);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_ALREADY_INUSE);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_ALREADY_INUSE);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::SetSurfaceNativeContent()
+void GenericCommunicator::SetSurfaceNativeContent(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint id = 0;
-    m_ipcModule.getUint(&id);
     uint handle = 0;
-    m_ipcModule.getUint(&handle);
     uint width = 0;
-    m_ipcModule.getUint(&width);
     uint height = 0;
-    m_ipcModule.getUint(&height);
     uint pixelformat = 0;
-    m_ipcModule.getUint(&pixelformat);
-    PixelFormat pf = (PixelFormat) pixelformat;
+    PixelFormat pf = PIXELFORMAT_UNKNOWN;
+
+    m_ipcModule.getUint(message, &id);
+    m_ipcModule.getUint(message, &handle);
+    m_ipcModule.getUint(message, &width);
+    m_ipcModule.getUint(message, &height);
+    m_ipcModule.getUint(message, &pixelformat);
+
+    pf = (PixelFormat) pixelformat;
 
     t_ilm_bool status = m_executor->execute(new SurfaceSetNativeContentCommand(id, handle, pf, width, height));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_ALREADY_INUSE);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_ALREADY_INUSE);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::RemoveSurfaceNativeContent()
+void GenericCommunicator::RemoveSurfaceNativeContent(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint id = 0;
-    m_ipcModule.getUint(&id);
+    m_ipcModule.getUint(message, &id);
 
     t_ilm_bool status = m_executor->execute(new SurfaceRemoveNativeContentCommand(id));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_ALREADY_INUSE);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_ALREADY_INUSE);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::RemoveSurface()
+void GenericCommunicator::RemoveSurface(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint param = 0;
-    m_ipcModule.getUint(&param);
+    m_ipcModule.getUint(message, &param);
     t_ilm_bool status = m_executor->execute(new SurfaceRemoveCommand(param));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_ALREADY_INUSE);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_ALREADY_INUSE);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::CreateLayer()
+void GenericCommunicator::CreateLayer(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint id = GraphicalObject::INVALID_ID;
     // use resolution of default screen as default width and height of layers
     uint* resolution = m_executor->getScreenResolution(DEFAULT_SCREEN);
     t_ilm_bool status = m_executor->execute(new LayerCreateCommand(resolution[0], resolution[1], &id));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.appendUint(id);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
+        m_ipcModule.appendUint(response, id);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_ALREADY_INUSE);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_ALREADY_INUSE);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::CreateLayerFromId()
+void GenericCommunicator::CreateLayerFromId(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint id = GraphicalObject::INVALID_ID;
 
-    m_ipcModule.getUint(&id);
+    m_ipcModule.getUint(message, &id);
     // use resolution of default screen as default width and height of layers
     uint* resolution = m_executor->getScreenResolution(DEFAULT_SCREEN);
     t_ilm_bool status = m_executor->execute(new LayerCreateCommand(resolution[0], resolution[1], &id));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.appendUint(id);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
+        m_ipcModule.appendUint(response, id);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_ALREADY_INUSE);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_ALREADY_INUSE);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
 
-void GenericCommunicator::CreateLayerWithDimension()
+void GenericCommunicator::CreateLayerWithDimension(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint width = 0;
-    m_ipcModule.getUint(&width);
+    m_ipcModule.getUint(message, &width);
     uint height = 0;
-    m_ipcModule.getUint(&height);
+    m_ipcModule.getUint(message, &height);
 
     uint id = GraphicalObject::INVALID_ID;
     t_ilm_bool status = m_executor->execute(new LayerCreateCommand(width, height, &id));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.appendUint(id);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
+        m_ipcModule.appendUint(response, id);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::CreateLayerFromIdWithDimension()
+void GenericCommunicator::CreateLayerFromIdWithDimension(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint id = GraphicalObject::INVALID_ID;
-
-    m_ipcModule.getUint(&id);
     uint width = 0;
-    m_ipcModule.getUint(&width);
     uint height = 0;
-    m_ipcModule.getUint(&height);
-    t_ilm_bool status = m_executor->execute(new LayerCreateCommand(width, height, &id));
+    t_ilm_bool status = ILM_FALSE;
+
+    m_ipcModule.getUint(message, &id);
+    m_ipcModule.getUint(message, &width);
+    m_ipcModule.getUint(message, &height);
+
+    status = m_executor->execute(new LayerCreateCommand(width, height, &id));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.appendUint(id);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
+        m_ipcModule.appendUint(response, id);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_ALREADY_INUSE);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_ALREADY_INUSE);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::RemoveLayer()
+void GenericCommunicator::RemoveLayer(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint param = 0;
-    m_ipcModule.getUint(&param);
+    m_ipcModule.getUint(message, &param);
     t_ilm_bool status = m_executor->execute(new LayerRemoveCommand(param));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::AddSurfaceToSurfaceGroup()
+void GenericCommunicator::AddSurfaceToSurfaceGroup(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint surfaceid = 0;
-    m_ipcModule.getUint(&surfaceid);
     uint surfacegroupid = 0;
-    m_ipcModule.getUint(&surfacegroupid);
+
+    m_ipcModule.getUint(message, &surfaceid);
+    m_ipcModule.getUint(message, &surfacegroupid);
 
     t_ilm_bool status = m_executor->execute(new SurfacegroupAddSurfaceCommand(surfacegroupid, surfaceid));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::RemoveSurfaceFromSurfaceGroup()
+void GenericCommunicator::RemoveSurfaceFromSurfaceGroup(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint surfaceid = 0;
-    m_ipcModule.getUint(&surfaceid);
     uint surfacegroupid = 0;
-    m_ipcModule.getUint(&surfacegroupid);
+
+    m_ipcModule.getUint(message, &surfaceid);
+    m_ipcModule.getUint(message, &surfacegroupid);
 
     t_ilm_bool status = m_executor->execute(new SurfacegroupRemoveSurfaceCommand(surfacegroupid, surfaceid));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::AddLayerToLayerGroup()
+void GenericCommunicator::AddLayerToLayerGroup(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint layerid = 0;
-    m_ipcModule.getUint(&layerid);
     uint layergroupid = 0;
-    m_ipcModule.getUint(&layergroupid);
+
+    m_ipcModule.getUint(message, &layerid);
+    m_ipcModule.getUint(message, &layergroupid);
 
     t_ilm_bool status = m_executor->execute(new LayergroupAddLayerCommand(layergroupid, layerid));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::RemoveLayerFromLayerGroup()
+void GenericCommunicator::RemoveLayerFromLayerGroup(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint layerid = 0;
-    m_ipcModule.getUint(&layerid);
     uint layergroupid = 0;
-    m_ipcModule.getUint(&layergroupid);
+
+    m_ipcModule.getUint(message, &layerid);
+    m_ipcModule.getUint(message, &layergroupid);
 
     t_ilm_bool status = m_executor->execute(new LayergroupRemoveLayerCommand(layergroupid, layerid));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::AddSurfaceToLayer()
+void GenericCommunicator::AddSurfaceToLayer(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint surfaceid = 0;
-    m_ipcModule.getUint(&surfaceid);
     uint layer = 0;
-    m_ipcModule.getUint(&layer);
+
+    m_ipcModule.getUint(message, &surfaceid);
+    m_ipcModule.getUint(message, &layer);
 
     t_ilm_bool status = m_executor->execute(new LayerAddSurfaceCommand(layer, surfaceid));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_ALREADY_INUSE);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_ALREADY_INUSE);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::RemoveSurfaceFromLayer()
+void GenericCommunicator::RemoveSurfaceFromLayer(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint surfaceid = 0;
-    m_ipcModule.getUint(&surfaceid);
     uint layerid = 0;
-    m_ipcModule.getUint(&layerid);
+    m_ipcModule.getUint(message, &surfaceid);
+    m_ipcModule.getUint(message, &layerid);
 
     t_ilm_bool status = m_executor->execute(new LayerRemoveSurfaceCommand(layerid, surfaceid));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::CreateSurfaceGroup()
+void GenericCommunicator::CreateSurfaceGroup(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint newID = GraphicalObject::INVALID_ID;
 
     t_ilm_bool status = m_executor->execute(new SurfacegroupCreateCommand(&newID));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.appendUint(newID);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
+        m_ipcModule.appendUint(response, newID);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_ALREADY_INUSE);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_ALREADY_INUSE);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::CreateSurfaceGroupFromId()
+void GenericCommunicator::CreateSurfaceGroupFromId(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint newID = GraphicalObject::INVALID_ID;
 
-    m_ipcModule.getUint(&newID);
+    m_ipcModule.getUint(message, &newID);
 
     t_ilm_bool status = m_executor->execute(new SurfacegroupCreateCommand(&newID));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.appendUint(newID);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
+        m_ipcModule.appendUint(response, newID);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_ALREADY_INUSE);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_ALREADY_INUSE);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::RemoveSurfaceGroup()
+void GenericCommunicator::RemoveSurfaceGroup(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint param = 0;
-    m_ipcModule.getUint(&param);
+    m_ipcModule.getUint(message, &param);
 
     t_ilm_bool status = m_executor->execute(new SurfacegroupRemoveCommand(param));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::CreateLayerGroup()
+void GenericCommunicator::CreateLayerGroup(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint newID = GraphicalObject::INVALID_ID;
 
     t_ilm_bool status = m_executor->execute(new LayergroupCreateCommand(&newID));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.appendUint(newID);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
+        m_ipcModule.appendUint(response, newID);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_ALREADY_INUSE);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_ALREADY_INUSE);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::CreateLayerGroupFromId()
+void GenericCommunicator::CreateLayerGroupFromId(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint newID = GraphicalObject::INVALID_ID;
 
-    m_ipcModule.getUint(&newID);
+    m_ipcModule.getUint(message, &newID);
 
     t_ilm_bool status = m_executor->execute(new LayergroupCreateCommand(&newID));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.appendUint(newID);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
+        m_ipcModule.appendUint(response, newID);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_ALREADY_INUSE);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_ALREADY_INUSE);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::RemoveLayerGroup()
+void GenericCommunicator::RemoveLayerGroup(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint param = 0;
-    m_ipcModule.getUint(&param);
+    m_ipcModule.getUint(message, &param);
 
     t_ilm_bool status = m_executor->execute(new LayergroupRemoveCommand(param));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::SetSurfaceSourceRegion()
+void GenericCommunicator::SetSurfaceSourceRegion(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint id = 0;
-    m_ipcModule.getUint(&id);
     uint x = 0;
-    m_ipcModule.getUint(&x);
     uint y = 0;
-    m_ipcModule.getUint(&y);
     uint width = 0;
-    m_ipcModule.getUint(&width);
     uint height = 0;
-    m_ipcModule.getUint(&height);
+
+    m_ipcModule.getUint(message, &id);
+    m_ipcModule.getUint(message, &x);
+    m_ipcModule.getUint(message, &y);
+    m_ipcModule.getUint(message, &width);
+    m_ipcModule.getUint(message, &height);
 
     t_ilm_bool status = m_executor->execute(new SurfaceSetSourceRectangleCommand(id, x, y, width, height));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::SetLayerSourceRegion()
+void GenericCommunicator::SetLayerSourceRegion(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint id = 0;
-    m_ipcModule.getUint(&id);
     uint x = 0;
-    m_ipcModule.getUint(&x);
     uint y = 0;
-    m_ipcModule.getUint(&y);
     uint width = 0;
-    m_ipcModule.getUint(&width);
     uint height = 0;
-    m_ipcModule.getUint(&height);
 
-    //LOG_DEBUG("DBUSC","new SetSourceRectangleCommand with arguments: " <<id <<" " << x <<" "<< y <<" "<< width <<" "<< height );
+    m_ipcModule.getUint(message, &id);
+    m_ipcModule.getUint(message, &x);
+    m_ipcModule.getUint(message, &y);
+    m_ipcModule.getUint(message, &width);
+    m_ipcModule.getUint(message, &height);
+
     t_ilm_bool status = m_executor->execute(new LayerSetSourceRectangleCommand(id, x, y, width, height));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::SetSurfaceDestinationRegion()
+void GenericCommunicator::SetSurfaceDestinationRegion(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint id = 0;
-    m_ipcModule.getUint(&id);
     uint x = 0;
-    m_ipcModule.getUint(&x);
     uint y = 0;
-    m_ipcModule.getUint(&y);
     uint width = 0;
-    m_ipcModule.getUint(&width);
     uint height = 0;
-    m_ipcModule.getUint(&height);
+
+    m_ipcModule.getUint(message, &id);
+    m_ipcModule.getUint(message, &x);
+    m_ipcModule.getUint(message, &y);
+    m_ipcModule.getUint(message, &width);
+    m_ipcModule.getUint(message, &height);
 
     t_ilm_bool status = m_executor->execute(new SurfaceSetDestinationRectangleCommand(id, x, y, width, height));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::SetSurfacePosition()
+void GenericCommunicator::SetSurfacePosition(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint id = 0;
-    m_ipcModule.getUint(&id);
     uint x = 0;
-    m_ipcModule.getUint(&x);
     uint y = 0;
-    m_ipcModule.getUint(&y);
+
+    m_ipcModule.getUint(message, &id);
+    m_ipcModule.getUint(message, &x);
+    m_ipcModule.getUint(message, &y);
 
     t_ilm_bool status = m_executor->execute(new SurfaceSetPositionCommand(id, x, y));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::GetSurfacePosition()
+void GenericCommunicator::GetSurfacePosition(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint id = 0;
-    m_ipcModule.getUint(&id);
     uint x = 0;
     uint y = 0;
+
+    m_ipcModule.getUint(message, &id);
 
     t_ilm_bool status = m_executor->execute(new SurfaceGetPositionCommand(id, &x, &y));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.appendUint(x);
-        m_ipcModule.appendUint(y);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
+        m_ipcModule.appendUint(response, x);
+        m_ipcModule.appendUint(response, y);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::SetSurfaceDimension()
+void GenericCommunicator::SetSurfaceDimension(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint id = 0;
-    m_ipcModule.getUint(&id);
     uint width = 0;
-    m_ipcModule.getUint(&width);
     uint height = 0;
-    m_ipcModule.getUint(&height);
+
+    m_ipcModule.getUint(message, &id);
+    m_ipcModule.getUint(message, &width);
+    m_ipcModule.getUint(message, &height);
 
     t_ilm_bool status = m_executor->execute(new SurfaceSetDimensionCommand(id, width, height));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::SetLayerDestinationRegion()
+void GenericCommunicator::SetLayerDestinationRegion(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint id = 0;
-    m_ipcModule.getUint(&id);
     uint x = 0;
-    m_ipcModule.getUint(&x);
     uint y = 0;
-    m_ipcModule.getUint(&y);
     uint width = 0;
-    m_ipcModule.getUint(&width);
     uint height = 0;
-    m_ipcModule.getUint(&height);
+
+    m_ipcModule.getUint(message, &id);
+    m_ipcModule.getUint(message, &x);
+    m_ipcModule.getUint(message, &y);
+    m_ipcModule.getUint(message, &width);
+    m_ipcModule.getUint(message, &height);
 
     t_ilm_bool status = m_executor->execute(new LayerSetDestinationRectangleCommand(id, x, y, width, height));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::SetLayerPosition()
+void GenericCommunicator::SetLayerPosition(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint id = 0;
-    m_ipcModule.getUint(&id);
     uint x = 0;
-    m_ipcModule.getUint(&x);
     uint y = 0;
-    m_ipcModule.getUint(&y);
+
+    m_ipcModule.getUint(message, &id);
+    m_ipcModule.getUint(message, &x);
+    m_ipcModule.getUint(message, &y);
 
     t_ilm_bool status = m_executor->execute(new LayerSetPositionCommand(id, x, y));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::GetLayerPosition()
+void GenericCommunicator::GetLayerPosition(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint id = 0;
-    m_ipcModule.getUint(&id);
     uint x = 0;
     uint y = 0;
+
+    m_ipcModule.getUint(message, &id);
 
     t_ilm_bool status = m_executor->execute(new LayerGetPositionCommand(id, &x, &y));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.appendUint(x);
-        m_ipcModule.appendUint(y);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
+        m_ipcModule.appendUint(response, x);
+        m_ipcModule.appendUint(response, y);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::SetLayerDimension()
+void GenericCommunicator::SetLayerDimension(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint id = 0;
-    m_ipcModule.getUint(&id);
     uint width = 0;
-    m_ipcModule.getUint(&width);
     uint height = 0;
-    m_ipcModule.getUint(&height);
+
+    m_ipcModule.getUint(message, &id);
+    m_ipcModule.getUint(message, &width);
+    m_ipcModule.getUint(message, &height);
 
     t_ilm_bool status = m_executor->execute(new LayerSetDimensionCommand(id, width, height));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::GetLayerDimension()
+void GenericCommunicator::GetLayerDimension(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint id = 0;
-    m_ipcModule.getUint(&id);
     uint width = 0;
     uint height = 0;
+
+    m_ipcModule.getUint(message, &id);
 
     t_ilm_bool status = m_executor->execute(new LayerGetDimensionCommand(id, &width, &height));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.appendUint(width);
-        m_ipcModule.appendUint(height);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
+        m_ipcModule.appendUint(response, width);
+        m_ipcModule.appendUint(response, height);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::GetSurfaceDimension()
+void GenericCommunicator::GetSurfaceDimension(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint id = 0;
-    m_ipcModule.getUint(&id);
     uint width = 0;
     uint height = 0;
+
+    m_ipcModule.getUint(message, &id);
 
     t_ilm_bool status = m_executor->execute(new SurfaceGetDimensionCommand(id, &width, &height));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.appendUint(width);
-        m_ipcModule.appendUint(height);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
+        m_ipcModule.appendUint(response, width);
+        m_ipcModule.appendUint(response, height);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::SetSurfaceOpacity()
+void GenericCommunicator::SetSurfaceOpacity(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint id = 0;
-    m_ipcModule.getUint(&id);
     double param = 0.0;
-    m_ipcModule.getDouble(&param);
+
+    m_ipcModule.getUint(message, &id);
+    m_ipcModule.getDouble(message, &param);
 
     t_ilm_bool status = m_executor->execute(new SurfaceSetOpacityCommand(id, param));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::SetLayerOpacity()
+void GenericCommunicator::SetLayerOpacity(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint id = 0;
-    m_ipcModule.getUint(&id);
     double param = 0.0;
-    m_ipcModule.getDouble(&param);
+
+    m_ipcModule.getUint(message, &id);
+    m_ipcModule.getDouble(message, &param);
 
     t_ilm_bool status = m_executor->execute(new LayerSetOpacityCommand(id, param));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::SetSurfacegroupOpacity()
+void GenericCommunicator::SetSurfacegroupOpacity(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint id = 0;
-    m_ipcModule.getUint(&id);
     double param = 0.0;
-    m_ipcModule.getDouble(&param);
+
+    m_ipcModule.getUint(message, &id);
+    m_ipcModule.getDouble(message, &param);
 
     t_ilm_bool status = m_executor->execute(new SurfacegroupSetOpacityCommand(id, param));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::SetLayergroupOpacity()
+void GenericCommunicator::SetLayergroupOpacity(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint id = 0;
-    m_ipcModule.getUint(&id);
     double param = 0.0;
-    m_ipcModule.getDouble(&param);
+
+    m_ipcModule.getUint(message, &id);
+    m_ipcModule.getDouble(message, &param);
 
     t_ilm_bool status = m_executor->execute(new LayergroupSetOpacityCommand(id, param));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::GetSurfaceOpacity()
+void GenericCommunicator::GetSurfaceOpacity(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint id = 0;
-    m_ipcModule.getUint(&id);
     double param = 0.0;
+
+    m_ipcModule.getUint(message, &id);
 
     t_ilm_bool status = m_executor->execute(new SurfaceGetOpacityCommand(id, &param));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.appendDouble(param);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
+        m_ipcModule.appendDouble(response, param);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::GetLayerOpacity()
+void GenericCommunicator::GetLayerOpacity(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint id = 0;
-    m_ipcModule.getUint(&id);
     double param = 0.0;
+
+    m_ipcModule.getUint(message, &id);
 
     t_ilm_bool status = m_executor->execute(new LayerGetOpacityCommand(id, &param));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.appendDouble(param);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
+        m_ipcModule.appendDouble(response, param);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::SetSurfaceOrientation()
+void GenericCommunicator::SetSurfaceOrientation(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint id = 0;
-    m_ipcModule.getUint(&id);
     uint param = 0;
-    m_ipcModule.getUint(&param);
-    OrientationType o = (OrientationType) param;
+    OrientationType o = Zero;
+
+    m_ipcModule.getUint(message, &id);
+    m_ipcModule.getUint(message, &param);
+
+    o = (OrientationType) param;
 
     t_ilm_bool status = m_executor->execute(new SurfaceSetOrientationCommand(id, o));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::GetSurfaceOrientation()
+void GenericCommunicator::GetSurfaceOrientation(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint id = 0;
-    m_ipcModule.getUint(&id);
     OrientationType o;
+
+    m_ipcModule.getUint(message, &id);
 
     t_ilm_bool status = m_executor->execute(new SurfaceGetOrientationCommand(id, &o));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.appendUint(o);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
+        m_ipcModule.appendUint(response, o);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::SetLayerOrientation()
+void GenericCommunicator::SetLayerOrientation(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint id = 0;
-    m_ipcModule.getUint(&id);
     uint param = 0;
-    m_ipcModule.getUint(&param);
-    OrientationType o = (OrientationType) param;
+    OrientationType o = Zero;
+
+    m_ipcModule.getUint(message, &id);
+    m_ipcModule.getUint(message, &param);
+
+    o = (OrientationType) param;
 
     t_ilm_bool status = m_executor->execute(new LayerSetOrientationCommand(id, o));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::GetLayerOrientation()
+void GenericCommunicator::GetLayerOrientation(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint id = 0;
-    m_ipcModule.getUint(&id);
     OrientationType o;
+
+    m_ipcModule.getUint(message, &id);
 
     t_ilm_bool status = m_executor->execute(new LayerGetOrientationCommand(id, &o));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.appendUint(o);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
+        m_ipcModule.appendUint(response, o);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::GetSurfacePixelformat()
+void GenericCommunicator::GetSurfacePixelformat(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint id = 0;
-    m_ipcModule.getUint(&id);
-    PixelFormat param;
+    PixelFormat pixelFormat;
 
-    t_ilm_bool status = m_executor->execute(new SurfaceGetPixelformatCommand(id, &param));
+    m_ipcModule.getUint(message, &id);
+
+    t_ilm_bool status = m_executor->execute(new SurfaceGetPixelformatCommand(id, &pixelFormat));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.appendUint(param);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
+        m_ipcModule.appendUint(response, pixelFormat);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::SetSurfaceVisibility()
+void GenericCommunicator::SetSurfaceVisibility(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint surfaceid = 0;
-    m_ipcModule.getUint(&surfaceid);
     t_ilm_bool newVis = ILM_FALSE;
-    m_ipcModule.getBool(&newVis);
+
+    m_ipcModule.getUint(message, &surfaceid);
+    m_ipcModule.getBool(message, &newVis);
 
     t_ilm_bool status = m_executor->execute(new SurfaceSetVisibilityCommand(surfaceid, newVis));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::SetLayerVisibility()
+void GenericCommunicator::SetLayerVisibility(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint layerid = 0;
-    m_ipcModule.getUint(&layerid);
     t_ilm_bool myparam = ILM_FALSE;
-    m_ipcModule.getBool(&myparam);
+
+    m_ipcModule.getUint(message, &layerid);
+    m_ipcModule.getBool(message, &myparam);
 
     t_ilm_bool status = m_executor->execute(new LayerSetVisibilityCommand(layerid, myparam));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::GetSurfaceVisibility()
+void GenericCommunicator::GetSurfaceVisibility(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint id = 0;
-    m_ipcModule.getUint(&id);
-    bool param;
+    bool visibility;
 
-    t_ilm_bool status = m_executor->execute(new SurfaceGetVisibilityCommand(id, &param));
+    m_ipcModule.getUint(message, &id);
+
+    t_ilm_bool status = m_executor->execute(new SurfaceGetVisibilityCommand(id, &visibility));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        //LOG_DEBUG("GenericCommunicator", "returning surfacevisibility: " << param);
-        m_ipcModule.appendBool(param);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
+        m_ipcModule.appendBool(response, visibility);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::GetLayerVisibility()
+void GenericCommunicator::GetLayerVisibility(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint id = 0;
-    m_ipcModule.getUint(&id);
-    bool param;
+    bool visibility;
 
-    t_ilm_bool status = m_executor->execute(new LayerGetVisibilityCommand(id, &param));
+    m_ipcModule.getUint(message, &id);
+
+    t_ilm_bool status = m_executor->execute(new LayerGetVisibilityCommand(id, &visibility));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.appendBool(param);
-        //LOG_DEBUG("GenericCommunicator", "returning layervisibility: " << param);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
+        m_ipcModule.appendBool(response, visibility);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::SetSurfacegroupVisibility()
+void GenericCommunicator::SetSurfacegroupVisibility(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint groupid = 0;
-    m_ipcModule.getUint(&groupid);
     t_ilm_bool myparam = ILM_FALSE;
-    m_ipcModule.getBool(&myparam);
+
+    m_ipcModule.getUint(message, &groupid);
+    m_ipcModule.getBool(message, &myparam);
 
     t_ilm_bool status = m_executor->execute(new SurfacegroupSetVisibilityCommand(groupid, myparam));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::SetLayergroupVisibility()
+void GenericCommunicator::SetLayergroupVisibility(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint groupid = 0;
-    m_ipcModule.getUint(&groupid);
     t_ilm_bool myparam = ILM_FALSE;
-    m_ipcModule.getBool(&myparam);
+
+    m_ipcModule.getUint(message, &groupid);
+    m_ipcModule.getBool(message, &myparam);
 
     t_ilm_bool status = m_executor->execute(new LayergroupSetVisibilityCommand(groupid, myparam));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
 
-void GenericCommunicator::SetRenderOrderOfLayers()
+void GenericCommunicator::SetRenderOrderOfLayers(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint* array = NULL;
     int length = 0;
 
-    m_ipcModule.getUintArray(&array, &length);
-
-    //LOG_DEBUG("GenericCommunicator","Renderorder: Got " << length << " ids.");
+    m_ipcModule.getUintArray(message, &array, &length);
 
     t_ilm_bool status = m_executor->execute(new ScreenSetRenderOrderCommand(array, length));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::SetSurfaceRenderOrderWithinLayer()
+void GenericCommunicator::SetSurfaceRenderOrderWithinLayer(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint* array = NULL;
     int length = 0;
-
     uint layerid = 0;
-    m_ipcModule.getUint(&layerid);
 
-    m_ipcModule.getUintArray(&array, &length);
+    m_ipcModule.getUint(message, &layerid);
+    m_ipcModule.getUintArray(message, &array, &length);
 
     t_ilm_bool status = m_executor->execute(new LayerSetRenderOrderCommand(layerid, array, length));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::GetLayerType()
+void GenericCommunicator::GetLayerType(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint id = 0;
-    m_ipcModule.getUint(&id);
-    Layer* l = m_executor->getScene()->getLayer(id);
-    if (l != NULL)
+    m_ipcModule.getUint(message, &id);
+
+    Layer* layer = m_executor->getScene()->getLayer(id);
+    if (layer)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.appendUint(l->getLayerType());
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
+        m_ipcModule.appendUint(response, layer->getLayerType());
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::GetLayertypeCapabilities()
+void GenericCommunicator::GetLayertypeCapabilities(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint id = 0;
-    m_ipcModule.getUint(&id);
-    LayerType type = (LayerType) id;
+    LayerType type = Unknown;
+
+    m_ipcModule.getUint(message, &id);
+
+    type = (LayerType) id;
+
     uint capabilities = m_executor->getLayerTypeCapabilities(type);
-    //LOG_DEBUG("GenericCommunicator", "GetLayertypeCapabilities: returning capabilities:" << capabilities);
-    m_ipcModule.createMessage((char*)__FUNCTION__);
-    m_ipcModule.appendUint(capabilities);
-    m_ipcModule.sendMessage();
+    response = m_ipcModule.createResponse(message);
+    m_ipcModule.appendUint(response, capabilities);
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::GetLayerCapabilities()
+void GenericCommunicator::GetLayerCapabilities(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint id = 0;
-    m_ipcModule.getUint(&id);
-    Layer* l = m_executor->getScene()->getLayer(id);
-    if (l != NULL)
+    m_ipcModule.getUint(message, &id);
+
+    Layer* layer = m_executor->getScene()->getLayer(id);
+    if (layer)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.appendUint(l->getCapabilities());
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
+        m_ipcModule.appendUint(response, layer->getCapabilities());
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::FadeIn()
+void GenericCommunicator::FadeIn(t_ilm_message message)
 {
-    m_ipcModule.createMessage((char*)__FUNCTION__);
-    m_ipcModule.sendMessage();
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
+    response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, NOT_IMPLEMENTED);
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::SynchronizedFade()
+void GenericCommunicator::SynchronizedFade(t_ilm_message message)
 {
-    m_ipcModule.createMessage((char*)__FUNCTION__);
-    m_ipcModule.sendMessage();
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
+    response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, NOT_IMPLEMENTED);
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::FadeOut()
+void GenericCommunicator::FadeOut(t_ilm_message message)
 {
-    m_ipcModule.createMessage((char*)__FUNCTION__);
-    m_ipcModule.sendMessage();
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
+    response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, NOT_IMPLEMENTED);
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::Exit()
+void GenericCommunicator::Exit(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     t_ilm_bool status = m_executor->execute(new ExitCommand());
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
     }
     else
     {
-        m_ipcModule.sendError(INVALID_ARGUMENT);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, INVALID_ARGUMENT);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::CommitChanges()
+void GenericCommunicator::CommitChanges(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     t_ilm_bool status = m_executor->execute(new CommitCommand());
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
     }
     else
     {
-        m_ipcModule.sendError(INVALID_ARGUMENT);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, INVALID_ARGUMENT);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::CreateShader()
+void GenericCommunicator::CreateShader(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     char vertname[1024];
     char fragname[1024];
-    m_ipcModule.getString(vertname);
-    m_ipcModule.getString(fragname);
     uint id = 0;
+
+    m_ipcModule.getString(message, vertname);
+    m_ipcModule.getString(message, fragname);
 
     t_ilm_bool status = m_executor->execute(new ShaderCreateCommand(vertname, fragname, &id));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.appendUint(id);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
+        m_ipcModule.appendUint(response, id);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::DestroyShader()
+void GenericCommunicator::DestroyShader(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint shaderid = 0;
-    m_ipcModule.getUint(&shaderid);
+
+    m_ipcModule.getUint(message, &shaderid);
 
     t_ilm_bool status = m_executor->execute(new ShaderDestroyCommand(shaderid));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::SetShader()
+void GenericCommunicator::SetShader(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint surfaceId = 0;
     uint shaderid = 0;
-    m_ipcModule.getUint(&surfaceId);
-    m_ipcModule.getUint(&shaderid);
+
+    m_ipcModule.getUint(message, &surfaceId);
+    m_ipcModule.getUint(message, &shaderid);
 
     t_ilm_bool status = m_executor->execute(new SurfaceSetShaderCommand(surfaceId, shaderid));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::SetUniforms()
+void GenericCommunicator::SetUniforms(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint id = 0;
-    m_ipcModule.getUint(&id);
-
     std::vector<string> uniforms;
+
+    m_ipcModule.getUint(message, &id);
 
     // TODO
     //m_ipcModule.getStringArray(&uniforms);
@@ -1964,117 +2220,382 @@ void GenericCommunicator::SetUniforms()
     t_ilm_bool status = m_executor->execute(new ShaderSetUniformsCommand(id, uniforms));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::SetKeyboardFocusOn()
+void GenericCommunicator::SetKeyboardFocusOn(t_ilm_message message)
 {
+    t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
+    t_ilm_message response;
     uint surfaceId = 0;
 
-    m_ipcModule.getUint(&surfaceId);
+    m_ipcModule.getUint(message, &surfaceId);
 
     t_ilm_bool status = m_executor->execute(new SurfaceSetKeyboardFocusCommand(surfaceId));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message);
+        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1);
+    m_ipcModule.destroyMessage(response);
 }
 
 
-void GenericCommunicator::GetKeyboardFocusSurfaceId()
+void GenericCommunicator::GetKeyboardFocusSurfaceId(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint surfaceId;
-    
+
     t_ilm_bool status = m_executor->execute(new SurfaceGetKeyboardFocusCommand(&surfaceId));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.appendUint(surfaceId);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
+        m_ipcModule.appendUint(response, surfaceId);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
-    
-    
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
 
-void GenericCommunicator::UpdateInputEventAcceptanceOn()
+void GenericCommunicator::UpdateInputEventAcceptanceOn(t_ilm_message message)
 {
+    t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
+    t_ilm_message response;
     uint surfaceId = 0;
-        uint udevices = 0;
-        InputDevice devices;
-        t_ilm_bool accept;
+    uint udevices = 0;
+    InputDevice devices;
+    t_ilm_bool accept;
 
-    m_ipcModule.getUint(&surfaceId);
-    m_ipcModule.getUint(&udevices);
-    m_ipcModule.getBool(&accept);
+    m_ipcModule.getUint(message, &surfaceId);
+    m_ipcModule.getUint(message, &udevices);
+    m_ipcModule.getBool(message, &accept);
 
     devices = (InputDevice) udevices;
+
     t_ilm_bool status = m_executor->execute(new SurfaceUpdateInputEventAcceptance(surfaceId, devices, accept));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message);
+        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1);
+    m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::SetSurfaceChromaKey()
+void GenericCommunicator::SetSurfaceChromaKey(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint* array = NULL;
     int length = 0;
     uint surfaceid = 0;
 
-    m_ipcModule.getUint(&surfaceid);
-    m_ipcModule.getUintArray(&array, &length);
+    m_ipcModule.getUint(message, &surfaceid);
+    m_ipcModule.getUintArray(message, &array, &length);
 
     t_ilm_bool status = m_executor->execute(new SurfaceSetChromaKeyCommand(surfaceid, array, length));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
     }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::SetLayerChromaKey()
+void GenericCommunicator::SetLayerChromaKey(t_ilm_message message)
 {
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     uint* array = NULL;
     int length = 0;
     uint layerid = 0;
 
-    m_ipcModule.getUint(&layerid);
-    m_ipcModule.getUintArray(&array, &length);
+    m_ipcModule.getUint(message, &layerid);
+    m_ipcModule.getUintArray(message, &array, &length);
 
     t_ilm_bool status = m_executor->execute(new LayerSetChromaKeyCommand(layerid, array, length));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+    }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
+}
+
+void GenericCommunicator::LayerAddNotification(t_ilm_message message)
+{
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
+    uint layerid = 0;
+
+    m_ipcModule.getUint(message, &layerid);
+
+    Layer* layer = m_executor->getScene()->getLayer(layerid);
+    if (layer)
+    {
+        layer->addNotification(clientHandle);
+        response = m_ipcModule.createResponse(message);
+    }
+    else
+    {
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, INVALID_ARGUMENT);
+    }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
+}
+
+void GenericCommunicator::SurfaceAddNotification(t_ilm_message message)
+{
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
+    uint surfaceid = 0;
+
+    m_ipcModule.getUint(message, &surfaceid);
+
+    Surface* surface = m_executor->getScene()->getSurface(surfaceid);
+    if (surface)
+    {
+        surface->addNotification(clientHandle);
+        response = m_ipcModule.createResponse(message);
+    }
+    else
+    {
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, INVALID_ARGUMENT);
+    }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
+}
+
+void GenericCommunicator::LayerRemoveNotification(t_ilm_message message)
+{
+    t_ilm_message response; t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
+    uint layerid = 0;
+
+    m_ipcModule.getUint(message, &layerid);
+
+    Layer* layer = m_executor->getScene()->getLayer(layerid);
+    if (layer)
+    {
+        layer->removeNotification(clientHandle);
+        response = m_ipcModule.createResponse(message);
+    }
+    else
+    {
+        response = m_ipcModule.createErrorResponse(message); m_ipcModule.appendString(response, INVALID_ARGUMENT);
+    }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1); m_ipcModule.destroyMessage(response);
+}
+
+void GenericCommunicator::SurfaceRemoveNotification(t_ilm_message message)
+{
+    t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
+    t_ilm_message response;
+    uint surfaceid = 0;
+
+    m_ipcModule.getUint(message, &surfaceid);
+
+    Surface* surface = m_executor->getScene()->getSurface(surfaceid);
+    if (surface)
+    {
+        surface->removeNotification(clientHandle);
+        response = m_ipcModule.createResponse(message);
+    }
+    else
+    {
+        response = m_ipcModule.createErrorResponse(message);
+        m_ipcModule.appendString(response, INVALID_ARGUMENT);
+    }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1);
+    m_ipcModule.destroyMessage(response);
+}
+
+void GenericCommunicator::processNotificationQueue()
+{
+    NotificationQueue& notificationQueue = m_executor->getClientNotificationQueue();
+    NotificationQueue::iterator iter = notificationQueue.begin();
+    NotificationQueue::iterator end = notificationQueue.end();
+
+    for (; iter != end; ++iter)
+    {
+        GraphicalObject* object = iter->first;
+        t_ilm_notification_mask mask = iter->second;
+        sendNotification(object, mask);
+    }
+    notificationQueue.clear();
+}
+
+void GenericCommunicator::sendNotification(GraphicalObject* object, t_ilm_notification_mask mask)
+{
+    switch (object->type)
+    {
+    case TypeLayer:
+    {
+        Layer* layer = static_cast<Layer*>(object);
+        if (layer)
+        {
+            ApplicationReferenceList& arl = layer->getNotificationClients();
+
+            if (arl.size())
+            {
+                t_ilm_message notification;
+                Rectangle dest = layer->getDestinationRegion();
+                Rectangle src = layer->getSourceRegion();
+                OrientationType orientation = layer->getOrientation();
+
+                unsigned char chromaKeyRed = 0;
+                unsigned char chromaKeyGreen = 0;
+                unsigned char chromaKeyBlue = 0;
+                layer->getChromaKey(chromaKeyRed, chromaKeyGreen, chromaKeyBlue);
+
+                std::stringstream notificationName;
+                notificationName << "NotificationForLayer" << layer->getID();
+
+                notification = m_ipcModule.createNotification(notificationName.str().c_str());
+                m_ipcModule.appendUint(notification, layer->getID());
+                m_ipcModule.appendUint(notification, mask);
+
+                m_ipcModule.appendDouble(notification, layer->getOpacity());
+                m_ipcModule.appendUint(notification, src.x);
+                m_ipcModule.appendUint(notification, src.y);
+                m_ipcModule.appendUint(notification, src.width);
+                m_ipcModule.appendUint(notification, src.height);
+                m_ipcModule.appendUint(notification, layer->OriginalSourceWidth);
+                m_ipcModule.appendUint(notification, layer->OriginalSourceHeight);
+                m_ipcModule.appendUint(notification, dest.x);
+                m_ipcModule.appendUint(notification, dest.y);
+                m_ipcModule.appendUint(notification, dest.width);
+                m_ipcModule.appendUint(notification, dest.height);
+                m_ipcModule.appendUint(notification, orientation);
+                m_ipcModule.appendBool(notification, layer->getVisibility());
+                m_ipcModule.appendUint(notification, layer->getLayerType());
+                m_ipcModule.appendBool(notification, layer->getChromaKeyEnabled());
+                m_ipcModule.appendUint(notification, chromaKeyRed);
+                m_ipcModule.appendUint(notification, chromaKeyGreen);
+                m_ipcModule.appendUint(notification, chromaKeyBlue);
+
+                int clientCount = arl.size();
+                t_ilm_client_handle clients[clientCount];
+
+                ApplicationReferenceList::iterator iter = arl.begin();
+                ApplicationReferenceList::iterator end = arl.end();
+
+                for (int clientNumber = 0; iter != end; ++iter, ++clientNumber)
+                {
+                    clients[clientNumber] = *iter;
+                }
+
+                LOG_DEBUG("GenericCommunicator", "Sending " << clientCount << " notification(s): layer " << layer->getID() << " was updated.");
+
+                if (!m_ipcModule.sendToClients(notification, clients, clientCount))
+                {
+                    LOG_ERROR("GenericCommunicator", "Sending notification to clients failed.")
+                }
+
+                m_ipcModule.destroyMessage(notification);
+            }
+        }
+    }
+    break;
+    case TypeSurface:
+    {
+        Surface* surface = static_cast<Surface*>(object);
+        if (surface)
+        {
+            ApplicationReferenceList& arl = surface->getNotificationClients();
+
+            if (arl.size())
+            {
+                t_ilm_message notification;
+                std::stringstream notificationName;
+                notificationName << "NotificationForSurface" << surface->getID();
+
+                unsigned char chromaKeyRed = 0;
+                unsigned char chromaKeyGreen = 0;
+                unsigned char chromaKeyBlue = 0;
+                surface->getChromaKey(chromaKeyRed, chromaKeyGreen, chromaKeyBlue);
+
+                notification = m_ipcModule.createNotification(notificationName.str().c_str());
+                m_ipcModule.appendUint(notification, surface->getID());
+                m_ipcModule.appendUint(notification, mask);
+
+                m_ipcModule.appendDouble(notification, surface->getOpacity());
+                m_ipcModule.appendUint(notification, surface->getSourceRegion().x);
+                m_ipcModule.appendUint(notification, surface->getSourceRegion().y);
+                m_ipcModule.appendUint(notification, surface->getSourceRegion().width);
+                m_ipcModule.appendUint(notification, surface->getSourceRegion().height);
+                m_ipcModule.appendUint(notification, surface->OriginalSourceWidth);
+                m_ipcModule.appendUint(notification, surface->OriginalSourceHeight);
+                m_ipcModule.appendUint(notification, surface->getDestinationRegion().x);
+                m_ipcModule.appendUint(notification, surface->getDestinationRegion().y);
+                m_ipcModule.appendUint(notification, surface->getDestinationRegion().width);
+                m_ipcModule.appendUint(notification, surface->getDestinationRegion().height);
+                m_ipcModule.appendUint(notification, surface->getOrientation());
+                m_ipcModule.appendBool(notification, surface->getVisibility());
+                m_ipcModule.appendUint(notification, surface->frameCounter);
+                m_ipcModule.appendUint(notification, surface->drawCounter);
+                m_ipcModule.appendUint(notification, surface->updateCounter);
+                m_ipcModule.appendUint(notification, surface->getPixelFormat());
+                m_ipcModule.appendUint(notification, surface->getNativeContent());
+                m_ipcModule.appendUint(notification, surface->getInputEventAcceptanceOnDevices());
+                m_ipcModule.appendBool(notification, surface->getChromaKeyEnabled());
+                m_ipcModule.appendUint(notification, chromaKeyRed);
+                m_ipcModule.appendUint(notification, chromaKeyGreen);
+                m_ipcModule.appendUint(notification, chromaKeyBlue);
+
+                int clientCount = arl.size();
+                t_ilm_client_handle clients[clientCount];
+
+                ApplicationReferenceList::iterator iter = arl.begin();
+                ApplicationReferenceList::iterator end = arl.end();
+
+                for (int clientNumber = 0; iter != end; ++iter, ++clientNumber)
+                {
+                    clients[clientNumber] = *iter;
+                }
+
+                LOG_DEBUG("GenericCommunicator", "Sending " << clientCount << " notification(s): surface " << surface->getID() << " was updated.");
+
+                if (!m_ipcModule.sendToClients(notification, clients, clientCount))
+                {
+                    LOG_ERROR("GenericCommunicator", "Sending notification to clients failed.")
+                }
+
+                m_ipcModule.destroyMessage(notification);
+            }
+        }
+    }
+    break;
+    default:
+        LOG_INFO("GenericCommunicator", "Unknown notification found in queue.");
+        break;
     }
 }
 

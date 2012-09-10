@@ -81,8 +81,9 @@ public:
     virtual const SurfaceMap getAllSurfaces() const;
     virtual bool isLayerInCurrentRenderOrder(const uint id);
 
-private:
     const LayerMap getAllLayers() const;
+
+private:
     void removeLayerFromAllLayerGroups(Layer* layer);
     void removeSurfaceFromAllSurfaceGroups(Surface* surface);
 

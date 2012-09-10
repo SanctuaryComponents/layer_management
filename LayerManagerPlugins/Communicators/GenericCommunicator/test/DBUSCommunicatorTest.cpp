@@ -121,7 +121,11 @@ public:
     MockLayerList layerlist;
     ApplicationReferenceMap refmap;
     
-    DBUSCommunicatorTest() {
+    DBUSCommunicatorTest()
+    : processThread(0)
+    , running(false)
+    , communicatorUnderTest(NULL)
+    {
     }
 
     virtual ~DBUSCommunicatorTest() {
@@ -151,9 +155,9 @@ public:
 
     void TearDown() {
         running = false;
-        this->communicatorUnderTest->stop();
-        pthread_join(processThread, NULL);
         if (communicatorUnderTest) {
+            this->communicatorUnderTest->stop();
+            pthread_join(processThread, NULL);
             delete communicatorUnderTest;
         }
     }

@@ -55,6 +55,9 @@ class MockCommandExecutor : public ICommandExecutor {
   MOCK_CONST_METHOD1(getNumberOfHardwareLayers, uint(uint));
   MOCK_CONST_METHOD1(getScreenResolution, uint*(uint));
   MOCK_CONST_METHOD1(getScreenIDs, uint*(uint*));
+
+  MOCK_METHOD2(addClientNotification, void(GraphicalObject* object, t_ilm_notification_mask mask));
+  MOCK_METHOD0(getClientNotificationQueue, NotificationQueue&());
 };
 
 #endif /* MockCommandExecutor_H_ */
