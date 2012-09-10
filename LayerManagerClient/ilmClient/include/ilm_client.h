@@ -856,6 +856,45 @@ ilmErrorTypes ilm_UpdateInputEventAcceptanceOn(t_ilm_surface surfaceId, ilmInput
  */
 ilmErrorTypes ilm_commitChanges();
 
+/**
+ * \brief register for notification on property changes of layer
+ * \ingroup ilmClient
+ * \param[in] layer id of layer to register for notification
+ * \param[in] callback pointer to function to be called for notification
+ * \return ILM_SUCCESS if the method call was successful
+ * \return ILM_FAILED if the client can not call the method on the service.
+ */
+ilmErrorTypes ilm_layerAddNotification(t_ilm_layer layer, layerNotificationFunc callback);
+
+/**
+ * \brief remove notification on property changes of layer
+ * \ingroup ilmClient
+ * \param[in] layer id of layer to remove notification
+ * \return ILM_SUCCESS if the method call was successful
+ * \return ILM_FAILED if the client can not call the method on the service.
+ */
+ilmErrorTypes ilm_layerRemoveNotification(t_ilm_layer layer);
+
+/**
+ * \brief register for notification on property changes of surface
+ * \ingroup ilmClient
+ * \param[in] surface id of surface to register for notification
+ * \param[in] callback pointer to function to be called for notification
+ * \return ILM_SUCCESS if the method call was successful
+ * \return ILM_FAILED if the client can not call the method on the service.
+ */
+ilmErrorTypes ilm_surfaceAddNotification(t_ilm_surface surface, surfaceNotificationFunc callback);
+
+/**
+ * \brief remove notification on property changes of surface
+ * \ingroup ilmClient
+ * \param[in] surface id of surface to remove notification
+ * \return ILM_SUCCESS if the method call was successful
+ * \return ILM_FAILED if the client can not call the method on the service.
+ */
+ilmErrorTypes ilm_surfaceRemoveNotification(t_ilm_surface surface);
+
+
 #ifdef __cplusplus
 } //
 #endif // __cplusplus

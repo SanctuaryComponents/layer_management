@@ -23,6 +23,12 @@
 #include "ilm_client_platform.h"
 
 /**
+ * convenience macro to access single bits of a bitmask
+ */
+#define BIT(x) (1 << (x))
+
+
+/**
  * \brief Represent the logical true value
  * \ingroup ilmClient
  **/
@@ -220,15 +226,51 @@ struct ilmLayerProperties
     t_ilm_uint chromaKeyBlue;    /*!< chromakey's blue value of the layer */
 };
 
-
-enum IpcMessageType
+/**
+ * enum representing all possible incoming events for ilmClient and
+ * Communicator Plugin
+ */
+typedef enum e_t_ilm_message_type
 {
     IpcMessageTypeNone = 0,
     IpcMessageTypeCommand,
-    //IpcMessageTypeConnect,
+    IpcMessageTypeConnect,
     IpcMessageTypeDisconnect,
     IpcMessageTypeNotification,
-    IpcMessageTypeError
-};
+    IpcMessageTypeError,
+    IpcMessageTypeShutdown
+} t_ilm_message_type;
+
+/**
+ * Typedef for opaque handling of client handles within an IpcModule
+ */
+typedef void* t_ilm_client_handle;
+
+/**
+ * enum representing the possible flags for changed properties in notification callbacks.
+ */
+typedef enum
+{
+    ILM_NOTIFICATION_VISIBILITY         = BIT(1),
+    ILM_NOTIFICATION_OPACITY            = BIT(2),
+    ILM_NOTIFICATION_ORIENTATION        = BIT(3),
+    ILM_NOTIFICATION_SOURCE_RECT        = BIT(4),
+    ILM_NOTIFICATION_DEST_RECT          = BIT(5),
+    ILM_NOTIFICATION_ALL                = 0xffff
+} t_ilm_notification_mask;
+
+/**
+ * Typedef for notification callback on property changes of a layer
+ */
+typedef void(*layerNotificationFunc)(t_ilm_layer layer,
+                                     struct ilmLayerProperties*,
+                                     t_ilm_notification_mask mask);
+
+/**
+ * Typedef for notification callback on property changes of a surface
+ */
+typedef void(*surfaceNotificationFunc)(t_ilm_surface surface,
+                                     struct ilmSurfaceProperties*,
+                                     t_ilm_notification_mask mask);
 
 #endif // _ILM_TYPES_H_

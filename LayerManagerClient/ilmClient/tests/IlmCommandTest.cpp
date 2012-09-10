@@ -43,12 +43,15 @@ public:
     IlmCommandTest(){
     }
 
-    void SetUp() {
+    static void SetUpTestCase() {
         ilm_init();
      }
+    static void TearDownTestCase() {
+        ilm_destroy();
+    }
+
     void TearDown() {
         removeAll();
-        ilm_destroy();
     }
 
     void removeAll(){
@@ -740,7 +743,7 @@ TEST_F(IlmCommandTest, ilm_takeScreenshot) {
 
     ilm_takeScreenshot(0, "/tmp/test.bmp");
 
-    usleep(50000); // TODO
+    sleep(1);
     f = fopen("/tmp/test.bmp","r");
     ASSERT_TRUE(f!=NULL);
     fclose(f);
