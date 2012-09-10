@@ -22,6 +22,7 @@
 #define _GRAPHICALOBJECT_H_
 
 #include "ObjectType.h"
+#include "ApplicationReferenceList.h"
 
 class Shader;
 
@@ -115,6 +116,21 @@ public:
      */
     Shader* getShader();
 
+    /**
+     * @brief add a client application to be notified on property changes of this graphical object.
+     * @param applicationHash UUID of application, as registered during ServiceConnect() in the client API
+     */
+    void addNotification(t_ilm_client_handle client);
+
+    /**
+     * @brief remove a client application from the notification list on property changes of this graphical object.
+     * @param applicationHash UUID of application, as registered during ServiceConnect() in the client API
+     */
+    void removeNotification(t_ilm_client_handle client);
+
+    ApplicationReferenceList& getNotificationClients();
+
+
 public:
     static const unsigned int INVALID_ID;
     ObjectType type;
@@ -133,6 +149,7 @@ public:
 protected:
     unsigned int graphicInternalId;
     unsigned int graphicExternalId;
+    ApplicationReferenceList applicationList;
 
 private:
     static unsigned int nextGraphicId[TypeMax];
@@ -259,5 +276,19 @@ inline Shader* GraphicalObject::getShader()
     return shader;
 }
 
+inline void GraphicalObject::addNotification(t_ilm_client_handle client)
+{
+    applicationList.push_back(client);
+}
+
+inline void GraphicalObject::removeNotification(t_ilm_client_handle client)
+{
+    applicationList.remove(client);
+}
+
+inline ApplicationReferenceList& GraphicalObject::getNotificationClients()
+{
+    return applicationList;
+}
 
 #endif /* _GRAPHICALOBJECT_H_ */

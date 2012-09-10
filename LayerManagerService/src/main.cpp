@@ -121,7 +121,7 @@ T* getCreateFunction(string libname)
         LOG_ERROR("LayerManagerService", "Failed to load shared lib entry point: " << dlsym_error);
     }
 
-    // TODO: free these resources on shutdown
+    // Note: free these resources on shutdown
     //dlclose(libraryHandle);
     //free(libraryHandle);
 
@@ -517,7 +517,7 @@ int main(int argc, char **argv)
             CommunicatorListIterator commIterEnd = communicatorList.end();
             for (; commIter != commIterEnd; ++commIter)
             {
-                (*commIter)->process(100);
+                (*commIter)->process(-1);
             }
         }
     }

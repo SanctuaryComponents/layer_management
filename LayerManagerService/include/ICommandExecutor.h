@@ -25,6 +25,8 @@
 #include "SceneProviderList.h"
 #include "ApplicationReferenceMap.h"
 #include "LayerType.h"
+#include "ObjectType.h"
+#include "NotificationQueue.h"
 
 class ICommand;
 class Scene;
@@ -216,6 +218,10 @@ public:
      * \todo removable, use default command processing
      */
     virtual unsigned int* getScreenIDs(unsigned int* length) const = 0;
+
+    virtual void addClientNotification(GraphicalObject* object, t_ilm_notification_mask mask) = 0;
+
+    virtual NotificationQueue& getClientNotificationQueue() = 0;
 };
 
 #endif /* _COMMANDEXECUTOR_H_ */

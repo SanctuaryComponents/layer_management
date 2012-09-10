@@ -21,6 +21,7 @@
 #define _LAYERMANAGER_H_
 
 #include "ICommandExecutor.h"
+#include "NotificationQueue.h"
 #include "Scene.h"
 
 class ICommand;
@@ -59,6 +60,9 @@ public:
     virtual RendererList* getRendererList(void);
     virtual CommunicatorList* getCommunicatorList(void);
     virtual SceneProviderList* getSceneProviderList(void);
+
+    virtual void addClientNotification(GraphicalObject* object, t_ilm_notification_mask mask);
+    virtual NotificationQueue& getClientNotificationQueue();
     virtual ApplicationReferenceMap* getApplicationReferenceMap(void);
 
 private:
@@ -76,6 +80,7 @@ private:
     RendererList* m_pRendererList;
     CommunicatorList* m_pCommunicatorList;
     SceneProviderList* m_pSceneProviderList;
+    NotificationQueue m_clientNotificationQueue;
     ApplicationReferenceMap* m_pApplicationReferenceMap;
 };
 
@@ -103,4 +108,22 @@ inline ApplicationReferenceMap* Layermanager::getApplicationReferenceMap(void)
 {
     return m_pApplicationReferenceMap;
 }
+
+inline void Layermanager::addClientNotification(GraphicalObject* object, t_ilm_notification_mask newMask)
+{
+    if (m_clientNotificationQueue.find(object) != m_clientNotificationQueue.end())
+    {
+        m_clientNotificationQueue[object] = (t_ilm_notification_mask)(m_clientNotificationQueue[object] | newMask);
+    }
+    else
+    {
+        m_clientNotificationQueue[object] = newMask;
+    }
+}
+
+inline NotificationQueue& Layermanager::getClientNotificationQueue()
+{
+    return m_clientNotificationQueue;
+}
+
 #endif /* _LAYERMANAGER_H_ */
