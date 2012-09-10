@@ -27,37 +27,43 @@ extern "C" {
 
 struct IpcModule
 {
-    t_ilm_bool (*init)(t_ilm_bool);
+    t_ilm_bool (*initClientMode)();
+    t_ilm_bool (*initServiceMode)();
+
+    t_ilm_message (*createMessage)(t_ilm_const_string);
+    t_ilm_message (*createResponse)(t_ilm_message);
+    t_ilm_message (*createErrorResponse)(t_ilm_message);
+    t_ilm_message (*createNotification)(t_ilm_const_string);
+
+    t_ilm_bool (*appendBool)(t_ilm_message, const t_ilm_bool);
+    t_ilm_bool (*appendDouble)(t_ilm_message, const double);
+    t_ilm_bool (*appendString)(t_ilm_message, const char*);
+    t_ilm_bool (*appendInt)(t_ilm_message, const int);
+    t_ilm_bool (*appendIntArray)(t_ilm_message, const int*, int);
+    t_ilm_bool (*appendUint)(t_ilm_message, const unsigned int);
+    t_ilm_bool (*appendUintArray)(t_ilm_message, const unsigned int*, int);
+
+    t_ilm_bool (*sendToClients)(t_ilm_message, t_ilm_client_handle*, int);
+    t_ilm_bool (*sendToService)(t_ilm_message);
+
+    t_ilm_message (*receive)(t_ilm_int); // timeout in ms
+
+    t_ilm_const_string (*getMessageName)(t_ilm_message);
+    t_ilm_message_type (*getMessageType)(t_ilm_message);
+    t_ilm_const_string (*getSenderName)(t_ilm_message);
+    t_ilm_client_handle (*getSenderHandle)(t_ilm_message);
+
+    t_ilm_bool (*getBool)(t_ilm_message, t_ilm_bool*);
+    t_ilm_bool (*getDouble)(t_ilm_message, double*);
+    t_ilm_bool (*getString)(t_ilm_message, char*);
+    t_ilm_bool (*getInt)(t_ilm_message, int*);
+    t_ilm_bool (*getIntArray)(t_ilm_message, int**, int*);
+    t_ilm_bool (*getUint)(t_ilm_message, unsigned int*);
+    t_ilm_bool (*getUintArray)(t_ilm_message, unsigned int**, int*);
+
+    t_ilm_bool (*destroyMessage)(t_ilm_message);
+
     t_ilm_bool (*destroy)();
-
-    t_ilm_bool (*createMessage)(t_ilm_const_string);
-    t_ilm_bool (*sendMessage)();
-    t_ilm_bool (*destroyMessage)();
-    t_ilm_bool (*sendError)(t_ilm_const_string);
-    enum IpcMessageType (*receiveMessage)(int); // timeout in ms
-
-    t_ilm_const_string (*getMessageName)();
-    t_ilm_const_string (*getSenderName)();
-    t_ilm_bool (*isErrorMessage)();
-
-    t_ilm_bool (*appendBool)(const t_ilm_bool);
-    t_ilm_bool (*getBool)(t_ilm_bool*);
-
-    t_ilm_bool (*appendDouble)(const double);
-    t_ilm_bool (*getDouble)(double*);
-
-    t_ilm_bool (*appendString)(const char*);
-    t_ilm_bool (*getString)(char*);
-
-    t_ilm_bool (*appendInt)(const int);
-    t_ilm_bool (*getInt)(int*);
-    t_ilm_bool (*appendIntArray)(const int*, int);
-    t_ilm_bool (*getIntArray)(int**, int*);
-
-    t_ilm_bool (*appendUint)(const unsigned int);
-    t_ilm_bool (*getUint)(unsigned int*);
-    t_ilm_bool (*appendUintArray)(const unsigned int*, int);
-    t_ilm_bool (*getUintArray)(unsigned int**, int*);
 };
 
 t_ilm_bool loadIpcModule(struct IpcModule* communicator);

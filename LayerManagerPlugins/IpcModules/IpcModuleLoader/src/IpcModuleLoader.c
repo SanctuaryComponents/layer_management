@@ -26,18 +26,12 @@
 #include <dirent.h> // DIR
 #include <string.h> // strcpy, strcat, strstr
 
-//=============================================================================
-// logging
-//=============================================================================
-//#define LOG_ENTER_FUNCTION printf("--> ilmCommunicatorControl::%s\n", __PRETTY_FUNCTION__)
-#define LOG_ENTER_FUNCTION
-
 
 //=============================================================================
 // global variables
 //=============================================================================
 const char* gDefaultPluginLookupPath = CMAKE_INSTALL_PREFIX"/lib/layermanager";
-const char* gCommunicatorPluginDirectory = "/ipcmodules";
+const char* gCommunicatorPluginDirectory = "ipcmodules";
 
 
 //=============================================================================
@@ -58,38 +52,49 @@ t_ilm_bool loadSymbolTable(struct IpcModule* ipcModule, char* path, char* file)
 
     struct ApiFunction ApiFunctionTable[] =
     {
-        { "init",            (void**)&ipcModule->init },
-        { "destroy",         (void**)&ipcModule->destroy },
-        { "createMessage",   (void**)&ipcModule->createMessage },
-        { "sendMessage",     (void**)&ipcModule->sendMessage },
-        { "destroyMessage",  (void**)&ipcModule->destroyMessage },
-        { "sendError",       (void**)&ipcModule->sendError },
-        { "isErrorMessage",  (void**)&ipcModule->isErrorMessage },
-        { "receiveMessage",  (void**)&ipcModule->receiveMessage },
-        { "getMessageName",  (void**)&ipcModule->getMessageName },
-        { "getSenderName",   (void**)&ipcModule->getSenderName },
-        { "appendBool",      (void**)&ipcModule->appendBool },
-        { "getBool",         (void**)&ipcModule->getBool },
-        { "appendDouble",    (void**)&ipcModule->appendDouble },
-        { "getDouble",       (void**)&ipcModule->getDouble },
-        { "appendString",    (void**)&ipcModule->appendString },
-        { "getString",       (void**)&ipcModule->getString },
-        { "appendInt",       (void**)&ipcModule->appendInt },
-        { "getInt",          (void**)&ipcModule->getInt },
-        { "appendIntArray",  (void**)&ipcModule->appendIntArray },
-        { "getIntArray",     (void**)&ipcModule->getIntArray },
-        { "appendUint",      (void**)&ipcModule->appendUint },
-        { "getUint",         (void**)&ipcModule->getUint },
-        { "appendUintArray", (void**)&ipcModule->appendUintArray },
-        { "getUintArray",    (void**)&ipcModule->getUintArray }
+        { "initClientMode",      (void**)&ipcModule->initClientMode },
+        { "initServiceMode",     (void**)&ipcModule->initServiceMode },
+
+        { "createMessage",       (void**)&ipcModule->createMessage },
+        { "createResponse",      (void**)&ipcModule->createResponse },
+        { "createErrorResponse", (void**)&ipcModule->createErrorResponse },
+        { "createNotification",  (void**)&ipcModule->createNotification },
+
+        { "appendBool",          (void**)&ipcModule->appendBool },
+        { "appendDouble",        (void**)&ipcModule->appendDouble },
+        { "appendString",        (void**)&ipcModule->appendString },
+        { "appendInt",           (void**)&ipcModule->appendInt },
+        { "appendIntArray",      (void**)&ipcModule->appendIntArray },
+        { "appendUint",          (void**)&ipcModule->appendUint },
+        { "appendUintArray",     (void**)&ipcModule->appendUintArray },
+
+        { "sendToClients",       (void**)&ipcModule->sendToClients },
+        { "sendToService",       (void**)&ipcModule->sendToService },
+
+        { "receive",             (void**)&ipcModule->receive },
+
+        { "getMessageName",      (void**)&ipcModule->getMessageName },
+        { "getMessageType",      (void**)&ipcModule->getMessageType },
+        { "getSenderName",       (void**)&ipcModule->getSenderName },
+        { "getSenderHandle",     (void**)&ipcModule->getSenderHandle },
+
+        { "getBool",             (void**)&ipcModule->getBool },
+        { "getDouble",           (void**)&ipcModule->getDouble },
+        { "getString",           (void**)&ipcModule->getString },
+        { "getInt",              (void**)&ipcModule->getInt },
+        { "getIntArray",         (void**)&ipcModule->getIntArray },
+        { "getUint",             (void**)&ipcModule->getUint },
+        { "getUintArray",        (void**)&ipcModule->getUintArray },
+
+        { "destroyMessage",      (void**)&ipcModule->destroyMessage },
+
+        { "destroy",             (void**)&ipcModule->destroy }
     };
 
     const unsigned int apiFunctionCount = sizeof (ApiFunctionTable) / sizeof(struct ApiFunction);
     unsigned int symbolCount = 0;
 
-    strcat(fullFilePath, path);
-    strcat(fullFilePath, "/");
-    strcat(fullFilePath, file);
+    snprintf(fullFilePath, sizeof(fullFilePath), "%s/%s", path, file);
 
     pluginLibHandle = dlopen(fullFilePath, RTLD_LAZY);
 
@@ -104,6 +109,11 @@ t_ilm_bool loadSymbolTable(struct IpcModule* ipcModule, char* path, char* file)
             if (*func->funcPtr)
             {
                 symbolCount++;
+                //printf("[ OK ] symbol %s\n", func->name);
+            }
+            else
+            {
+                //printf("[FAIL] symbol %s\n", func->name);
             }
         }
     }
@@ -126,6 +136,10 @@ t_ilm_bool loadSymbolTable(struct IpcModule* ipcModule, char* path, char* file)
         }
     }
 
+    // Note: will break plugin. must be done during shutdown,
+    // but currently there is no unloadIpcModule
+    //dlclose(pluginLibHandle);
+
     return returnValue;
 }
 
@@ -141,8 +155,9 @@ t_ilm_bool loadIpcModule(struct IpcModule* communicator)
     }
 
     char path[1024];
-    strcpy(path, gDefaultPluginLookupPath);
-    strcat(path, gCommunicatorPluginDirectory);
+
+    snprintf(path, sizeof(path), "%s/%s", gDefaultPluginLookupPath,
+                                          gCommunicatorPluginDirectory);
 
     // open directory
     DIR *directory = opendir(path);
