@@ -38,7 +38,15 @@ ExecutionResult LayerSetVisibilityCommand::execute(ICommandExecutor* executor)
     if (layer)
     {
         LOG_DEBUG("LayerSetVisibilityCommand", "setting visibility: " << m_visibility << " of id " << m_idtoSet);
-        result = layer->setVisibility(m_visibility) ? ExecutionSuccessRedraw : ExecutionSuccess;
+        if (layer->setVisibility(m_visibility))
+        {
+            executor->addClientNotification(layer, ILM_NOTIFICATION_VISIBILITY);
+            result = ExecutionSuccessRedraw;
+        }
+        else
+        {
+            result = ExecutionSuccess;
+        }
     }
 
     return result;

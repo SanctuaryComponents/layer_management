@@ -35,15 +35,23 @@ ExecutionResult SurfaceSetPositionCommand::execute(ICommandExecutor* executor)
     ExecutionResult result = ExecutionFailed;
 
     Surface* surface = scene.getSurface(m_id);
-	
+
     if (surface)
     {
-		unsigned int layerid = surface->getContainingLayerId();
-        result = surface->setPosition(m_x, m_y) ? ExecutionSuccessRedraw : ExecutionSuccess;
-        if ( layerid != Surface::INVALID_ID ) 
-        { 			
-			surface->calculateTargetDestination(scene.getLayer(layerid)->getSourceRegion(),scene.getLayer(layerid)->getDestinationRegion());
-		}		        
+        unsigned int layerid = surface->getContainingLayerId();
+        if (surface->setPosition(m_x, m_y))
+        {
+            executor->addClientNotification(surface, ILM_NOTIFICATION_DEST_RECT);
+            result = ExecutionSuccessRedraw;
+        }
+        else
+        {
+            result = ExecutionSuccess;
+        }
+        if (layerid != Surface::INVALID_ID)
+        {
+            surface->calculateTargetDestination(scene.getLayer(layerid)->getSourceRegion(),scene.getLayer(layerid)->getDestinationRegion());
+        }
     }
     return result;
 }

@@ -39,13 +39,21 @@ ExecutionResult SurfaceSetSourceRectangleCommand::execute(ICommandExecutor* exec
     Surface* surface = scene.getSurface(m_id);
     if (surface)
     {
-		unsigned int layerid = surface->getContainingLayerId();
+        unsigned int layerid = surface->getContainingLayerId();
         const Rectangle rectangle(m_x, m_y, m_width, m_height);
-        result = surface->setSourceRegion(rectangle) ? ExecutionSuccessRedraw : ExecutionSuccess;
+        if (surface->setSourceRegion(rectangle))
+        {
+            executor->addClientNotification(surface, ILM_NOTIFICATION_SOURCE_RECT);
+            result = ExecutionSuccessRedraw;
+        }
+        else
+        {
+            result = ExecutionSuccess;
+        }
         if ( layerid != Surface::INVALID_ID ) 
-        { 			
-			surface->calculateTargetDestination(scene.getLayer(layerid)->getSourceRegion(),scene.getLayer(layerid)->getDestinationRegion());
-		}	        
+        {
+            surface->calculateTargetDestination(scene.getLayer(layerid)->getSourceRegion(),scene.getLayer(layerid)->getDestinationRegion());
+        }
     }
 
     return result;

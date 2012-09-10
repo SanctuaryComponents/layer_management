@@ -38,8 +38,16 @@ ExecutionResult LayerSetPositionCommand::execute(ICommandExecutor* executor)
 
     if (layer)
     {
-        result = layer->setPosition(m_x, m_y) ? ExecutionSuccessRedraw : ExecutionSuccess;
-		layer->applySurfaceTransform();        
+        if (layer->setPosition(m_x, m_y))
+        {
+            result = ExecutionSuccessRedraw;
+            executor->addClientNotification(layer, ILM_NOTIFICATION_DEST_RECT);
+        }
+        else
+        {
+            result = ExecutionSuccess;
+        }
+        layer->applySurfaceTransform();
     }
     return result;
 }

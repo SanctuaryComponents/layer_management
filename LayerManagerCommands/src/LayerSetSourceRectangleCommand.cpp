@@ -41,7 +41,15 @@ ExecutionResult LayerSetSourceRectangleCommand::execute(ICommandExecutor* execut
     if (layer)
     {
         const Rectangle rectangle(m_x, m_y, m_width, m_height);
-        result = layer->setSourceRegion(rectangle) ? ExecutionSuccessRedraw : ExecutionSuccess;
+        if (layer->setSourceRegion(rectangle))
+        {
+            result = ExecutionSuccessRedraw;
+            executor->addClientNotification(layer, ILM_NOTIFICATION_SOURCE_RECT);
+        }
+        else
+        {
+            result = ExecutionSuccess;
+        }
         layer->applySurfaceTransform();
     }
 

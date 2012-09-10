@@ -37,7 +37,15 @@ ExecutionResult SurfaceSetOrientationCommand::execute(ICommandExecutor* executor
 
     if (surface)
     {
-        result = surface->setOrientation(m_orientation) ? ExecutionSuccessRedraw : ExecutionSuccess;
+        if (surface->setOrientation(m_orientation))
+        {
+            executor->addClientNotification(surface, ILM_NOTIFICATION_ORIENTATION);
+            result = ExecutionSuccessRedraw;
+        }
+        else
+        {
+            result = ExecutionSuccess;
+        }
     }
 
     return result;

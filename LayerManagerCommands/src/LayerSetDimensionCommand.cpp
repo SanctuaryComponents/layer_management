@@ -38,7 +38,15 @@ ExecutionResult LayerSetDimensionCommand::execute(ICommandExecutor* executor)
 
     if (layer)
     {
-        result = layer->setDimension(m_width, m_height) ? ExecutionSuccessRedraw : ExecutionSuccess;
+        if (layer->setDimension(m_width, m_height))
+        {
+            result = ExecutionSuccessRedraw;
+            executor->addClientNotification(layer, ILM_NOTIFICATION_DEST_RECT);
+        }
+        else
+        {
+            result = ExecutionSuccess;
+        }
         layer->applySurfaceTransform();
     }
 

@@ -38,7 +38,15 @@ ExecutionResult LayerSetOpacityCommand::execute(ICommandExecutor* executor)
     if (layer)
     {
         LOG_DEBUG("LayerSetOpacityCommand","new opacity " << m_opacity << " for id: " << m_id);
-        result = layer->setOpacity(m_opacity) ? ExecutionSuccessRedraw : ExecutionSuccess;
+        if (layer->setOpacity(m_opacity))
+        {
+            result = ExecutionSuccessRedraw;
+            executor->addClientNotification(layer, ILM_NOTIFICATION_OPACITY);
+        }
+        else
+        {
+            result = ExecutionSuccess;
+        }
     }
 
     return result;

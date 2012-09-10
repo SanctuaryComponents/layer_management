@@ -42,8 +42,17 @@ ExecutionResult LayerSetDestinationRectangleCommand::execute(ICommandExecutor* e
     if (layer)
     {
         const Rectangle rectangle(m_x, m_y, m_width, m_height);
-        result = layer->setDestinationRegion(rectangle) ? ExecutionSuccessRedraw : ExecutionSuccess;
-		layer->applySurfaceTransform();
+        if (layer->setDestinationRegion(rectangle))
+        {
+            result = ExecutionSuccessRedraw;
+            executor->addClientNotification(layer, ILM_NOTIFICATION_DEST_RECT);
+        }
+        else
+        {
+            result = ExecutionSuccess;
+        }
+
+        layer->applySurfaceTransform();
     }
 
     return result;
