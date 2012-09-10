@@ -18,6 +18,7 @@
  ****************************************************************************/
 #include "ExpressionInterpreter.h"
 #include "Expression.h"
+#include "ilm_client.h"
 #include <string>
 #include <sstream>
 #include <algorithm> // transform
@@ -98,7 +99,17 @@ CommandResult ExpressionInterpreter::interpretCommand(string userInput)
     {
         if (currentWord->isExecutable())
         {
-            currentWord->execute();
+            if (ILM_SUCCESS != ilm_init())
+            {
+                mErrorText = "Could not connect to LayerManagerService.";
+                result = CommandExecutionFailed;
+            }
+
+            else
+            {
+                currentWord->execute();
+                ilm_destroy();
+            }
         }
         else
         {

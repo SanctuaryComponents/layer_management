@@ -27,7 +27,8 @@ enum CommandResult
 {
     CommandSuccess,
     CommandIncomplete,
-    CommandInvalid
+    CommandInvalid,
+    CommandExecutionFailed
 };
 
 class ExpressionInterpreter

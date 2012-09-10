@@ -17,7 +17,6 @@
  *
  ****************************************************************************/
 #include "ExpressionInterpreter.h"
-#include "ilm_client.h"
 #include <iostream>
 using namespace std;
 
@@ -42,19 +41,11 @@ int main(int argc, char* argv[])
         userCommand = userCommand.substr(0, userCommand.size() - 1);
     }
 
-    if (ILM_SUCCESS != ilm_init() && userCommand != "help")
-    {
-        cerr << "Could not connect to LayerManagerService.\n";
-        return 0;
-    }
-
     // start interpreter
     if (CommandSuccess != interpreter.interpretCommand(userCommand))
     {
         cerr << "Interpreter error: " << interpreter.getLastError() << endl;
     }
-
-    ilm_destroy();
 
     return 0;
 }

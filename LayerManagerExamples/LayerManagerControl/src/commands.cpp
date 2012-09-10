@@ -540,6 +540,8 @@ COMMAND("set surface <surfaceid> accept <acceptance> input events from devices <
     }
     ilm_UpdateInputEventAcceptanceOn(surfaceId, devices, acceptance);
     ilm_commitChanges();
+
+    delete[] str;
 }
 
 //=============================================================================
@@ -553,7 +555,6 @@ COMMAND("set surface <surfaceid> chromakey <red> <green> <blue>")
         input->getInt("green"),
         input->getInt("blue")
     };
-
     ilm_surfaceSetChromaKey(surface, color);
     ilm_commitChanges();
 }
@@ -584,12 +585,201 @@ COMMAND("set layer <layerid> chromakey <red> <green> <blue>")
 }
 
 //=============================================================================
-COMMAND("set layer <layerid> chromakey disabled")
-//=============================================================================
+void layerNotificationCallback(t_ilm_layer layer,
+                               struct ilmLayerProperties* properties,
+                               t_ilm_notification_mask mask)
 {
-    t_ilm_surface surface = input->getUint("layerid");
-    ilm_layerSetChromaKey(surface, NULL);
-    ilm_commitChanges();
+    cout << "\nNotification: layer " << layer << " updated properties:\n";
+
+    if (ILM_NOTIFICATION_VISIBILITY & mask)
+    {
+        cout << "\tvisibility = " << properties->visibility << "\n";
+    }
+
+    if (ILM_NOTIFICATION_OPACITY & mask)
+    {
+        cout << "\topacity = " << properties->opacity << "\n";
+    }
+
+    if (ILM_NOTIFICATION_ORIENTATION & mask)
+    {
+        cout << "\torientation = " << properties->orientation << "\n";
+    }
+
+    if (ILM_NOTIFICATION_SOURCE_RECT & mask)
+    {
+        cout << "\tsource rect = x:" << properties->sourceX
+             << ", y:" << properties->sourceY
+             << ", width:" << properties->sourceWidth
+             << ", height:" << properties->sourceHeight
+             << "\n";
+    }
+
+    if (ILM_NOTIFICATION_DEST_RECT & mask)
+    {
+        cout << "\tdest rect = x:" << properties->destX
+             << ", y:" << properties->destY
+             << ", width:" << properties->destWidth
+             << ", height:" << properties->destHeight
+             << "\n";
+    }
 }
 
+COMMAND("test notification layer <layerid>")
+//=============================================================================
+{
+    ilmErrorTypes ret;
+    unsigned int layerid = input->getUint("layerid");
+
+    cout << "Setup notification for layer " << layerid << " \n";
+    ret = ilm_layerAddNotification(layerid, layerNotificationCallback);
+
+    if (ret != ILM_SUCCESS)
+    {
+        cerr << "ilm_layerAddNotification returned error " << ret << "\n";
+    }
+
+    for  (int i = 0; i < 2; ++i)
+    {
+        usleep(100 * 1000);
+        cout << "Set layer 1000 visbility to FALSE\n";
+        ilm_layerSetVisibility(layerid, ILM_FALSE);
+        ilm_commitChanges();
+
+        usleep(100 * 1000);
+        cout << "Set layer 1000 visbility to TRUE\n";
+        ilm_layerSetVisibility(layerid, ILM_TRUE);
+
+        cout << "Set layer 1000 opacity to 0.3\n";
+        ilm_layerSetOpacity(layerid, 0.3);
+        ilm_commitChanges();
+
+        usleep(100 * 1000);
+        cout << "Set layer 1000 opacity to 1.0\n";
+        ilm_layerSetOpacity(layerid, 1.0);
+        ilm_commitChanges();
+    }
+
+    ilm_commitChanges(); // make sure, app lives long enough to receive last notification
+}
+
+//=============================================================================
+COMMAND("watch layer <layeridarray>")
+//=============================================================================
+{
+    ilmErrorTypes ret;
+
+    unsigned int* layerids = NULL;
+    unsigned int layeridCount;
+    input->getUintArray("layeridarray", &layerids, &layeridCount);
+
+    for (int i = 0; i < layeridCount; ++i)
+    {
+        unsigned int layerid = layerids[i];
+        cout << "Setup notification for layer " << layerid << "\n";
+        ret = ilm_layerAddNotification(layerid, layerNotificationCallback);
+
+        if (ret != ILM_SUCCESS)
+        {
+            cerr << "ilm_layerAddNotification(" << layerid << ") returned error " << ret << "\n";
+            return;
+        }
+    }
+
+    cout << "Waiting for notifications...\n";
+    int block;
+    cin >> block;
+
+    for (int i = 0; i < layeridCount; ++i)
+    {
+        unsigned int layerid = layerids[i];
+        cout << "Removing notification for layer " << layerid << "\n";
+        ilm_layerRemoveNotification(layerid);
+    }
+
+    if (layerids)
+    {
+        delete[] layerids;
+    }
+}
+
+//=============================================================================
+void surfaceNotificationCallback(t_ilm_layer surface,
+                               struct ilmSurfaceProperties* properties,
+                               t_ilm_notification_mask mask)
+{
+    cout << "\nNotification: surface " << surface << " updated properties:\n";
+
+    if (ILM_NOTIFICATION_VISIBILITY & mask)
+    {
+        cout << "\tvisibility = " << properties->visibility << "\n";
+    }
+
+    if (ILM_NOTIFICATION_OPACITY & mask)
+    {
+        cout << "\topacity = " << properties->opacity << "\n";
+    }
+
+    if (ILM_NOTIFICATION_ORIENTATION & mask)
+    {
+        cout << "\torientation = " << properties->orientation << "\n";
+    }
+
+    if (ILM_NOTIFICATION_SOURCE_RECT & mask)
+    {
+        cout << "\tsource rect = x:" << properties->sourceX
+             << ", y:" << properties->sourceY
+             << ", width:" << properties->sourceWidth
+             << ", height:" << properties->sourceHeight
+             << "\n";
+    }
+
+    if (ILM_NOTIFICATION_DEST_RECT & mask)
+    {
+        cout << "\tdest rect = x:" << properties->destX
+             << ", y:" << properties->destY
+             << ", width:" << properties->destWidth
+             << ", height:" << properties->destHeight
+             << "\n";
+    }
+}
+
+COMMAND("watch surface <surfaceidarray>")
+//=============================================================================
+{
+    ilmErrorTypes ret;
+
+    unsigned int* surfaceids = NULL;
+    unsigned int surfaceidCount;
+    input->getUintArray("surfaceidarray", &surfaceids, &surfaceidCount);
+
+    for (int i = 0; i < surfaceidCount; ++i)
+    {
+        unsigned int surfaceid = surfaceids[i];
+        cout << "Setup notification for surface " << surfaceid << "\n";
+        ret = ilm_surfaceAddNotification(surfaceid, surfaceNotificationCallback);
+
+        if (ret != ILM_SUCCESS)
+        {
+            cerr << "ilm_surfaceAddNotification(" << surfaceid << ") returned error " << ret << "\n";
+            return;
+        }
+    }
+
+    cout << "Waiting for notifications...\n";
+    int block;
+    cin >> block;
+
+    for (int i = 0; i < surfaceidCount; ++i)
+    {
+        unsigned int surfaceid = surfaceids[i];
+        cout << "Removing notification for surface " << surfaceid << "\n";
+        ilm_surfaceRemoveNotification(surfaceid);
+    }
+
+    if (surfaceids)
+    {
+        delete[] surfaceids;
+    }
+}
 
