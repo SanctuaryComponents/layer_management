@@ -39,6 +39,7 @@ add_dependencies(ilmClient
 set(LIBS
     ${LIBS}
     IpcModuleLoader
+    rt
     ${CMAKE_THREAD_LIBS_INIT}
 )
 
@@ -60,7 +61,7 @@ if (WITH_TESTS)
 
     enable_testing()
     
-    add_executable(ilmClient_Test tests/IlmCommandTest.cpp)
+    add_executable(ilmClient_Test tests/IlmCommandTest.cpp tests/IlmNotificationTest.cpp src/generic_ilm_client.c)
     target_link_libraries(ilmClient_Test ilmClient ${LIBS} gtest)
     
     add_test(ilmClient ilmClient_Test )

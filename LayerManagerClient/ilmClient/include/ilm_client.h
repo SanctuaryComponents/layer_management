@@ -863,6 +863,7 @@ ilmErrorTypes ilm_commitChanges();
  * \param[in] callback pointer to function to be called for notification
  * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
+ * \return ILM_ERROR_INVALID_ARGUMENT if the given layer already has notification callback registered
  */
 ilmErrorTypes ilm_layerAddNotification(t_ilm_layer layer, layerNotificationFunc callback);
 
@@ -872,6 +873,7 @@ ilmErrorTypes ilm_layerAddNotification(t_ilm_layer layer, layerNotificationFunc 
  * \param[in] layer id of layer to remove notification
  * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
+ * \return ILM_ERROR_INVALID_ARGUMENT if the given layer has no notification callback registered
  */
 ilmErrorTypes ilm_layerRemoveNotification(t_ilm_layer layer);
 
@@ -882,6 +884,7 @@ ilmErrorTypes ilm_layerRemoveNotification(t_ilm_layer layer);
  * \param[in] callback pointer to function to be called for notification
  * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
+ * \return ILM_ERROR_INVALID_ARGUMENT if the given surface already has notification callback registered
  */
 ilmErrorTypes ilm_surfaceAddNotification(t_ilm_surface surface, surfaceNotificationFunc callback);
 
@@ -891,6 +894,7 @@ ilmErrorTypes ilm_surfaceAddNotification(t_ilm_surface surface, surfaceNotificat
  * \param[in] surface id of surface to remove notification
  * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
+ * \return ILM_ERROR_INVALID_ARGUMENT if the given surface has no notification callback registered
  */
 ilmErrorTypes ilm_surfaceRemoveNotification(t_ilm_surface surface);
 

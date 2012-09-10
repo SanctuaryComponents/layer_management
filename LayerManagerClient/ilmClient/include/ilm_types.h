@@ -247,6 +247,11 @@ typedef enum e_t_ilm_message_type
 typedef void* t_ilm_client_handle;
 
 /**
+ * Typedef for opaque handling of messages from IpcModule
+ */
+typedef void* t_ilm_message;
+
+/**
  * enum representing the possible flags for changed properties in notification callbacks.
  */
 typedef enum

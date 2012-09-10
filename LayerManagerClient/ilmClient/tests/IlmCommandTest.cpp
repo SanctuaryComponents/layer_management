@@ -955,3 +955,40 @@ TEST_F(IlmCommandTest, ilm_input_event_acceptance)
     EXPECT_NE(surface1, surface);
 }
 
+extern "C"
+{
+    void calculateTimeout(struct timeval* currentTime, int giventimeout, struct timespec* timeout);
+}
+
+TEST(Calc, TimeCalcTestWith1SecondOverflow)
+{
+   struct timeval currentTime;
+   struct timespec timeAdded;
+   currentTime.tv_usec = 456000;
+   currentTime.tv_sec = 3;
+   calculateTimeout(&currentTime, 544, &timeAdded);
+   ASSERT_EQ(4, timeAdded.tv_sec);
+   ASSERT_EQ(0, timeAdded.tv_nsec);
+}
+
+TEST(Calc, TimeCalcTestWithMultipleSecondsOverflow)
+{
+   struct timeval currentTime;
+   struct timespec timeAdded;
+   currentTime.tv_usec = 123456;
+   currentTime.tv_sec = 3;
+   calculateTimeout(&currentTime, 3500, &timeAdded);
+   ASSERT_EQ(6, timeAdded.tv_sec);
+   ASSERT_EQ(623456000, timeAdded.tv_nsec);
+}
+
+TEST(Calc, TimeCalcTestWithoutOverflow)
+{
+   struct timeval currentTime;
+   struct timespec timeAdded;
+   currentTime.tv_usec = 123456;
+   currentTime.tv_sec = 3;
+   calculateTimeout(&currentTime, 544, &timeAdded);
+   ASSERT_EQ(3, timeAdded.tv_sec);
+   ASSERT_EQ(667456000, timeAdded.tv_nsec);
+}
