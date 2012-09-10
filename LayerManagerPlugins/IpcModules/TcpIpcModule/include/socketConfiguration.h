@@ -28,17 +28,12 @@
 #define SOCKET_MAX_MESSAGE_SIZE         1024
 #define SOCKET_MAX_PENDING_CONNECTIONS  10
 
-#define SOCKET_MESSAGE_BUFFER_COUNT     2
-
-#define SOCKET_MESSAGE_TYPE_NORMAL      'n'
-#define SOCKET_MESSAGE_TYPE_ERROR       'e'
-
-#define SOCKET_MESSAGE_TYPE_INT         'i'
-#define SOCKET_MESSAGE_TYPE_UINT        'u'
-#define SOCKET_MESSAGE_TYPE_BOOL        'b'
-#define SOCKET_MESSAGE_TYPE_DOUBLE      'd'
-#define SOCKET_MESSAGE_TYPE_STRING      's'
-#define SOCKET_MESSAGE_TYPE_ARRAY       'a'
+#define SOCKET_MESSAGE_TYPE_INT          'i'
+#define SOCKET_MESSAGE_TYPE_UINT         'u'
+#define SOCKET_MESSAGE_TYPE_BOOL         'b'
+#define SOCKET_MESSAGE_TYPE_DOUBLE       'd'
+#define SOCKET_MESSAGE_TYPE_STRING       's'
+#define SOCKET_MESSAGE_TYPE_ARRAY        'a'
 
 #define ENV_TCP_HOST                    "LM_TCP_HOST"
 #define ENV_TCP_PORT                    "LM_TCP_PORT"

@@ -25,11 +25,9 @@
 // get simple data types
 //-----------------------------------------------------------------------------
 
-t_ilm_bool getGenericValue(void* value, const char protocolType, const char expectedSize)
+t_ilm_bool getGenericValue(struct SocketMessage* msg, void* value, const char protocolType, const char expectedSize)
 {
     t_ilm_bool result = ILM_FALSE;
-
-    struct SocketMessage* msg = &gState.incomingMessage[gState.incomingQueueIndex];
 
     // get protocol value from message
     char readType = msg->paket.data[msg->index];
@@ -75,40 +73,43 @@ t_ilm_bool getGenericValue(void* value, const char protocolType, const char expe
     return ILM_TRUE;
 }
 
-t_ilm_bool getUint(t_ilm_uint* value)
+t_ilm_bool getUint(t_ilm_message message, t_ilm_uint* value)
 {
-    return getGenericValue(value, SOCKET_MESSAGE_TYPE_UINT, sizeof(t_ilm_uint));
+    struct SocketMessage* msg = (struct SocketMessage*)message;
+    return getGenericValue(msg, value, SOCKET_MESSAGE_TYPE_UINT, sizeof(t_ilm_uint));
 }
 
-t_ilm_bool getInt(t_ilm_int* value)
+t_ilm_bool getInt(t_ilm_message message, t_ilm_int* value)
 {
-    return getGenericValue(value, SOCKET_MESSAGE_TYPE_INT, sizeof(t_ilm_int));
+    struct SocketMessage* msg = (struct SocketMessage*)message;
+    return getGenericValue(msg, value, SOCKET_MESSAGE_TYPE_INT, sizeof(t_ilm_int));
 }
 
-t_ilm_bool getBool(t_ilm_bool* value)
+t_ilm_bool getBool(t_ilm_message message, t_ilm_bool* value)
 {
-    return getGenericValue(value, SOCKET_MESSAGE_TYPE_BOOL, sizeof(t_ilm_bool));
+    struct SocketMessage* msg = (struct SocketMessage*)message;
+    return getGenericValue(msg, value, SOCKET_MESSAGE_TYPE_BOOL, sizeof(t_ilm_bool));
 }
 
-t_ilm_bool getDouble(t_ilm_float* value)
+t_ilm_bool getDouble(t_ilm_message message, t_ilm_float* value)
 {
-    return getGenericValue(value, SOCKET_MESSAGE_TYPE_DOUBLE, sizeof(t_ilm_float));
+    struct SocketMessage* msg = (struct SocketMessage*)message;
+    return getGenericValue(msg, value, SOCKET_MESSAGE_TYPE_DOUBLE, sizeof(t_ilm_float));
 }
 
-t_ilm_bool getString(char* value)
+t_ilm_bool getString(t_ilm_message message, char* value)
 {
-    return getGenericValue(value, SOCKET_MESSAGE_TYPE_STRING, sizeof(t_ilm_const_string));
+    struct SocketMessage* msg = (struct SocketMessage*)message;
+    return getGenericValue(msg, value, SOCKET_MESSAGE_TYPE_STRING, sizeof(t_ilm_const_string));
 }
 
 //-----------------------------------------------------------------------------
 // get array data types
 //-----------------------------------------------------------------------------
 
-t_ilm_bool getGenericArray(t_ilm_int* arraySize, void** value, const char protocolType, const char expectedSize)
+t_ilm_bool getGenericArray(struct SocketMessage* msg, t_ilm_int* arraySize, void** value, const char protocolType, const char expectedSize)
 {
     t_ilm_bool result = ILM_TRUE;
-
-    struct SocketMessage* msg = &gState.incomingMessage[gState.incomingQueueIndex];
 
     // get protocol value from message
     char readType = msg->paket.data[msg->index];
@@ -134,19 +135,21 @@ t_ilm_bool getGenericArray(t_ilm_int* arraySize, void** value, const char protoc
     char i = 0;
     for (i = 0; i < *arraySize; ++i)
     {
-        result &= getGenericValue(((*value) + expectedSize * i), protocolType, expectedSize);
+        result &= getGenericValue(msg, ((*value) + expectedSize * i), protocolType, expectedSize);
     }
 
     return result;
 }
 
-t_ilm_bool getIntArray(t_ilm_int** valueArray, t_ilm_int* arraySize)
+t_ilm_bool getIntArray(t_ilm_message message, t_ilm_int** valueArray, t_ilm_int* arraySize)
 {
-    return getGenericArray(arraySize, (void**)valueArray, SOCKET_MESSAGE_TYPE_INT, sizeof(t_ilm_int));
+    struct SocketMessage* msg = (struct SocketMessage*)message;
+    return getGenericArray(msg, arraySize, (void**)valueArray, SOCKET_MESSAGE_TYPE_INT, sizeof(t_ilm_int));
 }
 
-t_ilm_bool getUintArray(t_ilm_uint** valueArray, t_ilm_int* arraySize)
+t_ilm_bool getUintArray(t_ilm_message message, t_ilm_uint** valueArray, t_ilm_int* arraySize)
 {
-    return getGenericArray(arraySize, (void**)valueArray, SOCKET_MESSAGE_TYPE_UINT, sizeof(t_ilm_uint));
+    struct SocketMessage* msg = (struct SocketMessage*)message;
+    return getGenericArray(msg, arraySize, (void**)valueArray, SOCKET_MESSAGE_TYPE_UINT, sizeof(t_ilm_uint));
 }
 

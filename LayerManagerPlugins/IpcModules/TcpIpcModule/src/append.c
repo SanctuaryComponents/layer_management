@@ -23,10 +23,8 @@
 // append simple data types
 //-----------------------------------------------------------------------------
 
-t_ilm_bool appendGenericValue(const char protocolType, const char size, const void* value)
+t_ilm_bool appendGenericValue(struct SocketMessage* msg, const char protocolType, const char size, const void* value)
 {
-    struct SocketMessage* msg = &gState.outgoingMessage;
-
     // size check: is message size reached
     if (sizeof(msg->paket) - sizeof(msg->paket.data)  // header
         + msg->index + size                           // + data
@@ -51,40 +49,43 @@ t_ilm_bool appendGenericValue(const char protocolType, const char size, const vo
     return ILM_TRUE;
 }
 
-t_ilm_bool appendUint(const t_ilm_uint value)
+t_ilm_bool appendUint(t_ilm_message message, const t_ilm_uint value)
 {
-    return appendGenericValue(SOCKET_MESSAGE_TYPE_UINT, sizeof(t_ilm_uint), &value);
+    struct SocketMessage* msg = (struct SocketMessage*)message;
+    return appendGenericValue(msg, SOCKET_MESSAGE_TYPE_UINT, sizeof(t_ilm_uint), &value);
 }
 
-t_ilm_bool appendInt(const t_ilm_int value)
+t_ilm_bool appendInt(t_ilm_message message, const t_ilm_int value)
 {
-    return appendGenericValue(SOCKET_MESSAGE_TYPE_INT, sizeof(t_ilm_int), &value);
+    struct SocketMessage* msg = (struct SocketMessage*)message;
+    return appendGenericValue(msg, SOCKET_MESSAGE_TYPE_INT, sizeof(t_ilm_int), &value);
 }
 
-t_ilm_bool appendBool(const t_ilm_bool value)
+t_ilm_bool appendBool(t_ilm_message message, const t_ilm_bool value)
 {
-    return appendGenericValue(SOCKET_MESSAGE_TYPE_BOOL, sizeof(t_ilm_bool), &value);
+    struct SocketMessage* msg = (struct SocketMessage*)message;
+    return appendGenericValue(msg, SOCKET_MESSAGE_TYPE_BOOL, sizeof(t_ilm_bool), &value);
 }
 
-t_ilm_bool appendDouble(const t_ilm_float value)
+t_ilm_bool appendDouble(t_ilm_message message, const t_ilm_float value)
 {
-    return appendGenericValue(SOCKET_MESSAGE_TYPE_DOUBLE, sizeof(t_ilm_float), &value);
+    struct SocketMessage* msg = (struct SocketMessage*)message;
+    return appendGenericValue(msg, SOCKET_MESSAGE_TYPE_DOUBLE, sizeof(t_ilm_float), &value);
 }
 
-t_ilm_bool appendString(t_ilm_const_string value)
+t_ilm_bool appendString(t_ilm_message message, t_ilm_const_string value)
 {
-    return appendGenericValue(SOCKET_MESSAGE_TYPE_STRING, strlen(value), value);
+    struct SocketMessage* msg = (struct SocketMessage*)message;
+    return appendGenericValue(msg, SOCKET_MESSAGE_TYPE_STRING, strlen(value), value);
 }
 
 //-----------------------------------------------------------------------------
 // append array data types
 //-----------------------------------------------------------------------------
 
-t_ilm_bool appendGenericArray(const char arraySize, const char protocolType, const char size, const void* value)
+t_ilm_bool appendGenericArray(struct SocketMessage* msg, const char arraySize, const char protocolType, const char size, const void* value)
 {
     t_ilm_bool result = ILM_TRUE;
-
-    struct SocketMessage* msg = &gState.outgoingMessage;
 
     // TODO: size check: is message size reached?
 
@@ -100,30 +101,34 @@ t_ilm_bool appendGenericArray(const char arraySize, const char protocolType, con
     char i = 0;
     for (i = 0; i < arraySize; ++i)
     {
-        result &= appendGenericValue(protocolType, size, value + i * size);
+        result &= appendGenericValue(msg, protocolType, size, value + i * size);
     }
 
     return result;
 }
 
-t_ilm_bool appendUintArray(const t_ilm_uint* valueArray, t_ilm_int arraySize)
+t_ilm_bool appendUintArray(t_ilm_message message, const t_ilm_uint* valueArray, t_ilm_int arraySize)
 {
-    return appendGenericArray(arraySize, SOCKET_MESSAGE_TYPE_UINT, sizeof(t_ilm_uint), valueArray);
+    struct SocketMessage* msg = (struct SocketMessage*)message;
+    return appendGenericArray(msg, arraySize, SOCKET_MESSAGE_TYPE_UINT, sizeof(t_ilm_uint), valueArray);
 }
 
-t_ilm_bool appendIntArray(const t_ilm_int* valueArray, t_ilm_int arraySize)
+t_ilm_bool appendIntArray(t_ilm_message message, const t_ilm_int* valueArray, t_ilm_int arraySize)
 {
-    return appendGenericArray(arraySize, SOCKET_MESSAGE_TYPE_INT, sizeof(t_ilm_int), valueArray);
+    struct SocketMessage* msg = (struct SocketMessage*)message;
+    return appendGenericArray(msg, arraySize, SOCKET_MESSAGE_TYPE_INT, sizeof(t_ilm_int), valueArray);
 }
 
-t_ilm_bool appendBoolArray(const t_ilm_bool* valueArray, t_ilm_int arraySize)
+t_ilm_bool appendBoolArray(t_ilm_message message, const t_ilm_bool* valueArray, t_ilm_int arraySize)
 {
-    return appendGenericArray(arraySize, SOCKET_MESSAGE_TYPE_BOOL, sizeof(t_ilm_bool), valueArray);
+    struct SocketMessage* msg = (struct SocketMessage*)message;
+    return appendGenericArray(msg, arraySize, SOCKET_MESSAGE_TYPE_BOOL, sizeof(t_ilm_bool), valueArray);
 }
 
-t_ilm_bool appendDoubleArray(const t_ilm_float* valueArray, t_ilm_int arraySize)
+t_ilm_bool appendDoubleArray(t_ilm_message message, const t_ilm_float* valueArray, t_ilm_int arraySize)
 {
-    return appendGenericArray(arraySize, SOCKET_MESSAGE_TYPE_DOUBLE, sizeof(t_ilm_float), valueArray);
+    struct SocketMessage* msg = (struct SocketMessage*)message;
+    return appendGenericArray(msg, arraySize, SOCKET_MESSAGE_TYPE_DOUBLE, sizeof(t_ilm_float), valueArray);
 }
 
 // TODO appendStringArray()

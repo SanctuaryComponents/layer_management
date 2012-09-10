@@ -56,9 +56,6 @@ struct State
     struct sockaddr_in    clientAddrIn;
     fd_set                monitoredSockets;
     int                   monitoredSocketMax;
-    struct SocketMessage  outgoingMessage;
-    struct SocketMessage  incomingMessage[SOCKET_MESSAGE_BUFFER_COUNT];
-    t_ilm_int             incomingQueueIndex;
 };
 
 

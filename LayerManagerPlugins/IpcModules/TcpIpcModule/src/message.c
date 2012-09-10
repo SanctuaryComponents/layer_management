@@ -21,102 +21,164 @@
 #include <errno.h>
 #include <stdio.h>
 #include <sys/select.h>
+#include <stdlib.h>
 
 
 //=============================================================================
 // prototypes
 //=============================================================================
 t_ilm_bool acceptClientConnection();
-void receiveFromSocket(int socketNumber);
+t_ilm_bool sendToSocket(struct SocketMessage* msg, int socketNumber);
+void receiveFromSocket(struct SocketMessage* msg, int socketNumber);
 
+//=============================================================================
+// incoming queue handling (one select may return more than one active
+// descriptor, but receive must only return one message at a time.
+// all messages are first received and added to this queue, so no
+// messages get lost
+//=============================================================================
+struct QueueElement
+{
+    struct SocketMessage* data;
+    struct QueueElement* next;
+};
+
+static struct QueueElement* oldest = NULL;
+static struct QueueElement* latest = NULL;
+
+void addToIncomingQueue(struct SocketMessage* data)
+{
+    struct QueueElement* newMessage = (struct QueueElement*)malloc(sizeof(struct QueueElement));
+    newMessage->data = data;
+    newMessage->next = NULL;
+    if (!oldest)
+    {
+        oldest = latest = newMessage;
+    }
+    else
+    {
+        latest->next = newMessage;
+        latest = latest->next;
+    }
+}
+
+struct SocketMessage* getFromIncomingQueue()
+{
+    struct SocketMessage* data = NULL;
+    if (oldest)
+    {
+        data = oldest->data;
+        struct QueueElement* delPtr = oldest;
+        oldest = oldest->next;
+        free(delPtr);
+    }
+    return data;
+}
 
 //=============================================================================
 // message handling
 //=============================================================================
-t_ilm_bool createMessage(t_ilm_const_string name)
+t_ilm_message createMessage(t_ilm_const_string name)
 {
-    memset(&gState.outgoingMessage, 0, sizeof(gState.outgoingMessage));
-
-    gState.outgoingMessage.paket.type = SOCKET_MESSAGE_TYPE_NORMAL;
-    gState.outgoingMessage.index = 0;
-
-    return appendString(name);
+    struct SocketMessage* newMessage = (struct SocketMessage*)malloc(sizeof(struct SocketMessage));
+    newMessage->paket.type = IpcMessageTypeCommand;
+    newMessage->index = 0;
+    appendString(newMessage, name);
+    return (t_ilm_message)newMessage;
 }
 
-t_ilm_bool destroyMessage()
+t_ilm_message createResponse(t_ilm_message receivedMessage)
 {
-    t_ilm_bool returnValue = ILM_TRUE;
-    
-    /* to be implemented if needed */
-       
-    return returnValue;
+    struct SocketMessage* newResponse = (struct SocketMessage*)malloc(sizeof(struct SocketMessage));
+    newResponse->paket.type = IpcMessageTypeCommand;
+    newResponse->index = 0;
+    appendString(newResponse, getMessageName(receivedMessage));
+    return (t_ilm_message)newResponse;
 }
 
-t_ilm_bool sendMessage()
+t_ilm_message createErrorResponse(t_ilm_message receivedMessage)
 {
-    int activesocket = 0;
-    int sentBytes = 0;
-    int retVal = 0;
+    struct SocketMessage* newErrorResponse = (struct SocketMessage*)malloc(sizeof(struct SocketMessage));
+    newErrorResponse->paket.type = IpcMessageTypeError;
+    newErrorResponse->index = 0;
+    appendString(newErrorResponse, getMessageName(receivedMessage));
+    return (t_ilm_message)newErrorResponse;
+}
 
-    int headerSize = sizeof(gState.outgoingMessage.paket) - sizeof(gState.outgoingMessage.paket.data);
-    gState.outgoingMessage.paket.size = gState.outgoingMessage.index + headerSize;
+t_ilm_message createNotification(t_ilm_const_string name)
+{
+    struct SocketMessage* newNotification = (struct SocketMessage*)malloc(sizeof(struct SocketMessage));
+    newNotification->paket.type = IpcMessageTypeNotification;
+    newNotification->index = 0;
+    appendString(newNotification, name);
+    return (t_ilm_message)newNotification;
+}
 
+t_ilm_bool destroyMessage(t_ilm_message message)
+{
+    struct SocketMessage* msg = (struct SocketMessage*)message;
+    if (msg)
+    {
+        free(msg);
+    }
+    return ILM_TRUE;
+}
+
+t_ilm_bool sendToClients(t_ilm_message message, t_ilm_client_handle* receiverList, int receiverCount)
+{
+    struct SocketMessage* msg = (struct SocketMessage*)message;
     if (gState.isClient)
     {
-        activesocket = gState.socket;
-    }
-    else
-    {
-        activesocket = gState.incomingMessage[gState.incomingQueueIndex].sender;
+        return ILM_FALSE;
     }
 
-    int sendSize = gState.outgoingMessage.paket.size;
+    t_ilm_bool result = ILM_TRUE;
+    int i = 0;
 
-    do
+    for (i = 0; i < receiverCount; ++i)
     {
-        retVal += send(activesocket,
-                       &gState.outgoingMessage.paket + sentBytes,
-                       sendSize - sentBytes,
-                       0);
-        sentBytes += retVal;
-    } while (retVal > 0 && sentBytes < sendSize);
-
-    //printf("      --> TcpIpcModule: %d bytes sent to socket %d\n", sentBytes, activesocket);
-
-    return (sentBytes == sendSize) ? ILM_TRUE : ILM_FALSE;
+        int sock = (int)receiverList[i];
+        result &= sendToSocket(msg, sock);
+    }
+    return result;
 }
 
-t_ilm_bool sendError(t_ilm_const_string desc)
+t_ilm_bool sendToService(t_ilm_message message)
 {
-    gState.outgoingMessage.paket.type = SOCKET_MESSAGE_TYPE_ERROR;
+    struct SocketMessage* msg = (struct SocketMessage*)message;
+    if (!gState.isClient)
+    {
+        return ILM_FALSE;
+    }
 
-    // reset content to error description
-    gState.outgoingMessage.index = 0;
-    appendString(desc);
-
-    return sendMessage();
+    return sendToSocket(msg, gState.socket);
 }
 
-enum IpcMessageType receiveMessage(t_ilm_int timeoutInMs)
+t_ilm_message receive(t_ilm_int timeoutInMs)
 {
-    enum IpcMessageType result = IpcMessageTypeNone;
-
-    // switch to next receive buffer
-    gState.incomingQueueIndex = ++gState.incomingQueueIndex % SOCKET_MESSAGE_BUFFER_COUNT;
-
-    struct SocketMessage* msg = &gState.incomingMessage[gState.incomingQueueIndex];
-
-    msg->index = 0;
+    struct SocketMessage* queuedMessage = getFromIncomingQueue();
+    if (queuedMessage)
+    {
+        return queuedMessage;
+    }
 
     fd_set readFds = gState.monitoredSockets;
 
-    struct timeval timeoutValue;
-    timeoutValue.tv_sec = timeoutInMs / 1000;
-    timeoutValue.tv_usec = (timeoutInMs % 1000) * 1000;
+    int numberOfFdsReady = 0;
 
-    int numberOfFdsReady = select(gState.monitoredSocketMax + 1, &readFds, 0, 0, &timeoutValue);
+    if (timeoutInMs < 0)
+    {
+        numberOfFdsReady = select(gState.monitoredSocketMax + 1, &readFds, 0, 0, NULL);
+    }
+    else
+    {
+        struct timeval timeoutValue;
+        timeoutValue.tv_sec = timeoutInMs / 1000;
+        timeoutValue.tv_usec = (timeoutInMs % 1000) * 1000;
+        numberOfFdsReady = select(gState.monitoredSocketMax + 1, &readFds, 0, 0, &timeoutValue);
+    }
 
-    if (-1  == numberOfFdsReady)
+    if (-1 == numberOfFdsReady)
     {
         printf("TcpIpcModule: select() failed\n");
     }
@@ -127,72 +189,85 @@ enum IpcMessageType receiveMessage(t_ilm_int timeoutInMs)
         {
             if (FD_ISSET(socketNumber, &readFds))
             {
+                struct SocketMessage* msg = (struct SocketMessage*)malloc(sizeof(struct SocketMessage));
+                msg->paket.type = IpcMessageTypeNone;
+                msg->sender = socketNumber;
+                msg->index = 0;
+                addToIncomingQueue(msg);
+
                 if (!gState.isClient)
                 {
                     if (gState.socket == socketNumber)
                     {
                         // New client connected
+                        msg->paket.type = IpcMessageTypeConnect;
                         acceptClientConnection();
-                        result = IpcMessageTypeNone;  // no data received
                         continue;
                     }
 
                     // receive data from socket
-                    receiveFromSocket(socketNumber);
+                    receiveFromSocket(msg, socketNumber);
 
                     if(msg->paket.size > 0)
                     {
                         // new message from client
-                        getString(msg->name);
-                        result = IpcMessageTypeCommand;
+                        getString(msg, msg->name);
                         continue;
                     }
 
                     if(msg->paket.size == 0)
                     {
                         // client disconnected
+                        msg->paket.type = IpcMessageTypeDisconnect;
                         close(socketNumber);
                         FD_CLR(socketNumber, &gState.monitoredSockets);
-                        result = IpcMessageTypeDisconnect;
                         continue;
                     }
 
                     // error
+                    msg->paket.type = IpcMessageTypeError;
                     const char* errorMsg = (char*)strerror(errno);
-                    printf("      --> TcpIpcModule: Error receiving data from socket %d (%s)\n",
-                           msg->sender, errorMsg);
-                    result = IpcMessageTypeError;
+                    printf("TcpIpcModule: receive error socket %d (%s)\n", msg->sender, errorMsg);
                 }
                 else
                 {
-                    // receive LayerManager response
-                    receiveFromSocket(socketNumber);
-                    getString(msg->name);
-                    result = IpcMessageTypeCommand;
+                    // receive LayerManager response or notification
+                    receiveFromSocket(msg, socketNumber);
+                    getString(msg, msg->name);
                 }
             }
         }
     }
 
-    return result;
+    return getFromIncomingQueue();
 }
 
-t_ilm_const_string getMessageName()
+t_ilm_const_string getMessageName(t_ilm_message message)
 {
-    return gState.incomingMessage[gState.incomingQueueIndex].name;
+    struct SocketMessage* msg = (struct SocketMessage*)message;
+    return msg ? msg->name : NULL;
 }
 
-t_ilm_bool isErrorMessage()
+t_ilm_message_type getMessageType(t_ilm_message message)
 {
-    return (SOCKET_MESSAGE_TYPE_ERROR == gState.incomingMessage[gState.incomingQueueIndex].paket.type);
+    struct SocketMessage* msg = (struct SocketMessage*)message;
+    return msg ? msg->paket.type : IpcMessageTypeNone;
 }
 
-t_ilm_const_string getSenderName()
+t_ilm_const_string getSenderName(t_ilm_message message)
 {
-    char buffer[16];
-    sprintf(buffer, "socket %d", gState.incomingMessage[gState.incomingQueueIndex].sender);
-    return strdup(buffer);
+    struct SocketMessage* msg = (struct SocketMessage*)message;
+    char name[] = "socket XXXXXXXXXXXXXXXXXX";
+    sprintf(name, "socket %d", (msg ? msg->sender : -1));
+    return strdup(name);
 }
+
+t_ilm_client_handle getSenderHandle(t_ilm_message message)
+{
+    struct SocketMessage* msg = (struct SocketMessage*)message;
+    return msg ? (t_ilm_client_handle)msg->sender : (t_ilm_client_handle)0;
+}
+
 
 //=============================================================================
 //private
@@ -216,12 +291,32 @@ t_ilm_bool acceptClientConnection()
     return result;
 }
 
-void receiveFromSocket(int socketNumber)
+t_ilm_bool sendToSocket(struct SocketMessage* msg, int socketNumber)
+{
+    int sentBytes = 0;
+    int retVal = 0;
+
+    int headerSize = sizeof(msg->paket) - sizeof(msg->paket.data);
+    msg->paket.size = msg->index + headerSize;
+
+    int sendSize = msg->paket.size;
+
+    do
+    {
+        retVal += send(socketNumber,
+                       &msg->paket + sentBytes,
+                       sendSize - sentBytes,
+                       0);
+        sentBytes += retVal;
+    } while (retVal > 0 && sentBytes < sendSize);
+
+    return (sentBytes == sendSize) ? ILM_TRUE : ILM_FALSE;
+}
+
+void receiveFromSocket(struct SocketMessage* msg, int socketNumber)
 {
     int receivedBytes = 0;
     int retVal = 0;
-
-    struct SocketMessage* msg = &gState.incomingMessage[gState.incomingQueueIndex];
 
     msg->sender = socketNumber;
 

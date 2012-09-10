@@ -56,7 +56,7 @@ protected:
 
 TEST_F(Loopback, DISABLE_lifecycle)
 {
-    ASSERT_TRUE(mService.init(ILM_FALSE));
+    ASSERT_TRUE(mService.initClientMode());
     //ASSERT_TRUE(mClient.init(ILM_TRUE));
 
     //ASSERT_TRUE(mClient.destroy());
