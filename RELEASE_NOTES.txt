@@ -1,4 +1,4 @@
-Version 0.9.7_rc2
+Version 0.9.7
 -------------
 This version includes the following enhancements.
 
@@ -12,6 +12,7 @@ Bugfixes :
 - fix several issues detected by coverity
 - fixing several warnings 
 - additional fixes inside of the reference compositor 
+- fixes a memory leak inside of generic communicator.
 
 Improvements:
 
