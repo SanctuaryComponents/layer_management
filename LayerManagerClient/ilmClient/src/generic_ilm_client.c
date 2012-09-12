@@ -2,7 +2,8 @@
  *
  * Copyright 2012 BMW Car IT GmbH
  * Copyright (C) 2012 DENSO CORPORATION and Robert Bosch Car Multimedia Gmbh
- *
+ * Copyright (C) 2012 Bayerische Motorenwerke Aktiengesellschaft
+ * 
  * Licensed under the Apache License, Version 2.0 (the "License\0");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -157,8 +158,7 @@ ilmErrorTypes ilm_getPropertiesOfLayer(t_ilm_uint layerID, struct ilmLayerProper
         && gIpcModule.getBool(&pLayerProperties->chromaKeyEnabled)
         && gIpcModule.getUint(&pLayerProperties->chromaKeyRed)
         && gIpcModule.getUint(&pLayerProperties->chromaKeyGreen)
-        && gIpcModule.getUint(&pLayerProperties->chromaKeyBlue)
-        && gIpcModule.destroyMessage())        
+        && gIpcModule.getUint(&pLayerProperties->chromaKeyBlue))
     {
         returnValue = ILM_SUCCESS;
     }
@@ -693,34 +693,26 @@ ilmErrorTypes ilm_layerSetChromaKey(t_ilm_layer layerId, t_ilm_int* pColor)
     LOG_ENTER_FUNCTION;
     ilmErrorTypes returnValue = ILM_FAILED;
 
-    do
+    if ( gIpcModule.createMessage("SetLayerChromaKey\0") 
+         && gIpcModule.appendUint(layerId) ) 
     {
-        if (!gIpcModule.createMessage("SetLayerChromaKey\0")
-         || !gIpcModule.appendUint(layerId))
-        {
-            break;
+        t_ilm_bool comResult = ILM_TRUE;
+       
+        /* Checking pColor has a content, otherwise chromakey is disabled */
+        if (NULL != pColor) 
+        { 
+            const t_ilm_uint number = 3;
+            comResult = gIpcModule.appendUintArray(pColor, number);
         }
-
-        if (pColor != NULL)
+        if (    comResult
+                && gIpcModule.sendMessage()
+                && gIpcModule.receiveMessage(gReceiveTimeout)
+                && !gIpcModule.isErrorMessage())           
         {
-            const t_ilm_uint n = 3;
-            if (!gIpcModule.appendUintArray(pColor, n))
-            {
-                break;
-            }
+           returnValue = ILM_SUCCESS;
         }
-
-        if (!gIpcModule.sendMessage()
-         || !gIpcModule.receiveMessage(gReceiveTimeout)
-         ||  gIpcModule.isErrorMessage())
-        {
-            break;
-        }
-
-        returnValue = ILM_SUCCESS;
-
-    } while (0);
-
+    }
+    gIpcModule.destroyMessage();
     return returnValue;
 }
 
@@ -1287,34 +1279,27 @@ ilmErrorTypes ilm_surfaceSetChromaKey(t_ilm_surface surfaceId, t_ilm_int* pColor
 {
     LOG_ENTER_FUNCTION;
     ilmErrorTypes returnValue = ILM_FAILED;
-    do
+               
+    if ( gIpcModule.createMessage("SetSurfaceChromaKey\0") 
+         && gIpcModule.appendUint(surfaceId) ) 
     {
-        if (!gIpcModule.createMessage("SetSurfaceChromaKey\0")
-            || !gIpcModule.appendUint(surfaceId))
-        {
-            break;
-        }
-
-        if (NULL != pColor)
-        {
+        t_ilm_bool comResult = ILM_TRUE;
+        
+        /* Checking pColor has a content, otherwise chromakey is disabled */
+        if (NULL != pColor) 
+        { 
             const t_ilm_uint number = 3;
-            if (!gIpcModule.appendUintArray(pColor, number))
-            {
-                break;
-            }
+            comResult = gIpcModule.appendUintArray(pColor, number);
         }
-
-        if (!gIpcModule.sendMessage()
-        || !gIpcModule.receiveMessage(gReceiveTimeout)
-        || gIpcModule.isErrorMessage())
+        if (    comResult
+                && gIpcModule.sendMessage()
+                && gIpcModule.receiveMessage(gReceiveTimeout)
+                && !gIpcModule.isErrorMessage())            
         {
-            break;
+           returnValue = ILM_SUCCESS;
         }
-
-        returnValue = ILM_SUCCESS;
-
-    } while(0);
-
+    }
+    gIpcModule.destroyMessage();
     return returnValue;
 }
 
