@@ -34,7 +34,7 @@
 class WaylandFbdevWindowSystem: public WaylandBaseWindowSystem
 {
 public:
-    WaylandFbdevWindowSystem(const char* displayname, int width, int height, Scene* pScene);
+    WaylandFbdevWindowSystem(const char* displayname, int width, int height, Scene* pScene, InputManager* pInputManager);
 
 protected:
     virtual bool createNativeContext();

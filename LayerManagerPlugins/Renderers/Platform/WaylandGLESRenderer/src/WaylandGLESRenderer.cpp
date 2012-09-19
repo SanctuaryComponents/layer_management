@@ -55,13 +55,13 @@ bool WaylandGLESRenderer::start(int width, int height, const char* displayname)
     // create Wayland windows, register as composite manager etc
     m_pWindowSystem = NULL;
 #ifdef WITH_WAYLAND_FBDEV
-    m_pWindowSystem = new WaylandFbdevWindowSystem(displayname, width, height, m_pScene);
+    m_pWindowSystem = new WaylandFbdevWindowSystem(displayname, width, height, m_pScene, m_pInputManager);
 #endif
 #ifdef WITH_WAYLAND_X11
-    m_pWindowSystem = new WaylandX11WindowSystem(displayname, width, height, m_pScene);
+    m_pWindowSystem = new WaylandX11WindowSystem(displayname, width, height, m_pScene, m_pInputManager);
 #endif
 #ifdef WITH_WAYLAND_DRM
-    m_pWindowSystem = new WaylandDrmWindowSystem(displayname, width, height, m_pScene);
+    m_pWindowSystem = new WaylandDrmWindowSystem(displayname, width, height, m_pScene, m_pInputManager);
 #endif
     if( m_pWindowSystem == NULL )
     {

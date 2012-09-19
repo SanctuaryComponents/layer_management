@@ -41,6 +41,7 @@
 #include <unistd.h>
 #include <iomanip>
 #include "WindowSystems/WaylandServerinfoServerProtocol.h"
+#include "InputManager.h"
 
 extern "C" {
     struct serverinfo {
@@ -112,8 +113,8 @@ extern "C" {
     };
 }
 
-WaylandBaseWindowSystem::WaylandBaseWindowSystem(const char* displayname, int width, int height, Scene* pScene)
-: BaseWindowSystem(pScene, NULL)
+WaylandBaseWindowSystem::WaylandBaseWindowSystem(const char* displayname, int width, int height, Scene* pScene, InputManager* pInputManager)
+: BaseWindowSystem(pScene, pInputManager)
 , m_wlDisplay(NULL)
 , m_wlDisplayClient(NULL)
 , m_wlCompositorClient(NULL)
@@ -139,6 +140,7 @@ WaylandBaseWindowSystem::WaylandBaseWindowSystem(const char* displayname, int wi
 , m_width(width)
 , m_height(height)
 , m_listFrameCallback()
+, m_inputEvent(NULL)
 , m_connectionList()
 {
     LOG_DEBUG("WaylandBaseWindowSystem", "creating WaylandBaseWindowSystem width:" << width << " height:" << height);
@@ -150,6 +152,8 @@ WaylandBaseWindowSystem::WaylandBaseWindowSystem(const char* displayname, int wi
 
 WaylandBaseWindowSystem::~WaylandBaseWindowSystem()
 {
+    if (m_inputEvent)
+        delete m_inputEvent;
 }
 
 void WaylandBaseWindowSystem::printDebug()
@@ -214,6 +218,29 @@ Surface* WaylandBaseWindowSystem::getSurfaceFromNativeSurface(struct native_surf
     }
     LOG_DEBUG("WaylandBaseWindowSystem", "could not find surface for surface " << nativeSurface);
     return NULL;
+}
+
+struct native_surface*
+WaylandBaseWindowSystem::getNativeSurfaceFromSurface(Surface* surface)
+{
+    struct native_surface *nativeSurface = NULL;
+
+    WaylandPlatformSurface* platformSurface = static_cast<WaylandPlatformSurface*>(surface->platform);
+    if (!platformSurface)
+    {
+        return NULL;
+    }
+
+    wl_list_for_each(nativeSurface, &m_nativeSurfaceList, link)
+    {
+        if ((nativeSurface->connectionId == platformSurface->connectionId) &&
+            (nativeSurface->surface.resource.object.id == platformSurface->surfaceId))
+        {
+            break; // FOUND
+        }
+    }
+
+    return nativeSurface;
 }
 
 void WaylandBaseWindowSystem::checkForNewSurfaceNativeContent()
@@ -711,6 +738,7 @@ extern "C" void WaylandBaseWindowSystem::compositorIFCreateSurface
 
     windowSystem->checkForNewSurfaceNativeContent();
     wl_client_add_resource(client, &surface->surface.resource);
+    wl_list_insert(windowSystem->m_nativeSurfaceList.prev, &surface->link);
     LOG_DEBUG("WaylandBaseWindowSystem", "compositorIFCreateSurface OUT");
 }
 
@@ -774,8 +802,8 @@ bool WaylandBaseWindowSystem::initCompositor()
     wl_display_init_shm(m_wlDisplay);
 
     wl_list_init(&m_listFrameCallback);
-
     wl_list_init(&m_connectionList);
+    wl_list_init(&m_nativeSurfaceList);
     createServerinfo(this);
 
     LOG_DEBUG("WaylandBaseWindowSystem", "initCompositor END");
@@ -869,6 +897,15 @@ void* WaylandBaseWindowSystem::eventLoop()
             break;
         }
         LOG_DEBUG("WaylandBaseWindowSystem", "SUCCESS:init GraphicSystem");
+
+        // create input event
+        status = createInputEvent();
+        if (false == status)
+        {
+            LOG_ERROR("WaylandBaseWindowSystem", "failed to create input event");
+            break;
+        }
+        LOG_DEBUG("WaylandBaseWindowSystem", "SUCCESS:create InputEvent");
 
         this->m_success = status;
         this->m_initialized = true;
@@ -1138,4 +1175,118 @@ void WaylandBaseWindowSystem::doScreenShotOfSurface(std::string fileName, const 
     m_screenShotFile = fileName;
     m_screenShotSurfaceID = id;
     m_screenShotLayerID = layer_id;
+}
+
+void WaylandBaseWindowSystem::manageWLInputEvent(const InputDevice type,
+                                                 const InputEventState state,
+                                                 const WLEvent *wlEvent)
+{
+    if (!m_inputEvent){
+        LOG_WARNING("WaylandBaseWindowSystem", "InputEvent not available");
+        return;
+    }
+    Surface *surface = NULL;
+    native_surface *nativeSurface = NULL;
+    uint32_t time = getTime();
+
+    switch (type){
+    case INPUT_DEVICE_KEYBOARD:
+        {
+            LOG_DEBUG("WaylandBaseWindowSystem",
+                      "INPUT_DEVICE_KEYBOARD: state = " << state <<
+                      ", keyCode = " << wlEvent->keyCode);
+            surface = m_pInputManager->reportKeyboardEvent(state, wlEvent->keyCode);
+            if (!surface){
+                m_inputEvent->inputDevice().setKeyboardFocus(NULL);
+                break;
+            }
+
+            nativeSurface = getNativeSurfaceFromSurface(surface);
+            if (!nativeSurface)
+                break;
+
+            switch (state){
+            case INPUT_STATE_PRESSED:
+                m_inputEvent->inputDevice().sendKeyPressEvent(
+                    &nativeSurface->surface, time, wlEvent->keyCode);
+                break;
+            case INPUT_STATE_RELEASED:
+                m_inputEvent->inputDevice().sendKeyReleaseEvent(
+                    &nativeSurface->surface, time, wlEvent->keyCode);
+                break;
+            case INPUT_STATE_OTHER:
+            default:
+                // nothing to do
+                break;
+            }
+        }
+        break;
+    case INPUT_DEVICE_POINTER:
+        {
+            LOG_DEBUG("WaylandBaseWindowSystem",
+                      "INPUT_DEVICE_POINTER: state = " << state <<
+                      ", x = " << wlEvent->x <<
+                      ", y = " << wlEvent->y);
+            Point globalPos = {state, wlEvent->x, wlEvent->y};
+            Point localPos  = globalPos;
+            surface = m_pInputManager->reportPointerEvent(localPos);
+            if (!surface){
+                LOG_WARNING("WaylandBaseWindowSystem", "NO FOUND SURFACE!");
+                break;
+            }
+            LOG_DEBUG("WaylandBaseWindowSystem",
+                      "Local coordinates: x = " << localPos.x <<
+                      ", y = " << localPos.y);
+
+            nativeSurface = getNativeSurfaceFromSurface(surface);
+            if (!nativeSurface)
+                break;
+
+            switch (state){
+            case INPUT_STATE_PRESSED:
+                m_inputEvent->inputDevice().sendMousePressEvent(
+                    globalPos, localPos, wlEvent->button, time);
+                break;
+            case INPUT_STATE_RELEASED:
+                m_inputEvent->inputDevice().sendMouseReleaseEvent(
+                    globalPos, localPos, wlEvent->button, time);
+                break;
+            case INPUT_STATE_MOTION:
+                m_inputEvent->inputDevice().sendMouseMotionEvent(
+                    &nativeSurface->surface, globalPos, localPos, time);
+                break;
+            case INPUT_STATE_OTHER:
+            default:
+                break;
+            }
+        }
+        break;
+    case INPUT_DEVICE_TOUCH:
+        {
+            LOG_DEBUG("WaylandBaseWindowSystem",
+                      "INPUT_DEVICE_TOUCH: state = " << state <<
+                      ", x = " << wlEvent->x <<
+                      ", y = " << wlEvent->y);
+            Point pt = {state, wlEvent->x, wlEvent->y};
+            PointVect ptVec(1, pt);
+            surface = m_pInputManager->reportTouchEvent(ptVec);
+            if (!surface)
+                break;
+
+            switch (state){
+            case INPUT_STATE_PRESSED:
+                m_inputEvent->inputDevice().sendTouchPointEvent();
+                break;
+            case INPUT_STATE_MOTION:
+            case INPUT_STATE_RELEASED:
+            case INPUT_STATE_OTHER:
+            default:
+                break;
+            }
+        }
+        break;
+    case INPUT_DEVICE_ALL:
+    default:
+        break;
+    }
 }

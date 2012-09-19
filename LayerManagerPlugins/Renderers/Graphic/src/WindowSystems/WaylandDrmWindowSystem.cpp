@@ -40,8 +40,8 @@
 
 static const char default_seat[] = "seat0";
 
-WaylandDrmWindowSystem::WaylandDrmWindowSystem(const char* displayname, int width, int height, Scene* pScene)
-: WaylandBaseWindowSystem(displayname, width, height, pScene)
+WaylandDrmWindowSystem::WaylandDrmWindowSystem(const char* displayname, int width, int height, Scene* pScene, InputManager* pInputManager)
+: WaylandBaseWindowSystem(displayname, width, height, pScene, pInputManager)
 , m_fdDev(-1), m_gbm(NULL)
 {
     LOG_DEBUG("WaylandDrmWindowSystem", "creating WaylandDrmWindowSystem width:" << width << " height:" << height);

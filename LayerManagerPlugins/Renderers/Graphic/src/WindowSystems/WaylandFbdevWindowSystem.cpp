@@ -45,8 +45,8 @@
 #endif
 #include <iomanip>
 
-WaylandFbdevWindowSystem::WaylandFbdevWindowSystem(const char* displayname, int width, int height, Scene* pScene)
-: WaylandBaseWindowSystem(displayname, width, height, pScene)
+WaylandFbdevWindowSystem::WaylandFbdevWindowSystem(const char* displayname, int width, int height, Scene* pScene, InputManager* pInputManager)
+: WaylandBaseWindowSystem(displayname, width, height, pScene, pInputManager)
 , m_fdFB(-1)
 {
     LOG_DEBUG("WaylandFbdevWindowSystem", "creating WaylandFbdevWindowSystem width:" << width << " height:" << height);

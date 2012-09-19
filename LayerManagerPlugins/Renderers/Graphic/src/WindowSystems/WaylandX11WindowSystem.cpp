@@ -44,9 +44,10 @@
 #include "GraphicSystems/GLESGraphicSystem.h"
 
 #include "WindowSystems/WaylandServerinfoServerProtocol.h"
+#include "WindowSystems/WaylandX11InputEvent.h"
 
-WaylandX11WindowSystem::WaylandX11WindowSystem(const char* displayname, int width, int height, Scene* pScene)
-: WaylandBaseWindowSystem(displayname, width, height, pScene)
+WaylandX11WindowSystem::WaylandX11WindowSystem(const char* displayname, int width, int height, Scene* pScene, InputManager* pInputManager)
+: WaylandBaseWindowSystem(displayname, width, height, pScene, pInputManager)
 , m_x11Window(0)
 , m_x11Display(0)
 , m_x11Screen(0)
@@ -138,7 +139,7 @@ bool WaylandX11WindowSystem::createNativeContext()
     // Add to these for handling other events
     windowAttributes.event_mask = StructureNotifyMask | ExposureMask
             | ButtonPressMask | ButtonReleaseMask | KeyPressMask
-            | KeyReleaseMask;
+            | KeyReleaseMask | Button1MotionMask | PointerMotionMask | FocusChangeMask;
     windowAttributes.backing_store = Always;
 
     // Set the window mask attributes
@@ -170,4 +171,11 @@ bool WaylandX11WindowSystem::createNativeContext()
     LOG_DEBUG("WaylandX11WindowSystem", "createNativeContext OUT");
 
     return result;
+}
+
+bool WaylandX11WindowSystem::createInputEvent()
+{
+    m_inputEvent = new WaylandX11InputEvent(this);
+    m_inputEvent->setupInputEvent();
+    return true;
 }

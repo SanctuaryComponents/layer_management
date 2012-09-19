@@ -38,14 +38,16 @@
 class WaylandX11WindowSystem: public WaylandBaseWindowSystem
 {
 public:
-    WaylandX11WindowSystem(const char* displayname, int width, int height, Scene* pScene);
+    WaylandX11WindowSystem(const char* displayname, int width, int height, Scene* pScene, InputManager* pInputManager);
 #if 0
     virtual bool init(BaseGraphicSystem<EGLNativeDisplayType, EGLNativeWindowType>* sys);
 #endif
+    Display* x11Display() const;
 
 protected:
     virtual bool createNativeContext();
     virtual bool initGraphicSystem();
+    virtual bool createInputEvent();
 
 private:
 #if 0
@@ -58,5 +60,7 @@ private:
     XVisualInfo* m_x11Visual;
     Colormap m_x11Colormap;
 };
+
+inline Display* WaylandX11WindowSystem::x11Display() const { return m_x11Display; }
 
 #endif /* _WAYLANDX11WINDOWSYSTEM_H_ */

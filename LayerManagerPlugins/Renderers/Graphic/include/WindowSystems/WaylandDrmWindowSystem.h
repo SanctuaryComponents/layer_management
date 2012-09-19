@@ -36,7 +36,7 @@ struct gbm_device;
 class WaylandDrmWindowSystem: public WaylandBaseWindowSystem
 {
 public:
-    WaylandDrmWindowSystem(const char* displayname, int width, int height, Scene* pScene);
+    WaylandDrmWindowSystem(const char* displayname, int width, int height, Scene* pScene, InputManager* pInputManager);
     virtual ~WaylandDrmWindowSystem();
 
 protected:

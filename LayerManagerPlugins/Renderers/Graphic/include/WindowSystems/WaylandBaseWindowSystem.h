@@ -38,6 +38,8 @@
 #include "Log.h"
 #include "ScreenShotType.h"
 #include "config.h"
+#include "InputManager.h"
+#include "WindowSystems/WaylandInputEvent.h"
 
 extern "C" {
 // TODO:to abstract
@@ -49,6 +51,17 @@ typedef enum waylandWindowSystemStates
     UNKOWN_STATE
 } WaylandWindowSystemStates;
 
+typedef struct _wlevent {
+    int        x, y;
+    int32_t    button;
+    enum wl_pointer_button_state buttonState;
+    long       keyCode;
+    enum wl_keyboard_key_state   keyState;
+    uint32_t   serial;
+    int        touchId;
+    int        touchType;
+} WLEvent;
+
 } // extern "C"
 
 struct native_surface;
@@ -56,7 +69,7 @@ struct native_surface;
 class WaylandBaseWindowSystem: public BaseWindowSystem
 {
 public:
-    WaylandBaseWindowSystem(const char* displayname, int width, int height, Scene* pScene);
+    WaylandBaseWindowSystem(const char* displayname, int width, int height, Scene* pScene, InputManager* pInputManager);
     virtual ~WaylandBaseWindowSystem();
     bool init(BaseGraphicSystem<void*, void*>* sys);
     bool start();
@@ -106,6 +119,7 @@ protected:
     int m_height;
 
     struct wl_list m_listFrameCallback;
+    struct wl_list m_nativeSurfaceList;
 
     void createServerinfo(WaylandBaseWindowSystem* windowSystem);
     struct native_surface* createNativeSurface();
@@ -117,6 +131,7 @@ protected:
     void Redraw();
     void shutdownCompositor();
     Surface* getSurfaceFromNativeSurface(struct native_surface* nativeSurface);
+    struct native_surface* getNativeSurfaceFromSurface(Surface* surface);
     void checkForNewSurfaceNativeContent();
     void calculateFps();
     void calculateSurfaceFps(Surface *currentSurface, float time) ;
@@ -129,6 +144,9 @@ protected:
     static void idleEventRepaint(void *data);
     bool createWaylandClient();
     void releaseWaylandClient();
+
+    WaylandInputEvent* m_inputEvent;
+    virtual bool createInputEvent();
 
 public:
     static void serverinfoIFCreateConnection(struct wl_client *client, struct wl_resource *resource);
@@ -150,6 +168,9 @@ public:
     static void compositorIFCreateSurface(struct wl_client *client, struct wl_resource* resource, uint32_t id);
 
     struct wl_list m_connectionList;
+
+    // Input event
+    void manageWLInputEvent(const InputDevice type, const InputEventState state, const WLEvent *wlEvent);
 };
 
 inline void WaylandBaseWindowSystem::setSystemState (WaylandWindowSystemStates state)
@@ -165,6 +186,11 @@ inline WaylandWindowSystemStates WaylandBaseWindowSystem::getSystemState ()
 inline struct wl_display* WaylandBaseWindowSystem::getNativeDisplayHandle()
 {
     return m_wlDisplay;
+}
+
+inline bool WaylandBaseWindowSystem::createInputEvent()
+{
+    return false;
 }
 
 extern "C" {
