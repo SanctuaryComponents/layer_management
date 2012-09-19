@@ -146,6 +146,7 @@ if (WITH_WL_EXAMPLE)
     add_subdirectory (LayerManagerExamples/EGLWLApplicationExample)
     add_subdirectory (LayerManagerExamples/EGLWLMockNavigation)
     add_subdirectory (LayerManagerExamples/WLChromakeyExample)
+    add_subdirectory (LayerManagerExamples/EGLWLInputEventExample)
     set (BUILD_UTILS_LIB ON)
 endif(WITH_WL_EXAMPLE)
 
