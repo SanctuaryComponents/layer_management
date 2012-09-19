@@ -25,7 +25,6 @@
 #include "EGL/eglext.h"
 #include "GLES2/gl2.h"
 #include "Bitmap.h"
-#include "Transformation/ViewportTransform.h"
 #include "PlatformSurfaces/WaylandPlatformSurface.h"
 #include "WindowSystems/WaylandBaseWindowSystem.h"
 
@@ -59,17 +58,10 @@ DrmGLESGraphicSystem::DrmGLESGraphicSystem(int windowWidth, int windowHeight,
 {
     LOG_DEBUG("DrmGLESGraphicSystem", "creating DrmGLESGraphicSystem");
 
-	m_pfGLEglImageTargetRenderbufferStorageOES =
-		(PFNGLEGLIMAGETARGETRENDERBUFFERSTORAGEOESPROC)eglGetProcAddress("glEGLImageTargetRenderbufferStorageOES");
-	m_pfEglCreateImageKHR = (PFNEGLCREATEIMAGEKHRPROC)eglGetProcAddress("eglCreateImageKHR");
-	m_pfEglDestroyImageKHR = (PFNEGLDESTROYIMAGEKHRPROC)eglGetProcAddress("eglDestroyImageKHR");
 	m_pfEglBindWaylandDisplayWL = (PFNEGLBINDWAYLANDDISPLAYWL)eglGetProcAddress("eglBindWaylandDisplayWL");
 	m_pfEglUnbindWaylandDisplayWL = (PFNEGLUNBINDWAYLANDDISPLAYWL)eglGetProcAddress("eglUnbindWaylandDisplayWL");
 
-	if (!m_pfGLEglImageTargetRenderbufferStorageOES ||
-		!m_pfEglCreateImageKHR ||
-		!m_pfEglDestroyImageKHR ||
-		!m_pfEglBindWaylandDisplayWL ||
+	if (!m_pfEglBindWaylandDisplayWL ||
 		!m_pfEglUnbindWaylandDisplayWL)
 	{
 		LOG_ERROR("DrmGLESGraphicSystem", "Query EGL extensions failed.");
@@ -81,18 +73,37 @@ DrmGLESGraphicSystem::~DrmGLESGraphicSystem()
 	WaylandBaseWindowSystem* windowSystem = dynamic_cast<WaylandBaseWindowSystem*>(m_baseWindowSystem);
 	struct wl_display* wlDisplay = windowSystem->getNativeDisplayHandle();
 
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER,
-							  GL_COLOR_ATTACHMENT0,
-							  GL_RENDERBUFFER,
-							  0);
-	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+	if (NULL != m_eglContext)
+	{
+		eglDestroyContext(m_eglDisplay, m_eglContext);
+		m_eglContext = NULL;
+	}
+	if (NULL != m_dummyEglSurface)
+	{
+		eglDestroySurface(m_eglDisplay, m_dummyEglSurface);
+		m_dummyEglSurface = NULL;
+	}
+	if (NULL != m_dummySurface)
+	{
+		gbm_surface_destroy(m_dummySurface);
+		m_dummySurface = NULL;
+	}
 
 	struct DrmOutput* output = NULL;
 	wl_list_for_each(output, &m_outputList, link) {
-		glDeleteRenderbuffers(2, output->rbo);
 		for (int i = 0; i < 2; ++i){
 			drmModeRmFB(m_fdDev, output->fbID[i]);
-			gbm_bo_destroy(output->bo[i]);
+			if (NULL != output->eglSurface[i])
+			{
+				eglDestroySurface(m_eglDisplay, output->eglSurface[i]);
+				output->eglSurface[i] = NULL;
+			}
+
+			if (NULL != output->surface[i])
+			{
+				gbm_surface_destroy(output->surface[i]);
+				output->surface[i] = NULL;
+			}
 		}
 		free(output);
 	}
@@ -140,27 +151,54 @@ bool DrmGLESGraphicSystem::init(EGLNativeDisplayType display, EGLNativeWindowTyp
 		return false;
 	}
 
-	const char* ext = eglQueryString(m_eglDisplay, EGL_EXTENSIONS);
-	if (!strstr(ext, "EGL_KHR_surfaceless_gles2"))
+	if (!eglBindAPI(EGL_OPENGL_ES_API))
 	{
-		LOG_ERROR("DrmGLESGraphicSystem", "EGL_KHR_surfaceless_gles2 not avaiable.");
+		LOG_ERROR("DrmGLESGraphicSystem", "failed to bind api EGL_OPENGL_ES_API.");
 		return false;
 	}
 
-	eglBindAPI(EGL_OPENGL_ES_API);
+	static const EGLint configAttribs[] = {
+		EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
+		EGL_RED_SIZE,   1,
+		EGL_GREEN_SIZE, 1,
+		EGL_BLUE_SIZE,  1,
+		EGL_ALPHA_SIZE, 0,
+		EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+		EGL_NONE
+	};
+	EGLint n = 0;
+	if (!eglChooseConfig(m_eglDisplay, configAttribs, &m_eglConfig, 1, &n) || n != 1)
+	{
+		LOG_ERROR("DrmGLESGraphicSystem", "failed to choose config.");
+		return false;
+	}
 
 	EGLint contextAttrs[] = {
 		EGL_CONTEXT_CLIENT_VERSION, 2,
 		EGL_NONE
 	};
-	m_eglContext = eglCreateContext(m_eglDisplay, NULL, EGL_NO_CONTEXT, contextAttrs);
+	m_eglContext = eglCreateContext(m_eglDisplay, m_eglConfig, EGL_NO_CONTEXT, contextAttrs);
 	if (!m_eglContext)
 	{
 		LOG_ERROR("DrmGLESGraphicSystem", "failed to create EGL context.");
 		return false;
 	}
 
-	if (!eglMakeCurrent(m_eglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, m_eglContext))
+	m_dummySurface = gbm_surface_create(m_gbm, 10, 10,
+					       GBM_FORMAT_XRGB8888,
+					       GBM_BO_USE_RENDERING);
+	if (!m_dummySurface) {
+		LOG_ERROR("DrmGLESGraphicSystem", "failed to create gbm surface.");
+		return false;
+	}
+
+	m_dummyEglSurface = eglCreateWindowSurface(m_eglDisplay, m_eglConfig, (EGLNativeWindowType)m_dummySurface, NULL);
+	if (m_dummyEglSurface == EGL_NO_SURFACE) {
+		LOG_ERROR("DrmGLESGraphicSystem", "failed to create egl surface.");
+		return false;
+	}
+
+	if (!eglMakeCurrent(m_eglDisplay, m_dummyEglSurface, m_dummyEglSurface, m_eglContext))
 	{
 		LOG_ERROR("DrmGLESGraphicSystem", "failed to make context current.");
 		return false;
@@ -193,24 +231,12 @@ void DrmGLESGraphicSystem::activateGraphicContext()
 	}
 }
 
-void DrmGLESGraphicSystem::releaseGraphicContext()
-{
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER,
-							  GL_COLOR_ATTACHMENT0,
-							  GL_RENDERBUFFER,
-							  NULL);
-}
-
 bool DrmGLESGraphicSystem::initializeSystem()
 {
     LOG_DEBUG("DrmGLESGraphicSystem", "initializeSystem IN");
 
 	WaylandBaseWindowSystem* windowSystem = dynamic_cast<WaylandBaseWindowSystem*>(m_baseWindowSystem);
 	struct wl_display* wlDisplay = windowSystem->getNativeDisplayHandle();
-
-	GLuint fbo;
-	glGenFramebuffers(1, &fbo);
-	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
 	// bind display
 	m_pfEglBindWaylandDisplayWL(m_eglDisplay, wlDisplay);
@@ -241,6 +267,7 @@ bool DrmGLESGraphicSystem::createOutputs()
 	m_crtcs = (uint32_t*)calloc(resources->count_crtcs, sizeof(uint32_t));
 	if (!m_crtcs)
 	{
+		drmModeFreeResources(resources);
 		return false;
 	}
 	m_crtcsNum = resources->count_crtcs;
@@ -271,6 +298,7 @@ bool DrmGLESGraphicSystem::createOutputs()
 	if (wl_list_empty(&m_outputList))
 	{
 		LOG_ERROR("DrmGLESGraphicSystem", "DrmOutput list is empty.");
+		drmModeFreeResources(resources);
 		return false;
 	}
 
@@ -288,8 +316,10 @@ int DrmGLESGraphicSystem::createOutputForConnector(drmModeRes* resources,
 	int ret;
 	int ii;
 	drmModeEncoder* encoder;
-	unsigned handle, stride;
 	struct DrmMode*	drmMode = NULL;
+	struct gbm_bo* bo = NULL;
+	uint32_t handle = 0;
+	uint32_t stride = 0;
 
 	encoder = drmModeGetEncoder(m_fdDev, connector->encoders[0]);
 	if (encoder == NULL){
@@ -347,52 +377,60 @@ int DrmGLESGraphicSystem::createOutputForConnector(drmModeRes* resources,
 	output->currentMode = drmMode;
 	drmMode->flags = WL_OUTPUT_MODE_CURRENT | WL_OUTPUT_MODE_PREFERRED;
 
-	glGenRenderbuffers(2, output->rbo);
 	for (ii = 0; ii < 2; ++ii)
 	{
-		glBindRenderbuffer(GL_RENDERBUFFER, output->rbo[ii]);
-
-		output->bo[ii] = gbm_bo_create(m_gbm,
-									   output->currentMode->width,
-									   output->currentMode->height,
-									   GBM_BO_FORMAT_XRGB8888,
-									   GBM_BO_USE_SCANOUT |
-									   GBM_BO_USE_RENDERING);
-		if (!output->bo[ii])
-		{
-			LOG_ERROR("DrmGLESGraphicSystem", "failed to create bo.");
-			goto err_bufs;
+		output->surface[ii] = gbm_surface_create(m_gbm,
+						       output->currentMode->width,
+						       output->currentMode->height,
+						       GBM_BO_FORMAT_XRGB8888,
+						       GBM_BO_USE_SCANOUT | GBM_BO_USE_RENDERING);
+		if (!output->surface[ii]) {
+			LOG_ERROR("DrmGLESGraphicSystem", "failed to create gbm surface.");
+			goto err_free;
 		}
 
-		output->image[ii] = m_pfEglCreateImageKHR(m_eglDisplay,
-												  NULL,
-												  EGL_NATIVE_PIXMAP_KHR,
-												  output->bo[ii],
-												  NULL);
-		if (!output->image[ii])
-			goto err_bufs;
+		output->eglSurface[ii] = eglCreateWindowSurface(m_eglDisplay, m_eglConfig, (EGLNativeWindowType)output->surface[ii], NULL);
+		if (output->eglSurface[ii] == EGL_NO_SURFACE) {
+			LOG_ERROR("DrmGLESGraphicSystem", "failed to create egl surface.");
+			goto err_gbm_surface;
+		}
 
-		m_pfGLEglImageTargetRenderbufferStorageOES(GL_RENDERBUFFER,
-												   output->image[ii]);
+		if (!eglMakeCurrent(m_eglDisplay, output->eglSurface[ii], output->eglSurface[ii], m_eglContext))
+		{
+			LOG_ERROR("DrmGLESGraphicSystem", "failed to make current.");
+			goto err_egl_surface;
+		}
 
-		stride = gbm_bo_get_pitch(output->bo[ii]);
-		handle = gbm_bo_get_handle(output->bo[ii]).u32;
+		eglSwapBuffers(m_eglDisplay, output->eglSurface[ii]);
+
+		bo = gbm_surface_lock_front_buffer(output->surface[ii]);
+		if (!bo)
+		{
+			LOG_ERROR("DrmGLESGraphicSystem", "failed to lock front buffer.");
+			goto err_egl_surface;
+		}
+
+		stride = gbm_bo_get_stride(bo);
+		handle = gbm_bo_get_handle(bo).u32;
 
 		ret = drmModeAddFB(m_fdDev, drmMode->width, drmMode->height,
 			24, 32, stride, handle, &output->fbID[ii]);
 		if (ret)
 		{
-			LOG_ERROR("DrmGLESGraphicSystem", "failed to add fb(" << ii << ")");
-			goto err_bufs;
+			LOG_ERROR("DrmGLESGraphicSystem", "failed to ddd fb(" << ii << ")");
+			goto err_egl_surface;
 		}
+
+		gbm_surface_release_buffer(output->surface[ii], bo);
 	}
 
+		if (!eglMakeCurrent(m_eglDisplay, output->eglSurface[0], output->eglSurface[0], m_eglContext))
+		{
+			LOG_ERROR("DrmGLESGraphicSystem", "failed to make current.");
+			goto err_egl_surface;
+		}
+		eglSwapBuffers(m_eglDisplay, output->eglSurface[0]);
 	output->current = 0;
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER,
-							  GL_COLOR_ATTACHMENT0,
-							  GL_RENDERBUFFER,
-							  output->rbo[output->current]);
-
 	ret = drmModeSetCrtc(m_fdDev, output->crtcID,
 						 output->fbID[output->current ^ 1], 0, 0,
 						 &output->connectorID, 1,
@@ -400,7 +438,7 @@ int DrmGLESGraphicSystem::createOutputForConnector(drmModeRes* resources,
 	if (ret)
 	{
 		LOG_ERROR("DrmGLESGraphicSystem", "failed to set mode.");
-		goto err_fb;
+		goto err_egl_surface;
 	}
 
 	wl_list_insert(m_outputList.prev, &output->link);
@@ -408,23 +446,17 @@ int DrmGLESGraphicSystem::createOutputForConnector(drmModeRes* resources,
 	LOG_DEBUG("DrmGLESGraphicSystem", "createOutputForConnector OUT (NORMAL)");
 	return 0;
 
-err_fb:
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER,
-							  GL_COLOR_ATTACHMENT0,
-							  GL_RENDERBUFFER,
-							  0);
-
-err_bufs:
+err_egl_surface:
 	for (ii = 0; ii < 2; ++ii){
-		if (output->fbID[ii] != 0)
-			drmModeRmFB(m_fdDev, output->fbID[ii]);
-		if (output->image[ii])
-			m_pfEglDestroyImageKHR(m_eglDisplay, output->image[ii]);
-		if (output->bo[ii])
-			gbm_bo_destroy(output->bo[ii]);
+		if (output->eglSurface[ii])
+			eglDestroySurface(m_eglDisplay, output->eglSurface[ii]);
 	}
-	glBindRenderbuffer(GL_RENDERBUFFER, 0);
-	glDeleteRenderbuffers(2, output->rbo);
+
+err_gbm_surface:
+	for (ii = 0; ii < 2; ++ii){
+		if (output->surface[ii])
+			gbm_surface_destroy(output->surface[ii]);
+	}
 
 err_free:
 	drmModeFreeCrtc(output->orgCrtc);
@@ -456,14 +488,9 @@ int DrmGLESGraphicSystem::drmOutputAddMode(struct DrmOutput* output, drmModeMode
 
 int DrmGLESGraphicSystem::drmOutputPrepareRender(struct DrmOutput* output)
 {
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER,
-							  GL_COLOR_ATTACHMENT0,
-							  GL_RENDERBUFFER,
-							  output->rbo[output->current]);
-
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+	if (!eglMakeCurrent(m_eglDisplay, output->eglSurface[output->current], output->eglSurface[output->current], m_eglContext))
 	{
-		LOG_ERROR("DrmGLESGraphicSystem", "glCheckFramebufferStatus() failed.");
+		LOG_ERROR("DrmGLESGraphicSystem", "failed to make current.");
 		return -1;
 	}
 	return 0;
@@ -479,11 +506,21 @@ void DrmGLESGraphicSystem::swapBuffers()
 	{
 		glFinish();
 
+		eglSwapBuffers(m_eglDisplay, output->eglSurface[output->current]);
+
 		output->current ^= 1;
 		uint32_t fbID = output->fbID[output->current ^ 1];
 #if 0
 		LOG_INFO("DrmGLESGraphicSystem", "fbID = " << fbID << ", current = " << output->current);
 #endif
+		if (drmModeSetCrtc(m_fdDev, output->crtcID,
+							 fbID, 0, 0,
+							 &output->connectorID, 1,
+							 &output->currentMode->modeInfo))
+		{
+			LOG_ERROR("DrmGLESGraphicSystem", "failed to set mode in swapBuffers.");
+		}
+
 		if (drmModePageFlip(m_fdDev, output->crtcID, fbID, 0, NULL) < 0)
 		{
 			LOG_ERROR("DrmGLESGraphicSystem", "queueing pageflip failed");
@@ -493,9 +530,3 @@ void DrmGLESGraphicSystem::swapBuffers()
     LOG_DEBUG("DrmGLESGraphicSystem", "swapBuffers OUT");
 }
 
-void DrmGLESGraphicSystem::applyLayerMatrix(IlmMatrix& matrix)
-{
-	GLESGraphicsystem::applyLayerMatrix(matrix);
-	// reverse Y axis
-	matrix.f[5] *= -1.0f;
-}

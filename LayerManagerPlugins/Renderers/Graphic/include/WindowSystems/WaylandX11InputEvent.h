@@ -32,7 +32,7 @@
 
 #include "config.h"
 
-#define HAVE_XCB_POLL_FOR_QUEUED_EVENT 1
+//#define HAVE_XCB_POLL_FOR_QUEUED_EVENT 1
 
 #include <wayland-server.h>
 #include <xcb/xcb.h>

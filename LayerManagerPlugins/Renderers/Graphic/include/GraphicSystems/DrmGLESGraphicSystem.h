@@ -54,12 +54,11 @@ struct DrmOutput {
 	uint32_t        crtcID;
 	uint32_t        connectorID;
 	drmModeCrtcPtr  orgCrtc;
-	GLuint          rbo[2];
 	uint32_t        fbID[2];
-	EGLImageKHR     image[2];
-	struct gbm_bo*  bo[2];
 	uint32_t        current;
 	int             fdDev;
+	struct gbm_surface*	surface[2];
+	EGLSurface	eglSurface[2];
 };
 
 class DrmGLESGraphicSystem: public GLESGraphicsystem
@@ -72,24 +71,21 @@ public:
 
     virtual bool init(EGLNativeDisplayType display, EGLNativeWindowType window);
     virtual void activateGraphicContext();
-    virtual void releaseGraphicContext();
     virtual void swapBuffers();
-	virtual void applyLayerMatrix(IlmMatrix& matrix);
 
 // proterties
 private:
 	struct wl_list m_outputList;
 
 	gbm_device*    m_gbm;
+	struct gbm_surface*   m_dummySurface;
+	EGLSurface     m_dummyEglSurface;
 	int            m_fdDev;
 	uint32_t*      m_crtcs;
 	int            m_crtcsNum;
 	uint32_t       m_crtcAllocator;
 	uint32_t       m_connectorAllocator;
 
-	PFNGLEGLIMAGETARGETRENDERBUFFERSTORAGEOESPROC	m_pfGLEglImageTargetRenderbufferStorageOES;
-	PFNEGLCREATEIMAGEKHRPROC						m_pfEglCreateImageKHR;
-	PFNEGLDESTROYIMAGEKHRPROC						m_pfEglDestroyImageKHR;
 	PFNEGLBINDWAYLANDDISPLAYWL						m_pfEglBindWaylandDisplayWL;
 	PFNEGLUNBINDWAYLANDDISPLAYWL					m_pfEglUnbindWaylandDisplayWL;
 
