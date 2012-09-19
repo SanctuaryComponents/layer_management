@@ -253,6 +253,7 @@ if (WITH_WAYLAND)
                 ${LIBS}
                 ${X11_X11_LIB}
                 ${WAYLAND_EGL_LIBRARIES}
+                ${XKB_LIBRARIES}
         )
         
         set(SOURCES
@@ -262,6 +263,9 @@ if (WITH_WAYLAND)
             src/WindowSystems/WaylandBaseWindowSystem.cpp
             src/WindowSystems/WaylandX11WindowSystem.cpp
             src/WindowSystems/WaylandServerinfoProtocol.cpp  
+            src/WindowSystems/WaylandInputDevice.cpp
+            src/WindowSystems/WaylandInputEvent.cpp
+            src/WindowSystems/WaylandX11InputEvent.cpp
             src/TextureBinders/WaylandGLESTexture.cpp
         )
         

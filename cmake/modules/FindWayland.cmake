@@ -50,6 +50,15 @@ NAMES ffi
 PATHS /usr/lib /usr/local/lib
 )
 
+FIND_PATH(XKB_INCLUDE_DIR /xkbcommon.h
+/usr/include/xkbcommon /usr/local/include/xkbcommon
+)
+
+FIND_LIBRARY(XKB_LIBRARIES
+NAMES xkbcommon
+PATHS /usr/lib /usr/local/lib
+)
+
 SET( WAYLAND_FOUND "NO" )
 IF(WAYLAND_CLIENT_LIBRARIES AND WAYLAND_SERVER_LIBRARIES)
     SET( WAYLAND_FOUND "YES" )
@@ -60,6 +69,8 @@ IF(WAYLAND_CLIENT_LIBRARIES AND WAYLAND_SERVER_LIBRARIES)
     message(STATUS "Found Wayland-Egl libs: ${WAYLAND_EGL_LIBRARIES}")
     message(STATUS "Found ffi need by Wayland libs: ${FFI_LIBRARIES}")
     message(STATUS "Found ffi need by Wayland includes: ${FFI_INCLUDE_DIR}")
+    message(STATUS "Found xkbcommon need by Wayland libs: ${XKB_LIBRARIES}")
+    message(STATUS "Found xkbcommon need by Wayland includes: ${XKB_INCLUDE_DIR}")
 ENDIF(WAYLAND_CLIENT_LIBRARIES AND WAYLAND_SERVER_LIBRARIES)
 
 MARK_AS_ADVANCED(
@@ -70,4 +81,6 @@ MARK_AS_ADVANCED(
   WAYLAND_EGL_LIBRARIES
   FFI_INCLUDE_DIR
   FFI_LIBRARIES
+  XKB_LIBRARIES
+  XKB_INCLUDE_DIR
 )
