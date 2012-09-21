@@ -412,6 +412,11 @@ void signalHandler(int sig)
         LOG_ERROR("LayerManagerService", "Signal SIGSEGV received. Shutting down.");
         printStackTrace();
         break;
+    case SIGABRT:
+        g_LayerManagerRunning = false;
+        LOG_ERROR("LayerManagerService", "Signal SIGABRT received. Shutting down.");
+        printStackTrace();
+        break;
 
     default:
         LOG_INFO("LayerManagerService", "Signal " << sig << " received.");
@@ -429,6 +434,7 @@ int main(int argc, char **argv)
     signal(SIGSEGV, signalHandler);
     signal(SIGTERM, signalHandler);
     signal(SIGINT, signalHandler);
+    signal(SIGABRT, signalHandler);
 
     parseCommandLine(argc, (char**) argv);
     char* pluginLookupPath = getenv("LM_PLUGIN_PATH");
