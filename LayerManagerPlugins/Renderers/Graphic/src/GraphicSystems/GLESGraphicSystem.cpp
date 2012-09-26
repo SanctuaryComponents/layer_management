@@ -66,9 +66,6 @@ GLESGraphicsystem::GLESGraphicsystem(int windowWidth, int windowHeight, PfnShade
 , m_defaultShaderNoUniformAlpha(0)
 , m_defaultShaderAddUniformChromaKey(0)
 , m_currentLayer(0)
-#ifdef DRAW_LAYER_DEBUG
-, m_layerShader(0)
-#endif
 , m_texId(0)
 {
     LOG_DEBUG("GLESGraphicsystem", "creating GLESGraphicsystem");
@@ -361,9 +358,6 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
     IlmMatrixIdentity(layerMatrix);
 
     ShaderProgram::CommonUniforms uniforms;
-#ifdef DRAW_LAYER_DEBUG
-    ShaderProgram::CommonUniforms layeruniforms;
-#endif
     Shader* layerShader = m_currentLayer->getShader();
     if (!layerShader)
     {
@@ -433,19 +427,6 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
     shader = pickOptimizedShader(shader, uniforms);
 
 
-#ifdef DRAW_LAYER_DEBUG
-    layeruniforms.x = (float) layerDestinationRegion.x / m_displayWidth;
-    layeruniforms.y = (float) layerDestinationRegion.y / m_displayHeight;
-    layeruniforms.width = (float)layerDestinationRegion.width / m_displayWidth;
-    layeruniforms.height = (float)layerDestinationRegion.height / m_displayHeight;
-    layeruniforms.opacity = m_currentLayer->getOpacity();
-    layeruniforms.matrix = &layerMatrix.f[0];
-    m_layerShader->use();
-    m_layerShader->loadCommonUniforms(layeruniforms);
-    m_layerShader->loadUniforms();
-
-    glDrawArrays(GL_TRIANGLES, 0, 6);
-#endif
     shader->use();
 
     /* load common uniforms */
@@ -487,27 +468,7 @@ bool GLESGraphicsystem::initOpenGLES(EGLint displayWidth, EGLint displayHeight)
     m_defaultShaderNoUniformAlpha = Shader::createShader("default", "default_no_uniform_alpha");
     m_defaultShaderAddUniformChromaKey= Shader::createShader("default", "default_add_uniform_chromakey");
 
-#ifdef DRAW_LAYER_DEBUG
-    std::string pluginLookupPath = getenv("LM_PLUGIN_PATH");
-    std::string vertexShaderPath;
-    std::string fragmentShaderPath;
-
-    if (pluginLookupPath.empty())
-    {
-        pluginLookupPath = CMAKE_INSTALL_PREFIX"/lib/layermanager";
-    }
-
-    vertexShaderPath   = pluginLookupPath + "/renderer/renderer_layer.glslv";
-    fragmentShaderPath = pluginLookupPath + "/renderer/renderer_layer.glslf";
-
-    m_layerShader = Shader::createShader(vertexShaderPath, fragmentShaderPath);
-#endif
-    if (
-      !m_defaultShader || !m_defaultShaderNoUniformAlpha || !m_defaultShaderAddUniformChromaKey
-#ifdef DRAW_LAYER_DEBUG
-    || !m_layerShader
-#endif
-    )
+    if (!m_defaultShader || !m_defaultShaderNoUniformAlpha || !m_defaultShaderAddUniformChromaKey )
     {
         LOG_ERROR("GLESGraphicsystem", "Failed to create and link default shader program");
         delete m_defaultShader;

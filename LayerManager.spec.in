@@ -59,9 +59,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/layermanager/renderer/libX11GLESRenderer.so
 %{_libdir}/layermanager/renderer/renderer_frag.glslf
 %{_libdir}/layermanager/renderer/renderer_frag_no_ualpha.glslf
-%{_libdir}/layermanager/renderer/renderer_layer.glslf
 %{_libdir}/layermanager/renderer/renderer_vert.glslv
-%{_libdir}/layermanager/renderer/renderer_layer.glslv
 %dir %_libdir/layermanager/static
 %{_libdir}/layermanager/static/libLayerManagerUtils.a
 

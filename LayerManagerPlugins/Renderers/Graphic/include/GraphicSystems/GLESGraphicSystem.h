@@ -29,8 +29,6 @@
 
 class IlmMatrix;
 
-/* uncomment if layer drawing needed */
-/* #define DRAW_LAYER_DEBUG */
 class GLESGraphicsystem: public BaseGraphicSystem<EGLNativeDisplayType, EGLNativeWindowType>
 {
 public:
@@ -95,10 +93,9 @@ protected:
     Shader* m_defaultShaderNoUniformAlpha;
     Shader* m_defaultShaderAddUniformChromaKey;
     Layer* m_currentLayer;
-#ifdef DRAW_LAYER_DEBUG
-    Shader* m_layerShader;
-#endif
+
     uint m_texId;
+
 private:
     void saveScreenShot();
 };
