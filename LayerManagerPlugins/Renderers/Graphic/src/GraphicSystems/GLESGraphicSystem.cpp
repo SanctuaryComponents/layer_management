@@ -525,7 +525,7 @@ bool GLESGraphicsystem::initOpenGLES(EGLint displayWidth, EGLint displayHeight)
         glEnableVertexAttribArray(1);
 
         glEnable(GL_BLEND);
-        glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA,GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
         m_blendingStatus = true;
         glClearColor(0.0, 0.0, 0.0, 0.0);
         resize(displayWidth, displayHeight);
