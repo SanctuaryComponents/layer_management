@@ -72,6 +72,8 @@ t_ilm_bool getUintArray(t_ilm_message message, t_ilm_uint** valueArray, t_ilm_in
         // create callers buffer, copy data to buffer
         *valueArray = malloc(sizeof(t_ilm_uint) * (*arraySize));
         memcpy(*valueArray, dbusArrayPointer, sizeof(t_ilm_uint) * (*arraySize));
+
+        dbus_message_iter_next(&gpCurrentMessage->iter);
     }
     else
     {
