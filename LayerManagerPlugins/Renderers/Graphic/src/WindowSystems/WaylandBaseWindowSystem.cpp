@@ -902,10 +902,11 @@ void* WaylandBaseWindowSystem::eventLoop()
         status = createInputEvent();
         if (false == status)
         {
-            LOG_ERROR("WaylandBaseWindowSystem", "failed to create input event");
-            break;
-        }
-        LOG_DEBUG("WaylandBaseWindowSystem", "SUCCESS:create InputEvent");
+             LOG_WARNING("WaylandBaseWindowSystem", "WARNING: failed to create input event");
+             status = true;
+         } else {
+             LOG_DEBUG("WaylandBaseWindowSystem", "SUCCESS:create InputEvent");
+         }
 
         this->m_success = status;
         this->m_initialized = true;
