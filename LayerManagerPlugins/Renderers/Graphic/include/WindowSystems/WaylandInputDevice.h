@@ -45,6 +45,11 @@ private:
     bool               m_hasTouch;
     int                m_nTp;
 
+    struct wl_surface*  m_wlTouchFocus;
+    struct wl_listener  m_wlTouchFocusListener;
+    struct wl_resource* m_wlTouchFocusResource;
+    struct wl_listener  m_wlTouchFocusResourceListener;
+
     struct {
         struct wl_pointer  wlPointer;
         struct wl_keyboard wlKeyboard;
@@ -83,7 +88,8 @@ public:
     void sendKeyReleaseEvent(struct wl_surface *surface, uint32_t time, uint32_t code);
     void setKeyboardFocus(struct wl_surface *surface);
 
-    void sendTouchPointEvent();
+    void sendTouchPointEvent(struct wl_surface *surface, uint32_t time,
+                             int touchId, int touchState, const Point& touchPos);
     void sendTouchFrameEvent();
     void sendTouchCancelEvent();
 
@@ -97,6 +103,8 @@ private:
     void sendMouseMotionEvent(const Point& globalPos,
                               const Point& localPos,
                               uint32_t time);
+
+    void setTouchFocus(struct wl_surface *surface);
 
     const static struct wl_seat_interface m_seatInterface;
 

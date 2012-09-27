@@ -36,6 +36,19 @@
 
 /////////////////////////////////////////////////////////////////////////////
 
+static struct wl_resource*
+findResourceForClient(struct wl_list *list, struct wl_client *client)
+{
+    struct wl_resource *r;
+    wl_list_for_each(r, list, link){
+        if (r->client == client)
+            return r;
+    }
+    return NULL;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+
 WaylandInputDevice::WaylandInputDevice(struct wl_display *display)
 : m_wlDisplay(display)
 , m_hasPointer(false)
@@ -307,18 +320,64 @@ WaylandInputDevice::sendKeyReleaseEvent(struct wl_surface* /*surface*/,
 }
 
 void
-WaylandInputDevice::sendTouchPointEvent()
+WaylandInputDevice::sendTouchPointEvent(struct wl_surface* surface, uint32_t time,
+                                        int touchId, int touchState, const Point& touchPos)
 {
+    switch (touchState){
+    case WL_TOUCH_DOWN:
+        ++m_nTp;
+        if (m_nTp == 1){
+            setTouchFocus(surface);
+        }
+        if (m_wlTouchFocusResource && m_wlTouchFocus){
+            wl_touch_send_down(m_wlTouchFocusResource,
+                               0 /*serial*/, time,
+                               &m_wlTouchFocus->resource, touchId,
+                               wl_fixed_from_double(touchPos.x),
+                               wl_fixed_from_double(touchPos.y));
+        }
+        break;
+    case WL_TOUCH_MOTION:
+        if (!m_wlTouchFocus){
+            break;
+        }
+        if (m_wlTouchFocusResource){
+            wl_touch_send_motion(m_wlTouchFocusResource,
+                                 time, touchId,
+                                 wl_fixed_from_double(touchPos.x),
+                                 wl_fixed_from_double(touchPos.y));
+        }
+        break;
+    case WL_TOUCH_UP:
+        --m_nTp;
+        if (m_wlTouchFocusResource){
+            wl_touch_send_up(m_wlTouchFocusResource, 0 /*serial*/, time, touchId);
+        }
+        if (m_nTp == 0){
+            setTouchFocus(NULL);
+        }
+        break;
+    }
 }
 
 void
 WaylandInputDevice::sendTouchFrameEvent()
 {
+    wl_touch *touch = touchDevice();
+    wl_resource *resource = touch->focus_resource;
+    if (resource){
+        wl_touch_send_frame(resource);
+    }
 }
 
 void
 WaylandInputDevice::sendTouchCancelEvent()
 {
+    wl_touch *touch = touchDevice();
+    wl_resource *resource = touch->focus_resource;
+    if (resource){
+        wl_touch_send_cancel(resource);
+    }
 }
 
 void
@@ -342,4 +401,27 @@ void
 WaylandInputDevice::setKeyboardFocus(struct wl_surface* surface)
 {
     wl_keyboard_set_focus(keyboardDevice(), surface);
+}
+
+void
+WaylandInputDevice::setTouchFocus(struct wl_surface* surface)
+{
+    struct wl_resource* resource = NULL;
+
+    if (m_wlTouchFocus == surface)
+        return;
+
+    if (surface){
+        resource = findResourceForClient(&m_wlSeat.touch->resource_list,
+                                         surface->resource.client);
+        if (!resource){
+            return;
+        }
+        m_wlSeat.touch->focus = surface;
+        m_wlSeat.touch->focus_resource = resource;
+    }
+    else {
+        m_wlSeat.touch->focus = NULL;
+        m_wlSeat.touch->focus_resource = NULL;
+    }
 }

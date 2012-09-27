@@ -1273,12 +1273,18 @@ void WaylandBaseWindowSystem::manageWLInputEvent(const InputDevice type,
             if (!surface)
                 break;
 
+            nativeSurface = getNativeSurfaceFromSurface(surface);
+            if (!nativeSurface)
+                break;
+
             switch (state){
             case INPUT_STATE_PRESSED:
-                m_inputEvent->inputDevice().sendTouchPointEvent();
-                break;
             case INPUT_STATE_MOTION:
             case INPUT_STATE_RELEASED:
+                m_inputEvent->inputDevice().sendTouchPointEvent(
+                    &nativeSurface->surface, time, wlEvent->touchId,
+                    wlEvent->touchType, ptVec[0]);
+                break;
             case INPUT_STATE_OTHER:
             default:
                 break;
