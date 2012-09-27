@@ -56,24 +56,6 @@ extern "C"
         xcb_atom_t xkbNames;
         xcb_atom_t string;
     };
-
-    struct weston_xkb_info_ {
-        struct xkb_keymap *keymap;
-        int keymap_fd;
-        size_t keymap_size;
-        char *keymap_area;
-        xkb_mod_index_t shift_mod;
-        xkb_mod_index_t caps_mod;
-        xkb_mod_index_t ctrl_mod;
-        xkb_mod_index_t alt_mod;
-        xkb_mod_index_t mod2_mod;
-        xkb_mod_index_t mod3_mod;
-        xkb_mod_index_t super_mod;
-        xkb_mod_index_t mod5_mod;
-        xkb_led_index_t num_led;
-        xkb_led_index_t caps_led;
-        xkb_led_index_t scroll_led;
-    };
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -87,11 +69,7 @@ private:
 
     bool              m_hasXkb;
     uint8_t           m_xkbEventBase;
-    struct xkb_context     *m_xkbContext;
-    struct xkb_rule_names   m_xkbNames;
-    struct xkb_state       *m_xkbState;
-    struct atom_            m_atom;
-    struct weston_xkb_info_ m_xkbInfo;
+    struct atom_      m_atom;
 
 // Methods
 public:
@@ -103,14 +81,10 @@ public:
 protected:
 private:
     static int handleInputEvent(int fd, uint32_t mask, void *data);
-    static void updateXkbStateFromCore();
 
-    bool initXkb();
     void setupXkb();
     bool hasXkb();
     struct xkb_keymap *getKeymap();
-    void createNewKeymap();
-    void buildGlobalKeymap();
 
     xcb_connection_t *connection();
     uint8_t xkbEventBase();

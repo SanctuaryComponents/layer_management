@@ -425,3 +425,15 @@ WaylandInputDevice::setTouchFocus(struct wl_surface* surface)
         m_wlSeat.touch->focus_resource = NULL;
     }
 }
+
+void
+WaylandInputDevice::sendModifiers(uint32_t serial)
+{
+    struct wl_keyboard *keyboard = keyboardDevice();
+    struct wl_keyboard_grab *grab = keyboard->grab;
+    grab->interface->modifiers(grab, serial,
+                               keyboard->modifiers.mods_depressed,
+                               keyboard->modifiers.mods_latched,
+                               keyboard->modifiers.mods_locked,
+                               keyboard->modifiers.group);
+}

@@ -65,6 +65,7 @@ public:
     void initKeyboardDevice();
     void initTouchDevice();
 
+    struct wl_display* display();
     struct wl_seat* seat();
     bool hasPointer() const;
     bool hasKeyboard() const;
@@ -92,6 +93,8 @@ public:
                              int touchId, int touchState, const Point& touchPos);
     void sendTouchFrameEvent();
     void sendTouchCancelEvent();
+
+    void sendModifiers(uint32_t serial);
 
 private:
     void releaseDevices();
@@ -126,6 +129,7 @@ private:
                          uint32_t id);
 };
 
+inline struct wl_display* WaylandInputDevice::display() { return m_wlDisplay; }
 inline struct wl_seat* WaylandInputDevice::seat() { return &m_wlSeat; }
 inline bool WaylandInputDevice::hasPointer() const { return m_hasPointer; }
 inline bool WaylandInputDevice::hasKeyboard() const { return m_hasKeyboard; }

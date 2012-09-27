@@ -58,6 +58,8 @@ typedef struct _wlevent {
     long       keyCode;
     enum wl_keyboard_key_state   keyState;
     uint32_t   serial;
+    uint32_t   axis;
+    wl_fixed_t axisValue;
     int        touchId;
     int        touchType;
 } WLEvent;
@@ -84,6 +86,8 @@ public:
     void doScreenShot(std::string fileName);
     void doScreenShotOfLayer(std::string fileName, const uint id);
     void doScreenShotOfSurface(std::string fileName, const uint id, const uint layer_id);
+    int getWindowWidth() const;
+    int getWindowHeight() const;
 
 protected:
     struct wl_display* m_wlDisplay;
@@ -192,6 +196,9 @@ inline bool WaylandBaseWindowSystem::createInputEvent()
 {
     return false;
 }
+
+inline int WaylandBaseWindowSystem::getWindowWidth() const { return m_width; }
+inline int WaylandBaseWindowSystem::getWindowHeight() const { return m_height; }
 
 extern "C" {
     struct native_surface {

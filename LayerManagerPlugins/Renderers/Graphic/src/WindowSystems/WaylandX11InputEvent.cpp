@@ -29,7 +29,6 @@
 #include <time.h>
 #include <sys/time.h>
 #include <sys/wait.h>
-#include <sys/mman.h>
 #include <linux/input.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -87,7 +86,6 @@ WaylandX11InputEvent::WaylandX11InputEvent(WaylandBaseWindowSystem *windowSystem
 , m_xcbConn(NULL)
 , m_hasXkb(false)
 , m_xkbEventBase(0)
-, m_xkbContext(NULL)
 {
     memset(&m_xkbNames, 0x00, sizeof(m_xkbNames));
 }
@@ -99,8 +97,6 @@ WaylandX11InputEvent::~WaylandX11InputEvent()
     if (m_x11Display)
         XCloseDisplay(m_x11Display);
 #endif
-    if (m_xkbContext)
-        xkb_context_unref(m_xkbContext);
 }
 
 #define F(field) offsetof(struct atom_, field)
@@ -110,10 +106,7 @@ WaylandX11InputEvent::setupInputEvent()
 {
     LOG_DEBUG("WaylandX11InputEvent", "setupInputEvent IN");
 
-    if (!initXkb()){
-        LOG_ERROR("WaylandX11InputEvent", "ERROR: Failed to init XKB");
-        return;
-    }
+    WaylandInputEvent::setupInputEvent();
 
     WaylandX11WindowSystem* x11WindowSystem
         = dynamic_cast<WaylandX11WindowSystem*>(m_windowSystem);
@@ -164,26 +157,12 @@ WaylandX11InputEvent::setupInputEvent()
     }
 
     // Initialize pointer device
-    m_inputDevice->initPointerDevice();
-
-    setupXkb();
-    struct xkb_keymap *keymap = getKeymap();
-    if (!keymap){
-        m_xkbInfo.keymap = xkb_map_ref(keymap);
-        createNewKeymap();
-    }
-    else {
-        buildGlobalKeymap();
-        m_xkbInfo.keymap = xkb_map_ref(m_xkbInfo.keymap);
-    }
-    m_xkbState = xkb_state_new(m_xkbInfo.keymap);
-    if (m_xkbState == NULL){
-        LOG_ERROR("WaylandX11InputEvent", "Failed to initialise XKB state");
-        return;
-    }
+    initPointerDevice();
 
     // Initialize keyboard device
-    m_inputDevice->initKeyboardDevice();
+    setupXkb();
+    struct xkb_keymap *keymap = getKeymap();
+    initKeyboardDevice(keymap);
     if (keymap){
         xkb_map_unref(keymap);
     }
@@ -200,23 +179,6 @@ WaylandX11InputEvent::setupInputEvent()
     wl_event_source_check(m_wlEventSource);
 
     LOG_DEBUG("WaylandX11InputEvent", "setupInputEvent OUT");
-}
-
-bool
-WaylandX11InputEvent::initXkb()
-{
-    m_xkbContext = xkb_context_new(static_cast<xkb_context_flags>(0));
-    if (m_xkbContext == NULL){
-        LOG_ERROR("WaylandX11InputEvent", "ERROR: Failed to init XKB context");
-        return false;
-    }
-
-    // TODO: set specified configuration
-    m_xkbNames.rules  = strdup("evdev");
-    m_xkbNames.model  = strdup("pc105");
-    m_xkbNames.layout = strdup("us");
-
-    return true;
 }
 
 void
@@ -319,82 +281,6 @@ WaylandX11InputEvent::getKeymap()
 
     free(reply);
     return ret;
-}
-
-void
-WaylandX11InputEvent::createNewKeymap()
-{
-    m_xkbInfo.shift_mod  = xkb_map_mod_get_index(m_xkbInfo.keymap, XKB_MOD_NAME_SHIFT);
-    m_xkbInfo.caps_mod   = xkb_map_mod_get_index(m_xkbInfo.keymap, XKB_MOD_NAME_CAPS);
-    m_xkbInfo.ctrl_mod   = xkb_map_mod_get_index(m_xkbInfo.keymap, XKB_MOD_NAME_CTRL);
-    m_xkbInfo.alt_mod    = xkb_map_mod_get_index(m_xkbInfo.keymap, XKB_MOD_NAME_ALT);
-    m_xkbInfo.mod2_mod   = xkb_map_mod_get_index(m_xkbInfo.keymap, "Mod2");
-    m_xkbInfo.mod3_mod   = xkb_map_mod_get_index(m_xkbInfo.keymap, "Mod3");
-    m_xkbInfo.super_mod  = xkb_map_mod_get_index(m_xkbInfo.keymap, XKB_MOD_NAME_LOGO);
-    m_xkbInfo.mod5_mod   = xkb_map_mod_get_index(m_xkbInfo.keymap, "Mod5");
-    m_xkbInfo.num_led    = xkb_map_led_get_index(m_xkbInfo.keymap, XKB_LED_NAME_NUM);
-    m_xkbInfo.caps_led   = xkb_map_led_get_index(m_xkbInfo.keymap, XKB_LED_NAME_CAPS);
-    m_xkbInfo.scroll_led = xkb_map_led_get_index(m_xkbInfo.keymap, XKB_LED_NAME_SCROLL);
-
-    char *keymapStr = xkb_map_get_as_string(m_xkbInfo.keymap);
-    if (keymapStr == NULL){
-        LOG_ERROR("WaylandX11InputEvent", "Failed to get string version of keymap");
-        return;
-    }
-    m_xkbInfo.keymap_size = strlen(keymapStr) + 1;
-
-    m_xkbInfo.keymap_fd = createAnonymousFile(m_xkbInfo.keymap_size);
-    if (m_xkbInfo.keymap_fd < 0){
-        LOG_WARNING("WaylandX11InputEvent", "Creating a keymap file for " <<
-                    (unsigned long)m_xkbInfo.keymap_size <<
-                    " bytes failed");
-        goto err_keymapStr;
-    }
-
-    m_xkbInfo.keymap_area = (char*)mmap(NULL,
-                                        m_xkbInfo.keymap_size,
-                                        PROT_READ | PROT_WRITE,
-                                        MAP_SHARED,
-                                        m_xkbInfo.keymap_fd,
-                                        0);
-    if (m_xkbInfo.keymap_area == MAP_FAILED){
-        LOG_WARNING("WaylandX11InputEvent", "Failed to mmap() " <<
-                    (unsigned long) m_xkbInfo.keymap_size <<
-                    " bytes");
-        goto err_dev_zero;
-    }
-    strcpy(m_xkbInfo.keymap_area, keymapStr);
-    free(keymapStr);
-
-    return;
-
-err_dev_zero:
-    close(m_xkbInfo.keymap_fd);
-    m_xkbInfo.keymap_fd = -1;
-
-err_keymapStr:
-    free(keymapStr);
-    exit(EXIT_FAILURE);
-}
-
-void
-WaylandX11InputEvent::buildGlobalKeymap()
-{
-    if (m_xkbInfo.keymap != NULL)
-        return;
-
-    m_xkbInfo.keymap = xkb_map_new_from_names(m_xkbContext,
-                                              &m_xkbNames,
-                                              static_cast<xkb_map_compile_flags>(0));
-    if (m_xkbInfo.keymap == NULL){
-        LOG_ERROR("WaylandX11InputEvent", "Failed to compile global XKB keymap");
-        LOG_ERROR("WaylandX11InputEvent", "  tried rules: " << m_xkbNames.rules <<
-                                          ", model: "       << m_xkbNames.model <<
-                                          ", layout: "      << m_xkbNames.layout);
-        return;
-    }
-
-    createNewKeymap();
 }
 
 int

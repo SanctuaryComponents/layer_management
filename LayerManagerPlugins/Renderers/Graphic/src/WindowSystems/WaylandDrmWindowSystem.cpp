@@ -37,6 +37,7 @@
 #include <libudev.h>
 #include <xf86drm.h>
 #include <xf86drmMode.h>
+#include "WindowSystems/WaylandEvdevInputEvent.h"
 
 static const char default_seat[] = "seat0";
 
@@ -126,5 +127,12 @@ bool WaylandDrmWindowSystem::createNativeContext()
 	udev_device_unref(drm_device);
 
     LOG_DEBUG("WaylandDrmWindowSystem", "SUCCESS:create gbm device");
+    return true;
+}
+
+bool WaylandDrmWindowSystem::createInputEvent()
+{
+    m_inputEvent = new WaylandEvdevInputEvent(this);
+    m_inputEvent->setupInputEvent();
     return true;
 }

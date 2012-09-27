@@ -29,6 +29,7 @@
 #include <time.h>
 #include <sys/time.h>
 #include <sys/wait.h>
+#include <sys/mman.h>
 #include <linux/input.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -42,6 +43,7 @@
 
 /////////////////////////////////////////////////////////////////////////////
 
+#ifndef HAVE_MKOSTEMP
 static int
 setCloexecOrClose(int fd)
 {
@@ -61,6 +63,7 @@ err:
     close(fd);
     return -1;
 }
+#endif
 
 static int
 createTmpFileCloexec(char *tmpname)
@@ -88,6 +91,7 @@ WaylandInputEvent::WaylandInputEvent(WaylandBaseWindowSystem *windowSystem)
 , m_inputDevice(NULL)
 , m_wlEventSource(NULL)
 , m_fd(0)
+, m_xkbContext(NULL)
 {
     initInputEvent();
 }
@@ -96,6 +100,23 @@ WaylandInputEvent::~WaylandInputEvent()
 {
     if (!m_wlEventSource)
         wl_event_source_remove(m_wlEventSource);
+
+    if (m_xkbInfo.keymap)
+        xkb_map_unref(m_xkbInfo.keymap);
+
+    if (m_xkbInfo.keymap_area)
+        munmap(m_xkbInfo.keymap_area, m_xkbInfo.keymap_size);
+
+    if (m_xkbInfo.keymap_fd >= 0)
+        close(m_xkbInfo.keymap_fd);
+
+    xkb_context_unref(m_xkbContext);
+
+    free((char*)m_xkbNames.rules);
+    free((char*)m_xkbNames.model);
+    free((char*)m_xkbNames.layout);
+    free((char*)m_xkbNames.variant);
+    free((char*)m_xkbNames.options);
 }
 
 void
@@ -107,13 +128,66 @@ WaylandInputEvent::initInputEvent()
         LOG_ERROR("WaylandInputEvent", "Failed to create WaylandInputDevice");
         return;
     }
+
+    memset(&m_xkbInfo, 0, sizeof(m_xkbInfo));
+    memset(&m_xkbState, 0, sizeof(m_xkbState));
+    memset(&m_xkbNames, 0, sizeof(m_xkbNames));
+
     LOG_DEBUG("WaylandInputEvent", "initInputEvent OUT");
 }
 
 void
 WaylandInputEvent::setupInputEvent()
 {
-    LOG_ERROR("WaylandInputEvent", "Called setupInputEvent()");
+    if (!m_xkbContext){
+        m_xkbContext = xkb_context_new((enum xkb_context_flags)0);
+        if (!m_xkbContext){
+            LOG_ERROR("WaylandInputEvent", "Failed to create XKB context");
+            return;
+        }
+    }
+
+    m_xkbNames.rules  = strdup("evdev");
+    m_xkbNames.model  = strdup("pc105");
+    m_xkbNames.layout = strdup("us");
+}
+
+void
+WaylandInputEvent::initPointerDevice()
+{
+    if (m_inputDevice->hasPointer())
+        return;
+    m_inputDevice->initPointerDevice();
+}
+
+void
+WaylandInputEvent::initKeyboardDevice(struct xkb_keymap *keymap)
+{
+    if (m_inputDevice->hasKeyboard())
+        return;
+
+    if (keymap){
+        m_xkbInfo.keymap = xkb_map_ref(keymap);
+        createNewKeymap();
+    } else {
+        buildGlobalKeymap();
+    }
+
+    m_xkbState.state = xkb_state_new(m_xkbInfo.keymap);
+    if (!m_xkbState.state){
+        LOG_ERROR("WaylandInputEvent", "Failed to initialize XKB state");
+        return;
+    }
+
+    m_inputDevice->initKeyboardDevice();
+}
+
+void
+WaylandInputEvent::initTouchDevice()
+{
+    if (m_inputDevice->hasTouch())
+        return;
+    m_inputDevice->initTouchDevice();
 }
 
 int
@@ -149,4 +223,80 @@ WaylandInputEvent::createAnonymousFile(off_t size)
     }
 
     return fd;
+}
+
+void
+WaylandInputEvent::createNewKeymap()
+{
+    m_xkbInfo.shift_mod  = xkb_map_mod_get_index(m_xkbInfo.keymap, XKB_MOD_NAME_SHIFT);
+    m_xkbInfo.caps_mod   = xkb_map_mod_get_index(m_xkbInfo.keymap, XKB_MOD_NAME_CAPS);
+    m_xkbInfo.ctrl_mod   = xkb_map_mod_get_index(m_xkbInfo.keymap, XKB_MOD_NAME_CTRL);
+    m_xkbInfo.alt_mod    = xkb_map_mod_get_index(m_xkbInfo.keymap, XKB_MOD_NAME_ALT);
+    m_xkbInfo.mod2_mod   = xkb_map_mod_get_index(m_xkbInfo.keymap, "Mod2");
+    m_xkbInfo.mod3_mod   = xkb_map_mod_get_index(m_xkbInfo.keymap, "Mod3");
+    m_xkbInfo.super_mod  = xkb_map_mod_get_index(m_xkbInfo.keymap, XKB_MOD_NAME_LOGO);
+    m_xkbInfo.mod5_mod   = xkb_map_mod_get_index(m_xkbInfo.keymap, "Mod5");
+    m_xkbInfo.num_led    = xkb_map_led_get_index(m_xkbInfo.keymap, XKB_LED_NAME_NUM);
+    m_xkbInfo.caps_led   = xkb_map_led_get_index(m_xkbInfo.keymap, XKB_LED_NAME_CAPS);
+    m_xkbInfo.scroll_led = xkb_map_led_get_index(m_xkbInfo.keymap, XKB_LED_NAME_SCROLL);
+
+    char *keymapStr = xkb_map_get_as_string(m_xkbInfo.keymap);
+    if (keymapStr == NULL){
+        LOG_ERROR("WaylandX11InputEvent", "Failed to get string version of keymap");
+        return;
+    }
+    m_xkbInfo.keymap_size = strlen(keymapStr) + 1;
+
+    m_xkbInfo.keymap_fd = createAnonymousFile(m_xkbInfo.keymap_size);
+    if (m_xkbInfo.keymap_fd < 0){
+        LOG_WARNING("WaylandX11InputEvent", "Creating a keymap file for " <<
+                    (unsigned long)m_xkbInfo.keymap_size <<
+                    " bytes failed");
+        goto err_keymapStr;
+    }
+
+    m_xkbInfo.keymap_area = (char*)mmap(NULL,
+                                        m_xkbInfo.keymap_size,
+                                        PROT_READ | PROT_WRITE,
+                                        MAP_SHARED,
+                                        m_xkbInfo.keymap_fd,
+                                        0);
+    if (m_xkbInfo.keymap_area == MAP_FAILED){
+        LOG_WARNING("WaylandX11InputEvent", "Failed to mmap() " <<
+                    (unsigned long) m_xkbInfo.keymap_size <<
+                    " bytes");
+        goto err_dev_zero;
+    }
+    strcpy(m_xkbInfo.keymap_area, keymapStr);
+    free(keymapStr);
+
+    return;
+
+err_dev_zero:
+    close(m_xkbInfo.keymap_fd);
+    m_xkbInfo.keymap_fd = -1;
+
+err_keymapStr:
+    free(keymapStr);
+    exit(EXIT_FAILURE);
+}
+
+void
+WaylandInputEvent::buildGlobalKeymap()
+{
+    if (m_xkbInfo.keymap != NULL)
+        return;
+
+    m_xkbInfo.keymap = xkb_map_new_from_names(m_xkbContext,
+                                              &m_xkbNames,
+                                              static_cast<xkb_map_compile_flags>(0));
+    if (m_xkbInfo.keymap == NULL){
+        LOG_ERROR("WaylandInputEvent", "Failed to compile global XKB keymap");
+        LOG_ERROR("WaylandInputEvent", "  tried rules: " << m_xkbNames.rules <<
+                                       ", model: "       << m_xkbNames.model <<
+                                       ", layout: "      << m_xkbNames.layout);
+        return;
+    }
+
+    createNewKeymap();
 }

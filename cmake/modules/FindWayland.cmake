@@ -59,6 +59,15 @@ NAMES xkbcommon
 PATHS /usr/lib /usr/local/lib
 )
 
+FIND_PATH(MTDEV_INCLUDE_DIR /mtdev.h
+/usr/include /usr/local/include
+)
+
+FIND_LIBRARY(MTDEV_LIBRARIES
+NAMES mtdev
+PATHS /usr/lib /usr/local/lib
+)
+
 SET( WAYLAND_FOUND "NO" )
 IF(WAYLAND_CLIENT_LIBRARIES AND WAYLAND_SERVER_LIBRARIES)
     SET( WAYLAND_FOUND "YES" )
@@ -71,6 +80,8 @@ IF(WAYLAND_CLIENT_LIBRARIES AND WAYLAND_SERVER_LIBRARIES)
     message(STATUS "Found ffi need by Wayland includes: ${FFI_INCLUDE_DIR}")
     message(STATUS "Found xkbcommon need by Wayland libs: ${XKB_LIBRARIES}")
     message(STATUS "Found xkbcommon need by Wayland includes: ${XKB_INCLUDE_DIR}")
+    message(STATUS "Found mtdev need by Wayland libs: ${MTDEV_LIBRARIES}")
+    message(STATUS "Found mtdev need by Wayland includes: ${MTDEV_INCLUDE_DIR}")
 ENDIF(WAYLAND_CLIENT_LIBRARIES AND WAYLAND_SERVER_LIBRARIES)
 
 MARK_AS_ADVANCED(
@@ -83,4 +94,6 @@ MARK_AS_ADVANCED(
   FFI_LIBRARIES
   XKB_LIBRARIES
   XKB_INCLUDE_DIR
+  MTDEV_LIBRARIES
+  MTDEV_INCLUDE_DIR
 )

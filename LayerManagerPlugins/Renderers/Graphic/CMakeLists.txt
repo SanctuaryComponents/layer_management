@@ -279,7 +279,10 @@ if (WITH_WAYLAND)
 
         set(LIBS
                 ${LIBS}
+                ${UDEV_LIBRARIES}
                 ${WAYLAND_EGL_LIBRARIES}
+                ${MTDEV_LIBRARIES}
+                ${XKB_LIBRARIES}
         )
 
         file(GLOB SOURCES 
@@ -289,6 +292,9 @@ if (WITH_WAYLAND)
             src/WindowSystems/WaylandBaseWindowSystem.cpp
             src/WindowSystems/WaylandFbdevWindowSystem.cpp
             src/WindowSystems/WaylandServerinfoProtocol.cpp  
+            src/WindowSystems/WaylandInputDevice.cpp
+            src/WindowSystems/WaylandInputEvent.cpp
+            src/WindowSystems/WaylandEvdevInputEvent.cpp
             src/TextureBinders/WaylandGLESTexture.cpp
         )
 
@@ -311,6 +317,8 @@ if (WITH_WAYLAND)
                 ${GBM_LIBRARIES}
                 ${DRM_LIBRARIES}
                 ${WAYLAND_EGL_LIBRARIES}
+                ${MTDEV_LIBRARIES}
+                ${XKB_LIBRARIES}
         )
         
 
@@ -322,6 +330,9 @@ if (WITH_WAYLAND)
             src/WindowSystems/WaylandBaseWindowSystem.cpp
             src/WindowSystems/WaylandDrmWindowSystem.cpp
             src/WindowSystems/WaylandServerinfoProtocol.cpp
+            src/WindowSystems/WaylandInputDevice.cpp
+            src/WindowSystems/WaylandInputEvent.cpp
+            src/WindowSystems/WaylandEvdevInputEvent.cpp
             src/TextureBinders/WaylandGLESTexture.cpp
         )
 

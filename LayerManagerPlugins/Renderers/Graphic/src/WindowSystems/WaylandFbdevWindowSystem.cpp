@@ -44,6 +44,7 @@
 #include <unistd.h>
 #endif
 #include <iomanip>
+#include "WindowSystems/WaylandEvdevInputEvent.h"
 
 WaylandFbdevWindowSystem::WaylandFbdevWindowSystem(const char* displayname, int width, int height, Scene* pScene, InputManager* pInputManager)
 : WaylandBaseWindowSystem(displayname, width, height, pScene, pInputManager)
@@ -66,5 +67,12 @@ bool WaylandFbdevWindowSystem::createNativeContext()
         return false;
     }
     LOG_DEBUG("WaylandFbdevWindowSystem", "SUCCESS:open FB");
+    return true;
+}
+
+bool WaylandFbdevWindowSystem::createInputEvent()
+{
+    m_inputEvent = new WaylandEvdevInputEvent(this);
+    m_inputEvent->setupInputEvent();
     return true;
 }

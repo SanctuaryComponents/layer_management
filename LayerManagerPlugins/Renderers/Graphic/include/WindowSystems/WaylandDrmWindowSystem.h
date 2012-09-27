@@ -42,6 +42,7 @@ public:
 protected:
     virtual bool createNativeContext();
     virtual bool initGraphicSystem();
+    virtual bool createInputEvent();
 
 private:
     int m_fdDev;
