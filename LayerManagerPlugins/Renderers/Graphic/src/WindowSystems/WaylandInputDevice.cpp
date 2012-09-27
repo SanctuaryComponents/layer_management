@@ -290,19 +290,19 @@ WaylandInputDevice::sendKeyPressEvent(struct wl_surface* surface,
     if (keyboard->focus_resource){
         uint32_t serial = wl_display_next_serial(m_wlDisplay);
         wl_keyboard_send_key(keyboard->focus_resource,
-                             serial, time, code - 8, 1);
+                             serial, time, code, 1);
     }
 }
 
 void
-WaylandInputDevice::sendKeyReleaseEvent(struct wl_surface* surface,
+WaylandInputDevice::sendKeyReleaseEvent(struct wl_surface* /*surface*/,
                                         uint32_t time, uint32_t code)
 {
     wl_keyboard *keyboard = keyboardDevice();
     if (keyboard->focus_resource){
         uint32_t serial = wl_display_next_serial(m_wlDisplay);
         wl_keyboard_send_key(keyboard->focus_resource,
-                             serial, time, code - 8, 0);
+                             serial, time, code, 0);
     }
 }
 
