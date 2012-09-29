@@ -34,12 +34,14 @@ private:
     struct wl_seat*       m_wlSeat;
     struct wl_pointer*    m_wlPointer;
     struct wl_keyboard*   m_wlKeyboard;
+    struct wl_touch*      m_wlTouch;
     struct serverinfo*    m_wlServerInfo;
     uint32_t m_mask;
     uint32_t m_connectionId;
 
     struct wl_pointer_listener*  m_wlPointerListener;
     struct wl_keyboard_listener* m_wlKeyboardListener;
+    struct wl_touch_listener*    m_wlTouchListener;
 
 // methods
 public:
@@ -47,15 +49,18 @@ public:
     virtual ~WLContext();
 
     bool InitWLContext(const struct wl_pointer_listener* wlPointerListener = NULL,
-                       const struct wl_keyboard_listener* wlKeyboardListener = NULL);
+                       const struct wl_keyboard_listener* wlKeyboardListener = NULL,
+                       const struct wl_touch_listener* wlTouchListener = NULL);
 
     struct wl_compositor* GetWLCompositor() const;
     struct wl_display* GetWLDisplay() const;
     struct wl_pointer* GetWLPointer() const;
     struct wl_keyboard* GetWLKeyboard() const;
+    struct wl_touch* GetWLTouch() const;
     struct wl_seat* GetWLSeat() const;
     struct wl_pointer_listener* GetWLPointerListener() const;
     struct wl_keyboard_listener* GetWLKeyboardListener() const;
+    struct wl_touch_listener* GetWLTouchListener() const;
     uint32_t GetConnectionId() const;
 
     void SetEventMask(uint32_t mask);
@@ -65,6 +70,7 @@ public:
     void SetConnectionId(uint32_t connectionId);
     void SetWLPointer(struct wl_pointer* wlPointer);
     void SetWLKeyboard(struct wl_keyboard* wlKeyboard);
+    void SetWLTouch(struct wl_touch* wlTouch);
 
     static void DisplayHandleGlobal(struct wl_display* display,
                                     uint32_t id,
@@ -87,11 +93,14 @@ inline struct wl_compositor* WLContext::GetWLCompositor() const { return m_wlCom
 inline struct wl_display* WLContext::GetWLDisplay() const { return m_wlDisplay; }
 inline struct wl_pointer* WLContext::GetWLPointer() const { return m_wlPointer; }
 inline struct wl_keyboard* WLContext::GetWLKeyboard() const { return m_wlKeyboard; }
+inline struct wl_touch* WLContext::GetWLTouch() const { return m_wlTouch; }
 inline struct wl_seat* WLContext::GetWLSeat() const { return m_wlSeat; }
 inline struct wl_pointer_listener* WLContext::GetWLPointerListener() const
     { return m_wlPointerListener; }
 inline struct wl_keyboard_listener* WLContext::GetWLKeyboardListener() const
     { return m_wlKeyboardListener; }
+inline struct wl_touch_listener* WLContext::GetWLTouchListener() const
+    { return m_wlTouchListener; }
 inline uint32_t WLContext::GetConnectionId() const { return m_connectionId; }
 
 inline void WLContext::SetEventMask(uint32_t mask) { m_mask = mask; }
@@ -107,5 +116,7 @@ inline void WLContext::SetWLPointer(struct wl_pointer* wlPointer)
     { m_wlPointer = wlPointer; }
 inline void WLContext::SetWLKeyboard(struct wl_keyboard* wlKeyboard)
     { m_wlKeyboard = wlKeyboard; }
+inline void WLContext::SetWLTouch(struct wl_touch* wlTouch)
+    { m_wlTouch = wlTouch; }
 
 #endif

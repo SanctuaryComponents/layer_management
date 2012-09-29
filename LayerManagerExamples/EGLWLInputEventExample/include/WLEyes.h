@@ -31,6 +31,8 @@ private:
     TPoint* m_eyeLiner;
     int     m_nPupilPoint;
     TPoint* m_pupil;
+    int     m_nWhiteEyePoint;
+    TPoint* m_whiteEye;
 
 public:
     WLEye();
@@ -46,7 +48,14 @@ public:
                      const Transform& trans);
 
     void GetEyeLinerGeom(int* nPoint, float** points);
+    void GetWhiteEyeGeom(int* nPoint, float** points);
     void GetPupilGeom(int* nPoint, float** points);
+
+private:
+    void CreateWhiteEye(const float& centerX,
+                        const float& centerY,
+                        const float& diam,
+                        const Transform& trans);
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -66,6 +75,7 @@ public:
     void SetPointOfView(int mousePosX, int mousePosY);
 
     void GetEyeLinerGeom(int n, int* nPoint, float** points);
+    void GetWhiteEyeGeom(int n, int* nPoint, float** points);
     void GetPupilGeom(int n, int* nPoint, float** points);
 
 private:

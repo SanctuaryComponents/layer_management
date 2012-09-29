@@ -205,6 +205,8 @@ WLEye::WLEye()
 , m_eyeLiner(NULL)
 , m_nPupilPoint(0)
 , m_pupil(NULL)
+, m_nWhiteEyePoint(0)
+, m_whiteEye(NULL)
 {
 }
 
@@ -215,6 +217,9 @@ WLEye::~WLEye()
     }
     if (m_nPupilPoint > 0 && m_pupil){
         free(m_pupil);
+    }
+    if (m_nWhiteEyePoint > 0 && m_whiteEye){
+        free(m_whiteEye);
     }
 }
 
@@ -227,6 +232,19 @@ WLEye::CreateEyeLiner(const float& centerX, const float& centerY,
         m_nPoint = 0;
     }
     CreateEllipsePoints(centerX, centerY, diam, trans, m_nPoint, m_eyeLiner);
+
+    CreateWhiteEye(centerX, centerY, diam * 0.8, trans);
+}
+
+void
+WLEye::CreateWhiteEye(const float& centerX, const float& centerY,
+                      const float& diam, const Transform& trans)
+{
+    if (m_nWhiteEyePoint > 0 && m_whiteEye){
+        free(m_whiteEye);
+        m_nWhiteEyePoint = 0;
+    }
+    CreateEllipsePoints(centerX, centerY, diam, trans, m_nWhiteEyePoint, m_whiteEye);
 }
 
 void
@@ -245,6 +263,13 @@ WLEye::GetEyeLinerGeom(int* nPoint, float** points)
 {
     *nPoint = m_nPoint;
     *points = (float*)m_eyeLiner;
+}
+
+void
+WLEye::GetWhiteEyeGeom(int* nPoint, float** points)
+{
+    *nPoint = m_nWhiteEyePoint;
+    *points = (float*)m_whiteEye;
 }
 
 void
@@ -296,6 +321,16 @@ WLEyes::GetEyeLinerGeom(int n, int* nPoint, float** points)
     *points = NULL;
     if (n < 3){
         m_eyes[n]->GetEyeLinerGeom(nPoint, points);
+    }
+}
+
+void
+WLEyes::GetWhiteEyeGeom(int n, int* nPoint, float** points)
+{
+    *nPoint = 0;
+    *points = NULL;
+    if (n < 3){
+        m_eyes[n]->GetWhiteEyeGeom(nPoint, points);
     }
 }
 

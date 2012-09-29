@@ -31,6 +31,30 @@ extern int gNeedRedraw;
 extern int gPointerX;
 extern int gPointerY;
 
+const struct wl_pointer_listener PointerListener = {
+    PointerHandleEnter,
+    PointerHandleLeave,
+    PointerHandleMotion,
+    PointerHandleButton,
+    PointerHandleAxis
+};
+
+const struct wl_keyboard_listener KeyboardListener = {
+    KeyboardHandleKeymap,
+    KeyboardHandleEnter,
+    KeyboardHandleLeave,
+    KeyboardHandleKey,
+    KeyboardHandleModifiers,
+};
+
+const struct wl_touch_listener TouchListener = {
+    TouchHandleDown,
+    TouchHandleUp,
+    TouchHandleMotion,
+    TouchHandleFrame,
+    TouchHandleCancel,
+};
+
 void WaitForEvent(struct wl_display* wlDisplay)
 {
     wl_display_iterate(wlDisplay, WL_DISPLAY_READABLE);
@@ -170,6 +194,61 @@ KeyboardHandleModifiers(void* data, struct wl_keyboard* keyboard, uint32_t seria
 //         "                               mods_latched(%d), mods_locked(%d)\n"
 //         "                               group(%d)\n",
 //      serial, mods_depressed, mods_latched, mods_locked, group);
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
+void
+TouchHandleDown(void* data, struct wl_touch* touch, uint32_t serial, uint32_t time,
+                struct wl_surface* surface, int32_t id, wl_fixed_t xw, wl_fixed_t yw)
+{
+    WL_UNUSED(data);
+    WL_UNUSED(touch);
+    WL_UNUSED(serial);
+    WL_UNUSED(time);
+    WL_UNUSED(surface);
+    WL_UNUSED(id);
+    WL_UNUSED(xw);
+    WL_UNUSED(yw);
+    printf("ENTER TouchHandleDown\n");
+}
+
+void
+TouchHandleUp(void* data, struct wl_touch* touch, uint32_t serial, uint32_t time, int32_t id)
+{
+    WL_UNUSED(data);
+    WL_UNUSED(touch);
+    WL_UNUSED(serial);
+    WL_UNUSED(time);
+    WL_UNUSED(id);
+    printf("ENTER TouchHandleUp\n");
+}
+
+void
+TouchHandleMotion(void* data, struct wl_touch* touch, uint32_t time, int32_t id,
+                  wl_fixed_t xw, wl_fixed_t yw)
+{
+    WL_UNUSED(data);
+    WL_UNUSED(touch);
+    WL_UNUSED(time);
+    WL_UNUSED(id);
+    WL_UNUSED(xw);
+    WL_UNUSED(yw);
+    printf("ENTER TouchHandleMotion\n");
+}
+
+void
+TouchHandleFrame(void* data, struct wl_touch* touch)
+{
+    WL_UNUSED(data);
+    WL_UNUSED(touch);
+}
+
+void
+TouchHandleCancel(void* data, struct wl_touch* touch)
+{
+    WL_UNUSED(data);
+    WL_UNUSED(touch);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -384,6 +463,7 @@ DrawEyes(WLEGLSurface* surface, WLEyes* eyes)
                           0.0,    b, 0.0, 0.0,
                           0.0,  0.0, 1.0, 0.0,
                          -1.0, -1.0, 0.0, 1.0};
+
         glUniformMatrix4fv(gShaderObject.matrixLocation, 1, GL_FALSE, mtx);
 
         eyes->SetPointOfView(gPointerX, gPointerY);
@@ -393,18 +473,26 @@ DrawEyes(WLEGLSurface* surface, WLEyes* eyes)
         int nPoint = 0;
         float* points = NULL;
         for (int ii = 0; ii < 2; ++ii){
+            // eye liner
             eyes->GetEyeLinerGeom(ii, &nPoint, &points);
             if (nPoint <= 0 || points == NULL){
                 continue;
             }
-            DrawFillPoly(nPoint, points, white); // eye shape
-            DrawPoly((nPoint - 1), &points[2], black, 20); // eye liner
+            DrawFillPoly(nPoint, points, black);
 
+            // eye shape (white eye)
+            eyes->GetWhiteEyeGeom(ii, &nPoint, &points);
+            if (nPoint <= 0 || points == NULL){
+                continue;
+            }
+            DrawFillPoly(nPoint, points, white);
+
+            // pupil
             eyes->GetPupilGeom(ii, &nPoint, &points);
             if (nPoint <= 0 || points == NULL){
                 continue;
             }
-            DrawFillPoly(nPoint, points, black); // pupil
+            DrawFillPoly(nPoint, points, black);
         }
     }
     DetachVertexBuffer();

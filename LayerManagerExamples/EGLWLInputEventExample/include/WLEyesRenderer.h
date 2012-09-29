@@ -50,26 +50,20 @@ void KeyboardHandleKey(void*, struct wl_keyboard*, uint32_t, uint32_t, uint32_t,
 void KeyboardHandleModifiers(void*, struct wl_keyboard*, uint32_t, uint32_t,
                              uint32_t, uint32_t, uint32_t);
 
+// Touch event handler
+void TouchHandleDown(void*, struct wl_touch*, uint32_t, uint32_t, struct wl_surface*,
+                     int32_t, wl_fixed_t, wl_fixed_t);
+void TouchHandleUp(void*, struct wl_touch*, uint32_t, uint32_t, int32_t);
+void TouchHandleMotion(void*, struct wl_touch*, uint32_t, int32_t, wl_fixed_t, wl_fixed_t);
+void TouchHandleFrame(void*, struct wl_touch*);
+void TouchHandleCancel(void*, struct wl_touch*);
+
 bool DrawEyes(WLEGLSurface* surface, WLEyes* eyes);
 void DrawFillPoly(const int nPoint, const float* points, const float color[4]);
 void DrawPoly(const int nPoint, const float* points, const float color[4], int width);
 
-const struct wl_pointer_listener PointerListener
-{
-    PointerHandleEnter,
-    PointerHandleLeave,
-    PointerHandleMotion,
-    PointerHandleButton,
-    PointerHandleAxis
-};
-
-const struct wl_keyboard_listener KeyboardListener
-{
-    KeyboardHandleKeymap,
-    KeyboardHandleEnter,
-    KeyboardHandleLeave,
-    KeyboardHandleKey,
-    KeyboardHandleModifiers,
-};
+extern const struct wl_pointer_listener PointerListener;
+extern const struct wl_keyboard_listener KeyboardListener;
+extern const struct wl_touch_listener TouchListener;
 
 #endif

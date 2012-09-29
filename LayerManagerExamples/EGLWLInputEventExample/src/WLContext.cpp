@@ -43,10 +43,13 @@ WLContext::WLContext()
 , m_wlCompositor(NULL)
 , m_wlSeat(NULL)
 , m_wlPointer(NULL)
+, m_wlTouch(NULL)
 , m_wlServerInfo(NULL)
 , m_mask(0)
 , m_connectionId(0)
 , m_wlPointerListener(NULL)
+, m_wlKeyboardListener(NULL)
+, m_wlTouchListener(NULL)
 {
 }
 
@@ -155,16 +158,30 @@ WLContext::SeatHandleCapabilities(void* data, struct wl_seat* seat, uint32_t cap
         wlKeyboard = NULL;
     }
     context->SetWLKeyboard(wlKeyboard);
+
+    struct wl_touch* wlTouch = context->GetWLTouch();
+    if ((caps & WL_SEAT_CAPABILITY_TOUCH) && !wlTouch){
+        wlTouch = wl_seat_get_touch(wlSeat);
+        wl_touch_set_user_data(wlTouch, data);
+        wl_touch_add_listener(wlTouch, context->GetWLTouchListener(), data);
+    } else
+    if (!(caps & WL_SEAT_CAPABILITY_TOUCH) && wlTouch){
+        wl_touch_destroy(wlTouch);
+        wlTouch = NULL;
+    }
+    context->SetWLTouch(wlTouch);
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
 bool
 WLContext::InitWLContext(const struct wl_pointer_listener* wlPointerListener,
-                         const struct wl_keyboard_listener* wlKeyboardListener)
+                         const struct wl_keyboard_listener* wlKeyboardListener,
+                         const struct wl_touch_listener* wlTouchListener)
 {
     m_wlPointerListener = const_cast<wl_pointer_listener*>(wlPointerListener);
     m_wlKeyboardListener = const_cast<wl_keyboard_listener*>(wlKeyboardListener);
+    m_wlTouchListener = const_cast<wl_touch_listener*>(wlTouchListener);
 
     m_wlDisplay = wl_display_connect(NULL);
 

@@ -94,7 +94,7 @@ WLSurface::CreateIlmSurface(t_ilm_layer* layerId,
 
     rtnv = ilm_layerAddSurface(*layerId, *surfaceId);
     rtnv = ilm_UpdateInputEventAcceptanceOn(*surfaceId,
-                                            INPUT_DEVICE_POINTER,
+                                            INPUT_DEVICE_POINTER | INPUT_DEVICE_TOUCH,
                                             ILM_TRUE);
     rtnv = ilm_SetKeyboardFocusOn(*surfaceId);
 

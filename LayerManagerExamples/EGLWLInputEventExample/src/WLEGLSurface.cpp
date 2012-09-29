@@ -64,6 +64,8 @@ WLEGLSurface::CreatePlatformSurface()
         EGL_GREEN_SIZE, 8,
         EGL_BLUE_SIZE,  8,
         EGL_ALPHA_SIZE, 8,
+        //EGL_SAMPLE_BUFFERS, 1,
+        //EGL_SAMPLES,        2,
         EGL_NONE,
     };
     EGLint contextAttribs[] = {
