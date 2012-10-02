@@ -1,3 +1,16 @@
+Version 0.9.8_rc1
+------------------
+This version includes the following enhancements.
+
+Bugfixes :
+- LayerManagement does not wake up every 100 ms anymore.
+
+
+Improvements:
+- Introducing Client Notifications for Layer and Surfaces
+- Introducing Layer and Surface Chroma Key Support
+
+
 Version 0.9.7
 -------------
 This version includes the following enhancements.
