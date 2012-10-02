@@ -1064,7 +1064,9 @@ void X11WindowSystem::cleanup(){
     }
 #endif //WITH_XTHREADS
     XCloseDisplay(x11Display);
+    pthread_mutex_lock(&this->run_lock);
     m_running = false;
+    pthread_mutex_unlock(&this->run_lock);
 }
 
 bool X11WindowSystem::init(BaseGraphicSystem<Display*,Window>* base)

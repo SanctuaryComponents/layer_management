@@ -32,6 +32,10 @@ BaseRenderer::BaseRenderer(Scene* pScene) : m_pScene(pScene)
 
 BaseRenderer::~BaseRenderer()
 {
+    if (m_pInputManager)
+    {
+        delete m_pInputManager;
+    }
 }
 
 uint BaseRenderer::getLayerTypeCapabilities(LayerType layerType)
