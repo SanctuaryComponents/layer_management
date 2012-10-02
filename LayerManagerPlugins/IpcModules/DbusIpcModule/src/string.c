@@ -24,24 +24,24 @@
 #include <string.h>  // memcpy
 
 
-t_ilm_bool appendString(const char* value)
+t_ilm_bool appendString(t_ilm_message message, const char* value)
 {
-    LOG_ENTER_FUNCTION;
-    return dbus_message_iter_append_basic(&gpCurrentMessage->iter, DBUS_TYPE_STRING, &value);
+    dbusmessage* msg = (dbusmessage*)message;
+    return dbus_message_iter_append_basic(&msg->iter, DBUS_TYPE_STRING, &value);
 }
 
-t_ilm_bool getString(char* value)
+t_ilm_bool getString(t_ilm_message message, char* value)
 {
-    LOG_ENTER_FUNCTION;
+    dbusmessage* msg = (dbusmessage*)message;
     t_ilm_bool returnValue = ILM_FALSE;
 
-    t_ilm_int type = dbus_message_iter_get_arg_type(&gpCurrentMessage->iter);
+    t_ilm_int type = dbus_message_iter_get_arg_type(&msg->iter);
 
     if (DBUS_TYPE_STRING == type)
     {
         char* tmp = NULL;
-        dbus_message_iter_get_basic(&gpCurrentMessage->iter, &tmp);
-        dbus_message_iter_next(&gpCurrentMessage->iter);
+        dbus_message_iter_get_basic(&msg->iter, &tmp);
+        dbus_message_iter_next(&msg->iter);
         int len = strlen(tmp);
         strncpy(value, tmp, len);
         value[len] = '\0';

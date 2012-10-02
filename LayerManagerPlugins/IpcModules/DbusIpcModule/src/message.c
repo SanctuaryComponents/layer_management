@@ -22,222 +22,391 @@
 #include "introspection.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>  // memcpy
+#include <string.h> // strdup
+#include <errno.h>
 
+//=============================================================================
+// prototypes internal functions
+//=============================================================================
+void handleWatchesForFds(fd_set in, fd_set out);
+t_ilm_bool dispatchIncomingMessages();
+
+void registerSignalForNotification(dbusmessage* message, char* signalName);
+void unregisterSignalForNotification(dbusmessage* message, char* signalName);
 
 //=============================================================================
 // message handling
 //=============================================================================
-t_ilm_bool createMessage(t_ilm_const_string name)
+t_ilm_message createMessage(t_ilm_const_string name)
 {
-    LOG_ENTER_FUNCTION;
-    t_ilm_bool returnValue = ILM_FALSE;
-
-    if (gpDbusState->isClient)
+    if (!gDbus.initialized)
     {
-        gpCurrentMessage->name = name;
-        gpCurrentMessage->pMessage = dbus_message_new_method_call(ILM_SERVICE_NAME,
-                                                            ILM_PATH_COMPOSITE_SERVICE,
+        return 0;
+    }
+
+    dbusmessage* newMessage = (dbusmessage*)malloc(sizeof(dbusmessage));
+    newMessage->type = IpcMessageTypeCommand;
+    newMessage->dbusNativeType = DBUS_MESSAGE_TYPE_METHOD_CALL;
+    pthread_mutex_lock(&gDbus.mutex);
+    newMessage->pMessage = dbus_message_new_method_call(ILM_SERVICE_NAME,
+                                                        ILM_PATH_COMPOSITE_SERVICE,
+                                                        ILM_INTERFACE_COMPOSITE_SERVICE,
+                                                        name);
+    pthread_mutex_unlock(&gDbus.mutex);
+    dbus_message_iter_init_append(newMessage->pMessage, &newMessage->iter);
+    return (t_ilm_message)newMessage;
+}
+
+t_ilm_message createResponse(t_ilm_message message)
+{
+    if (!gDbus.initialized)
+    {
+        return NULL;
+    }
+    dbusmessage* receivedMessage = (dbusmessage*)message;
+    dbusmessage* newResponse = (dbusmessage*)malloc(sizeof(dbusmessage));
+
+    newResponse->type = IpcMessageTypeCommand;
+    newResponse->dbusNativeType = DBUS_MESSAGE_TYPE_METHOD_RETURN;
+
+    pthread_mutex_lock(&gDbus.mutex);
+    newResponse->pMessage = dbus_message_new(DBUS_MESSAGE_TYPE_METHOD_RETURN);
+    pthread_mutex_unlock(&gDbus.mutex);
+
+    const char* member = dbus_message_get_member(receivedMessage->pMessage);
+    const char* destination = dbus_message_get_sender(receivedMessage->pMessage);
+    dbus_message_set_member(newResponse->pMessage, member);
+    dbus_message_set_destination(newResponse->pMessage, destination);
+    dbus_message_set_reply_serial(newResponse->pMessage, receivedMessage->dbusSerial);
+    dbus_message_iter_init_append(newResponse->pMessage, &newResponse->iter);
+
+    return (t_ilm_message)newResponse;
+}
+
+t_ilm_message createErrorResponse(t_ilm_message message)
+{
+    if (!gDbus.initialized)
+    {
+        return 0;
+    }
+
+    dbusmessage* receivedMessage = (dbusmessage*)message;
+    dbusmessage* newResponse = (dbusmessage*)malloc(sizeof(dbusmessage));
+    memset(newResponse, 0, sizeof(dbusmessage));
+
+    newResponse->type = IpcMessageTypeError;
+    newResponse->dbusNativeType = DBUS_MESSAGE_TYPE_ERROR;
+
+    pthread_mutex_lock(&gDbus.mutex);
+    newResponse->pMessage = dbus_message_new(DBUS_MESSAGE_TYPE_ERROR);
+    pthread_mutex_unlock(&gDbus.mutex);
+
+    const char* member = dbus_message_get_member(receivedMessage->pMessage);
+    const char* destination = dbus_message_get_sender(receivedMessage->pMessage);
+    dbus_message_set_member(newResponse->pMessage, member);
+    dbus_message_set_destination(newResponse->pMessage, destination);
+    dbus_message_set_error_name(newResponse->pMessage, DBUS_SERVICE_ERROR);
+    dbus_message_set_reply_serial(newResponse->pMessage, receivedMessage->dbusSerial);
+    dbus_message_iter_init_append(newResponse->pMessage, &newResponse->iter);
+
+    return (t_ilm_message)newResponse;
+}
+
+t_ilm_message createNotification(t_ilm_const_string name)
+{
+    if (!gDbus.initialized)
+    {
+        return 0;
+    }
+
+    dbusmessage* newNotification = (dbusmessage*)malloc(sizeof(dbusmessage));
+
+    newNotification->type = IpcMessageTypeNotification;
+    newNotification->dbusNativeType = DBUS_MESSAGE_TYPE_SIGNAL;
+
+    if (!gDbus.isClient)
+    {
+        pthread_mutex_lock(&gDbus.mutex);
+        newNotification->pMessage = dbus_message_new_signal(ILM_PATH_COMPOSITE_SERVICE,
                                                             ILM_INTERFACE_COMPOSITE_SERVICE,
-                                                            gpCurrentMessage->name);
-        dbus_message_iter_init_append(gpCurrentMessage->pMessage, &gpCurrentMessage->iter);
+                                                            name);
+        pthread_mutex_unlock(&gDbus.mutex);
+        dbus_message_iter_init_append(newNotification->pMessage, &newNotification->iter);
+    }
 
-        if (NULL != gpCurrentMessage->pMessage)
-        {
-            returnValue = ILM_TRUE;
-        }
+    return (t_ilm_message)newNotification;
+}
+
+t_ilm_bool sendToClients(t_ilm_message message, t_ilm_client_handle* receiverList, int receiverCount)
+{
+    if (gDbus.isClient)
+    {
+        return ILM_FALSE;
+    }
+
+    dbusmessage* messageToSend = (dbusmessage*)message;
+    t_ilm_int serial = dbus_message_get_serial(messageToSend->pMessage);
+
+    pthread_mutex_lock(&gDbus.mutex);
+    dbus_bool_t success = dbus_connection_send(gDbus.connection, messageToSend->pMessage, &serial);
+    pthread_mutex_unlock(&gDbus.mutex);
+    if (!success)
+    {
+        printf("DBUSIpcModule: Out Of Memory!\n");
+        exit(1);
+    }
+
+    return ILM_TRUE;
+}
+
+t_ilm_bool sendToService(t_ilm_message message)
+{
+    if (!gDbus.isClient)
+    {
+        return ILM_FALSE;
+    }
+
+    dbusmessage* messageToSend = (dbusmessage*)message;
+    t_ilm_int serial = 1;
+    pthread_mutex_lock(&gDbus.mutex);
+    dbus_bool_t success = dbus_connection_send(gDbus.connection, messageToSend->pMessage, &serial);
+    pthread_mutex_unlock(&gDbus.mutex);
+    if (!success)
+    {
+        printf("DBUSIpcModule: Out Of Memory!\n");
+        exit(1);
+    }
+
+    const char* msgName = dbus_message_get_member(messageToSend->pMessage);
+
+    if (0 == strcmp(msgName, "LayerAddNotification"))
+    {
+        registerSignalForNotification(messageToSend, "NotificationForLayer");
+    }
+
+    if (0 == strcmp(msgName, "LayerRemoveNotification"))
+    {
+        unregisterSignalForNotification(messageToSend, "NotificationForLayer");
+    }
+
+    if (0 == strcmp(msgName, "SurfaceAddNotification"))
+    {
+        registerSignalForNotification(messageToSend, "NotificationForSurface");
+    }
+
+    if (0 == strcmp(msgName, "SurfaceRemoveNotification"))
+    {
+        unregisterSignalForNotification(messageToSend, "NotificationForSurface");
+    }
+
+    return ILM_TRUE;
+}
+
+t_ilm_message receive(t_ilm_int timeoutInMs)
+{
+    gpIncomingMessage = (dbusmessage*)malloc(sizeof(dbusmessage));
+    memset(gpIncomingMessage, 0, sizeof(dbusmessage));
+
+    if (!gDbus.initialized)
+    {
+        return (t_ilm_message)gpIncomingMessage;
+    }
+
+    if (dispatchIncomingMessages())
+    {
+        return (t_ilm_message)gpIncomingMessage;
+    }
+
+    fd_set readFds = gDbus.incomingSockets;
+    fd_set writeFds = gDbus.outgoingSockets;
+    int fdMax = (gDbus.incomingSocketsMax > gDbus.outgoingSocketsMax) ?
+                 gDbus.incomingSocketsMax : gDbus.outgoingSocketsMax;
+
+    int fdsReady = 0;
+
+    if (timeoutInMs < 0)
+    {
+        fdsReady = select(fdMax, &readFds, &writeFds, 0, NULL);
     }
     else
     {
-        gpCurrentMessage->pMessageReply = dbus_message_new_method_return(gpCurrentMessage->pMessage);
-        dbus_message_iter_init_append(gpCurrentMessage->pMessageReply, &gpCurrentMessage->iter);
-        returnValue = ILM_TRUE;
+        struct timeval timeoutValue;
+        timeoutValue.tv_sec = timeoutInMs / 1000;
+        timeoutValue.tv_usec = (timeoutInMs % 1000) * 1000;
+        fdsReady = select(fdMax, &readFds, &writeFds, 0, &timeoutValue);
     }
 
-    return returnValue;
+    switch (fdsReady)
+    {
+    case -1: // error: select was cancelled -> shutdown
+        gpIncomingMessage->type = IpcMessageTypeShutdown;
+        break;
+
+    case 0: // timeout
+        gpIncomingMessage->type = IpcMessageTypeNone;
+        break;
+
+    default: // message or shutdown
+        handleWatchesForFds(readFds, writeFds);
+        dispatchIncomingMessages();
+        break;
+    }
+
+    return (t_ilm_message)gpIncomingMessage;
 }
 
-
-t_ilm_bool destroyMessage()
+t_ilm_const_string getMessageName(t_ilm_message message)
 {
-    
-    t_ilm_bool returnValue = ILM_TRUE;
-    
-    /* Clean up message if existing */
-    
-    if (NULL!=gpCurrentMessage->pMessage)
-    {
-        dbus_message_unref(gpCurrentMessage->pMessage);
-        gpCurrentMessage->pMessage = NULL;
-        gpCurrentMessage->name = "";
-    }
-    
-    return returnValue;
+    dbusmessage* msg = (dbusmessage*)message;
+    return msg->pMessage ? dbus_message_get_member(msg->pMessage) : NULL;
 }
 
-t_ilm_bool sendMessage()
+t_ilm_message_type getMessageType(t_ilm_message message)
 {
-    LOG_ENTER_FUNCTION;
-    t_ilm_bool returnValue = ILM_FALSE;
-
-    if (gpDbusState->isClient)
-    {
-        gpCurrentMessage->pPending = NULL;
-        returnValue = dbus_connection_send_with_reply(gpDbusState->connection,
-                                                      gpCurrentMessage->pMessage,
-                                                      &gpCurrentMessage->pPending,
-                                                      DBUS_RECEIVE_TIMEOUT_IN_MS);
-    }
-    else
-    {
-        t_ilm_int serial = dbus_message_get_serial(gpCurrentMessage->pMessageReply);
-        if (!dbus_connection_send(gpDbusState->connection, gpCurrentMessage->pMessageReply, &serial))
-        {
-            printf("DBUSIpcModule: Out Of Memory!\n");
-            exit(1);
-        }
-        dbus_message_unref(gpCurrentMessage->pMessageReply);        
-        gpCurrentMessage->pMessageReply = NULL;        
-    }
-
-    dbus_connection_flush(gpDbusState->connection);
-    dbus_message_unref(gpCurrentMessage->pMessage);
-    gpCurrentMessage->pMessage = NULL;
-    gpCurrentMessage->name = ""; 
-
-    return returnValue;
+    dbusmessage* msg = (dbusmessage*)message;
+    return msg->type;
 }
 
-t_ilm_bool sendError(t_ilm_const_string desc)
+t_ilm_const_string getSenderName(t_ilm_message message)
 {
-    LOG_ENTER_FUNCTION;
-    t_ilm_bool returnValue = ILM_FALSE;
-
-    if (!gpDbusState->isClient)
-    {
-        t_ilm_uint serial = 0;
-        DBusMessage* errorMsg = dbus_message_new_error(gpCurrentMessage->pMessage,
-                                                          DBUS_SERVICE_ERROR,
-                                                          desc);
-
-        if (!dbus_connection_send(gpDbusState->connection,
-                                  errorMsg,
-                                  &serial))
-        {
-            printf("DBUSIpcModule: Out Of Memory!\n");
-            exit(1);
-        }
-        dbus_connection_flush(gpDbusState->connection);
-
-        // free the reply
-        dbus_message_unref(errorMsg);
-        errorMsg = NULL;
-    }
-
-    return returnValue;
+    dbusmessage* msg = (dbusmessage*)message;
+    return msg->pMessage ? dbus_message_get_sender(msg->pMessage) : NULL;
 }
 
-enum IpcMessageType receiveMessage(t_ilm_int timeoutInMs)
+t_ilm_client_handle getSenderHandle(t_ilm_message message)
 {
-    //LOG_ENTER_FUNCTION;
-    enum IpcMessageType returnValue = IpcMessageTypeNone;
+    dbusmessage* msg = (dbusmessage*)message;
+    t_ilm_uint result = 0;
 
-    if (gpDbusState->isClient)
+    const char* sender = getSenderName(message);
+    if (sender)
     {
-        if (gpCurrentMessage->pPending)
-        {
-            // block until we receive a reply
-            dbus_pending_call_block(gpCurrentMessage->pPending);
+        float f = atof(&sender[1]);
+        result = (t_ilm_uint)(f * 1000000);
+    };
+    return (t_ilm_client_handle)result;
+}
 
-            // get the reply message
-            gpCurrentMessage->pMessage = dbus_pending_call_steal_reply(gpCurrentMessage->pPending);
-            dbus_pending_call_unref(gpCurrentMessage->pPending);
-            gpCurrentMessage->pPending = NULL;
-
-            dbus_message_iter_init(gpCurrentMessage->pMessage, &gpCurrentMessage->iter);
-            gpCurrentMessage->sender = dbus_message_get_sender(gpCurrentMessage->pMessage);
-            gpCurrentMessage->name = dbus_message_get_member(gpCurrentMessage->pMessage);
-            returnValue = IpcMessageTypeCommand;
-        }
+t_ilm_bool destroyMessage(t_ilm_message message)
+{
+    dbusmessage* msg = (dbusmessage*)message;
+    if (msg->pMessage)
+    {
+        pthread_mutex_lock(&gDbus.mutex);
+        dbus_message_unref(msg->pMessage);
+        pthread_mutex_unlock(&gDbus.mutex);
     }
-    else
+    free(msg);
+    return ILM_TRUE;
+}
+
+//=============================================================================
+// prototypes internal functions
+//=============================================================================
+void handleWatchesForFds(fd_set in, fd_set out)
+{
+    int fd = 0;
+
+    for (fd = 0; fd < gDbus.incomingSocketsMax; ++fd)
     {
-        gpCurrentMessage->pMessage = NULL;
-
-        dbus_connection_read_write(gpDbusState->connection, timeoutInMs);
-        gpCurrentMessage->pMessage = dbus_connection_pop_message(gpDbusState->connection);
-        if (gpCurrentMessage->pMessage)
+        if (FD_ISSET(fd, &in))
         {
-            int messageType = dbus_message_get_type(gpCurrentMessage->pMessage);
-            dbus_message_iter_init(gpCurrentMessage->pMessage, &gpCurrentMessage->iter);
+            DBusWatch* activeWatch = gDbus.incomingWatch[fd];
 
-            gpCurrentMessage->sender = dbus_message_get_sender(gpCurrentMessage->pMessage);
+            pthread_mutex_lock(&gDbus.mutex);
+            dbus_bool_t success = dbus_watch_handle(activeWatch, DBUS_WATCH_READABLE);
+            pthread_mutex_unlock(&gDbus.mutex);
 
-            if (dbus_message_is_signal(gpCurrentMessage->pMessage, DBUS_INTERFACE_DBUS, "NameOwnerChanged"))
+            if (!success)
             {
-                char *name, *oldName, *newName;
-                if (!dbus_message_get_args(gpCurrentMessage->pMessage, NULL,
-                    DBUS_TYPE_STRING, &name,
-                    DBUS_TYPE_STRING, &oldName,
-                    DBUS_TYPE_STRING, &newName,
-                    DBUS_TYPE_INVALID))
-                {
-                    returnValue = IpcMessageTypeError;
-                }
-                else
-                {
-                    if (*newName == '\0')
-                    {
-                        gpCurrentMessage->sender = oldName;
-                        returnValue =  IpcMessageTypeDisconnect;
-                    }
-                    else
-                    {
-                        returnValue =  IpcMessageTypeNone;
-                    }
-                }
-            }
-
-            else if (DBUS_MESSAGE_TYPE_ERROR != messageType)
-            {
-                gpCurrentMessage->name = dbus_message_get_member(gpCurrentMessage->pMessage);
-                returnValue = IpcMessageTypeCommand;
-            }
-
-            else if (dbus_message_is_method_call(gpCurrentMessage->pMessage, DBUS_INTERFACE_INTROSPECTABLE, "Introspect"))
-            {
-                sendIntrospectionResponse(gpDbusState->connection, gpCurrentMessage->pMessage);
-                returnValue = IpcMessageTypeNone;
-            }
-
-            else
-            {
-                returnValue = IpcMessageTypeError;
+                printf("incoming dbus_watch_handle() failed\n");
             }
         }
     }
 
-    return returnValue;
+    for (fd = 0; fd < gDbus.outgoingSocketsMax; ++fd)
+    {
+        if (FD_ISSET(fd, &out))
+        {
+            DBusWatch* activeWatch = gDbus.outgoingWatch[fd];
+
+            pthread_mutex_lock(&gDbus.mutex);
+            dbus_bool_t success = dbus_watch_handle(activeWatch, DBUS_WATCH_WRITABLE);
+            pthread_mutex_unlock(&gDbus.mutex);
+
+            if (!success)
+            {
+                printf("outgoing dbus_watch_handle() failed\n");
+            }
+        }
+    }
 }
 
-t_ilm_const_string getMessageName()
+t_ilm_bool dispatchIncomingMessages()
 {
-    LOG_ENTER_FUNCTION;
-    return gpCurrentMessage->name;
+    t_ilm_bool dispatched = ILM_FALSE;
+    if (DBUS_DISPATCH_DATA_REMAINS == dbus_connection_get_dispatch_status(gDbus.connection))
+    {
+        pthread_mutex_lock(&gDbus.mutex);
+        dbus_connection_dispatch(gDbus.connection);
+        pthread_mutex_unlock(&gDbus.mutex);
+        dispatched = ILM_TRUE;
+    }
+    return dispatched;
 }
 
-t_ilm_const_string getSenderName()
+void registerSignalForNotification(dbusmessage* message, char* signalName)
 {
-    LOG_ENTER_FUNCTION;
-    return gpCurrentMessage->sender;
+    char rule[1024];
+    t_ilm_uint id;
+    dbus_message_get_args(message->pMessage, NULL,
+                          DBUS_TYPE_UINT32, &id,
+                          DBUS_TYPE_INVALID);
+
+    sprintf(rule,
+            "type='signal',sender='%s',interface='%s',member='%s%u'",
+            ILM_INTERFACE_COMPOSITE_SERVICE,
+            ILM_INTERFACE_COMPOSITE_SERVICE,
+            signalName,
+            id);
+
+    // do not block here, race condition with receive thread.
+    // according to dbus documentation almost impossible to fail
+    // (only if out of memory)
+    // if result is important, create method call manually
+    // and use main loop for communication
+    pthread_mutex_lock(&gDbus.mutex);
+    dbus_bus_add_match(gDbus.connection, rule, NULL);
+    pthread_mutex_unlock(&gDbus.mutex);
 }
 
-t_ilm_bool isErrorMessage()
+void unregisterSignalForNotification(dbusmessage* message, char* signalName)
 {
-    LOG_ENTER_FUNCTION;
-    int messageType = dbus_message_get_type(gpCurrentMessage->pMessage);
-    return (DBUS_MESSAGE_TYPE_ERROR == messageType);
+    char rule[1024];
+    t_ilm_uint id;
+    dbus_message_get_args(message->pMessage, NULL,
+                          DBUS_TYPE_UINT32, &id,
+                          DBUS_TYPE_INVALID);
+
+    printf("DbusIpcModule: removing signal handler %s%d\n", signalName, id);
+    sprintf(rule,
+            "type='signal',sender='%s',interface='%s',member='%s%d'",
+            ILM_INTERFACE_COMPOSITE_SERVICE,
+            ILM_INTERFACE_COMPOSITE_SERVICE,
+            signalName,
+            id);
+
+    // do not block here, race condition with receive thread.
+    // according to dbus documentation almost impossible to fail
+    // (only if out of memory)
+    // if result is important, create method call manually
+    // and use main loop for communication
+    pthread_mutex_lock(&gDbus.mutex);
+    dbus_bus_remove_match(gDbus.connection, rule, NULL);
+    pthread_mutex_unlock(&gDbus.mutex);
 }
+
+
 
 //=============================================================================
 // print debug information
@@ -259,11 +428,7 @@ void printTypeName(int type)
         printf("DBUS_TYPE_INT32\n");
         break;
     case DBUS_TYPE_STRING:
-        {
-            char text[1024];
-            getString(text);
-            printf("DBUS_TYPE_STRING (%s)\n", text);
-        }
+        printf("DBUS_TYPE_STRING\n");
         break;
     case DBUS_TYPE_UINT32:
         printf("DBUS_TYPE_UINT\n");

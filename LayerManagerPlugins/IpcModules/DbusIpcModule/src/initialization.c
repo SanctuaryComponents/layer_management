@@ -18,17 +18,18 @@
  ****************************************************************************/
 #include "IpcModule.h"
 #include "common.h"
+#include "callbacks.h"
 #include "DBUSConfiguration.h"
 #include <dbus/dbus.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h> // memset
 
 
 //=============================================================================
 // prototypes
 //=============================================================================
 t_ilm_bool initService();
-
 t_ilm_bool destroyClient();
 t_ilm_bool destroyService();
 
@@ -36,120 +37,278 @@ t_ilm_bool destroyService();
 //=============================================================================
 // setup
 //=============================================================================
-t_ilm_bool init(t_ilm_bool isClient)
+t_ilm_bool initServiceMode()
 {
-    LOG_ENTER_FUNCTION;
+    memset(&gDbus, 0, sizeof(gDbus));
 
-    gpCurrentMessage = malloc(sizeof(dbusmessage));
-    gpDbusState = malloc(sizeof(dbus));
+    gDbus.initialized = ILM_FALSE;
+    gDbus.isClient = ILM_FALSE;
 
-    gpDbusState->initialized = ILM_FALSE;
-    gpDbusState->isClient = isClient;
+    pthread_mutex_init(&gDbus.mutex, NULL);
 
-    dbus_error_init(&gpDbusState->error);
+    dbus_error_init(&gDbus.error);
 
     char* useSessionBus = getenv("LM_USE_SESSION_BUS");
     if (useSessionBus && strcmp(useSessionBus, "enable") == 0 )
     {
-        gpDbusState->type = DBUS_BUS_SESSION;
+        gDbus.type = DBUS_BUS_SESSION;
         printf("DbusIpcmodule: using session bus\n");
     }
     else
     {
-        gpDbusState->type = DBUS_BUS_SYSTEM;
+        gDbus.type = DBUS_BUS_SYSTEM;
         printf("DbusIpcmodule: using system bus\n");
     }
 
-    gpDbusState->connection = dbus_bus_get(gpDbusState->type, &gpDbusState->error);
+    gDbus.connection = dbus_bus_get(gDbus.type, &gDbus.error);
 
-    if (dbus_error_is_set(&gpDbusState->error) || !gpDbusState->connection)
+    if (dbus_error_is_set(&gDbus.error) || !gDbus.connection)
     {
         printf("DbusIpcmodule: Connection error\n");
-        dbus_error_free(&gpDbusState->error);
+        dbus_error_free(&gDbus.error);
         exit(1);
     }
 
-    if (gpDbusState->isClient)
+    gDbus.initialized = ILM_TRUE;
+
+    if (!gDbus.isClient)
     {
-        gpDbusState->initialized = ILM_TRUE;
+        printf("DbusIpcmodule: registering dbus address %s\n", DBUS_SERVICE_PREFIX);
+        int ret = dbus_bus_request_name(gDbus.connection, DBUS_SERVICE_PREFIX, DBUS_NAME_FLAG_REPLACE_EXISTING, &gDbus.error);
+
+        if (dbus_error_is_set(&gDbus.error))
+        {
+            printf("DbusIpcmodule: Name Error %s\n", gDbus.error.message);
+            dbus_error_free(&gDbus.error);
+            gDbus.initialized = ILM_FALSE;
+        }
+
+        if (DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER != ret)
+        {
+            printf("DbusIpcmodule: Not Primary Owner of %s (error %d)\n", DBUS_SERVICE_PREFIX, ret);
+            gDbus.initialized = ILM_FALSE;
+        }
+
+        const char* rule = "type='signal',"
+                           "sender='"DBUS_INTERFACE_DBUS"',"
+                           "interface='"DBUS_INTERFACE_DBUS"',"
+                           "member='NameOwnerChanged'";
+
+        dbus_bus_add_match(gDbus.connection, rule, &gDbus.error);
+        if (dbus_error_is_set(&gDbus.error))
+        {
+            printf("DbusIpcModule: Could not add client watch, error: %s\n", gDbus.error.message);
+            dbus_error_free(&gDbus.error);
+        }
+    }
+
+/*
+    if (!dbus_connection_add_filter(gDbus.connection,
+                                    filterLogging,
+                                    NULL,
+                                    NULL))
+    {
+        printf("Couldn't set up filter functions\n");
+        exit(1);
+    }
+*/
+    if (!dbus_connection_add_filter(gDbus.connection,
+                                    filterNameOwnerChanged,
+                                    NULL,
+                                    NULL))
+    {
+        printf("Couldn't set up filter functions\n");
+        exit(1);
+    }
+
+    if (!dbus_connection_add_filter(gDbus.connection,
+                                    filterIntrospection,
+                                    NULL,
+                                    NULL))
+    {
+        printf("Couldn't set up filter functions\n");
+        exit(1);
+    }
+
+    if (!dbus_connection_add_filter(gDbus.connection,
+                                    filterNameAcquired,
+                                    NULL,
+                                    NULL))
+    {
+        printf("Couldn't set up filter functions\n");
+        exit(1);
+    }
+
+    if (!dbus_connection_add_filter(gDbus.connection,
+                                    filterLayerManagerCommands,
+                                    NULL,
+                                    NULL))
+    {
+        printf("Couldn't set up filter functions\n");
+        exit(1);
+    }
+
+    if (!dbus_connection_add_filter(gDbus.connection,
+                                    filterDiscardUnexpected,
+                                    NULL,
+                                    NULL))
+    {
+        printf("Couldn't set up filter functions\n");
+        exit(1);
+    }
+
+    if(!dbus_connection_set_watch_functions(gDbus.connection,
+                                            addWatch,
+                                            removeWatch,
+                                            toggleWatch,
+                                            0,
+                                            NULL))
+    {
+        printf("Couldn't set up watch functions\n");
+        exit(1);
+    }
+
+    return gDbus.initialized;
+}
+
+t_ilm_bool initClientMode()
+{
+    memset(&gDbus, 0, sizeof(gDbus));
+
+    gDbus.initialized = ILM_FALSE;
+    gDbus.isClient = ILM_TRUE;
+
+    pthread_mutex_init(&gDbus.mutex, NULL);
+
+    dbus_error_init(&gDbus.error);
+
+    char* useSessionBus = getenv("LM_USE_SESSION_BUS");
+    if (useSessionBus && strcmp(useSessionBus, "enable") == 0 )
+    {
+        gDbus.type = DBUS_BUS_SESSION;
+        printf("DbusIpcmodule: using session bus\n");
     }
     else
     {
-        gpDbusState->initialized = initService();
+        gDbus.type = DBUS_BUS_SYSTEM;
+        printf("DbusIpcmodule: using system bus\n");
     }
 
+    gDbus.connection = dbus_bus_get(gDbus.type, &gDbus.error);
 
-    return gpDbusState->initialized;
+    if (dbus_error_is_set(&gDbus.error) || !gDbus.connection)
+    {
+        printf("DbusIpcmodule: Connection error\n");
+        dbus_error_free(&gDbus.error);
+        exit(1);
+    }
+
+    gDbus.initialized = ILM_TRUE;
+/*
+    if (!dbus_connection_add_filter(gDbus.connection,
+                                    filterLogging,
+                                    NULL,
+                                    NULL))
+    {
+        printf("Couldn't set up filter functions\n");
+        exit(1);
+    }
+*/
+    if (!dbus_connection_add_filter(gDbus.connection,
+                                    filterNameAcquired,
+                                    NULL,
+                                    NULL))
+    {
+        printf("Couldn't set up filter functions\n");
+        exit(1);
+    }
+
+    if (!dbus_connection_add_filter(gDbus.connection,
+                                    filterLayerManagerCommands,
+                                    NULL,
+                                    NULL))
+    {
+        printf("Couldn't set up filter functions\n");
+        exit(1);
+    }
+
+    if (!dbus_connection_add_filter(gDbus.connection,
+                                    filterLayerManagerErrors,
+                                    NULL,
+                                    NULL))
+    {
+        printf("Couldn't set up filter functions\n");
+        exit(1);
+    }
+
+    if (!dbus_connection_add_filter(gDbus.connection,
+                                    filterLayerManagerNotifications,
+                                    NULL,
+                                    NULL))
+    {
+        printf("Couldn't set up filter functions\n");
+        exit(1);
+    }
+
+    if (!dbus_connection_add_filter(gDbus.connection,
+                                    filterDiscardUnexpected,
+                                    NULL,
+                                    NULL))
+    {
+        printf("Couldn't set up filter functions\n");
+        exit(1);
+    }
+
+    if(!dbus_connection_set_watch_functions(gDbus.connection,
+                                            addWatch,
+                                            removeWatch,
+                                            toggleWatch,
+                                            0,
+                                            NULL))
+    {
+        printf("Couldn't set up watch functions\n");
+        exit(1);
+    }
+
+    return gDbus.initialized;
 }
 
 t_ilm_bool destroy()
 {
-    LOG_ENTER_FUNCTION;
-
-    if (gpDbusState->initialized)
+    if (gDbus.initialized)
     {
-        if (gpDbusState->isClient)
+        gDbus.initialized = ILM_FALSE;
+
+        dbus_connection_set_watch_functions(gDbus.connection, NULL, NULL, NULL, 0, NULL);
+        dbus_connection_remove_filter(gDbus.connection, filterNameAcquired, NULL);
+        dbus_connection_remove_filter(gDbus.connection, filterLayerManagerCommands, NULL);
+        dbus_connection_remove_filter(gDbus.connection, filterDiscardUnexpected, NULL);
+
+        if (gDbus.isClient)
         {
+            dbus_connection_remove_filter(gDbus.connection, filterLayerManagerErrors, NULL);
+            dbus_connection_remove_filter(gDbus.connection, filterLayerManagerNotifications, NULL);
             destroyClient();
         }
         else
         {
+            dbus_connection_remove_filter(gDbus.connection, filterNameOwnerChanged, NULL);
+            dbus_connection_remove_filter(gDbus.connection, filterIntrospection, NULL);
             destroyService();
         }
+
+        pthread_mutex_destroy(&gDbus.mutex);
     }
 
-    free(gpCurrentMessage);
-    free(gpDbusState);
-
-    return !gpDbusState->initialized;
+    return gDbus.initialized;
 }
 
 
 //=============================================================================
 // service specific
 //=============================================================================
-t_ilm_bool initService()
-{
-    LOG_ENTER_FUNCTION;
-
-    t_ilm_bool result = ILM_TRUE;
-
-    printf("DbusIpcmodule: registering dbus address %s\n", DBUS_SERVICE_PREFIX);
-    int ret = dbus_bus_request_name(gpDbusState->connection, DBUS_SERVICE_PREFIX, DBUS_NAME_FLAG_REPLACE_EXISTING, &gpDbusState->error);
-
-    if (dbus_error_is_set(&gpDbusState->error))
-    {
-        printf("DbusIpcmodule: Name Error %s\n", gpDbusState->error.message);
-        dbus_error_free(&gpDbusState->error);
-        result = ILM_FALSE;
-    }
-
-    if (DBUS_REQUEST_NAME_REPLY_PRIMARY_OWNER != ret)
-    {
-        printf("DbusIpcmodule: Not Primary Owner of %s (error %d)\n", DBUS_SERVICE_PREFIX, ret);
-        result = ILM_FALSE;
-    }
-
-    const char* rule = "type='signal',"
-                       "sender='"DBUS_INTERFACE_DBUS"',"
-                       "interface='"DBUS_INTERFACE_DBUS"',"
-                       "member='NameOwnerChanged'";
-
-    dbus_bus_add_match(gpDbusState->connection, rule, &gpDbusState->error);
-    if (dbus_error_is_set(&gpDbusState->error))
-    {
-        printf("DbusIpcModule: Could not add client watch, error: %s\n", gpDbusState->error.message);
-        dbus_error_free(&gpDbusState->error);
-    }
-
-    return result;
-}
-
-
 t_ilm_bool destroyService()
 {
-    LOG_ENTER_FUNCTION;
-
     DBusError err;
     dbus_error_init(&err);
 
@@ -159,14 +318,34 @@ t_ilm_bool destroyService()
         printf("DbusIpcmodule: there was an dbus error\n");
     }
 
-    dbus_bus_name_has_owner(gpDbusState->connection, DBUS_SERVICE_PREFIX, &err);
+    dbus_bus_name_has_owner(gDbus.connection, DBUS_SERVICE_PREFIX, &err);
     errorset = dbus_error_is_set(&err);
+    
     if (errorset)
     {
         printf("DbusIpcmodule: there was an dbus error\n");
     }
+
     dbus_error_init(&err);
-    dbus_bus_release_name(gpDbusState->connection, DBUS_SERVICE_PREFIX, &err);
+    
+    const char* rule = "type='signal',"
+                       "sender='"DBUS_INTERFACE_DBUS"',"
+                       "interface='"DBUS_INTERFACE_DBUS"',"
+                       "member='NameOwnerChanged'";
+
+    dbus_bus_remove_match(gDbus.connection, rule, &err);
+
+    errorset = dbus_error_is_set(&err);
+    
+    if (errorset)
+    {
+        printf("DbusIpcmodule: there was an dbus error\n");
+    }
+    
+    dbus_error_init(&err);
+    dbus_bus_release_name(gDbus.connection, DBUS_SERVICE_PREFIX, &err);
+
+    return ILM_TRUE;
 }
 
 
@@ -176,8 +355,7 @@ t_ilm_bool destroyService()
 
 t_ilm_bool destroyClient()
 {
-    LOG_ENTER_FUNCTION;
-    dbus_connection_unref(gpDbusState->connection);
-    dbus_error_free(&gpDbusState->error);
-    gpDbusState->initialized = ILM_FALSE;
+    dbus_connection_unref(gDbus.connection);
+    dbus_error_free(&gDbus.error);
+    return ILM_TRUE;
 }

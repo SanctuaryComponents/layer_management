@@ -22,6 +22,6 @@
 
 #include "common.h"
 
-void sendIntrospectionResponse(DBusConnection* conn, DBusMessage* msg);
+void generateIntrospectionString(char* msgBuffer);
 
 #endif // _DBUSINTROSPECTION_H_

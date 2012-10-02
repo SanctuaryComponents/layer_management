@@ -34,6 +34,7 @@ include_directories(
 add_library(${PROJECT_NAME} SHARED
     src/bool.c
     src/double.c
+    src/callbacks.c
     src/initialization.c
     src/int.c
     src/introspection.c

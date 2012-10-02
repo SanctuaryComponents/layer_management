@@ -24,24 +24,22 @@
 #include <string.h>  // memcpy
 
 
-t_ilm_bool appendBool(const t_ilm_bool value)
+t_ilm_bool appendBool(t_ilm_message message, const t_ilm_bool value)
 {
-    LOG_ENTER_FUNCTION;
-    //printf("%d\n", value);
-    return dbus_message_iter_append_basic(&gpCurrentMessage->iter, DBUS_TYPE_BOOLEAN, &value);
+    dbusmessage* msg = (dbusmessage*)message;
+    return dbus_message_iter_append_basic(&msg->iter, DBUS_TYPE_BOOLEAN, &value);
 }
 
-t_ilm_bool getBool(t_ilm_bool* value)
+t_ilm_bool getBool(t_ilm_message message, t_ilm_bool* value)
 {
-    LOG_ENTER_FUNCTION;
     t_ilm_bool returnValue = ILM_FALSE;
-
-    t_ilm_int type = dbus_message_iter_get_arg_type(&gpCurrentMessage->iter);
+    dbusmessage* msg = (dbusmessage*)message;
+    t_ilm_int type = dbus_message_iter_get_arg_type(&msg->iter);
 
     if (DBUS_TYPE_BOOLEAN == type)
     {
-        dbus_message_iter_get_basic(&gpCurrentMessage->iter, value);
-        dbus_message_iter_next(&gpCurrentMessage->iter);
+        dbus_message_iter_get_basic(&msg->iter, value);
+        dbus_message_iter_next(&msg->iter);
         returnValue = ILM_TRUE;
     }
     else
@@ -50,6 +48,5 @@ t_ilm_bool getBool(t_ilm_bool* value)
         printTypeName(type);
     }
 
-    //printf("%s - %d\n", returnValue ? "SUCCESS" : "FAIL", *value);
     return returnValue;
 }

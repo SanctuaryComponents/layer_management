@@ -21,8 +21,6 @@
 #include <string.h>  // memset
 #include <stdio.h>  // sprintf
 
-#define INTROSPECTION_BUFFER_SIZE 65536
-
 //=============================================================================
 // internal data types
 //=============================================================================
@@ -32,13 +30,6 @@ struct IntrospectionTable
     const char *signature;
     const char *reply;
 };
-
-//=============================================================================
-// external prototypes from DBUS Ipc Module
-//=============================================================================
-t_ilm_bool createMessage(t_ilm_const_string name);
-t_ilm_bool appendString(const char* value);
-t_ilm_bool sendMessage();
 
 //=============================================================================
 // internal prototypes
@@ -58,29 +49,7 @@ unsigned int closeNode(char* msgBuffer);
 //=============================================================================
 // implementation
 //=============================================================================
-void sendIntrospectionResponse(DBusConnection* conn, DBusMessage* msg)
-{
-    DBusMessage * reply;
-    DBusMessageIter args;
-    dbus_uint32_t serial = 0;
-
-    // generate introspection string
-    char introspectionString[INTROSPECTION_BUFFER_SIZE];
-    memset(introspectionString, 0, sizeof(introspectionString));
-    generateString(introspectionString);
-
-    // create reply
-    createMessage(NULL);
-
-    // add introspection info to reply
-    appendString(introspectionString);
-
-    // send the reply
-    sendMessage();
-}
-
-
-void generateString(char* msgBuffer)
+void generateIntrospectionString(char* msgBuffer)
 {
     //LOG_DEBUG("DBUSCommunicator", "Generating introspection data");
 
@@ -175,7 +144,8 @@ void generateString(char* msgBuffer)
         { "CreateShader",                     "ss",    "u"              },
         { "DestroyShader",                    "u",     ""               },
         { "SetShader",                        "uu",    ""               },
-        { "SetUniforms",                      "uas",   ""               }
+        { "SetUniforms",                      "uas",   ""               },
+        { "LayerAddNotification",             "u",     ""               }
     };
 
     int introspectionInterfaceCount = sizeof(introspectionInterface) / sizeof(struct IntrospectionTable);

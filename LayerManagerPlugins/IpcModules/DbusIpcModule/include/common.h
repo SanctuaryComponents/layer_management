@@ -21,12 +21,8 @@
 
 #include "ilm_types.h"
 #include <dbus/dbus.h>
-
-//=============================================================================
-// logging
-//=============================================================================
-//#define LOG_ENTER_FUNCTION printf("      --> DBUSIpcModule::%s()\n", __FUNCTION__)
-#define LOG_ENTER_FUNCTION
+#include <sys/select.h>
+#include <pthread.h>
 
 
 //=============================================================================
@@ -34,28 +30,38 @@
 //=============================================================================
 typedef struct
 {
-    t_ilm_const_string name;
-    t_ilm_const_string sender;
+    t_ilm_message_type type;
+    int dbusNativeType;
+    int dbusSerial;
     DBusMessage* pMessage;
-    DBusMessage* pMessageReply;
     DBusMessageIter iter;
-    DBusPendingCall* pPending;
 } dbusmessage;
 
 typedef struct
 {
+    t_ilm_bool initialized;
+    t_ilm_bool isClient;
+
+    pthread_mutex_t mutex;
+
     DBusConnection* connection;
     DBusBusType type;
     DBusError error;
-    t_ilm_bool initialized;
-    t_ilm_bool isClient;
+
+    DBusWatch* incomingWatch[FD_SETSIZE];
+    fd_set incomingSockets;
+    int incomingSocketsMax;
+
+    DBusWatch* outgoingWatch[FD_SETSIZE];
+    fd_set outgoingSockets;
+    int outgoingSocketsMax;
 } dbus;
 
 //=============================================================================
 // global variables
 //=============================================================================
-dbusmessage* gpCurrentMessage;
-dbus* gpDbusState;
+dbus gDbus;
+dbusmessage* gpIncomingMessage;
 
 //=============================================================================
 // prototypes

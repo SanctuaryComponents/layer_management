@@ -23,22 +23,20 @@
 #include <stdlib.h>
 #include <string.h>  // memcpy
 
-t_ilm_bool appendUint(const t_ilm_uint value)
+t_ilm_bool appendUint(t_ilm_message message, const t_ilm_uint value)
 {
-    LOG_ENTER_FUNCTION;
-    //printf("%u\n", value);
-    return dbus_message_iter_append_basic(&gpCurrentMessage->iter, DBUS_TYPE_UINT32, &value);
+    dbusmessage* msg = (dbusmessage*)message;
+    return dbus_message_iter_append_basic(&msg->iter, DBUS_TYPE_UINT32, &value);
 }
 
-t_ilm_bool appendUintArray(const t_ilm_uint* valueArray, t_ilm_int arraySize)
+t_ilm_bool appendUintArray(t_ilm_message message, const t_ilm_uint* valueArray, t_ilm_int arraySize)
 {
-    LOG_ENTER_FUNCTION;
-
+    dbusmessage* msg = (dbusmessage*)message;
     t_ilm_bool returnValue = ILM_FALSE;
     char signature[2] = { DBUS_TYPE_UINT32, 0 };
     DBusMessageIter arrayIter;
 
-    returnValue = dbus_message_iter_open_container(&gpCurrentMessage->iter, DBUS_TYPE_ARRAY, signature, &arrayIter);
+    returnValue = dbus_message_iter_open_container(&msg->iter, DBUS_TYPE_ARRAY, signature, &arrayIter);
 
     t_ilm_int index = 0;
     for (index = 0; index < arraySize; ++index)
@@ -46,18 +44,17 @@ t_ilm_bool appendUintArray(const t_ilm_uint* valueArray, t_ilm_int arraySize)
         returnValue &= dbus_message_iter_append_basic(&arrayIter, DBUS_TYPE_UINT32, &valueArray[index]);
     }
 
-    returnValue &= dbus_message_iter_close_container(&gpCurrentMessage->iter, &arrayIter);
+    returnValue &= dbus_message_iter_close_container(&msg->iter, &arrayIter);
 
-    //printf("%s\n", returnValue ? "SUCCESS" : "FAIL");
     return returnValue;
 }
 
-t_ilm_bool getUintArray(t_ilm_uint** valueArray, t_ilm_int* arraySize)
+t_ilm_bool getUintArray(t_ilm_message message, t_ilm_uint** valueArray, t_ilm_int* arraySize)
 {
-    LOG_ENTER_FUNCTION;
+    dbusmessage* msg = (dbusmessage*)message;
     t_ilm_bool returnValue = ILM_FALSE;
 
-    t_ilm_int type = dbus_message_iter_get_arg_type(&gpCurrentMessage->iter);
+    t_ilm_int type = dbus_message_iter_get_arg_type(&msg->iter);
 
     if (DBUS_TYPE_ARRAY == type)
     {
@@ -66,7 +63,7 @@ t_ilm_bool getUintArray(t_ilm_uint** valueArray, t_ilm_int* arraySize)
         DBusMessageIter arrayIter;
         int index = 0;
 
-        dbus_message_iter_recurse(&gpCurrentMessage->iter, &arrayIter);
+        dbus_message_iter_recurse(&msg->iter, &arrayIter);
 
         // get pointer to dbus internal array data (zero copy)
         t_ilm_uint* dbusArrayPointer = NULL;
@@ -82,21 +79,20 @@ t_ilm_bool getUintArray(t_ilm_uint** valueArray, t_ilm_int* arraySize)
         printTypeName(type);
     }
 
-    //printf("%s\n", returnValue ? "SUCCESS" : "FAIL");
     return returnValue;
 }
 
-t_ilm_bool getUint(t_ilm_uint* value)
+t_ilm_bool getUint(t_ilm_message message, t_ilm_uint* value)
 {
-    LOG_ENTER_FUNCTION;
+    dbusmessage* msg = (dbusmessage*)message;
     t_ilm_bool returnValue = ILM_FALSE;
 
-    t_ilm_int type = dbus_message_iter_get_arg_type(&gpCurrentMessage->iter);
+    t_ilm_int type = dbus_message_iter_get_arg_type(&msg->iter);
 
     if (DBUS_TYPE_UINT32 == type)
     {
-        dbus_message_iter_get_basic(&gpCurrentMessage->iter, value);
-        dbus_message_iter_next(&gpCurrentMessage->iter);
+        dbus_message_iter_get_basic(&msg->iter, value);
+        dbus_message_iter_next(&msg->iter);
         returnValue = ILM_TRUE;
     }
     else
@@ -104,6 +100,6 @@ t_ilm_bool getUint(t_ilm_uint* value)
         printf("ERROR: expected: DBUS_TYPE_UINT32, received ");
         printTypeName(type);
     }
-    //printf("%s - %u\n", returnValue ? "SUCCESS" : "FAIL", *value);
+
     return returnValue;
 }
