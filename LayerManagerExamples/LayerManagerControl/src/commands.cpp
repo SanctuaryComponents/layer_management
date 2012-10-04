@@ -304,7 +304,7 @@ COMMAND("set surface <surfaceid> width <width>")
 //=============================================================================
 {
     unsigned int dimension[2];
-    unsigned int surfaceid = input->getUint("layerid");
+    unsigned int surfaceid = input->getUint("surfaceid");
     ilm_surfaceGetDimension(surfaceid, dimension);
     dimension[0] = input->getUint("width");
     ilm_surfaceSetDimension(surfaceid, dimension);
