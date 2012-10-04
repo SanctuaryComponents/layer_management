@@ -39,7 +39,18 @@ public:
     virtual uint getLayerTypeCapabilities(LayerType layerType);
     virtual InputManager* getInputManager() const {return m_pInputManager;}
     virtual Shader* createShader(const string* vertexName, const string* fragmentName); 
-
+    virtual bool setOptimizationMode(unsigned int id, unsigned int mode)
+    {
+        (void)id;
+        (void)mode;
+        return false;
+    }
+    virtual bool getOptimizationMode(unsigned int id, unsigned int *mode)
+    {
+        (void)id;
+        (void)mode;
+        return false;
+    }
 protected:
     Scene* m_pScene;
     InputManager* m_pInputManager;

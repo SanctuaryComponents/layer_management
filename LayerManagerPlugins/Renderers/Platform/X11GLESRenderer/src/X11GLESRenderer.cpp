@@ -163,6 +163,16 @@ void X11GLESRenderer::forceCompositionWindowSystem()
     m_pWindowSystem->m_forceComposition = true;
 }
 
+bool X11GLESRenderer::setOptimizationMode(OptimizationType id, OptimizationModeType mode)
+{
+    return m_pGraphicSystem->setOptimizationMode(id, mode);
+}
+
+bool X11GLESRenderer::getOptimizationMode(OptimizationType id, OptimizationModeType *mode)
+{
+    return m_pGraphicSystem->getOptimizationMode(id, mode);
+}
+
 Shader* X11GLESRenderer::createShader(const string* vertexName, const string* fragmentName)
 {
     Shader *result = NULL;

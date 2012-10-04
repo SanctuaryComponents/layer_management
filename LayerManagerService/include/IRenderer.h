@@ -24,6 +24,7 @@
 #include "PluginBase.h"
 #include "LayerType.h"
 #include "Shader.h"
+#include "OptimizationType.h"
 
 
 class InputManager;
@@ -149,6 +150,26 @@ public:
       * \ingroup    RendererAPI
       */
     virtual InputManager* getInputManager() const = 0;
+
+    /**
+     * \brief      Set the mode for the specified optimization (e.g. OFF,ON,AUTO)
+     * \ingroup    RendererAPI
+     * \param[in]  id id of optimization
+     * \param[in] mode mode to set for the optimization
+     * \return     TRUE: id and mode are valid and mode was set
+     * \return     FALSE: id or mode was invalid and/or mode could not be set
+     */
+    virtual bool setOptimizationMode(OptimizationType id, OptimizationModeType mode) = 0;
+
+    /**
+     * \brief      Get the current mode for the specified optimization
+     * \ingroup    RendererAPI
+     * \param[in]  id id of optimization
+     * \param[out] mode retrieved mode value
+     * \return     TRUE: id is valid and mode was returned
+     * \return     FALSE: id was invalid and/or mode was not returned
+     */
+    virtual bool getOptimizationMode(OptimizationType, OptimizationModeType *mode) = 0;
 };
 
 #endif /* _IRENDERER_H_ */

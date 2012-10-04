@@ -61,6 +61,8 @@ public:
     virtual void resize(EGLint displayWidth, EGLint displayHeight);
 
     virtual void saveScreenShotOfFramebuffer(std::string fileToSave);
+    virtual bool setOptimizationMode(OptimizationType id, OptimizationModeType mode);
+    virtual bool getOptimizationMode(OptimizationType id, OptimizationModeType *mode);
 
     virtual EGLDisplay getEGLDisplay()
     {
@@ -108,9 +110,9 @@ protected:
     std::map<int, Shader*> m_shaders;
 
     Layer* m_currentLayer;
-
     uint m_texId;
 
+    OptimizationModeType m_optimizations[OPT_COUNT];
 private:
     void saveScreenShot();
 };

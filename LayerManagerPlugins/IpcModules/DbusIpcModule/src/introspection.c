@@ -1,6 +1,7 @@
 /***************************************************************************
  *
  * Copyright 2010-2012 BMW Car IT GmbH
+ * Copyright (c) 2012, NVIDIA CORPORATION.  All rights reserved.
  *
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -151,7 +152,9 @@ void generateIntrospectionString(char* msgBuffer)
         { "LayerAddNotification",             "u",     ""               },
         { "LayerRemoveNotification",          "u",     ""               },
         { "SurfaceAddNotification",           "u",     ""               },
-        { "SurfaceRemoveNotification",        "u",     ""               }
+        { "SurfaceRemoveNotification",        "u",     ""               },
+        { "SetOptimizationMode",              "uu",    ""               },
+        { "GetOptimizationMode",              "u",     "u"              }
     };
 
     int introspectionInterfaceCount = sizeof(introspectionInterface) / sizeof(struct IntrospectionTable);

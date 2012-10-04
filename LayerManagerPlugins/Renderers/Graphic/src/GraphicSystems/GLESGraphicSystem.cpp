@@ -73,6 +73,10 @@ GLESGraphicsystem::GLESGraphicsystem(int windowWidth, int windowHeight, PfnShade
 , m_texId(0)
 {
     LOG_DEBUG("GLESGraphicsystem", "creating GLESGraphicsystem");
+    for (int i=0; i < OPT_COUNT; i++)
+    {
+        m_optimizations[i] = OPT_MODE_HEURISTIC;
+    }
 }
 
 void GLESGraphicsystem::activateGraphicContext()
@@ -350,6 +354,35 @@ void GLESGraphicsystem::renderSWLayer(Layer *layer, bool clear)
     }
 
     endLayer();
+}
+
+bool GLESGraphicsystem::setOptimizationMode(OptimizationType id, OptimizationModeType mode)
+{
+    if ((int)id >= OPT_COUNT)
+    {
+       return false;
+    }
+
+    if ((int)mode >= OPT_MODE_COUNT)
+    {
+        return false;
+    }
+
+    m_optimizations[id] = mode;
+
+    return true;
+}
+
+bool GLESGraphicsystem::getOptimizationMode(OptimizationType id, OptimizationModeType *mode)
+{
+    if ((int)id >= OPT_COUNT)
+    {
+       return false;
+    }
+
+    *mode = m_optimizations[id];
+
+    return true;
 }
 
 void GLESGraphicsystem::renderSWLayers(LayerList layers, bool clear)

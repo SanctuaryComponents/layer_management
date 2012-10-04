@@ -1,6 +1,7 @@
 /***************************************************************************
 *
 * Copyright 2010,2011 BMW Car IT GmbH
+* Copyright (c) 2012, NVIDIA CORPORATION.  All rights reserved.
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -847,6 +848,28 @@ ilmErrorTypes ilm_GetKeyboardFocusSurfaceId(t_ilm_surface* pSurfaceId);
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_UpdateInputEventAcceptanceOn(t_ilm_surface surfaceId, ilmInputDevice devices, t_ilm_bool acceptance);
+
+/**
+ * \brief Enable or disable a rendering optimization
+ *
+ * \ingroup ilmClient
+ * \param[in] id which optimization to change
+ * \param[in] mode the mode to set on the optimzation (e.g. ON, OFF, AUTO)
+ * \return ILM_SUCCESS if the method call was successful
+ * \return ILM_FAILED if the client can not call the method on the service.
+ */
+ilmErrorTypes ilm_SetOptimizationMode(ilmOptimization id, ilmOptimizationMode mode);
+
+/**
+ * \brief Get the current enablement for an optimization
+ *
+ * \ingroup ilmClient
+ * \param[in] id which optimization to query
+ * \param[out] mode current optimization mode
+ * \return ILM_SUCCESS if the method call was successful
+ * \return ILM_FAILED if the client can not call the method on the service.
+ */
+ilmErrorTypes ilm_GetOptimizationMode(ilmOptimization id, ilmOptimizationMode* mode);
 
 /**
  * \brief Commit all changes and executed commands since last commit.

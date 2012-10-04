@@ -171,6 +171,16 @@ void WaylandGLESRenderer::forceCompositionWindowSystem()
     m_pWindowSystem->m_forceComposition = true;
 }
 
+bool WaylandGLESRenderer::setOptimizationMode(OptimizationType id, OptimizationModeType mode)
+{
+    return m_pGraphicSystem->setOptimizationMode(id, mode);
+}
+
+bool WaylandGLESRenderer::getOptimizationMode(OptimizationType id, OptimizationModeType *mode)
+{
+    return m_pGraphicSystem->getOptimizationMode(id, mode);
+}
+
 Shader* WaylandGLESRenderer::createShader(const string* vertexName, const string* fragmentName)  
 {
     Shader *result = NULL;

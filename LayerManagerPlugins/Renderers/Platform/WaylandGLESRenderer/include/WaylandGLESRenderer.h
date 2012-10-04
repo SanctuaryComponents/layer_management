@@ -2,6 +2,7 @@
 *
 * Copyright 2010, 2011 BMW Car IT GmbH 
 * Copyright (C) 2011 DENSO CORPORATION and Robert Bosch Car Multimedia Gmbh
+* Copyright (c) 2012, NVIDIA CORPORATION.  All rights reserved.
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -43,6 +44,8 @@ public:
     void signalWindowSystemRedraw();
     void forceCompositionWindowSystem();
     Shader* createShader(const string* vertexName, const string* fragmentName);
+    virtual bool setOptimizationMode(OptimizationType id, OptimizationModeType mode);
+    virtual bool getOptimizationMode(OptimizationType id, OptimizationModeType *mode);
 
 private:
     WaylandBaseWindowSystem* m_pWindowSystem;

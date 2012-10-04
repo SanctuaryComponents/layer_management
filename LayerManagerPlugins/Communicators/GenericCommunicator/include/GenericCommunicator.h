@@ -159,6 +159,8 @@ private:
     void SurfaceAddNotification(t_ilm_message message);
     void LayerRemoveNotification(t_ilm_message message);
     void SurfaceRemoveNotification(t_ilm_message message);
+    void SetOptimizationMode(t_ilm_message message);
+    void GetOptimizationMode(t_ilm_message message);
 
     virtual HealthCondition getHealth();
 

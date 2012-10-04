@@ -58,4 +58,3 @@ uint BaseRenderer::getLayerTypeCapabilities(LayerType layerType)
     }
     return result;
 }
-

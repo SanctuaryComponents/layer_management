@@ -1,6 +1,7 @@
 /***************************************************************************
  *
  * Copyright 2010,2011 BMW Car IT GmbH
+ * Copyright (c) 2012, NVIDIA CORPORATION.  All rights reserved.
  *
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -52,6 +53,18 @@ public:
     virtual void clearBackground() = 0;
     virtual void swapBuffers() = 0;
     virtual void saveScreenShotOfFramebuffer(std::string fileToSave) = 0;
+    virtual bool setOptimizationMode(unsigned int id, unsigned int mode)
+    {
+        (void)id;
+        (void)mode;
+        return false;
+    }
+    virtual bool getOptimizationMode(unsigned int id, unsigned int *mode)
+    {
+        (void)id;
+        (void)mode;
+        return false;
+    }
 
     virtual void setTextureBinder(ITextureBinder* binder)
     {

@@ -84,7 +84,8 @@
 #include "SurfaceUpdateInputEventAcceptance.h"
 #include "SurfaceSetChromaKeyCommand.h"
 #include "LayerSetChromaKeyCommand.h"
-
+#include "SetOptimizationModeCommand.h"
+#include "GetOptimizationModeCommand.h"
 #include <stdbool.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -199,7 +200,9 @@ GenericCommunicator::GenericCommunicator(ICommandExecutor* executor)
         { "LayerAddNotification",             &GenericCommunicator::LayerAddNotification },
         { "SurfaceAddNotification",           &GenericCommunicator::SurfaceAddNotification },
         { "LayerRemoveNotification",          &GenericCommunicator::LayerRemoveNotification },
-        { "SurfaceRemoveNotification",        &GenericCommunicator::SurfaceRemoveNotification }
+        { "SurfaceRemoveNotification",        &GenericCommunicator::SurfaceRemoveNotification },
+        { "SetOptimizationMode",              &GenericCommunicator::SetOptimizationMode },
+        { "GetOptimizationMode",              &GenericCommunicator::GetOptimizationMode }
     };
 
     int entryCount = sizeof(manager_methods) / sizeof(MethodTable);
@@ -2948,6 +2951,51 @@ HealthCondition GenericCommunicator::getHealth()
         health = HealthDead;
     }
     return health;
+}
+
+void GenericCommunicator::SetOptimizationMode()
+{
+    OptimizationType optimizationId;
+    OptimizationModeType optimizationMode;
+
+    unsigned int o;
+    m_ipcModule.getUint(&o);
+    optimizationId = (OptimizationType) o;
+    m_ipcModule.getUint(&o);
+    optimizationMode = (OptimizationModeType) o;
+
+    t_ilm_bool status = m_executor->execute(new SetOptimizationModeCommand(optimizationId, optimizationMode));
+    if (status)
+    {
+        m_ipcModule.createMessage((char*)__FUNCTION__);
+        m_ipcModule.sendMessage();
+    }
+    else
+    {
+        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+    }
+}
+
+void GenericCommunicator::GetOptimizationMode()
+{
+    OptimizationType optimizationId;
+    OptimizationModeType optimizationMode;
+
+    unsigned int o;
+    m_ipcModule.getUint(&o);
+    optimizationId = (OptimizationType)o;
+
+    t_ilm_bool status = m_executor->execute(new GetOptimizationModeCommand(optimizationId, &optimizationMode));
+    if (status)
+    {
+        m_ipcModule.createMessage((char*)__FUNCTION__);
+        m_ipcModule.appendUint((unsigned int)optimizationMode);
+        m_ipcModule.sendMessage();
+    }
+    else
+    {
+        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+    }
 }
 
 extern "C" ICommunicator* createGenericCommunicator(ICommandExecutor* executor)

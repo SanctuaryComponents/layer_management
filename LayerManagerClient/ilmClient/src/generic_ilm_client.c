@@ -2365,6 +2365,42 @@ ilmErrorTypes ilm_UpdateInputEventAcceptanceOn(t_ilm_surface surfaceId, ilmInput
     return returnValue;
 }
 
+ilmErrorTypes ilm_SetOptimizationMode(ilmOptimization id, ilmOptimizationMode mode)
+{
+    LOG_ENTER_FUNCTION;
+    ilmErrorTypes returnValue = ILM_FAILED;
+
+    if (gIpcModule.createMessage("SetOptimizationMode\0")
+        && gIpcModule.appendUint(id)
+        && gIpcModule.appendUint(mode)
+        && gIpcModule.sendMessage()
+        && gIpcModule.receiveMessage(gReceiveTimeout)
+        && !gIpcModule.isErrorMessage())
+    {
+        returnValue = ILM_SUCCESS;
+    }
+    gIpcModule.destroyMessage();
+    return returnValue;
+}
+
+ilmErrorTypes ilm_GetOptimizationMode(ilmOptimization id, ilmOptimizationMode* pMode)
+{
+    LOG_ENTER_FUNCTION;
+    ilmErrorTypes returnValue = ILM_FAILED;
+
+    if (gIpcModule.createMessage("GetOptimizationMode\0")
+        && gIpcModule.appendUint(id)
+        && gIpcModule.sendMessage()
+        && gIpcModule.receiveMessage(gReceiveTimeout)
+        && !gIpcModule.isErrorMessage()
+        && gIpcModule.getUint(pMode))
+    {
+        returnValue = ILM_SUCCESS;
+    }
+    gIpcModule.destroyMessage();
+    return returnValue;
+}
+
 ilmErrorTypes ilm_commitChanges()
 {
     ilmErrorTypes returnValue = ILM_FAILED;

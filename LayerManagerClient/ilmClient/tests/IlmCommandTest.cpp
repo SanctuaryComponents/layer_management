@@ -992,3 +992,30 @@ TEST(Calc, TimeCalcTestWithoutOverflow)
    ASSERT_EQ(3, timeAdded.tv_sec);
    ASSERT_EQ(667456000, timeAdded.tv_nsec);
 }
+
+TEST_F(IlmCommandTest, SetGetOptimizationMode) {
+    ilmOptimization id;
+    ilmOptimizationMode mode;
+    ilmOptimizationMode retmode;
+
+    id = ILM_OPT_MULTITEXTURE;
+    mode = ILM_OPT_MODE_FORCE_OFF;
+    ilm_SetOptimizationMode(id, mode);
+    ilm_commitChanges();
+    ilm_GetOptimizationMode(id, &retmode);
+    ASSERT_EQ(mode, retmode);
+
+    id = ILM_OPT_SKIP_CLEAR;
+    mode = ILM_OPT_MODE_TOGGLE;
+    ilm_SetOptimizationMode(id, mode);
+    ilm_commitChanges();
+    ilm_GetOptimizationMode(id, &retmode);
+    ASSERT_EQ(mode, retmode);
+
+    id = ILM_OPT_MULTITEXTURE;
+    mode = ILM_OPT_MODE_HEURISTIC;
+    ilm_SetOptimizationMode(id, mode);
+    ilm_commitChanges();
+    ilm_GetOptimizationMode(id, &retmode);
+    ASSERT_EQ(mode, retmode);
+}

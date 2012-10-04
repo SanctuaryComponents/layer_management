@@ -93,6 +93,28 @@ typedef enum e_ilmObjectType
 } ilmObjectType;
 
 /**
+ * \brief Enumeration of renderer optimizations
+ * \ingroup ilmClient
+ **/
+typedef enum e_ilmOptimization
+{
+    ILM_OPT_MULTITEXTURE = 0,          /*!< Multi-texture optimization */
+    ILM_OPT_SKIP_CLEAR = 1             /*!< Skip clearing the screen */
+} ilmOptimization;
+
+/**
+ * \brief Enablement states for individual optimizations
+ * \ingroup ilmClient
+ **/
+typedef enum e_ilmOptimizationMode
+{
+    ILM_OPT_MODE_FORCE_OFF = 0,        /*!< Disable optimization */
+    ILM_OPT_MODE_FORCE_ON = 1,         /*!< Enable optimization */
+    ILM_OPT_MODE_HEURISTIC = 2,        /*!< Let renderer choose enablement */
+    ILM_OPT_MODE_TOGGLE = 3            /*!< Toggle on/and off rapidly for debugging */
+} ilmOptimizationMode;
+
+/**
  * \brief Enumeration for supported orientations of booth, surface and layer
  * \ingroup ilmClient
  **/
