@@ -1,6 +1,7 @@
 /***************************************************************************
  *
  * Copyright 2010,2011 BMW Car IT GmbH
+ * Copyright (c) 2012, NVIDIA CORPORATION.  All rights reserved.
  *
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -47,10 +48,10 @@ public:
     unsigned long int mThreadId; // TODO: remove
 protected:
     virtual void ClearDamage();
-    Scene* m_pScene;
     InputManager* m_pInputManager;
 
 public:
+    Scene* m_pScene;
     bool m_damaged;
     bool m_forceComposition;
 };

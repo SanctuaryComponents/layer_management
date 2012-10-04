@@ -1,7 +1,11 @@
 /***************************************************************************
  *
  * Copyright 2010,2011 BMW Car IT GmbH
+<<<<<<< HEAD
  * Copyright (C) 2012 DENSO CORPORATION and Robert Bosch Car Multimedia Gmbh
+=======
+ * Copyright (c) 2012, NVIDIA CORPORATION.  All rights reserved.
+>>>>>>> Renderers: new GLES shader selection mechanism
  *
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -164,6 +168,75 @@ bool GLESGraphicsystem::init(EGLNativeDisplayType display, EGLNativeWindowType N
     return true;
 }
 
+// Bits 31:30 = numSurfaces
+// Bit  29    = blend on/off
+// Bit  28    = unused
+// Bits 27:21 = Surface 4 Attributes
+// Bits 20:14 = Surface 3 Attributes
+// Bits 13:7  = Surface 2 Attributes
+// Bits 6:0   = Surface 1 Attributes
+#define SHADERKEY_MAX_SURFACES 4
+#define SHADERKEY_NUM_SURF_SHIFT 30
+#define SHADERKEY_NUM_SURF_MASK  (0x3 << SHADERKEY_NUM_SURF_SHIFT)
+
+#define SHADERKEY_BLEND_SHIFT        29
+#define SHADERKEY_BLEND_MASK         (0x1 << SHADERKEY_BLEND_SHIFT)
+
+#define SHADERKEY_BITS_PER_SURF    7
+#define SHADERKEY_CHROMAKEY_SHIFT(x)     (2 + (SHADERKEY_BITS_PER_SURF * x))
+#define SHADERKEY_ALPHA_CHANNEL_SHIFT(x) (1 + (SHADERKEY_BITS_PER_SURF * x))
+#define SHADERKEY_TRANSPARENCY_SHIFT(x)  (0 + (SHADERKEY_BITS_PER_SURF * x))
+#define SHADERKEY_CHROMAKEY_MASK(x)     (0x1 << (SHADERKEY_CHROMAKEY_SHIFT(x)))
+#define SHADERKEY_ALPHA_CHANNEL_MASK(x) (0x1 << (SHADERKEY_ALPHA_CHANNEL_SHIFT(x)))
+#define SHADERKEY_TRANSPARENCY_MASK(x)  (0x1 << (SHADERKEY_TRANSPARENCY_SHIFT(x)))
+
+unsigned int GLESGraphicsystem::shaderKey(int numSurfaces,
+                                 int needsBlend,
+                                 int hasTransparency0, int hasAlphaChannel0, int hasChromakey0,
+                                 int hasTransparency1, int hasAlphaChannel1, int hasChromakey1,
+                                 int hasTransparency2, int hasAlphaChannel2, int hasChromakey2,
+                                 int hasTransparency3, int hasAlphaChannel3, int hasChromakey3)
+{
+    return (((numSurfaces << SHADERKEY_NUM_SURF_SHIFT) & SHADERKEY_NUM_SURF_MASK) |
+            ((needsBlend << SHADERKEY_BLEND_SHIFT) & SHADERKEY_BLEND_MASK) |
+
+            ((hasChromakey3 << SHADERKEY_CHROMAKEY_SHIFT(3)) & SHADERKEY_CHROMAKEY_MASK(3)) |
+            ((hasChromakey2 << SHADERKEY_CHROMAKEY_SHIFT(2)) & SHADERKEY_CHROMAKEY_MASK(2)) |
+            ((hasChromakey1 << SHADERKEY_CHROMAKEY_SHIFT(1)) & SHADERKEY_CHROMAKEY_MASK(1)) |
+            ((hasChromakey0 << SHADERKEY_CHROMAKEY_SHIFT(0)) & SHADERKEY_CHROMAKEY_MASK(0)) |
+
+            ((hasAlphaChannel3 << SHADERKEY_ALPHA_CHANNEL_SHIFT(3)) & SHADERKEY_ALPHA_CHANNEL_MASK(3)) |
+            ((hasAlphaChannel2 << SHADERKEY_ALPHA_CHANNEL_SHIFT(2)) & SHADERKEY_ALPHA_CHANNEL_MASK(2)) |
+            ((hasAlphaChannel1 << SHADERKEY_ALPHA_CHANNEL_SHIFT(1)) & SHADERKEY_ALPHA_CHANNEL_MASK(1)) |
+            ((hasAlphaChannel0 << SHADERKEY_ALPHA_CHANNEL_SHIFT(0)) & SHADERKEY_ALPHA_CHANNEL_MASK(0)) |
+
+            ((hasTransparency3 << SHADERKEY_TRANSPARENCY_SHIFT(3)) & SHADERKEY_TRANSPARENCY_MASK(3)) |
+            ((hasTransparency2 << SHADERKEY_TRANSPARENCY_SHIFT(2)) & SHADERKEY_TRANSPARENCY_MASK(2)) |
+            ((hasTransparency1 << SHADERKEY_TRANSPARENCY_SHIFT(1)) & SHADERKEY_TRANSPARENCY_MASK(1)) |
+            ((hasTransparency0 << SHADERKEY_TRANSPARENCY_SHIFT(0)) & SHADERKEY_TRANSPARENCY_MASK(0)));
+}
+
+void GLESGraphicsystem::debugShaderKey(unsigned int key)
+{
+    int numSurfaces = ((key & SHADERKEY_NUM_SURF_MASK) >> SHADERKEY_NUM_SURF_SHIFT);
+    int needsBlend =  ((key & SHADERKEY_BLEND_MASK) >> SHADERKEY_BLEND_SHIFT);
+
+    LOG_DEBUG("GLESGraphicsystem", "Key: " << std::hex << key
+                               << " numSurfaces:" << numSurfaces
+                               << " needsBlend:" << needsBlend);
+
+    for (int i = 0; i < SHADERKEY_MAX_SURFACES; i++)
+    {
+        int hasChromakey =    ((key & SHADERKEY_CHROMAKEY_MASK(i)) >> SHADERKEY_CHROMAKEY_SHIFT(i));
+        int hasAlphaChannel = ((key & SHADERKEY_ALPHA_CHANNEL_MASK(i)) >> SHADERKEY_ALPHA_CHANNEL_SHIFT(i));
+        int hasTransparency = ((key & SHADERKEY_TRANSPARENCY_MASK(i)) >> SHADERKEY_TRANSPARENCY_SHIFT(i));
+        LOG_DEBUG("GLESGraphicsystem", "    Surface" << i << ":"
+                                   << " hasTransparency:" << hasTransparency
+                                   << " hasAlphaChannel:" << hasAlphaChannel
+                                   << " hasChromakey:" << hasChromakey);
+    }
+}
+
 void GLESGraphicsystem::clearBackground()
 {
     glClear(GL_COLOR_BUFFER_BIT);
@@ -306,38 +379,78 @@ void GLESGraphicsystem::endLayer()
     m_currentLayer = NULL;
 }
 
-//this is a particularly simple function currently, but it will likely be expanded as more shaders and effects are implemented.
-Shader *GLESGraphicsystem::pickOptimizedShader(Shader* currentShader, const ShaderProgram::CommonUniforms& curUniforms)
+Shader *GLESGraphicsystem::pickOptimizedShader(SurfaceList surfaces, bool needsBlend)
 {
-    Shader * retShader = currentShader;
+    int numSurfaces = surfaces.size();
 
-    //LOG_DEBUG("GLESGraphicsystem", "shader:currentShader");
-    do
+    if (numSurfaces > SHADERKEY_MAX_SURFACES)
     {
-        if (currentShader != m_defaultShader)
+        return NULL;
+    }
+
+    int hastransparency[SHADERKEY_MAX_SURFACES] = {0};
+    int hasalphachannel[SHADERKEY_MAX_SURFACES] = {0};
+    int haschromakey[SHADERKEY_MAX_SURFACES] = {0};
+
+    int i = 0;
+    for (SurfaceListConstIterator surface = surfaces.begin(); surface != surfaces.end(); surface++, i++)
+    {
+        int layerId = (*surface)->getContainingLayerId();
+        Layer* layer = m_baseWindowSystem->m_pScene->getLayer(layerId);
+
+        hastransparency[i] = ((*surface)->getOpacity() * layer->getOpacity()) < 1.0f;
+        hasalphachannel[i] = PixelFormatHasAlpha((*surface)->getPixelFormat());
+        haschromakey[i] = 0;
+    }
+
+    unsigned int key = shaderKey(numSurfaces,
+                        needsBlend ? 1 : 0,
+                        hastransparency[0], hasalphachannel[0], haschromakey[0],
+                        hastransparency[1], hasalphachannel[1], haschromakey[1],
+                        hastransparency[2], hasalphachannel[2], haschromakey[2],
+                        hastransparency[3], hasalphachannel[3], haschromakey[3]);
+
+    std::map<int, Shader*>::const_iterator iter = m_shaders.find(key);
+
+//    LOG_DEBUG("GLESGraphicsystem", "Looking for shader with key=" << std::hex << key);
+//    debugShaderKey(key);
+
+    if (iter == m_shaders.end())
+    {
+        LOG_WARNING("GLESGraphicsystem", "No optimal shader found for key=" << std::hex << key);
+        LOG_WARNING("GLESGraphicsystem", "Falling back to default shader");
+
+        switch (numSurfaces) {
+        case 1:
+            return m_defaultShader;
+        default:
+            return NULL;
+        }
+    }
+
+    return (*iter).second;
+}
+
+bool GLESGraphicsystem::needsBlending(SurfaceList surfaces)
+{
+    // Completely opaque surfaces don't need to be blended with framebuffer.
+    // Look for any possible translucency.
+    for (SurfaceListConstIterator surface = surfaces.begin(); surface != surfaces.end(); surface++)
+    {
+        if (PixelFormatHasAlpha((*surface)->getPixelFormat()))
         {
-            //LOG_DEBUG("GLESGraphicsystem", "shader:default");
-            break;
+            return true;
         }
 
-        if (false == curUniforms.chromaKeyEnabled)
-        {
-            if (curUniforms.opacity == 1.0f)
-            {
-                //no need for multiply in shader, just use texture
-                retShader = m_defaultShaderNoUniformAlpha;
-                //LOG_DEBUG("GLESGraphicsystem", "shader:defaultShaderNoUniformAlpha");
-            }
-        }
-        else
-        {
-            // Add chromakey to default fragment shader
-            retShader = m_defaultShaderAddUniformChromaKey;
-            //LOG_DEBUG("GLESGraphicsystem", "shader:defaultShaderAddUniformChromaKey");
-        }
-    } while(0);
+        int layerId = (*surface)->getContainingLayerId();
+        Layer* layer = m_baseWindowSystem->m_pScene->getLayer(layerId);
 
-    return retShader;
+        if (((*surface)->getOpacity() * layer->getOpacity()) < 1.0f)
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 void GLESGraphicsystem::applyLayerMatrix(IlmMatrix& matrix)
@@ -424,8 +537,14 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
         glEnable (GL_BLEND);
     }
 
-    shader = pickOptimizedShader(shader, uniforms);
-
+    {
+        SurfaceList sl;
+        sl.push_back(surface);
+        bool needblend = shader != m_defaultShader ||
+                         PixelFormatHasAlpha((surface)->getPixelFormat()) ||
+                         uniforms.opacity < 1.0f;
+        shader = pickOptimizedShader(sl, needblend);
+    }
 
     shader->use();
 
@@ -492,6 +611,20 @@ bool GLESGraphicsystem::initOpenGLES(EGLint displayWidth, EGLint displayHeight)
         resize(displayWidth, displayHeight);
         glActiveTexture(GL_TEXTURE0);
     }
+
+    //   Build Shader Map
+    //  --------------------------------------------
+    //   #: Number of Textures
+    //   B: Blends with framebuffer
+    //   T: Texture n has layer/surface transparency (layerAlpha != 1 or surfaceAlpha != 1)
+    //   A: Texture n has alpha channel
+    //   C: Texture n has chromakey
+    //                         0      1      2      3
+    //                       -----  -----  -----  -----
+    //                  # B  T A C  T A C  T A C  T A C
+    m_shaders[shaderKey(1,1, 1,1,0, 0,0,0, 0,0,0, 0,0,0)] = m_defaultShader;
+    m_shaders[shaderKey(1,1, 0,1,0, 0,0,0, 0,0,0, 0,0,0)] = m_defaultShaderNoUniformAlpha;
+
     return result;
 }
 

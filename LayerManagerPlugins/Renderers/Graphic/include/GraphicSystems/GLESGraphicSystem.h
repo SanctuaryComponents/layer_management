@@ -1,7 +1,11 @@
 /***************************************************************************
  *
  * Copyright 2010,2011 BMW Car IT GmbH
+<<<<<<< HEAD
  * Copyright (C) 2012 DENSO CORPORATION and Robert Bosch Car Multimedia Gmbh
+=======
+ * Copyright (c) 2012, NVIDIA CORPORATION.  All rights reserved.
+>>>>>>> Renderers: new GLES shader selection mechanism
  *
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -64,9 +68,17 @@ public:
     }
 
     virtual void renderSurface(Surface* surface);
-    virtual Shader *pickOptimizedShader(Shader* currentShader, const ShaderProgram::CommonUniforms& curUniforms);
-	virtual void applyLayerMatrix(IlmMatrix& matrix);
+    virtual Shader *pickOptimizedShader(SurfaceList surfaces, bool needsBlend);
+    virtual void applyLayerMatrix(IlmMatrix& matrix);
 
+    virtual bool needsBlending(SurfaceList surfaces);
+    virtual unsigned shaderKey(int numSurfaces,
+                               int needsBlend,
+                               int hasTransparency1, int hasAlphaChannel1, int hasChromakey1,
+                               int hasTransparency2, int hasAlphaChannel2, int hasChromakey2,
+                               int hasTransparency3, int hasAlphaChannel3, int hasChromakey3,
+                               int hasTransparency4, int hasAlphaChannel4, int hasChromakey4);
+    virtual void debugShaderKey(unsigned key);
 protected:
     virtual bool setupTextureForChromaKey();
     virtual void createPbufferSurface();
@@ -92,6 +104,9 @@ protected:
     Shader* m_defaultShader;
     Shader* m_defaultShaderNoUniformAlpha;
     Shader* m_defaultShaderAddUniformChromaKey;
+
+    std::map<int, Shader*> m_shaders;
+
     Layer* m_currentLayer;
 
     uint m_texId;
