@@ -25,7 +25,9 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/mo
 
 include(${CMAKE_MODULE_PATH}/CMakeVersions.txt)
 
+#==============================================================================
 # set default build type, if not defined by user
+#==============================================================================
 if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release CACHE STRING
                          "Choose build type: Debug, Release, RelWithDebInfo, MinSizeRel."
@@ -33,8 +35,10 @@ if (NOT CMAKE_BUILD_TYPE)
     message(STATUS "Build type not defined. Using default build type 'Release'.")
 endif (NOT CMAKE_BUILD_TYPE)
 
-# Platforms / A set of indiviual options at once
 
+#==============================================================================
+# Platforms / A set of indiviual options at once
+#==============================================================================
 option (WITH_X11_GLES       "Build for X11 with GLES 2.0"                         ON )
 option (WITH_GLESv2_LIB     "Build development library for GLES2 Based Renderers" OFF)
 option (WITH_EGL_EXAMPLE    "Build EGL_EXAMPLE / X11"                             ON )
@@ -51,33 +55,38 @@ option (WITH_WAYLAND_FBDEV  "Build Wayland with FBDEV backend"                  
 option (WITH_WAYLAND_X11    "Build Wayland with X11 backend"                      OFF)
 option (WITH_WAYLAND_DRM    "Build Wayland with drm backend"                      OFF)
 
-# check and resolve option dependencies
-# make sure, only one walynad based renderer was selected
+option (WITH_SERVICE_BIN    "Build LayerManagerService Binary"                    ON)
+option (WITH_CLIENT_LIB     "Build LayerManagement Client Lib"                    ON)
+option (WITH_COMMUNICATOR_GEN "Build Generic Communicator Plugin"                 ON)
 
-if (WITH_DESKTOP)
-    set (WITH_GLX_LIB ON CACHE BOOL "Build development library for GLX Based Renderers" FORCE)
-endif(WITH_DESKTOP)
 
-if (WITH_X11_GLES)
-    set (WITH_GLESv2_LIB ON CACHE BOOL "Build development library for GLES2 Based Renderers" FORCE)
-endif(WITH_X11_GLES)
+#==============================================================================
+# Internal global settings not available to user
+#==============================================================================
+set (WITH_WAYLAND    OFF)
+set (BUILD_UTILS_LIB  OFF)
+set (INSTALL_UTILS_LIB  OFF)
 
+
+#==============================================================================
+# make sure, only one wayland based renderer was selected
+#==============================================================================
 set(NumberOfWaylandRenderers 0)
 
 if (WITH_WAYLAND_X11)
-    set (WITH_GLESv2_LIB ON CACHE BOOL "Build development library for GLES2 Based Renderers" FORCE)
+    set (WITH_GLESv2_LIB ON)
     set (WITH_WAYLAND ON)
     MATH(EXPR NumberOfWaylandRenderers "${NumberOfWaylandRenderers} + 1")
 endif(WITH_WAYLAND_X11)
 
 if (WITH_WAYLAND_FBDEV)
-    set (WITH_GLESv2_LIB ON CACHE BOOL "Build development library for GLES2 Based Renderers" FORCE)
+    set (WITH_GLESv2_LIB)
     set (WITH_WAYLAND ON)
     MATH(EXPR NumberOfWaylandRenderers "${NumberOfWaylandRenderers} + 1")
 endif(WITH_WAYLAND_FBDEV)
 
 if (WITH_WAYLAND_DRM)
-    set (WITH_GLESv2_LIB ON CACHE BOOL "Build development library for GLES2 Based Renderers" FORCE)
+    set (WITH_GLESv2_LIB ON)
     set (WITH_WAYLAND ON)
     MATH(EXPR NumberOfWaylandRenderers "${NumberOfWaylandRenderers} + 1")
 endif(WITH_WAYLAND_DRM)
@@ -87,11 +96,10 @@ if(NumberOfWaylandRenderers GREATER 1)
 endif(NumberOfWaylandRenderers GREATER 1)
 
 
-
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
-
+#==============================================================================
+# set default build parameters
+#==============================================================================
 add_subdirectory(cmake/optionalFeatures)
-
 add_subdirectory(config)
 
 include_directories ("${PROJECT_SOURCE_DIR}/config")
@@ -99,16 +107,78 @@ include_directories ("${PROJECT_SOURCE_DIR}/3rdParty/")
 # ilm_types are used internally to LM, so we can include them by default
 include_directories ("${PROJECT_SOURCE_DIR}/LayerManagerClient/ilmClient/include")
 
+
+#==============================================================================
+# default compiler settings for 3rd party components
+#==============================================================================
+
 add_subdirectory (3rdParty)
-add_subdirectory (LayerManagerPlugins/Communicators/GenericCommunicator)
-add_subdirectory (LayerManagerPlugins/IpcModules)
-add_subdirectory (LayerManagerClient/ilmClient)
-add_subdirectory (LayerManagerCommands)
-add_subdirectory (LayerManagerService)
-add_subdirectory (LayerManagerUtils)
-add_subdirectory (LayerManagerPlugins/Renderers/Graphic)
+
+
+#==============================================================================
+# use strict compiler settings for examples
+#------------------------------------------------------------------------------
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra")
+#==============================================================================
+
+if (WITH_EGL_EXAMPLE)
+    add_subdirectory (LayerManagerExamples/EGLX11ApplicationExample)
+    add_subdirectory (LayerManagerExamples/EGLX11MockNavigation)
+    set (BUILD_UTILS_LIB ON)
+endif(WITH_EGL_EXAMPLE)
+
+if (WITH_GLX_EXAMPLE)
+    add_subdirectory (LayerManagerExamples/GLXApplicationExample)
+    set (BUILD_UTILS_LIB ON)
+endif(WITH_GLX_EXAMPLE)
+
+if (WITH_CLIENTEXAMPLES)
+    add_subdirectory (LayerManagerExamples/LayerManagerClientExample)
+    add_subdirectory (LayerManagerExamples/LayerManagerToolBox)
+    add_subdirectory (LayerManagerExamples/LayerManagerControl)
+    add_subdirectory (LayerManagerExamples/LayerSceneDescriptionExample)
+    set (BUILD_UTILS_LIB ON)
+endif(WITH_CLIENTEXAMPLES)
+
+if (WITH_WL_EXAMPLE)
+    add_subdirectory (LayerManagerExamples/EGLWLApplicationExample)
+    add_subdirectory (LayerManagerExamples/EGLWLMockNavigation)
+    add_subdirectory (LayerManagerExamples/WLChromakeyExample)
+    set (BUILD_UTILS_LIB ON)
+endif(WITH_WL_EXAMPLE)
+
+#==============================================================================
+# use very strict compiler settings for internal components
+#------------------------------------------------------------------------------
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Wno-long-long")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-function")
+#set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
+#==============================================================================
+
+if (WITH_COMMUNICATOR_GEN)
+    add_subdirectory (LayerManagerCommands)
+    add_subdirectory (LayerManagerPlugins/Communicators/GenericCommunicator)
+endif(WITH_COMMUNICATOR_GEN)
+
+if (WITH_SERVICE_BIN OR WITH_CLIENT_LIB)
+    add_subdirectory (LayerManagerPlugins/IpcModules)
+
+    if (WITH_SERVICE_BIN)
+        add_subdirectory (LayerManagerPlugins/Renderers/Graphic)
+        add_subdirectory (LayerManagerService)
+        set (BUILD_UTILS_LIB ON)
+        set (INSTALL_UTILS_LIB ON)
+    endif (WITH_SERVICE_BIN)
+    
+    if (WITH_CLIENT_LIB)
+        add_subdirectory (LayerManagerClient/ilmClient)
+    endif (WITH_CLIENT_LIB)
+
+endif (WITH_SERVICE_BIN OR WITH_CLIENT_LIB)
 
 if (WITH_DESKTOP)
+    set (WITH_GLX_LIB ON CACHE BOOL "Build X11 GLX development lib" FORCE)
     add_subdirectory (LayerManagerPlugins/Renderers/Platform/GLXRenderer)
 endif(WITH_DESKTOP)     
 
@@ -121,34 +191,19 @@ if (WITH_WAYLAND)
 endif(WITH_WAYLAND)
 
 if (WITH_X11_GLES)
+    set (WITH_GLESv2_LIB ON CACHE BOOL "Build X11 GLES development lib" FORCE)
     add_subdirectory (LayerManagerPlugins/Renderers/Platform/X11GLESRenderer)
 endif(WITH_X11_GLES)
 
-if (WITH_EGL_EXAMPLE)
-    add_subdirectory (LayerManagerExamples/EGLX11ApplicationExample)
-    add_subdirectory (LayerManagerExamples/EGLX11MockNavigation)
-endif(WITH_EGL_EXAMPLE)
+if (BUILD_UTILS_LIB)
+    add_subdirectory (LayerManagerUtils)
+endif (BUILD_UTILS_LIB)
 
-if (WITH_GLX_EXAMPLE)
-    add_subdirectory (LayerManagerExamples/GLXApplicationExample)
-endif(WITH_GLX_EXAMPLE)
-
-if (WITH_CLIENTEXAMPLES)
-    add_subdirectory (LayerManagerExamples/LayerManagerClientExample)
-    add_subdirectory (LayerManagerExamples/LayerManagerToolBox)
-    add_subdirectory (LayerManagerExamples/LayerManagerControl)
-    add_subdirectory (LayerManagerExamples/LayerSceneDescriptionExample)
-endif(WITH_CLIENTEXAMPLES)
-
-if (WITH_WL_EXAMPLE)
-    add_subdirectory (LayerManagerExamples/EGLWLApplicationExample)
-    add_subdirectory (LayerManagerExamples/EGLWLMockNavigation)
-    add_subdirectory (LayerManagerExamples/WLChromakeyExample)
-endif(WITH_WL_EXAMPLE)
-
+#==============================================================================
 # enable ctest if building with tests
 # run 'make test' after build to run all tests
 # be aware that some tests require a running layermanager
+#==============================================================================
 if (WITH_TESTS)
     enable_testing()
 endif(WITH_TESTS)

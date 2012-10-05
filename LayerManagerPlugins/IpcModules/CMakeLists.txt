@@ -19,7 +19,7 @@
 
 cmake_minimum_required (VERSION 2.6)
 
-add_subdirectory(IpcModuleLoader)
+set (BUILD_LOADER OFF)
 
 #==============================================================================
 # TCP Socket IPC MODULE
@@ -28,6 +28,7 @@ option (WITH_IPC_MODULE_TCP "Build with TCP Ipc Module" OFF)
 
 if (WITH_IPC_MODULE_TCP)
     add_subdirectory(TcpIpcModule)
+    set (BUILD_LOADER ON)
 endif (WITH_IPC_MODULE_TCP)
 
 #==============================================================================
@@ -37,4 +38,12 @@ option (WITH_IPC_MODULE_DBUS "Build with D-Bus Ipc Module" ON)
 
 if (WITH_IPC_MODULE_DBUS)
     add_subdirectory(DbusIpcModule)
+    set (BUILD_LOADER ON)
 endif (WITH_IPC_MODULE_DBUS)
+
+#==============================================================================
+# IPC MODULE LOADER
+#==============================================================================
+if (BUILD_LOADER)
+    add_subdirectory(IpcModuleLoader)
+endif (BUILD_LOADER)

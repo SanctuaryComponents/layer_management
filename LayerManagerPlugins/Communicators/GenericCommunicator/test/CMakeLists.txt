@@ -41,6 +41,8 @@ file(GLOB LM_SOURCES "${PROJECT_SOURCE_DIR}/LayerManagerService/src/Scene.cpp"
 
 file(GLOB DBUSCommunicator_SOURCES "../src/*.cpp")
 
+set (CMAKE_CXX_FLAGS "")
+
 add_executable(DBUSCommunicatorTest DBUSCommunicatorTest.cpp ${LM_SOURCES} ${DBUSCommunicator_SOURCES})
 target_link_libraries(DBUSCommunicatorTest gmock LayerManagerCommands ${LIBS})
 

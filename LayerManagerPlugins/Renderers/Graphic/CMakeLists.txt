@@ -386,6 +386,8 @@ endif(WITH_WAYLAND)
 
 if (WITH_TESTS)
 
+    set (CMAKE_CXX_FLAGS "")
+
     enable_testing()
     add_subdirectory (tests)
     

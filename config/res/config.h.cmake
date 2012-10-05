@@ -57,14 +57,8 @@
 // force copy of graphic buffers
 #cmakedefine WITH_FORCE_COPY
 
-// Build development library for GLES2 Based Renderers
-#cmakedefine WITH_GLESv2_LIB
-
 // build OpenGL/X11 examples
 #cmakedefine WITH_GLX_EXAMPLE
-
-// Build development library for GLX Based Renderers
-#cmakedefine WITH_GLX_LIB
 
 // build unit tests for all projects
 #cmakedefine WITH_TESTS
@@ -72,14 +66,14 @@
 // build OpenGL ES 2.0 / X11 renderer
 #cmakedefine WITH_X11_GLES
 
-// use OpenGL ES 2.0 / Wayland renderer
-#cmakedefine WITH_WAYLAND
-
 // use fbdev for wayland backend
 #cmakedefine WITH_WAYLAND_FBDEV
 
 // use x11 for wayland backend
 #cmakedefine WITH_WAYLAND_X11
+
+// use wayland-drm compositor
+#cmakedefine WITH_WAYLAND_DRM
 
 // use xthreads library
 #cmakedefine WITH_XTHREADS
@@ -87,8 +81,20 @@
 // use automotive dlt for logging
 #cmakedefine WITH_DLT
 
-// use wayland-drm compositor
-#cmakedefine WITH_WAYLAND_DRM
+// build LayerManagement client library
+#cmakedefine WITH_CLIENT_LIB
+
+// build LayerManagerService binary
+#cmakedefine WITH_SERVICE_BIN
+
+// build generic communicator plugin
+#cmakedefine WITH_COMMUNICATOR_GEN
+
+// build dbus ipc module
+#cmakedefine WITH_IPC_MODULE_DBUS
+
+// build tcp/ip ipc module
+#cmakedefine WITH_IPC_MODULE_TCP
 
 //-----------------------------------------------------------------------------
 // human readable report
@@ -103,25 +109,27 @@ typedef struct
 } buildConfigurationFlag;
 
 #define buildConfigurationFlags \
-{ INFO_FLAG,  "Build Version       = ${ILM_VERSION}"          }, \
-{ DEBUG_FLAG, "Build Type          = ${CMAKE_BUILD_TYPE}"     }, \
-{ DEBUG_FLAG, "Compiler Flags      = ${CMAKE_CXX_FLAGS}"      }, \
-{ DEBUG_FLAG, "Install Prefix      = ${CMAKE_INSTALL_PREFIX}" }, \
-{ DEBUG_FLAG, "WITH_CLIENTEXAMPLES = ${WITH_CLIENTEXAMPLES}"  }, \
-{ DEBUG_FLAG, "WITH_DESKTOP        = ${WITH_DESKTOP}"         }, \
-{ DEBUG_FLAG, "WITH_EGL_EXAMPLE    = ${WITH_EGL_EXAMPLE}"     }, \
-{ DEBUG_FLAG, "WITH_WL_EXAMPLE     = ${WITH_WL_EXAMPLE}"      }, \
-{ DEBUG_FLAG, "WITH_FORCE_COPY     = ${WITH_FORCE_COPY}"      }, \
-{ DEBUG_FLAG, "WITH_GLESv2_LIB     = ${WITH_GLESv2_LIB}"      }, \
-{ DEBUG_FLAG, "WITH_GLX_EXAMPLE    = ${WITH_GLX_EXAMPLE}"     }, \
-{ DEBUG_FLAG, "WITH_GLX_LIB        = ${WITH_GLX_LIB}"         }, \
-{ DEBUG_FLAG, "WITH_TESTS          = ${WITH_TESTS}"           }, \
-{ DEBUG_FLAG, "WITH_X11_GLES       = ${WITH_X11_GLES}"        }, \
-{ DEBUG_FLAG, "WITH_WAYLAND        = ${WITH_WAYLAND}"         }, \
-{ DEBUG_FLAG, "WITH_WAYLAND_FBDEV  = ${WITH_WAYLAND_FBDEV}"   }, \
-{ DEBUG_FLAG, "WITH_WAYLAND_X11    = ${WITH_WAYLAND_X11}"     }, \
-{ DEBUG_FLAG, "WITH_WAYLAND_DRM    = ${WITH_WAYLAND_DRM}"     }, \
-{ DEBUG_FLAG, "WITH_XTHREADS       = ${WITH_XTHREADS}"        }, \
-{ DEBUG_FLAG, "WITH_DLT            = ${WITH_DLT}"             }
+{ INFO_FLAG,  "Build Version         = ${ILM_VERSION}"           }, \
+{ DEBUG_FLAG, "Build Type            = ${CMAKE_BUILD_TYPE}"      }, \
+{ DEBUG_FLAG, "Compiler Flags        = ${CMAKE_CXX_FLAGS}"       }, \
+{ DEBUG_FLAG, "Install Prefix        = ${CMAKE_INSTALL_PREFIX}"  }, \
+{ DEBUG_FLAG, "WITH_CLIENTEXAMPLES   = ${WITH_CLIENTEXAMPLES}"   }, \
+{ DEBUG_FLAG, "WITH_CLIENT_LIB       = ${WITH_CLIENT_LIB}"       }, \
+{ DEBUG_FLAG, "WITH_COMMUNICATOR_GEN = ${WITH_COMMUNICATOR_GEN}" }, \
+{ DEBUG_FLAG, "WITH_DESKTOP          = ${WITH_DESKTOP}"          }, \
+{ DEBUG_FLAG, "WITH_DLT              = ${WITH_DLT}"              }, \
+{ DEBUG_FLAG, "WITH_EGL_EXAMPLE      = ${WITH_EGL_EXAMPLE}"      }, \
+{ DEBUG_FLAG, "WITH_FORCE_COPY       = ${WITH_FORCE_COPY}"       }, \
+{ DEBUG_FLAG, "WITH_GLX_EXAMPLE      = ${WITH_GLX_EXAMPLE}"      }, \
+{ DEBUG_FLAG, "WITH_IPC_MODULE_DBUS  = ${WITH_IPC_MODULE_DBUS}"  }, \
+{ DEBUG_FLAG, "WITH_IPC_MODULE_TCP   = ${WITH_IPC_MODULE_TCP}"   }, \
+{ DEBUG_FLAG, "WITH_SERVICE_BIN      = ${WITH_SERVICE_BIN}"      }, \
+{ DEBUG_FLAG, "WITH_TESTS            = ${WITH_TESTS}"            }, \
+{ DEBUG_FLAG, "WITH_WAYLAND_DRM      = ${WITH_WAYLAND_DRM}"      }, \
+{ DEBUG_FLAG, "WITH_WAYLAND_FBDEV    = ${WITH_WAYLAND_FBDEV}"    }, \
+{ DEBUG_FLAG, "WITH_WAYLAND_X11      = ${WITH_WAYLAND_X11}"      }, \
+{ DEBUG_FLAG, "WITH_WL_EXAMPLE       = ${WITH_WL_EXAMPLE}"       }, \
+{ DEBUG_FLAG, "WITH_X11_GLES         = ${WITH_X11_GLES}"         }, \
+{ DEBUG_FLAG, "WITH_XTHREADS         = ${WITH_XTHREADS}"         }
 
 #endif // __CONFIG_H__

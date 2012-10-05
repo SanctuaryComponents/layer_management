@@ -59,22 +59,26 @@ endif (WITH_DLT)
 
 include_directories(${INCLUDE_DIRS})
 
-install(FILES
-            include/Log.h
-            include/LogMessageBuffer.h
-            include/IlmMatrix.h
-            include/Bitmap.h
-        DESTINATION
-            include/layermanager
-)
+if (INSTALL_UTILS_LIB)
+        install(FILES
+                    include/Log.h
+                    include/LogMessageBuffer.h
+                    include/IlmMatrix.h
+                    include/Bitmap.h
+                DESTINATION
+                    include/layermanager
+        )
 
-install(TARGETS
-            ${PROJECT_NAME}
-        DESTINATION
-            lib/layermanager/static
-)
+        install(TARGETS
+                    ${PROJECT_NAME}
+                DESTINATION
+                    lib/layermanager/static
+        )
+endif (INSTALL_UTILS_LIB)
 
 if (WITH_TESTS)
+
+    set (CMAKE_CXX_FLAGS "")
 
     add_executable(${PROJECT_NAME}_Test
         tests/BitmapTest.cpp

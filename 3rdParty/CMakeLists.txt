@@ -19,6 +19,8 @@
 
 if (WITH_TESTS)
 
+set (CMAKE_CXX_FLAGS "")
+
 include_directories (".")
 add_library(gtest gtest/gtest-all.cc gtest/gtest_main.cc)
 add_library(gmock gmock/gmock-gtest-all.cc gmock/gmock_main.cc)

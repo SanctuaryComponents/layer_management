@@ -55,7 +55,7 @@ install (FILES ${LM_INCLUDES} DESTINATION include/layermanager)
 
 if (WITH_TESTS)
 enable_testing()
-
+set (CMAKE_CXX_FLAGS "")
 add_executable(LayerManagerService_Test
     tests/SceneTest.cpp
     tests/LayermanagerTest.cpp
