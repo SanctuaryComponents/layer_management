@@ -581,6 +581,7 @@ int main(int argc, char **argv)
     signal(SIGSEGV, SIG_DFL);
     signal(SIGTERM, SIG_DFL);
     signal(SIGINT, SIG_DFL);
+    signal(SIGABRT, SIG_DFL);
 
     LOG_INFO("LayerManagerService", "Shutdown complete.")    
     Log::closeInstance();
