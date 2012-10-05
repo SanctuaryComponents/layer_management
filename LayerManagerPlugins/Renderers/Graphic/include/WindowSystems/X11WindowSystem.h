@@ -137,12 +137,13 @@ private:
 
 inline void X11WindowSystem::setSystemState (X11WindowSystemStates state)
 {
-        m_systemState = state;
-};
+    m_systemState = state;
+}
+
 inline X11WindowSystemStates X11WindowSystem::getSystemState () 
 {
     return m_systemState;
-};
+}
 
 inline Display* X11WindowSystem::getNativeDisplayHandle()
 {
