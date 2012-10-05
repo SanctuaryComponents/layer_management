@@ -2,6 +2,7 @@
 # 
 # Copyright 2010-2012 BMW Car IT GmbH 
 # Copyright (C) 2012 DENSO CORPORATION and Robert Bosch Car Multimedia Gmbh
+# Copyright (c) 2012, NVIDIA CORPORATION.  All rights reserved.
 # 
 # 
 # Licensed under the Apache License, Version 2.0 (the "License"); 
@@ -52,7 +53,19 @@ add_dependencies(X11GLESRenderer LayerManagerUtils)
 add_dependencies(X11GLESRenderer LayerManagerGraphicGLESv2)
 
 install (TARGETS X11GLESRenderer DESTINATION lib/layermanager/renderer)
+install (FILES renderer_frag_clear.glslf DESTINATION lib/layermanager/renderer)
 install (FILES renderer_frag.glslf DESTINATION lib/layermanager/renderer)
+install (FILES renderer_frag_no_blend.glslf DESTINATION lib/layermanager/renderer)
 install (FILES renderer_frag_no_ualpha.glslf DESTINATION lib/layermanager/renderer)
 install (FILES renderer_frag_add_uchromakey.glslf DESTINATION lib/layermanager/renderer)
+install (FILES renderer_frag_no_blend_no_ualpha.glslf DESTINATION lib/layermanager/renderer)
+install (FILES renderer_frag_2surf.glslf DESTINATION lib/layermanager/renderer)
+install (FILES renderer_frag_2surf_no_blend.glslf DESTINATION lib/layermanager/renderer)
+install (FILES renderer_frag_2surf_no_ualpha.glslf DESTINATION lib/layermanager/renderer)
+install (FILES renderer_frag_2surf_no_blend_no_ualpha.glslf DESTINATION lib/layermanager/renderer)
+install (FILES renderer_frag_2surf_no_ualpha_0.glslf DESTINATION lib/layermanager/renderer)
+install (FILES renderer_frag_2surf_no_blend_no_ualpha_0.glslf DESTINATION lib/layermanager/renderer)
+install (FILES renderer_frag_2surf_no_ualpha_1.glslf DESTINATION lib/layermanager/renderer)
+install (FILES renderer_frag_2surf_no_blend_no_ualpha_1.glslf DESTINATION lib/layermanager/renderer)
 install (FILES renderer_vert.glslv DESTINATION lib/layermanager/renderer)
+install (FILES renderer_vert_2surf.glslv DESTINATION lib/layermanager/renderer)

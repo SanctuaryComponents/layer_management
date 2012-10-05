@@ -1,11 +1,8 @@
 /***************************************************************************
  *
  * Copyright 2010,2011 BMW Car IT GmbH
-<<<<<<< HEAD
  * Copyright (C) 2012 DENSO CORPORATION and Robert Bosch Car Multimedia Gmbh
-=======
  * Copyright (c) 2012, NVIDIA CORPORATION.  All rights reserved.
->>>>>>> Renderers: new GLES shader selection mechanism
  *
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,6 +28,8 @@
 #include "ViewportTransform.h"
 #include "config.h"
 #include <string>
+#include <set>
+#include <algorithm>
 
 static const float vertices[8 * 12] =
 { 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0,
@@ -66,9 +65,20 @@ GLESGraphicsystem::GLESGraphicsystem(int windowWidth, int windowHeight, PfnShade
 , m_displayWidth(0)
 , m_displayHeight(0)
 , m_blendingStatus(false)
+, m_defaultShaderClear(0)
 , m_defaultShader(0)
+, m_defaultShaderNoBlend(0)
 , m_defaultShaderNoUniformAlpha(0)
 , m_defaultShaderAddUniformChromaKey(0)
+, m_defaultShaderNoUniformAlphaNoBlend(0)
+, m_defaultShader2surf(0)
+, m_defaultShader2surfNoBlend(0)
+, m_defaultShader2surfNoUniformAlpha(0)
+, m_defaultShader2surfNoUniformAlphaNoBlend(0)
+, m_defaultShader2surfNoUniformAlpha0(0)
+, m_defaultShader2surfNoUniformAlpha0NoBlend(0)
+, m_defaultShader2surfNoUniformAlpha1(0)
+, m_defaultShader2surfNoUniformAlpha1NoBlend(0)
 , m_currentLayer(0)
 , m_texId(0)
 {
@@ -385,24 +395,219 @@ bool GLESGraphicsystem::getOptimizationMode(OptimizationType id, OptimizationMod
     return true;
 }
 
-void GLESGraphicsystem::renderSWLayers(LayerList layers, bool clear)
+// Decide if multitexture rendering is a supported possibility, but not necessarily if
+// it should be used.  That is determined in useMultitexture().
+bool GLESGraphicsystem::canMultitexture(LayerList layers)
 {
-    // This is a stub.
-    //
-    // TODO: render in a more optimal way
-    //   1. Turn off blending for first surface rendered
-    //   2. Don't clear when it's legal to avoid it
-    //         eg. a fullscreen opaque surface exists
-    //   3. Render multiple surfaces at time via multi-texturing
-    //   4. Remove fully obscured layers/surfaces
-    if (clear)
-    {
-        clearBackground();
-    }
-
+    // TODO, cache this result until there is a scene change
     for (LayerListConstIterator layer = layers.begin(); layer != layers.end(); layer++)
     {
-        renderSWLayer(*layer, false); // Don't clear
+        // No layer rotation support currently for multitexture rendering
+        if ((*layer)->getOrientation() != 0)
+        {
+            return false;
+        }
+
+        SurfaceList surfaces = (*layer)->getAllSurfaces();
+        for (SurfaceListConstIterator surface = surfaces.begin(); surface != surfaces.end(); surface++)
+        {
+            // No custom shaders allowed.  We wouldn't know what we were
+            // overriding by using multi-surface shaders.
+            Shader *shader = (*surface)->getShader();
+            if (!shader)
+            {
+                shader = (*layer)->getShader();
+            }
+
+            // TODO, other custom shaders okay too.
+            if (shader && shader != m_defaultShader)
+            {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+// Decide if the multitexturing rendering method should be used.  This does not
+// necessarily mean that multitexturing is legal to use.  That is determined in
+// canMultitexture().
+bool GLESGraphicsystem::useMultitexture()
+{
+    static int count = 0;
+    count++;
+
+    switch(m_optimizations[OPT_MULTITEXTURE])
+    {
+    case OPT_MODE_FORCE_OFF:
+        return false;
+    case OPT_MODE_FORCE_ON:
+        return true;
+    case OPT_MODE_HEURISTIC:
+        // TODO: Decide intelligently whether or not to use multitexture
+        return true;
+    case OPT_MODE_TOGGLE:
+        // Toggles optimization on and off to reveal bugs.  If flickering
+        // appears, something is broken.  Optimizations should have no impact
+        // on image appearance.  For debugging only.
+        return (count % 10) > 5;
+    default:
+        LOG_WARNING("GLESGraphicsystem", "Bad Multitexture Optimization Mode");
+        return false;
+    }
+}
+
+// Decide if the "skip clear" optimization is legal to use, but not necessarily that
+// it should be used.  That is determined in useSkipClear().
+bool GLESGraphicsystem::canSkipClear()
+{
+    // No current cases where this approach cannot be used.
+    return true;
+}
+
+// Decide if the "skip clear" optimization should be used.  This does not necessarily
+// mean that the optimization is legal to use.  In this case, it is always legal, but
+// not always wise.
+bool GLESGraphicsystem::useSkipClear(LayerList layers)
+{
+    float surfaceArea, displayArea, threshold;
+    SurfaceList surfaces;
+    static int count = 0;
+    count++;
+
+    switch(m_optimizations[OPT_SKIP_CLEAR])
+    {
+    case OPT_MODE_FORCE_OFF:
+        return false;
+    case OPT_MODE_FORCE_ON:
+        return true;
+    case OPT_MODE_HEURISTIC:
+        // Sample heuristic.  When large amounts of background are visible, it
+        // may be better to disable this optimization and simply use a regular
+        // glClear() call.  If very little, or no background is visible,
+        // we can skip glClear() to save time.
+        displayArea = m_displayWidth * m_displayHeight;
+        surfaceArea = 0;
+        threshold = .75; // 75% (Needs to be refined by experimentation)
+        for(LayerListConstIterator layer = layers.begin(); layer != layers.end(); layer++)
+        {
+            surfaces = (*layer)->getAllSurfaces();
+
+            if (surfaces.size() == 0) continue;
+            if (!(*layer)->visibility || (*layer)->getOpacity() <= 0.0f) continue;
+
+            for(SurfaceListConstIterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++)
+            {
+                if ((*currentS)->visibility == true && (*currentS)->getOpacity() > 0.0f)
+                {
+                    FloatRectangle surfDest = (*currentS)->getTargetDestinationRegion();
+                    surfaceArea += surfDest.width * surfDest.height;
+                }
+            }
+            break;
+        }
+        return (surfaceArea > threshold * displayArea);
+    case OPT_MODE_TOGGLE:
+        // Toggles optimization on and off to reveal bugs.  If flickering
+        // appears, something is broken.  Optimizations should have no impact
+        // on image appearance.  For debugging only.
+        return (count % 20) > 10;
+    default:
+        LOG_WARNING("GLESGraphicsystem", "Bad SkipClear Optimization Mode");
+        return false;
+    }
+}
+
+static void incrementDrawCounters(LayerList layers)
+{
+    for(LayerListConstIterator layer = layers.begin(); layer != layers.end(); layer++)
+    {
+        SurfaceList surfaces = (*layer)->getAllSurfaces();
+
+        if (surfaces.size() == 0) continue;
+        if (!(*layer)->visibility || (*layer)->getOpacity() <= 0.0f) continue;
+
+        for(SurfaceListConstIterator surface = surfaces.begin(); surface != surfaces.end(); surface++)
+        {
+            if ((*surface)->visibility == true && (*surface)->getOpacity() > 0.0f)
+            {
+                (*surface)->frameCounter++;
+                (*surface)->drawCounter++;
+            }
+        }
+    }
+};
+
+// Composite the surfaces from all layers in the provided list.
+// A traditional single-texture approach or a potentially faster multi-texture
+// method may be used.
+// 'clear' means that the framebuffer is dirty and needs to be initialized
+// to known values.  Normally achieved through a glClear, it can also be satisfied
+// by ensuring that each pixel receives at least one unblended draw.
+void GLESGraphicsystem::renderSWLayers(LayerList layers, bool clear)
+{
+    bool multitexture = useMultitexture() && canMultitexture(layers);
+    bool optimizeClear = useSkipClear(layers) && canSkipClear();
+    bool countersIncremented = false;
+
+    if (layers.size() == 0)
+    {
+        if (clear)
+        {
+            clearBackground();
+        }
+        return;
+    }
+
+    if (clear && !optimizeClear)
+    {
+        clearBackground();
+        clear = false;
+    }
+
+    if (multitexture)
+    {
+        // TODO, compute regions only when scene changes happen, not inside render loop
+        std::list<MultiSurfaceRegion*> regions = computeRegions(layers, clear);
+
+        bool blend = !clear;
+
+        for (std::list<MultiSurfaceRegion*>::const_iterator region = regions.begin(); region != regions.end(); region++)
+        {
+            renderRegion(*region, blend);
+        }
+    }
+    else
+    {
+        for (LayerListConstIterator layer = layers.begin(); layer != layers.end(); layer++)
+        {
+            if ((*layer)->getAllSurfaces().size() == 0) continue;
+            if (!(*layer)->visibility || (*layer)->getOpacity() <= 0.0f) continue;
+
+            if (clear && optimizeClear)
+            {
+                // Re-use the computeRegions code to fill out background areas not covered by
+                // the first layer of surfaces (in case its not a single fullscreen surface).
+                // Then perform an unblended draw for the whole first layer to "skip clear".
+                LayerList singleLayer;
+                singleLayer.push_back(*layer);
+                std::list<MultiSurfaceRegion*> regions = computeRegions(singleLayer, true); //do clear
+                for (std::list<MultiSurfaceRegion*>::const_iterator region = regions.begin(); region != regions.end(); region++)
+                {
+                    renderRegion(*region, false); //don't blend
+                }
+            } else {
+                renderSWLayer(*layer, clear);
+                countersIncremented = true;
+            }
+            clear = false;
+        }
+    }
+
+    // Increment counters now if the multitexture option was used.
+    if (!countersIncremented)
+    {
+        incrementDrawCounters(layers);
     }
 }
 
@@ -416,7 +621,7 @@ Shader *GLESGraphicsystem::pickOptimizedShader(SurfaceList surfaces, bool needsB
 {
     int numSurfaces = surfaces.size();
 
-    if (numSurfaces > SHADERKEY_MAX_SURFACES)
+    if (numSurfaces > MAX_MULTI_SURFACE || numSurfaces > SHADERKEY_MAX_SURFACES)
     {
         return NULL;
     }
@@ -454,8 +659,12 @@ Shader *GLESGraphicsystem::pickOptimizedShader(SurfaceList surfaces, bool needsB
         LOG_WARNING("GLESGraphicsystem", "Falling back to default shader");
 
         switch (numSurfaces) {
+        case 0:
+            return m_defaultShaderClear;
         case 1:
-            return m_defaultShader;
+            return needsBlend ? m_defaultShader : m_defaultShaderNoBlend;
+        case 2:
+            return needsBlend ? m_defaultShader2surf : m_defaultShader2surfNoBlend;
         default:
             return NULL;
         }
@@ -531,12 +740,12 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
     uniforms.y = 1.0f - (targetSurfaceDestination.y + targetSurfaceDestination.height) / m_displayHeight;;
     uniforms.width = targetSurfaceDestination.width / m_displayWidth;
     uniforms.height = targetSurfaceDestination.height / m_displayHeight;
-    uniforms.opacity = (surface)->getOpacity() * m_currentLayer->getOpacity();
-    uniforms.texRange[0] = (textureCoordinates[2]-textureCoordinates[0]);
-    uniforms.texRange[1] = (textureCoordinates[3]-textureCoordinates[1]);
-    uniforms.texOffset[0] = textureCoordinates[0];
-    uniforms.texOffset[1] = textureCoordinates[1];
-    uniforms.texUnit = 0;
+    uniforms.opacity[0] = (surface)->getOpacity() * m_currentLayer->getOpacity();
+    uniforms.texRange[0][0] = (textureCoordinates[2]-textureCoordinates[0]);
+    uniforms.texRange[0][1] = (textureCoordinates[3]-textureCoordinates[1]);
+    uniforms.texOffset[0][0] = textureCoordinates[0];
+    uniforms.texOffset[0][1] = textureCoordinates[1];
+    uniforms.texUnit[0] = 0;
     uniforms.matrix = &layerMatrix.f[0];
     uniforms.chromaKeyEnabled = (surface)->getChromaKeyEnabled();
     if (true == uniforms.chromaKeyEnabled)
@@ -551,7 +760,7 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
     }
 
     //We only know about specific Shaders, only do this if we start with the defaultShader
-    if (shader == m_defaultShader && uniforms.opacity == 1.0f)
+    if (shader == m_defaultShader && uniforms.opacity[0] == 1.0f)
     {
         if(!PixelFormatHasAlpha((surface)->getPixelFormat()))
         {
@@ -575,18 +784,19 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
         sl.push_back(surface);
         bool needblend = shader != m_defaultShader ||
                          PixelFormatHasAlpha((surface)->getPixelFormat()) ||
-                         uniforms.opacity < 1.0f;
+                         uniforms.opacity[0] < 1.0f;
         shader = pickOptimizedShader(sl, needblend);
     }
 
     shader->use();
 
     /* load common uniforms */
-    shader->loadCommonUniforms(uniforms);
+    shader->loadCommonUniforms(uniforms, 1);
 
     /* update all custom defined uniforms */
     shader->loadUniforms();
     /* Bind texture and set section */
+    glActiveTexture(GL_TEXTURE0);
     if (false == m_binder->bindSurfaceTexture(surface))
     {
         LOG_WARNING("GLESGraphicsystem", "Surface not successfully bind " << surface->getID());
@@ -601,6 +811,15 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
     index = orientation * 12;
     surface->frameCounter++;
     surface->drawCounter++;
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*) (sizeof(float) * 12));
+    glEnableVertexAttribArray(1);
+
+    /* Enable only the needed vertex attributes */
+    for (int i = 2; i <= MAX_MULTI_SURFACE; i++)
+    {
+        glDisableVertexAttribArray(i);
+    }
+
     glDrawArrays(GL_TRIANGLES, index, 6);
 
     m_binder->unbindSurfaceTexture(surface);
@@ -611,16 +830,493 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
     };
 }
 
+// For a given area of the screen, render the appropriate part of all the
+// surfaces listed in the provided SurfaceList.
+//     returns true if rendering succeeds
+//     returns false if rendering was aborted.  e.g. no shader was available
+bool GLESGraphicsystem::renderSurfaces(SurfaceList surfaces, FloatRectangle targetDestination, bool blend)
+{
+    GLenum glErrorCode = GL_NO_ERROR;
+
+    IlmMatrix identityMatrix;
+    IlmMatrixIdentity(identityMatrix);
+
+    ShaderProgram::CommonUniforms uniforms;
+
+    if (surfaces.size() > MAX_MULTI_SURFACE)
+    {
+        return false;
+    }
+
+    // update all common uniforms, scale values to display size
+    // offsets are generated w.r.t lower left corner (following GL conventions)
+    uniforms.x = targetDestination.x / m_displayWidth;
+    uniforms.y = 1.0f - (targetDestination.y + targetDestination.height) / m_displayHeight;;
+    uniforms.width = targetDestination.width / m_displayWidth;
+    uniforms.height = targetDestination.height / m_displayHeight;
+    uniforms.matrix = &identityMatrix.f[0];
+
+    // update per-texture uniforms
+    int surfacenum = 0;
+    for (SurfaceListConstIterator surface = surfaces.begin(); surface != surfaces.end(); surface++, surfacenum++)
+    {
+        int layerId = (*surface)->getContainingLayerId();
+        Layer* layer = m_baseWindowSystem->m_pScene->getLayer(layerId);
+
+        FloatRectangle targetSurfaceSource = (*surface)->getTargetSourceRegion();
+        FloatRectangle targetSurfaceDestination = (*surface)->getTargetDestinationRegion();
+
+        FloatRectangle targetRegionSurfaceSource;  // Further restricted to only targetDestination
+        float fracx = (targetDestination.x - targetSurfaceDestination.x) / targetSurfaceDestination.width;
+        float fracy = (targetDestination.y - targetSurfaceDestination.y) / targetSurfaceDestination.height;
+        float widthRatio = targetDestination.width / targetSurfaceDestination.width;
+        float heightRatio = targetDestination.height / targetSurfaceDestination.height;
+        targetRegionSurfaceSource.x = targetSurfaceSource.x + (targetSurfaceSource.width * fracx);
+        targetRegionSurfaceSource.y = targetSurfaceSource.y + (targetSurfaceSource.height * fracy);
+        targetRegionSurfaceSource.width = targetSurfaceSource.width * widthRatio;
+        targetRegionSurfaceSource.height = targetSurfaceSource.height * heightRatio;
+
+        // Convert cropped surface source rectangle to texture coordinates
+        float textureCoordinates[4];
+        ViewportTransform::transformRectangleToTextureCoordinates(
+            targetRegionSurfaceSource,
+            (*surface)->OriginalSourceWidth,
+            (*surface)->OriginalSourceHeight,
+            textureCoordinates);
+
+        uniforms.opacity[surfacenum] = (*surface)->getOpacity() * layer->getOpacity();
+
+        int effectiveOrientation = ((*surface)->getOrientation() + layer->getOrientation()) % 4;
+
+        switch (effectiveOrientation)
+        {
+        case 0:
+            uniforms.texRange[surfacenum][0] = (textureCoordinates[2]-textureCoordinates[0]);
+            uniforms.texRange[surfacenum][1] = (textureCoordinates[3]-textureCoordinates[1]);
+            uniforms.texOffset[surfacenum][0] = textureCoordinates[0];
+            uniforms.texOffset[surfacenum][1] = textureCoordinates[1];
+            break;
+        case 1:
+            uniforms.texRange[surfacenum][0] = (textureCoordinates[3]-textureCoordinates[1]);
+            uniforms.texRange[surfacenum][1] = (textureCoordinates[2]-textureCoordinates[0]);
+            uniforms.texOffset[surfacenum][0] = textureCoordinates[1];
+            uniforms.texOffset[surfacenum][1] = 1 - textureCoordinates[2];
+            break;
+        case 2:
+            uniforms.texRange[surfacenum][0] = (textureCoordinates[2]-textureCoordinates[0]);
+            uniforms.texRange[surfacenum][1] = (textureCoordinates[3]-textureCoordinates[1]);
+            uniforms.texOffset[surfacenum][0] = 1 - textureCoordinates[2];
+            uniforms.texOffset[surfacenum][1] = 1 - textureCoordinates[3];
+            break;
+        case 3:
+            uniforms.texRange[surfacenum][0] = (textureCoordinates[3]-textureCoordinates[1]);
+            uniforms.texRange[surfacenum][1] = (textureCoordinates[2]-textureCoordinates[0]);
+            uniforms.texOffset[surfacenum][0] = 1 - textureCoordinates[3];
+            uniforms.texOffset[surfacenum][1] = textureCoordinates[0];
+            break;
+        }
+
+        uniforms.texUnit[surfacenum] = surfacenum;
+    }
+
+    if (blend && !needsBlending(surfaces))
+    {
+        // We were asked to blend, but it looks like we don't need to...
+        blend = false;
+    }
+
+    Shader *shader = pickOptimizedShader(surfaces, blend);
+
+    if (!shader)
+    {
+        LOG_WARNING("GLESGraphicsystem", "Could not find a shader to render surfaces with");
+        return false;
+    }
+
+    // Set GL blend state (ignored for binary shaders)
+    if (blend)
+    {
+        glEnable (GL_BLEND);
+    }
+    else
+    {
+        glDisable (GL_BLEND);
+    }
+
+    shader->use();
+
+    /* load common uniforms */
+    shader->loadCommonUniforms(uniforms, surfaces.size());
+
+    /* update all custom defined uniforms */
+    shader->loadUniforms();
+
+    /* Bind all textures */
+    surfacenum = 0;
+    for (SurfaceListConstIterator surface = surfaces.begin(); surface != surfaces.end(); surface++, surfacenum++)
+    {
+        glActiveTexture(GL_TEXTURE0 + uniforms.texUnit[surfacenum]);
+        if (false == m_binder->bindSurfaceTexture(*surface))
+        {
+            LOG_WARNING("GLESGraphicsystem", "Surface not successfully bound " << (*surface)->getID());
+            return false;
+        }
+
+        /* Rotate texture vertex attribs, per-surface */
+        int layerId = (*surface)->getContainingLayerId();
+        Layer* layer = m_baseWindowSystem->m_pScene->getLayer(layerId);
+        int effectiveOrientation = ((*surface)->getOrientation() + layer->getOrientation()) % 4;
+
+        glVertexAttribPointer(surfacenum + 1, 2, GL_FLOAT, GL_FALSE, 0, (void*) ((1+(2*effectiveOrientation)) * sizeof(float) * 12));
+    }
+
+    /* Enable only the needed vertex attributes */
+    for (int i = 1; i <= MAX_MULTI_SURFACE; i++)
+    {
+        if (i <= surfaces.size())
+        {
+            glEnableVertexAttribArray(i);
+        }
+        else
+        {
+            glDisableVertexAttribArray(i);
+        }
+    }
+
+    /* Draw two triangles */
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+
+    /* UnBind all textures */
+    for (SurfaceListConstIterator surface = surfaces.begin(); surface != surfaces.end(); surface++)
+    {
+        if (false == m_binder->unbindSurfaceTexture(*surface))
+        {
+            LOG_WARNING("GLESGraphicsystem", "Surface not successfully un-bound " << (*surface)->getID());
+            return false;
+        }
+    }
+
+    glErrorCode = glGetError();
+    if ( GL_NO_ERROR != glErrorCode )
+    {
+        LOG_ERROR("GLESGraphicsystem", "GL Error occured :" << glErrorCode );
+        return false;
+    };
+
+    return true;
+}
+
+void GLESGraphicsystem::renderRegion(MultiSurfaceRegion* region, bool blend)
+{
+    // Render all surfaces in this region, performing as many rendering
+    // passes as necessary, each with up to MAX_MULTI_SURFACE surfaces.
+    SurfaceList surfaceBatch;
+    for(SurfaceListConstIterator currentS = region->m_surfaces.begin(); currentS != region->m_surfaces.end(); currentS++)
+    {
+        surfaceBatch.push_back(*currentS);
+
+        // Render when batch size reaches maximum, then start a new batch
+        if (surfaceBatch.size() == MAX_MULTI_SURFACE)
+        {
+            if (!renderSurfaces(surfaceBatch, region->m_rect, blend))
+            {
+                LOG_DEBUG("GLESGraphicsystem", "Failed to render region (multi-pass/multi-texture)");
+                return;
+            }
+            surfaceBatch.clear();
+            blend = true; // Do blend for subsequent batches
+        }
+    }
+
+    // Finish remaining work, take care of clear-color regions now also
+    if (!blend || surfaceBatch.size() > 0)
+    {
+        if (!renderSurfaces(surfaceBatch, region->m_rect, blend))
+        {
+            LOG_DEBUG("GLESGraphicsystem", "Failed to render region (multi-pass/multi-texture)");
+            return;
+        }
+    }
+}
+
+struct OrderedSurface {
+    Surface *surface;
+    int depth;
+    OrderedSurface(Surface *s, int d):surface(s),depth(d) {}
+    bool operator<(OrderedSurface rhs) const { return depth < rhs.depth; }
+    bool operator==(OrderedSurface rhs) const { return surface == rhs.surface; }
+};
+
+struct RegionLimit {
+    float value; // Location on either X or Y axis
+    bool entry;  // 1=in, 0=out
+    OrderedSurface orderedSurface;
+    RegionLimit(float v, bool e, OrderedSurface s):value(v),entry(e),orderedSurface(s) {}
+    bool operator<(RegionLimit rhs) const { return value < rhs.value; }
+};
+
+// Creates a list of non-overlapping screen-space regions, each with a list of
+// surfaces that reside in that area of the screen.  If 'clear' is true, the
+// list of screen regions are guaranteed to collectively cover the entire
+// screen space (empty surface lists are used to indicate regions with only
+// background color visible).  When 'clear' is false, the set of regions will
+// only cover screen space occupied by these layers' surfaces.
+std::list<MultiSurfaceRegion*> GLESGraphicsystem::computeRegions(std::list<Layer*> layers, bool clear)
+{
+    /*
+     * Example: on a 10x6 screen, with two surfaces A,B
+     *
+     * Surface A = (1,0)-(9,3)
+     * Surface B = (3,2)-(9,5)
+     *
+     * Sorted edge lists (note X=9 is listed twice):
+     *     xlimits = 1 A(in), 3 B(in), 9 A(out), 9 B(out)
+     *     ylimits = 0 A(in), 2 B(in), 3 A(out), 5 B(out)
+     *
+     *  X     1     3                 9
+     * Y
+     * 0     _ ________________________ _
+     *     |  |                       |  |
+     *     |  |           A           |  |
+     *     |  |                       |  |
+     * 2   | _|_ _ _ _________________|_ |
+     *     |  |  A  |       A+B       |  |
+     * 3   | _|_____|_________________|_ |
+     *     |        |                 |  |
+     *     |        |        B        |  |
+     *     |        |                 |  |
+     * 5   | _ _ _ _|_________________|_ |
+     *     |                             |
+     *     | _ _ _ _ _ _ _ _ _ _ _ _ _ _ |
+     *
+     * Without clear, the process will create 4 regions. 3 single surface regions
+     * and one dual-surface region.
+     *
+     * With clear, the edges of the screen are also added into xlimits and ylimits,
+     * so 11 regions are created. 3 single-surface, 1-dual-surface, and 7 no-surface.
+     */
+    std::list<MultiSurfaceRegion*> regions;
+    std::vector<RegionLimit> xlimits;
+    std::vector<RegionLimit> ylimits;
+ 
+    // If clear is needed enable a dummy surface so that additional zero-surface
+    // regions will be created around the edges to fill screen (when necessary)
+    if (clear)
+    {
+        xlimits.push_back(RegionLimit(0,               true,  OrderedSurface(NULL, 0)));
+        xlimits.push_back(RegionLimit(m_displayWidth,  false, OrderedSurface(NULL, 0)));
+        ylimits.push_back(RegionLimit(0,               true,  OrderedSurface(NULL, 0)));
+        ylimits.push_back(RegionLimit(m_displayHeight, false, OrderedSurface(NULL, 0)));
+    }
+
+    // Add the edges of the visible surfaces into xlimits and ylimits.  Each edge is flagged
+    // as either an "IN" (left or top edge), or an "OUT" (right or bottom edge).  Layer depth is
+    // also stored in the edge information.
+    LayerListConstIterator layer;
+    int depth = 0;
+    for(layer = layers.begin(); layer != layers.end(); layer++)
+    {
+        if ((*layer)->visibility == false || (*layer)->getOpacity() <= 0.0f)
+        {
+            continue;
+        }
+
+        SurfaceList surfaces = (*layer)->getAllSurfaces();
+        SurfaceListConstIterator surface;
+        for(surface = surfaces.begin(); surface != surfaces.end(); surface++)
+        {
+            if (!(*surface)->hasNativeContent())
+            {
+                continue;
+            }
+
+            if ((*surface)->visibility == false || (*surface)->getOpacity() <= 0.0f)
+            {
+                continue;
+            }
+
+            depth++;
+
+            FloatRectangle rect = (*surface)->getTargetDestinationRegion();
+
+            xlimits.push_back(RegionLimit(rect.x,               true,  OrderedSurface((*surface), depth)));
+            xlimits.push_back(RegionLimit(rect.x + rect.width,  false, OrderedSurface((*surface), depth)));
+            ylimits.push_back(RegionLimit(rect.y,               true,  OrderedSurface((*surface), depth)));
+            ylimits.push_back(RegionLimit(rect.y + rect.height, false, OrderedSurface((*surface), depth)));
+        }
+    }
+
+    // Early exit if there were no visible surfaces
+    if (xlimits.size() < 2 || ylimits.size() < 2)
+    {
+        return regions; //empty
+    }
+
+    // Sort the surface edges prior to traversal
+    std::sort(xlimits.begin(), xlimits.end());
+    std::sort(ylimits.begin(), ylimits.end());
+
+    /* Create the regions by stepping through rows and columns, keeping
+     * track of which surfaces are present using IN/OUT edge information.
+     *
+     * Foreach ylimit {
+     *     If the ylimit defines a new row {
+     *         Foreach xlimit {
+     *             If the xlimit defines a new column {
+     *                 If xlimit is for a surface not in "rowsurfaces", ignore it
+     *                 Create new region containing "regionsurfaces"
+     *                 Add the surface to the current "regionsurfaces" list if "IN"
+     *                 Remove from the current "regionsurfaces" list if "OUT"
+     *             }
+     *         }
+     *     }
+     *
+     *     Add the surface to the current "rowsurfaces" list if "IN"
+     *     Remove from the current "rowsurfaces" list if "OUT"
+     * }
+     *
+     * Care must be taken with duplicate xlimit or ylimit edges. Like in the
+     * example, both A and B are OUT at X=9, so there are two xlimit values
+     * with X=9.
+     */
+
+    // The set of surfaces which are present somewhere in the current row
+    std::set<Surface*> rowsurfaces;
+
+    int x1 = -1; // Left of current region
+    int x2 = -1; // Right of current region
+    int y1 = -1; // Top of current row/region
+    int y2 = -1; // Bottom of current row/region
+
+    // The first row on the screen starts at the very top
+    y1 = ylimits[0].value;
+    for (unsigned y = 0; y < ylimits.size(); y++)
+    {
+        // The current row is between y1 and y2
+        y2 = ylimits[y].value;
+
+        // When y1 and y2 are the same, this isn't a new row yet.  Do update
+        // "rowsurfaces", but don't yet step across the row.
+        if (y2 != y1)
+        {
+            // Process the new row.  The list of regionsurfaces starts empty
+            std::list<OrderedSurface> regionsurfaces;
+
+            // 1st region in the row starts at the far left
+            x1 = xlimits[0].value;
+            for (unsigned x = 0; x < xlimits.size(); x++)
+            {
+                // Skip x edges that don't pertain to surfaces within the
+                // current row.  This coallesces rows into as few regions as
+                // possible. Columns are not coallesced though.
+                if (rowsurfaces.find(xlimits[x].orderedSurface.surface) == rowsurfaces.end())
+                {
+                    continue;
+                }
+                // If this x edge defines the right side of a new region,
+                // create that region.
+                x2 = xlimits[x].value;
+                if (x2 != x1)
+                {
+                    // A new region is ready to be created.  It exists between
+                    // (x1,y1)-(x2,y2) and has the surfaces which currently are
+                    // in "regionsurfaces".
+                    MultiSurfaceRegion *region = new MultiSurfaceRegion();
+                    region->m_rect = FloatRectangle(x1, y1, x2-x1, y2-y1);
+                    std::list<OrderedSurface>::iterator si;
+                    for (si = regionsurfaces.begin(); si != regionsurfaces.end(); si++)
+                    {
+                        if ((*si).surface)
+                        {
+                            region->m_surfaces.push_back((*si).surface);
+                        }
+                    }
+                    // Add the new region to the list we return.  Only create
+                    // empty regions when 'clear' was requested
+                    if (clear || regionsurfaces.size() > 0)
+                    {
+                        regions.push_back(region);
+                    }
+                    // The right side of this region becomes the left side of
+                    // the next region
+                    x1 = x2;
+                }
+
+                // Update the list of surfaces in the current region
+                if (xlimits[x].entry)
+                {
+                    // This xlimit is the left side of a surface, add it to
+                    // the list.  Keep the surfaces in this list sorted by
+                    // depth so when the region object is created, it will
+                    // be able to render with the surfaces layered properly.
+                    bool inserted = false;
+                    std::list<OrderedSurface>::iterator si;
+                    for (si = regionsurfaces.begin(); si != regionsurfaces.end(); si++)
+                    {
+                        if ((*si).depth >= xlimits[x].orderedSurface.depth)
+                        {
+                            regionsurfaces.insert(si, xlimits[x].orderedSurface);
+                            inserted = true;
+                            break;
+                        }
+                    }
+                    if (!inserted)
+                    {
+                        regionsurfaces.push_back(xlimits[x].orderedSurface);
+                    }
+                }
+                else
+                {
+                    // This xlimit is the right side of a surface, remove it
+                    // from the list
+                    regionsurfaces.remove(xlimits[x].orderedSurface);
+                }
+            }
+            // The bottom of this row becomes the top of the next row
+            y1 = y2;
+        }
+
+        // Update the list of surfaces which are present in this current row
+        if (ylimits[y].entry)
+        {
+            rowsurfaces.insert(ylimits[y].orderedSurface.surface);
+        }
+        else
+        {
+            rowsurfaces.erase(ylimits[y].orderedSurface.surface);
+        }
+    }
+
+    return regions;
+}
+
 bool GLESGraphicsystem::initOpenGLES(EGLint displayWidth, EGLint displayHeight)
 {
     LOG_DEBUG("GLESGraphicsystem", "initEGL");
     bool result = true;
     ShaderProgramFactory::setCreatorFunc(m_shaderCreatorFunc);
+    m_defaultShaderClear = Shader::createShader("default", "default_clear");
     m_defaultShader = Shader::createShader("default", "default");
+    m_defaultShaderNoBlend = Shader::createShader("default", "default_no_blend");
     m_defaultShaderNoUniformAlpha = Shader::createShader("default", "default_no_uniform_alpha");
     m_defaultShaderAddUniformChromaKey= Shader::createShader("default", "default_add_uniform_chromakey");
+    m_defaultShaderNoUniformAlphaNoBlend = Shader::createShader("default", "default_no_blend_no_uniform_alpha");
+    m_defaultShader2surf = Shader::createShader("default_2surf", "default_2surf");
+    m_defaultShader2surfNoBlend = Shader::createShader("default_2surf", "default_2surf_no_blend");
+    m_defaultShader2surfNoUniformAlpha = Shader::createShader("default_2surf", "default_2surf_no_uniform_alpha");
+    m_defaultShader2surfNoUniformAlphaNoBlend = Shader::createShader("default_2surf", "default_2surf_no_blend_no_uniform_alpha");
+    m_defaultShader2surfNoUniformAlpha0 = Shader::createShader("default_2surf", "default_2surf_no_uniform_alpha_0");
+    m_defaultShader2surfNoUniformAlpha0NoBlend = Shader::createShader("default_2surf", "default_2surf_no_blend_no_uniform_alpha_0");
+    m_defaultShader2surfNoUniformAlpha1 = Shader::createShader("default_2surf", "default_2surf_no_uniform_alpha_1");
+    m_defaultShader2surfNoUniformAlpha1NoBlend = Shader::createShader("default_2surf", "default_2surf_no_blend_no_uniform_alpha_1");
 
-    if (!m_defaultShader || !m_defaultShaderNoUniformAlpha || !m_defaultShaderAddUniformChromaKey )
+    if ((!m_defaultShaderClear) ||
+        (!m_defaultShader || !m_defaultShaderNoBlend) ||
+        (!m_defaultShaderNoUniformAlpha || !m_defaultShaderNoUniformAlphaNoBlend) ||
+        (!m_defaultShader2surf || !m_defaultShader2surfNoBlend) ||
+        (!m_defaultShader2surfNoUniformAlpha || !m_defaultShader2surfNoUniformAlphaNoBlend) ||
+        (!m_defaultShader2surfNoUniformAlpha0 || !m_defaultShader2surfNoUniformAlpha0NoBlend) ||
+        (!m_defaultShader2surfNoUniformAlpha1 || !m_defaultShader2surfNoUniformAlpha1NoBlend))
     {
         LOG_ERROR("GLESGraphicsystem", "Failed to create and link default shader program");
         delete m_defaultShader;
@@ -635,7 +1331,7 @@ bool GLESGraphicsystem::initOpenGLES(EGLint displayWidth, EGLint displayHeight)
         glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*) (sizeof(float) * 12));
-        glEnableVertexAttribArray(1);
+        glEnableVertexAttribArray(1);  // Enables only single texture initially
 
         glEnable(GL_BLEND);
         glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
@@ -655,8 +1351,21 @@ bool GLESGraphicsystem::initOpenGLES(EGLint displayWidth, EGLint displayHeight)
     //                         0      1      2      3
     //                       -----  -----  -----  -----
     //                  # B  T A C  T A C  T A C  T A C
+    m_shaders[shaderKey(0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0)] = m_defaultShaderClear;
+
     m_shaders[shaderKey(1,1, 1,1,0, 0,0,0, 0,0,0, 0,0,0)] = m_defaultShader;
+    m_shaders[shaderKey(1,0, 1,1,0, 0,0,0, 0,0,0, 0,0,0)] = m_defaultShaderNoBlend;
     m_shaders[shaderKey(1,1, 0,1,0, 0,0,0, 0,0,0, 0,0,0)] = m_defaultShaderNoUniformAlpha;
+    m_shaders[shaderKey(1,0, 0,1,0, 0,0,0, 0,0,0, 0,0,0)] = m_defaultShaderNoUniformAlphaNoBlend;
+
+    m_shaders[shaderKey(2,1, 1,1,0, 1,1,0, 0,0,0, 0,0,0)] = m_defaultShader2surf;
+    m_shaders[shaderKey(2,0, 1,1,0, 1,1,0, 0,0,0, 0,0,0)] = m_defaultShader2surfNoBlend;
+    m_shaders[shaderKey(2,1, 0,1,0, 0,1,0, 0,0,0, 0,0,0)] = m_defaultShader2surfNoUniformAlpha;
+    m_shaders[shaderKey(2,0, 0,1,0, 0,1,0, 0,0,0, 0,0,0)] = m_defaultShader2surfNoUniformAlphaNoBlend;
+    m_shaders[shaderKey(2,1, 0,1,0, 1,1,0, 0,0,0, 0,0,0)] = m_defaultShader2surfNoUniformAlpha0;
+    m_shaders[shaderKey(2,0, 0,1,0, 1,1,0, 0,0,0, 0,0,0)] = m_defaultShader2surfNoUniformAlpha0NoBlend;
+    m_shaders[shaderKey(2,1, 1,1,0, 0,1,0, 0,0,0, 0,0,0)] = m_defaultShader2surfNoUniformAlpha1;
+    m_shaders[shaderKey(2,0, 1,1,0, 0,1,0, 0,0,0, 0,0,0)] = m_defaultShader2surfNoUniformAlpha1NoBlend;
 
     return result;
 }

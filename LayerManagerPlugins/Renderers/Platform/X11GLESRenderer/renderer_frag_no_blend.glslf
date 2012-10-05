@@ -1,4 +1,4 @@
-// File: renderer_frag.glslf
+// File: renderer_frag_no_blend.glslf
 
 /***************************************************************************
 *
@@ -19,7 +19,7 @@
 * limitations under the License.
 *
 ****************************************************************************/
-#pragma profilepragma blendoperation( gl_FragColor, GL_FUNC_ADD, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_FUNC_ADD, GL_ONE, GL_ONE_MINUS_SRC_ALPHA )
+#pragma profilepragma blendoperation( gl_FragColor, GL_NO_OPERATION, GL_ZERO, GL_ZERO, GL_NO_OPERATION, GL_ZERO, GL_ZERO )
 
 // alpha value of the surfaces
 uniform mediump float uAlphaVal[1];
@@ -35,4 +35,5 @@ void main()
     gl_FragColor = texture2D(uTexUnit[0], vTexout[0]);
 
     gl_FragColor.a = gl_FragColor.a * uAlphaVal[0];
+    gl_FragColor.rgb = gl_FragColor.rgb * gl_FragColor.a;
 }

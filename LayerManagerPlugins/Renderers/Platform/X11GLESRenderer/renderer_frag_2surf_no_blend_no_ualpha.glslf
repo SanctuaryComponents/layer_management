@@ -1,4 +1,4 @@
-// File: renderer_frag.glslf
+// File: renderer_frag_2surf_no_blend_no_ualpha.glslf
 
 /***************************************************************************
 *
@@ -19,20 +19,26 @@
 * limitations under the License.
 *
 ****************************************************************************/
-#pragma profilepragma blendoperation( gl_FragColor, GL_FUNC_ADD, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_FUNC_ADD, GL_ONE, GL_ONE_MINUS_SRC_ALPHA )
+#pragma profilepragma blendoperation( gl_FragColor, GL_NO_OPERATION, GL_ZERO, GL_ZERO, GL_NO_OPERATION, GL_ZERO, GL_ZERO )
 
 // alpha value of the surfaces
-uniform mediump float uAlphaVal[1];
+uniform mediump float uAlphaVal[2];
 // textureunit which is accessed
-uniform sampler2D uTexUnit[1];
+uniform sampler2D uTexUnit[2];
 
 // texture coordinates sended by the vertex shader
-varying mediump vec2 vTexout[1];
+varying mediump vec2 vTexout[2];
 
 void main()
 {
     // correct Texture Coords;
-    gl_FragColor = texture2D(uTexUnit[0], vTexout[0]);
+    mediump vec4 color0 = texture2D(uTexUnit[0], vTexout[0]);
 
-    gl_FragColor.a = gl_FragColor.a * uAlphaVal[0];
+    color0.rgb = color0.rgb * color0.a;
+
+    gl_FragColor = texture2D(uTexUnit[1], vTexout[1]);
+
+    gl_FragColor.rgb = mix(color0.rgb, gl_FragColor.rgb, gl_FragColor.a);
+
+    gl_FragColor.a = gl_FragColor.a + color0.a - (gl_FragColor.a * color0.a);
 }

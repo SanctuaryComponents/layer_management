@@ -1,4 +1,4 @@
-// File: renderer_vert.glslv
+// File: renderer_vert_2surf.glslv
 
 /***************************************************************************
 *
@@ -23,6 +23,7 @@
 // Vertex position. Will be in range 0 to 1
 attribute highp vec2 aPosition;
 attribute highp vec2 aTexCoords;
+attribute highp vec2 aTexCoords2;
 
 uniform mediump mat4 uMatrix;
 // normalized window position
@@ -36,12 +37,12 @@ uniform mediump float uWidth;
 uniform mediump float uHeight;
 
 // texrange describes the width and height of texture area which should be rendered
-uniform mediump vec2 uTexRange[1];
+uniform mediump vec2 uTexRange[2];
 // texrange describes the x and y position of the texture area which should be rendered
-uniform mediump vec2 uTexOffset[1];
+uniform mediump vec2 uTexOffset[2];
 
 // texture coordinates
-varying mediump vec2 vTexout[1];
+varying mediump vec2 vTexout[2];
 void main()
 {
     highp vec4 position;
@@ -57,4 +58,5 @@ void main()
 
     // Invert t coordinates as textures provided by window systems are stored top-down instead of the GL convention of bottom-up
     vTexout[0] = vec2(uTexOffset[0].x + uTexRange[0].x * aTexCoords.x, uTexOffset[0].y + uTexRange[0].y * (1.0 - aTexCoords.y));
+    vTexout[1] = vec2(uTexOffset[1].x + uTexRange[1].x * aTexCoords2.x, uTexOffset[1].y + uTexRange[1].y * (1.0 - aTexCoords2.y));
 }

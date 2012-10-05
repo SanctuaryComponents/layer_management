@@ -1,6 +1,7 @@
 /***************************************************************************
 *
 * Copyright 2010,2011 BMW Car IT GmbH
+* Copyright (c) 2012, NVIDIA CORPORATION.  All rights reserved.
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -84,9 +85,9 @@ public:
      *
      * @param uniforms   Uniform values
      */
-    void loadCommonUniforms(const ShaderProgram::CommonUniforms& uniforms) const
+    void loadCommonUniforms(const ShaderProgram::CommonUniforms& uniforms, const int texCount) const
     {
-        m_program.loadCommonUniforms(uniforms);
+        m_program.loadCommonUniforms(uniforms, texCount);
     }
 
 private:

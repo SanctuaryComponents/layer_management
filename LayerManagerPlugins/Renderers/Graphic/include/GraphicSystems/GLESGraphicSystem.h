@@ -1,11 +1,8 @@
 /***************************************************************************
  *
  * Copyright 2010,2011 BMW Car IT GmbH
-<<<<<<< HEAD
  * Copyright (C) 2012 DENSO CORPORATION and Robert Bosch Car Multimedia Gmbh
-=======
  * Copyright (c) 2012, NVIDIA CORPORATION.  All rights reserved.
->>>>>>> Renderers: new GLES shader selection mechanism
  *
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,6 +29,12 @@
 #include "Shader.h"
 
 class IlmMatrix;
+
+struct MultiSurfaceRegion
+{
+    FloatRectangle m_rect;
+    SurfaceList m_surfaces;
+};
 
 class GLESGraphicsystem: public BaseGraphicSystem<EGLNativeDisplayType, EGLNativeWindowType>
 {
@@ -82,6 +85,7 @@ public:
                                int hasTransparency4, int hasAlphaChannel4, int hasChromakey4);
     virtual void debugShaderKey(unsigned key);
 protected:
+
     virtual bool setupTextureForChromaKey();
     virtual void createPbufferSurface();
     virtual void createTempTexture();
@@ -89,6 +93,15 @@ protected:
     virtual void destroyTempTexture();
 
 protected:
+    virtual std::list<MultiSurfaceRegion*> computeRegions(LayerList layers, bool clear);
+    virtual void renderRegion(MultiSurfaceRegion* region, bool blend);
+    virtual bool renderSurfaces(SurfaceList surfaces, FloatRectangle targetDestination, bool blend);
+
+    virtual bool canMultitexture(LayerList layers);
+    virtual bool useMultitexture();
+    virtual bool canSkipClear();
+    virtual bool useSkipClear(LayerList layers);
+
     int m_windowWidth;
     int m_windowHeight;
     EGLNativeDisplayType m_nativeDisplay;
@@ -103,10 +116,22 @@ protected:
     EGLint m_displayWidth;
     EGLint m_displayHeight;
     EGLBoolean m_blendingStatus;
+    Shader* m_defaultShaderClear;
     Shader* m_defaultShader;
+    Shader* m_defaultShaderNoBlend;
     Shader* m_defaultShaderNoUniformAlpha;
+
     Shader* m_defaultShaderAddUniformChromaKey;
 
+    Shader* m_defaultShaderNoUniformAlphaNoBlend;
+    Shader* m_defaultShader2surf;
+    Shader* m_defaultShader2surfNoBlend;
+    Shader* m_defaultShader2surfNoUniformAlpha;
+    Shader* m_defaultShader2surfNoUniformAlphaNoBlend;
+    Shader* m_defaultShader2surfNoUniformAlpha0;
+    Shader* m_defaultShader2surfNoUniformAlpha0NoBlend;
+    Shader* m_defaultShader2surfNoUniformAlpha1;
+    Shader* m_defaultShader2surfNoUniformAlpha1NoBlend;
     std::map<int, Shader*> m_shaders;
 
     Layer* m_currentLayer;

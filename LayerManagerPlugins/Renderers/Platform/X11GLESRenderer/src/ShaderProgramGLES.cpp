@@ -2,6 +2,7 @@
 *
 * Copyright 2010 BMW Car IT GmbH
 * Copyright (C) 2012 DENSO CORPORATION and Robert Bosch Car Multimedia Gmbh
+* Copyright (c) 2012, NVIDIA CORPORATION.  All rights reserved.
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,6 +32,7 @@ ShaderProgram* ShaderProgramGLES::createProgram(const std::string& vertName, con
     char defaultShaderDir[1024];
     char fragmentShaderLocation[1024];
     char vertexShaderLocation[1024];
+    int multitex = 1;
     
     const char* pluginLookupPath = getenv("LM_PLUGIN_PATH");
     if  (pluginLookupPath != NULL ) 
@@ -43,20 +45,53 @@ ShaderProgram* ShaderProgramGLES::createProgram(const std::string& vertName, con
     }
     strcat(defaultShaderDir,"/renderer");
 
-    if (vertName=="default" && fragName=="default")
+    if (vertName=="default")
     {
+        multitex = 1;
         strcpy(vertexShaderLocation,defaultShaderDir);
-        strcpy(fragmentShaderLocation,defaultShaderDir);
         strcat(vertexShaderLocation,"/renderer_vert.glslv");
-        strcat(fragmentShaderLocation,"/renderer_frag.glslf");
-        // load default shader from binary data
-        progHandle = RenderUtilLoadShaderSources(vertexShaderLocation,fragmentShaderLocation, GL_TRUE);
     }
-	else if (vertName=="default" && fragName=="default_no_uniform_alpha")
+    else if (vertName=="default_2surf")
     {
+        multitex = 2;
         strcpy(vertexShaderLocation,defaultShaderDir);
+        strcat(vertexShaderLocation,"/renderer_vert_2surf.glslv");
+    }
+    else if (vertName=="default_3surf")
+    {
+        multitex = 3;
+        strcpy(vertexShaderLocation,defaultShaderDir);
+        strcat(vertexShaderLocation,"/renderer_vert_3surf.glslv");
+    }
+    else if (vertName=="default_4surf")
+    {
+        multitex = 4;
+        strcpy(vertexShaderLocation,defaultShaderDir);
+        strcat(vertexShaderLocation,"/renderer_vert_4surf.glslv");
+    }
+    else
+    {
+        strcpy(vertexShaderLocation, vertName.c_str());
+    }
+
+    if (fragName=="default_clear")
+    {
         strcpy(fragmentShaderLocation,defaultShaderDir);
-        strcat(vertexShaderLocation,"/renderer_vert.glslv");
+        strcat(fragmentShaderLocation,"/renderer_frag_clear.glslf");
+    }
+    else if (fragName=="default")
+    {
+        strcpy(fragmentShaderLocation,defaultShaderDir);
+        strcat(fragmentShaderLocation,"/renderer_frag.glslf");
+    }
+    else if (fragName=="default_no_blend")
+    {
+        strcpy(fragmentShaderLocation,defaultShaderDir);
+        strcat(fragmentShaderLocation,"/renderer_frag_no_blend.glslf");
+    }
+    else if (fragName=="default_no_uniform_alpha")
+    {
+        strcpy(fragmentShaderLocation,defaultShaderDir);
         strcat(fragmentShaderLocation,"/renderer_frag_no_ualpha.glslf");
         progHandle = RenderUtilLoadShaderSources(vertexShaderLocation,fragmentShaderLocation, GL_TRUE);
     }
@@ -66,19 +101,78 @@ ShaderProgram* ShaderProgramGLES::createProgram(const std::string& vertName, con
         strcpy(fragmentShaderLocation,defaultShaderDir);
         strcat(vertexShaderLocation,"/renderer_vert.glslv");
         strcat(fragmentShaderLocation,"/renderer_frag_add_uchromakey.glslf");
-        progHandle = RenderUtilLoadShaderSources(vertexShaderLocation,fragmentShaderLocation, GL_TRUE);
     }
-	else
-	{
-		// load shader sources from file, compile and link them:
-		progHandle = RenderUtilLoadShaderSources(vertName.c_str(), fragName.c_str(), GL_TRUE);
-	}
+    else if (fragName=="default_no_blend_no_uniform_alpha")
+    {
+        strcpy(fragmentShaderLocation,defaultShaderDir);
+        strcat(fragmentShaderLocation,"/renderer_frag_no_blend_no_ualpha.glslf");
+    }
+    else if (fragName=="default_2surf")
+    {
+        strcpy(fragmentShaderLocation,defaultShaderDir);
+        strcat(fragmentShaderLocation,"/renderer_frag_2surf.glslf");
+    }
+    else if (fragName=="default_2surf_no_blend")
+    {
+        strcpy(fragmentShaderLocation,defaultShaderDir);
+        strcat(fragmentShaderLocation,"/renderer_frag_2surf_no_blend.glslf");
+    }
+    else if (fragName=="default_2surf_no_uniform_alpha")
+    {
+        strcpy(fragmentShaderLocation,defaultShaderDir);
+        strcat(fragmentShaderLocation,"/renderer_frag_2surf_no_ualpha.glslf");
+    }
+    else if (fragName=="default_2surf_no_blend_no_uniform_alpha")
+    {
+        strcpy(fragmentShaderLocation,defaultShaderDir);
+        strcat(fragmentShaderLocation,"/renderer_frag_2surf_no_blend_no_ualpha.glslf");
+    }
+    else if (fragName=="default_2surf_no_uniform_alpha_0")
+    {
+        strcpy(fragmentShaderLocation,defaultShaderDir);
+        strcat(fragmentShaderLocation,"/renderer_frag_2surf_no_ualpha_0.glslf");
+    }
+    else if (fragName=="default_2surf_no_blend_no_uniform_alpha_0")
+    {
+        strcpy(fragmentShaderLocation,defaultShaderDir);
+        strcat(fragmentShaderLocation,"/renderer_frag_2surf_no_blend_no_ualpha_0.glslf");
+    }
+    else if (fragName=="default_2surf_no_uniform_alpha_1")
+    {
+        strcpy(fragmentShaderLocation,defaultShaderDir);
+        strcat(fragmentShaderLocation,"/renderer_frag_2surf_no_ualpha_1.glslf");
+    }
+    else if (fragName=="default_2surf_no_blend_no_uniform_alpha_1")
+    {
+        strcpy(fragmentShaderLocation,defaultShaderDir);
+        strcat(fragmentShaderLocation,"/renderer_frag_2surf_no_blend_no_ualpha_1.glslf");
+    }
+    else
+    {
+        strcpy(fragmentShaderLocation, fragName.c_str());
+    }
+
+    progHandle = RenderUtilLoadShaderSources(vertexShaderLocation,fragmentShaderLocation, GL_TRUE);
 
     if (progHandle != 0)
     {
         // bind attrib locations for vertex positions and texture coordinates
         glBindAttribLocation(progHandle, 0, "aPosition");
-        glBindAttribLocation(progHandle, 1, "aTexCoords");
+
+        // each texture has its own texCoord attribute
+        for (int i = 1; i <= multitex; i++)
+        {
+            char attribName[15];
+            if (i == 1)
+            {
+                sprintf(attribName, "aTexCoords");
+            }
+            else
+            {
+                sprintf(attribName, "aTexCoords%d", i);
+            }
+            glBindAttribLocation(progHandle, i, attribName);
+        }
 
         // re-link the program as we have changed the attrib bindings
         glLinkProgram(progHandle);

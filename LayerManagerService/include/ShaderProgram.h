@@ -1,7 +1,9 @@
 /***************************************************************************
 *
 * Copyright 2010,2011 BMW Car IT GmbH
+
 * Copyright (C) 2012 DENSO CORPORATION and Robert Bosch Car Multimedia Gmbh
+* Copyright (c) 2012, NVIDIA CORPORATION.  All rights reserved.
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,6 +31,8 @@ using std::string;
 class ShaderProgram;
 typedef ShaderProgram* (*PfnShaderProgramCreator)(const string&, const string&);
 
+#define MAX_MULTI_SURFACE 2
+
 /**
  * Represents an OpenGL shader program.
  *
@@ -49,13 +53,14 @@ public:
         float y;
         float width;
         float height;
-        float opacity;
-        float texRange[2];
-        float texOffset[2];
-        int texUnit;
         float* matrix;
         float chromaKey[3];
         bool chromaKeyEnabled;
+        // Per-texture uniforms
+        float opacity[MAX_MULTI_SURFACE];
+        float texRange[MAX_MULTI_SURFACE][2];
+        float texOffset[MAX_MULTI_SURFACE][2];
+        int texUnit[MAX_MULTI_SURFACE];
     };
 
     /**
@@ -84,7 +89,7 @@ public:
      *
      * @param uniforms   Uniform values
      */
-    void loadCommonUniforms(const CommonUniforms& uniforms) const;
+    void loadCommonUniforms(const CommonUniforms& uniforms, const int texCount) const;
 
     /**
      * @return The name of the vertex shader
@@ -161,11 +166,13 @@ private:
     int m_yLoc;
     int m_widthLoc;
     int m_heightLoc;
+    int m_matrixLoc;
+
+    // per-texture uniforms
     int m_opacityLoc;
     int m_texRangeLoc;
     int m_texOffsetLoc;
     int m_texUnitLoc;
-    int m_matrixLoc;
     int m_chromaKeyLoc;
     /// global list of programs
     static ShaderProgramList m_programList;

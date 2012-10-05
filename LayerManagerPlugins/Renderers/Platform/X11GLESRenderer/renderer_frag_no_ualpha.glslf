@@ -1,6 +1,9 @@
+// File: renderer_frag_no_ualpha.glslf
+
 /***************************************************************************
 *
 * Copyright 2010,2011 BMW Car IT GmbH
+* Copyright (c) 2012, NVIDIA CORPORATION.  All rights reserved.
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,16 +19,19 @@
 * limitations under the License.
 *
 ****************************************************************************/
-// alpha value of the surfaces 
-uniform mediump float uAlphaVal;
+#pragma profilepragma blendoperation( gl_FragColor, GL_FUNC_ADD, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_FUNC_ADD, GL_ONE, GL_ONE_MINUS_SRC_ALPHA )
+
+// alpha value of the surfaces
+uniform mediump float uAlphaVal[1];
 // textureunit which is accessed
-uniform mediump sampler2D uTexUnit;
- 
+uniform sampler2D uTexUnit[1];
+
 // texture coordinates sended by the vertex shader
-varying mediump vec2 vTexout;
+varying mediump vec2 vTexout[1];
 
 void main()
-{	
-	// correct Texture Coords;
-    gl_FragColor = texture2D(uTexUnit, vTexout );
+{
+    // correct Texture Coords;
+    gl_FragColor = texture2D(uTexUnit[0], vTexout[0]);
+
 }

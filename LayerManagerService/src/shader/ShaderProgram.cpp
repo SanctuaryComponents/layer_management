@@ -2,6 +2,7 @@
  *
  * Copyright 2010,2011 BMW Car IT GmbH
  * Copyright (C) 2012 DENSO CORPORATION and Robert Bosch Car Multimedia Gmbh
+ * Copyright (c) 2012, NVIDIA CORPORATION.  All rights reserved.
  *
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -81,11 +82,11 @@ ShaderProgram::ShaderProgram(const string& vertFileName, const string& fragFileN
 , m_yLoc(0)
 , m_widthLoc(0)
 , m_heightLoc(0)
+, m_matrixLoc(0)
 , m_opacityLoc(0)
 , m_texRangeLoc(0)
 , m_texOffsetLoc(0)
 , m_texUnitLoc(0)
-, m_matrixLoc(0)
 , m_chromaKeyLoc(0)
 {
     // void
@@ -114,7 +115,7 @@ void ShaderProgram::unref(void)
     }
 }
 
-void ShaderProgram::loadCommonUniforms(const CommonUniforms& uniforms) const
+void ShaderProgram::loadCommonUniforms(const CommonUniforms& uniforms, const int texCount) const
 {
     if (m_xLoc >= 0)
     {
@@ -132,25 +133,27 @@ void ShaderProgram::loadCommonUniforms(const CommonUniforms& uniforms) const
     {
         uniform1fv(m_heightLoc, 1, &uniforms.height);
     }
-    if (m_opacityLoc >= 0)
-    {
-        uniform1fv(m_opacityLoc, 1, &uniforms.opacity);
-    }
-    if (m_texRangeLoc >= 0)
-    {
-        uniform2fv(m_texRangeLoc, 1, uniforms.texRange);
-    }
-    if (m_texOffsetLoc >= 0)
-    {
-        uniform2fv(m_texOffsetLoc, 1, uniforms.texOffset);
-    }
-    if (m_texUnitLoc >= 0)
-    {
-        uniform1iv(m_texUnitLoc, 1, &uniforms.texUnit);
-    }
     if (m_matrixLoc >= 0)
     {
         uniformMatrix4fv(m_matrixLoc, 1, false, uniforms.matrix);
+    }
+
+    // Per-texture uniforms
+    if (m_opacityLoc >= 0)
+    {
+        uniform1fv(m_opacityLoc, texCount, uniforms.opacity);
+    }
+    if (m_texRangeLoc >= 0)
+    {
+        uniform2fv(m_texRangeLoc, texCount, uniforms.texRange[0]);
+    }
+    if (m_texOffsetLoc >= 0)
+    {
+        uniform2fv(m_texOffsetLoc, texCount, uniforms.texOffset[0]);
+    }
+    if (m_texUnitLoc >= 0)
+    {
+        uniform1iv(m_texUnitLoc, texCount, uniforms.texUnit);
     }
     if (m_chromaKeyLoc>= 0)
     {
@@ -165,11 +168,11 @@ void ShaderProgram::updateCommonUniformLocations(void)
     m_yLoc = getUniformLocation("uY");
     m_widthLoc = getUniformLocation("uWidth");
     m_heightLoc = getUniformLocation("uHeight");
+    m_matrixLoc = getUniformLocation("uMatrix");
     m_opacityLoc = getUniformLocation("uAlphaVal");
     m_texRangeLoc = getUniformLocation("uTexRange");
     m_texOffsetLoc = getUniformLocation("uTexOffset");
     m_texUnitLoc = getUniformLocation("uTexUnit");
-    m_matrixLoc = getUniformLocation("uMatrix");
     m_chromaKeyLoc = getUniformLocation("uChromaKey");
 }
 
