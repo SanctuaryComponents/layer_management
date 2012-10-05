@@ -61,10 +61,10 @@ public:
     virtual bool removeLayer(Layer* layer);
     virtual bool removeSurface(Surface* surface);
     virtual void removeSurfaceNativeContent(Surface* surface);
-    virtual Layer* getLayer(const uint id) const;
-    virtual Surface* getSurface(const uint id) const;
-    virtual SurfaceGroup* getSurfaceGroup(const uint id) const;
-    virtual LayerGroup* getLayerGroup(const uint id) const;
+    virtual Layer* getLayer(const uint id);
+    virtual Surface* getSurface(const uint id);
+    virtual SurfaceGroup* getSurfaceGroup(const uint id);
+    virtual LayerGroup* getLayerGroup(const uint id);
 
     virtual void getLayerIDs(uint* length, uint** array) const;
     virtual bool getLayerIDsOfScreen(const uint screenID, uint* length, uint** array) const;

@@ -22,6 +22,7 @@
 #include <iostream>
 #include <cstring>
 #include <signal.h> // signal
+#include <unistd.h> // alarm
 
 using namespace std;
 
@@ -314,7 +315,6 @@ COMMAND("set surface <surfaceid> width <width>")
 COMMAND("set layer <layerid> height <height>")
 //=============================================================================
 {
-    unsigned int count = 0;
     unsigned int dimension[2];
     unsigned int layerid = input->getUint("layerid");
     ilm_layerGetDimension(layerid, dimension);
@@ -327,7 +327,6 @@ COMMAND("set layer <layerid> height <height>")
 COMMAND("set surface <surfaceid> height <height>")
 //=============================================================================
 {
-    unsigned int count = 0;
     unsigned int dimension[2];
     unsigned int surfaceid = input->getUint("surfaceid");
     ilm_surfaceGetDimension(surfaceid, dimension);
@@ -673,7 +672,7 @@ COMMAND("watch layer <layeridarray>")
     unsigned int layeridCount;
     input->getUintArray("layeridarray", &layerids, &layeridCount);
 
-    for (int i = 0; i < layeridCount; ++i)
+    for (unsigned int i = 0; i < layeridCount; ++i)
     {
         unsigned int layerid = layerids[i];
         cout << "Setup notification for layer " << layerid << "\n";
@@ -690,7 +689,7 @@ COMMAND("watch layer <layeridarray>")
     int block;
     cin >> block;
 
-    for (int i = 0; i < layeridCount; ++i)
+    for (unsigned int i = 0; i < layeridCount; ++i)
     {
         unsigned int layerid = layerids[i];
         cout << "Removing notification for layer " << layerid << "\n";
@@ -753,7 +752,7 @@ COMMAND("watch surface <surfaceidarray>")
     unsigned int surfaceidCount;
     input->getUintArray("surfaceidarray", &surfaceids, &surfaceidCount);
 
-    for (int i = 0; i < surfaceidCount; ++i)
+    for (unsigned int i = 0; i < surfaceidCount; ++i)
     {
         unsigned int surfaceid = surfaceids[i];
         cout << "Setup notification for surface " << surfaceid << "\n";
@@ -770,7 +769,7 @@ COMMAND("watch surface <surfaceidarray>")
     int block;
     cin >> block;
 
-    for (int i = 0; i < surfaceidCount; ++i)
+    for (unsigned int i = 0; i < surfaceidCount; ++i)
     {
         unsigned int surfaceid = surfaceids[i];
         cout << "Removing notification for surface " << surfaceid << "\n";

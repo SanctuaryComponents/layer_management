@@ -245,7 +245,7 @@ void printSurfaceProperties(unsigned int surfaceid, const char* prefix = "")
     int layerCount = 0;
     unsigned int* layerArray = NULL;
     ilm_getLayerIDs(&layerCount, &layerArray);
-    for (unsigned int layerIndex = 0; layerIndex < layerCount; ++layerIndex)
+    for (int layerIndex = 0; layerIndex < layerCount; ++layerIndex)
     {
         unsigned int layerid = layerArray[layerIndex];
         int surfaceCount = 0;

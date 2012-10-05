@@ -3,7 +3,7 @@
  * Copyright 2012 BMW Car IT GmbH
  * Copyright (C) 2012 DENSO CORPORATION and Robert Bosch Car Multimedia Gmbh
  * Copyright (C) 2012 Bayerische Motorenwerke Aktiengesellschaft
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1265,12 +1265,12 @@ ilmErrorTypes ilm_layerSetChromaKey(t_ilm_layer layerId, t_ilm_int* pColor)
         && gIpcModule.appendUint(command, layerId))
     {
         t_ilm_bool comResult = ILM_TRUE;
-       
+
         // Checking pColor has a content, otherwise chromakey is disabled
-        if (pColor) 
-        { 
+        if (pColor)
+        {
             const t_ilm_uint number = 3;
-            comResult = gIpcModule.appendUintArray(command, pColor, number);
+            comResult = gIpcModule.appendUintArray(command, (t_ilm_uint *)pColor, number);
         }
         if (comResult
             && gIpcModule.sendToService(command))
@@ -1976,18 +1976,18 @@ ilmErrorTypes ilm_surfaceGetPixelformat(t_ilm_layer surfaceId, ilmPixelFormat *p
 ilmErrorTypes ilm_surfaceSetChromaKey(t_ilm_surface surfaceId, t_ilm_int* pColor)
 {
     ilmErrorTypes returnValue = ILM_FAILED;
-               
+
     t_ilm_message command = gIpcModule.createMessage("SetSurfaceChromaKey");
     if (command
         && gIpcModule.appendUint(command, surfaceId))
     {
         t_ilm_bool comResult = ILM_TRUE;
-        
+
         // Checking pColor has a content, otherwise chromakey is disabled
-        if (pColor) 
-        { 
+        if (pColor)
+        {
             const t_ilm_uint number = 3;
-            comResult = gIpcModule.appendUintArray(command, pColor, number);
+            comResult = gIpcModule.appendUintArray(command, (t_ilm_uint *)pColor, number);
         }
         if (comResult
             && gIpcModule.sendToService(command))
@@ -2201,7 +2201,7 @@ ilmErrorTypes ilm_getScreenIDs(t_ilm_uint* pNumberOfIDs, t_ilm_uint** ppIDs)
         t_ilm_message response = waitForResponse(gResponseTimeout);
         if (response
             && gIpcModule.getMessageType(response) == IpcMessageTypeCommand
-            && gIpcModule.getUintArray(response, ppIDs, pNumberOfIDs))
+            && gIpcModule.getUintArray(response, ppIDs, (t_ilm_int *)pNumberOfIDs))
         {
             returnValue = ILM_SUCCESS;
         }

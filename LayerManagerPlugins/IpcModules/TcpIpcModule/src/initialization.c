@@ -22,6 +22,7 @@
 #include <stdlib.h>  // getenv
 #include <string.h>  // memset
 #include <signal.h>
+#include <unistd.h>
 
 
 t_ilm_bool initServiceMode()

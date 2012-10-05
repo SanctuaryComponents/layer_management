@@ -139,8 +139,8 @@ void shutdown()
 
 int main(int argc, char **argv)
 {
-    t_ilm_int LayerWidth = LAYERWIDTH;
-    t_ilm_int LayerHeight = LAYERHEIGHT;
+    t_ilm_uint LayerWidth = LAYERWIDTH;
+    t_ilm_uint LayerHeight = LAYERHEIGHT;
 
     if (ILM_SUCCESS != init())
     {
@@ -170,4 +170,5 @@ int main(int argc, char **argv)
     }
 
     shutdown();
+    return 0;
 }

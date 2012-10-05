@@ -27,8 +27,6 @@
 
 t_ilm_bool getGenericValue(struct SocketMessage* msg, void* value, const char protocolType, const char expectedSize)
 {
-    t_ilm_bool result = ILM_FALSE;
-
     // get protocol value from message
     char readType = msg->paket.data[msg->index];
     msg->index += sizeof(readType);
@@ -66,8 +64,8 @@ t_ilm_bool getGenericValue(struct SocketMessage* msg, void* value, const char pr
     // if value is string, add end of string
     if (protocolType == SOCKET_MESSAGE_TYPE_STRING)
     {
-        char* str = value;
-        str[size] = '\0';
+        char* str = (char *)value + size;
+        *str = '\0';
     }
 
     return ILM_TRUE;

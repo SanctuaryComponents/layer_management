@@ -36,7 +36,7 @@ void Expression::setVarValue(string value)
 
 bool Expression::isVar()
 {
-    return mName.at(0) == '<';
+    return mName[0] == '<';
 }
 
 string Expression::getString(string name)

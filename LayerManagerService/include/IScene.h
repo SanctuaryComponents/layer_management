@@ -100,7 +100,7 @@ public:
      * \param[in] id id of the layer
      * \return pointer to the layer with id
      */
-    virtual Layer* getLayer(const uint id) const = 0;
+    virtual Layer* getLayer(const uint id) = 0;
 
     /**
      * \brief Get a surface of the scene by id.
@@ -108,7 +108,7 @@ public:
      * \param[in] id id of the surface
      * \return pointer to the surface with id
      */
-    virtual Surface* getSurface(const uint id) const = 0;
+    virtual Surface* getSurface(const uint id) = 0;
 
     /**
      * \brief Get a surface group by id
@@ -116,7 +116,7 @@ public:
      * \param[in] id id of surface group
      * \return pointer to surface group with id
      */
-    virtual SurfaceGroup* getSurfaceGroup(const uint id) const = 0;
+    virtual SurfaceGroup* getSurfaceGroup(const uint id) = 0;
 
     /**
      * \brief Get a layer group by id
@@ -124,7 +124,7 @@ public:
      * \param[in] id id of the layer group
      * \return pointer to the layer group with id
      */
-    virtual LayerGroup* getLayerGroup(const uint id) const = 0;
+    virtual LayerGroup* getLayerGroup(const uint id) = 0;
 
     /**
      * \brief Get list of ids of all layers currently existing.

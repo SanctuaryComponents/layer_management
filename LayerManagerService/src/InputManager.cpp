@@ -217,8 +217,9 @@ Surface * InputManager::electSurfaceForPointerEvent(int& x, int& y)
     surf = NULL;
     /* Need to browse for all layers. 1st layer of m_currentRenderOrder is rendered
      * on bottom, last one is rendrered on top. So we have to reverse iterate */
+    LayerListConstReverseIterator layerEnd(ll.rend());
     for (currentLayer = ll.rbegin();
-         currentLayer != ll.rend() && surf == NULL;
+         currentLayer != layerEnd && surf == NULL;
          currentLayer++)
     {
         if ( ((*currentLayer)->visibility) && ((*currentLayer)->getOpacity() != 0) )
@@ -229,8 +230,9 @@ Surface * InputManager::electSurfaceForPointerEvent(int& x, int& y)
                 y_SurfCoordinate = y;
                 (*currentLayer)->DestToSourceCoordinates(&x_SurfCoordinate, &y_SurfCoordinate, false);
                 /* Need to browse for all surfaces */
+                SurfaceListConstReverseIterator surfEnd((*currentLayer)->getAllSurfaces().rend());
                 for (currentSurf = (*currentLayer)->getAllSurfaces().rbegin();
-                     currentSurf != (*currentLayer)->getAllSurfaces().rend() && surf == NULL;
+                     currentSurf !=  surfEnd && surf == NULL;
                      currentSurf++)
                 {
                     if ( ((*currentSurf)->hasNativeContent()) && ((*currentSurf)->visibility) && ((*currentSurf)->getOpacity() != 0) )

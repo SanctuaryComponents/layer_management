@@ -57,7 +57,7 @@ Layer* Scene::createLayer(const uint layerId)
         else
         {
             LOG_DEBUG("Scene","createLayer: Layer with id " << layerId << " already exists ");
-            newLayer = m_layerMap.at(layerId);
+            newLayer = m_layerMap[layerId];
         }
     }
     return newLayer;
@@ -82,7 +82,7 @@ Surface* Scene::createSurface(const uint surfaceId)
         }
         else
         {
-            newSurface = m_surfaceMap.at(surfaceId); 
+            newSurface = m_surfaceMap[surfaceId];
             LOG_DEBUG("Scene","Surface with id [ " << surfaceId << " ] " << " already exists " );
         }
     }
@@ -108,7 +108,7 @@ SurfaceGroup* Scene::createSurfaceGroup(const uint surfaceGroupId)
         }
         else
         {
-            newSurfaceGroup =  m_surfaceGroupMap.at(surfaceGroupId);
+            newSurfaceGroup =  m_surfaceGroupMap[surfaceGroupId];
         }
     }
     return newSurfaceGroup;
@@ -133,18 +133,18 @@ LayerGroup* Scene::createLayerGroup(const uint layerGroupId)
         }
         else
         {
-            newLayerGroup = m_layerGroupMap.at(layerGroupId);
+            newLayerGroup = m_layerGroupMap[layerGroupId];
         }
     }
     return newLayerGroup;
 }
 
-Layer* Scene::getLayer(const uint layerId) const
+Layer* Scene::getLayer(const uint layerId)
 {
     Layer* layer = NULL;
     if (m_layerMap.count(layerId) > 0)
     {
-        layer = m_layerMap.at(layerId);
+        layer = m_layerMap[layerId];
     }
     else
     {
@@ -153,12 +153,12 @@ Layer* Scene::getLayer(const uint layerId) const
     return layer;
 }
 
-Surface* Scene::getSurface(const uint surfaceId) const
+Surface* Scene::getSurface(const uint surfaceId)
 {
     Surface* surface = NULL;
     if (m_surfaceMap.count(surfaceId) > 0)
     {
-        surface = m_surfaceMap.at(surfaceId);
+        surface = m_surfaceMap[surfaceId];
     }
     else
     {
@@ -167,12 +167,12 @@ Surface* Scene::getSurface(const uint surfaceId) const
     return surface;
 }
 
-SurfaceGroup* Scene::getSurfaceGroup(const uint surfaceGroupId) const
+SurfaceGroup* Scene::getSurfaceGroup(const uint surfaceGroupId)
 {
     SurfaceGroup* surfaceGroup = NULL;
     if (m_surfaceGroupMap.count(surfaceGroupId) > 0)
     {
-        surfaceGroup = m_surfaceGroupMap.at(surfaceGroupId);
+        surfaceGroup = m_surfaceGroupMap[surfaceGroupId];
     }
     else
     {
@@ -181,12 +181,12 @@ SurfaceGroup* Scene::getSurfaceGroup(const uint surfaceGroupId) const
     return surfaceGroup;
 }
 
-LayerGroup* Scene::getLayerGroup(const uint layerGroupId) const
+LayerGroup* Scene::getLayerGroup(const uint layerGroupId)
 {
     LayerGroup* layerGroup = NULL;
     if (m_layerGroupMap.count(layerGroupId) > 0)
     {
-        layerGroup = m_layerGroupMap.at(layerGroupId);
+        layerGroup = m_layerGroupMap[layerGroupId];
     }
     else
     {

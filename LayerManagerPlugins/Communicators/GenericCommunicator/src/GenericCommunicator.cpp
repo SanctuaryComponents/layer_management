@@ -331,7 +331,7 @@ void GenericCommunicator::ServiceConnect(t_ilm_message message)
 
     t_ilm_message response;
     t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
-    u_int32_t processId = 0;
+    unsigned int processId = 0;
 
     m_ipcModule.getUint(message, &processId);
     char* owner = strdup(m_ipcModule.getSenderName(message));

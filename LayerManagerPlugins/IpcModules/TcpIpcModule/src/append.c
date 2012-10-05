@@ -30,7 +30,7 @@ t_ilm_bool appendGenericValue(struct SocketMessage* msg, const char protocolType
         + msg->index + size                           // + data
         > SOCKET_MAX_MESSAGE_SIZE)
     {
-        pritnf("Error: max message size exceeded.\n");
+        printf("Error: max message size exceeded.\n");
         return ILM_FALSE;
     }
 

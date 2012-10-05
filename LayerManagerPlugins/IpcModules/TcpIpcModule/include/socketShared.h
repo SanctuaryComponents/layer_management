@@ -26,6 +26,7 @@
 #include <netdb.h>  // struct hostent
 #include <string.h>
 #include <stdio.h>
+#include <sys/select.h>
 
 //=============================================================================
 // type definitions
