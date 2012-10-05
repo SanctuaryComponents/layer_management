@@ -782,3 +782,31 @@ COMMAND("watch surface <surfaceidarray>")
     }
 }
 
+//=============================================================================
+COMMAND("set optimization <id> mode <mode>")
+//=============================================================================
+{
+    if (ilm_SetOptimizationMode((ilmOptimization)input->getUint("id"),
+                                (ilmOptimizationMode)input->getUint("mode")) != ILM_SUCCESS)
+    {
+        cerr << "Error during communication" << endl;
+    }
+    ilm_commitChanges();
+}
+
+//=============================================================================
+COMMAND("get optimization <id>")
+//=============================================================================
+{
+    ilmOptimization optimizationId = (ilmOptimization)input->getUint("id");
+    ilmOptimizationMode optimizationMode;
+    if (ilm_GetOptimizationMode(optimizationId, &optimizationMode) == ILM_SUCCESS)
+    {
+        cout << "Optimization " << (int)optimizationId << " has mode " << (int)optimizationMode << endl;
+    }
+    else
+    {
+        cerr << "Error during communication" << endl;
+    }
+    ilm_commitChanges();
+}
