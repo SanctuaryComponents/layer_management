@@ -2502,19 +2502,22 @@ void GenericCommunicator::sendNotification(GraphicalObject* object, t_ilm_notifi
                 m_ipcModule.appendUint(notification, chromaKeyBlue);
 
                 int clientCount = arl.size();
-                t_ilm_client_handle clients[clientCount];
+                t_ilm_client_handle clientArray[256];
 
                 ApplicationReferenceList::iterator iter = arl.begin();
                 ApplicationReferenceList::iterator end = arl.end();
 
-                for (int clientNumber = 0; iter != end; ++iter, ++clientNumber)
+                for (int clientNumber = 0;
+                     iter != end, clientNumber < 256;
+                     ++iter, ++clientNumber)
                 {
-                    clients[clientNumber] = *iter;
+                    t_ilm_client_handle client = *iter;
+                    clientArray[clientNumber] = client;
                 }
 
                 LOG_DEBUG("GenericCommunicator", "Sending " << clientCount << " notification(s): layer " << layer->getID() << " was updated.");
 
-                if (!m_ipcModule.sendToClients(notification, clients, clientCount))
+                if (!m_ipcModule.sendToClients(notification, clientArray, clientCount))
                 {
                     LOG_ERROR("GenericCommunicator", "Sending notification to clients failed.")
                 }
@@ -2571,12 +2574,14 @@ void GenericCommunicator::sendNotification(GraphicalObject* object, t_ilm_notifi
                 m_ipcModule.appendUint(notification, chromaKeyBlue);
 
                 int clientCount = arl.size();
-                t_ilm_client_handle clients[clientCount];
+                t_ilm_client_handle clients[256];
 
                 ApplicationReferenceList::iterator iter = arl.begin();
                 ApplicationReferenceList::iterator end = arl.end();
 
-                for (int clientNumber = 0; iter != end; ++iter, ++clientNumber)
+                for (int clientNumber = 0;
+                     iter != end, clientNumber < 256;
+                     ++iter, ++clientNumber)
                 {
                     clients[clientNumber] = *iter;
                 }
