@@ -314,12 +314,12 @@ Shader *GLESGraphicsystem::pickOptimizedShader(Shader* currentShader, const Shad
 {
     Shader * retShader = currentShader;
 
-    LOG_DEBUG("GLESGraphicsystem", "shader:currentShader");
+    //LOG_DEBUG("GLESGraphicsystem", "shader:currentShader");
     do
     {
         if (currentShader != m_defaultShader)
         {
-        LOG_DEBUG("GLESGraphicsystem", "shader:default");
+            //LOG_DEBUG("GLESGraphicsystem", "shader:default");
             break;
         }
 
@@ -329,14 +329,14 @@ Shader *GLESGraphicsystem::pickOptimizedShader(Shader* currentShader, const Shad
             {
                 //no need for multiply in shader, just use texture
                 retShader = m_defaultShaderNoUniformAlpha;
-        LOG_DEBUG("GLESGraphicsystem", "shader:defaultShaderNoUniformAlpha");
+                //LOG_DEBUG("GLESGraphicsystem", "shader:defaultShaderNoUniformAlpha");
             }
         }
         else
         {
             // Add chromakey to default fragment shader
             retShader = m_defaultShaderAddUniformChromaKey;
-        LOG_DEBUG("GLESGraphicsystem", "shader:defaultShaderAddUniformChromaKey");
+            //LOG_DEBUG("GLESGraphicsystem", "shader:defaultShaderAddUniformChromaKey");
         }
     } while(0);
 
