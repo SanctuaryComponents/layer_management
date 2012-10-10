@@ -27,7 +27,7 @@ class SurfaceTest : public ::testing::Test
 public:
     void SetUp()
     {
-        m_pSurface = new Surface();
+        m_pSurface = new Surface(0);
         ASSERT_TRUE(m_pSurface);
     }
 
@@ -45,7 +45,7 @@ public:
 
 TEST_F(SurfaceTest, defaultConstructor)
 {
-    Surface surface;
+    Surface surface(0);
 
     /// make sure, surface was not added to any layer
     EXPECT_EQ(GraphicalObject::INVALID_ID, surface.getContainingLayerId());

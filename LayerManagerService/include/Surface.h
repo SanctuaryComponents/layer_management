@@ -179,8 +179,8 @@ public:
     int updateCounter;
     int drawCounter;
 
-    Surface()
-    : GraphicalSurface(TypeSurface)
+    Surface(int creatorPid)
+    : GraphicalSurface(TypeSurface, creatorPid)
     , platform(NULL)
     , frameCounter(0)
     , updateCounter(0)
@@ -197,8 +197,8 @@ public:
         pthread_mutex_init(&m_inputAcceptMutex, NULL);
     }
 
-    Surface(int id)
-    : GraphicalSurface(id, TypeSurface)
+    Surface(int id, int creatorPid)
+    : GraphicalSurface(id, TypeSurface, creatorPid)
     , platform(NULL)
     , frameCounter(0)
     , updateCounter(0)

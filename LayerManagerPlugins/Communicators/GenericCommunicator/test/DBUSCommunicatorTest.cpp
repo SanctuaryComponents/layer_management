@@ -206,7 +206,7 @@ TEST_F(DBUSCommunicatorTest, listSurfacesOfSurfacegroup) {
     DefaultValue<Scene*>::Set((Scene*) &this->layerlist);
     // Sets the default return value for type Bar.
     DefaultValue<std::list<int> >::Set(defaultlist);
-    DefaultValue<SurfaceGroup*>::Set(new SurfaceGroup());
+    DefaultValue<SurfaceGroup*>::Set(new SurfaceGroup(0));
     EXPECT_CALL(this->layerlist, getSurfaceGroup(Eq(84567u) )).Times(1);
     ASSERT_NE(-1, system((DBUSCOMMAND + std::string("ListSurfacesOfSurfacegroup uint32:84567")).c_str()));
 
@@ -218,7 +218,7 @@ TEST_F(DBUSCommunicatorTest, listlayersOflayergroup) {
     // Sets the default return value for type Bar.
     DefaultValue<Scene*>::Set((Scene*) &this->layerlist);
     DefaultValue<std::list<int> >::Set(defaultlist);
-    DefaultValue<LayerGroup*>::Set(new LayerGroup());
+    DefaultValue<LayerGroup*>::Set(new LayerGroup(0));
 
     EXPECT_CALL(this->layerlist, getLayerGroup(Eq(345u) )).Times(1);
     ASSERT_NE(-1, system((DBUSCOMMAND + std::string("ListLayersOfLayergroup uint32:345")).c_str()));
@@ -228,7 +228,7 @@ TEST_F(DBUSCommunicatorTest, listlayersOflayergroup) {
 TEST_F(DBUSCommunicatorTest, listSurfaceoflayer) {
 
     Scene scene;
-    DefaultValue<Layer*>::Set(scene.createLayer(234));
+    DefaultValue<Layer*>::Set(scene.createLayer(234, 0));
     DefaultValue<Scene*>::Set((Scene*) &layerlist);
     EXPECT_CALL(this->layerlist, getLayer(Eq(234u) )).Times(1);
     ASSERT_NE(-1, system((DBUSCOMMAND + std::string("ListSurfaceofLayer uint32:234")).c_str()));
@@ -239,7 +239,7 @@ TEST_F(DBUSCommunicatorTest, getPropertiesOfSurface) {
     Scene scene;
     unsigned int newID = 0;
     DefaultValue<Scene*>::Set((Scene*) &layerlist);
-    DefaultValue<Surface*>::Set(scene.createSurface(newID));
+    DefaultValue<Surface*>::Set(scene.createSurface(newID, 0));
     EXPECT_CALL(this->layerlist, getSurface(Eq(876u) )).Times(1);
     ASSERT_NE(-1, system((DBUSCOMMAND + std::string("GetPropertiesOfSurface uint32:876")).c_str()));
 }
@@ -247,7 +247,7 @@ TEST_F(DBUSCommunicatorTest, getPropertiesOfSurface) {
 TEST_F(DBUSCommunicatorTest, getPropertiesOflayer) {
 
     Scene scene;
-    DefaultValue<Layer*>::Set(scene.createLayer(0));
+    DefaultValue<Layer*>::Set(scene.createLayer(0, 0));
     DefaultValue<Scene*>::Set((Scene*) &layerlist);
     EXPECT_CALL(this->layerlist, getLayer(Eq(876u) )).Times(1);
     ASSERT_NE(-1, system((DBUSCOMMAND + std::string("GetPropertiesOfLayer uint32:876")).c_str()));

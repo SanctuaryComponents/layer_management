@@ -33,14 +33,14 @@ template <class T, ObjectType thetype>
 class GraphicalGroup : public GraphicalObject
 {
 public:
-    GraphicalGroup()
-    : GraphicalObject(thetype, 1.0, true)
+    GraphicalGroup(int creatorPid)
+    : GraphicalObject(thetype, 1.0, true, creatorPid)
     {
         list = std::list<T*>();
     }
 
-    GraphicalGroup(int externalId)
-    : GraphicalObject(externalId, thetype, 1.0, true)
+    GraphicalGroup(int externalId, int creatorPid)
+    : GraphicalObject(externalId, thetype, 1.0, true, creatorPid)
     {
         list = std::list<T*>();
     }

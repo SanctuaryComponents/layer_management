@@ -22,6 +22,8 @@
 #define _IAPPLICATION_REFERENCE_H_
 #include <locale>
 #include <string.h>
+#include <stdlib.h>
+
 /**
  * Abstract Base Class for all Application References 
  */
@@ -32,28 +34,29 @@ public:
      * Constructor: Contructs a Object with the provided Application id and SerialId
      * 
      */
-    IApplicationReference(char* applicationUid, unsigned int processId);
-    virtual ~IApplicationReference() {}
+    IApplicationReference(char* processName, unsigned int processId);
+    ~IApplicationReference();
 
-     virtual char* getApplicationUid();
-     static long generateApplicationHash(char* applicationUid);
-     virtual long getApplicationHash();
-     virtual unsigned int getProcessId();
+     const char* getProcessName();
+     unsigned int getProcessId();
 
 protected:
-    char* m_applicationUid;
+    char* m_processName;
     unsigned int m_processId;
 };
 
-inline IApplicationReference::IApplicationReference(char* applicationUid, unsigned int processId)
-: m_applicationUid(applicationUid)
+inline IApplicationReference::IApplicationReference(char* processName, unsigned int processId)
+: m_processName(strdup(processName))
 , m_processId(processId)
 {
 }
 
-inline char* IApplicationReference::getApplicationUid()
+inline IApplicationReference::~IApplicationReference()
 {
-    return m_applicationUid;
+    if (m_processName)
+    {
+        free(m_processName);
+    }
 }
 
 inline unsigned int IApplicationReference::getProcessId()
@@ -61,15 +64,9 @@ inline unsigned int IApplicationReference::getProcessId()
     return m_processId;
 }
 
-inline long IApplicationReference::getApplicationHash() 
+inline const char* IApplicationReference::getProcessName()
 {
-    return generateApplicationHash(m_applicationUid);
+    return m_processName;
 }
-inline long IApplicationReference::generateApplicationHash(char* applicationUid) 
-{
-  std::locale loc; 
-  const std::collate<char>& colHash = std::use_facet<std::collate<char> >(loc);
-  long result = colHash.hash(applicationUid,applicationUid+strlen(applicationUid)); 
-  return result;
-}
+
 #endif /* _IAPPLICATION_REFERENCE_H_ */

@@ -53,10 +53,10 @@ public:
     Scene();
     virtual ~Scene();
 
-    virtual Layer* createLayer(const uint id);
-    virtual Surface *createSurface(const uint id);
-    virtual LayerGroup *createLayerGroup(const uint id);
-    virtual SurfaceGroup *createSurfaceGroup(const uint id);
+    virtual Layer* createLayer(const uint id, int creatorPid);
+    virtual Surface *createSurface(const uint id, int creatorPid);
+    virtual LayerGroup *createLayerGroup(const uint id, int creatorPid);
+    virtual SurfaceGroup *createSurfaceGroup(const uint id, int creatorPid);
 
     virtual bool removeLayer(Layer* layer);
     virtual bool removeSurface(Surface* surface);

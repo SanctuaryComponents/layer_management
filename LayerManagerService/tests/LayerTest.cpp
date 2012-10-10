@@ -26,7 +26,7 @@ class LayerTest : public ::testing::Test
 public:
     void SetUp()
     {
-        m_pLayer = new Layer();
+        m_pLayer = new Layer(0);
         ASSERT_TRUE(m_pLayer);
     }
 
@@ -44,7 +44,7 @@ public:
 
 TEST_F(LayerTest, defaultConstructor)
 {
-    Layer layer;
+    Layer layer(0);
 
     /// make sure, Layer was not added to any layer
     //EXPECT_EQ(INVALID_ID, Layer.getContainingLayerId());
@@ -231,7 +231,7 @@ TEST_F(LayerTest, addSurface_alreadyOnOtherLayer)
 {
     unsigned int expectedSurfaceId = 34;
     Surface surface(expectedSurfaceId);
-    Layer layer;
+    Layer layer(0);
 
     /// make sure, layer contains no surfaces
     SurfaceList& slist = m_pLayer->getAllSurfaces();
@@ -258,7 +258,7 @@ TEST_F(LayerTest, addSurface_alreadyOnOtherLayer)
 
 TEST_F(LayerTest, removeSurface)
 {
-    Surface s1, s2, s3;
+    Surface s1(0), s2(0), s3(0);
 
     /// make sure, layer contains no surfaces
     SurfaceList& slist = m_pLayer->getAllSurfaces();
@@ -300,7 +300,7 @@ TEST_F(LayerTest, removeSurface)
 
 TEST_F(LayerTest, getAllSurfaces)
 {
-    Surface s1, s2, s3, s4, s5;
+    Surface s1(0), s2(0), s3(0), s4(0), s5(0);
 
     /// make sure, getAllSurfaces returns empty list, if layer contains no surfaces
     SurfaceList& slist = m_pLayer->getAllSurfaces();
@@ -327,7 +327,7 @@ TEST_F(LayerTest, getAllSurfaces)
 
 TEST_F(LayerTest, removeAllSurfaces)
 {
-    Surface s1, s2, s3, s4, s5;
+    Surface s1(0), s2(0), s3(0), s4(0), s5(0);
 
     /// make sure, getAllSurfaces returns empty list, if layer contains no surfaces
     SurfaceList& slist = m_pLayer->getAllSurfaces();

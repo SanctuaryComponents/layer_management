@@ -100,7 +100,7 @@ static Layer* createComplexLayer_1(IScene *m_pScene)
     Layer* pLayer;
     Surface* pSurface;
 
-    pLayer = m_pScene->createLayer(CPLX_SCREEN_LAY1_ID);
+    pLayer = m_pScene->createLayer(CPLX_SCREEN_LAY1_ID, 0);
     pLayer->OriginalSourceWidth = CPLX_SCREEN_WIDTH;
     pLayer->OriginalSourceHeight = CPLX_SCREEN_HEIGHT;
     pLayer->setSourceRegion(Rectangle(0, 0, CPLX_SCREEN_WIDTH, CPLX_SCREEN_HEIGHT));
@@ -110,7 +110,7 @@ static Layer* createComplexLayer_1(IScene *m_pScene)
 
 
     /* Surface 10 : Background */
-    pSurface = m_pScene->createSurface(CPLX_SCREEN_LAY1_SURF_BACKGROUND_ID);
+    pSurface = m_pScene->createSurface(CPLX_SCREEN_LAY1_SURF_BACKGROUND_ID, 0);
     pSurface->OriginalSourceWidth = CPLX_SCREEN_WIDTH;
     pSurface->OriginalSourceHeight = CPLX_SCREEN_HEIGHT;
     pSurface->setSourceRegion(Rectangle(0, 0, CPLX_SCREEN_WIDTH, CPLX_SCREEN_HEIGHT));
@@ -121,7 +121,7 @@ static Layer* createComplexLayer_1(IScene *m_pScene)
     pLayer->addSurface(pSurface);
 
     /* Surface 20 : Menubar */
-    pSurface = m_pScene->createSurface(CPLX_SCREEN_LAY1_SURF_MENUBAR_ID);
+    pSurface = m_pScene->createSurface(CPLX_SCREEN_LAY1_SURF_MENUBAR_ID, 0);
     pSurface->OriginalSourceWidth = CPLX_SCREEN_LAY1_MENUBAR_WIDTH;
     pSurface->OriginalSourceHeight = CPLX_SCREEN_HEIGHT;
     pSurface->setSourceRegion(Rectangle(0, 0, CPLX_SCREEN_LAY1_MENUBAR_WIDTH, CPLX_SCREEN_HEIGHT));
@@ -132,7 +132,7 @@ static Layer* createComplexLayer_1(IScene *m_pScene)
     pLayer->addSurface(pSurface);
 
     /* Surface 20 : Status */
-    pSurface = m_pScene->createSurface(CPLX_SCREEN_LAY1_SURF_STATUSBAR_ID);
+    pSurface = m_pScene->createSurface(CPLX_SCREEN_LAY1_SURF_STATUSBAR_ID, 0);
     pSurface->OriginalSourceWidth = CPLX_SCREEN_WIDTH;
     pSurface->OriginalSourceHeight = CPLX_SCREEN_HEIGHT;
     pSurface->setSourceRegion(Rectangle(0, 0, CPLX_SCREEN_WIDTH, CPLX_SCREEN_LAY1_STATUSBAR_HEIGHT));
@@ -206,7 +206,7 @@ static Layer* createComplexLayer_2(IScene *m_pScene)
     Layer* pLayer;
     Surface* pSurface;
 
-    pLayer = m_pScene->createLayer(CPLX_SCREEN_LAY2_ID);
+    pLayer = m_pScene->createLayer(CPLX_SCREEN_LAY2_ID, 0);
     pLayer->OriginalSourceWidth = CPLX_SCREEN_WIDTH;
     pLayer->OriginalSourceHeight = CPLX_SCREEN_HEIGHT;
     pLayer->setSourceRegion(Rectangle(0, 0, CPLX_SCREEN_WIDTH, CPLX_SCREEN_HEIGHT));
@@ -215,7 +215,7 @@ static Layer* createComplexLayer_2(IScene *m_pScene)
     pLayer->setVisibility(true);
 
     /* Surface 100 : Background */
-    pSurface = m_pScene->createSurface(CPLX_SCREEN_LAY2_SURF_BACKGROUND_ID);
+    pSurface = m_pScene->createSurface(CPLX_SCREEN_LAY2_SURF_BACKGROUND_ID, 0);
     pSurface->OriginalSourceWidth = CPLX_SCREEN_WIDTH;
     pSurface->OriginalSourceHeight = CPLX_SCREEN_HEIGHT;
     pSurface->setSourceRegion(Rectangle(0, 0, CPLX_SCREEN_WIDTH, CPLX_SCREEN_HEIGHT));
@@ -226,7 +226,7 @@ static Layer* createComplexLayer_2(IScene *m_pScene)
     pLayer->addSurface(pSurface);
 
     /* Surface 200 : Content */
-    pSurface = m_pScene->createSurface(CPLX_SCREEN_LAY2_SURF_CONTENT_ID);
+    pSurface = m_pScene->createSurface(CPLX_SCREEN_LAY2_SURF_CONTENT_ID, 0);
     pSurface->OriginalSourceWidth = CPLX_SCREEN_LAY2_CONTENT_WIDTH;
     pSurface->OriginalSourceHeight = CPLX_SCREEN_LAY2_CONTENT_HEIGHT;
     pSurface->setSourceRegion(Rectangle(0, 0, CPLX_SCREEN_LAY2_CONTENT_WIDTH, CPLX_SCREEN_LAY2_CONTENT_HEIGHT));
@@ -237,7 +237,7 @@ static Layer* createComplexLayer_2(IScene *m_pScene)
     pLayer->addSurface(pSurface);
 
     /* Surface 300 : Popup */
-    pSurface = m_pScene->createSurface(CPLX_SCREEN_LAY2_SURF_POPUP_ID);
+    pSurface = m_pScene->createSurface(CPLX_SCREEN_LAY2_SURF_POPUP_ID, 0);
     pSurface->OriginalSourceWidth = CPLX_SCREEN_LAY2_POPUP_WIDTH;
     pSurface->OriginalSourceHeight = CPLX_SCREEN_LAY2_POPUP_HEIGHT;
     pSurface->setSourceRegion(Rectangle(0, 0, CPLX_SCREEN_LAY2_POPUP_WIDTH, CPLX_SCREEN_LAY2_POPUP_HEIGHT));
@@ -682,7 +682,7 @@ TEST_F(InputManagerTest, PointerEvent_Coordinates_translation)
     layerTop = m_pScene->getLayer(CPLX_SCREEN_LAY2_ID);
 
     // Let's create a new surface & add it to the top layer
-    newSurf = m_pScene->createSurface(sid);
+    newSurf = m_pScene->createSurface(sid, 0);
     newSurf->OriginalSourceWidth = sw;
     newSurf->OriginalSourceHeight = sh;
     newSurf->setSourceRegion(Rectangle(0, 0, sw, sh));
@@ -745,7 +745,7 @@ TEST_F(InputManagerTest, PointerEvent_Coordinates_croping)
     layerTop = m_pScene->getLayer(CPLX_SCREEN_LAY2_ID);
 
     // Let's create a new surface & add it to the top layer
-    newSurf = m_pScene->createSurface(sid);
+    newSurf = m_pScene->createSurface(sid, 0);
     newSurf->OriginalSourceWidth = sw;
     newSurf->OriginalSourceHeight = sh;
     newSurf->setSourceRegion(Rectangle(0, 0, sw, sh));
@@ -803,7 +803,7 @@ TEST_F(InputManagerTest, PointerEvent_Coordinates_scaling)
     layerTop = m_pScene->getLayer(CPLX_SCREEN_LAY2_ID);
 
     // Let's create a new surface & add it to the top layer
-    newSurf = m_pScene->createSurface(sid);
+    newSurf = m_pScene->createSurface(sid, 0);
     newSurf->OriginalSourceWidth = sw;
     newSurf->OriginalSourceHeight = sh;
     newSurf->setSourceRegion(Rectangle(0, 0, sw, sh));

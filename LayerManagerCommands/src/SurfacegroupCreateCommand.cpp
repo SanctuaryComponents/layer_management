@@ -26,7 +26,7 @@ ExecutionResult SurfacegroupCreateCommand::execute(ICommandExecutor* executor)
     Scene& scene = *(executor->getScene());
     ExecutionResult result = ExecutionFailed;
 
-    SurfaceGroup *surfacegroup = scene.createSurfaceGroup(*m_idReturn);
+    SurfaceGroup *surfacegroup = scene.createSurfaceGroup(*m_idReturn, getSenderPid());
 
     if (surfacegroup)
     {

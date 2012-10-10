@@ -35,8 +35,8 @@ class Layer: public GraphicalSurface
     friend class Scene;
 
 public:
-    Layer();
-    Layer(int id);
+    Layer(int creatorPid);
+    Layer(int id, int creatorPid);
 
     virtual ~Layer() {}
 
@@ -56,15 +56,15 @@ private:
     uint m_capabilities;
 };
 
-inline Layer::Layer()
-: GraphicalSurface(TypeLayer)
+inline Layer::Layer(int creatorPid)
+: GraphicalSurface(TypeLayer, creatorPid)
 , m_layerType(Software_2D)
 , m_capabilities(0)
 {
 }
 
-inline Layer::Layer(int id)
-: GraphicalSurface(id, TypeLayer)
+inline Layer::Layer(int id, int creatorPid)
+: GraphicalSurface(id, TypeLayer, creatorPid)
 , m_layerType(Software_2D)
 , m_capabilities(0)
 {

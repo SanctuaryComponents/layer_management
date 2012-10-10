@@ -24,6 +24,8 @@
 #include "NotificationQueue.h"
 #include "Scene.h"
 
+typedef std::map<unsigned int, const char*> PidToProcessNameTable;
+
 class ICommand;
 class IRenderer;
 class ICommunicator;
@@ -56,6 +58,8 @@ public:
     virtual void addApplicationReference(t_ilm_client_handle client, IApplicationReference* reference);
     virtual void removeApplicationReference(t_ilm_client_handle client);
     virtual t_ilm_uint getSenderPid(t_ilm_client_handle client);
+    const char* getSenderName(t_ilm_client_handle client);
+    const char* getSenderName(unsigned int pid);
     
     virtual bool startManagement(const int width, const int height, const char* displayName);
     virtual bool stopManagement();
@@ -86,6 +90,7 @@ private:
     SceneProviderList* m_pSceneProviderList;
     NotificationQueue m_clientNotificationQueue;
     ApplicationReferenceMap* m_pApplicationReferenceMap;
+    PidToProcessNameTable m_pidToProcessNameTable;
 };
 
 inline Scene* Layermanager::getScene(void)

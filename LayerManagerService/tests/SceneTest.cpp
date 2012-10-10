@@ -56,7 +56,7 @@ TEST_F(SceneTest, createLayer)
     ASSERT_EQ((uint)0, size) << "Scene should contain 0 layers";
 
     /// create layer with expected id
-    pLayer = m_pScene->createLayer(expected);
+    pLayer = m_pScene->createLayer(expected, 0);
     ASSERT_TRUE(pLayer) << "Layer was not created.";
 
     /// make sure layer has expected id
@@ -82,7 +82,7 @@ TEST_F(SceneTest, createLayer_invalidId)
     ASSERT_EQ((uint)0, size) << "Scene should contain 0 layers";
 
     /// create layer with invalid id
-    pLayer = m_pScene->createLayer(GraphicalObject::INVALID_ID);
+    pLayer = m_pScene->createLayer(GraphicalObject::INVALID_ID, 0);
     ASSERT_TRUE(pLayer) << "Layer was not created.";
 
     /// make sure new layer has valid id
@@ -103,7 +103,7 @@ TEST_F(SceneTest, createLayer_twice)
     Layer* pLayer2;
 
     /// create Layer with id 55
-    pLayer1 = m_pScene->createLayer(expected);
+    pLayer1 = m_pScene->createLayer(expected, 0);
     ASSERT_EQ(expected, pLayer1->getID());
 
     /// make sure, scene contains one layer
@@ -111,7 +111,7 @@ TEST_F(SceneTest, createLayer_twice)
     ASSERT_EQ((uint)1, size) << "Scene should contain 1 layer";
 
     /// try to create existing layer 55, handle to existing layer should be returned
-    pLayer2 = m_pScene->createLayer(expected);
+    pLayer2 = m_pScene->createLayer(expected, 0);
     ASSERT_EQ(expected, pLayer2->getID());
 
     /// make sure, scene still contains one layer
@@ -137,7 +137,7 @@ TEST_F(SceneTest, createSurface)
     ASSERT_EQ((uint)0, size) << "Scene should contain 0 surfaces";
 
     /// create surface with expected id
-    pSurface = m_pScene->createSurface(expected);
+    pSurface = m_pScene->createSurface(expected, 0);
     ASSERT_TRUE(pSurface) << "Surface was not created.";
 
     /// make sure surface has expected id
@@ -162,7 +162,7 @@ TEST_F(SceneTest, createSurface_invalidId)
     ASSERT_EQ((uint)0, size) << "Scene should contain 0 surfaces";
 
     /// create surface with invalid id
-    pSurface = m_pScene->createSurface(GraphicalObject::INVALID_ID);
+    pSurface = m_pScene->createSurface(GraphicalObject::INVALID_ID, 0);
     ASSERT_TRUE(pSurface) << "Surface was not created.";
 
     /// make sure new surface has valid id
@@ -187,7 +187,7 @@ TEST_F(SceneTest, createSurface_twice)
     ASSERT_EQ((uint)0, size) << "Scene should contain 0 surfaces";
 
     /// create surface with expected id
-    pSurface1 = m_pScene->createSurface(expected);
+    pSurface1 = m_pScene->createSurface(expected, 0);
     ASSERT_TRUE(pSurface1) << "Surface was not created.";
 
     /// make sure surface has expected id
@@ -198,7 +198,7 @@ TEST_F(SceneTest, createSurface_twice)
     ASSERT_EQ((uint)1, size) << "Scene should contain 1 surface";
 
     /// create surface with expected id again
-    pSurface2 = m_pScene->createSurface(expected);
+    pSurface2 = m_pScene->createSurface(expected, 0);
     ASSERT_TRUE(pSurface2) << "Surface was not created.";
 
     /// make sure surface has expected id again
@@ -225,7 +225,7 @@ TEST_F(SceneTest, createLayerGroup)
     ASSERT_FALSE(pLayerGroup);
 
     /// create expected layer group
-    m_pScene->createLayerGroup(expectedId);
+    m_pScene->createLayerGroup(expectedId, 0);
 
     /// make sure, expected layer group does exist
     pLayerGroup = m_pScene->getLayerGroup(expectedId);
@@ -245,14 +245,14 @@ TEST_F(SceneTest, createLayerGroup_twice)
     ASSERT_FALSE(pLayerGroup1);
 
     /// create expected layer group, get 1st handle to group
-    pLayerGroup1 = m_pScene->createLayerGroup(expectedLayerGroupId);
+    pLayerGroup1 = m_pScene->createLayerGroup(expectedLayerGroupId, 0);
     ASSERT_TRUE(pLayerGroup1);
 
     /// make sure, expected layer group does exist
     EXPECT_TRUE(pLayerGroup1);
 
     /// create expected layer group again, get 2nd handle to group
-    pLayerGroup2 = m_pScene->createLayerGroup(expectedLayerGroupId);
+    pLayerGroup2 = m_pScene->createLayerGroup(expectedLayerGroupId, 0);
 
     /// make sure, expected layer group does exist
     ASSERT_TRUE(pLayerGroup2);
@@ -278,7 +278,7 @@ TEST_F(SceneTest, createSurfaceGroup)
     ASSERT_FALSE(pSurfaceGroup);
 
     /// create expected Surface group, get 1st handle to group
-    pSurfaceGroup = m_pScene->createSurfaceGroup(expectedSurfaceGroupId);
+    pSurfaceGroup = m_pScene->createSurfaceGroup(expectedSurfaceGroupId, 0);
     ASSERT_TRUE(pSurfaceGroup);
 
     /// make sure, expected Surface group does exist
@@ -298,14 +298,14 @@ TEST_F(SceneTest, createSurfaceGroup_twice)
     ASSERT_FALSE(pSurfaceGroup1);
 
     /// create expected Surface group, get 1st handle to group
-    pSurfaceGroup1 = m_pScene->createSurfaceGroup(expectedSurfaceGroupId);
+    pSurfaceGroup1 = m_pScene->createSurfaceGroup(expectedSurfaceGroupId, 0);
     ASSERT_TRUE(pSurfaceGroup1);
 
     /// make sure, expected Surface group does exist
     EXPECT_TRUE(pSurfaceGroup1);
 
     /// create expected Surface group again, get 2nd handle to group
-    pSurfaceGroup2 = m_pScene->createSurfaceGroup(expectedSurfaceGroupId);
+    pSurfaceGroup2 = m_pScene->createSurfaceGroup(expectedSurfaceGroupId, 0);
 
     /// make sure, expected Surface group does exist
     ASSERT_TRUE(pSurfaceGroup2);
@@ -327,7 +327,7 @@ TEST_F(SceneTest, removeLayer)
     Layer* pLayer;
 
     /// create layer
-    pLayer = m_pScene->createLayer(expectedLayerId);
+    pLayer = m_pScene->createLayer(expectedLayerId, 0);
     ASSERT_TRUE(pLayer);
 
     /// make sure, layer exists
@@ -346,7 +346,7 @@ TEST_F(SceneTest, removeSurface)
     Surface* pSurface;
 
     /// create Surface
-    pSurface = m_pScene->createSurface(expectedSurfaceId);
+    pSurface = m_pScene->createSurface(expectedSurfaceId, 0);
     ASSERT_TRUE(pSurface);
 
     /// make sure, Surface exists
@@ -368,7 +368,7 @@ TEST_F(SceneTest, getLayer)
     EXPECT_FALSE(m_pScene->getLayer(expectedLayerId));
 
     /// create layer
-    pLayer = m_pScene->createLayer(expectedLayerId);
+    pLayer = m_pScene->createLayer(expectedLayerId, 0);
     ASSERT_TRUE(pLayer);
 
     /// get layer
@@ -390,7 +390,7 @@ TEST_F(SceneTest, getSurface)
     EXPECT_FALSE(m_pScene->getSurface(expectedSurfaceId));
 
     /// create Surface
-    pSurface = m_pScene->createSurface(expectedSurfaceId);
+    pSurface = m_pScene->createSurface(expectedSurfaceId, 0);
     ASSERT_TRUE(pSurface);
 
     /// get Surface
@@ -412,7 +412,7 @@ TEST_F(SceneTest, getSurfaceGroup)
     EXPECT_FALSE(m_pScene->getSurfaceGroup(expectedSurfaceGroupId));
 
     /// create SurfaceGroup
-    pSurfaceGroup = m_pScene->createSurfaceGroup(expectedSurfaceGroupId);
+    pSurfaceGroup = m_pScene->createSurfaceGroup(expectedSurfaceGroupId, 0);
     ASSERT_TRUE(pSurfaceGroup);
 
     /// get SurfaceGroup
@@ -434,7 +434,7 @@ TEST_F(SceneTest, getLayerGroup)
     EXPECT_FALSE(m_pScene->getLayerGroup(expectedLayerGroupId));
 
     /// create LayerGroup
-    pLayerGroup = m_pScene->createLayerGroup(expectedLayerGroupId);
+    pLayerGroup = m_pScene->createLayerGroup(expectedLayerGroupId, 0);
     ASSERT_TRUE(pLayerGroup);
 
     /// get LayerGroup
@@ -461,10 +461,10 @@ TEST_F(SceneTest, getLayerIDs)
     ASSERT_EQ((uint)0, size);
 
     /// create 4 layers in scene
-    m_pScene->createLayer(layerId1);
-    m_pScene->createLayer(layerId2);
-    m_pScene->createLayer(layerId3);
-    m_pScene->createLayer(layerId4);
+    m_pScene->createLayer(layerId1, 0);
+    m_pScene->createLayer(layerId2, 0);
+    m_pScene->createLayer(layerId3, 0);
+    m_pScene->createLayer(layerId4, 0);
 
     /// make sure, scene contains these 4 layers
     m_pScene->getLayerIDs(&size, &array);
@@ -494,10 +494,10 @@ TEST_F(SceneTest, getLayerIDsOfScreen)
     ASSERT_EQ((uint)0, size);
 
     /// create 4 layers in scene, but dont add them to render order
-    l1 = m_pScene->createLayer(layerId1);
-    l2 = m_pScene->createLayer(layerId2);
-    l3 = m_pScene->createLayer(layerId3);
-    l4 = m_pScene->createLayer(layerId4);
+    l1 = m_pScene->createLayer(layerId1, 0);
+    l2 = m_pScene->createLayer(layerId2, 0);
+    l3 = m_pScene->createLayer(layerId3, 0);
+    l4 = m_pScene->createLayer(layerId4, 0);
 
     /// make sure, scene contains these 4 layers
     m_pScene->getLayerIDs(&size, &array);
@@ -550,10 +550,10 @@ TEST_F(SceneTest, getSurfaceIDs)
     ASSERT_EQ((uint)0, size);
 
     /// create 4 surfaces in scene
-    m_pScene->createSurface(surfaceId1);
-    m_pScene->createSurface(surfaceId2);
-    m_pScene->createSurface(surfaceId3);
-    m_pScene->createSurface(surfaceId4);
+    m_pScene->createSurface(surfaceId1, 0);
+    m_pScene->createSurface(surfaceId2, 0);
+    m_pScene->createSurface(surfaceId3, 0);
+    m_pScene->createSurface(surfaceId4, 0);
 
     /// make sure, scene contains these 4 surfaces
     m_pScene->getSurfaceIDs(&size, &array);
@@ -578,10 +578,10 @@ TEST_F(SceneTest, getLayerGroupIDs)
     ASSERT_EQ((uint)0, size);
 
     /// create 4 layergroups in scene
-    m_pScene->createLayerGroup(layergroupId1);
-    m_pScene->createLayerGroup(layergroupId2);
-    m_pScene->createLayerGroup(layergroupId3);
-    m_pScene->createLayerGroup(layergroupId4);
+    m_pScene->createLayerGroup(layergroupId1, 0);
+    m_pScene->createLayerGroup(layergroupId2, 0);
+    m_pScene->createLayerGroup(layergroupId3, 0);
+    m_pScene->createLayerGroup(layergroupId4, 0);
 
     /// make sure, scene contains these 4 layergroups
     m_pScene->getLayerGroupIDs(&size, &array);
@@ -606,10 +606,10 @@ TEST_F(SceneTest, getSurfaceGroupIDs)
     ASSERT_EQ((uint)0, size);
 
     /// create 4 surfacegroups in scene
-    m_pScene->createSurfaceGroup(surfacegroupId1);
-    m_pScene->createSurfaceGroup(surfacegroupId2);
-    m_pScene->createSurfaceGroup(surfacegroupId3);
-    m_pScene->createSurfaceGroup(surfacegroupId4);
+    m_pScene->createSurfaceGroup(surfacegroupId1, 0);
+    m_pScene->createSurfaceGroup(surfacegroupId2, 0);
+    m_pScene->createSurfaceGroup(surfacegroupId3, 0);
+    m_pScene->createSurfaceGroup(surfacegroupId4, 0);
 
     /// make sure, scene contains these 4 surfacegroups
     m_pScene->getSurfaceGroupIDs(&size, &array);
@@ -645,7 +645,7 @@ TEST_F(SceneTest, removeSurfaceGroup)
     SurfaceGroup* pSurfaceGroup;
 
     /// create expected Surface group
-    pSurfaceGroup = m_pScene->createSurfaceGroup(expectedSurfaceGroupId);
+    pSurfaceGroup = m_pScene->createSurfaceGroup(expectedSurfaceGroupId, 0);
     ASSERT_TRUE(pSurfaceGroup);
 
     /// make sure, expected Surface group does exist
@@ -666,7 +666,7 @@ TEST_F(SceneTest, removeLayerGroup)
     LayerGroup* pLayerGroup;
 
     /// create expected Layer group
-    pLayerGroup = m_pScene->createLayerGroup(expectedLayerGroupId);
+    pLayerGroup = m_pScene->createLayerGroup(expectedLayerGroupId, 0);
     ASSERT_TRUE(pLayerGroup);
 
     /// make sure, expected Layer group does exist
@@ -694,9 +694,9 @@ TEST_F(SceneTest, getAllSurfaces)
     ASSERT_EQ((uint)0, m_pScene->getAllSurfaces().size());
 
     /// add 3 surfaces to scene
-    s1 = m_pScene->createSurface(expectedId1);
-    s2 = m_pScene->createSurface(expectedId2);
-    s3 = m_pScene->createSurface(expectedId3);
+    s1 = m_pScene->createSurface(expectedId1, 0);
+    s2 = m_pScene->createSurface(expectedId2, 0);
+    s3 = m_pScene->createSurface(expectedId3, 0);
 
     /// get all surfaces
     const SurfaceMap& smap1 = m_pScene->getAllSurfaces();
@@ -726,7 +726,7 @@ TEST_F(SceneTest, isLayerInCurrentRenderOrder)
     Layer* l1;
 
     /// create layer in scene, but dont add it to render order
-    l1 = m_pScene->createLayer(layerId1);
+    l1 = m_pScene->createLayer(layerId1, 0);
 
     /// make sure, scene contains the new layers
     m_pScene->getLayerIDs(&size, &array);

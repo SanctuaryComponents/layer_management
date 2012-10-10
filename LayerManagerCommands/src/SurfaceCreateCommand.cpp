@@ -26,7 +26,7 @@ ExecutionResult SurfaceCreateCommand::execute(ICommandExecutor* executor)
     Scene& scene = *(executor->getScene());
     ExecutionResult result = ExecutionFailed;
 
-    Surface* surface = scene.createSurface(*m_idReturn);
+    Surface* surface = scene.createSurface(*m_idReturn, getSenderPid());
 
     if (surface)
     {

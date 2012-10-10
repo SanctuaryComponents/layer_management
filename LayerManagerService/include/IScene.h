@@ -54,7 +54,7 @@ public:
      * \param[in] id id of layer
      * \return pointer to layer
      */
-    virtual Layer* createLayer(const uint id) = 0;
+    virtual Layer* createLayer(const uint id, int creatorPid) = 0;
 
     /**
      * \brief Creates a new surface within the scene.
@@ -62,7 +62,7 @@ public:
      * \param[in] id id of surface
      * \return pointer to surface
      */
-    virtual Surface* createSurface(const uint id) = 0;
+    virtual Surface* createSurface(const uint id, int creatorPid) = 0;
 
     /**
      * \brief Create a new layer group within the scene.
@@ -70,7 +70,7 @@ public:
      * \param[in] id id of the layer group
      * \return pointer to layer group
      */
-    virtual LayerGroup* createLayerGroup(const uint id) = 0;
+    virtual LayerGroup* createLayerGroup(const uint id, int creatorPid) = 0;
 
     /**
      * \brief Create a new surface group within the scene.
@@ -78,7 +78,7 @@ public:
      * \param[in] id id of the new surface group
      * \return pointer to surface group
      */
-    virtual SurfaceGroup* createSurfaceGroup(const uint id) = 0;
+    virtual SurfaceGroup* createSurfaceGroup(const uint id, int creatorPid) = 0;
 
     /**
      * \brief Remove a layer from the scene.

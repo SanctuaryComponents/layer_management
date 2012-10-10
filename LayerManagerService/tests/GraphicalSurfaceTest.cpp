@@ -26,7 +26,7 @@ class GraphicalSurfaceTest : public ::testing::Test
 public:
     void SetUp()
     {
-        m_pGraphicalSurface = new GraphicalSurface(TypeSurface);
+        m_pGraphicalSurface = new GraphicalSurface(TypeSurface, 0);
         ASSERT_TRUE(m_pGraphicalSurface);
     }
 

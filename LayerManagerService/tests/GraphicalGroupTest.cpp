@@ -29,8 +29,8 @@ class GraphicalGroupTest : public ::testing::Test
 public:
     void SetUp()
     {
-        m_pLayerGroup = new GraphicalGroup<Layer, TypeLayer>();
-        m_pSurfaceGroup = new GraphicalGroup<Surface, TypeSurface>();
+        m_pLayerGroup = new GraphicalGroup<Layer, TypeLayer>(0);
+        m_pSurfaceGroup = new GraphicalGroup<Surface, TypeSurface>(0);
         ASSERT_TRUE(m_pLayerGroup);
         ASSERT_TRUE(m_pSurfaceGroup);
     }
@@ -58,7 +58,7 @@ TEST_F(GraphicalGroupTest, defaultConstructor_Layer)
     GraphicalGroup<Layer, TypeLayer>* pLayerGroup = 0;
 
     /// create graphical group of type layer (= layer group)
-    pLayerGroup = new GraphicalGroup<Layer, TypeLayer>();
+    pLayerGroup = new GraphicalGroup<Layer, TypeLayer>(0);
 
     /// make sure, layer group was created
     ASSERT_TRUE(pLayerGroup);
@@ -78,7 +78,7 @@ TEST_F(GraphicalGroupTest, defaultConstructor_Surface)
     GraphicalGroup<Surface, TypeSurface>* pSurfaceGroup = 0;
 
     /// create graphical group of type surface (= surface group)
-    pSurfaceGroup = new GraphicalGroup<Surface, TypeSurface>();
+    pSurfaceGroup = new GraphicalGroup<Surface, TypeSurface>(0);
 
     /// make sure, surface group was created
     ASSERT_TRUE(pSurfaceGroup);
@@ -146,7 +146,7 @@ TEST_F(GraphicalGroupTest, specialConstructor_Surface)
 TEST_F(GraphicalGroupTest, setVisibility_Layer)
 {
     /// create 3 layers
-    Layer l1, l2, l3;
+    Layer l1(0), l2(0), l3(0);
 
     /// set 2 layers to visible, one to invisible
     l1.setVisibility(true);
@@ -195,7 +195,7 @@ TEST_F(GraphicalGroupTest, setVisibility_Layer)
 TEST_F(GraphicalGroupTest, setVisibility_Surface)
 {
     /// create 3 surfaces
-    Surface l1, l2, l3;
+    Surface l1(0), l2(0), l3(0);
 
     /// set 2 surfaces to visible, one to invisible
     l1.setVisibility(true);
@@ -244,7 +244,7 @@ TEST_F(GraphicalGroupTest, setVisibility_Surface)
 TEST_F(GraphicalGroupTest, setOpacity_Layer)
 {
     /// create 3 layers
-    Layer l1, l2, l3;
+    Layer l1(0), l2(0), l3(0);
 
     /// set different opacity for each of the 3 layers
     l1.setOpacity(0.3);
@@ -285,7 +285,7 @@ TEST_F(GraphicalGroupTest, setOpacity_Layer)
 TEST_F(GraphicalGroupTest, setOpacity_Surface)
 {
     /// create 3 surfaces
-    Surface l1, l2, l3;
+    Surface l1(0), l2(0), l3(0);
 
     /// set different opacity for each of the 3 surfaces
     l1.setOpacity(0.3);
@@ -329,7 +329,7 @@ TEST_F(GraphicalGroupTest, getList_Layer)
     EXPECT_EQ(0u, m_pLayerGroup->getList().size());
 
     /// add 3 layers to graphical group
-    Layer l1, l2, l3;
+    Layer l1(0), l2(0), l3(0);
     m_pLayerGroup->addElement(&l1);
     m_pLayerGroup->addElement(&l2);
     m_pLayerGroup->addElement(&l3);
@@ -357,7 +357,7 @@ TEST_F(GraphicalGroupTest, getList_Surface)
     EXPECT_EQ(0u, m_pSurfaceGroup->getList().size());
 
     /// add 3 surfaces to graphical group
-    Surface l1, l2, l3;
+    Surface l1(0), l2(0), l3(0);
     m_pSurfaceGroup->addElement(&l1);
     m_pSurfaceGroup->addElement(&l2);
     m_pSurfaceGroup->addElement(&l3);
@@ -385,14 +385,14 @@ TEST_F(GraphicalGroupTest, addElement_Layer)
     EXPECT_EQ(0u, m_pLayerGroup->getList().size());
 
     /// add 1 layer to graphical group
-    Layer l1;
+    Layer l1(0);
     m_pLayerGroup->addElement(&l1);
 
     /// make sure, list not contains 1 element
     EXPECT_EQ(1u, m_pLayerGroup->getList().size());
 
     /// add 2 layers to graphical group
-    Layer l2, l3;
+    Layer l2(0), l3(0);
     m_pLayerGroup->addElement(&l2);
     m_pLayerGroup->addElement(&l3);
 
@@ -406,14 +406,14 @@ TEST_F(GraphicalGroupTest, addElement_Surface)
     EXPECT_EQ(0u, m_pSurfaceGroup->getList().size());
 
     /// add 1 surface to graphical group
-    Surface l1;
+    Surface l1(0);
     m_pSurfaceGroup->addElement(&l1);
 
     /// make sure, list not contains 1 element
     EXPECT_EQ(1u, m_pSurfaceGroup->getList().size());
 
     /// add 2 surfaces to graphical group
-    Surface l2, l3;
+    Surface l2(0), l3(0);
     m_pSurfaceGroup->addElement(&l2);
     m_pSurfaceGroup->addElement(&l3);
 
@@ -427,7 +427,7 @@ TEST_F(GraphicalGroupTest, removeElement_Layer)
     EXPECT_EQ(0u, m_pLayerGroup->getList().size());
 
     /// add 3 layers to graphical group
-    Layer l1, l2, l3;
+    Layer l1(0), l2(0), l3(0);
     m_pLayerGroup->addElement(&l1);
     m_pLayerGroup->addElement(&l2);
     m_pLayerGroup->addElement(&l3);
@@ -455,7 +455,7 @@ TEST_F(GraphicalGroupTest, removeElement_Surface)
     EXPECT_EQ(0u, m_pSurfaceGroup->getList().size());
 
     /// add 3 surfaces to graphical group
-    Surface l1, l2, l3;
+    Surface l1(0), l2(0), l3(0);
     m_pSurfaceGroup->addElement(&l1);
     m_pSurfaceGroup->addElement(&l2);
     m_pSurfaceGroup->addElement(&l3);

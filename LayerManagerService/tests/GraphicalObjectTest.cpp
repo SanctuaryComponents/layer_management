@@ -27,8 +27,8 @@ class GraphicalObjectTest : public ::testing::Test
 public:
     void SetUp()
     {
-        m_pSurface = new GraphicalObject(TypeSurface, 1.0, true);
-        m_pLayer = new GraphicalObject(TypeLayer, 1.0, true);
+        m_pSurface = new GraphicalObject(TypeSurface, 1.0, true, 0);
+        m_pLayer = new GraphicalObject(TypeLayer, 1.0, true, 0);
         ASSERT_TRUE(m_pSurface);
         ASSERT_TRUE(m_pLayer);
     }
@@ -57,7 +57,7 @@ TEST_F(GraphicalObjectTest, constructor_LayerWithoutId)
     unsigned int expectedVisibility = 1;
 
     /// Create graphical object of type layer without specific id
-    GraphicalObject layer(TypeLayer, expectedOpacity, expectedVisibility);
+    GraphicalObject layer(TypeLayer, expectedOpacity, expectedVisibility, 0);
 
     /// make sure, layer has a valid id assigned
     EXPECT_NE(GraphicalObject::INVALID_ID, layer.getID());
@@ -82,7 +82,7 @@ TEST_F(GraphicalObjectTest, constructor_SurfaceWithoutId)
     unsigned char chromaKeyBlue = 111;
 
     /// Create graphical object of type surface without specific id
-    GraphicalObject surface(TypeSurface, expectedOpacity, expectedVisibility);
+    GraphicalObject surface(TypeSurface, expectedOpacity, expectedVisibility, 0);
 
     /// make sure, surface has a valid id assigned
     EXPECT_NE(GraphicalObject::INVALID_ID, surface.getID());
@@ -117,7 +117,7 @@ TEST_F(GraphicalObjectTest, constructor_LayerWithId)
     unsigned char chromaKeyBlue = 111;
 
     /// Create graphical object of type layer without specific id
-    GraphicalObject layer(expectedId, TypeLayer, expectedOpacity, expectedVisibility);
+    GraphicalObject layer(expectedId, TypeLayer, expectedOpacity, expectedVisibility, 0);
 
     /// make sure, layer has a expected id assigned
     EXPECT_EQ(expectedId, layer.getID());
@@ -152,7 +152,7 @@ TEST_F(GraphicalObjectTest, constructor_SurfaceWithId)
     unsigned char chromaKeyBlue = 111;
 
     /// Create graphical object of type surface without specific id
-    GraphicalObject surface(expectedId, TypeSurface, expectedOpacity, expectedVisibility);
+    GraphicalObject surface(expectedId, TypeSurface, expectedOpacity, expectedVisibility, 0);
 
     /// make sure, surface has a expected id assigned
     EXPECT_EQ(expectedId, surface.getID());
@@ -297,7 +297,7 @@ TEST_F(GraphicalObjectTest, getID_Layer)
     EXPECT_NE(GraphicalObject::INVALID_ID, m_pLayer->getID());
 
     /// create graphical object of type layer with expected id
-    GraphicalObject layer(expectedLayerId, TypeLayer, 1.0, 1);
+    GraphicalObject layer(expectedLayerId, TypeLayer, 1.0, 1, 0);
 
     /// make sure, graphical object has expected id
     EXPECT_EQ(expectedLayerId, layer.getID());
@@ -311,7 +311,7 @@ TEST_F(GraphicalObjectTest, getID_Surface)
     EXPECT_NE(GraphicalObject::INVALID_ID, m_pSurface->getID());
 
     /// create graphical object of type surface with expected id
-    GraphicalObject surface(expectedSurfaceId, TypeSurface, 1.0, 1);
+    GraphicalObject surface(expectedSurfaceId, TypeSurface, 1.0, 1, 0);
 
     /// make sure, graphical object has expected id
     EXPECT_EQ(expectedSurfaceId, surface.getID());

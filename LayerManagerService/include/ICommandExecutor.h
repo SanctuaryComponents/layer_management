@@ -184,11 +184,25 @@ public:
     virtual void removeApplicationReference(t_ilm_client_handle client) = 0;
 
     /**
-     * \brief get pid of a connected applications
+     * \brief get pid of a connected application
      * \ingroup ServiceAPI
      * \param[in] client client handle to get process id for
      */
     virtual t_ilm_uint getSenderPid(t_ilm_client_handle client) = 0;
+
+    /**
+     * \brief get name of a connected application
+     * \ingroup ServiceAPI
+     * \param[in] client client handle to get process name for
+     */
+    virtual const char* getSenderName(t_ilm_client_handle client) = 0;
+
+    /**
+     * \brief get name of a connected application
+     * \ingroup ServiceAPI
+     * \param[in] pid process id to get process name for
+     */
+    virtual const char* getSenderName(unsigned int pid) = 0;
 
     /**
      * \brief get capabilities of layer type

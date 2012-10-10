@@ -26,6 +26,8 @@
 #include "IRenderer.h"
 #include "ISceneProvider.h"
 
+static const char* NO_SENDER_NAME = "unknown";
+
 Layermanager::Layermanager()
 {
     m_pScene = new Scene();
@@ -172,8 +174,10 @@ void Layermanager::addApplicationReference(t_ilm_client_handle client, IApplicat
 {
     if (client && reference)
     {
-        LOG_INFO("LayerManagerService", "Connect from application handle:" << client << ", pid:" << reference->getProcessId());
+        m_pidToProcessNameTable[reference->getProcessId()] = reference->getProcessName();
         (*m_pApplicationReferenceMap)[client]=reference;
+        unsigned int pid = getSenderPid(client);
+        LOG_INFO("LayerManagerService", "Connect from application " << getSenderName(client) << "(" << pid << ")");
     }
 }
 
@@ -181,8 +185,10 @@ void Layermanager::removeApplicationReference(t_ilm_client_handle client)
 {
     if (client)
     {
-        LOG_INFO("LayerManagerService", "Disconnect from application with handle:" << client << ", pid:" << getSenderPid(client));
+        unsigned int pid = getSenderPid(client);
+        LOG_INFO("LayerManagerService", "Disconnect from application " << getSenderName(client) << "(" << pid << ")");
         m_pApplicationReferenceMap->erase(client);
+        m_pidToProcessNameTable.erase(pid);
     }
 }
 
@@ -193,6 +199,27 @@ t_ilm_uint Layermanager::getSenderPid(t_ilm_client_handle client)
     if (app)
     {
         result = app->getProcessId();
+    }
+    return result;
+}
+
+const char*  Layermanager::getSenderName(t_ilm_client_handle client)
+{
+    const char* result = NO_SENDER_NAME;
+    IApplicationReference* app = (*m_pApplicationReferenceMap)[client];
+    if (app)
+    {
+        result = app->getProcessName();
+    }
+    return result;
+}
+
+const char* Layermanager::getSenderName(unsigned int pid)
+{
+    const char* result = m_pidToProcessNameTable[pid];
+    if (!result)
+    {
+        result = NO_SENDER_NAME;
     }
     return result;
 }
@@ -257,7 +284,9 @@ bool Layermanager::executeCommand(ICommand* commandToBeExecuted)
     	signalRendererRedraw();
     }
 
-    LOG_INFO("LayerManagerService", "executed: " << commandToBeExecuted->getString()
+    unsigned int commandPid = commandToBeExecuted->getSenderPid();
+    LOG_INFO("LayerManagerService", "executed " << commandToBeExecuted->getString()
+                                     << " from " << getSenderName(commandPid) << "(" << commandPid << ")"
                                      << ((status == ExecutionSuccess || status == ExecutionSuccessRedraw) ? "+" : "-"));
 
     return (status == ExecutionSuccess || status == ExecutionSuccessRedraw);
@@ -274,7 +303,9 @@ bool Layermanager::enqueueCommand(ICommand* commandToBeExecuted)
     sizeAfter = m_pScene->m_toBeCommittedList.size();
     m_pScene->unlockScene();
 
-    LOG_DEBUG("LayerManagerService", "enqueued: " << commandToBeExecuted->getString()
+    unsigned int commandPid = commandToBeExecuted->getSenderPid();
+    LOG_DEBUG("LayerManagerService", "enqueued " << commandToBeExecuted->getString()
+            << " from " << getSenderName(commandPid) << "(" << commandPid << ")"
                                      << ((sizeAfter == sizeBefore + 1) ? "+" : "-"));
 
     // if queue size increased by 1, enqueue command was successful

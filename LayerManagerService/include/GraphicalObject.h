@@ -33,9 +33,9 @@ class GraphicalObject
 {
 public:
 
-    GraphicalObject(ObjectType type, double opacity, bool visibility);
+    GraphicalObject(ObjectType type, double opacity, bool visibility, int creatorPid);
 
-    GraphicalObject(int externalId,ObjectType type, double opacity, bool visibility);
+    GraphicalObject(int externalId, ObjectType type, double opacity, bool visibility, int creatorPid);
 
     virtual ~GraphicalObject() {}
 
@@ -128,7 +128,15 @@ public:
      */
     void removeNotification(t_ilm_client_handle client);
 
+    /**
+     * @brief get list of client that registered to a notification for this object
+     */
     ApplicationReferenceList& getNotificationClients();
+
+    /**
+     * @brief get process id of process that created this object
+     */
+    int getCreatorPid();
 
 
 public:
@@ -153,9 +161,10 @@ protected:
 
 private:
     static unsigned int nextGraphicId[TypeMax];
+    int createdByPid;
 };
 
-inline GraphicalObject::GraphicalObject(ObjectType type, double opacity, bool visibility)
+inline GraphicalObject::GraphicalObject(ObjectType type, double opacity, bool visibility, int creatorPid)
 : type(type)
 , renderPropertyChanged(false)
 , damaged(false)
@@ -167,11 +176,12 @@ inline GraphicalObject::GraphicalObject(ObjectType type, double opacity, bool vi
 , chromaKeyGreen(0)
 , chromaKeyBlue(0)
 , graphicInternalId(nextGraphicId[type]++)
+, createdByPid(creatorPid)
 {
     graphicExternalId = graphicInternalId;
 }
 
-inline GraphicalObject::GraphicalObject(int externalId, ObjectType type, double opacity, bool visibility)
+inline GraphicalObject::GraphicalObject(int externalId, ObjectType type, double opacity, bool visibility, int creatorPid)
 : type(type)
 , renderPropertyChanged(false)
 , damaged(false)
@@ -184,6 +194,7 @@ inline GraphicalObject::GraphicalObject(int externalId, ObjectType type, double 
 , chromaKeyBlue(0)
 , graphicInternalId(nextGraphicId[type]++)
 , graphicExternalId(externalId)
+, createdByPid(creatorPid)
 {
 }
 

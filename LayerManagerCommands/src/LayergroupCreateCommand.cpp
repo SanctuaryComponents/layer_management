@@ -26,7 +26,7 @@ ExecutionResult LayergroupCreateCommand::execute(ICommandExecutor* executor)
     Scene& scene = *(executor->getScene());
     ExecutionResult result = ExecutionFailed;
 
-    LayerGroup *layergroup = scene.createLayerGroup(*m_idReturn);
+    LayerGroup *layergroup = scene.createLayerGroup(*m_idReturn, getSenderPid());
 
     if (layergroup)
     {

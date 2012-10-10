@@ -35,13 +35,13 @@ Scene::~Scene()
     pthread_mutex_destroy(&m_layerListMutex);
 }
 
-Layer* Scene::createLayer(const uint layerId)
+Layer* Scene::createLayer(const uint layerId, int creatorPid)
 {
     Layer* newLayer = NULL;
     if (layerId == GraphicalObject::INVALID_ID)
     {
         LOG_DEBUG("Scene", "createLayer: creating new layer");
-        newLayer = new Layer();
+        newLayer = new Layer(creatorPid);
         uint newLayerId = newLayer->getID();
         m_layerMap[newLayerId] = newLayer;
     }
@@ -50,7 +50,7 @@ Layer* Scene::createLayer(const uint layerId)
         if (0 == m_layerMap.count(layerId))
         {
             LOG_DEBUG("Scene", "createLayer: unknown layer id provided; creating new layer");
-            newLayer = new Layer(layerId);
+            newLayer = new Layer(layerId, creatorPid);
             uint newLayerId = newLayer->getID();
             m_layerMap[newLayerId] = newLayer;
         }
@@ -63,12 +63,12 @@ Layer* Scene::createLayer(const uint layerId)
     return newLayer;
 }
 
-Surface* Scene::createSurface(const uint surfaceId)
+Surface* Scene::createSurface(const uint surfaceId, int creatorPid)
 {
     Surface* newSurface = NULL;
     if (surfaceId == GraphicalObject::INVALID_ID)
     {
-        newSurface = new Surface();
+        newSurface = new Surface(creatorPid);
         uint newSurfaceId = newSurface->getID();
         m_surfaceMap[newSurfaceId] = newSurface;
     }
@@ -76,7 +76,7 @@ Surface* Scene::createSurface(const uint surfaceId)
     {
         if (0 == m_surfaceMap.count(surfaceId))
         {
-            newSurface = new Surface(surfaceId);
+            newSurface = new Surface(surfaceId, creatorPid);
             uint newSurfaceId = newSurface->getID();
             m_surfaceMap[newSurfaceId] = newSurface;
         }
@@ -89,12 +89,12 @@ Surface* Scene::createSurface(const uint surfaceId)
     return newSurface;
 }
 
-SurfaceGroup* Scene::createSurfaceGroup(const uint surfaceGroupId)
+SurfaceGroup* Scene::createSurfaceGroup(const uint surfaceGroupId, int creatorPid)
 {
     SurfaceGroup* newSurfaceGroup = NULL;
     if (surfaceGroupId == GraphicalObject::INVALID_ID)
     {
-        newSurfaceGroup = new SurfaceGroup();
+        newSurfaceGroup = new SurfaceGroup(creatorPid);
         uint newSurfaceGroupId = newSurfaceGroup->getID();
         m_surfaceGroupMap[newSurfaceGroupId] = newSurfaceGroup;
     }
@@ -102,7 +102,7 @@ SurfaceGroup* Scene::createSurfaceGroup(const uint surfaceGroupId)
     {
         if (0 == m_surfaceGroupMap.count(surfaceGroupId))
         {
-            newSurfaceGroup = new SurfaceGroup(surfaceGroupId);
+            newSurfaceGroup = new SurfaceGroup(surfaceGroupId, creatorPid);
             uint newSurfaceGroupId = newSurfaceGroup->getID();
             m_surfaceGroupMap[newSurfaceGroupId] = newSurfaceGroup;
         }
@@ -114,12 +114,12 @@ SurfaceGroup* Scene::createSurfaceGroup(const uint surfaceGroupId)
     return newSurfaceGroup;
 }
 
-LayerGroup* Scene::createLayerGroup(const uint layerGroupId)
+LayerGroup* Scene::createLayerGroup(const uint layerGroupId, int creatorPid)
 {
     LayerGroup* newLayerGroup = NULL;
     if (layerGroupId == GraphicalObject::INVALID_ID)
     {
-        newLayerGroup = new LayerGroup();
+        newLayerGroup = new LayerGroup(creatorPid);
         uint newLayerGroupId = newLayerGroup->getID();
         m_layerGroupMap[newLayerGroupId] = newLayerGroup;
     }
@@ -127,7 +127,7 @@ LayerGroup* Scene::createLayerGroup(const uint layerGroupId)
     {
         if (0 == m_layerGroupMap.count(layerGroupId))
         {
-            newLayerGroup = new LayerGroup(layerGroupId);
+            newLayerGroup = new LayerGroup(layerGroupId, creatorPid);
             uint newLayerGroupId = newLayerGroup->getID();
             m_layerGroupMap[newLayerGroupId] = newLayerGroup;
         }

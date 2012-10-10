@@ -31,9 +31,9 @@
 class GraphicalSurface : public GraphicalObject
 {
 public:
-    GraphicalSurface(ObjectType type);
+    GraphicalSurface(ObjectType type, int creatorPid);
 
-    GraphicalSurface(int externalId,ObjectType type);
+    GraphicalSurface(int externalId, ObjectType type, int creatorPid);
 
     virtual ~GraphicalSurface() {}
 
@@ -107,12 +107,11 @@ private:
     OrientationType m_orientation; // Rotation of the graphical content
     Rectangle m_sourceViewport;
     Rectangle m_destinationViewport;
-
 };
 
 
-inline GraphicalSurface::GraphicalSurface(ObjectType type)
-: GraphicalObject(type, 1.0, false)
+inline GraphicalSurface::GraphicalSurface(ObjectType type, int creatorPid)
+: GraphicalObject(type, 1.0, false, creatorPid)
 , OriginalSourceWidth(0)
 , OriginalSourceHeight(0)
 , m_orientation(Zero)
@@ -121,8 +120,8 @@ inline GraphicalSurface::GraphicalSurface(ObjectType type)
 {
 }
 
-inline GraphicalSurface::GraphicalSurface(int externalId,ObjectType type)
-: GraphicalObject(externalId,type,1.0,false)
+inline GraphicalSurface::GraphicalSurface(int externalId, ObjectType type, int creatorPid)
+: GraphicalObject(externalId, type, 1.0, false, creatorPid)
 , OriginalSourceWidth(0)
 , OriginalSourceHeight(0)
 , m_orientation(Zero)

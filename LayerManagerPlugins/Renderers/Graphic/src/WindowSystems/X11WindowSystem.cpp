@@ -805,7 +805,7 @@ init_complete:
     gettimeofday(&tv0, NULL);
     if (this->debugMode)
     {
-        defaultLayer = this->m_pScene->createLayer(0);
+        defaultLayer = this->m_pScene->createLayer(0, 0);
         defaultLayer->setOpacity(1.0);
         defaultLayer->setDestinationRegion(Rectangle(0,0,this->resolutionWidth,this->resolutionHeight));
         defaultLayer->setSourceRegion(Rectangle(0,0,this->resolutionWidth,this->resolutionHeight));
@@ -834,7 +834,7 @@ init_complete:
                 if (this->debugMode)
                 {
                     LOG_DEBUG("X11WindowSystem", "CreateNotify Event");
-                    Surface* s = this->m_pScene->createSurface(0);
+                    Surface* s = this->m_pScene->createSurface(0, 0);
                     s->setOpacity(1.0);
                     this->NewWindow(s, event.xcreatewindow.window);
                     defaultLayer->addSurface(s);

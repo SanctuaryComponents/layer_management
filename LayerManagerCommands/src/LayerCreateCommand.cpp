@@ -26,7 +26,7 @@ ExecutionResult LayerCreateCommand::execute(ICommandExecutor* executor)
     Scene& scene = *(executor->getScene());
     ExecutionResult result = ExecutionFailed;
 
-	Layer *layer = scene.createLayer(*m_idReturn);
+	Layer *layer = scene.createLayer(*m_idReturn, getSenderPid());
 	if (layer)
 	{
 		*m_idReturn = layer->getID();
