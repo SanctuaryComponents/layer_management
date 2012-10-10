@@ -440,6 +440,13 @@ int main(int argc, char **argv)
     char* pluginLookupPath = getenv("LM_PLUGIN_PATH");
     LOG_INFO("LayerManagerService", "Starting Layermanager (version: " << ILM_VERSION << ")");
 
+    std::stringstream commandLine;
+    for (int i = 0; i < argc; ++i)
+    {
+        commandLine << argv[i] << " ";
+    }
+    LOG_INFO("LayerManagerService", "Command Line: " << commandLine.str());
+
     buildConfigurationFlag configFlags[] = { buildConfigurationFlags };
     int configFlagCount = sizeof(configFlags) / sizeof(configFlags[0]);
     for (int i = 0; i < configFlagCount; ++i)
