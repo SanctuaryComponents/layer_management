@@ -25,6 +25,7 @@
 #include "ShaderLighting.h"
 
 #include <stdlib.h>
+#include <unistd.h>
 #include <limits.h>
 
 #define CITY_GRID_SIZE 1.0f

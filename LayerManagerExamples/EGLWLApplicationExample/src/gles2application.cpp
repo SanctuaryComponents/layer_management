@@ -238,8 +238,8 @@ printf("currentTime=%d, startTime=%d, animTime=%d\n", currentTime, startTime, an
             currentAngle = angle - ((float) i) * 10.0f;
             IlmMatrixIdentity(matrix);
             IlmMatrixRotateZ(matrix, currentAngle);
-            float color[4] = { 0.0, 1.0, 1.0, 0.5 + (0.3 / (float) i) };
-            float lineColor[4] = { 0.0, 0.0, 0.0, 0.5 + (0.4 / (float) i) };
+            float color[4] = { 0.0f, 1.0f, 1.0f, 0.5f + (0.3f / (float) i) };
+            float lineColor[4] = { 0.0f, 0.0f, 0.0f, 0.5f + (0.4f / (float) i) };
 
             glUniformMatrix4fv(shader.matrixLocation, 1, GL_FALSE, &matrix.f[0]);
             glUniform4fv(shader.colorLocation, 1, &color[0]);

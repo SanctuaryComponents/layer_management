@@ -26,6 +26,7 @@ using std::cout;
 using std::endl;
 
 #include <stdlib.h>
+#include <unistd.h>
 #include <math.h>
 #include <sys/time.h>
 
