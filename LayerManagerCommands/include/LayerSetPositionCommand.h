@@ -20,20 +20,27 @@
 #ifndef _LAYERSETPOSITIONCOMMAND_H_
 #define _LAYERSETPOSITIONCOMMAND_H_
 
-#include "BaseCommandAsynchronous.h"
+#include "ICommand.h"
 
-class LayerSetPositionCommand : public BaseCommandAsynchronous
+class LayerSetPositionCommand : public ICommand
 {
 public:
     /*!
      * \action    This command sets the position of a layer within the GENIVI LayerManagement
      * \frequency Called for rearranging graphical contents.
+     * \param[in] sender process id of application that sent this command
      * \param[in] id id of layer
      * \param[in] x x position of layer on screen
      * \param[in] y y position of layer on screen
      * \ingroup Commands
      */
-    LayerSetPositionCommand(unsigned int id, unsigned int x, unsigned int y);
+    LayerSetPositionCommand(pid_t sender, unsigned int id, unsigned int x, unsigned int y)
+    : ICommand(ExecuteAsynchronous, sender)
+    , m_id(id)
+    , m_x(x)
+    , m_y(y)
+    {}
+
 
     /**
      * \brief default destructor

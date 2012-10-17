@@ -20,19 +20,24 @@
 #ifndef _LAYERSETOPACITYCOMMAND_H_
 #define _LAYERSETOPACITYCOMMAND_H_
 
-#include "BaseCommandAsynchronous.h"
+#include "ICommand.h"
 
-class LayerSetOpacityCommand : public BaseCommandAsynchronous
+class LayerSetOpacityCommand : public ICommand
 {
 public:
     /*!
      * \action    This command sets the opacity of a layer within the GENIVI LayerManagement
      * \frequency Can occur very frequently for animations.
+     * \param[in] sender process id of application that sent this command
      * \param[in] id id of layer
      * \param[in] Opacity opacity of layer
      * \ingroup Commands
      */
-    LayerSetOpacityCommand(unsigned int id, double Opacity);
+    LayerSetOpacityCommand(pid_t sender, unsigned int id, double Opacity)
+    : ICommand(ExecuteAsynchronous, sender)
+    , m_id(id)
+    , m_opacity(Opacity)
+    {}
 
     /**
      * \brief default destructor

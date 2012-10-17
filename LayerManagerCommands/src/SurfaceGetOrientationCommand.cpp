@@ -21,12 +21,6 @@
 #include "Scene.h"
 #include <sstream>
 
-SurfaceGetOrientationCommand::SurfaceGetOrientationCommand(int id, OrientationType* orientation)
-: m_id(id)
-, m_pReturnOrientation(orientation)
-{
-}
-
 ExecutionResult SurfaceGetOrientationCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());

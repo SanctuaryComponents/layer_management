@@ -22,18 +22,22 @@
 #define _SURFACESETKEYBOARDFOCUSCOMMAND_H_
 
 
-#include "BaseCommandSynchronous.h"
+#include "ICommand.h"
 
-class SurfaceSetKeyboardFocusCommand : public BaseCommandSynchronous
+class SurfaceSetKeyboardFocusCommand : public ICommand
 {
     public:
         /*!
          * \action    This command sets the keyboard focus on a particular surface
          * \frequency Called whenever a surface needs to receive keyboard events
+         * \param[in] sender process id of application that sent this command
          * \param[in] surfId id of surface
          * \ingroup Commands
          */
-        SurfaceSetKeyboardFocusCommand(unsigned int surfId);
+        SurfaceSetKeyboardFocusCommand(pid_t sender, unsigned int surfId)
+        : ICommand(ExecuteSynchronous, sender)
+        , m_surfId(surfId)
+        {}
 
         /**
          * \brief default destructor

@@ -21,13 +21,6 @@
 #include "Scene.h"
 #include "Log.h"
 
-LayerSetPositionCommand::LayerSetPositionCommand(unsigned int id, unsigned int x, unsigned int y )
-: m_id(id)
-, m_x(x)
-, m_y(y)
-{
-}
-
 ExecutionResult LayerSetPositionCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());

@@ -20,20 +20,25 @@
 #ifndef _LAYERGETORIENTATIONCOMMAND_H_
 #define _LAYERGETORIENTATIONCOMMAND_H_
 
-#include "BaseCommandSynchronous.h"
+#include "ICommand.h"
 #include "OrientationType.h"
 
-class LayerGetOrientationCommand: public BaseCommandSynchronous
+class LayerGetOrientationCommand: public ICommand
 {
 public:
     /*!
      * \action    This command returns the orientation of a layer within the GENIVI LayerManagement
      * \frequency Can be used for rearrangement.
+     * \param[in] sender process id of application that sent this command
      * \param[in] id id of layer
      * \param[in] orientation location to store orientation of layer on execution
      * \ingroup Commands
      */
-    LayerGetOrientationCommand(int id, OrientationType* orientation);
+    LayerGetOrientationCommand(pid_t sender, int id, OrientationType* orientation)
+    : ICommand(ExecuteSynchronous, sender)
+    , m_id(id)
+    , m_pReturnOrientation(orientation)
+    {}
 
     /**
      * \brief default destructor

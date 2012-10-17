@@ -22,12 +22,6 @@
 #include "ShaderMap.h"
 #include "Log.h"
 
-SurfaceSetShaderCommand::SurfaceSetShaderCommand(unsigned int id,unsigned  int shaderid)
-: m_id(id)
-, m_shaderid(shaderid)
-{
-}
-
 unsigned int SurfaceSetShaderCommand::getID() const
 {
     return m_id;

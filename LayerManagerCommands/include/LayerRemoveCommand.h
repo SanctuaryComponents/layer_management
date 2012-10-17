@@ -20,9 +20,9 @@
 #ifndef _LAYERREMOVECOMMAND_H_
 #define _LAYERREMOVECOMMAND_H_
 
-#include "BaseCommandSynchronous.h"
+#include "ICommand.h"
 
-class LayerRemoveCommand : public BaseCommandSynchronous
+class LayerRemoveCommand : public ICommand
 {
 public:
     /*!
@@ -32,10 +32,14 @@ public:
      *            than surfaces. A small configuration might create a layer for
      *            everything concerning OEM branding, one layer for third party
      *            applications and one layer for status applications.
+     * \param[in] sender process id of application that sent this command
      * \param[in] objectID id of layer
      * \ingroup Commands
      */
-    LayerRemoveCommand(unsigned int objectID);
+    LayerRemoveCommand(pid_t sender, unsigned int objectID)
+    : ICommand(ExecuteSynchronous, sender)
+    , m_idToRemove(objectID)
+    {}
 
     /**
      * \brief default destructor

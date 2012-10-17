@@ -20,19 +20,24 @@
 #ifndef _SURFACEGROUPREMOVESURFACECOMMAND_H_
 #define _SURFACEGROUPREMOVESURFACECOMMAND_H_
 
-#include "BaseCommandAsynchronous.h"
+#include "ICommand.h"
 
-class SurfacegroupRemoveSurfaceCommand : public BaseCommandAsynchronous
+class SurfacegroupRemoveSurfaceCommand : public ICommand
 {
 public:
     /*!
      * \action    This command removes a surface from a surface group within the GENIVI LayerManagement
      * \frequency Used for surface group management.
+     * \param[in] sender process id of application that sent this command
      * \param[in] surfacegroupid id of surface group
      * \param[in] surfaceid id of surface
      * \ingroup Commands
      */
-    SurfacegroupRemoveSurfaceCommand(int surfacegroupid, unsigned int surfaceid);
+    SurfacegroupRemoveSurfaceCommand(pid_t sender, int surfacegroupid, unsigned int surfaceid)
+    : ICommand(ExecuteAsynchronous, sender)
+    , m_surfacegroupid(surfacegroupid)
+    , m_surfaceid(surfaceid)
+    {}
 
     /**
      * \brief default destructor

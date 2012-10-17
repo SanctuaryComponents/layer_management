@@ -20,20 +20,25 @@
 #ifndef _SURFACESETORIENTATIONCOMMAND_H_
 #define _SURFACESETORIENTATIONCOMMAND_H_
 
-#include "BaseCommandAsynchronous.h"
+#include "ICommand.h"
 #include "OrientationType.h"
 
-class SurfaceSetOrientationCommand : public BaseCommandAsynchronous
+class SurfaceSetOrientationCommand : public ICommand
 {
 public:
     /*!
      * \action    This command sets the orientation of a surface within the GENIVI LayerManagement
      * \frequency Called to rearrange applications output.
+     * \param[in] sender process id of application that sent this command
      * \param[in] id id of surface
      * \param[in] Orientation orientation of surface (rotation)
      * \ingroup Commands
      */
-    SurfaceSetOrientationCommand(unsigned int id, OrientationType Orientation);
+    SurfaceSetOrientationCommand(pid_t sender, unsigned int id, OrientationType Orientation)
+    : ICommand(ExecuteAsynchronous, sender)
+    , m_id(id)
+    , m_orientation(Orientation)
+    {}
 
     /**
      * \brief default destructor

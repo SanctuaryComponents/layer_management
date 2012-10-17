@@ -21,12 +21,6 @@
 #include "Scene.h"
 #include "Log.h"
 
-SurfacegroupSetOpacityCommand::SurfacegroupSetOpacityCommand(unsigned int id, double Opacity)
-: m_id(id)
-, m_opacity(Opacity)
-{
-}
-
 ExecutionResult SurfacegroupSetOpacityCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());

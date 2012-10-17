@@ -20,19 +20,24 @@
 #ifndef _SURFACESETOPACITYCOMMAND_H_
 #define _SURFACESETOPACITYCOMMAND_H_
 
-#include "BaseCommandAsynchronous.h"
+#include "ICommand.h"
 
-class SurfaceSetOpacityCommand : public BaseCommandAsynchronous
+class SurfaceSetOpacityCommand : public ICommand
 {
 public:
     /*!
      * \action    This command sets the opacity of a surface withing the GENIVI LayerManagement
      * \frequency Can be called very frequently as it can be used for animations.
+     * \param[in] sender process id of application that sent this command
      * \param[in] id id of surface
      * \param[in] Opacity opacity of surface
      * \ingroup Commands
      */
-    SurfaceSetOpacityCommand(unsigned int id, double Opacity);
+    SurfaceSetOpacityCommand(pid_t sender, unsigned int id, double Opacity)
+    : ICommand(ExecuteAsynchronous, sender)
+    , m_id(id)
+    , m_opacity(Opacity)
+    {}
 
     /**
      * \brief default destructor

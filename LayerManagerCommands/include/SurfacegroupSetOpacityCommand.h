@@ -20,19 +20,24 @@
 #ifndef _SURFACEGROUPSETOPACITYCOMMAND_H_
 #define _SURFACEGROUPSETOPACITYCOMMAND_H_
 
-#include "BaseCommandAsynchronous.h"
+#include "ICommand.h"
 
-class SurfacegroupSetOpacityCommand : public BaseCommandAsynchronous
+class SurfacegroupSetOpacityCommand : public ICommand
 {
 public:
     /*!
      * \action    This command sets the opacity of a surface group within the GENIVI LayerManagement
      * \frequency Used for surface group management.
+     * \param[in] sender process id of application that sent this command
      * \param[in] id id of surface group
      * \param[in] Opacity new opacity for all surfaces in group
      * \ingroup Commands
      */
-    SurfacegroupSetOpacityCommand(unsigned int id, double Opacity);
+    SurfacegroupSetOpacityCommand(pid_t sender, unsigned int id, double Opacity)
+    : ICommand(ExecuteAsynchronous, sender)
+    , m_id(id)
+    , m_opacity(Opacity)
+    {}
 
     /**
      * \brief default destructor

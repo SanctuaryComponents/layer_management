@@ -21,13 +21,6 @@
 #include "Scene.h"
 #include "Log.h"
 
-SurfaceGetDimensionCommand::SurfaceGetDimensionCommand(int id, uint* widthRet, uint* heightRet)
-: m_id(id)
-, m_pWidth(widthRet)
-, m_pHeight(heightRet)
-{
-}
-
 ExecutionResult SurfaceGetDimensionCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());

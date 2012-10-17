@@ -21,11 +21,6 @@
 #include "Scene.h"
 #include "Log.h"
 
-LayergroupCreateCommand::LayergroupCreateCommand(uint* idReturn)
-: m_idReturn(idReturn)
-{
-}
-
 ExecutionResult LayergroupCreateCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());

@@ -21,11 +21,6 @@
 #include "Scene.h"
 #include <sstream>
 
-SurfaceCreateCommand::SurfaceCreateCommand(uint* idReturn)
-: m_idReturn(idReturn)
-{
-}
-
 ExecutionResult SurfaceCreateCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());

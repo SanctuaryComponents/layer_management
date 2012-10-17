@@ -20,20 +20,26 @@
 #ifndef _SURFACEGETDIMENSIONCOMMAND_H_
 #define _SURFACEGETDIMENSIONCOMMAND_H_
 
-#include "BaseCommandSynchronous.h"
+#include "ICommand.h"
 
-class SurfaceGetDimensionCommand: public BaseCommandSynchronous
+class SurfaceGetDimensionCommand: public ICommand
 {
 public:
     /*!
      * \action    This command returns the dimension of a surface within the GENIVI LayerManagement
      * \frequency Called for rearranging graphical contents.
+     * \param[in] sender process id of application that sent this command
      * \param[in] id id of surface
      * \param[in] widthRet pointer to store surface width on execution
      * \param[in] heightRet pointer to store surface height on execution
      * \ingroup Commands
      */
-    SurfaceGetDimensionCommand(int id, unsigned int* widthRet, unsigned int* heightRet);
+    SurfaceGetDimensionCommand(pid_t sender, int id, unsigned int* widthRet, unsigned int* heightRet)
+    : ICommand(ExecuteSynchronous, sender)
+    , m_id(id)
+    , m_pWidth(widthRet)
+    , m_pHeight(heightRet)
+    {}
 
     /**
      * \brief default destructor

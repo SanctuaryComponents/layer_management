@@ -20,20 +20,25 @@
 #ifndef _SURFACEGETORIENTATIONCOMMAND_H_
 #define _SURFACEGETORIENTATIONCOMMAND_H_
 
-#include "BaseCommandSynchronous.h"
+#include "ICommand.h"
 #include "OrientationType.h"
 
-class SurfaceGetOrientationCommand: public BaseCommandSynchronous
+class SurfaceGetOrientationCommand: public ICommand
 {
 public:
     /*!
      * \action    This command returns the orientation of a surface within the GENIVI LayerManagement
      * \frequency Can be used for rearrangement.
+     * \param[in] sender process id of application that sent this command
      * \param[in] id id of surface
      * \param[in] orientation location to tore orientation of surface on execution
      * \ingroup Commands
      */
-    SurfaceGetOrientationCommand(int id, OrientationType* orientation);
+    SurfaceGetOrientationCommand(pid_t sender, int id, OrientationType* orientation)
+    : ICommand(ExecuteSynchronous, sender)
+    , m_id(id)
+    , m_pReturnOrientation(orientation)
+    {}
 
     /**
      * \brief default destructor

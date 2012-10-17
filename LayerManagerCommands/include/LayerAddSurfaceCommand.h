@@ -20,9 +20,9 @@
 #ifndef _LAYERADDSURFACECOMMAND_H_
 #define _LAYERADDSURFACECOMMAND_H_
 
-#include "BaseCommandAsynchronous.h"
+#include "ICommand.h"
 
-class LayerAddSurfaceCommand : public BaseCommandAsynchronous
+class LayerAddSurfaceCommand : public ICommand
 {
 public:
     /*!
@@ -30,11 +30,16 @@ public:
      * \frequency Typically surfaces will be added to one or more layers once in their life
      *            cycle. So this will typically be called at least once for every surface
      *            created.
+     * \param[in] sender process id of application that sent this command
      * \param[in] layerid id of layer
      * \param[in] surfaceid id of surface
      * \ingroup Commands
      */
-    LayerAddSurfaceCommand(unsigned int layerid, unsigned int surfaceid);
+    LayerAddSurfaceCommand(pid_t sender, unsigned int layerid, unsigned int surfaceid)
+    : ICommand(ExecuteAsynchronous, sender)
+    , m_layerid(layerid)
+    , m_surfaceid(surfaceid)
+    {}
 
     /**
      * \brief default destructor

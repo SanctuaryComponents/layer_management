@@ -21,12 +21,6 @@
 #include "Scene.h"
 #include "Log.h"
 
-SurfaceGetPixelformatCommand::SurfaceGetPixelformatCommand(int id, PixelFormat* f)
-: m_id(id)
-, m_pFormatreturn(f)
-{
-}
-
 ExecutionResult SurfaceGetPixelformatCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());

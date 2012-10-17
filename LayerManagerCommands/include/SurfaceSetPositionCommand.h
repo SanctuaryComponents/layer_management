@@ -20,20 +20,26 @@
 #ifndef _SURFACESETPOSITIONCOMMAND_H_
 #define _SURFACESETPOSITIONCOMMAND_H_
 
-#include "BaseCommandAsynchronous.h"
+#include "ICommand.h"
 
-class SurfaceSetPositionCommand : public BaseCommandAsynchronous
+class SurfaceSetPositionCommand : public ICommand
 {
 public:
     /*!
      * \action    This command sets the position of a surface within the GENIVI LayerManagement
      * \frequency Called for rearranging graphical contents.
+     * \param[in] sender process id of application that sent this command
      * \param[in] id id of surface
      * \param[in] x x position of surface on layer
      * \param[in] y y position of surface on layer
      * \ingroup Commands
      */
-    SurfaceSetPositionCommand(unsigned int id, unsigned int x, unsigned int y);
+    SurfaceSetPositionCommand(pid_t sender, unsigned int id, unsigned int x, unsigned int y)
+    : ICommand(ExecuteAsynchronous, sender)
+    , m_id(id)
+    , m_x(x)
+    , m_y(y)
+    {}
 
     /**
      * \brief default destructor

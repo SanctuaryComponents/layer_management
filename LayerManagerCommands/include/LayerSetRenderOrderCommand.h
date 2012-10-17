@@ -20,20 +20,26 @@
 #ifndef _LAYERSETRENDERORDERCOMMAND_H_
 #define _LAYERSETRENDERORDERCOMMAND_H_
 
-#include "BaseCommandAsynchronous.h"
+#include "ICommand.h"
 
-class LayerSetRenderOrderCommand : public BaseCommandAsynchronous
+class LayerSetRenderOrderCommand : public ICommand
 {
 public:
     /*!
      * \action    This command sets the render order of surfaces on a layer within the GENIVI LayerManagement
      * \frequency Called for rearranging graphical contents.
+     * \param[in] sender process id of application that sent this command
      * \param[in] layerid id of layer
      * \param[in] array array of surface ids
      * \param[in] length length of array provided as argument array
      * \ingroup Commands
      */
-    LayerSetRenderOrderCommand(unsigned int layerid, unsigned int* array, unsigned  int length);
+    LayerSetRenderOrderCommand(pid_t sender, unsigned int layerid, unsigned int* array, unsigned  int length)
+    : ICommand(ExecuteAsynchronous, sender)
+    , m_layerid(layerid)
+    , m_array(array)
+    , m_length(length)
+    {}
 
     /**
      * \brief default destructor

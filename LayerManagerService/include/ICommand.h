@@ -31,13 +31,30 @@ class ICommandExecutor;
 class ICommand
 {
 public:
-    virtual ~ICommand() {}
+    ICommand(ExecutionType type, pid_t sender)
+    : mExecutionType(type)
+    , mSenderPid(sender)
+    {}
+
+    virtual ~ICommand() {};
 
     virtual ExecutionResult execute(ICommandExecutor* executor) = 0;
 
-    virtual ExecutionType getExecutionType() = 0;
-
     virtual const std::string getString() = 0;
+
+    ExecutionType getExecutionType()
+    {
+        return mExecutionType;
+    }
+
+    pid_t getSenderPid()
+    {
+        return mSenderPid;
+    }
+
+private:
+    ExecutionType mExecutionType;
+    pid_t         mSenderPid;
 };
 
 #endif // _ICOMMAND_H_

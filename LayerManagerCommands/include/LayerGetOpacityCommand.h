@@ -20,19 +20,24 @@
 #ifndef _LAYERGETOPACITYCOMMAND_H_
 #define _LAYERGETOPACITYCOMMAND_H_
 
-#include "BaseCommandSynchronous.h"
+#include "ICommand.h"
 
-class LayerGetOpacityCommand : public BaseCommandSynchronous
+class LayerGetOpacityCommand : public ICommand
 {
 public:
     /*!
      * \action    This command returns the opacity of a layer within the GENIVI LayerManagement
      * \frequency Can occur very frequently for animations.
+     * \param[in] sender process id of application that sent this command
      * \param[in] id id of layer
      * \param[in] returnOpacity location to store opacity of layer on execution
      * \ingroup Commands
      */
-    LayerGetOpacityCommand(int id, double* returnOpacity);
+    LayerGetOpacityCommand(pid_t sender, int id, double* returnOpacity)
+    : ICommand(ExecuteSynchronous, sender)
+    , m_id(id)
+    , m_pReturnOpacity(returnOpacity)
+    {}
 
     /**
      * \brief default destructor

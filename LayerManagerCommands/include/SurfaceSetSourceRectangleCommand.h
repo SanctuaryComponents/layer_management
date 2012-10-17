@@ -20,9 +20,9 @@
 #ifndef _SURFACESETSOURCERECTANGLECOMMAND_H_
 #define _SURFACESETSOURCERECTANGLECOMMAND_H_
 
-#include "BaseCommandAsynchronous.h"
+#include "ICommand.h"
 
-class SurfaceSetSourceRectangleCommand : public BaseCommandAsynchronous
+class SurfaceSetSourceRectangleCommand : public ICommand
 {
 public:
     /*!
@@ -30,6 +30,7 @@ public:
      *            GENIVI LayerManagement
      * \frequency Typically only called at creation of an surface if the
      *            graphical output of the application should not be used entirely
+     * \param[in] sender process id of application that sent this command
      * \param[in] id id of surface
      * \param[in] x x position within surface
      * \param[in] y y position wihtin surface
@@ -37,7 +38,14 @@ public:
      * \param[in] height height within surface
      * \ingroup Commands
      */
-    SurfaceSetSourceRectangleCommand(int id, unsigned int x, unsigned int y, unsigned int width, unsigned int height);
+    SurfaceSetSourceRectangleCommand(pid_t sender, int id, unsigned int x, unsigned int y, unsigned int width, unsigned int height)
+    : ICommand(ExecuteAsynchronous, sender)
+    , m_id(id)
+    , m_x(x)
+    , m_y(y)
+    , m_width(width)
+    , m_height(height)
+    {}
 
     /**
      * \brief default destructor

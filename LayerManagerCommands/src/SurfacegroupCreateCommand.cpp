@@ -21,11 +21,6 @@
 #include "Scene.h"
 #include "Log.h"
 
-SurfacegroupCreateCommand::SurfacegroupCreateCommand(uint* idReturn)
-: m_idReturn(idReturn)
-{
-}
-
 ExecutionResult SurfacegroupCreateCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());

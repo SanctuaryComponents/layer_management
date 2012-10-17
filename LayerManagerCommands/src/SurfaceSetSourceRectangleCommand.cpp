@@ -21,15 +21,6 @@
 #include "Scene.h"
 #include "Log.h"
 
-SurfaceSetSourceRectangleCommand::SurfaceSetSourceRectangleCommand(int id, unsigned int x, unsigned int y, unsigned int width, unsigned int height)
-: m_id(id)
-, m_x(x)
-, m_y(y)
-, m_width(width)
-, m_height(height)
-{
-}
-
 ExecutionResult SurfaceSetSourceRectangleCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());

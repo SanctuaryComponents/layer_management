@@ -20,20 +20,25 @@
 #ifndef _LAYERDUMPCOMMAND_H_
 #define _LAYERDUMPCOMMAND_H_
 
-#include "BaseCommandSynchronous.h"
+#include "ICommand.h"
 #include <string>
 
-class LayerDumpCommand: public BaseCommandSynchronous
+class LayerDumpCommand: public ICommand
 {
 public:
     /*!
      * \action    This command stores a bitmap file with the graphical content of a layer within the GENIVI LayerManagement
      * \frequency Used for layer management.
+     * \param[in] sender process id of application that sent this command
      * \param[in] givenfilename path and filename to store bitmap file
      * \param[in] id
      * \ingroup Commands
      */
-    LayerDumpCommand(char* givenfilename, unsigned int id = 0);
+    LayerDumpCommand(pid_t sender, char* givenfilename, unsigned int id = 0)
+    : ICommand(ExecuteSynchronous, sender)
+    , m_filename(givenfilename)
+    , m_id(id)
+    {}
 
     /**
      * \brief default destructor

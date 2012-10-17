@@ -20,11 +20,11 @@
 #ifndef _SURFACEREMOVENATIVECONTENTCOMMAND_H_
 #define _SURFACEREMOVENATIVECONTENTCOMMAND_H_
 
-#include "BaseCommandAsynchronous.h"
+#include "ICommand.h"
 #include "PixelFormat.h"
 #include "IScene.h"
 
-class SurfaceRemoveNativeContentCommand : public BaseCommandAsynchronous
+class SurfaceRemoveNativeContentCommand : public ICommand
 {
 public:
     /*!
@@ -32,10 +32,14 @@ public:
      *            of a surface within the GENIVI LayerManagement
      * \frequency Typically should not be needed unless a client wants to
      *            re-use the surface with multiple contents.
+     * \param[in] sender process id of application that sent this command
      * \param[in] surfaceId id of surface
      * \ingroup Commands
      */
-    SurfaceRemoveNativeContentCommand(unsigned int surfaceId);
+    SurfaceRemoveNativeContentCommand(pid_t sender, unsigned int surfaceId)
+    : ICommand(ExecuteAsynchronous, sender)
+    , m_surfaceId(surfaceId)
+    {}
 
     /**
      * \brief default destructor

@@ -20,20 +20,25 @@
 #ifndef _SURFACEDUMPCOMMAND_H_
 #define _SURFACEDUMPCOMMAND_H_
 
-#include "BaseCommandSynchronous.h"
+#include "ICommand.h"
 #include <string>
 
-class SurfaceDumpCommand: public BaseCommandSynchronous
+class SurfaceDumpCommand: public ICommand
 {
 public:
     /*!
      * \action    This command stores a bitmap file with the graphical content of a surface within the GENIVI LayerManagement
      * \frequency Used for surface management.
+     * \param[in] sender process id of application that sent this command
      * \param[in] givenfilename path and filename for bitmap file
      * \param[in] id id of surface
      * \ingroup Commands
      */
-    SurfaceDumpCommand(char* givenfilename, unsigned int id = 0);
+    SurfaceDumpCommand(pid_t sender, char* givenfilename, unsigned int id = 0)
+    : ICommand(ExecuteSynchronous, sender)
+    , m_filename(givenfilename)
+    , m_id(id)
+    {}
 
     /**
      * \brief default destructor

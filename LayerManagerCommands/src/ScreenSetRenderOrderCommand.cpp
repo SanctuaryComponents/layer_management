@@ -21,12 +21,6 @@
 #include "Scene.h"
 #include "Log.h"
 
-ScreenSetRenderOrderCommand::ScreenSetRenderOrderCommand(unsigned int* array, unsigned int length)
-: m_array(array)
-, m_length(length)
-{
-}
-
 ExecutionResult ScreenSetRenderOrderCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());

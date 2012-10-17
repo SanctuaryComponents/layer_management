@@ -20,10 +20,10 @@
 #ifndef _SURFACEGROUPCREATECOMMAND_H_
 #define _SURFACEGROUPCREATECOMMAND_H_
 
-#include "BaseCommandSynchronous.h"
+#include "ICommand.h"
 #include "IScene.h"
 
-class SurfacegroupCreateCommand : public BaseCommandSynchronous
+class SurfacegroupCreateCommand : public ICommand
 {
 public:
     /*!
@@ -31,11 +31,15 @@ public:
      *            GENIVI LayerManagement
      * \frequency Used for management of several surfaces, only called
      *            in initialization phase.
+     * \param[in] sender process id of application that sent this command
      * \param[in] idReturn location to store id for new surface group on execution
      *            pre-initialized values is interpreted as requested id for new surface group
      * \ingroup Commands
      */
-    SurfacegroupCreateCommand(uint* idReturn);
+    SurfacegroupCreateCommand(pid_t sender, uint* idReturn)
+    : ICommand(ExecuteSynchronous, sender)
+    , m_idReturn(idReturn)
+    {}
 
     /**
      * \brief default destructor

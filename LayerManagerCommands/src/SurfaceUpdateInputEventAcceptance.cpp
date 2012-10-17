@@ -24,15 +24,6 @@
 #include "ICommandExecutor.h"
 #include "InputManager.h"
 
-
-SurfaceUpdateInputEventAcceptance::SurfaceUpdateInputEventAcceptance(unsigned int surfId, InputDevice devices, bool accept) :
-    m_surfId(surfId),
-    m_devices(devices),
-    m_accept(accept)
-{
-}
-
-
 ExecutionResult SurfaceUpdateInputEventAcceptance::execute(ICommandExecutor* executor)
 {
     RendererList* rList;

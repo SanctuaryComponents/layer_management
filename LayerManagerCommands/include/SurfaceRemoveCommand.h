@@ -20,19 +20,23 @@
 #ifndef _SURFACEREMOVECOMMAND_H_
 #define _SURFACEREMOVECOMMAND_H_
 
-#include "BaseCommandSynchronous.h"
+#include "ICommand.h"
 
-class SurfaceRemoveCommand : public BaseCommandSynchronous
+class SurfaceRemoveCommand : public ICommand
 {
 public:
     /*!
      * \action    This command removes a surface within the GENIVI LayerManagement
      * \frequency Called at end of application or when an application or its window
      *            is shut down.
+     * \param[in] sender process id of application that sent this command
      * \param[in] objectID id of surface
      * \ingroup Commands
      */
-    SurfaceRemoveCommand(unsigned int objectID);
+    SurfaceRemoveCommand(pid_t sender, unsigned int objectID)
+    : ICommand(ExecuteSynchronous, sender)
+    , m_idToRemove(objectID)
+    {}
 
     /**
      * \brief default destructor

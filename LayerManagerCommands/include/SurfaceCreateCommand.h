@@ -20,11 +20,11 @@
 #ifndef _SURFACECREATECOMMAND_H_
 #define _SURFACECREATECOMMAND_H_
 
-#include "BaseCommandSynchronous.h"
+#include "ICommand.h"
 #include "PixelFormat.h"
 #include "IScene.h"
 
-class SurfaceCreateCommand : public BaseCommandSynchronous
+class SurfaceCreateCommand : public ICommand
 {
 public:
     /*!
@@ -32,11 +32,16 @@ public:
      * \frequency Called at least once for all graphical applications, either by
      *            applications themselves or through a management component informed
      *            of a new window by the window management API.
+     * \param[in] sender process id of application that sent this command
+     * \param[in] sender process id of sender of this command
      * \param[in] idReturn location where surface id will be stored during execution
      *                     pre-initialized value is used as requested surface id
      * \ingroup Commands
      */
-    SurfaceCreateCommand(uint* idReturn);
+    SurfaceCreateCommand(pid_t sender, uint* idReturn)
+    : ICommand(ExecuteSynchronous, sender)
+    , m_idReturn(idReturn)
+    {}
 
     /**
      * \brief default destructor

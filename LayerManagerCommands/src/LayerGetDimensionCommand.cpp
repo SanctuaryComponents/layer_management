@@ -22,13 +22,6 @@
 #include "Scene.h"
 #include "Log.h"
 
-LayerGetDimensionCommand::LayerGetDimensionCommand(int id, uint* widthRet, uint* heightRet)
-: m_id(id)
-, m_pWidth(widthRet)
-, m_pHeight(heightRet)
-{
-}
-
 ExecutionResult LayerGetDimensionCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());

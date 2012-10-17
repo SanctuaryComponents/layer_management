@@ -21,12 +21,6 @@
 #include "Scene.h"
 #include "Log.h"
 
-LayerSetOpacityCommand::LayerSetOpacityCommand(unsigned int id, double Opacity)
-: m_id(id)
-, m_opacity(Opacity)
-{
-}
-
 ExecutionResult LayerSetOpacityCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());

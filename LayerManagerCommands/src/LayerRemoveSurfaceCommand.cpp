@@ -21,12 +21,6 @@
 #include "Scene.h"
 #include "Log.h"
 
-LayerRemoveSurfaceCommand::LayerRemoveSurfaceCommand(unsigned layerid, unsigned  surfaceid)
-: m_layerid(layerid)
-, m_surfaceid(surfaceid)
-{
-}
-
 ExecutionResult LayerRemoveSurfaceCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());

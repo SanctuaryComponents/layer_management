@@ -20,20 +20,25 @@
 #ifndef _LAYERGROUPADDLAYERCOMMAND_H_
 #define _LAYERGROUPADDLAYERCOMMAND_H_
 
-#include "BaseCommandAsynchronous.h"
+#include "ICommand.h"
 
-class LayergroupAddLayerCommand : public BaseCommandAsynchronous
+class LayergroupAddLayerCommand : public ICommand
 {
 public:
     /*!
      * \action    This command adds a layer to a layer group within the GENIVI LayerManagement
      * \frequency Called within initialisations in order to change properties of all group
      *            members at once at a later point in time, not needed for every layer.
+     * \param[in] sender process id of application that sent this command
      * \param[in] layergroupid id of layer group
      * \param[in] layerid id of layer
      * \ingroup Commands
      */
-    LayergroupAddLayerCommand(unsigned int layergroupid, unsigned int layerid);
+    LayergroupAddLayerCommand(pid_t sender, unsigned int layergroupid, unsigned int layerid)
+    : ICommand(ExecuteAsynchronous, sender)
+    , m_layergroupid(layergroupid)
+    , m_layerid(layerid)
+    {}
 
     /**
      * \brief default destructor

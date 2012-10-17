@@ -21,13 +21,6 @@
 #include "Scene.h"
 #include "Log.h"
 
-LayerSetRenderOrderCommand::LayerSetRenderOrderCommand(unsigned int layerid,unsigned  int* array,unsigned  int length)
-: m_layerid(layerid)
-, m_array(array)
-, m_length(length)
-{
-}
-
 ExecutionResult LayerSetRenderOrderCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());

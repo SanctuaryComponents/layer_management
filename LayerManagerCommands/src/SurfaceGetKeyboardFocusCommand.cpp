@@ -21,11 +21,6 @@
 #include "Scene.h"
 #include "Log.h"
 
-SurfaceGetKeyboardFocusCommand::SurfaceGetKeyboardFocusCommand(unsigned int* pSurfId)
-: m_pSurfId(pSurfId)
-{
-}
-
 ExecutionResult SurfaceGetKeyboardFocusCommand::execute(ICommandExecutor* executor)
 {
     RendererList* rList;

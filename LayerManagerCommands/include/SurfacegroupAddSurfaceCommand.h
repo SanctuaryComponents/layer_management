@@ -20,9 +20,9 @@
 #ifndef _SURFACEGROUPADDSURFACECOMMAND_H_
 #define _SURFACEGROUPADDSURFACECOMMAND_H_
 
-#include "BaseCommandAsynchronous.h"
+#include "ICommand.h"
 
-class SurfacegroupAddSurfaceCommand : public BaseCommandAsynchronous
+class SurfacegroupAddSurfaceCommand : public ICommand
 {
 public:
     /*!
@@ -31,11 +31,16 @@ public:
      * \frequency Called within initializations in order to change properties of
      *            all group members at once at a later point in time, not needed
      *            for every surface.
+     * \param[in] sender process id of application that sent this command
      * \param[in] surfacegroupid id of surface group
      * \param[in] surfaceid id of surface
      * \ingroup Commands
      */
-    SurfacegroupAddSurfaceCommand(unsigned int surfacegroupid, unsigned int surfaceid);
+    SurfacegroupAddSurfaceCommand(pid_t sender, unsigned int surfacegroupid, unsigned int surfaceid)
+    : ICommand(ExecuteAsynchronous, sender)
+    , m_surfacegroupid(surfacegroupid)
+    , m_surfaceid(surfaceid)
+    {}
 
     /**
      * \brief default destructor

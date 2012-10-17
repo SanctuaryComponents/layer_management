@@ -21,20 +21,26 @@
 #ifndef _LAYERSETCHROMAKEYCOMMAND_H_
 #define _LAYERSETCHROMAKEYCOMMAND_H_
 
-#include "BaseCommandAsynchronous.h"
+#include "ICommand.h"
 
-class LayerSetChromaKeyCommand : public BaseCommandAsynchronous
+class LayerSetChromaKeyCommand : public ICommand
 {
 public:
     /*!
      * \action    This command sets the chroma key of a layer within the GENIVI LayerManagement
      * \frequency Called in order to rearrange graphical output.
+     * \param[in] sender process id of application that sent this command
      * \param[in] layer Id of the layer to set the chromakey of.
      * \param[in] array array of color value which is defined in red, green, blue
      * \param[in] length length of array provided as argument array
      * \ingroup Commands
      */
-    LayerSetChromaKeyCommand(unsigned int layerid, unsigned int* array, unsigned  int length);
+    LayerSetChromaKeyCommand(pid_t sender, unsigned int layerid, unsigned int* array, unsigned  int length)
+    : ICommand(ExecuteAsynchronous, sender)
+    , m_layerid(layerid)
+    , m_array(array)
+    , m_length(length)
+    {}
 
     /**
      * \brief default destructor

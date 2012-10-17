@@ -21,12 +21,6 @@
 #include "Scene.h"
 #include "Log.h"
 
-SurfacegroupRemoveSurfaceCommand::SurfacegroupRemoveSurfaceCommand(int surfacegroupid, unsigned int surfaceid)
-: m_surfacegroupid(surfacegroupid)
-, m_surfaceid(surfaceid)
-{
-}
-
 ExecutionResult SurfacegroupRemoveSurfaceCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());

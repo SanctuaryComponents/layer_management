@@ -20,19 +20,24 @@
 #ifndef _SCREENSETRENDERORDERCOMMAND_H_
 #define _SCREENSETRENDERORDERCOMMAND_H_
 
-#include "BaseCommandAsynchronous.h"
+#include "ICommand.h"
 
-class ScreenSetRenderOrderCommand: public BaseCommandAsynchronous
+class ScreenSetRenderOrderCommand: public ICommand
 {
 public:
     /*!
      * \action    This command sets the render order of layers within the GENIVI LayerManagement
      * \frequency Called for rearranging graphical contents.
+     * \param[in] sender process id of application that sent this command
      * \param[in] array array of layer ids
      * \param[in] length length of array provided in parameter array
      * \ingroup Commands
      */
-    ScreenSetRenderOrderCommand(unsigned int* array, unsigned int length);
+    ScreenSetRenderOrderCommand(pid_t sender, unsigned int* array, unsigned int length)
+    : ICommand(ExecuteAsynchronous, sender)
+    , m_array(array)
+    , m_length(length)
+    {}
 
     /**
      * \brief default destructor

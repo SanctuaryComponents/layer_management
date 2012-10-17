@@ -20,20 +20,26 @@
 #ifndef _SURFACESETDIMENSIONCOMMAND_H_
 #define _SURFACESETDIMENSIONCOMMAND_H_
 
-#include "BaseCommandAsynchronous.h"
+#include "ICommand.h"
 
-class SurfaceSetDimensionCommand : public BaseCommandAsynchronous
+class SurfaceSetDimensionCommand : public ICommand
 {
 public:
     /*!
      * \action    This command sets the dimension of a surface within the GENIVI LayerManagement
      * \frequency Called for rearranging graphical contents.
+     * \param[in] sender process id of application that sent this command
      * \param[in] id id of surface
      * \param[in] width width of surface
      * \param[in] height height of surface
      * \ingroup Commands
      */
-    SurfaceSetDimensionCommand(int id, unsigned int width,unsigned  int height);
+    SurfaceSetDimensionCommand(pid_t sender, int id, unsigned int width,unsigned  int height)
+    : ICommand(ExecuteAsynchronous, sender)
+    , m_id(id)
+    , m_width(width)
+    , m_height(height)
+    {}
 
     /**
      * \brief default destructor

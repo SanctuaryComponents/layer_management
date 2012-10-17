@@ -20,14 +20,15 @@
 #ifndef _LAYERSETSOURCERECTANGLECOMMAND_H_
 #define _LAYERSETSOURCERECTANGLECOMMAND_H_
 
-#include "BaseCommandAsynchronous.h"
+#include "ICommand.h"
 
-class LayerSetSourceRectangleCommand : public BaseCommandAsynchronous
+class LayerSetSourceRectangleCommand : public ICommand
 {
 public:
     /*!
      * \action    This command sets the source region of a layer within the GENIVI LayerManagement
      * \frequency Called when first initializing a new layer and for rearranging graphical contents.
+     * \param[in] sender process id of application that sent this command
      * \param[in] id id of layer
      * \param[in] x x position wihtin layer
      * \param[in] y y position within layer
@@ -35,7 +36,14 @@ public:
      * \param[in] height height within layer
      * \ingroup Commands
      */
-    LayerSetSourceRectangleCommand(int id, unsigned int x, unsigned int y, unsigned int width, unsigned int height);
+    LayerSetSourceRectangleCommand(pid_t sender, int id, unsigned int x, unsigned int y, unsigned int width, unsigned int height)
+    : ICommand(ExecuteAsynchronous, sender)
+    , m_id(id)
+    , m_x(x)
+    , m_y(y)
+    , m_width(width)
+    , m_height(height)
+    {}
 
     /**
      * \brief default destructor

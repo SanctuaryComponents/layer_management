@@ -21,12 +21,6 @@
 #include "Scene.h"
 #include <sstream>
 
-LayerGetOrientationCommand::LayerGetOrientationCommand(int id, OrientationType* orientation)
-: m_id(id)
-, m_pReturnOrientation(orientation)
-{
-}
-
 ExecutionResult LayerGetOrientationCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());

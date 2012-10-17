@@ -20,20 +20,25 @@
 #ifndef _LAYERREMOVESURFACECOMMAND_H_
 #define _LAYERREMOVESURFACECOMMAND_H_
 
-#include "BaseCommandAsynchronous.h"
+#include "ICommand.h"
 
-class LayerRemoveSurfaceCommand : public BaseCommandAsynchronous
+class LayerRemoveSurfaceCommand : public ICommand
 {
 public:
     /*!
      * \action    This command removes a surface from a layer within the GENIVI LayerManagement
      * \frequency Typically surfaces will be added to one or more layers once in their life
      *            cycle. So this will typically be called at least once for every surface created.
+     * \param[in] sender process id of application that sent this command
      * \param[in] layerid id of layer
      * \param[in] surfaceid id of surface
      * \ingroup Commands
      */
-    LayerRemoveSurfaceCommand(unsigned layerid, unsigned  surfaceid);
+    LayerRemoveSurfaceCommand(pid_t sender, unsigned layerid, unsigned  surfaceid)
+    : ICommand(ExecuteAsynchronous, sender)
+    , m_layerid(layerid)
+    , m_surfaceid(surfaceid)
+    {}
 
     /**
      * \brief default destructor

@@ -20,20 +20,26 @@
 #ifndef _SURFACEGETPOSITIONCOMMAND_H_
 #define _SURFACEGETPOSITIONCOMMAND_H_
 
-#include "BaseCommandSynchronous.h"
+#include "ICommand.h"
 
-class SurfaceGetPositionCommand : public BaseCommandSynchronous
+class SurfaceGetPositionCommand : public ICommand
 {
 public:
     /*!
      * \action    This command returns the position of a surface within the GENIVI LayerManagement
      * \frequency Called for rearranging graphical contents.
+     * \param[in] sender process id of application that sent this command
      * \param[in] id id of surface
      * \param[in] xRet location to store x position of surface on execution
      * \param[in] yRet location to store y position of surface on execution
      * \ingroup Commands
      */
-    SurfaceGetPositionCommand(int id, unsigned int* xRet, unsigned int* yRet);
+    SurfaceGetPositionCommand(pid_t sender, int id, unsigned int* xRet, unsigned int* yRet)
+    : ICommand(ExecuteSynchronous, sender)
+    , m_id(id)
+    , m_pX(xRet)
+    , m_pY(yRet)
+    {}
 
     /**
      * \brief default destructor

@@ -20,21 +20,26 @@
 #ifndef _SCREENDUMPCOMMAND_H_
 #define _SCREENDUMPCOMMAND_H_
 
-#include "BaseCommandSynchronous.h"
+#include "ICommand.h"
 #include <string>
 
-class ScreenDumpCommand: public BaseCommandSynchronous
+class ScreenDumpCommand: public ICommand
 {
 public:
     /*!
      * \action    This command stores a bitmap file with the graphical content
      *            of a screen within the GENIVI LayerManagement
      * \frequency Used for screen management.
+     * \param[in] sender process id of application that sent this command
      * \param[in] givenfilename path and filename to store bitmap file
      * \param[in] id
      * \ingroup Commands
      */
-    ScreenDumpCommand(char* givenfilename, unsigned int id = 0);
+    ScreenDumpCommand(pid_t sender, char* givenfilename, unsigned int id = 0)
+    : ICommand(ExecuteSynchronous, sender)
+    , m_filename(givenfilename)
+    , m_id(id)
+    {}
 
     /**
      * \brief default destructor

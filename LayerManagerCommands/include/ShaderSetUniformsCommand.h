@@ -19,21 +19,26 @@
 #ifndef _SHADERSETUNIFORMSCOMMAND_H_
 #define _SHADERSETUNIFORMSCOMMAND_H_
 
-#include "BaseCommandSynchronous.h"
+#include "ICommand.h"
 #include <string>
 #include <vector>
 
-class ShaderSetUniformsCommand : public BaseCommandSynchronous
+class ShaderSetUniformsCommand : public ICommand
 {
 public:
     /*!
      * \action    This command sets the uniform value of a shader within the GENIVI LayerManagement
      * \frequency Typically for every rendered frame.
+     * \param[in] sender process id of application that sent this command
      * \param[in] shaderid id of shader
      * \param[in] uniforms vector holding uniforms
      * \ingroup Commands
      */
-    ShaderSetUniformsCommand(unsigned int shaderid, const std::vector<std::string>& uniforms);
+    ShaderSetUniformsCommand(pid_t sender, unsigned int shaderid, const std::vector<std::string>& uniforms)
+    : ICommand(ExecuteSynchronous, sender)
+    , m_shaderid(shaderid)
+    , m_uniforms(uniforms)
+    {}
 
     /**
      * \brief default destructor

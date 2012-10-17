@@ -21,20 +21,26 @@
 #ifndef _SURFACESETCHROMAKEYCOMMAND_H_
 #define _SURFACESETCHROMAKEYCOMMAND_H_
 
-#include "BaseCommandAsynchronous.h"
+#include "ICommand.h"
 
-class SurfaceSetChromaKeyCommand : public BaseCommandAsynchronous
+class SurfaceSetChromaKeyCommand : public ICommand
 {
 public:
     /*!
      * \action    This command sets the chroma key of a surface within the GENIVI LayerManagement
      * \frequency Called in order to rearrange graphical output.
+     * \param[in] sender process id of application that sent this command
      * \param[in] surfaceId Id of the surface to set the chromakey of.
      * \param[in] array array of color value which is defined in red, green, blue
      * \param[in] length length of array provided as argument array
      * \ingroup Commands
      */
-    SurfaceSetChromaKeyCommand(unsigned int surfaceid, unsigned int* array, unsigned  int length);
+    SurfaceSetChromaKeyCommand(pid_t sender, unsigned int surfaceid, unsigned int* array, unsigned  int length)
+    : ICommand(ExecuteAsynchronous, sender)
+    , m_surfaceid(surfaceid)
+    , m_array(array)
+    , m_length(length)
+    {}
 
     /**
      * \brief default destructor

@@ -20,18 +20,22 @@
 #ifndef _SURFACEGETKEYBOARDFOCUSCOMMAND_H_
 #define _SURFACEGETKEYBOARDFOCUSCOMMAND_H_
 
-#include "BaseCommandSynchronous.h"
+#include "ICommand.h"
 
-class SurfaceGetKeyboardFocusCommand : public BaseCommandSynchronous
+class SurfaceGetKeyboardFocusCommand : public ICommand
 {
 public:
     /*!
      * \action    This command returns the identifier of the surface which currently hold the keyboard focus
      * \frequency Whenever it is needed
+     * \param[in] sender process id of application that sent this command
      * \param[out] id id of surface
      * \ingroup Commands
      */
-    SurfaceGetKeyboardFocusCommand(unsigned int *surfId);
+    SurfaceGetKeyboardFocusCommand(pid_t sender, unsigned int *pSurfId)
+    : ICommand(ExecuteSynchronous, sender)
+    , m_pSurfId(pSurfId)
+    {}
 
     /**
      * \brief default destructor

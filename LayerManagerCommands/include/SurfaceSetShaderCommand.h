@@ -20,9 +20,9 @@
 #ifndef _SURFACESETSHADERCOMMAND_H_
 #define _SURFACESETSHADERCOMMAND_H_
 
-#include "BaseCommandSynchronous.h"
+#include "ICommand.h"
 
-class SurfaceSetShaderCommand : public BaseCommandSynchronous
+class SurfaceSetShaderCommand : public ICommand
 {
 public:
     /*!
@@ -30,11 +30,16 @@ public:
      *            LayerManagement
      * \frequency Typically once during surface creation. May be used during
      *            runtime for effects.
+     * \param[in] sender process id of application that sent this command
      * \param[in] id id of surface
      * \param[in] shaderid id of shader
      * \ingroup Commands
      */
-    SurfaceSetShaderCommand(unsigned int id, unsigned int shaderid);
+    SurfaceSetShaderCommand(pid_t sender, unsigned int id, unsigned int shaderid)
+    : ICommand(ExecuteSynchronous, sender)
+    , m_id(id)
+    , m_shaderid(shaderid)
+    {}
 
     /**
      * \brief default destructor

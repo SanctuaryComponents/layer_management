@@ -20,22 +20,28 @@
 #ifndef _SHADERCREATECOMMAND_H_
 #define _SHADERCREATECOMMAND_H_
 
-#include "BaseCommandSynchronous.h"
+#include "ICommand.h"
 #include "Shader.h"
 #include <string>
 
-class ShaderCreateCommand : public BaseCommandSynchronous
+class ShaderCreateCommand : public ICommand
 {
 public:
     /*!
      * \action    This command creates a shader within the GENIVI LayerManagement
      * \frequency Once per shader.
+     * \param[in] sender process id of application that sent this command
      * \param[in] vertName path and filename to vertex shader source file
      * \param[in] fragName path and filename to fragment shader source file
      * \param[in] id location to store shader id on execution
      * \ingroup Commands
      */
-    ShaderCreateCommand(const std::string& vertName, const std::string& fragName, unsigned int* id);
+    ShaderCreateCommand(pid_t sender, const std::string& vertName, const std::string& fragName, unsigned int* id)
+    : ICommand(ExecuteSynchronous, sender)
+    , m_vertName(vertName)
+    , m_fragName(fragName)
+    , m_returnID(id)
+    {}
 
     /**
      * \brief default destructor

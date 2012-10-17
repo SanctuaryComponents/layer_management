@@ -20,20 +20,25 @@
 #ifndef _SURFACEGETPIXELFORMATCOMMAND_H_
 #define _SURFACEGETPIXELFORMATCOMMAND_H_
 
-#include "BaseCommandSynchronous.h"
+#include "ICommand.h"
 #include "PixelFormat.h"
 
-class SurfaceGetPixelformatCommand : public BaseCommandSynchronous
+class SurfaceGetPixelformatCommand : public ICommand
 {
 public:
     /*!
      * \action    This command returns the pixel format of a surface within the GENIVI LayerManagement
      * \frequency
+     * \param[in] sender process id of application that sent this command
      * \param[in] id id of surface
      * \param[in] f location to store pixel format of surface on execution
      * \ingroup Commands
      */
-    SurfaceGetPixelformatCommand(int id, PixelFormat* f);
+    SurfaceGetPixelformatCommand(pid_t sender, int id, PixelFormat* f)
+    : ICommand(ExecuteSynchronous, sender)
+    , m_id(id)
+    , m_pFormatreturn(f)
+    {}
 
     /**
      * \brief default destructor

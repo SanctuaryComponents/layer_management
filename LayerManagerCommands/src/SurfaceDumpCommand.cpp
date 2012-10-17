@@ -21,12 +21,6 @@
 #include "Scene.h"
 #include "Log.h"
 
-SurfaceDumpCommand::SurfaceDumpCommand(char* givenfilename, unsigned int id)
-: m_filename(givenfilename)
-, m_id(id)
-{
-}
-
 ExecutionResult SurfaceDumpCommand::execute(ICommandExecutor* executor)
 {
 	ExecutionResult result = ExecutionFailed;

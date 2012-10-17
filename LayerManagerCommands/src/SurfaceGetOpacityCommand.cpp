@@ -21,12 +21,6 @@
 #include "Scene.h"
 #include "Log.h"
 
-SurfaceGetOpacityCommand::SurfaceGetOpacityCommand(int id, double* returnOpacity)
-: m_id(id)
-, m_pReturnOpacity(returnOpacity)
-{
-}
-
 ExecutionResult SurfaceGetOpacityCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());

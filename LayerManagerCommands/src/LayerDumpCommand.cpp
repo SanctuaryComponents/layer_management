@@ -21,12 +21,6 @@
 #include "Scene.h"
 #include "Log.h"
 
-LayerDumpCommand::LayerDumpCommand(char* givenfilename, unsigned int id)
-: m_filename(givenfilename)
-, m_id(id)
-{
-}
-
 ExecutionResult LayerDumpCommand::execute(ICommandExecutor* executor)
 {
 	ExecutionResult result = ExecutionFailed;

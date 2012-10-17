@@ -24,11 +24,6 @@
 #include "ICommandExecutor.h"
 #include "InputManager.h"
 
-SurfaceSetKeyboardFocusCommand::SurfaceSetKeyboardFocusCommand(unsigned int surfId) :
-    m_surfId(surfId)
-{
-}
-
 ExecutionResult SurfaceSetKeyboardFocusCommand::execute(ICommandExecutor* executor)
 {
     RendererList* rList;

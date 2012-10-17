@@ -20,14 +20,15 @@
 #ifndef _SURFACESETDESTINATIONRECTANGLECOMMAND_H_
 #define _SURFACESETDESTINATIONRECTANGLECOMMAND_H_
 
-#include "BaseCommandAsynchronous.h"
+#include "ICommand.h"
 
-class SurfaceSetDestinationRectangleCommand : public BaseCommandAsynchronous
+class SurfaceSetDestinationRectangleCommand : public ICommand
 {
 public:
     /*!
      * \action    This command sets the destination region of a surface within the GENIVI LayerManagement
      * \frequency Called to rearrange applications output.
+     * \param[in] sender process id of application that sent this command
      * \param[in] id id of surface
      * \param[in] x x position of surface on layer
      * \param[in] y y position of surface on layer
@@ -35,7 +36,14 @@ public:
      * \param[in] height height of surface on layer
      * \ingroup Commands
      */
-    SurfaceSetDestinationRectangleCommand(int id, unsigned int x, unsigned int y, unsigned int width, unsigned int height);
+    SurfaceSetDestinationRectangleCommand(pid_t sender, int id, unsigned int x, unsigned int y, unsigned int width, unsigned int height)
+    : ICommand(ExecuteAsynchronous, sender)
+    , m_id(id)
+    , m_x(x)
+    , m_y(y)
+    , m_width(width)
+    , m_height(height)
+    {}
 
     /**
      * \brief default destructor

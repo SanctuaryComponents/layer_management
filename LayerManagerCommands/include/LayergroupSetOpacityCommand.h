@@ -20,19 +20,24 @@
 #ifndef _LAYERGROUPSETOPACITYCOMMAND_H_
 #define _LAYERGROUPSETOPACITYCOMMAND_H_
 
-#include "BaseCommandAsynchronous.h"
+#include "ICommand.h"
 
-class LayergroupSetOpacityCommand : public BaseCommandAsynchronous
+class LayergroupSetOpacityCommand : public ICommand
 {
 public:
     /*!
      * \action    This command sets the opacity of a layer group within the GENIVI LayerManagement
      * \frequency Called in order to rearrange graphical output.
+     * \param[in] sender process id of application that sent this command
      * \param[in] id id of layer group
      * \param[in] Opacity new opacity for all layers in layer group
      * \ingroup Commands
      */
-    LayergroupSetOpacityCommand(unsigned int id, double Opacity);
+    LayergroupSetOpacityCommand(pid_t sender, unsigned int id, double Opacity)
+    : ICommand(ExecuteAsynchronous, sender)
+    , m_id(id)
+    , m_opacity(Opacity)
+    {}
 
     /**
      * \brief default destructor

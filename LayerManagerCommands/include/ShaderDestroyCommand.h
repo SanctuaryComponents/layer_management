@@ -20,22 +20,26 @@
 #ifndef _SHADERDESTROYCOMMAND_H_
 #define _SHADERDESTROYCOMMAND_H_
 
-#include "BaseCommandSynchronous.h"
+#include "ICommand.h"
 #include "GraphicalObject.h"
 #include "Scene.h"
 #include "LayerMap.h"
 #include "SurfaceMap.h"
 
-class ShaderDestroyCommand : public BaseCommandSynchronous
+class ShaderDestroyCommand : public ICommand
 {
 public:
     /*!
      * \action    This command destroys a shader within the GENIVI LayerManagement
      * \frequency Once per shader.
+     * \param[in] sender process id of application that sent this command
      * \param[in] shaderid id of shader
      * \ingroup Commands
      */
-    ShaderDestroyCommand(unsigned int shaderid);
+    ShaderDestroyCommand(pid_t sender, unsigned int shaderid)
+    : ICommand(ExecuteSynchronous, sender)
+    , m_id(shaderid)
+    {}
 
     /**
      * \brief default destructor

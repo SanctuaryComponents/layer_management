@@ -20,20 +20,26 @@
 #ifndef _LAYERSETDIMENSIONCOMMAND_H_
 #define _LAYERSETDIMENSIONCOMMAND_H_
 
-#include "BaseCommandAsynchronous.h"
+#include "ICommand.h"
 
-class LayerSetDimensionCommand : public BaseCommandAsynchronous
+class LayerSetDimensionCommand : public ICommand
 {
 public:
     /*!
      * \action    This command sets the dimensions of a layer within the GENIVI LayerManagement
      * \frequency Called for rearranging graphical contents.
+     * \param[in] sender process id of application that sent this command
      * \param[in] id id of layer
      * \param[in] width width of layer
      * \param[in] height height of layer
      * \ingroup Commands
      */
-    LayerSetDimensionCommand(int id, unsigned int width, unsigned  int height);
+    LayerSetDimensionCommand(pid_t sender, int id, unsigned int width, unsigned  int height)
+    : ICommand(ExecuteAsynchronous, sender)
+    , m_id(id)
+    , m_width(width)
+    , m_height(height)
+    {}
 
     /**
      * \brief default destructor

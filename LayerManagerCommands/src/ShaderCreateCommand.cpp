@@ -22,13 +22,6 @@
 #include "Log.h"
 #include "RendererList.h"
 
-ShaderCreateCommand::ShaderCreateCommand(const std::string& vertName, const std::string& fragName, unsigned int* id)
-: m_vertName(vertName)
-, m_fragName(fragName)
-, m_returnID(id)
-{
-}
-
 ExecutionResult ShaderCreateCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());

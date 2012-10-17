@@ -20,18 +20,21 @@
 #ifndef _EXITCOMMAND_H_
 #define _EXITCOMMAND_H_
 
-#include "BaseCommandSynchronous.h"
+#include "ICommand.h"
 
-class ExitCommand: public BaseCommandSynchronous
+class ExitCommand: public ICommand
 {
 public:
 
     /*!
      * \action    This command triggers a service shutdown within the GENIVI LayerManagement
      * \frequency Can be called only once.
+     * \param[in] sender process id of application that sent this command
      * \ingroup Commands
      */
-    ExitCommand(void) {}
+    ExitCommand(pid_t sender)
+    : ICommand(ExecuteSynchronous, sender)
+    {}
 
      /**
      * \brief default destructor

@@ -20,20 +20,25 @@
 #ifndef _LAYERSETTYPECOMMAND_H_
 #define _LAYERSETTYPECOMMAND_H_
 
-#include "BaseCommandAsynchronous.h"
+#include "ICommand.h"
 #include "LayerType.h"
 
-class LayerSetTypeCommand : public BaseCommandAsynchronous
+class LayerSetTypeCommand : public ICommand
 {
 public:
     /*!
      * \action    This command sets the type of a layer within the GENIVI LayerManagement
      * \frequency Called when first initializing a new layer.
+     * \param[in] sender process id of application that sent this command
      * \param[in] givenid id of layer
      * \param[in] layertype type of layer
      * \ingroup Commands
      */
-    LayerSetTypeCommand(const unsigned int givenid, LayerType layertype);
+    LayerSetTypeCommand(pid_t sender, const unsigned int givenid, LayerType layertype)
+    : ICommand(ExecuteAsynchronous, sender)
+    , m_idtoSet(givenid)
+    , m_layerType(layertype)
+    {}
 
     /**
      * \brief default destructor

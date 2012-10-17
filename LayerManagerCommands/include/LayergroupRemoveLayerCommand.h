@@ -20,19 +20,24 @@
 #ifndef _LAYERGROUPREMOVELAYERCOMMAND_H_
 #define _LAYERGROUPREMOVELAYERCOMMAND_H_
 
-#include "BaseCommandSynchronous.h"
+#include "ICommand.h"
 
-class LayergroupRemoveLayerCommand : public BaseCommandSynchronous
+class LayergroupRemoveLayerCommand : public ICommand
 {
 public:
     /*!
      * \action    This command removes a layer from a layer group within the GENIVI LayerManagement
      * \frequency Infrequent.
+     * \param[in] sender process id of application that sent this command
      * \param[in] layergroupid id of layer group
      * \param[in] layerid id lf layer
      * \ingroup Commands
      */
-    LayergroupRemoveLayerCommand(unsigned int layergroupid, unsigned int layerid);
+    LayergroupRemoveLayerCommand(pid_t sender, unsigned int layergroupid, unsigned int layerid)
+    : ICommand(ExecuteSynchronous, sender)
+    , m_layergroupid(layergroupid)
+    , m_layerid(layerid)
+    {}
 
     /**
      * \brief default destructor

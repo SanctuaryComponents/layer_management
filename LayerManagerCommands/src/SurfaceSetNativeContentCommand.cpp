@@ -21,15 +21,6 @@
 #include "Scene.h"
 #include <sstream>
 
-SurfaceSetNativeContentCommand::SurfaceSetNativeContentCommand(unsigned int surfaceId, unsigned int handle, PixelFormat pixelformat, uint OriginalWidth, uint OriginalHeight)
-: m_surfaceId(surfaceId)
-, m_nativeHandle(handle)
-, m_pixelformat(pixelformat)
-, m_originalWidth(OriginalWidth)
-, m_originalHeight(OriginalHeight)
-{
-}
-
 ExecutionResult SurfaceSetNativeContentCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());

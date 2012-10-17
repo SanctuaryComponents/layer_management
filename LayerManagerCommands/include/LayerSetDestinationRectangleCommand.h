@@ -20,14 +20,15 @@
 #ifndef _LAYERSETDESTINATIONRECTANGLECOMMAND_H_
 #define _LAYERSETDESTINATIONRECTANGLECOMMAND_H_
 
-#include "BaseCommandAsynchronous.h"
+#include "ICommand.h"
 
-class LayerSetDestinationRectangleCommand : public BaseCommandAsynchronous
+class LayerSetDestinationRectangleCommand : public ICommand
 {
 public:
     /*!
      * \action    This command sets the destination region of a layer within the GENIVI LayerManagement
      * \frequency Called when first initializing a new layer and for rearranging graphical contents.
+     * \param[in] sender process id of application that sent this command
      * \param[in] id id of layer
      * \param[in] x x position of layer on screen
      * \param[in] y y position of layer on screen
@@ -35,7 +36,14 @@ public:
      * \param[in] height height of layer on screen
      * \ingroup Commands
      */
-    LayerSetDestinationRectangleCommand(int id, unsigned int x, unsigned int y, unsigned int width, unsigned int height);
+    LayerSetDestinationRectangleCommand(pid_t sender, int id, unsigned int x, unsigned int y, unsigned int width, unsigned int height)
+    : ICommand(ExecuteAsynchronous, sender)
+    , m_id(id)
+    , m_x(x)
+    , m_y(y)
+    , m_width(width)
+    , m_height(height)
+    {}
 
     /**
      * \brief default destructor

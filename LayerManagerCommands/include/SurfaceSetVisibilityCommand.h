@@ -20,9 +20,9 @@
 #ifndef _SURFACESETVISIBILITYCOMMAND_H_
 #define _SURFACESETVISIBILITYCOMMAND_H_
 
-#include "BaseCommandAsynchronous.h"
+#include "ICommand.h"
 
-class SurfaceSetVisibilityCommand : public BaseCommandAsynchronous
+class SurfaceSetVisibilityCommand : public ICommand
 {
 public:
     /*!
@@ -30,11 +30,16 @@ public:
      *            the GENIVI LayerManagement
      * \frequency Called more frequently than setOpacity, as event occur
      *            which change the general context for the user for example.
+     * \param[in] sender process id of application that sent this command
      * \param[in] givenid id of surface
      * \param[in] newvisibility TRUE: surface is visible, FALSE: surface is invisible
      * \ingroup Commands
      */
-    SurfaceSetVisibilityCommand(const unsigned int givenid, bool newvisibility);
+    SurfaceSetVisibilityCommand(pid_t sender, const unsigned int givenid, bool newvisibility)
+    : ICommand(ExecuteAsynchronous, sender)
+    , m_idtoSet(givenid)
+    , m_visibility(newvisibility)
+    {}
 
     /**
      * \brief default destructor

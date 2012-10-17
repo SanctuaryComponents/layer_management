@@ -21,12 +21,6 @@
 #include "Scene.h"
 #include "Log.h"
 
-LayerAddSurfaceCommand::LayerAddSurfaceCommand(unsigned int layerid, unsigned  int surfaceid)
-: m_layerid(layerid)
-, m_surfaceid(surfaceid)
-{
-}
-
 ExecutionResult LayerAddSurfaceCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());

@@ -22,13 +22,6 @@
 #include "Scene.h"
 #include "Log.h"
 
-SurfaceSetChromaKeyCommand::SurfaceSetChromaKeyCommand(unsigned int surfaceid,unsigned int* array,unsigned  int length)
-: m_surfaceid(surfaceid)
-, m_array(array)
-, m_length(length)
-{
-}
-
 ExecutionResult SurfaceSetChromaKeyCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());

@@ -21,12 +21,6 @@
 #include "Scene.h"
 #include "Log.h"
 
-LayergroupSetVisibilityCommand::LayergroupSetVisibilityCommand(const uint givenid, bool newvisibility)
-: m_idtoSet(givenid)
-, m_visibility(newvisibility)
-{
-}
-
 ExecutionResult LayergroupSetVisibilityCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());

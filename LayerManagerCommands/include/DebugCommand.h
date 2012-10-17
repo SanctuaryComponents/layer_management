@@ -20,18 +20,22 @@
 #ifndef _DEBUGCOMMAND_H_
 #define _DEBUGCOMMAND_H_
 
-#include "BaseCommandSynchronous.h"
+#include "ICommand.h"
 
-class DebugCommand : public BaseCommandSynchronous
+class DebugCommand : public ICommand
 {
 public:
     /*!
      * \action    This command sets the debug mode within the GENIVI LayerManagement
      * \frequency Used only for development and debugging.
+     * \param[in] sender process id of application that sent this command
      * \param[in] onoff TRUE: enable debug mode, FALSE: disable debug mode
      * \ingroup Commands
      */
-    DebugCommand(bool onoff);
+    DebugCommand(pid_t sender, bool onoff)
+    : ICommand(ExecuteSynchronous, sender)
+    , m_onoff(onoff)
+    {}
 
     /**
      * \brief default destructor

@@ -21,12 +21,6 @@
 #include "Scene.h"
 #include "Log.h"
 
-LayerSetTypeCommand::LayerSetTypeCommand(const uint givenid, LayerType layerType)
-: m_idtoSet(givenid)
-, m_layerType(layerType)
-{
-}
-
 ExecutionResult LayerSetTypeCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());

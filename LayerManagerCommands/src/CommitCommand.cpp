@@ -36,7 +36,6 @@ ExecutionResult CommitCommand::execute(ICommandExecutor* executor)
         ICommand* command = (*iter);
         if (command)
         {
-            LOG_INFO("CommitCommand", "executing " << command->getString());
             ExecutionResult result = command->execute(executor);
 
             if (result == ExecutionFailed || result == ExecutionFailedRedraw)
@@ -48,6 +47,11 @@ ExecutionResult CommitCommand::execute(ICommandExecutor* executor)
             {
                 redraw = true;
             }
+
+            unsigned int pid = getSenderPid();
+            LOG_INFO("CommitCommand", "executed " << command->getString()
+                    << " from " << executor->getSenderName(pid) << "(" << pid << ")"
+                    << (success ? "+" : "-"));
             delete command;
         }
     }

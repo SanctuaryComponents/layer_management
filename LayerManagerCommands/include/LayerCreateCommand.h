@@ -20,10 +20,10 @@
 #ifndef _LAYERCREATECOMMAND_H_
 #define _LAYERCREATECOMMAND_H_
 
-#include "BaseCommandSynchronous.h"
+#include "ICommand.h"
 #include "IScene.h"
 
-class LayerCreateCommand : public BaseCommandSynchronous
+class LayerCreateCommand : public ICommand
 {
 public:
     /**
@@ -33,13 +33,19 @@ public:
      *            layer for everything concerning OEM branding, one layer for third party applications and one
      *            layer for status applications.
      * \ingroup Commands
+     * \param[in] sender process id of application that sent this command
      * \param[in] OriginalWidth width of the original layer
      * \param[in] OriginalHeight height of the original layer
      * \param[in] idReturn location to store layer id on execution;
      *                     pre-initialized value will be used as new
      *                     id for the layer to be created
      */
-    LayerCreateCommand(uint OriginalWidth, uint OriginalHeight, uint* idReturn);
+    LayerCreateCommand(pid_t sender, uint OriginalWidth, uint OriginalHeight, uint* idReturn)
+    : ICommand(ExecuteSynchronous, sender)
+    , m_originalWidth(OriginalWidth)
+    , m_originalHeight(OriginalHeight)
+    , m_idReturn(idReturn)
+    {}
 
     /**
      * \brief default destructor

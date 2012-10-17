@@ -22,11 +22,6 @@
 #include "Log.h"
 #include <sstream>
 
-SurfaceRemoveCommand::SurfaceRemoveCommand(unsigned int objectID)
-: m_idToRemove(objectID)
-{
-}
-
 ExecutionResult SurfaceRemoveCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());

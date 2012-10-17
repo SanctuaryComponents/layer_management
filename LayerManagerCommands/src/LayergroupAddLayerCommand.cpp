@@ -22,12 +22,6 @@
 #include "Log.h"
 #include <algorithm>
 
-LayergroupAddLayerCommand::LayergroupAddLayerCommand(unsigned int layergroupid,unsigned int layerid)
-: m_layergroupid(layergroupid)
-, m_layerid(layerid)
-{
-}
-
 ExecutionResult LayergroupAddLayerCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());

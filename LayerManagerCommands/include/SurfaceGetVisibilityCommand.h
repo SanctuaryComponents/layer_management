@@ -20,19 +20,24 @@
 #ifndef _SURFACEGETVISIBILITYCOMMAND_H_
 #define _SURFACEGETVISIBILITYCOMMAND_H_
 
-#include "BaseCommandSynchronous.h"
+#include "ICommand.h"
 
-class SurfaceGetVisibilityCommand : public BaseCommandSynchronous
+class SurfaceGetVisibilityCommand : public ICommand
 {
 public:
     /*!
      * \action    This command returns the visibility of a surface within the GENIVI LayerManagement
      * \frequency Can be used for rearrangement.
+     * \param[in] sender process id of application that sent this command
      * \param[in] id id of surface
      * \param[in] visibility location to store visibility on execution
      * \ingroup Commands
      */
-    SurfaceGetVisibilityCommand(int id, bool* visibility);
+    SurfaceGetVisibilityCommand(pid_t sender, int id, bool* visibility)
+    : ICommand(ExecuteSynchronous, sender)
+    , m_id(id)
+    , m_pVisibility(visibility)
+    {}
 
     /**
      * \brief default destructor

@@ -19,17 +19,20 @@
 #ifndef _COMMITCOMMAND_H_
 #define _COMMITCOMMAND_H_
 
-#include "BaseCommandSynchronous.h"
+#include "ICommand.h"
 
-class CommitCommand : public BaseCommandSynchronous
+class CommitCommand : public ICommand
 {
 public:
     /*!
      * \action    This command executes all enqueued asynchronous commands within the GENIVI LayerManagement
      * \frequency Called after one or more calls of changing properties.
+     * \param[in] sender process id of application that sent this command
      * \ingroup Commands
      */
-    CommitCommand(void) {}
+    CommitCommand(pid_t sender)
+    : ICommand(ExecuteSynchronous, sender)
+    {}
 
      /**
      * \brief default destructor

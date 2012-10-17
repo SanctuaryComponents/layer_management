@@ -20,20 +20,25 @@
 #ifndef _LAYERGETVISIBILITYCOMMAND_H_
 #define _LAYERGETVISIBILITYCOMMAND_H_
 
-#include "BaseCommandSynchronous.h"
+#include "ICommand.h"
 
-class LayerGetVisibilityCommand : public BaseCommandSynchronous
+class LayerGetVisibilityCommand : public ICommand
 {
 public:
     /*!
      * \action    This command returns the visibility of a layer within the GENIVI LayerManagement
      * \frequency Frequently when events occur within the system which cause a rearrangement of
      *            graphics, applications or contexts.
+     * \param[in] sender process id of application that sent this command
      * \param[in] id id of layer
      * \param[in] visibility location to store visibility on execution
      * \ingroup Commands
      */
-    LayerGetVisibilityCommand(int id, bool* visibility);
+    LayerGetVisibilityCommand(pid_t sender, int id, bool* visibility)
+    : ICommand(ExecuteSynchronous, sender)
+    , m_id(id)
+    , m_pVisibility(visibility)
+    {}
 
     /**
      * \brief default destructor

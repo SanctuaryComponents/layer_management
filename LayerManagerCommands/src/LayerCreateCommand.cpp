@@ -21,13 +21,6 @@
 #include "Scene.h"
 #include "Log.h"
 
-LayerCreateCommand::LayerCreateCommand(uint OriginalWidth, uint OriginalHeight, uint* idReturn)
-: m_originalWidth(OriginalWidth)
-, m_originalHeight(OriginalHeight)
-, m_idReturn(idReturn)
-{
-}
-
 ExecutionResult LayerCreateCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());

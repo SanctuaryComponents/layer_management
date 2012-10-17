@@ -79,6 +79,7 @@ static surfaceScene gInitialSurfaceScene[] =
 bool LayerSceneProvider::delegateScene() 
 {
     bool result = true;
+    pid_t layermanagerPid = getpid();
     int i = 0;
     int numberOfLayers = sizeof(gInitialLayerScene) / sizeof (layerScene);
     int numberOfSurfaces = sizeof(gInitialSurfaceScene) / sizeof (surfaceScene);
@@ -89,17 +90,17 @@ bool LayerSceneProvider::delegateScene()
         /* setup inital layer scenery */
         for (i = 0;i<numberOfLayers;i++)
         {
-            result &= m_executor->execute(new LayerCreateCommand(screenResolution[0], screenResolution[1], &(gInitialLayerScene[i].layer)));
-            result &= m_executor->execute(new LayerSetSourceRectangleCommand(gInitialLayerScene[i].layer, 0, 0, screenResolution[0], screenResolution[1]));
-            result &= m_executor->execute(new LayerSetDestinationRectangleCommand(gInitialLayerScene[i].layer, 0, 0, screenResolution[0], screenResolution[1]));
-            result &= m_executor->execute(new LayerSetOpacityCommand(gInitialLayerScene[i].layer, gInitialLayerScene[i].opacity) );
-            result &= m_executor->execute(new LayerSetVisibilityCommand(gInitialLayerScene[i].layer, gInitialLayerScene[i].visibility) );
-            result &= m_executor->execute(new CommitCommand());
+            result &= m_executor->execute(new LayerCreateCommand(layermanagerPid, screenResolution[0], screenResolution[1], &(gInitialLayerScene[i].layer)));
+            result &= m_executor->execute(new LayerSetSourceRectangleCommand(layermanagerPid, gInitialLayerScene[i].layer, 0, 0, screenResolution[0], screenResolution[1]));
+            result &= m_executor->execute(new LayerSetDestinationRectangleCommand(layermanagerPid, gInitialLayerScene[i].layer, 0, 0, screenResolution[0], screenResolution[1]));
+            result &= m_executor->execute(new LayerSetOpacityCommand(layermanagerPid, gInitialLayerScene[i].layer, gInitialLayerScene[i].opacity) );
+            result &= m_executor->execute(new LayerSetVisibilityCommand(layermanagerPid, gInitialLayerScene[i].layer, gInitialLayerScene[i].visibility) );
+            result &= m_executor->execute(new CommitCommand(layermanagerPid));
             renderOrder[i]=gInitialLayerScene[i].layer;
         }        
         /* Finally set the first executed renderorder */
-        result &= m_executor->execute(new ScreenSetRenderOrderCommand(renderOrder, numberOfLayers));
-        result &= m_executor->execute(new CommitCommand());
+        result &= m_executor->execute(new ScreenSetRenderOrderCommand(layermanagerPid, renderOrder, numberOfLayers));
+        result &= m_executor->execute(new CommitCommand(layermanagerPid));
     }
     
     if ( numberOfSurfaces > 0 ) 
@@ -107,10 +108,10 @@ bool LayerSceneProvider::delegateScene()
         /* setup inital surface scenery */
         for (i = 0;i<numberOfSurfaces;i++)
         {
-            result &= m_executor->execute(new SurfaceCreateCommand( &(gInitialSurfaceScene[i].surface)));
-            result &= m_executor->execute(new SurfaceSetOpacityCommand(gInitialSurfaceScene[i].surface, gInitialSurfaceScene[i].opacity));
-            result &= m_executor->execute(new SurfaceSetVisibilityCommand(gInitialSurfaceScene[i].surface, gInitialSurfaceScene[i].visibility));
-            result &= m_executor->execute(new CommitCommand());
+            result &= m_executor->execute(new SurfaceCreateCommand(layermanagerPid, &(gInitialSurfaceScene[i].surface)));
+            result &= m_executor->execute(new SurfaceSetOpacityCommand(layermanagerPid, gInitialSurfaceScene[i].surface, gInitialSurfaceScene[i].opacity));
+            result &= m_executor->execute(new SurfaceSetVisibilityCommand(layermanagerPid, gInitialSurfaceScene[i].surface, gInitialSurfaceScene[i].visibility));
+            result &= m_executor->execute(new CommitCommand(layermanagerPid));
         }        
         /* Finally set the first executed renderorder */
     }

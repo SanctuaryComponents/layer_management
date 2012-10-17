@@ -22,11 +22,6 @@
 #include "Log.h"
 #include "ShaderMap.h"
 
-ShaderDestroyCommand::ShaderDestroyCommand(unsigned int shaderid)
-: m_id(shaderid)
-{
-}
-
 ExecutionResult ShaderDestroyCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());

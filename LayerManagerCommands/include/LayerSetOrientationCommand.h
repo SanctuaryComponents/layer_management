@@ -20,20 +20,25 @@
 #ifndef _LAYERSETORIENTATIONCOMMAND_H_
 #define _LAYERSETORIENTATIONCOMMAND_H_
 
-#include "BaseCommandAsynchronous.h"
+#include "ICommand.h"
 #include "OrientationType.h"
 
-class LayerSetOrientationCommand : public BaseCommandAsynchronous
+class LayerSetOrientationCommand : public ICommand
 {
 public:
     /*!
      * \action    This command sets the orientation of a layer within the GENIVI LayerManagement
      * \frequency Called for rearranging graphical contents.
+     * \param[in] sender process id of application that sent this command
      * \param[in] id id of layer
      * \param[in] Orientation orientation of layer
      * \ingroup Commands
      */
-    LayerSetOrientationCommand(unsigned int id, OrientationType Orientation);
+    LayerSetOrientationCommand(pid_t sender, unsigned int id, OrientationType Orientation)
+    : ICommand(ExecuteAsynchronous, sender)
+    , m_id(id)
+    , m_orientation(Orientation)
+    {}
 
     /**
      * \brief default destructor

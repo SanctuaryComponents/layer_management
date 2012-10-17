@@ -20,9 +20,9 @@
 #ifndef _SURFACEGROUPREMOVECOMMAND_H_
 #define _SURFACEGROUPREMOVECOMMAND_H_
 
-#include "BaseCommandSynchronous.h"
+#include "ICommand.h"
 
-class SurfacegroupRemoveCommand : public BaseCommandSynchronous
+class SurfacegroupRemoveCommand : public ICommand
 {
 public:
     /*!
@@ -30,10 +30,14 @@ public:
      *            LayerManagement
      * \frequency Called during removal of applications with several surfaces
      *            or even application groups combined of several surfaces.
+     * \param[in] sender process id of application that sent this command
      * \param[in] objectID id of surface group
      * \ingroup Commands
      */
-    SurfacegroupRemoveCommand(unsigned int objectID);
+    SurfacegroupRemoveCommand(pid_t sender, unsigned int objectID)
+    : ICommand(ExecuteSynchronous, sender)
+    , m_idToRemove(objectID)
+    {}
 
     /**
      * \brief default destructor

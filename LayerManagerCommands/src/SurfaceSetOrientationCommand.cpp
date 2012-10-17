@@ -21,12 +21,6 @@
 #include "Scene.h"
 #include "Log.h"
 
-SurfaceSetOrientationCommand::SurfaceSetOrientationCommand(unsigned int id, OrientationType Orientation)
-: m_id(id)
-, m_orientation(Orientation)
-{
-}
-
 ExecutionResult SurfaceSetOrientationCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());

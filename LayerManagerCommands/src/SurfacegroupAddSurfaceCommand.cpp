@@ -23,12 +23,6 @@
 #include "Log.h"
 #include <algorithm>
 
-SurfacegroupAddSurfaceCommand::SurfacegroupAddSurfaceCommand(unsigned int surfacegroupid, unsigned int surfaceid)
-: m_surfacegroupid(surfacegroupid)
-, m_surfaceid(surfaceid)
-{
-}
-
 ExecutionResult SurfacegroupAddSurfaceCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());

@@ -20,20 +20,25 @@
 #ifndef _LAYERSETVISIBILITYCOMMAND_H_
 #define _LAYERSETVISIBILITYCOMMAND_H_
 
-#include "BaseCommandAsynchronous.h"
+#include "ICommand.h"
 
-class LayerSetVisibilityCommand : public BaseCommandAsynchronous
+class LayerSetVisibilityCommand : public ICommand
 {
 public:
     /*!
      * \action    This command sets the visibility of a layer within the GENIVI LayerManagement
      * \frequency Frequently when events occur within the system which cause a rearrangement
      *            of graphics, applications or contexts.
+     * \param[in] sender process id of application that sent this command
      * \param[in] givenid id of layer
      * \param[in] newvisibility TRUE: layer is set to visible, FALSE: layer is set to invisible
      * \ingroup Commands
      */
-    LayerSetVisibilityCommand(const unsigned int givenid, bool newvisibility);
+    LayerSetVisibilityCommand(pid_t sender, const unsigned int givenid, bool newvisibility)
+    : ICommand(ExecuteAsynchronous, sender)
+    , m_idtoSet(givenid)
+    , m_visibility(newvisibility)
+    {}
 
     /**
      * \brief default destructor

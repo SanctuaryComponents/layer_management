@@ -22,12 +22,6 @@
 #include "Scene.h"
 #include "Log.h"
 
-ShaderSetUniformsCommand::ShaderSetUniformsCommand(unsigned int shaderid, const std::vector<std::string>& uniforms)
-: m_shaderid(shaderid)
-, m_uniforms(uniforms)
-{
-}
-
 ExecutionResult ShaderSetUniformsCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());

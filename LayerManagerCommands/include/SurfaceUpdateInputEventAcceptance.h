@@ -23,10 +23,10 @@
 
 #include "ilm_types.h"
 #include "InputManager.h"
-#include "BaseCommandSynchronous.h"
+#include "ICommand.h"
 
 
-class SurfaceUpdateInputEventAcceptance : public BaseCommandSynchronous
+class SurfaceUpdateInputEventAcceptance : public ICommand
 {
     public:
         /*!
@@ -34,11 +34,11 @@ class SurfaceUpdateInputEventAcceptance : public BaseCommandSynchronous
          * can accept events from. Call this method if you do not want a surface
          * to receive particular type of event (touch, keyboard, ...)
          *
-         *
-         * \frequency Preferably at init. This could lead to wierd results
+         * \frequency Preferably at init. This could lead to weird results
          * if you update the acceptance at runtime, while the surface has already
          * a focus (touch, keyboard, ...)
          *
+         * \param[in] sender process id of application that sent this command
          * \param[in] surfId id of surface
          * \param[in] devices Bitmask of ilmInputDevice. To set the acceptance status of one or more input device.
          *            Note that this method will only the acceptance status for the specified InputDeviced in the
@@ -47,7 +47,12 @@ class SurfaceUpdateInputEventAcceptance : public BaseCommandSynchronous
          *
          * \ingroup Commands
          */
-        SurfaceUpdateInputEventAcceptance(unsigned int surfId, InputDevice devices, bool accept);
+        SurfaceUpdateInputEventAcceptance(pid_t sender, unsigned int surfId, InputDevice devices, bool accept)
+        : ICommand(ExecuteSynchronous, sender)
+        , m_surfId(surfId)
+        , m_devices(devices)
+        , m_accept(accept)
+        {}
 
         /**
          * \brief default destructor

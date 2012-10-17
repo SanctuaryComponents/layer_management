@@ -20,19 +20,24 @@
 #ifndef _SURFACEGETOPACITYCOMMAND_H_
 #define _SURFACEGETOPACITYCOMMAND_H_
 
-#include "BaseCommandSynchronous.h"
+#include "ICommand.h"
 
-class SurfaceGetOpacityCommand : public BaseCommandSynchronous
+class SurfaceGetOpacityCommand : public ICommand
 {
 public:
     /*!
      * \action    This command returns the opacity of a surface within the GENIVI LayerManagement
      * \frequency Can be used for rearrangement.
+     * \param[in] sender process id of application that sent this command
      * \param[in] id id of surface
      * \param[in] returnOpacity location to store opacity of surface on execution
      * \ingroup Commands
      */
-    SurfaceGetOpacityCommand(int id, double* returnOpacity);
+    SurfaceGetOpacityCommand(pid_t sender, int id, double* returnOpacity)
+    : ICommand(ExecuteSynchronous, sender)
+    , m_id(id)
+    , m_pReturnOpacity(returnOpacity)
+    {}
 
     /**
      * \brief default destructor

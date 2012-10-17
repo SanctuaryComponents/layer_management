@@ -21,12 +21,6 @@
 #include "Scene.h"
 #include "Log.h"
 
-SurfaceSetVisibilityCommand::SurfaceSetVisibilityCommand(const uint givenid, bool newvisibility)
-: m_idtoSet(givenid)
-, m_visibility(newvisibility)
-{
-}
-
 ExecutionResult SurfaceSetVisibilityCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());

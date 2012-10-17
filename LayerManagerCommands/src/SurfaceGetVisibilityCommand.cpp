@@ -21,12 +21,6 @@
 #include "Scene.h"
 #include "Log.h"
 
-SurfaceGetVisibilityCommand::SurfaceGetVisibilityCommand(int id, bool* visibility)
-: m_id(id)
-, m_pVisibility(visibility)
-{
-}
-
 ExecutionResult SurfaceGetVisibilityCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());

@@ -22,11 +22,6 @@
 #include "Log.h"
 #include <sstream>
 
-LayerRemoveCommand::LayerRemoveCommand(unsigned int objectID)
-: m_idToRemove(objectID)
-{
-}
-
 ExecutionResult LayerRemoveCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());

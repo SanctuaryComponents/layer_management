@@ -21,13 +21,6 @@
 #include "Scene.h"
 #include "Log.h"
 
-SurfaceSetPositionCommand::SurfaceSetPositionCommand(unsigned int id, unsigned int x, unsigned int y )
-: m_id(id)
-, m_x(x)
-, m_y(y)
-{
-}
-
 ExecutionResult SurfaceSetPositionCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());

@@ -20,11 +20,11 @@
 #ifndef _SURFACESETNATIVECONTENTCOMMAND_H_
 #define _SURFACESETNATIVECONTENTCOMMAND_H_
 
-#include "BaseCommandSynchronous.h"
+#include "ICommand.h"
 #include "PixelFormat.h"
 #include "IScene.h"
 
-class SurfaceSetNativeContentCommand : public BaseCommandSynchronous
+class SurfaceSetNativeContentCommand : public ICommand
 {
 public:
     /*!
@@ -32,6 +32,7 @@ public:
      *            of a surface within the GENIVI LayerManagement
      * \frequency Typically once during startup of an application providing content
      *            for a surface.
+     * \param[in] sender process id of application that sent this command
      * \param[in] surfaceId id of surface
      * \param[in] handle
      * \param[in] pixelformat
@@ -39,7 +40,14 @@ public:
      * \param[in] OriginalHeight original height for native content
      * \ingroup Commands
      */
-    SurfaceSetNativeContentCommand(unsigned int surfaceId, unsigned int handle, PixelFormat pixelformat, uint OriginalWidth, uint OriginalHeight);
+    SurfaceSetNativeContentCommand(pid_t sender, unsigned int surfaceId, unsigned int handle, PixelFormat pixelformat, uint OriginalWidth, uint OriginalHeight)
+    : ICommand(ExecuteSynchronous, sender)
+    , m_surfaceId(surfaceId)
+    , m_nativeHandle(handle)
+    , m_pixelformat(pixelformat)
+    , m_originalWidth(OriginalWidth)
+    , m_originalHeight(OriginalHeight)
+    {}
 
     /**
      * \brief default destructor

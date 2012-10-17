@@ -21,12 +21,6 @@
 #include "Scene.h"
 #include "Log.h"
 
-LayerGetVisibilityCommand::LayerGetVisibilityCommand(int id, bool* visibility)
-: m_id(id)
-, m_pVisibility(visibility)
-{
-}
-
 ExecutionResult LayerGetVisibilityCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());

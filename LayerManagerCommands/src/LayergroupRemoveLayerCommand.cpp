@@ -21,12 +21,6 @@
 #include "Scene.h"
 #include "Log.h"
 
-LayergroupRemoveLayerCommand::LayergroupRemoveLayerCommand(unsigned int layergroupid, unsigned int layerid)
-: m_layergroupid(layergroupid)
-, m_layerid(layerid)
-{
-}
-
 ExecutionResult LayergroupRemoveLayerCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());

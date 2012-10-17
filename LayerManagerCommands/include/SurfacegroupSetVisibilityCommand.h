@@ -20,19 +20,24 @@
 #ifndef _SURFACEGROUPSETVISIBILITYCOMMAND_H_
 #define _SURFACEGROUPSETVISIBILITYCOMMAND_H_
 
-#include "BaseCommandAsynchronous.h"
+#include "ICommand.h"
 
-class SurfacegroupSetVisibilityCommand : public BaseCommandAsynchronous
+class SurfacegroupSetVisibilityCommand : public ICommand
 {
 public:
     /*!
      * \action    This command sets the visibility of a surface group within the GENIVI LayerManagement
      * \frequency Used for surface group management.
+     * \param[in] sender process id of application that sent this command
      * \param[in] givenid id ofsurface group
      * \param[in] newvisibility TRUE: all surfaces in group visible, FALSE: all surface in group invisible
      * \ingroup Commands
      */
-    SurfacegroupSetVisibilityCommand(const unsigned int givenid, bool newvisibility);
+    SurfacegroupSetVisibilityCommand(pid_t sender, const unsigned int givenid, bool newvisibility)
+    : ICommand(ExecuteAsynchronous, sender)
+    , m_idtoSet(givenid)
+    , m_visibility(newvisibility)
+    {}
 
     /**
      * \brief default destructor

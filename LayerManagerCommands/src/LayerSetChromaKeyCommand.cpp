@@ -22,13 +22,6 @@
 #include "Scene.h"
 #include "Log.h"
 
-LayerSetChromaKeyCommand::LayerSetChromaKeyCommand(unsigned int layerid,unsigned int* array,unsigned  int length)
-: m_layerid(layerid)
-, m_array(array)
-, m_length(length)
-{
-}
-
 ExecutionResult LayerSetChromaKeyCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());

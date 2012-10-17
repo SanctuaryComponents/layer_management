@@ -20,20 +20,26 @@
 #ifndef _LAYERGETPOSITIONCOMMAND_H_
 #define _LAYERGETPOSITIONCOMMAND_H_
 
-#include "BaseCommandSynchronous.h"
+#include "ICommand.h"
 
-class LayerGetPositionCommand : public BaseCommandSynchronous
+class LayerGetPositionCommand : public ICommand
 {
 public:
     /*!
      * \action    This command returns the position of a layer within the GENIVI LayerManagement
      * \frequency Called for rearranging graphical contents.
+     * \param[in] sender process id of application that sent this command
      * \param[in] id id of layer
      * \param[in] xRet location to return x position of layer on execution
      * \param[in] yRet location to return y position of layer on execution
      * \ingroup Commands
      */
-    LayerGetPositionCommand(int id, unsigned int* xRet, unsigned int* yRet);
+    LayerGetPositionCommand(pid_t sender, int id, unsigned int* xRet, unsigned int* yRet)
+    : ICommand(ExecuteSynchronous, sender)
+    , m_id(id)
+    , m_pX(xRet)
+    , m_pY(yRet)
+    {}
 
     /**
      * \brief default destructor

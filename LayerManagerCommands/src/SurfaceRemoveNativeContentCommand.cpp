@@ -22,11 +22,6 @@
 #include <sstream>
 #include "stdio.h"
 
-SurfaceRemoveNativeContentCommand::SurfaceRemoveNativeContentCommand(unsigned int surfaceId)
-: m_surfaceId(surfaceId)
-{
-}
-
 ExecutionResult SurfaceRemoveNativeContentCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());

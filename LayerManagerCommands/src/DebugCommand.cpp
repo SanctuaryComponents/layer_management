@@ -21,11 +21,6 @@
 #include "Scene.h"
 #include <sstream>
 
-DebugCommand::DebugCommand(bool onoff)
-: m_onoff(onoff)
-{
-}
-
 ExecutionResult DebugCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());

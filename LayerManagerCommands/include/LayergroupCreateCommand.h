@@ -20,21 +20,25 @@
 #ifndef _LAYERGROUPCREATECOMMAND_H_
 #define _LAYERGROUPCREATECOMMAND_H_
 
-#include "BaseCommandSynchronous.h"
+#include "ICommand.h"
 #include "IScene.h"
 
-class LayergroupCreateCommand : public BaseCommandSynchronous
+class LayergroupCreateCommand : public ICommand
 {
 public:
     /*!
      * \action    This command creates a layer group within the GENIVI LayerManagement
      * \frequency Called within initializations in order to change properties of all
      *            group members at once at a later point in time.
+     * \param[in] sender process id of application that sent this command
      * \param[in] idReturn location to store layer group id on execution;
      *                     pre-initialized value will be interpreted as id request
      * \ingroup Commands
      */
-    LayergroupCreateCommand(uint* idReturn);
+    LayergroupCreateCommand(pid_t sender, uint* idReturn)
+    : ICommand(ExecuteSynchronous, sender)
+    , m_idReturn(idReturn)
+    {}
 
     /**
      * \brief default destructor

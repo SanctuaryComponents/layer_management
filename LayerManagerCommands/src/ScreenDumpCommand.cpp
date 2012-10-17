@@ -21,12 +21,6 @@
 #include "Scene.h"
 #include "Log.h"
 
-ScreenDumpCommand::ScreenDumpCommand(char* givenfilename, unsigned int id)
-: m_filename(givenfilename)
-, m_id(id)
-{
-}
-
 ExecutionResult ScreenDumpCommand::execute(ICommandExecutor* executor)
 {
 	ExecutionResult result = ExecutionFailed;

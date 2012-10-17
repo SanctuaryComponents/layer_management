@@ -20,20 +20,26 @@
 #ifndef _LAYERGETDIMENSIONCOMMAND_H_
 #define _LAYERGETDIMENSIONCOMMAND_H_
 
-#include "BaseCommandSynchronous.h"
+#include "ICommand.h"
 
-class LayerGetDimensionCommand: public BaseCommandSynchronous
+class LayerGetDimensionCommand: public ICommand
 {
 public:
     /*!
      * \action    This command returns the dimensions of a layer within the GENIVI LayerManagement
      * \frequency Called for rearranging graphical contents.
+     * \param[in] sender process id of application that sent this command
      * \param[in] id id of layer
      * \param[in] widthRet location to return width of layer on execution
      * \param[in] heightRet location to return height of layer on execution
      * \ingroup Commands
      */
-    LayerGetDimensionCommand(int id, unsigned int* widthRet, unsigned int* heightRet);
+    LayerGetDimensionCommand(pid_t sender, int id, unsigned int* widthRet, unsigned int* heightRet)
+    : ICommand(ExecuteSynchronous, sender)
+    , m_id(id)
+    , m_pWidth(widthRet)
+    , m_pHeight(heightRet)
+    {}
 
     /**
      * \brief default destructor
