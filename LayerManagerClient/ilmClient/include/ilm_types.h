@@ -198,6 +198,7 @@ struct ilmSurfaceProperties
     t_ilm_uint chromaKeyRed;                /*!< chromakey's red value of the surface */
     t_ilm_uint chromaKeyGreen;              /*!< chromakey's green value of the surface */
     t_ilm_uint chromaKeyBlue;               /*!< chromakey's blue value of the surface */
+    t_ilm_int  creatorPid;                  /*!< process id of application that created this surface */
 };
 
 /**
@@ -224,6 +225,7 @@ struct ilmLayerProperties
     t_ilm_uint chromaKeyRed;     /*!< chromakey's red value of the layer */
     t_ilm_uint chromaKeyGreen;   /*!< chromakey's green value of the layer */
     t_ilm_uint chromaKeyBlue;    /*!< chromakey's blue value of the layer */
+    t_ilm_int  creatorPid;       /*!< process id of application that created this layer */
 };
 
 /**

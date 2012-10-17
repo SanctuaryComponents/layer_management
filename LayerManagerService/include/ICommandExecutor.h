@@ -174,14 +174,21 @@ public:
      * \ingroup ServiceAPI
      * \param[in] applicationReference pointer to application object
      */
-    virtual void addApplicationReference(IApplicationReference* applicationReference) = 0;
+    virtual void addApplicationReference(t_ilm_client_handle client, IApplicationReference* applicationReference) = 0;
 
     /**
      * \brief remove application from list of currently registered applications
      * \ingroup ServiceAPI
      * \param[in] applicationReference pointer to application object
      */
-    virtual void removeApplicationReference(IApplicationReference* applicationReference) = 0;
+    virtual void removeApplicationReference(t_ilm_client_handle client) = 0;
+
+    /**
+     * \brief get pid of a connected applications
+     * \ingroup ServiceAPI
+     * \param[in] client client handle to get process id for
+     */
+    virtual t_ilm_uint getSenderPid(t_ilm_client_handle client) = 0;
 
     /**
      * \brief get capabilities of layer type

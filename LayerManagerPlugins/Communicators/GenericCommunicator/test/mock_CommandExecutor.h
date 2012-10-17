@@ -48,8 +48,11 @@ class MockCommandExecutor : public ICommandExecutor {
   MOCK_METHOD1(removeSceneProvider, void(ISceneProvider* provider));
 
   MOCK_METHOD0(getApplicationReferenceMap, ApplicationReferenceMap*());
-  MOCK_METHOD1(addApplicationReference, void(IApplicationReference* reference));
-  MOCK_METHOD1(removeApplicationReference, void(IApplicationReference* reference));
+  MOCK_METHOD2(addApplicationReference, void(t_ilm_client_handle client, IApplicationReference* reference));
+  MOCK_METHOD1(removeApplicationReference, void(t_ilm_client_handle client));
+  MOCK_METHOD1(getSenderPid, t_ilm_uint(t_ilm_client_handle client));
+  MOCK_METHOD1(getSenderName, const char*(t_ilm_client_handle client));
+  MOCK_METHOD1(getSenderName, const char*(unsigned int pid));
 
   MOCK_CONST_METHOD1(getLayerTypeCapabilities, uint(LayerType));
   MOCK_CONST_METHOD1(getNumberOfHardwareLayers, uint(uint));

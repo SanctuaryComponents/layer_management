@@ -46,12 +46,16 @@ public:
 
     virtual void addRenderer(IRenderer* renderer);
     virtual void removeRenderer(IRenderer* renderer);
+
     virtual void addCommunicator(ICommunicator* communicator);
     virtual void removeCommunicator(ICommunicator* communicator);
+
     virtual void addSceneProvider(ISceneProvider* sceneProvider);
     virtual void removeSceneProvider(ISceneProvider* sceneProvider);
-    virtual void addApplicationReference(IApplicationReference* reference);
-    virtual void removeApplicationReference(IApplicationReference* reference);
+
+    virtual void addApplicationReference(t_ilm_client_handle client, IApplicationReference* reference);
+    virtual void removeApplicationReference(t_ilm_client_handle client);
+    virtual t_ilm_uint getSenderPid(t_ilm_client_handle client);
     
     virtual bool startManagement(const int width, const int height, const char* displayName);
     virtual bool stopManagement();

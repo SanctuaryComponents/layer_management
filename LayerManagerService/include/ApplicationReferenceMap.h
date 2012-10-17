@@ -23,8 +23,8 @@
 #include "IApplicationReference.h"
 #include <string.h>
 
-typedef std::map<long, IApplicationReference*> ApplicationReferenceMap;
-typedef std::map<long, IApplicationReference*>::iterator ApplicationReferenceMapIterator;
-typedef std::map<long, IApplicationReference*>::const_iterator ApplicationReferenceMapConstIterator;
+typedef std::map<t_ilm_client_handle, IApplicationReference*> ApplicationReferenceMap;
+typedef std::map<t_ilm_client_handle, IApplicationReference*>::iterator ApplicationReferenceMapIterator;
+typedef std::map<t_ilm_client_handle, IApplicationReference*>::const_iterator ApplicationReferenceMapConstIterator;
 
 #endif /* _APPLICATION_REFERENCE_MAP_H_ */

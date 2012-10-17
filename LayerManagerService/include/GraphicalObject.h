@@ -291,4 +291,9 @@ inline ApplicationReferenceList& GraphicalObject::getNotificationClients()
     return applicationList;
 }
 
+inline int GraphicalObject::getCreatorPid()
+{
+    return createdByPid;
+}
+
 #endif /* _GRAPHICALOBJECT_H_ */

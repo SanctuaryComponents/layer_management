@@ -261,6 +261,7 @@ void* notificationThreadLoop(void* param)
             gIpcModule.getUint(notification, &properties.chromaKeyRed);
             gIpcModule.getUint(notification, &properties.chromaKeyGreen);
             gIpcModule.getUint(notification, &properties.chromaKeyBlue);
+            gIpcModule.getInt(notification, &properties.creatorPid);
 
             layerNotificationFunc func = getLayerNotificationCallback(id);
             if (func)
@@ -304,6 +305,7 @@ void* notificationThreadLoop(void* param)
             gIpcModule.getUint(notification, &properties.chromaKeyRed);
             gIpcModule.getUint(notification, &properties.chromaKeyGreen);
             gIpcModule.getUint(notification, &properties.chromaKeyBlue);
+            gIpcModule.getInt(notification, &properties.creatorPid);
 
             surfaceNotificationFunc func = getSurfaceNotificationCallback(id);
             if (func)
@@ -571,7 +573,8 @@ ilmErrorTypes ilm_getPropertiesOfSurface(t_ilm_uint surfaceID, struct ilmSurface
             && gIpcModule.getBool(response, &pSurfaceProperties->chromaKeyEnabled)
             && gIpcModule.getUint(response, &pSurfaceProperties->chromaKeyRed)
             && gIpcModule.getUint(response, &pSurfaceProperties->chromaKeyGreen)
-            && gIpcModule.getUint(response, &pSurfaceProperties->chromaKeyBlue))
+            && gIpcModule.getUint(response, &pSurfaceProperties->chromaKeyBlue)
+            && gIpcModule.getInt(response, &pSurfaceProperties->creatorPid))
         {
             returnValue = ILM_SUCCESS;
         }
@@ -611,7 +614,8 @@ ilmErrorTypes ilm_getPropertiesOfLayer(t_ilm_uint layerID, struct ilmLayerProper
             && gIpcModule.getBool(response, &pLayerProperties->chromaKeyEnabled)
             && gIpcModule.getUint(response, &pLayerProperties->chromaKeyRed)
             && gIpcModule.getUint(response, &pLayerProperties->chromaKeyGreen)
-            && gIpcModule.getUint(response, &pLayerProperties->chromaKeyBlue))
+            && gIpcModule.getUint(response, &pLayerProperties->chromaKeyBlue)
+            && gIpcModule.getInt(response, &pLayerProperties->creatorPid))
         {
             returnValue = ILM_SUCCESS;
         }
