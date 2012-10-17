@@ -63,6 +63,7 @@ Log::Log()
     m_logContext = new DltContext;    
     DLT_REGISTER_APP("LMSA","LayerManagerService");
     DLT_REGISTER_CONTEXT(*((DltContext*)m_logContext),"LMSC","LayerManagerService");
+    DLT_SET_APPLICATION_LL_TS_LIMIT(DLT_LOG_DEFAULT, DLT_TRACE_STATUS_DEFAULT);
 #else
     m_logContext = NULL;
 #endif
