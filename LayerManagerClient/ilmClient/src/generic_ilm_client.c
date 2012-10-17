@@ -48,6 +48,8 @@ const int gResponseTimeout = 500; // in ms
 //=============================================================================
 // global vars
 //=============================================================================
+extern char *__progname;
+
 struct IpcModule gIpcModule;
 
 pthread_t gReceiveThread;
@@ -468,8 +470,9 @@ ilmErrorTypes ilm_init()
 
         t_ilm_message command = gIpcModule.createMessage("ServiceConnect");
         if (command
-            && gIpcModule.appendUint(command, pid)
-            && gIpcModule.sendToService(command))
+                && gIpcModule.appendUint(command, pid)
+                && gIpcModule.appendString(command, __progname)
+                && gIpcModule.sendToService(command))
         {
             t_ilm_message response = waitForResponse(gResponseTimeout);
             if (response)
