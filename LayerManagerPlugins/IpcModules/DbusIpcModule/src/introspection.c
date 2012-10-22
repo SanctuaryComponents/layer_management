@@ -145,7 +145,13 @@ void generateIntrospectionString(char* msgBuffer)
         { "DestroyShader",                    "u",     ""               },
         { "SetShader",                        "uu",    ""               },
         { "SetUniforms",                      "uas",   ""               },
-        { "LayerAddNotification",             "u",     ""               }
+        { "SetKeyboardFocusOn",               "u",     ""               },
+        { "GetKeyboardFocusSurfaceId",        "",      "u"              },
+        { "UpdateInputEventAcceptanceOn",     "uub",   ""               },
+        { "LayerAddNotification",             "u",     ""               },
+        { "LayerRemoveNotification",          "u",     ""               },
+        { "SurfaceAddNotification",           "u",     ""               },
+        { "SurfaceRemoveNotification",        "u",     ""               }
     };
 
     int introspectionInterfaceCount = sizeof(introspectionInterface) / sizeof(struct IntrospectionTable);
