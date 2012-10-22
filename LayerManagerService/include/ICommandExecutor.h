@@ -240,8 +240,19 @@ public:
      */
     virtual unsigned int* getScreenIDs(unsigned int* length) const = 0;
 
+    /**
+     * \brief add a notification for an updated scene element
+     * \ingroup ServiceAPI
+     * \param[in] object pointer to updated scene element, e.g. layer or surface
+     * \param[in] mask bitmask indicating which property of scene element was udpated
+     */
     virtual void addClientNotification(GraphicalObject* object, t_ilm_notification_mask mask) = 0;
 
+    /**
+     * \brief get the list of updated scene elements
+     * \ingroup ServiceAPI
+     * \return reference to current list of updated scene elements
+     */
     virtual NotificationQueue& getClientNotificationQueue() = 0;
 };
 
