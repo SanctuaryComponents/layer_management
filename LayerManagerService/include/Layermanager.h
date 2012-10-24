@@ -22,10 +22,10 @@
 
 #include "ICommandExecutor.h"
 #include "NotificationQueue.h"
-#include "Scene.h"
 
 typedef std::map<unsigned int, const char*> PidToProcessNameTable;
 
+class Scene;
 class ICommand;
 class IRenderer;
 class ICommunicator;

@@ -23,6 +23,7 @@
 #include "ICommunicator.h"
 #include "ISceneProvider.h"
 #include "ICommandExecutor.h"
+#include "Scene.h"
 #include <iostream>
 #include <sys/types.h>
 #include <dirent.h>

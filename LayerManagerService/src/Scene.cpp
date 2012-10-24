@@ -22,8 +22,11 @@
 #include "Log.h"
 
 #include "Layer.h"
-#include "GraphicalGroup.h"
+#include "Surface.h"
+#include "LayerGroup.h"
+#include "SurfaceGroup.h"
 #include "Shader.h"
+#include "Scene.h"
 
 Scene::Scene()
 {

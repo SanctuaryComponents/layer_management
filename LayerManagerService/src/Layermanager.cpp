@@ -25,6 +25,7 @@
 #include "ICommunicator.h"
 #include "IRenderer.h"
 #include "ISceneProvider.h"
+#include "Scene.h"
 
 static const char* NO_SENDER_NAME = "unknown";
 
