@@ -63,6 +63,8 @@ mqd_t incomingMqWrite;
 mqd_t notificationMqRead;
 mqd_t notificationMqWrite;
 
+static t_ilm_bool gInitialized = ILM_FALSE;
+
 //=============================================================================
 // notification management
 //=============================================================================
@@ -400,6 +402,12 @@ ilmErrorTypes ilm_init()
 {
     ilmErrorTypes result = ILM_FAILED;
 
+    if (gInitialized)
+    {
+        printf("ilm_init() was called, but ilmClientLib is already initialized. returning success, but initialization was skipped this time.\n");
+        return ILM_SUCCESS;
+    }
+
     initNotificationCallbacks();
 
     if (loadIpcModule(&gIpcModule))
@@ -491,6 +499,8 @@ ilmErrorTypes ilm_init()
         gIpcModule.destroyMessage(command);
     }
 
+    gInitialized = (result == ILM_SUCCESS) ? ILM_TRUE : ILM_FALSE;
+
     return result;
 }
 
@@ -534,6 +544,8 @@ ilmErrorTypes ilm_destroy()
 
     mq_close(incomingMqRead);
     mq_close(incomingMqWrite);
+
+    gInitialized = ILM_FALSE;
 
     return ILM_SUCCESS;
 }
