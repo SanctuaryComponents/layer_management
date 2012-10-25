@@ -313,13 +313,20 @@ void handleWatchesForFds(fd_set in, fd_set out)
         {
             DBusWatch* activeWatch = gDbus.incomingWatch[fd];
 
-            pthread_mutex_lock(&gDbus.mutex);
-            dbus_bool_t success = dbus_watch_handle(activeWatch, DBUS_WATCH_READABLE);
-            pthread_mutex_unlock(&gDbus.mutex);
-
-            if (!success)
+            if (activeWatch)
             {
-                printf("incoming dbus_watch_handle() failed\n");
+                pthread_mutex_lock(&gDbus.mutex);
+                dbus_bool_t success = dbus_watch_handle(activeWatch, DBUS_WATCH_READABLE);
+                pthread_mutex_unlock(&gDbus.mutex);
+
+                if (!success)
+                {
+                    printf("incoming dbus_watch_handle() failed\n");
+                }
+            }
+            else
+            {
+                printf("no watch was found for incoming fd %d, not calling dbus_watch_handle(NULL)\n", fd);
             }
         }
     }
@@ -330,13 +337,20 @@ void handleWatchesForFds(fd_set in, fd_set out)
         {
             DBusWatch* activeWatch = gDbus.outgoingWatch[fd];
 
-            pthread_mutex_lock(&gDbus.mutex);
-            dbus_bool_t success = dbus_watch_handle(activeWatch, DBUS_WATCH_WRITABLE);
-            pthread_mutex_unlock(&gDbus.mutex);
-
-            if (!success)
+            if (activeWatch)
             {
-                printf("outgoing dbus_watch_handle() failed\n");
+                pthread_mutex_lock(&gDbus.mutex);
+                dbus_bool_t success = dbus_watch_handle(activeWatch, DBUS_WATCH_WRITABLE);
+                pthread_mutex_unlock(&gDbus.mutex);
+
+                if (!success)
+                {
+                    printf("outgoing dbus_watch_handle() failed\n");
+                }
+            }
+            else
+            {
+                printf("no watch was found for outgoing fd %d, not calling dbus_watch_handle(NULL)\n", fd);
             }
         }
     }
