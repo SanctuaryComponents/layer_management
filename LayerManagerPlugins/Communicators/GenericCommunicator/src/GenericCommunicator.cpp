@@ -258,7 +258,6 @@ void GenericCommunicator::process(int timeout_ms)
 
     t_ilm_message_type messageType = m_ipcModule.getMessageType(message);
     t_ilm_const_string name = m_ipcModule.getMessageName(message);
-    t_ilm_const_string sender = m_ipcModule.getSenderName(message);
     t_ilm_client_handle senderHandle = m_ipcModule.getSenderHandle(message);
 
     switch(messageType)
@@ -274,17 +273,21 @@ void GenericCommunicator::process(int timeout_ms)
         }
         else
         {
-            LOG_WARNING("GenericCommunicator", "Received unknown command " << name << " from " << sender);
+            LOG_WARNING("GenericCommunicator", "Received unknown command " << name
+                  << " from " << m_executor->getSenderName(senderHandle)
+                  << "(pid " << m_executor->getSenderPid(senderHandle) << ")");
         }
         processNotificationQueue();
         break;
 
     case IpcMessageTypeConnect:
-        LOG_DEBUG("GenericCommunicator", "client " << sender << " connected");
+        LOG_DEBUG("GenericCommunicator", "client " << m_executor->getSenderName(senderHandle)
+                  << "(pid " << m_executor->getSenderPid(senderHandle) << ") connected");
         break;
 
     case IpcMessageTypeDisconnect:
-        LOG_DEBUG("GenericCommunicator", "client " << sender << " disconnected");
+        LOG_DEBUG("GenericCommunicator", "client " << m_executor->getSenderName(senderHandle)
+                  << "(pid " << m_executor->getSenderPid(senderHandle) << ") disconnected");
         {
             const LayerMap& layers = m_executor->getScene()->getAllLayers();
             LayerMapConstIterator layerIter =  layers.begin();
@@ -307,7 +310,9 @@ void GenericCommunicator::process(int timeout_ms)
         break;
 
     case IpcMessageTypeError:
-        LOG_DEBUG("GenericCommunicator", "Received error message " << name << " from " << sender);
+        LOG_DEBUG("GenericCommunicator", "Received error message " << name << " from "
+                  << m_executor->getSenderName(senderHandle)
+                  << "(pid " << m_executor->getSenderPid(senderHandle) << ")");
         break;
 
     case IpcMessageTypeShutdown:
@@ -316,7 +321,8 @@ void GenericCommunicator::process(int timeout_ms)
 
     default:
         LOG_DEBUG("GenericCommunicator", "Received unknown data from "
-                  << sender << "(Message type: " << messageType << ")");
+                  << m_executor->getSenderName(senderHandle)
+                  << "(pid " << m_executor->getSenderPid(senderHandle) << "), Message type: " << messageType);
         break;
     }
     m_ipcModule.destroyMessage(message);
