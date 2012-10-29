@@ -30,6 +30,7 @@
 #include "SurfaceCreateCommand.h"
 #include "SurfaceSetVisibilityCommand.h"
 #include "SurfaceSetOpacityCommand.h"
+#include <unistd.h>
 
 LayerSceneProvider::LayerSceneProvider(ICommandExecutor* executor)
 : ISceneProvider(executor)
