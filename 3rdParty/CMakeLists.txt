@@ -17,12 +17,20 @@
 #
 ############################################################################
 
-if (WITH_TESTS)
-
+# set default compiler flags for 3rdParty code
+set (CMAKE_C_FLAGS "")
 set (CMAKE_CXX_FLAGS "")
 
+# include base path to 3rdParty code
 include_directories (".")
-add_library(gtest gtest/gtest-all.cc gtest/gtest_main.cc)
-add_library(gmock gmock/gmock-gtest-all.cc gmock/gmock_main.cc)
 
+# build systemd reference client library
+if (WITH_SYSTEMD)
+    add_library(systemd systemd/sd-daemon.c)
+endif (WITH_SYSTEMD)
+
+# build unit test frameworks, if tests are enabled
+if (WITH_TESTS)
+    add_library(gtest gtest/gtest-all.cc gtest/gtest_main.cc)
+    add_library(gmock gmock/gmock-gtest-all.cc gmock/gmock_main.cc)
 endif(WITH_TESTS)

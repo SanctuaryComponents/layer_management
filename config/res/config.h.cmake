@@ -96,6 +96,9 @@
 // build tcp/ip ipc module
 #cmakedefine WITH_IPC_MODULE_TCP
 
+// build with native systemd support
+#cmakedefine WITH_SYSTEMD
+
 //-----------------------------------------------------------------------------
 // human readable report
 //-----------------------------------------------------------------------------
@@ -104,8 +107,8 @@
 
 typedef struct
 {
-	int type;
-	const char* description;
+    int type;
+    const char* description;
 } buildConfigurationFlag;
 
 #define buildConfigurationFlags \
@@ -130,6 +133,7 @@ typedef struct
 { DEBUG_FLAG, "WITH_WAYLAND_X11      = ${WITH_WAYLAND_X11}"      }, \
 { DEBUG_FLAG, "WITH_WL_EXAMPLE       = ${WITH_WL_EXAMPLE}"       }, \
 { DEBUG_FLAG, "WITH_X11_GLES         = ${WITH_X11_GLES}"         }, \
-{ DEBUG_FLAG, "WITH_XTHREADS         = ${WITH_XTHREADS}"         }
+{ DEBUG_FLAG, "WITH_XTHREADS         = ${WITH_XTHREADS}"         }, \
+{ DEBUG_FLAG, "WITH_SYSTEMD          = ${WITH_SYSTEMD}"          }
 
 #endif // __CONFIG_H__

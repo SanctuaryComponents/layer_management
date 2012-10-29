@@ -47,6 +47,10 @@ set(LIBS ${LIBS}
          ${CMAKE_THREAD_LIBS_INIT}
          ${DLT_LIBRARY}) 
 
+if (WITH_SYSTEMD)
+    set(LIBS ${LIBS} systemd rt)
+endif (WITH_SYSTEMD)
+
 target_link_libraries(LayerManagerService ${LIBS})
 
 install (TARGETS LayerManagerService DESTINATION bin)

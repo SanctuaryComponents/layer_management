@@ -59,6 +59,8 @@ option (WITH_SERVICE_BIN    "Build LayerManagerService Binary"                  
 option (WITH_CLIENT_LIB     "Build LayerManagement Client Lib"                    ON)
 option (WITH_COMMUNICATOR_GEN "Build Generic Communicator Plugin"                 ON)
 
+option (WITH_SYSTEMD        "Build with native systemd integration"               OFF)
+
 
 #==============================================================================
 # Internal global settings not available to user
