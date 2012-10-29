@@ -7,3 +7,5 @@ doc_generated
 configure
 *.pdf
 config.h
+git.kdev4
+.kdev4
