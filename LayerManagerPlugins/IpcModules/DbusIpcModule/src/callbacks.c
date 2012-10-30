@@ -16,6 +16,7 @@
  * limitations under the License.
  *
  ****************************************************************************/
+#include "DBUSConfiguration.h"
 #include "callbacks.h"
 #include "common.h"
 #include "introspection.h"
@@ -31,6 +32,16 @@ t_ilm_message createResponse(t_ilm_message);
 
 DBusHandlerResult filterLayerManagerNotifications(DBusConnection *connection, DBusMessage *message, void *data)
 {
+    const char* interfaceName = dbus_message_get_interface(message);
+    if (!interfaceName)
+    {
+        return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+    }
+    if (strcmp(ILM_INTERFACE_COMPOSITE_SERVICE, interfaceName)) // 0 == equals
+    {
+        return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+    }
+
     DBusHandlerResult result = DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     int messageType = dbus_message_get_type(message);
 
@@ -50,6 +61,16 @@ DBusHandlerResult filterLayerManagerNotifications(DBusConnection *connection, DB
 
 DBusHandlerResult filterLayerManagerCommands(DBusConnection *connection, DBusMessage *message, void *data)
 {
+    const char* interfaceName = dbus_message_get_interface(message);
+    if (!interfaceName)
+    {
+        return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+    }
+    if (strcmp(ILM_INTERFACE_COMPOSITE_SERVICE, interfaceName)) // 0 == equals
+    {
+        return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+    }
+
     DBusHandlerResult result = DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     int messageType = dbus_message_get_type(message);
 
@@ -70,6 +91,16 @@ DBusHandlerResult filterLayerManagerCommands(DBusConnection *connection, DBusMes
 
 DBusHandlerResult filterLayerManagerErrors(DBusConnection *connection, DBusMessage *message, void *data)
 {
+    const char* interfaceName = dbus_message_get_interface(message);
+    if (!interfaceName)
+    {
+        return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+    }
+    if (strcmp(ILM_INTERFACE_COMPOSITE_SERVICE, interfaceName)) // 0 == equals
+    {
+        return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+    }
+
     DBusHandlerResult result = DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     int messageType = dbus_message_get_type(message);
 
@@ -128,7 +159,6 @@ DBusHandlerResult filterNameAcquired(DBusConnection *connection, DBusMessage *me
     {
         gpIncomingMessage->pMessage = dbus_message_copy(message);
         gpIncomingMessage->type = IpcMessageTypeNone;
-        return DBUS_HANDLER_RESULT_HANDLED;
     }
 
     return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
@@ -156,7 +186,6 @@ DBusHandlerResult filterNameOwnerChanged(DBusConnection *connection, DBusMessage
             dbus_message_set_sender(gpIncomingMessage->pMessage, old);
         }
 
-        return DBUS_HANDLER_RESULT_HANDLED;
     }
 
     return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
@@ -189,41 +218,6 @@ DBusHandlerResult filterIntrospection(DBusConnection *connection, DBusMessage *m
     }
 
     return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
-}
-
-DBusHandlerResult filterDiscardUnexpected(DBusConnection *connection, DBusMessage *message, void *data)
-{
-    gpIncomingMessage->pMessage = dbus_message_copy(message);
-    gpIncomingMessage->type = IpcMessageTypeNone;
-
-    printf("---------------------------------\n");
-    printf("discarded unexpected data:\n");
-    printf("\tmember:    %s\n", dbus_message_get_member(message));
-    printf("\ttype:      ");
-    switch (dbus_message_get_type(message))
-    {
-    case DBUS_MESSAGE_TYPE_METHOD_CALL:
-        printf("method call\n");
-        break;
-    case DBUS_MESSAGE_TYPE_METHOD_RETURN:
-        printf("method return\n");
-        break;
-    case DBUS_MESSAGE_TYPE_ERROR:
-        printf("error: %s\n", dbus_message_get_error_name(message));
-        break;
-    case DBUS_MESSAGE_TYPE_SIGNAL:
-        printf("signal\n");
-        break;
-    default:
-        printf("unknown\n");
-        break;
-    }
-    printf("\tsender:    %s\n", dbus_message_get_sender(message));
-    printf("\tdest:      %s\n", dbus_message_get_destination(message));
-    printf("\tpath:      %s\n", dbus_message_get_path(message));
-    printf("\tinterface: %s\n", dbus_message_get_interface(message));
-
-    return DBUS_HANDLER_RESULT_HANDLED;
 }
 
 //=============================================================================

@@ -147,6 +147,8 @@ t_ilm_bool sendToClients(t_ilm_message message, t_ilm_client_handle* receiverLis
     dbusmessage* messageToSend = (dbusmessage*)message;
     t_ilm_int serial = dbus_message_get_serial(messageToSend->pMessage);
 
+    dbus_message_set_path(messageToSend->pMessage, ILM_PATH_COMPOSITE_SERVICE);
+    dbus_message_set_interface(messageToSend->pMessage, ILM_INTERFACE_COMPOSITE_SERVICE);
     pthread_mutex_lock(&gDbus.mutex);
     dbus_bool_t success = dbus_connection_send(gDbus.connection, messageToSend->pMessage, &serial);
     pthread_mutex_unlock(&gDbus.mutex);

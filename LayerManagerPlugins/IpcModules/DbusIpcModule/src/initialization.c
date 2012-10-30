@@ -148,15 +148,6 @@ t_ilm_bool initServiceMode()
         exit(1);
     }
 
-    if (!dbus_connection_add_filter(gDbus.connection,
-                                    filterDiscardUnexpected,
-                                    NULL,
-                                    NULL))
-    {
-        printf("Couldn't set up filter functions\n");
-        exit(1);
-    }
-
     if(!dbus_connection_set_watch_functions(gDbus.connection,
                                             addWatch,
                                             removeWatch,
@@ -194,7 +185,7 @@ t_ilm_bool initClientMode()
         printf("DbusIpcmodule: using system bus\n");
     }
 
-    gDbus.connection = dbus_bus_get(gDbus.type, &gDbus.error);
+    gDbus.connection = dbus_bus_get_private(gDbus.type, &gDbus.error);
 
     if (dbus_error_is_set(&gDbus.error) || !gDbus.connection)
     {
@@ -250,15 +241,6 @@ t_ilm_bool initClientMode()
         exit(1);
     }
 
-    if (!dbus_connection_add_filter(gDbus.connection,
-                                    filterDiscardUnexpected,
-                                    NULL,
-                                    NULL))
-    {
-        printf("Couldn't set up filter functions\n");
-        exit(1);
-    }
-
     if(!dbus_connection_set_watch_functions(gDbus.connection,
                                             addWatch,
                                             removeWatch,
@@ -282,7 +264,6 @@ t_ilm_bool destroy()
         dbus_connection_set_watch_functions(gDbus.connection, NULL, NULL, NULL, 0, NULL);
         dbus_connection_remove_filter(gDbus.connection, filterNameAcquired, NULL);
         dbus_connection_remove_filter(gDbus.connection, filterLayerManagerCommands, NULL);
-        dbus_connection_remove_filter(gDbus.connection, filterDiscardUnexpected, NULL);
 
         if (gDbus.isClient)
         {
@@ -355,6 +336,11 @@ t_ilm_bool destroyService()
 
 t_ilm_bool destroyClient()
 {
+    // private dbus connection must be closed
+    if (dbus_connection_get_is_connected(gDbus.connection))
+    {
+        dbus_connection_close(gDbus.connection);
+    }
     dbus_connection_unref(gDbus.connection);
     dbus_error_free(&gDbus.error);
     return ILM_TRUE;
