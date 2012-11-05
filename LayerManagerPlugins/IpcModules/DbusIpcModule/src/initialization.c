@@ -185,6 +185,8 @@ t_ilm_bool initClientMode()
         printf("DbusIpcmodule: using system bus\n");
     }
 
+    dbus_threads_init_default();
+
     gDbus.connection = dbus_bus_get_private(gDbus.type, &gDbus.error);
 
     if (dbus_error_is_set(&gDbus.error) || !gDbus.connection)
