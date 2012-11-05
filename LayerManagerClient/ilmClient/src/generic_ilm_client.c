@@ -455,22 +455,26 @@ ilmErrorTypes ilm_init()
             pthread_attr_setdetachstate(&notificationThreadAttributes,
                                         PTHREAD_CREATE_JOINABLE);
 
-            if (0 != pthread_create(&gReceiveThread,
-                                    &notificationThreadAttributes,
-                                    receiveThreadLoop,
-                                    NULL))
+            int ret = pthread_create(&gReceiveThread,
+                                     &notificationThreadAttributes,
+                                     receiveThreadLoop,
+                                     NULL);
+            if (0 != ret)
             {
                 result = ILM_FAILED;
-                printf("Failed to start internal receive thread.");
+                printf("Failed to start internal receive thread. returned %d = %s\n", ret, (ret == EAGAIN ? "EAGAIN" : "EINVAL"));
+                return result;
             }
 
-            if (0 != pthread_create(&gNotificationThread,
-                                    &notificationThreadAttributes,
-                                    notificationThreadLoop,
-                                    NULL))
+            ret = pthread_create(&gNotificationThread,
+                                 &notificationThreadAttributes,
+                                 notificationThreadLoop,
+                                 NULL);
+            if (0 != ret)
             {
                 result = ILM_FAILED;
-                printf("Failed to start internal notification thread.");
+                printf("Failed to start internal notification thread. returned %d = %s\n", ret, (ret == EAGAIN ? "EAGAIN" : "EINVAL"));
+                return result;
             }
         }
         else
