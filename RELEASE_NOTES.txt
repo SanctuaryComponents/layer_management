@@ -4,16 +4,21 @@ This version includes the following enhancements.
 
 Bugfixes :
 - LayerManagement does not wake up every 100 ms anymore.
-- Serveral warning fixes for gcc 4.7.1
+- Serveral warning fixes for gcc 4.7.1,4.7.2
 - Removed GLESGraphicSystem Debug spams
 - fixed Signal Handling during shutdown
-- 
+- fixing Thread Safe Issue inside of the libDbusIpcModule
+
 
 Improvements:
 - Introducing Client Notifications for Layer and Surfaces
 - Introducing Layer and Surface Chroma Key Support
 - Introduced process name handling for each executed command
-
+- ilmClient: added check for response names
+- ilmClient: switching to open a private dbusConnection
+- Introducing PlugIn Base
+- added general health monitoring and a reference implementation on Systemd
+- added basic health monitoring on plugins
 
 Version 0.9.7
 -------------
