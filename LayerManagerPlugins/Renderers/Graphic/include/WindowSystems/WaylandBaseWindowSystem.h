@@ -155,11 +155,12 @@ public:
 inline void WaylandBaseWindowSystem::setSystemState (WaylandWindowSystemStates state)
 {
     m_systemState = state;
-};
+}
+
 inline WaylandWindowSystemStates WaylandBaseWindowSystem::getSystemState ()
 {
     return m_systemState;
-};
+}
 
 inline struct wl_display* WaylandBaseWindowSystem::getNativeDisplayHandle()
 {

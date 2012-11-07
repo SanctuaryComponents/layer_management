@@ -137,16 +137,14 @@ void WaylandGLESRenderer::doScreenShotOfSurface(std::string fileToSave, uint id,
 
 uint WaylandGLESRenderer::getNumberOfHardwareLayers(uint screenID)
 {
-    uint screen_id;
-    screen_id = screenID;
+    (void)screenID;
 
     return 0; // TODO provide real value here
 }
 
 uint* WaylandGLESRenderer::getScreenResolution(uint screenID)
 {
-    uint screen_id;
-    screen_id = screenID;
+    (void)screenID;
     // TODO provide value of real screen here
     uint * resolution = new uint[2];
     resolution[0] = m_width;
