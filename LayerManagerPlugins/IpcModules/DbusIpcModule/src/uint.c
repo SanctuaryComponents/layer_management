@@ -73,7 +73,7 @@ t_ilm_bool getUintArray(t_ilm_message message, t_ilm_uint** valueArray, t_ilm_in
         *valueArray = malloc(sizeof(t_ilm_uint) * (*arraySize));
         memcpy(*valueArray, dbusArrayPointer, sizeof(t_ilm_uint) * (*arraySize));
 
-        dbus_message_iter_next(&gpCurrentMessage->iter);
+        dbus_message_iter_next(&msg->iter);
     }
     else
     {
