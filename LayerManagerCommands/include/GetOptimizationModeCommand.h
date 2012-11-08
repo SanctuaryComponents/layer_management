@@ -21,10 +21,10 @@
 #ifndef _GETOPTIMIZATIONMODECOMMAND_H_
 #define _GETOPTIMIZATIONMODECOMMAND_H_
 
-#include "BaseCommandSynchronous.h"
+#include "ICommand.h"
 #include "OptimizationType.h"
 
-class GetOptimizationModeCommand : public BaseCommandSynchronous
+class GetOptimizationModeCommand : public ICommand
 {
 public:
     /*!
@@ -34,8 +34,11 @@ public:
      * \param[in] returnMode location to store mode of optimization on execution
      * \ingroup Commands
      */
-    GetOptimizationModeCommand(OptimizationType id, OptimizationModeType* returnMode);
-
+    GetOptimizationModeCommand(pid_t sender,OptimizationType id, OptimizationModeType* returnMode)
+    : ICommand(ExecuteSynchronous, sender)
+    , m_id(id)
+    , m_pReturnMode(returnMode)
+    {}
     /**
      * \brief default destructor
      */

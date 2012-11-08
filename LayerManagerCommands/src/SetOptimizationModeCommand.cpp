@@ -22,11 +22,6 @@
 #include "Scene.h"
 #include "Log.h"
 
-SetOptimizationModeCommand::SetOptimizationModeCommand(OptimizationType id, OptimizationModeType mode)
-: m_id(id)
-, m_mode(mode)
-{
-}
 
 ExecutionResult SetOptimizationModeCommand::execute(ICommandExecutor* executor)
 {

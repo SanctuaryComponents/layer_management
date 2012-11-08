@@ -200,7 +200,7 @@ GenericCommunicator::GenericCommunicator(ICommandExecutor* executor)
         { "LayerAddNotification",             &GenericCommunicator::LayerAddNotification },
         { "SurfaceAddNotification",           &GenericCommunicator::SurfaceAddNotification },
         { "LayerRemoveNotification",          &GenericCommunicator::LayerRemoveNotification },
-        { "SurfaceRemoveNotification",        &GenericCommunicator::SurfaceRemoveNotification },
+        { "SurfaceRemoveNotification",        &GenericCommunicator::SurfaceRemoveNotification }
         { "SetOptimizationMode",              &GenericCommunicator::SetOptimizationMode },
         { "GetOptimizationMode",              &GenericCommunicator::GetOptimizationMode }
     };

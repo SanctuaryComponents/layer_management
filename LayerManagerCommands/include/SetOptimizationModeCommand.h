@@ -21,10 +21,10 @@
 #ifndef _SETOPTIMIZATIONMODECOMMAND_H_
 #define _SETOPTIMIZATIONMODECOMMAND_H_
 
-#include "BaseCommandAsynchronous.h"
+#include "ICommand.h"
 #include "OptimizationType.h"
 
-class SetOptimizationModeCommand : public BaseCommandAsynchronous
+class SetOptimizationModeCommand : public ICommand
 {
 public:
     /*!
@@ -34,8 +34,11 @@ public:
      * \param[in] mode optimization mode to set
      * \ingroup Commands
      */
-    SetOptimizationModeCommand(OptimizationType id, OptimizationModeType mode);
-
+    SetOptimizationModeCommand(pid_t sender, OptimizationType id, OptimizationModeType mode)
+    : ICommand(ExecuteAsynchronous, sender)
+    , m_id(id)
+    , m_mode(mode)
+    {};
     /**
      * \brief default destructor
      */
