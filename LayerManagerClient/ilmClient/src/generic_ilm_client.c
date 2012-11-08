@@ -2367,37 +2367,46 @@ ilmErrorTypes ilm_UpdateInputEventAcceptanceOn(t_ilm_surface surfaceId, ilmInput
 
 ilmErrorTypes ilm_SetOptimizationMode(ilmOptimization id, ilmOptimizationMode mode)
 {
-    LOG_ENTER_FUNCTION;
     ilmErrorTypes returnValue = ILM_FAILED;
 
-    if (gIpcModule.createMessage("SetOptimizationMode\0")
-        && gIpcModule.appendUint(id)
-        && gIpcModule.appendUint(mode)
-        && gIpcModule.sendMessage()
-        && gIpcModule.receiveMessage(gReceiveTimeout)
-        && !gIpcModule.isErrorMessage())
+    t_ilm_message command = gIpcModule.createMessage("SetOptimizationMode");
+    if (command
+        && gIpcModule.appendUint(command,id)
+        && gIpcModule.appendUint(command,mode)
+        && gIpcModule.sendToService(command))
     {
-        returnValue = ILM_SUCCESS;
+        t_ilm_message response = waitForResponse(gResponseTimeout);
+        if (response
+            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand )
+        {
+            returnValue = ILM_SUCCESS;
+        }
+        gIpcModule.destroyMessage(response);
+
     }
-    gIpcModule.destroyMessage();
+    gIpcModule.destroyMessage(command);
     return returnValue;
 }
 
 ilmErrorTypes ilm_GetOptimizationMode(ilmOptimization id, ilmOptimizationMode* pMode)
 {
-    LOG_ENTER_FUNCTION;
     ilmErrorTypes returnValue = ILM_FAILED;
-
-    if (gIpcModule.createMessage("GetOptimizationMode\0")
-        && gIpcModule.appendUint(id)
-        && gIpcModule.sendMessage()
-        && gIpcModule.receiveMessage(gReceiveTimeout)
-        && !gIpcModule.isErrorMessage()
-        && gIpcModule.getUint(pMode))
+    t_ilm_message command = gIpcModule.createMessage("GetOptimizationMode");
+    if (command
+        && gIpcModule.appendUint(command,id)
+        && gIpcModule.sendToService(command))
     {
-        returnValue = ILM_SUCCESS;
+        t_ilm_message response = waitForResponse(gResponseTimeout);
+        if (response
+            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand
+            && gIpcModule.getUint(response,pMode) )
+        {
+            returnValue = ILM_SUCCESS;
+        }
+
+        gIpcModule.destroyMessage(response);
     }
-    gIpcModule.destroyMessage();
+    gIpcModule.destroyMessage(command);
     return returnValue;
 }
 

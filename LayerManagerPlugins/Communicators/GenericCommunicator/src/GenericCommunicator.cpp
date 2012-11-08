@@ -200,7 +200,7 @@ GenericCommunicator::GenericCommunicator(ICommandExecutor* executor)
         { "LayerAddNotification",             &GenericCommunicator::LayerAddNotification },
         { "SurfaceAddNotification",           &GenericCommunicator::SurfaceAddNotification },
         { "LayerRemoveNotification",          &GenericCommunicator::LayerRemoveNotification },
-        { "SurfaceRemoveNotification",        &GenericCommunicator::SurfaceRemoveNotification }
+        { "SurfaceRemoveNotification",        &GenericCommunicator::SurfaceRemoveNotification },
         { "SetOptimizationMode",              &GenericCommunicator::SetOptimizationMode },
         { "GetOptimizationMode",              &GenericCommunicator::GetOptimizationMode }
     };
@@ -2953,49 +2953,61 @@ HealthCondition GenericCommunicator::getHealth()
     return health;
 }
 
-void GenericCommunicator::SetOptimizationMode()
+void GenericCommunicator::SetOptimizationMode(t_ilm_message message)
 {
+    t_ilm_message response;
     OptimizationType optimizationId;
     OptimizationModeType optimizationMode;
+    unsigned int o;    
+    t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
+    t_ilm_uint clientPid = m_executor->getSenderPid(clientHandle);
 
-    unsigned int o;
-    m_ipcModule.getUint(&o);
+    m_ipcModule.getUint(message,&o);
     optimizationId = (OptimizationType) o;
-    m_ipcModule.getUint(&o);
+    m_ipcModule.getUint(message,&o);
     optimizationMode = (OptimizationModeType) o;
 
-    t_ilm_bool status = m_executor->execute(new SetOptimizationModeCommand(optimizationId, optimizationMode));
+    t_ilm_bool status = m_executor->execute(new SetOptimizationModeCommand(clientPid, optimizationId, optimizationMode));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.sendMessage();
+        response = m_ipcModule.createResponse(message);       
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message);
+        m_ipcModule.appendString(response,RESOURCE_NOT_FOUND);
     }
+    m_ipcModule.sendToClients(response,&clientHandle,1);
+    m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::GetOptimizationMode()
+void GenericCommunicator::GetOptimizationMode(t_ilm_message message)
 {
+    t_ilm_message response;
+    t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
+    t_ilm_uint clientPid = m_executor->getSenderPid(clientHandle);
     OptimizationType optimizationId;
     OptimizationModeType optimizationMode;
-
     unsigned int o;
-    m_ipcModule.getUint(&o);
+
+    m_ipcModule.getUint(message,&o);
     optimizationId = (OptimizationType)o;
 
-    t_ilm_bool status = m_executor->execute(new GetOptimizationModeCommand(optimizationId, &optimizationMode));
+    t_ilm_bool status = m_executor->execute(new GetOptimizationModeCommand(clientPid, optimizationId, &optimizationMode));
     if (status)
     {
-        m_ipcModule.createMessage((char*)__FUNCTION__);
-        m_ipcModule.appendUint((unsigned int)optimizationMode);
-        m_ipcModule.sendMessage();
+        
+        response = m_ipcModule.createResponse(message);
+        m_ipcModule.appendUint(response,(unsigned int)optimizationMode);
     }
     else
     {
-        m_ipcModule.sendError(RESSOURCE_NOT_FOUND);
+        response = m_ipcModule.createErrorResponse(message);
+        m_ipcModule.appendString(response,RESOURCE_NOT_FOUND);
     }
+    m_ipcModule.sendToClients(response,&clientHandle,1);
+    m_ipcModule.destroyMessage(response);
+
 }
 
 extern "C" ICommunicator* createGenericCommunicator(ICommandExecutor* executor)
