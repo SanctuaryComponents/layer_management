@@ -26,7 +26,8 @@
 #include "IRenderer.h"
 #include "ISceneProvider.h"
 #include "Scene.h"
-#include "config.h"
+#include "Configuration.h"
+
 #include <unistd.h>
 //#include <bits/sigthread.h>
 #include <pthread.h>
@@ -460,11 +461,14 @@ void* watchdogThreadLoop(void* param)
     return NULL;
 }
 
-bool Layermanager::startManagement(const int width, const int height,
-        const char* displayName)
+bool Layermanager::startManagement(Configuration& config)
 {
     bool result = false;
 
+    const int width = config.getDisplayWidth();
+    const int height = config.getDisplayHeight();
+    const char* displayName = config.getDisplayName().c_str();
+    
     // 1. start renderers, no prerequisites
     // 2. execute scene provider plugins
     // 3. start communication (after scene is ready to use)

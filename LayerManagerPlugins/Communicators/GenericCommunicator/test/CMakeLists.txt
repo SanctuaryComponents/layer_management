@@ -42,6 +42,7 @@ file(GLOB LM_SOURCES "${PROJECT_SOURCE_DIR}/LayerManagerService/src/Scene.cpp"
                      "${PROJECT_SOURCE_DIR}/LayerManagerService/src/GraphicalSurface.cpp"
                      "${PROJECT_SOURCE_DIR}/LayerManagerService/src/HealthSystemd.cpp"
                      "${PROJECT_SOURCE_DIR}/LayerManagerService/src/PluginBase.cpp"
+                     "${PROJECT_SOURCE_DIR}/LayerManagerService/src/Configuration.cpp"
                      "${PROJECT_SOURCE_DIR}/LayerManagerService/src/shader/*.cpp"
                      "${PROJECT_SOURCE_DIR}/LayerManagerService/src/commands/*.cpp")
 

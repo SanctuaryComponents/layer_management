@@ -33,6 +33,7 @@ class ISceneProvider;
 class IApplicationReference;
 class IHealth;
 class IPlugin;
+class Configuration;
 
 typedef std::map<unsigned int, const char*> PidToProcessNameTable;
 typedef std::list<IPlugin*> PluginList;
@@ -67,7 +68,7 @@ public:
     const char* getSenderName(t_ilm_client_handle client);
     const char* getSenderName(unsigned int pid);
     
-    virtual bool startManagement(const int width, const int height, const char* displayName);
+    virtual bool startManagement(Configuration& config);
     virtual bool stopManagement();
 
     virtual Scene* getScene(void);

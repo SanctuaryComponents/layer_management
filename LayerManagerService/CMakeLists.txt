@@ -86,6 +86,7 @@ add_executable(LayerManagerService_Test
     src/shader/ShaderProgram.cpp
     src/shader/ShaderProgramFactory.cpp
     src/shader/ShaderUniform.cpp
+    src/Configuration.cpp
 )
 target_link_libraries(LayerManagerService_Test ${LIBS} gtest gmock)
 

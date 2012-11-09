@@ -31,6 +31,7 @@
 
 class ICommand;
 class Scene;
+class Configuration;
 
 /**
  * \brief Interface for LayerManagement Command Executors
@@ -71,7 +72,7 @@ public:
      * \return TRUE: start management successful
      * \return FALSE: start management failed
      */
-    virtual bool startManagement(const int width, const int height, const char* displayName) = 0;
+    virtual bool startManagement(Configuration& config) = 0;
 
     /**
      * \brief stop layer management

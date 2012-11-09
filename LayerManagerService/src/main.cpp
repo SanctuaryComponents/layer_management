@@ -19,6 +19,7 @@
 
 #include "Layermanager.h"
 #include "config.h"
+#include "Configuration.h"
 #include "SignalHandler.h"
 #include "IRenderer.h"
 #include "ICommunicator.h"
@@ -31,7 +32,6 @@
 #include <errno.h>
 #include <dlfcn.h>
 #include "Log.h"
-#include <getopt.h>
 #include <libgen.h> // basename
 #include <sys/stat.h>
 
@@ -44,11 +44,7 @@ using std::string;
 typedef list<string> tFileList;
 typedef list<string>::iterator tFileListIterator;
 
-
-const char* displayName = ":0";
-const char* gPluginLookupPath = CMAKE_INSTALL_PREFIX"/lib/layermanager";
-int displayWidth = 1280; // default value, override with -w argument
-int displayHeight = 480; // default value, override with -h argument
+const char* gPluginLookupPath = NULL;
 
 const char* gRendererPluginDirectories[] = { "/renderer" };
 
@@ -61,17 +57,6 @@ uint gCommunicatorPluginDirectoriesCount = sizeof(gCommunicatorPluginDirectories
 const char* gScenePluginDirectories[] = { "" };
 
 uint gScenePluginDirectoriesCount = sizeof(gScenePluginDirectories) / sizeof(gScenePluginDirectories[0]);                                                 
-                                                 
-const char* USAGE_DESCRIPTION = "Usage:\t LayerManagerService [options]\n"
-                                "options:\t\n\n"
-                                "\t-w: Window Width\t\n"
-                                "\t-h: Window Height\t\n"
-                                "\t-d: displayName \t\n"
-                                "\t-f: loglevel file \t 0 [default] \n\t\t\t\t[0=disabled,1=error,2=info,3=warning,4=debug]\n"
-                                "\t-c: loglevel console \t 2 [default] \n\t\t\t\t[0=disabled,1=error,2=info,3=warning,4=debug]\n"
-                                "\t-v: show version info\t\n"
-                                "\nexample: LayerManagerService -w800 -h480 -d:0\n";
-
 template<class T>
 T* getCreateFunction(string libname)
 {
@@ -124,47 +109,6 @@ T* getCreateFunction(string libname)
     //free(libraryHandle);
 
     return createFunction;
-}
-
-void parseCommandLine(int argc, char **argv)
-{
-    while (optind < argc)
-    {
-        int option = getopt(argc, argv, "w::h::d::?::c::f::v::");
-        switch (option)
-        {
-        case 'd':
-            displayName = optarg;
-            break;
-        case 'w':
-            displayWidth = atoi(optarg);
-            break;
-        case 'h':
-            displayHeight = atoi(optarg);
-            break;
-        case 'c':
-            if ( atoi(optarg) < LOG_MAX_LEVEL ) 
-            {
-                Log::consoleLogLevel = (LOG_MODES) atoi(optarg);
-            }
-            break;
-        case 'f':
-            if ( atoi(optarg) < LOG_MAX_LEVEL ) 
-            {
-                Log::fileLogLevel = (LOG_MODES) atoi(optarg);
-            }
-            break;
-        case 'v':
-            printf("LayerManagerService\nVersion: %s\n", ILM_VERSION);
-            exit(-1);
-            break;
-        case '?':   
-        default:
-            printf("LayerManagerService\nVersion: %s\n", ILM_VERSION);
-            puts(USAGE_DESCRIPTION);
-            exit(-1);
-        }
-    }
 }
 
 void getSharedLibrariesFromDirectory(tFileList& fileList, string dirName)
@@ -368,39 +312,13 @@ void loadRendererPlugins(RendererList& rendererList, IScene* pScene)
 
 int main(int argc, char **argv)
 {
-    parseCommandLine(argc, (char**) argv);
-    char* pluginLookupPath = getenv("LM_PLUGIN_PATH");
     LOG_INFO("LayerManagerService", "Starting Layermanager (version: " << ILM_VERSION << ")");
 
     SignalHandler signalHandler;
-    
-    std::stringstream commandLine;
-    for (int i = 0; i < argc; ++i)
-    {
-        commandLine << argv[i] << " ";
-    }
-    LOG_INFO("LayerManagerService", "Command Line: " << commandLine.str());
+    Configuration configuration(argc, argv);
 
-    buildConfigurationFlag configFlags[] = { buildConfigurationFlags };
-    int configFlagCount = sizeof(configFlags) / sizeof(configFlags[0]);
-    for (int i = 0; i < configFlagCount; ++i)
-    {
-        buildConfigurationFlag& flag = configFlags[i];
-        switch (flag.type)
-        {
-        case DEBUG_FLAG:
-            LOG_DEBUG("LayerManagerService", flag.description);
-            break;
-        case INFO_FLAG:
-            LOG_INFO("LayerManagerService", flag.description);
-            break;
-        }
-    }
+    gPluginLookupPath = configuration.getPluginPath().c_str();
 
-    if  (pluginLookupPath != NULL ) 
-    {
-        gPluginLookupPath = pluginLookupPath;
-    }
     LOG_INFO("LayerManagerService", "Used plugin directory is " << gPluginLookupPath);
 
     LOG_DEBUG("LayerManagerService", "Creating Layermanager.");
@@ -446,7 +364,7 @@ int main(int argc, char **argv)
     {
         pManager->addSceneProvider(*sceneProviderIter);
     }
-    bool started = pManager->startManagement(displayWidth, displayHeight, displayName);
+    bool started = pManager->startManagement(configuration);
 
     if (started)
     {

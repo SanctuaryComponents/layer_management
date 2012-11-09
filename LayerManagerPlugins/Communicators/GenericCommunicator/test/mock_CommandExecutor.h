@@ -23,6 +23,7 @@
 #include "GraphicalSurface.h"
 #include "ICommand.h"
 #include "ICommandExecutor.h"
+#include "Configuration.h"
 #include <list>
 #include <gmock/gmock.h>  // Brings in Google Mock.
 using ::testing::DefaultValue;
@@ -30,7 +31,7 @@ class MockCommandExecutor : public ICommandExecutor {
  public:
   MOCK_METHOD1(execute, bool(ICommand* commandToBeExecuted));
 
-  MOCK_METHOD3(startManagement, bool(const int width, const int height, const char* displayName));
+  MOCK_METHOD1(startManagement, bool(Configuration& config));
   MOCK_METHOD0(stopManagement, bool());
 
   MOCK_METHOD0(getScene, Scene*());
