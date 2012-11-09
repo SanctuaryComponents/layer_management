@@ -536,7 +536,7 @@ static void incrementDrawCounters(LayerList layers)
             }
         }
     }
-};
+}
 
 // Composite the surfaces from all layers in the provided list.
 // A traditional single-texture approach or a potentially faster multi-texture
@@ -638,7 +638,7 @@ Shader *GLESGraphicsystem::pickOptimizedShader(SurfaceList surfaces, bool needsB
 
         hastransparency[i] = ((*surface)->getOpacity() * layer->getOpacity()) < 1.0f;
         hasalphachannel[i] = PixelFormatHasAlpha((*surface)->getPixelFormat());
-        haschromakey[i] = 0;
+        haschromakey[i] = (*surface)->getChromaKeyEnabled()==true ? 1:0 ;
     }
 
     unsigned int key = shaderKey(numSurfaces,
@@ -971,7 +971,7 @@ bool GLESGraphicsystem::renderSurfaces(SurfaceList surfaces, FloatRectangle targ
     }
 
     /* Enable only the needed vertex attributes */
-    for (int i = 1; i <= MAX_MULTI_SURFACE; i++)
+    for (unsigned int i = 1; i <= MAX_MULTI_SURFACE; i++)
     {
         if (i <= surfaces.size())
         {
@@ -1311,6 +1311,7 @@ bool GLESGraphicsystem::initOpenGLES(EGLint displayWidth, EGLint displayHeight)
     m_defaultShader2surfNoUniformAlpha1NoBlend = Shader::createShader("default_2surf", "default_2surf_no_blend_no_uniform_alpha_1");
 
     if ((!m_defaultShaderClear) ||
+        (!m_defaultShaderAddUniformChromaKey) ||
         (!m_defaultShader || !m_defaultShaderNoBlend) ||
         (!m_defaultShaderNoUniformAlpha || !m_defaultShaderNoUniformAlphaNoBlend) ||
         (!m_defaultShader2surf || !m_defaultShader2surfNoBlend) ||
@@ -1352,8 +1353,8 @@ bool GLESGraphicsystem::initOpenGLES(EGLint displayWidth, EGLint displayHeight)
     //                       -----  -----  -----  -----
     //                  # B  T A C  T A C  T A C  T A C
     m_shaders[shaderKey(0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0)] = m_defaultShaderClear;
-
     m_shaders[shaderKey(1,1, 1,1,0, 0,0,0, 0,0,0, 0,0,0)] = m_defaultShader;
+    m_shaders[shaderKey(1,1, 1,1,1, 0,0,0, 0,0,0, 0,0,0)] = m_defaultShaderAddUniformChromaKey;
     m_shaders[shaderKey(1,0, 1,1,0, 0,0,0, 0,0,0, 0,0,0)] = m_defaultShaderNoBlend;
     m_shaders[shaderKey(1,1, 0,1,0, 0,0,0, 0,0,0, 0,0,0)] = m_defaultShaderNoUniformAlpha;
     m_shaders[shaderKey(1,0, 0,1,0, 0,0,0, 0,0,0, 0,0,0)] = m_defaultShaderNoUniformAlphaNoBlend;
@@ -1489,6 +1490,8 @@ void GLESGraphicsystem::destroyTempTexture()
 
 void GLESGraphicsystem::renderTempTexture()
 {
+    // TODO FIX IT , IS NOT ALREADY WORKING ANYMORE WITH MULTITEXTURE OPTIMIZATION, IF WE HAVE CHROMAKEY LAYER    
+#if 0    
     const FloatRectangle layerSourceRegion      = m_currentLayer->getSourceRegion();
     const FloatRectangle layerDestinationRegion = m_currentLayer->getDestinationRegion();
     float textureCoordinates[4];
@@ -1507,12 +1510,12 @@ void GLESGraphicsystem::renderTempTexture()
     uniforms.y = 1.0f - (layerDestinationRegion.y + layerDestinationRegion.height) / m_displayHeight;
     uniforms.width   = layerDestinationRegion.width  / m_displayWidth;
     uniforms.height  = layerDestinationRegion.height / m_displayHeight;
-    uniforms.opacity = m_currentLayer->getOpacity();
-    uniforms.texRange[0]  = textureCoordinates[2] - textureCoordinates[0];
-    uniforms.texRange[1]  = textureCoordinates[3] - textureCoordinates[1];
-    uniforms.texOffset[0] = textureCoordinates[0];
-    uniforms.texOffset[1] = textureCoordinates[1];
-    uniforms.texUnit = 0;
+    uniforms.opacity[0] = m_currentLayer->getOpacity();
+    uniforms.texRange[0][0]  = textureCoordinates[2] - textureCoordinates[0];
+    uniforms.texRange[0][1]  = textureCoordinates[3] - textureCoordinates[1];
+    uniforms.texOffset[0][0] = textureCoordinates[0];
+    uniforms.texOffset[0][1] = textureCoordinates[1];
+    uniforms.texUnit[0] = 0;
     uniforms.matrix = layerMatrix.f;
     uniforms.chromaKeyEnabled = m_currentLayer->getChromaKeyEnabled();
     if (uniforms.chromaKeyEnabled == true) {
@@ -1533,7 +1536,7 @@ void GLESGraphicsystem::renderTempTexture()
     }
     shader = pickOptimizedShader(shader, uniforms);
     shader->use();
-    shader->loadCommonUniforms(uniforms);
+    shader->loadCommonUniforms(uniforms,0);
     shader->loadUniforms();
 
     glBindTexture(GL_TEXTURE_2D, m_texId);
@@ -1546,4 +1549,5 @@ void GLESGraphicsystem::renderTempTexture()
     if ( GL_NO_ERROR != glErrorCode ) {
         LOG_ERROR("GLESGraphicsystem", "GL Error occured in renderTempTexture:" << glErrorCode );
     }
+#endif    
 }

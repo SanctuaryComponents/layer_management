@@ -19,17 +19,17 @@
 // alpha value of the surfaces
 uniform mediump float uAlphaVal;
 // textureunit which is accessed
-uniform mediump sampler2D uTexUnit;
+uniform sampler2D uTexUnit[1];
 // chromakey of the surfaces
 uniform mediump vec3 uChromaKey;
 
 // texture coordinates sended by the vertex shader
-varying mediump vec2 vTexout;
+varying mediump vec2 vTexout[1];
 
 void main()
 {
 	// correct Texture Coords;
-    mediump vec4 tcolor = texture2D(uTexUnit, vTexout );
+    mediump vec4 tcolor = texture2D(uTexUnit[0], vTexout[0] );
         // if both match, discarding
     if (tcolor.rgb == uChromaKey.rgb)
     {
