@@ -802,7 +802,38 @@ COMMAND("get optimization <id>")
     ilmOptimizationMode optimizationMode;
     if (ilm_GetOptimizationMode(optimizationId, &optimizationMode) == ILM_SUCCESS)
     {
-        cout << "Optimization " << (int)optimizationId << " has mode " << (int)optimizationMode << endl;
+        switch ( optimizationId )
+        {
+            case ILM_OPT_MULTITEXTURE : 
+                cout << "Optimization " << (int)optimizationId << " (Multitexture Optimization)" << endl;
+                break;
+            
+            case ILM_OPT_SKIP_CLEAR : 
+                cout << "Optimization " << (int)optimizationId << " (Skip Clear)" << endl;
+                break;
+            default:
+               cout << "Optimization " << "unknown" << endl;
+        } 
+
+        switch (optimizationMode)
+        {   
+                case ILM_OPT_MODE_FORCE_OFF : 
+                    cout << "Mode " << (int)optimizationMode << " (forced off)" << endl;
+                break;
+
+                case ILM_OPT_MODE_FORCE_ON : 
+                    cout << "Mode " << (int)optimizationMode << " (forced on)" << endl;
+                break;
+                case ILM_OPT_MODE_HEURISTIC : 
+                    cout << "Mode " << (int)optimizationMode << " (Heuristic / Render choose the optimization)" << endl;
+                break;
+                case ILM_OPT_MODE_TOGGLE : 
+                    cout << "Mode " << (int)optimizationMode << " (Toggle on/and off rapidly for debugging)" << endl;
+                break;                
+            
+            default:
+               cout <<"Mode " << "unknown" << endl ;
+        }
     }
     else
     {
