@@ -403,7 +403,8 @@ bool GLESGraphicsystem::canMultitexture(LayerList layers)
     for (LayerListConstIterator layer = layers.begin(); layer != layers.end(); layer++)
     {
         // No layer rotation support currently for multitexture rendering
-        if ((*layer)->getOrientation() != 0)
+        // No multitexture rendering if one layer has chromaKeyEnabled
+        if ((*layer)->getOrientation() != 0 || (*layer)->getChromaKeyEnabled() )
         {
             return false;
         }
@@ -420,7 +421,7 @@ bool GLESGraphicsystem::canMultitexture(LayerList layers)
             }
 
             // TODO, other custom shaders okay too.
-            if (shader && shader != m_defaultShader)
+            if (shader && shader != m_defaultShader || (*surface)->getChromaKeyEnabled())
             {
                 return false;
             }
@@ -638,7 +639,7 @@ Shader *GLESGraphicsystem::pickOptimizedShader(SurfaceList surfaces, bool needsB
 
         hastransparency[i] = ((*surface)->getOpacity() * layer->getOpacity()) < 1.0f;
         hasalphachannel[i] = PixelFormatHasAlpha((*surface)->getPixelFormat());
-        haschromakey[i] = (*surface)->getChromaKeyEnabled()==true ? 1:0 ;
+        haschromakey[i] = (*surface)->getChromaKeyEnabled() ? 1:0 ;
     }
 
     unsigned int key = shaderKey(numSurfaces,
@@ -662,7 +663,12 @@ Shader *GLESGraphicsystem::pickOptimizedShader(SurfaceList surfaces, bool needsB
         case 0:
             return m_defaultShaderClear;
         case 1:
-            return needsBlend ? m_defaultShader : m_defaultShaderNoBlend;
+            if (haschromakey[0])
+            {
+                return m_defaultShaderAddUniformChromaKey;
+            } else { 
+                return needsBlend ? m_defaultShader : m_defaultShaderNoBlend;
+            }
         case 2:
             return needsBlend ? m_defaultShader2surf : m_defaultShader2surfNoBlend;
         default:
@@ -1491,7 +1497,6 @@ void GLESGraphicsystem::destroyTempTexture()
 void GLESGraphicsystem::renderTempTexture()
 {
     // TODO FIX IT , IS NOT ALREADY WORKING ANYMORE WITH MULTITEXTURE OPTIMIZATION, IF WE HAVE CHROMAKEY LAYER    
-#if 0    
     const FloatRectangle layerSourceRegion      = m_currentLayer->getSourceRegion();
     const FloatRectangle layerDestinationRegion = m_currentLayer->getDestinationRegion();
     float textureCoordinates[4];
@@ -1534,7 +1539,8 @@ void GLESGraphicsystem::renderTempTexture()
     if (!shader) {
         shader = m_defaultShader;
     }
-    shader = pickOptimizedShader(shader, uniforms);
+    //shader = pickOptimizedShader(shader, uniforms);
+    shader = m_defaultShaderAddUniformChromaKey;
     shader->use();
     shader->loadCommonUniforms(uniforms,0);
     shader->loadUniforms();
@@ -1549,5 +1555,4 @@ void GLESGraphicsystem::renderTempTexture()
     if ( GL_NO_ERROR != glErrorCode ) {
         LOG_ERROR("GLESGraphicsystem", "GL Error occured in renderTempTexture:" << glErrorCode );
     }
-#endif    
 }

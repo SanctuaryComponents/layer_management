@@ -17,7 +17,7 @@
 *
 ****************************************************************************/
 // alpha value of the surfaces
-uniform mediump float uAlphaVal;
+uniform mediump float uAlphaVal[1];
 // textureunit which is accessed
 uniform sampler2D uTexUnit[1];
 // chromakey of the surfaces
@@ -35,6 +35,6 @@ void main()
     {
         discard;
     }
-    mediump vec4 color = tcolor * vec4(1.0,1.0,1.0,uAlphaVal);
+    mediump vec4 color = tcolor * vec4(1.0,1.0,1.0,uAlphaVal[0]);
     gl_FragColor = color;
 }
