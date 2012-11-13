@@ -70,7 +70,7 @@ typedef enum e_ilmPixelFormat
 
 /**
  * \brief Enumeration for supported layertypes
- * \ingroup ilmClient
+ * \ingroup ilmControl
  **/
 typedef enum e_ilmLayerType
 {
@@ -82,7 +82,7 @@ typedef enum e_ilmLayerType
 
 /**
  * \brief Enumeration for supported graphical objects
- * \ingroup ilmClient
+ * \ingroup ilmControl
  **/
 typedef enum e_ilmObjectType
 {
@@ -94,7 +94,7 @@ typedef enum e_ilmObjectType
 
 /**
  * \brief Enumeration of renderer optimizations
- * \ingroup ilmClient
+ * \ingroup ilmControl
  **/
 typedef enum e_ilmOptimization
 {
@@ -104,7 +104,7 @@ typedef enum e_ilmOptimization
 
 /**
  * \brief Enablement states for individual optimizations
- * \ingroup ilmClient
+ * \ingroup ilmControl
  **/
 typedef enum e_ilmOptimizationMode
 {
@@ -116,7 +116,7 @@ typedef enum e_ilmOptimizationMode
 
 /**
  * \brief Enumeration for supported orientations of booth, surface and layer
- * \ingroup ilmClient
+ * \ingroup ilmControl
  **/
 typedef enum e_ilmOrientation
 {
@@ -151,13 +151,13 @@ typedef t_ilm_uint     t_ilm_surface;
 
 /**
  * \brief Typedef for representing a layergroup
- * \ingroup ilmClient
+ * \ingroup ilmControl
  **/
 typedef t_ilm_uint     t_ilm_layergroup;
 
 /**
  * \brief Typedef for representing a surfacegroup
- * \ingroup ilmClient
+ * \ingroup ilmControl
  **/
 typedef t_ilm_uint     t_ilm_surfacegroup;
 
@@ -169,7 +169,7 @@ typedef t_ilm_uint     t_ilm_display;
 
 /**
  * \brief Typedef for representing layer capabilities
- * \ingroup ilmClient
+ * \ingroup ilmControl
  **/
 typedef t_ilm_uint     t_ilm_layercapabilities;
 
@@ -225,7 +225,7 @@ struct ilmSurfaceProperties
 
 /**
  * \brief Typedef for representing a the layer properties structure
- * \ingroup ilmClient
+ * \ingroup ilmControl
  **/
 struct ilmLayerProperties
 {
