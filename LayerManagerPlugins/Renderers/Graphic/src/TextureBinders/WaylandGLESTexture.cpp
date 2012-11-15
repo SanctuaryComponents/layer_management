@@ -132,15 +132,8 @@ void WaylandGLESTexture::createClientBuffer(Surface* surface)
             LOG_DEBUG("WaylandGLESTexture", "creating EGL Image from client buffer");
             if (nativeSurface->eglImage)
             {
-#ifdef WITH_WAYLAND_DRM
-                if (nativeSurface->texture){
-                    glBindTexture(GL_TEXTURE_2D, 0);
-                    glDeleteTextures(1,&nativeSurface->texture);
-                }
-#else
                 m_pfEglDestroyImageKHR(m_eglDisplay, nativeSurface->eglImage);
                 glDeleteTextures(1,&nativeSurface->texture);
-#endif // WITH_WAYLAND_DRM
                 nativeSurface->eglImage = 0;
                 nativeSurface->texture = 0;
             }
