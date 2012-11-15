@@ -1021,7 +1021,7 @@ WaylandEvdevInputEvent::handleInputEvent(int fd, uint32_t mask, void *data)
     do {
         if (device->mtdev){
             len = mtdev_get(device->mtdev, fd, ev,
-                ARRAY_LENGTH(ev) * sizeof(struct input_event));
+                ARRAY_LENGTH(ev)) * sizeof(struct input_event);
         }
         else {
             len = read(fd, &ev, sizeof(ev));
