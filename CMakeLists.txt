@@ -163,22 +163,6 @@ if (WITH_COMMUNICATOR_GEN)
     add_subdirectory (LayerManagerPlugins/Communicators/GenericCommunicator)
 endif(WITH_COMMUNICATOR_GEN)
 
-if (WITH_SERVICE_BIN OR WITH_CLIENT_LIB)
-    add_subdirectory (LayerManagerPlugins/IpcModules)
-
-    if (WITH_SERVICE_BIN)
-        add_subdirectory (LayerManagerPlugins/Renderers/Graphic)
-        add_subdirectory (LayerManagerService)
-        set (BUILD_UTILS_LIB ON)
-        set (INSTALL_UTILS_LIB ON)
-    endif (WITH_SERVICE_BIN)
-    
-    if (WITH_CLIENT_LIB)
-        add_subdirectory (LayerManagerClient/ilmClient)
-    endif (WITH_CLIENT_LIB)
-
-endif (WITH_SERVICE_BIN OR WITH_CLIENT_LIB)
-
 if (WITH_DESKTOP)
     set (WITH_GLX_LIB ON CACHE BOOL "Build X11 GLX development lib" FORCE)
     add_subdirectory (LayerManagerPlugins/Renderers/Platform/GLXRenderer)
@@ -197,6 +181,25 @@ if (WITH_X11_GLES)
     add_subdirectory (LayerManagerPlugins/Renderers/Platform/X11GLESRenderer)
 endif(WITH_X11_GLES)
 
+if (WITH_SERVICE_BIN OR WITH_CLIENT_LIB)
+    add_subdirectory (LayerManagerPlugins/IpcModules)
+
+    if (WITH_SERVICE_BIN)
+        add_subdirectory (LayerManagerPlugins/Renderers/Graphic)
+        add_subdirectory (LayerManagerService)
+        set (BUILD_UTILS_LIB ON)
+        set (INSTALL_UTILS_LIB ON)
+    endif (WITH_SERVICE_BIN)
+
+    if (WITH_CLIENT_LIB)
+        add_subdirectory (LayerManagerClient/ilmClient)
+    endif (WITH_CLIENT_LIB)
+
+endif (WITH_SERVICE_BIN OR WITH_CLIENT_LIB)
+
+#==============================================================================
+# build internal libraries, if required by other components
+#==============================================================================
 if (BUILD_UTILS_LIB)
     add_subdirectory (LayerManagerUtils)
 endif (BUILD_UTILS_LIB)
