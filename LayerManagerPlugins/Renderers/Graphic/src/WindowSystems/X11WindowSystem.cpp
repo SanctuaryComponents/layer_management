@@ -820,9 +820,6 @@ init_complete:
 
     while (this->m_running)
     {
-#ifndef WITH_XTHREADS
-        if ( XPending(this->x11Display) > 0) {
-#endif //WITH_XTHREADS
             XEvent event;
             // blocking wait for event
             XNextEvent(this->x11Display, &event);
@@ -922,9 +919,6 @@ init_complete:
             }
             this->m_pScene->unlockScene();
 
-#ifndef WITH_XTHREADS
-        }
-#endif //WITH_XTHREADS
         if (this->m_systemState == REDRAW_STATE)
         {
             LOG_DEBUG("X11WindowSystem", "Enter Redraw State");
@@ -958,13 +952,6 @@ init_complete:
             this->Redraw();
             checkRedraw = false;
         }
-#ifndef WITH_XTHREADS
-        else {
-            /* put thread in sleep mode for 500 useconds due to safe cpu performance */
-
-            usleep(500);
-        }
-#endif
     }
     this->cleanup();
     LOG_DEBUG("X11WindowSystem", "Renderer thread finished");
@@ -1015,12 +1002,10 @@ void X11WindowSystem::ManageXInputEvent(InputDevice type, InputEventState state,
 }
 
 
-#ifdef WITH_XTHREADS
 static Display* displaySignal = NULL;
-#endif //WITH_XTHREADS
+
 void X11WindowSystem::wakeUpRendererThread() 
 {
-#ifdef WITH_XTHREADS
     // send dummy expose event, to wake up blocking x11 event loop (XNextEvent)
     LOG_DEBUG("X11WindowSystem", "Sending dummy event to wake up renderer thread");
     if (NULL == displaySignal )
@@ -1033,7 +1018,6 @@ void X11WindowSystem::wakeUpRendererThread()
     XUnlockDisplay(displaySignal);
     XFlush(displaySignal);
     LOG_DEBUG("X11WindowSystem", "Event successfully sent to renderer");
-#endif //WITH_XTHREADS
 }
 
 void X11WindowSystem::signalRedrawEvent()
@@ -1057,12 +1041,11 @@ void X11WindowSystem::cleanup(){
         delete windowVis;
     }
 
-#ifdef WITH_XTHREADS
     if ( NULL  != displaySignal )
     {
         XCloseDisplay(displaySignal);
     }
-#endif //WITH_XTHREADS
+
     XCloseDisplay(x11Display);
     pthread_mutex_lock(&this->run_lock);
     m_running = false;
@@ -1071,9 +1054,7 @@ void X11WindowSystem::cleanup(){
 
 bool X11WindowSystem::init(BaseGraphicSystem<Display*,Window>* base)
 {
-#ifdef WITH_XTHREADS
     XInitThreads();
-#endif //WITH_XTHREADS
     X11WindowSystem *renderer = this;
     graphicSystem = base;
     LOG_INFO("X11WindowSystem","Initialization");    

@@ -47,7 +47,6 @@ option (WITH_DESKTOP        "Build for Desktop / GLX"                           
 option (WITH_GLX_LIB        "Build development library for GLX Based Renderers"   OFF)
 option (WITH_GLX_EXAMPLE    "Build GLX_EXAMPLE "                                  OFF)
 option (WITH_FORCE_COPY     "Force Software Copy of Pixmaps"                      OFF)
-option (WITH_XTHREADS       "Build with usage of X11 Threading"                   ON )
 option (WITH_CLIENTEXAMPLES "Build client examples "                              ON )
 option (WITH_TESTS          "Build Available Tests "                              OFF)
 option (WITH_DLT            "Build with DLT support "                             OFF)

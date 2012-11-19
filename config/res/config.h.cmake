@@ -75,9 +75,6 @@
 // use wayland-drm compositor
 #cmakedefine WITH_WAYLAND_DRM
 
-// use xthreads library
-#cmakedefine WITH_XTHREADS
-
 // use automotive dlt for logging
 #cmakedefine WITH_DLT
 
@@ -134,7 +131,6 @@ const BuildFlag gBuildFlags[] =
     { DEBUG_FLAG, "WITH_WAYLAND_X11      = ${WITH_WAYLAND_X11}" },
     { DEBUG_FLAG, "WITH_WL_EXAMPLE       = ${WITH_WL_EXAMPLE}" },
     { DEBUG_FLAG, "WITH_X11_GLES         = ${WITH_X11_GLES}" },
-    { DEBUG_FLAG, "WITH_XTHREADS         = ${WITH_XTHREADS}" },
     { DEBUG_FLAG, "WITH_SYSTEMD          = ${WITH_SYSTEMD}" }
 };
 
