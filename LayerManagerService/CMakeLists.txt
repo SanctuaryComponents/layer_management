@@ -79,6 +79,7 @@ add_executable(LayerManagerService_Test
     src/GraphicalSurface.cpp
     src/Layermanager.cpp
     src/InputManager.cpp
+    src/HealthSystemd.cpp
     src/Scene.cpp
     src/shader/Shader.cpp
     src/shader/ShaderProgram.cpp
