@@ -31,6 +31,7 @@ class IRenderer;
 class ICommunicator;
 class ISceneProvider;
 class IApplicationReference;
+class IHealth;
 
 class Layermanager: public ICommandExecutor
 {
@@ -91,6 +92,7 @@ private:
     NotificationQueue m_clientNotificationQueue;
     ApplicationReferenceMap* m_pApplicationReferenceMap;
     PidToProcessNameTable m_pidToProcessNameTable;
+    IHealth* m_pHealth;
 };
 
 inline Scene* Layermanager::getScene(void)

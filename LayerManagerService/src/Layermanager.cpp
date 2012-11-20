@@ -26,6 +26,14 @@
 #include "IRenderer.h"
 #include "ISceneProvider.h"
 #include "Scene.h"
+#include "config.h"
+#ifdef WITH_SYSTEMD
+    #include "HealthSystemd.h"
+    #define HEALTH_CLASS_TYPE HealthSystemd
+#else
+    #include "HealthDefault.h"
+    #define HEALTH_CLASS_TYPE HealthDefault
+#endif
 
 static const char* NO_SENDER_NAME = "unknown";
 
@@ -36,6 +44,7 @@ Layermanager::Layermanager()
     m_pCommunicatorList = new CommunicatorList();
     m_pSceneProviderList = new SceneProviderList();
     m_pApplicationReferenceMap = new ApplicationReferenceMap();
+    m_pHealth = new HEALTH_CLASS_TYPE();
 }
 
 Layermanager::~Layermanager()
@@ -63,6 +72,11 @@ Layermanager::~Layermanager()
     if (m_pApplicationReferenceMap)
     {
         delete m_pApplicationReferenceMap;
+    }
+
+    if (m_pHealth)
+    {
+        delete m_pHealth;
     }
 }
 
