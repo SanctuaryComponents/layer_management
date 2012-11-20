@@ -27,6 +27,11 @@
 #include "ISceneProvider.h"
 #include "Scene.h"
 #include "config.h"
+#include <unistd.h>
+//#include <bits/sigthread.h>
+#include <pthread.h>
+#include <signal.h>
+
 #ifdef WITH_SYSTEMD
     #include "HealthSystemd.h"
     #define HEALTH_CLASS_TYPE HealthSystemd
@@ -45,6 +50,7 @@ Layermanager::Layermanager()
     m_pSceneProviderList = new SceneProviderList();
     m_pApplicationReferenceMap = new ApplicationReferenceMap();
     m_pHealth = new HEALTH_CLASS_TYPE();
+    mHealthState = true;
 }
 
 Layermanager::~Layermanager()
@@ -157,6 +163,7 @@ void Layermanager::addRenderer(IRenderer* renderer)
     if (renderer)
     {
         m_pRendererList->push_back(renderer);
+        mMonitoredPlugins.push_back(renderer);
     }
 
 }
@@ -166,6 +173,7 @@ void Layermanager::removeRenderer(IRenderer* renderer)
     if (renderer)
     {
         m_pRendererList->remove(renderer);
+        mMonitoredPlugins.remove(renderer);
     }
 }
 
@@ -245,6 +253,7 @@ void Layermanager::addCommunicator(ICommunicator* communicator)
     if (communicator)
     {
         m_pCommunicatorList->push_back(communicator);
+        mMonitoredPlugins.push_back(communicator);
     }
 }
 
@@ -253,6 +262,7 @@ void Layermanager::removeCommunicator(ICommunicator* communicator)
     if (communicator)
     {
         m_pCommunicatorList->remove(communicator);
+        mMonitoredPlugins.remove(communicator);
     }
 }
 
@@ -431,6 +441,25 @@ bool Layermanager::startAllCommunicators()
     return allStarted;
 }
 
+struct watchdogArguments
+{
+    IHealth* health;
+    Layermanager* layermanager;
+};
+
+void* watchdogThreadLoop(void* param)
+{
+    IHealth* health = ((watchdogArguments*)param)->health;
+    Layermanager* lm = ((watchdogArguments*)param)->layermanager;
+    int intervalInMs = health->getWatchdogIntervalInMs();
+    while (health->watchdogEnabled() && lm->getHealth())
+    {
+        health->signalWatchdog();
+        usleep(intervalInMs * 1000);
+    }
+    return NULL;
+}
+
 bool Layermanager::startManagement(const int width, const int height,
         const char* displayName)
 {
@@ -442,6 +471,21 @@ bool Layermanager::startManagement(const int width, const int height,
     result = startAllRenderers(width, height, displayName)
              && delegateScene()
              && startAllCommunicators();
+
+    if (result)
+    {
+        if (m_pHealth->watchdogEnabled())
+        {
+            static watchdogArguments args = { m_pHealth, this };
+            if (0 != pthread_create(&m_pWatchdogThread, NULL, watchdogThreadLoop, (void*)&args))
+            {
+                LOG_ERROR("LayerManagerService:", "Failed to start watchdog thread.");
+                result = false;
+            }
+        }
+
+        m_pHealth->reportStartupComplete();
+    }
 
     return result;
 }
@@ -481,3 +525,18 @@ bool Layermanager::stopManagement()
     return true; // TODO
 }
 
+HealthCondition Layermanager::getHealth()
+{
+    HealthCondition returnValue = HealthRunning;
+    PluginList::const_iterator iter = mMonitoredPlugins.begin();
+    PluginList::const_iterator iterEnd = mMonitoredPlugins.end();
+
+    while ((iter != iterEnd) && (HealthRunning == returnValue))
+    {
+        IPlugin* monitoredPlugin = *iter;
+        returnValue = monitoredPlugin->getHealth();
+        ++iter;
+    }
+
+    return returnValue;
+}

@@ -27,6 +27,7 @@
 #include "LayerType.h"
 #include "ObjectType.h"
 #include "NotificationQueue.h"
+#include <pthread.h>
 
 class ICommand;
 class Scene;
@@ -254,6 +255,13 @@ public:
      * \return reference to current list of updated scene elements
      */
     virtual NotificationQueue& getClientNotificationQueue() = 0;
+    
+    /**
+     * \brief get system health state
+     * \ingroup ServiceAPI
+     * \return system health condition
+     */
+    virtual HealthCondition getHealth() = 0;
 };
 
 #endif /* _COMMANDEXECUTOR_H_ */

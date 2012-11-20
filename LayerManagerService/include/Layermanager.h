@@ -22,8 +22,8 @@
 
 #include "ICommandExecutor.h"
 #include "NotificationQueue.h"
+#include <pthread.h>
 
-typedef std::map<unsigned int, const char*> PidToProcessNameTable;
 
 class Scene;
 class ICommand;
@@ -32,6 +32,11 @@ class ICommunicator;
 class ISceneProvider;
 class IApplicationReference;
 class IHealth;
+class IPlugin;
+
+typedef std::map<unsigned int, const char*> PidToProcessNameTable;
+typedef std::list<IPlugin*> PluginList;
+
 
 class Layermanager: public ICommandExecutor
 {
@@ -74,6 +79,8 @@ public:
     virtual NotificationQueue& getClientNotificationQueue();
     virtual ApplicationReferenceMap* getApplicationReferenceMap(void);
 
+    virtual HealthCondition getHealth();
+
 private:
     void printDebugInformation() const;
     bool startAllRenderers(const int width, const int height, const char *displayName);
@@ -93,6 +100,9 @@ private:
     ApplicationReferenceMap* m_pApplicationReferenceMap;
     PidToProcessNameTable m_pidToProcessNameTable;
     IHealth* m_pHealth;
+    pthread_t m_pWatchdogThread;
+    bool mHealthState;
+    PluginList mMonitoredPlugins;
 };
 
 inline Scene* Layermanager::getScene(void)
