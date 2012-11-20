@@ -61,6 +61,8 @@ class MockCommandExecutor : public ICommandExecutor {
 
   MOCK_METHOD2(addClientNotification, void(GraphicalObject* object, t_ilm_notification_mask mask));
   MOCK_METHOD0(getClientNotificationQueue, NotificationQueue&());
+
+  MOCK_METHOD0(getHealth, HealthCondition());
 };
 
 #endif /* MockCommandExecutor_H_ */

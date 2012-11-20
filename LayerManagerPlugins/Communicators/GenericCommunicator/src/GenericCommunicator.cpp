@@ -91,6 +91,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <string>
+#include <pthread.h>
+#include <signal.h>
 
 #define DEFAULT_SCREEN 0
 
@@ -213,6 +215,8 @@ GenericCommunicator::GenericCommunicator(ICommandExecutor* executor)
     }
 
     memset(&m_ipcModule, 0, sizeof(m_ipcModule));
+
+    mThreadId = pthread_self();
 }
 
 bool GenericCommunicator::start()
@@ -234,6 +238,7 @@ bool GenericCommunicator::start()
     LOG_DEBUG("GenericCommunicator", "Initializing IpcModule success.");
 
     m_running = ILM_TRUE;
+    setHealth(HealthRunning);
 
     return ILM_TRUE;
 }
@@ -246,6 +251,7 @@ void GenericCommunicator::stop()
     {
         m_ipcModule.destroy();
     }
+    setHealth(HealthStopped);
 }
 
 void GenericCommunicator::process(int timeout_ms)
@@ -2932,6 +2938,16 @@ void GenericCommunicator::sendNotification(GraphicalObject* object, t_ilm_notifi
         LOG_INFO("GenericCommunicator", "Unknown notification found in queue.");
         break;
     }
+}
+
+HealthCondition GenericCommunicator::getHealth()
+{
+    HealthCondition health = PluginBase::getHealth();
+    if (0 != pthread_kill(mThreadId, 0))
+    {
+        health = HealthDead;
+    }
+    return health;
 }
 
 extern "C" ICommunicator* createGenericCommunicator(ICommandExecutor* executor)

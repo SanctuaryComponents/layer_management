@@ -160,6 +160,8 @@ private:
     void LayerRemoveNotification(t_ilm_message message);
     void SurfaceRemoveNotification(t_ilm_message message);
 
+    virtual HealthCondition getHealth();
+
 private:
     void RemoveApplicationReference(char* owner);
     void processNotificationQueue();
@@ -169,6 +171,7 @@ private:
     IpcModule m_ipcModule;
     CallBackTable m_callBackTable;
     bool m_running;
+    unsigned long int mThreadId;
 };
 
 #endif // __GENERICCOMMUNICATOR_H__

@@ -31,11 +31,17 @@ include_directories(${DBUS_ARCH_INCLUDE_DIR})
 find_package (Threads)
 set(LIBS ${LIBS} ${DBUS_LIBRARY} ${CMAKE_THREAD_LIBS_INIT} LayerManagerUtils ${DLT_LIBRARY})
 
+if (WITH_SYSTEMD)
+    set(LIBS ${LIBS} systemd rt)
+endif (WITH_SYSTEMD)
+
 file(GLOB LM_SOURCES "${PROJECT_SOURCE_DIR}/LayerManagerService/src/Scene.cpp"
                      "${PROJECT_SOURCE_DIR}/LayerManagerService/src/Layermanager.cpp"
                      "${PROJECT_SOURCE_DIR}/LayerManagerService/src/InputManager.cpp"
                      "${PROJECT_SOURCE_DIR}/LayerManagerService/src/GraphicalObject.cpp"
                      "${PROJECT_SOURCE_DIR}/LayerManagerService/src/GraphicalSurface.cpp"
+                     "${PROJECT_SOURCE_DIR}/LayerManagerService/src/HealthSystemd.cpp"
+                     "${PROJECT_SOURCE_DIR}/LayerManagerService/src/PluginBase.cpp"
                      "${PROJECT_SOURCE_DIR}/LayerManagerService/src/shader/*.cpp"
                      "${PROJECT_SOURCE_DIR}/LayerManagerService/src/commands/*.cpp")
 
