@@ -193,6 +193,7 @@ bool NullWindowSystem::start(int displayWidth, int displayHeight, const char* Di
     {
         return false;
     }
+    mThreadId = renderThread;
     while (!m_initialized)
     {
         sleep(1);

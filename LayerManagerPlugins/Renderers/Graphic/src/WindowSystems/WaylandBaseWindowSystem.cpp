@@ -1030,6 +1030,7 @@ bool WaylandBaseWindowSystem::init(BaseGraphicSystem<void*, void*>* base)
         return false;
     }
 
+    mThreadId = renderThread;
     while (false == m_initialized)
     {
         usleep(10000); // TODO

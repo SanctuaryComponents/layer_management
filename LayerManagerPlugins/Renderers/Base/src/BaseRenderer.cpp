@@ -28,6 +28,7 @@ BaseRenderer::BaseRenderer(Scene* pScene) : m_pScene(pScene)
 {
     LOG_DEBUG("BaseRenderer", "Creating Renderer");
     m_pInputManager = new InputManager(pScene);
+    setHealth(HealthRunning);
 }
 
 BaseRenderer::~BaseRenderer()
@@ -36,6 +37,7 @@ BaseRenderer::~BaseRenderer()
     {
         delete m_pInputManager;
     }
+    setHealth(HealthStopped);
 }
 
 uint BaseRenderer::getLayerTypeCapabilities(LayerType layerType)

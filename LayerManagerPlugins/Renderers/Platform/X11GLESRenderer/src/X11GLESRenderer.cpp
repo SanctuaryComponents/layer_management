@@ -24,6 +24,8 @@
 #include "X11/Xlib.h"
 #include "TextureBinders/X11CopyGLES.h"
 #include "TextureBinders/X11EglImage.h"
+#include <pthread.h>
+#include <signal.h>
 
 X11GLESRenderer::X11GLESRenderer(Scene* pScene)
 : BaseRenderer(pScene)
@@ -174,6 +176,16 @@ Shader* X11GLESRenderer::createShader(const string* vertexName, const string* fr
     m_pWindowSystem->setSystemState(WAKEUP_STATE);
     m_pScene->lockScene();
     return result;
+}
+
+HealthCondition X11GLESRenderer::getHealth()
+{
+    HealthCondition health = PluginBase::getHealth();
+    if (0 != pthread_kill(m_pWindowSystem->mThreadId, 0))
+    {
+        health = HealthDead;
+    }
+    return health;
 }
 
 extern "C" BaseRenderer* createX11GLESRenderer(Scene* pScene){

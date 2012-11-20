@@ -44,6 +44,7 @@ public:
     virtual void doScreenShotOfLayer(std::string fileName, const uint id) = 0;
     virtual void doScreenShotOfSurface(std::string fileName, const uint id, const uint layer_id) = 0;
 
+    unsigned long int mThreadId; // TODO: remove
 protected:
     virtual void ClearDamage();
     Scene* m_pScene;

@@ -1084,6 +1084,8 @@ bool X11WindowSystem::init(BaseGraphicSystem<Display*,Window>* base)
         pthread_mutex_unlock(&init_lock);
         return false;
     }
+    mThreadId = renderThread;
+    
     pthread_cond_wait(&init_condition,&init_lock);
 /*  while (!m_initialized)
     {

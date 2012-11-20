@@ -41,6 +41,8 @@ public:
     void forceCompositionWindowSystem();
     Shader* createShader(const string* vertexName, const string* fragmentName);
 
+    virtual HealthCondition getHealth();
+
 private:
     X11WindowSystem* m_pWindowSystem;
     GLESGraphicsystem* m_pGraphicSystem;
