@@ -280,4 +280,14 @@ typedef void(*surfaceNotificationFunc)(t_ilm_surface surface,
                                      struct ilmSurfaceProperties*,
                                      t_ilm_notification_mask mask);
 
+/**
+ * enum for identifying different health states
+ */
+enum HealthCondition
+{
+    HealthStopped,
+    HealthRunning,
+    HealthDead
+};
+
 #endif // _ILM_TYPES_H_
