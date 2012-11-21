@@ -52,14 +52,13 @@ typedef struct t_eglContextStruct
 typedef struct t_wlContextStruct
 {
     struct wl_display* wlDisplay;
+    struct wl_registry* wlRegistry;
     struct wl_compositor* wlCompositor;
 
     struct wl_surface* wlSurface;
     struct wl_egl_window* wlNativeWindow;
     int width;
     int height;
-
-    uint32_t mask;
 
     struct serverinfo* wlExtServerinfo;
     uint32_t connect_id;
@@ -80,7 +79,7 @@ struct serverinfo_listener serverinfo_listener_list = {
     serverinfoListener
 };
 
-static void display_handle_global(struct wl_display* display, uint32_t id, const char* interface, uint32_t version, void* data)
+static void registry_handle_global(void* data, struct wl_registry* registry, uint32_t name, const char* interface, uint32_t version)
 {
     version = version; // TODO: to avoid warning
     WLContextStruct* p_wlCtx = (WLContextStruct*)data;
@@ -91,27 +90,24 @@ static void display_handle_global(struct wl_display* display, uint32_t id, const
         ans_strcmp = strcmp(interface, "wl_compositor");
         if (0 == ans_strcmp)
         {
-            p_wlCtx->wlCompositor = (wl_compositor*)wl_display_bind(display, id, &wl_compositor_interface);
+            p_wlCtx->wlCompositor = (wl_compositor*)wl_registry_bind(registry, name, &wl_compositor_interface, 1);
             break;
         }
 
         ans_strcmp = strcmp(interface, "serverinfo");
         if (0 == ans_strcmp)
         {
-            p_wlCtx->wlExtServerinfo = (struct serverinfo*)wl_display_bind(display, id, &serverinfo_interface);
+            p_wlCtx->wlExtServerinfo = (struct serverinfo*)wl_registry_bind(registry, name, &serverinfo_interface, 1);
             serverinfo_add_listener(p_wlCtx->wlExtServerinfo, &serverinfo_listener_list, data);
             serverinfo_get_connection_id(p_wlCtx->wlExtServerinfo);
         }
     } while(0);
 }
 
-static int
-event_mask_update(uint32_t mask, void* data)
-{
-    WLContextStruct* p_wlCtx = (WLContextStruct*)data;
-    p_wlCtx->mask = mask;
-    return 0;
-}
+static const struct wl_registry_listener registry_listener = {
+    registry_handle_global,
+    NULL
+};
 
 t_ilm_bool createWLContext(t_ilm_int width, t_ilm_int height)
 {
@@ -127,9 +123,9 @@ t_ilm_bool createWLContext(t_ilm_int width, t_ilm_int height)
         printf("Error: wl_display_connect() failed.\n");
     }
 
-    wl_display_add_global_listener(g_wlContextStruct.wlDisplay, display_handle_global, &g_wlContextStruct);
-    wl_display_get_fd(g_wlContextStruct.wlDisplay, event_mask_update, &g_wlContextStruct);
-    wl_display_iterate(g_wlContextStruct.wlDisplay, WL_DISPLAY_READABLE);
+    g_wlContextStruct.wlRegistry = wl_display_get_registry(g_wlContextStruct.wlDisplay);
+    wl_registry_add_listener(g_wlContextStruct.wlRegistry, &registry_listener, &g_wlContextStruct);
+    wl_display_dispatch(g_wlContextStruct.wlDisplay);
     wl_display_roundtrip(g_wlContextStruct.wlDisplay);
 
     g_wlContextStruct.wlSurface = wl_compositor_create_surface(g_wlContextStruct.wlCompositor);
@@ -330,5 +326,6 @@ void swapBuffers()
 
     struct wl_callback* callback = wl_surface_frame(g_wlContextStruct.wlSurface);
     wl_callback_add_listener(callback, &frame_listener, NULL);
+    wl_surface_commit(g_wlContextStruct.wlSurface);
     wl_display_flush(g_wlContextStruct.wlDisplay);
 }
