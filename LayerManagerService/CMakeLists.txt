@@ -26,14 +26,14 @@ include_directories(${DLT_INCLUDE_DIR})
 endif (WITH_DLT)
 
 include_directories ("include")
-include_directories ("${PROJECT_SOURCE_DIR}/config")
-include_directories ("${PROJECT_SOURCE_DIR}/LayerManagerUtils/include")
-include_directories ("${PROJECT_SOURCE_DIR}/LayerManagerCommands/include")
+include_directories ("${CMAKE_SOURCE_DIR}/config")
+include_directories ("${CMAKE_SOURCE_DIR}/LayerManagerUtils/include")
+include_directories ("${CMAKE_SOURCE_DIR}/LayerManagerCommands/include")
 
 file(GLOB LM_SOURCES src/*.cpp src/shader/*.cpp)
 file(GLOB LM_INCLUDES include/*.h)
 
-add_executable(LayerManagerService ${LM_SOURCES} ${LM_INCLUDES} ${PROJECT_SOURCE_DIR}/config/config.h)
+add_executable(LayerManagerService ${LM_SOURCES} ${LM_INCLUDES} ${CMAKE_SOURCE_DIR}/config/config.h)
 
 add_dependencies(LayerManagerService LayerManagerUtils)
 add_dependencies(LayerManagerService LayerManagerCommands)

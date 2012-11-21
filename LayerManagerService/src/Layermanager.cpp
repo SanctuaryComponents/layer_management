@@ -27,9 +27,9 @@
 #include "ISceneProvider.h"
 #include "Scene.h"
 #include "Configuration.h"
+#include "PluginManager.h"
 
 #include <unistd.h>
-//#include <bits/sigthread.h>
 #include <pthread.h>
 #include <signal.h>
 
@@ -43,37 +43,25 @@
 
 static const char* NO_SENDER_NAME = "unknown";
 
-Layermanager::Layermanager()
+Layermanager::Layermanager(Configuration& config)
+: mConfiguration(config)
 {
     m_pScene = new Scene();
-    m_pRendererList = new RendererList();
-    m_pCommunicatorList = new CommunicatorList();
-    m_pSceneProviderList = new SceneProviderList();
+    m_pPluginManager = new PluginManager(*this, mConfiguration);
     m_pApplicationReferenceMap = new ApplicationReferenceMap();
     m_pHealth = new HEALTH_CLASS_TYPE();
+
+    m_pRendererList = m_pPluginManager->getRendererList();
+    m_pCommunicatorList = m_pPluginManager->getCommunicatorList();
+    m_pSceneProviderList = m_pPluginManager->getSceneProviderList();
     mHealthState = true;
 }
 
 Layermanager::~Layermanager()
 {
-    if (m_pScene)
+    if (m_pHealth)
     {
-        delete m_pScene;
-    }
-
-    if (m_pRendererList)
-    {
-        delete m_pRendererList;
-    }
-
-    if (m_pCommunicatorList)
-    {
-        delete m_pCommunicatorList;
-    }
-
-    if (m_pSceneProviderList)
-    {
-        delete m_pSceneProviderList;
+        delete m_pHealth;
     }
 
     if (m_pApplicationReferenceMap)
@@ -81,9 +69,14 @@ Layermanager::~Layermanager()
         delete m_pApplicationReferenceMap;
     }
 
-    if (m_pHealth)
+    if (m_pPluginManager)
     {
-        delete m_pHealth;
+        delete m_pPluginManager;
+    }
+
+    if (m_pScene)
+    {
+        delete m_pScene;
     }
 }
 
@@ -461,13 +454,13 @@ void* watchdogThreadLoop(void* param)
     return NULL;
 }
 
-bool Layermanager::startManagement(Configuration& config)
+bool Layermanager::startManagement()
 {
     bool result = false;
 
-    const int width = config.getDisplayWidth();
-    const int height = config.getDisplayHeight();
-    const char* displayName = config.getDisplayName().c_str();
+    const int width = mConfiguration.getDisplayWidth();
+    const int height = mConfiguration.getDisplayHeight();
+    const char* displayName = mConfiguration.getDisplayName().c_str();
     
     // 1. start renderers, no prerequisites
     // 2. execute scene provider plugins

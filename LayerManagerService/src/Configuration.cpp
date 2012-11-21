@@ -47,11 +47,6 @@ Configuration::Configuration(int argc, char** argv)
     processBuildFlags();
     processEnvironmentVariables();
     processCommandLine(argc, argv);
-
-    Log::consoleLogLevel = (LOG_MODES)getLogLevelConsole();
-    Log::fileLogLevel = (LOG_MODES)getLogLevelFile();
-    
-    logAllSettings();
 }
 
 std::string Configuration::getDisplayName()

@@ -20,13 +20,15 @@
 #include <gtest/gtest.h>
 
 #include "Layermanager.h"
+#include "Configuration.h"
 
 class LayermanagerTest : public ::testing::Test
 {
 public:
     void SetUp()
     {
-        m_pLayermanager = new Layermanager();
+        Configuration config(0, NULL);
+        m_pLayermanager = new Layermanager(config);
         ASSERT_TRUE(m_pLayermanager);
     }
 

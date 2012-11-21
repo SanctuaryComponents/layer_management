@@ -72,7 +72,7 @@ public:
      * \return TRUE: start management successful
      * \return FALSE: start management failed
      */
-    virtual bool startManagement(Configuration& config) = 0;
+    virtual bool startManagement() = 0;
 
     /**
      * \brief stop layer management

@@ -20,9 +20,9 @@
 
 include_directories (".")
 include_directories ("../include")
-include_directories ("${PROJECT_SOURCE_DIR}/LayerManagerService/include")
-include_directories ("${PROJECT_SOURCE_DIR}/LayerManagerUtils/include")
-link_directories ("${PROJECT_SOURCE_DIR}/LayerManagerCommands")
+include_directories ("${CMAKE_SOURCE_DIR}/LayerManagerService/include")
+include_directories ("${CMAKE_SOURCE_DIR}/LayerManagerUtils/include")
+link_directories ("${CMAKE_SOURCE_DIR}/LayerManagerCommands")
 
 find_package(DBUS REQUIRED)
 include_directories(${DBUS_INCLUDE_DIR})
@@ -35,16 +35,17 @@ if (WITH_SYSTEMD)
     set(LIBS ${LIBS} systemd rt)
 endif (WITH_SYSTEMD)
 
-file(GLOB LM_SOURCES "${PROJECT_SOURCE_DIR}/LayerManagerService/src/Scene.cpp"
-                     "${PROJECT_SOURCE_DIR}/LayerManagerService/src/Layermanager.cpp"
-                     "${PROJECT_SOURCE_DIR}/LayerManagerService/src/InputManager.cpp"
-                     "${PROJECT_SOURCE_DIR}/LayerManagerService/src/GraphicalObject.cpp"
-                     "${PROJECT_SOURCE_DIR}/LayerManagerService/src/GraphicalSurface.cpp"
-                     "${PROJECT_SOURCE_DIR}/LayerManagerService/src/HealthSystemd.cpp"
-                     "${PROJECT_SOURCE_DIR}/LayerManagerService/src/PluginBase.cpp"
-                     "${PROJECT_SOURCE_DIR}/LayerManagerService/src/Configuration.cpp"
-                     "${PROJECT_SOURCE_DIR}/LayerManagerService/src/shader/*.cpp"
-                     "${PROJECT_SOURCE_DIR}/LayerManagerService/src/commands/*.cpp")
+file(GLOB LM_SOURCES "${CMAKE_SOURCE_DIR}/LayerManagerService/src/Scene.cpp"
+                     "${CMAKE_SOURCE_DIR}/LayerManagerService/src/Layermanager.cpp"
+                     "${CMAKE_SOURCE_DIR}/LayerManagerService/src/InputManager.cpp"
+                     "${CMAKE_SOURCE_DIR}/LayerManagerService/src/GraphicalObject.cpp"
+                     "${CMAKE_SOURCE_DIR}/LayerManagerService/src/GraphicalSurface.cpp"
+                     "${CMAKE_SOURCE_DIR}/LayerManagerService/src/HealthSystemd.cpp"
+                     "${CMAKE_SOURCE_DIR}/LayerManagerService/src/PluginBase.cpp"
+                     "${CMAKE_SOURCE_DIR}/LayerManagerService/src/PluginManager.cpp"
+                     "${CMAKE_SOURCE_DIR}/LayerManagerService/src/Configuration.cpp"
+                     "${CMAKE_SOURCE_DIR}/LayerManagerService/src/shader/*.cpp"
+                     "${CMAKE_SOURCE_DIR}/LayerManagerService/src/commands/*.cpp")
 
 file(GLOB DBUSCommunicator_SOURCES "../src/*.cpp")
 

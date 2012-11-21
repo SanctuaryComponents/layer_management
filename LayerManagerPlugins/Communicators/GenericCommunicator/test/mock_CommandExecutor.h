@@ -31,7 +31,7 @@ class MockCommandExecutor : public ICommandExecutor {
  public:
   MOCK_METHOD1(execute, bool(ICommand* commandToBeExecuted));
 
-  MOCK_METHOD1(startManagement, bool(Configuration& config));
+  MOCK_METHOD0(startManagement, bool());
   MOCK_METHOD0(stopManagement, bool());
 
   MOCK_METHOD0(getScene, Scene*());

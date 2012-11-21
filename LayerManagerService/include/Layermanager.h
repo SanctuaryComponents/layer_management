@@ -24,7 +24,6 @@
 #include "NotificationQueue.h"
 #include <pthread.h>
 
-
 class Scene;
 class ICommand;
 class IRenderer;
@@ -34,6 +33,7 @@ class IApplicationReference;
 class IHealth;
 class IPlugin;
 class Configuration;
+class PluginManager;
 
 typedef std::map<unsigned int, const char*> PidToProcessNameTable;
 typedef std::list<IPlugin*> PluginList;
@@ -42,7 +42,7 @@ typedef std::list<IPlugin*> PluginList;
 class Layermanager: public ICommandExecutor
 {
 public:
-    Layermanager();
+    Layermanager(Configuration& config);
     virtual ~Layermanager();
 
     void signalRendererRedraw();
@@ -68,7 +68,7 @@ public:
     const char* getSenderName(t_ilm_client_handle client);
     const char* getSenderName(unsigned int pid);
     
-    virtual bool startManagement(Configuration& config);
+    virtual bool startManagement();
     virtual bool stopManagement();
 
     virtual Scene* getScene(void);
@@ -104,6 +104,8 @@ private:
     pthread_t m_pWatchdogThread;
     bool mHealthState;
     PluginList mMonitoredPlugins;
+    Configuration& mConfiguration;
+    PluginManager* m_pPluginManager;
 };
 
 inline Scene* Layermanager::getScene(void)

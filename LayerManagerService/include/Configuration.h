@@ -52,8 +52,9 @@ public:
 
     std::string getPluginPath();
 
-private:
     void logAllSettings();
+    
+private:
     void processCommandLine(int argc, char** argv);
     void processBuildFlags();
     void processEnvironmentVariables();
