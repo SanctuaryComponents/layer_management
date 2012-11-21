@@ -60,7 +60,7 @@ extern "C"
         OpenGLES2App::serverinfoListener
     };
 
-    void OpenGLES2App::display_handle_global(struct wl_display* display, uint32_t id, const char* interface, uint32_t version, void* data)
+    void OpenGLES2App::registry_handle_global(void* data, struct wl_registry* registry, uint32_t name, const char* interface, uint32_t version)
     {
         version = version; // TODO:to avoid warning
         WLContextStruct* p_wlCtx = (WLContextStruct*)data;
@@ -71,26 +71,24 @@ extern "C"
             ans_strcmp = strcmp(interface, "wl_compositor");
             if (0 == ans_strcmp)
             {
-                p_wlCtx->wlCompositor = (wl_compositor*)wl_display_bind(display, id, &wl_compositor_interface);
+                p_wlCtx->wlCompositor = (wl_compositor*)wl_registry_bind(registry, name, &wl_compositor_interface, 1);
                 break;
             }
 
             ans_strcmp = strcmp(interface, "tunneler");
             if (0 == ans_strcmp)
             {
-                p_wlCtx->wlExtServerinfo = (struct serverinfo*)wl_display_bind(display, id, &serverinfo_interface);
+                p_wlCtx->wlExtServerinfo = (struct serverinfo*)wl_registry_bind(registry, name, &serverinfo_interface, 1);
                 serverinfo_add_listener(p_wlCtx->wlExtServerinfo, &serverinfo_listener_list, data);
                 serverinfo_get_connection_id(p_wlCtx->wlExtServerinfo);
             }
         } while(0);
     }
 
-    int OpenGLES2App::event_mask_update(uint32_t mask, void* data)
-    {
-        WLContextStruct* p_wlCtx = (WLContextStruct*)data;
-        p_wlCtx->mask = mask;
-        return 0;
-    }
+    static const struct wl_registry_listener registry_listener = {
+        OpenGLES2App::registry_handle_global,
+        NULL
+    };
 }
 
 #define RUNTIME_IN_MS() (GetTickCount() - startTimeInMS)
@@ -173,9 +171,9 @@ bool OpenGLES2App::createWLContext(SurfaceConfiguration* config)
         cout<<"Error: wl_display_connect() failed.\n";
     }
 
-    wl_display_add_global_listener(m_wlContextStruct.wlDisplay, display_handle_global, &m_wlContextStruct);
-    wl_display_get_fd(m_wlContextStruct.wlDisplay, event_mask_update, &m_wlContextStruct);
-    wl_display_iterate(m_wlContextStruct.wlDisplay, WL_DISPLAY_READABLE);
+    m_wlContextStruct.wlRegistry = wl_display_get_registry(m_wlContextStruct.wlDisplay);
+    wl_registry_add_listener(m_wlContextStruct.wlRegistry, &registry_listener, &m_wlContextStruct);
+    wl_display_dispatch(m_wlContextStruct.wlDisplay);
     wl_display_roundtrip(m_wlContextStruct.wlDisplay);
 
     m_wlContextStruct.wlSurface = wl_compositor_create_surface(m_wlContextStruct.wlCompositor);
@@ -380,5 +378,6 @@ void OpenGLES2App::swapBuffers()
 
     struct wl_callback* callback = wl_surface_frame(m_wlContextStruct.wlSurface);
     wl_callback_add_listener(callback, &frame_listener, NULL);
+    wl_surface_commit(m_wlContextStruct.wlSurface);
     wl_display_flush(m_wlContextStruct.wlDisplay);
 }

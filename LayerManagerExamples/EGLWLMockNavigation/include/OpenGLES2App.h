@@ -48,8 +48,7 @@ public:
     void mainloop();
 
     static void serverinfoListener( void *data, struct serverinfo *pServerinfo, uint32_t client_handle );
-    static void display_handle_global(struct wl_display* display, uint32_t id, const char* interface, uint32_t version, void* data);
-    static int event_mask_update(uint32_t mask, void* data);
+    static void registry_handle_global(void* data, struct wl_registry* registry, uint32_t name, const char* interface, uint32_t version);
     static void frame_listener_func(void *data, struct wl_callback *callback, uint32_t time);
 
 protected:
@@ -88,13 +87,12 @@ protected:
     typedef struct t_wlContextStruct
     {
         struct wl_display* wlDisplay;
+        struct wl_registry* wlRegistry;
         struct wl_compositor* wlCompositor;
 	struct wl_egl_window* wlNativeWindow;
         struct wl_surface* wlSurface;
         int width;
         int height;
-
-        uint32_t mask;
 
         struct serverinfo* wlExtServerinfo;
         uint32_t connect_id;
