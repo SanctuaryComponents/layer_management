@@ -421,7 +421,7 @@ bool GLESGraphicsystem::canMultitexture(LayerList layers)
             }
 
             // TODO, other custom shaders okay too.
-            if (shader && shader != m_defaultShader || (*surface)->getChromaKeyEnabled())
+            if ( (shader && shader != m_defaultShader) || (*surface)->getChromaKeyEnabled())
             {
                 return false;
             }
