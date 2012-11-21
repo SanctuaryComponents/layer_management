@@ -75,7 +75,7 @@ extern "C"
                 break;
             }
 
-            ans_strcmp = strcmp(interface, "tunneler");
+            ans_strcmp = strcmp(interface, "serverinfo");
             if (0 == ans_strcmp)
             {
                 p_wlCtx->wlExtServerinfo = (struct serverinfo*)wl_registry_bind(registry, name, &serverinfo_interface, 1);
