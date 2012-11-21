@@ -30,13 +30,13 @@ class WLContext
 // properties
 private:
     struct wl_display*    m_wlDisplay;
+    struct wl_registry*   m_wlRegistry;
     struct wl_compositor* m_wlCompositor;
     struct wl_seat*       m_wlSeat;
     struct wl_pointer*    m_wlPointer;
     struct wl_keyboard*   m_wlKeyboard;
     struct wl_touch*      m_wlTouch;
     struct serverinfo*    m_wlServerInfo;
-    uint32_t m_mask;
     uint32_t m_connectionId;
 
     struct wl_pointer_listener*  m_wlPointerListener;
@@ -54,6 +54,7 @@ public:
 
     struct wl_compositor* GetWLCompositor() const;
     struct wl_display* GetWLDisplay() const;
+    struct wl_registry* GetWLRegistry() const;
     struct wl_pointer* GetWLPointer() const;
     struct wl_keyboard* GetWLKeyboard() const;
     struct wl_touch* GetWLTouch() const;
@@ -72,11 +73,11 @@ public:
     void SetWLKeyboard(struct wl_keyboard* wlKeyboard);
     void SetWLTouch(struct wl_touch* wlTouch);
 
-    static void DisplayHandleGlobal(struct wl_display* display,
-                                    uint32_t id,
-                                    const char* interface,
-                                    uint32_t version,
-                                    void* data);
+    static void RegistryHandleGlobal(void* data,
+                                     struct wl_registry* registry,
+                                     uint32_t name,
+                                     const char* interface,
+                                     uint32_t version);
     static void ServerInfoListener(void* data,
                                    struct serverinfo* serverInfo,
                                    uint32_t clientHandle);
@@ -91,6 +92,7 @@ protected:
 
 inline struct wl_compositor* WLContext::GetWLCompositor() const { return m_wlCompositor; }
 inline struct wl_display* WLContext::GetWLDisplay() const { return m_wlDisplay; }
+inline struct wl_registry* WLContext::GetWLRegistry() const { return m_wlRegistry; }
 inline struct wl_pointer* WLContext::GetWLPointer() const { return m_wlPointer; }
 inline struct wl_keyboard* WLContext::GetWLKeyboard() const { return m_wlKeyboard; }
 inline struct wl_touch* WLContext::GetWLTouch() const { return m_wlTouch; }
@@ -103,7 +105,6 @@ inline struct wl_touch_listener* WLContext::GetWLTouchListener() const
     { return m_wlTouchListener; }
 inline uint32_t WLContext::GetConnectionId() const { return m_connectionId; }
 
-inline void WLContext::SetEventMask(uint32_t mask) { m_mask = mask; }
 inline void WLContext::SetWLCompositor(struct wl_compositor* wlCompositor)
     { m_wlCompositor = wlCompositor; }
 inline void WLContext::SetWLServerInfo(struct serverinfo* wlServerInfo)

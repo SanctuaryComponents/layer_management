@@ -57,7 +57,7 @@ const struct wl_touch_listener TouchListener = {
 
 void WaitForEvent(struct wl_display* wlDisplay)
 {
-    wl_display_iterate(wlDisplay, WL_DISPLAY_READABLE);
+    wl_display_dispatch(wlDisplay);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -502,6 +502,7 @@ DrawEyes(WLEGLSurface* surface, WLEyes* eyes)
 
     struct wl_callback* cb = wl_surface_frame(surface->GetWLSurface());
     wl_callback_add_listener(cb, &FrameListener, NULL);
+    wl_surface_commit(surface->GetWLSurface());
     wl_display_flush(surface->GetWLDisplay());
 
     return true;

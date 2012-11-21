@@ -28,6 +28,11 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
+static struct wl_registry_listener registryListener = {
+    WLContext::RegistryHandleGlobal,
+    NULL
+};
+
 static struct serverinfo_listener serverInfoListenerList = {
     WLContext::ServerInfoListener,
 };
@@ -40,12 +45,12 @@ static struct wl_seat_listener seatListener = {
 
 WLContext::WLContext()
 : m_wlDisplay(NULL)
+, m_wlRegistry(NULL)
 , m_wlCompositor(NULL)
 , m_wlSeat(NULL)
 , m_wlPointer(NULL)
 , m_wlTouch(NULL)
 , m_wlServerInfo(NULL)
-, m_mask(0)
 , m_connectionId(0)
 , m_wlPointerListener(NULL)
 , m_wlKeyboardListener(NULL)
@@ -61,13 +66,12 @@ WLContext::~WLContext()
 //////////////////////////////////////////////////////////////////////////////
 
 void
-WLContext::DisplayHandleGlobal(struct wl_display* display,
-                               uint32_t id,
-                               const char* interface,
-                               uint32_t version,
-                               void* data)
+WLContext::RegistryHandleGlobal(void* data,
+                                struct wl_registry* registry,
+                                uint32_t name,
+                                const char* interface,
+                                uint32_t version)
 {
-    WL_UNUSED(display);
     WL_UNUSED(version);
 
     WLContext* surface = static_cast<WLContext*>(data);
@@ -76,15 +80,16 @@ WLContext::DisplayHandleGlobal(struct wl_display* display,
     do {
         if (!strcmp(interface, "wl_compositor")){
             surface->SetWLCompositor(
-                (wl_compositor*)wl_display_bind(surface->GetWLDisplay(),
-                                                id,
-                                                &wl_compositor_interface));
+                (wl_compositor*)wl_registry_bind(registry,
+                                                name,
+                                                &wl_compositor_interface,
+                                                1));
             break;
         }
 
         if (!strcmp(interface, "serverinfo")){
-            struct serverinfo* wlServerInfo = (struct serverinfo*)wl_display_bind(
-                surface->GetWLDisplay(), id, &serverinfo_interface);
+            struct serverinfo* wlServerInfo = (struct serverinfo*)wl_registry_bind(
+                registry, name, &serverinfo_interface, 1);
             serverinfo_add_listener(wlServerInfo, &serverInfoListenerList, data);
             serverinfo_get_connection_id(wlServerInfo);
             surface->SetWLServerInfo(wlServerInfo);
@@ -92,22 +97,12 @@ WLContext::DisplayHandleGlobal(struct wl_display* display,
         }
 
         if (!strcmp(interface, "wl_seat")){
-            struct wl_seat* wlSeat = (wl_seat*)wl_display_bind(
-                surface->GetWLDisplay(), id, &wl_seat_interface);
+            struct wl_seat* wlSeat = (wl_seat*)wl_registry_bind(
+                registry, name, &wl_seat_interface, 1);
             wl_seat_add_listener(wlSeat, &seatListener, data);
             surface->SetWLSeat(wlSeat);
         }
     } while (0);
-}
-
-int
-WLContext::EventMaskUpdate(uint32_t mask, void* data)
-{
-    WLContext* surface = static_cast<WLContext*>(data);
-    assert(surface);
-
-    surface->SetEventMask(mask);
-    return 0;
 }
 
 void
@@ -185,9 +180,9 @@ WLContext::InitWLContext(const struct wl_pointer_listener* wlPointerListener,
 
     m_wlDisplay = wl_display_connect(NULL);
 
-    wl_display_add_global_listener(m_wlDisplay, DisplayHandleGlobal, this);
-    wl_display_get_fd(m_wlDisplay, EventMaskUpdate, this);
-    wl_display_iterate(m_wlDisplay, WL_DISPLAY_READABLE);
+    m_wlRegistry = wl_display_get_registry(m_wlDisplay);
+    wl_registry_add_listener(m_wlRegistry, &registryListener, this);
+    wl_display_dispatch(m_wlDisplay);
     wl_display_roundtrip(m_wlDisplay);
 
     return true;
