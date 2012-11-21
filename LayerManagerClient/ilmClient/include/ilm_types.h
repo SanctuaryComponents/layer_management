@@ -25,7 +25,7 @@
 /**
  * convenience macro to access single bits of a bitmask
  */
-#define BIT(x) (1 << (x))
+#define ILM_BIT(x) (1 << (x))
 
 
 /**
@@ -280,11 +280,11 @@ typedef void* t_ilm_message;
  */
 typedef enum
 {
-    ILM_NOTIFICATION_VISIBILITY         = BIT(1),
-    ILM_NOTIFICATION_OPACITY            = BIT(2),
-    ILM_NOTIFICATION_ORIENTATION        = BIT(3),
-    ILM_NOTIFICATION_SOURCE_RECT        = BIT(4),
-    ILM_NOTIFICATION_DEST_RECT          = BIT(5),
+    ILM_NOTIFICATION_VISIBILITY         = ILM_BIT(1),
+    ILM_NOTIFICATION_OPACITY            = ILM_BIT(2),
+    ILM_NOTIFICATION_ORIENTATION        = ILM_BIT(3),
+    ILM_NOTIFICATION_SOURCE_RECT        = ILM_BIT(4),
+    ILM_NOTIFICATION_DEST_RECT          = ILM_BIT(5),
     ILM_NOTIFICATION_ALL                = 0xffff
 } t_ilm_notification_mask;
 
