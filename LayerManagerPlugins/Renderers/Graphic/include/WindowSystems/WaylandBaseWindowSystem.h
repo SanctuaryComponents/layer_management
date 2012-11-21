@@ -40,6 +40,7 @@
 #include "config.h"
 #include "InputManager.h"
 #include "WindowSystems/WaylandInputEvent.h"
+#include "Rectangle.h"
 
 extern "C" {
 // TODO:to abstract
@@ -92,8 +93,8 @@ public:
 protected:
     struct wl_display* m_wlDisplay;
     struct wl_display* m_wlDisplayClient;
+    struct wl_registry* m_wlRegistryClient;
     struct wl_compositor* m_wlCompositorClient;
-    struct wl_global_listener* m_wlCompositorGlobalListener;
     struct wl_surface* m_wlSurfaceClient;
     pthread_t renderThread;
     pthread_mutex_t run_lock;
@@ -145,6 +146,7 @@ protected:
     static void bindCompositor(struct wl_client* client, void* data, uint32_t version, uint32_t id);
     static int signalEventOnTerm(int signal_number, void *data);
     static void destroyListenerSurfaceBuffer(struct wl_listener* listener,void *data);
+    static void destroyListenerSurfacePendingBuffer(struct wl_listener* listener,void *data);
     static void idleEventRepaint(void *data);
     bool createWaylandClient();
     void releaseWaylandClient();
@@ -159,7 +161,7 @@ public:
     static void destroySurfaceCallback(struct wl_resource* resource);
     static void destroyFrameCallback(struct wl_resource *resource);
     static void* eventLoopCallback(void* ptr);
-    static void bindDisplayClient(struct wl_display* display, uint32_t id, const char* interface, uint32_t version, void* data);
+    static void registryHandleGlobalClient(void* data, struct wl_registry* registry, uint32_t name, const char* interface, uint32_t version);
     static void surfaceListenerFrame(void* data, struct wl_callback* callback, uint32_t time);
 
     // wl_surface interface
@@ -167,6 +169,7 @@ public:
     static void surfaceIFAttach(struct wl_client *client, struct wl_resource *resource, struct wl_resource *buffer_resource, int32_t x, int32_t y);
     static void surfaceIFDamage(struct wl_client *client, struct wl_resource *resource, int32_t x, int32_t y, int32_t width, int32_t height);
     static void surfaceIFFrame(struct wl_client *client, struct wl_resource *resource, uint32_t callback);
+    static void surfaceIFCommit(struct wl_client *client, struct wl_resource *resource);
     
     // wl_compositor interface
     static void compositorIFCreateSurface(struct wl_client *client, struct wl_resource* resource, uint32_t id);
@@ -207,10 +210,26 @@ extern "C" {
         struct wl_buffer* buffer;
         int connectionId;
 
-        struct wl_list buffer_link; // TODO confirm:it's necessary or not
         uint32_t visual; // TODO confirm:it's necessary or not
-        struct wl_listener buffer_destroy_listener; // TODO it's necessary or not
+        struct wl_listener buffer_destroy_listener;
         struct wl_list link;
+
+        /* All the pending state, that wl_surface.commit will apply. */
+        struct {
+            /* wl_surface.attach */
+            int remove_contents;
+            struct wl_buffer *buffer;
+            struct wl_listener buffer_destroy_listener;
+            int32_t sx;
+            int32_t sy;
+
+            /* wl_surface.damage */
+            Rectangle damage;
+            bool damaged;
+
+            /* wl_surface.frame */
+            struct wl_list frame_callback_list;
+        } pending;
     };
 
     struct native_frame_callback {
