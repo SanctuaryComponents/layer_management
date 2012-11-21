@@ -37,6 +37,8 @@
 #include "WindowSystems/WaylandX11InputEvent.h"
 #include "WindowSystems/WaylandX11WindowSystem.h"
 
+#define ARRAY_LENGTH(a) (sizeof (a) / sizeof (a)[0])
+
 extern "C"
 {
     static int
