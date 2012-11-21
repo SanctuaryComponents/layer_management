@@ -44,7 +44,7 @@ enum evdev_event_type {
     EVDEV_ABSOLUTE_MT_DOWN   = (1 << 1),
     EVDEV_ABSOLUTE_MT_MOTION = (1 << 2),
     EVDEV_ABSOLUTE_MT_UP     = (1 << 3),
-    EVDEV_RELATIVE_MOTION    = (1 << 4),
+    EVDEV_RELATIVE_MOTION    = (1 << 4)
 };
 
 enum evdev_device_capability {
@@ -52,12 +52,12 @@ enum evdev_device_capability {
     EVDEV_BUTTON     = (1 << 1),
     EVDEV_MOTION_ABS = (1 << 2),
     EVDEV_MOTION_REL = (1 << 3),
-    EVDEV_TOUCH      = (1 << 4),
+    EVDEV_TOUCH      = (1 << 4)
 };
 
 enum key_state_update {
     STATE_UPDATE_AUTOMATIC,
-    STATE_UPDATE_NONE,
+    STATE_UPDATE_NONE
 };
 
 class WaylandEvdevInputEvent;

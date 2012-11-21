@@ -123,6 +123,8 @@ WaylandInputDevice::releaseDevices()
 void
 WaylandInputDevice::cleanupDataDeviceForClient(struct wl_client *client, bool destroyDev)
 {
+    (void)client;
+    (void)destroyDev;
 }
 
 void

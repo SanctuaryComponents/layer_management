@@ -56,7 +56,7 @@ extern "C"
         xcb_atom_t xkbNames;
         xcb_atom_t string;
     };
-};
+}
 
 //////////////////////////////////////////////////////////////////////////////
 class WaylandX11InputEvent : public WaylandInputEvent

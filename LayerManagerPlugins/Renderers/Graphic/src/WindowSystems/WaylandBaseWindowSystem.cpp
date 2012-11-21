@@ -110,7 +110,7 @@ extern "C" {
         }
 
         m_serverInfo = (void*)serverInfo;
-    };
+    }
 }
 
 WaylandBaseWindowSystem::WaylandBaseWindowSystem(const char* displayname, int width, int height, Scene* pScene, InputManager* pInputManager)

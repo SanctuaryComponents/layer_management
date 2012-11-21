@@ -39,13 +39,13 @@ enum keyboard_modifier {
     MODIFIER_CTRL  = (1 << 0),
     MODIFIER_ALT   = (1 << 1),
     MODIFIER_SUPER = (1 << 2),
-    MODIFIER_SHIFT = (1 << 3),
+    MODIFIER_SHIFT = (1 << 3)
 };
 
 enum keyboard_led {
     LED_NUM_LOCK    = (1 << 0),
     LED_CAPS_LOCK   = (1 << 1),
-    LED_SCROLL_LOCK = (1 << 2),
+    LED_SCROLL_LOCK = (1 << 2)
 };
 
 class WaylandBaseWindowSystem;
