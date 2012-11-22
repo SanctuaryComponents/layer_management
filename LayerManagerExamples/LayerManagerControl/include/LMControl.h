@@ -270,4 +270,35 @@ void getOptimization(t_ilm_uint id);
  */
 t_ilm_bool analyzeSurface(t_ilm_surface targetSurfaceId);
 
+
+//=============================================================================
+//scatter.cpp
+//=============================================================================
+
+/*
+ * Divides the screen into a grid of equal sized portions, and displays every rendered
+ * surface in a separate tile with its relative size and position preserved
+ *
+ * Only rendred surfaces are considered. Surfaces are displayed according to their render order
+ * topleft-to-rightbottom
+ */
+void scatter();
+
+
+/*
+ * Divides the screen into a grid of equal sized portions, and displays every existing surface
+ * in a separate tile with its relative size and position preserved
+ *
+ * All existing surfaces are considered. surfaces that have 0 visibility are set to visibility 1.
+ * Surfaces that have 0 opacity are set to opacity 1. Surfaces that are not on any layer and surfaces
+ * that are on layers that are not on any screen are displayed as well
+ */
+void scatterAll();
+
+/*
+ * Returns a scattered version of the scene
+ */
+t_scene_data getScatteredScene(t_scene_data* pInitialScene);
+
+
 #endif

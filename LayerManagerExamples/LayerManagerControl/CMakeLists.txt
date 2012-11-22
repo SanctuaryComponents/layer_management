@@ -38,6 +38,7 @@ add_executable(${PROJECT_NAME}
     src/Expression.cpp
     src/ExpressionInterpreter.cpp
     src/print.cpp
+    src/scatter.cpp
     src/util.cpp
 )
 
