@@ -31,6 +31,10 @@ using std::set;
 
 #include <string>
 using std::string;
+//=============================================================================
+//print.cpp
+//=============================================================================
+
 /*
  * Functions for printing arrays, vector and maps
  */
@@ -66,6 +70,10 @@ void printSurfaceProperties(unsigned int surfaceid, const char* prefix = "");
  */
 void printScene();
 
+
+//=============================================================================
+//control.cpp
+//=============================================================================
 void getCommunicatorPerformance();
 void setSurfaceKeyboardFocus(t_ilm_surface surface);
 void getKeyboardFocus();
