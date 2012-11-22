@@ -258,4 +258,16 @@ void watchLayer(unsigned int* layerids, unsigned int layeridCount);
 void watchSurface(unsigned int* surfaceids, unsigned int surfaceidCount);
 void setOptimization(t_ilm_uint id, t_ilm_uint mode);
 void getOptimization(t_ilm_uint id);
+
+
+//=============================================================================
+//analyze.cpp
+//=============================================================================
+
+/*
+ * Runs and prints the results for a set of analysis procedures to check if there are any potential problems that
+ * might lead to the surface being not rendered or not visible
+ */
+t_ilm_bool analyzeSurface(t_ilm_surface targetSurfaceId);
+
 #endif

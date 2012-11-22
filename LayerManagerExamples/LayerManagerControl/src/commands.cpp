@@ -534,3 +534,11 @@ COMMAND("get optimization <id>")
     t_ilm_uint id = input->getUint("id");
     getOptimization(id);
 }
+
+//=============================================================================
+COMMAND("analyze surface <surfaceid>")
+//=============================================================================
+{
+    t_ilm_surface targetSurfaceId = (t_ilm_uint) input->getUint("surfaceid");
+    analyzeSurface(targetSurfaceId);
+}
