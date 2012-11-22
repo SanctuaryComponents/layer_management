@@ -32,10 +32,12 @@ include_directories(
 add_executable(${PROJECT_NAME}
     src/main.cpp
     src/commands.cpp
+    src/common.cpp
     src/control.cpp
     src/Expression.cpp
     src/ExpressionInterpreter.cpp
     src/print.cpp
+    src/util.cpp
 )
 
 add_dependencies(${PROJECT_NAME}
