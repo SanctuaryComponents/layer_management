@@ -19,9 +19,16 @@
 
 #include "SignalHandler.h"
 #include "Log.h"
+#include "config.h"
+
 #include <signal.h>
-#include <execinfo.h> // stacktrace
 #include <stdlib.h>   // exit
+
+#ifdef HAVE_EXECINFO_H
+    #include <execinfo.h>
+#endif
+
+
 
 //===========================================================================
 // Prototypes
@@ -66,6 +73,7 @@ t_ilm_bool SignalHandler::shutdownSignalReceived()
 //===========================================================================
 void printStackTrace()
 {
+#ifdef HAVE_BACKTRACE
     const int maxStackSize = 64;
     void* stack[maxStackSize];
     
@@ -78,7 +86,8 @@ void printStackTrace()
         LOG_INFO("LayerManagerService", "Stack-Trace [" << i << "]: " << lines[i]);
     }
     LOG_INFO("LayerManagerService", "--------------------------------------------------");
-    
+#endif
+
     LOG_INFO("LayerManagerService", "Exiting application.")
     exit(-1);
 }

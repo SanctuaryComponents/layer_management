@@ -96,6 +96,17 @@
 // build with native systemd support
 #cmakedefine WITH_SYSTEMD
 
+
+//-----------------------------------------------------------------------------
+// platform configuration
+//-----------------------------------------------------------------------------
+// execinfo header file
+#cmakedefine HAVE_EXECINFO_H
+
+// backtrace available
+#cmakedefine HAVE_BACKTRACE
+
+
 //-----------------------------------------------------------------------------
 // human readable report
 //-----------------------------------------------------------------------------

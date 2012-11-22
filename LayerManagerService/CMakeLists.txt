@@ -93,3 +93,13 @@ target_link_libraries(LayerManagerService_Test ${LIBS} gtest gmock)
 add_test(LayerManagerService LayerManagerService_Test )
 
 endif(WITH_TESTS) 
+
+
+#=============================================================
+# configuration depending on system
+#=============================================================
+include(CheckFunctionExists)
+check_function_exists(backtrace_symbols HAVE_BACKTRACE)
+
+include(CheckIncludeFiles)
+check_include_files(execinfo.h HAVE_EXECINFO_H)
