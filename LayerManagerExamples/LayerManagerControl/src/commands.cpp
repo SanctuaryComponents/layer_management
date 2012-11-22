@@ -17,18 +17,22 @@
  *
  ****************************************************************************/
 #include "ilm_client.h"
+#include "LMControl.h"
 #include "Expression.h"
 #include "ExpressionInterpreter.h"
 #include <iostream>
+#include <sstream>
+#include <iomanip>
+#include <vector>
+#include <map>
+#include <algorithm>
+#include <iterator>
 #include <cstring>
 #include <signal.h> // signal
 #include <unistd.h> // alarm
 
 using namespace std;
 
-//=============================================================================
-// common helper functions
-//=============================================================================
 
 #define COMMAND(text) COMMAND2(__COUNTER__,text)
 
@@ -40,10 +44,7 @@ using namespace std;
         ExpressionInterpreter::addExpression(func_ ## funcNumber, text); \
     void func_ ## funcNumber(Expression* input)
 
-void printArray(const char* text, unsigned int* array, int count);
-void printScreenProperties(unsigned int screenid, const char* prefix = "");
-void printLayerProperties(unsigned int layerid, const char* prefix = "");
-void printSurfaceProperties(unsigned int surfaceid, const char* prefix = "");
+
 
 //=============================================================================
 COMMAND("help")
@@ -409,138 +410,41 @@ COMMAND("destroy surface <surfaceid>")
 COMMAND("get scene")
 //=============================================================================
 {
-    unsigned int screenCount = 0;
-    unsigned int* screenArray = NULL;
-
-    ilm_getScreenIDs(&screenCount, &screenArray);
-
-    for (unsigned int screenIndex = 0; screenIndex < screenCount; ++screenIndex)
-    {
-        unsigned int screenid = screenArray[screenIndex];
-        printScreenProperties(screenid);
-        cout << "\n";
-
-        int layerCount = 0;
-        unsigned int* layerArray = NULL;
-        ilm_getLayerIDsOnScreen(screenid, &layerCount, &layerArray);
-        for (int layerIndex = 0; layerIndex < layerCount; ++layerIndex)
-        {
-            unsigned int layerid = layerArray[layerIndex];
-            printLayerProperties(layerid, "    ");
-            cout << "\n";
-
-            int surfaceCount = 0;
-            unsigned int* surfaceArray = NULL;
-            ilm_getSurfaceIDsOnLayer(layerid, &surfaceCount, &surfaceArray);
-            for (int surfaceIndex = 0; surfaceIndex < surfaceCount; ++surfaceIndex)
-            {
-                unsigned int surfaceid = surfaceArray[surfaceIndex];
-                printSurfaceProperties(surfaceid, "        ");
-                cout << "\n";
-            }
-        }
-    }
+    printScene();
 }
 
 //=============================================================================
-bool gBenchmark_running;
-
-void benchmarkSigHandler(int sig)
-{
-    gBenchmark_running = false;
-}
-
 COMMAND("get communicator performance")
 //=============================================================================
 {
-    int runs = 0;
-    int runtimeInSec = 5;
-    unsigned int hwLayerCnt = 0;
-    cout << "running performance test for " << runtimeInSec << " seconds... ";
-    flush(cout);
-
-    signal(SIGALRM, benchmarkSigHandler);
-
-    gBenchmark_running = true;
-
-    alarm(runtimeInSec);
-
-    while (gBenchmark_running)
-    {
-        ilm_getNumberOfHardwareLayers(0, &hwLayerCnt);
-        ++runs;
-    }
-
-    signal(SIGALRM, SIG_DFL);
-
-    cout << (runs/runtimeInSec) << " transactions/second\n";
+   getCommunicatorPerformance();
 }
 
 //=============================================================================
 COMMAND("set surface <surfaceid> keyboard focus")
 //=============================================================================
 {
-    if (ilm_SetKeyboardFocusOn(input->getUint("surfaceid")) != ILM_SUCCESS)
-    {
-        cerr << "Error during communication" << endl;
-    }
+    t_ilm_surface surface = input->getUint("surfaceid");
+
+    setSurfaceKeyboardFocus(surface);
 }
 
 //=============================================================================
 COMMAND("get keyboard focus")
 //=============================================================================
 {
-    t_ilm_surface surfaceId;
-    if (ilm_GetKeyboardFocusSurfaceId(&surfaceId) == ILM_SUCCESS)
-    {
-        cout << "keyboardFocusSurfaceId == " << surfaceId << endl;
-    }
-    else
-    {
-        cerr << "Error during communication" << endl;
-    }
+    getKeyboardFocus();
 }
 
 //=============================================================================
 COMMAND("set surface <surfaceid> accept <acceptance> input events from devices <kbd:pointer:touch>")
 //=============================================================================
 {
-    t_ilm_surface surfaceId;
-    ilmInputDevice devices;
-    t_ilm_bool acceptance;
-    char* str;
-    char* tok;
+    t_ilm_surface surfaceId = input->getUint("surfaceid");
+    t_ilm_bool acceptance = input->getBool("acceptance");
+    string kbdPointerTouch = input->getString("kbd:pointer:touch");
 
-    devices = (ilmInputDevice)0;
-    surfaceId = input->getUint("surfaceid");
-    acceptance = input->getBool("acceptance");
-    str = new char [input->getString("kbd:pointer:touch").size()+1];
-    strcpy (str, input->getString("kbd:pointer:touch").c_str());
-    tok = strtok(str, ":");
-    while (tok != NULL)
-    {
-        if (!strcmp(tok, "kbd"))
-        {
-            devices |= ILM_INPUT_DEVICE_KEYBOARD;
-        }
-        else if (!strcmp(tok, "pointer"))
-        {
-            devices |= ILM_INPUT_DEVICE_POINTER;
-        }
-        else if (!strcmp(tok, "touch"))
-        {
-          devices |= ILM_INPUT_DEVICE_TOUCH;
-        }
-        else
-        {
-          cerr << "Unknown devices specified." << endl;
-        }
-        tok = strtok(NULL, ":");
-    }
-    ilm_UpdateInputEventAcceptanceOn(surfaceId, devices, acceptance);
-    ilm_commitChanges();
-
-    delete[] str;
+    setSurfaceAcceptsInput(surfaceId, kbdPointerTouch, acceptance);
 }
 
 //=============================================================================
@@ -584,260 +488,49 @@ COMMAND("set layer <layerid> chromakey <red> <green> <blue>")
 }
 
 //=============================================================================
-void layerNotificationCallback(t_ilm_layer layer,
-                               struct ilmLayerProperties* properties,
-                               t_ilm_notification_mask mask)
-{
-    cout << "\nNotification: layer " << layer << " updated properties:\n";
-
-    if (ILM_NOTIFICATION_VISIBILITY & mask)
-    {
-        cout << "\tvisibility = " << properties->visibility << "\n";
-    }
-
-    if (ILM_NOTIFICATION_OPACITY & mask)
-    {
-        cout << "\topacity = " << properties->opacity << "\n";
-    }
-
-    if (ILM_NOTIFICATION_ORIENTATION & mask)
-    {
-        cout << "\torientation = " << properties->orientation << "\n";
-    }
-
-    if (ILM_NOTIFICATION_SOURCE_RECT & mask)
-    {
-        cout << "\tsource rect = x:" << properties->sourceX
-             << ", y:" << properties->sourceY
-             << ", width:" << properties->sourceWidth
-             << ", height:" << properties->sourceHeight
-             << "\n";
-    }
-
-    if (ILM_NOTIFICATION_DEST_RECT & mask)
-    {
-        cout << "\tdest rect = x:" << properties->destX
-             << ", y:" << properties->destY
-             << ", width:" << properties->destWidth
-             << ", height:" << properties->destHeight
-             << "\n";
-    }
-}
-
 COMMAND("test notification layer <layerid>")
 //=============================================================================
 {
-    ilmErrorTypes ret;
     unsigned int layerid = input->getUint("layerid");
 
-    cout << "Setup notification for layer " << layerid << " \n";
-    ret = ilm_layerAddNotification(layerid, layerNotificationCallback);
-
-    if (ret != ILM_SUCCESS)
-    {
-        cerr << "ilm_layerAddNotification returned error " << ret << "\n";
-    }
-
-    for  (int i = 0; i < 2; ++i)
-    {
-        usleep(100 * 1000);
-        cout << "Set layer 1000 visbility to FALSE\n";
-        ilm_layerSetVisibility(layerid, ILM_FALSE);
-        ilm_commitChanges();
-
-        usleep(100 * 1000);
-        cout << "Set layer 1000 visbility to TRUE\n";
-        ilm_layerSetVisibility(layerid, ILM_TRUE);
-
-        cout << "Set layer 1000 opacity to 0.3\n";
-        ilm_layerSetOpacity(layerid, 0.3);
-        ilm_commitChanges();
-
-        usleep(100 * 1000);
-        cout << "Set layer 1000 opacity to 1.0\n";
-        ilm_layerSetOpacity(layerid, 1.0);
-        ilm_commitChanges();
-    }
-
-    ilm_commitChanges(); // make sure, app lives long enough to receive last notification
+    testNotificationLayer(layerid);
 }
 
 //=============================================================================
 COMMAND("watch layer <layeridarray>")
 //=============================================================================
 {
-    ilmErrorTypes ret;
-
     unsigned int* layerids = NULL;
     unsigned int layeridCount;
     input->getUintArray("layeridarray", &layerids, &layeridCount);
 
-    for (unsigned int i = 0; i < layeridCount; ++i)
-    {
-        unsigned int layerid = layerids[i];
-        cout << "Setup notification for layer " << layerid << "\n";
-        ret = ilm_layerAddNotification(layerid, layerNotificationCallback);
-
-        if (ret != ILM_SUCCESS)
-        {
-            cerr << "ilm_layerAddNotification(" << layerid << ") returned error " << ret << "\n";
-            return;
-        }
-    }
-
-    cout << "Waiting for notifications...\n";
-    int block;
-    cin >> block;
-
-    for (unsigned int i = 0; i < layeridCount; ++i)
-    {
-        unsigned int layerid = layerids[i];
-        cout << "Removing notification for layer " << layerid << "\n";
-        ilm_layerRemoveNotification(layerid);
-    }
-
-    if (layerids)
-    {
-        delete[] layerids;
-    }
+    watchLayer(layerids, layeridCount);
 }
 
 //=============================================================================
-void surfaceNotificationCallback(t_ilm_layer surface,
-                               struct ilmSurfaceProperties* properties,
-                               t_ilm_notification_mask mask)
-{
-    cout << "\nNotification: surface " << surface << " updated properties:\n";
-
-    if (ILM_NOTIFICATION_VISIBILITY & mask)
-    {
-        cout << "\tvisibility = " << properties->visibility << "\n";
-    }
-
-    if (ILM_NOTIFICATION_OPACITY & mask)
-    {
-        cout << "\topacity = " << properties->opacity << "\n";
-    }
-
-    if (ILM_NOTIFICATION_ORIENTATION & mask)
-    {
-        cout << "\torientation = " << properties->orientation << "\n";
-    }
-
-    if (ILM_NOTIFICATION_SOURCE_RECT & mask)
-    {
-        cout << "\tsource rect = x:" << properties->sourceX
-             << ", y:" << properties->sourceY
-             << ", width:" << properties->sourceWidth
-             << ", height:" << properties->sourceHeight
-             << "\n";
-    }
-
-    if (ILM_NOTIFICATION_DEST_RECT & mask)
-    {
-        cout << "\tdest rect = x:" << properties->destX
-             << ", y:" << properties->destY
-             << ", width:" << properties->destWidth
-             << ", height:" << properties->destHeight
-             << "\n";
-    }
-}
-
 COMMAND("watch surface <surfaceidarray>")
 //=============================================================================
 {
-    ilmErrorTypes ret;
-
     unsigned int* surfaceids = NULL;
     unsigned int surfaceidCount;
     input->getUintArray("surfaceidarray", &surfaceids, &surfaceidCount);
 
-    for (unsigned int i = 0; i < surfaceidCount; ++i)
-    {
-        unsigned int surfaceid = surfaceids[i];
-        cout << "Setup notification for surface " << surfaceid << "\n";
-        ret = ilm_surfaceAddNotification(surfaceid, surfaceNotificationCallback);
-
-        if (ret != ILM_SUCCESS)
-        {
-            cerr << "ilm_surfaceAddNotification(" << surfaceid << ") returned error " << ret << "\n";
-            return;
-        }
-    }
-
-    cout << "Waiting for notifications...\n";
-    int block;
-    cin >> block;
-
-    for (unsigned int i = 0; i < surfaceidCount; ++i)
-    {
-        unsigned int surfaceid = surfaceids[i];
-        cout << "Removing notification for surface " << surfaceid << "\n";
-        ilm_surfaceRemoveNotification(surfaceid);
-    }
-
-    if (surfaceids)
-    {
-        delete[] surfaceids;
-    }
+    watchSurface(surfaceids, surfaceidCount);
 }
 
 //=============================================================================
 COMMAND("set optimization <id> mode <mode>")
 //=============================================================================
 {
-    if (ilm_SetOptimizationMode((ilmOptimization)input->getUint("id"),
-                                (ilmOptimizationMode)input->getUint("mode")) != ILM_SUCCESS)
-    {
-        cerr << "Error during communication" << endl;
-    }
-    ilm_commitChanges();
+    t_ilm_uint id = input->getUint("id");
+    t_ilm_uint mode = input->getUint("mode");
+    setOptimization(id, mode);
 }
 
 //=============================================================================
 COMMAND("get optimization <id>")
 //=============================================================================
 {
-    ilmOptimization optimizationId = (ilmOptimization)input->getUint("id");
-    ilmOptimizationMode optimizationMode;
-    if (ilm_GetOptimizationMode(optimizationId, &optimizationMode) == ILM_SUCCESS)
-    {
-        switch ( optimizationId )
-        {
-            case ILM_OPT_MULTITEXTURE : 
-                cout << "Optimization " << (int)optimizationId << " (Multitexture Optimization)" << endl;
-                break;
-            
-            case ILM_OPT_SKIP_CLEAR : 
-                cout << "Optimization " << (int)optimizationId << " (Skip Clear)" << endl;
-                break;
-            default:
-               cout << "Optimization " << "unknown" << endl;
-        } 
-
-        switch (optimizationMode)
-        {   
-                case ILM_OPT_MODE_FORCE_OFF : 
-                    cout << "Mode " << (int)optimizationMode << " (forced off)" << endl;
-                break;
-
-                case ILM_OPT_MODE_FORCE_ON : 
-                    cout << "Mode " << (int)optimizationMode << " (forced on)" << endl;
-                break;
-                case ILM_OPT_MODE_HEURISTIC : 
-                    cout << "Mode " << (int)optimizationMode << " (Heuristic / Render choose the optimization)" << endl;
-                break;
-                case ILM_OPT_MODE_TOGGLE : 
-                    cout << "Mode " << (int)optimizationMode << " (Toggle on/and off rapidly for debugging)" << endl;
-                break;                
-            
-            default:
-               cout <<"Mode " << "unknown" << endl ;
-        }
-    }
-    else
-    {
-        cerr << "Error during communication" << endl;
-    }
-    ilm_commitChanges();
+    t_ilm_uint id = input->getUint("id");
+    getOptimization(id);
 }
