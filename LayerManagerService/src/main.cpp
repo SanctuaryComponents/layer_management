@@ -19,6 +19,7 @@
 
 #include "Layermanager.h"
 #include "config.h"
+#include "SignalHandler.h"
 #include "IRenderer.h"
 #include "ICommunicator.h"
 #include "ISceneProvider.h"
@@ -32,8 +33,6 @@
 #include "Log.h"
 #include <getopt.h>
 #include <libgen.h> // basename
-#include <signal.h>
-#include <execinfo.h> // for stacktrace
 #include <sys/stat.h>
 
 #include <list>
@@ -72,8 +71,6 @@ const char* USAGE_DESCRIPTION = "Usage:\t LayerManagerService [options]\n"
                                 "\t-c: loglevel console \t 2 [default] \n\t\t\t\t[0=disabled,1=error,2=info,3=warning,4=debug]\n"
                                 "\t-v: show version info\t\n"
                                 "\nexample: LayerManagerService -w800 -h480 -d:0\n";
-
-bool g_LayerManagerRunning;
 
 template<class T>
 T* getCreateFunction(string libname)
@@ -369,78 +366,14 @@ void loadRendererPlugins(RendererList& rendererList, IScene* pScene)
     }
 }
 
-void printStackTrace()
-{
-    const int maxStackSize = 64;
-    void* stack[maxStackSize];
-
-    size_t count = backtrace(stack, maxStackSize);
-    char **lines = backtrace_symbols(stack, count);
-
-    LOG_INFO("LayerManagerService", "--------------------------------------------------");
-    for (unsigned int i = 0; i < count; ++i)
-    {
-        LOG_INFO("LayerManagerService", "Stack-Trace [" << i << "]: " << lines[i]);
-    }
-    LOG_INFO("LayerManagerService", "--------------------------------------------------");
-
-    LOG_INFO("LayerManagerService", "Exiting application.")
-    exit(-1);
-}
-
-void signalHandler(int sig)
-{
-    switch (sig)
-    {
-    case SIGTERM:
-        g_LayerManagerRunning = false;
-        LOG_INFO("LayerManagerService", "Signal SIGTERM received. Shutting down.");
-        break;
-
-    case SIGINT:
-        g_LayerManagerRunning = false;
-        LOG_INFO("LayerManagerService", "Signal SIGINT received. Shutting down.");
-        break;
-
-    case SIGBUS:
-        g_LayerManagerRunning = false;
-        LOG_ERROR("LayerManagerService", "Signal SIGBUS received. Shutting down.");
-        printStackTrace();
-        break;
-
-    case SIGSEGV:
-        g_LayerManagerRunning = false;
-        LOG_ERROR("LayerManagerService", "Signal SIGSEGV received. Shutting down.");
-        printStackTrace();
-        break;
-    case SIGABRT:
-        g_LayerManagerRunning = false;
-        LOG_ERROR("LayerManagerService", "Signal SIGABRT received. Shutting down.");
-        printStackTrace();
-        break;
-
-    default:
-        LOG_INFO("LayerManagerService", "Signal " << sig << " received.");
-        break;
-    }
-}
-
 int main(int argc, char **argv)
 {
-    // setup signal handler and global flag to handle shutdown
-    g_LayerManagerRunning = true;
-
-    LOG_DEBUG("LayerManagerService", "Setup signal handling.");
-    signal(SIGBUS, signalHandler);
-    signal(SIGSEGV, signalHandler);
-    signal(SIGTERM, signalHandler);
-    signal(SIGINT, signalHandler);
-    signal(SIGABRT, signalHandler);
-
     parseCommandLine(argc, (char**) argv);
     char* pluginLookupPath = getenv("LM_PLUGIN_PATH");
     LOG_INFO("LayerManagerService", "Starting Layermanager (version: " << ILM_VERSION << ")");
 
+    SignalHandler signalHandler;
+    
     std::stringstream commandLine;
     for (int i = 0; i < argc; ++i)
     {
@@ -519,7 +452,7 @@ int main(int argc, char **argv)
     {
         LOG_INFO("LayerManagerService", "Startup complete. EnterMainloop");
     
-        while (g_LayerManagerRunning)
+        while (!signalHandler.shutdownSignalReceived())
         {
             CommunicatorListIterator commIter = communicatorList.begin();
             CommunicatorListIterator commIterEnd = communicatorList.end();
@@ -582,14 +515,6 @@ int main(int argc, char **argv)
 
     LOG_DEBUG("LayerManagerService", "Removing manager.")
     delete pManager;
-
-    // reset signal handling to default
-    LOG_DEBUG("LayerManagerService", "Remove signal handling.");
-    signal(SIGBUS, SIG_DFL);
-    signal(SIGSEGV, SIG_DFL);
-    signal(SIGTERM, SIG_DFL);
-    signal(SIGINT, SIG_DFL);
-    signal(SIGABRT, SIG_DFL);
 
     LOG_INFO("LayerManagerService", "Shutdown complete.")    
     Log::closeInstance();
