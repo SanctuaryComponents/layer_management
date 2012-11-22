@@ -301,4 +301,15 @@ void scatterAll();
 t_scene_data getScatteredScene(t_scene_data* pInitialScene);
 
 
+//=============================================================================
+//demo.cpp
+//=============================================================================
+
+/*
+ * Run a set of effects on the rendered scene depending on the parameter.
+ * The function accepts values in range 0-4
+ */
+void demo(int mode);
+
+
 #endif

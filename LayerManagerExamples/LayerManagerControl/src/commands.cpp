@@ -557,3 +557,10 @@ COMMAND("scatter all")
     scatterAll();
 }
 
+//=============================================================================
+COMMAND("demo <animation_mode>")
+//=============================================================================
+{
+    int mode = (int) input->getInt("animation_mode");
+    demo(mode);
+}
