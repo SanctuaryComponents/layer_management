@@ -312,4 +312,25 @@ t_scene_data getScatteredScene(t_scene_data* pInitialScene);
 void demo(int mode);
 
 
+//=============================================================================
+//sceneio.cpp
+//=============================================================================
+
+/*
+ * Saves a representation of the current rendered scene to a file
+ */
+void exportSceneToFile(string filename);
+
+/*
+ * Saves an xtext representation of the grammar of the scene
+ */
+void exportXtext(string fileName, string grammar, string url);
+
+/*
+ * Imports a scene from a saved text file
+ */
+void importSceneFromFile(string filename);
+
+
+
 #endif

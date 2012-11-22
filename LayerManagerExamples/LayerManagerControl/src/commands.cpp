@@ -564,3 +564,29 @@ COMMAND("demo <animation_mode>")
     int mode = (int) input->getInt("animation_mode");
     demo(mode);
 }
+
+//=============================================================================
+COMMAND("export scene to <filename>")
+//=============================================================================
+{
+    string filename = (string) input->getString("filename");
+    exportSceneToFile(filename);
+}
+
+//=============================================================================
+COMMAND("export xtext to <filename> <grammar> <url>")
+//=============================================================================
+{
+    string filename = (string) input->getString("filename");
+    string grammar = (string) input->getString("grammar");
+    string url = (string) input->getString("url");
+    exportXtext(filename, grammar, url);
+}
+
+//=============================================================================
+COMMAND("import scene from <filename>")
+//=============================================================================
+{
+    string filename = (string) input->getString("filename");
+    importSceneFromFile(filename);
+}

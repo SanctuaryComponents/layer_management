@@ -40,6 +40,7 @@ add_executable(${PROJECT_NAME}
     src/ExpressionInterpreter.cpp
     src/print.cpp
     src/scatter.cpp
+    src/sceneio.cpp
     src/util.cpp
 )
 
