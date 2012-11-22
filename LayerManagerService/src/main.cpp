@@ -36,6 +36,7 @@ int main(int argc, char **argv)
     // setup logging
     Log::consoleLogLevel = (LOG_MODES)configuration.getLogLevelConsole();
     Log::fileLogLevel = (LOG_MODES)configuration.getLogLevelFile();
+    Log::dltLogLevel = (LOG_MODES)configuration.getLogLevelTrace();
 
     LOG_INFO("LayerManagerService", "Starting Layermanager (version: " << ILM_VERSION << ")");
     

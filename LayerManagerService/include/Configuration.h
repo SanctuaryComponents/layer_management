@@ -32,6 +32,7 @@
 
 #define DEFAULT_LOG_LEVEL_CONSOLE   2
 #define DEFAULT_LOG_LEVEL_FILE      0
+#define DEFAULT_LOG_LEVEL_TRACE     4
 
 #define DEFAULT_PLUGIN_PATH         CMAKE_INSTALL_PREFIX"/lib/layermanager"
 
@@ -49,6 +50,7 @@ public:
 
     int getLogLevelConsole();
     int getLogLevelFile();
+    int getLogLevelTrace();
 
     std::string getPluginPath();
 
@@ -66,6 +68,7 @@ private:
     int mDisplayHeight;
     int mLogLevelConsole;
     int mLogLevelFile;
+    int mLogLevelTrace;
 
     // environment
     std::string mDisplayName;

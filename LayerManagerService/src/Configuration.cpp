@@ -30,6 +30,7 @@ const char* USAGE_DESCRIPTION =
     "\t-d: displayName \t\n"
     "\t-f: loglevel file \t 0 [default] \n\t\t\t\t[0=disabled, 1=error, 2=info, 3=warning, 4=debug]\n"
     "\t-c: loglevel console \t 2 [default] \n\t\t\t\t[0=disabled, 1=error, 2=info, 3=warning, 4=debug]\n"
+    "\t-l: loglevel trace \t 4 [default] \n\t\t\t\t[0=disabled, 1=error, 2=info, 3=warning, 4=debug]\n"
     "\t-v: show version info\t\n"
     "\nexample: LayerManagerService -w800 -h480 -d:0\n";
 
@@ -39,6 +40,7 @@ Configuration::Configuration(int argc, char** argv)
 , mDisplayHeight(DEFAULT_DISPLAY_HEIGHT)
 , mLogLevelConsole(DEFAULT_LOG_LEVEL_CONSOLE)
 , mLogLevelFile(DEFAULT_LOG_LEVEL_FILE)
+, mLogLevelTrace(DEFAULT_LOG_LEVEL_TRACE)
 , mDisplayName(DEFAULT_DISPLAY_NAME)
 , mPluginPath(DEFAULT_PLUGIN_PATH)
 , mpBuildFlags(gBuildFlags)
@@ -74,6 +76,11 @@ int Configuration::getLogLevelFile()
     return mLogLevelFile;
 }
 
+int Configuration::getLogLevelTrace()
+{
+    return mLogLevelTrace;
+}
+
 std::string Configuration::getPluginPath()
 {
     return mPluginPath;
@@ -84,7 +91,7 @@ void Configuration::logAllSettings()
     LOG_DEBUG("LayerManagerService", "Command Line: " << mCommandLine);
     LOG_INFO("LayerManagerService", "Display " << mDisplayName << " size: " << mDisplayWidth << "x" << mDisplayHeight);
     LOG_INFO("LayerManagerService", "Plugin path: " << mPluginPath);
-    LOG_DEBUG("LayerManagerService", "Log level: console " << mLogLevelConsole << ", file " << mLogLevelFile);
+    LOG_DEBUG("LayerManagerService", "Log level: console " << mLogLevelConsole << ", file " << mLogLevelFile << ", trace " << mLogLevelTrace);
     
     for (int i = 0; i < mBuildFlagCount; ++i)
     {
@@ -105,7 +112,7 @@ void Configuration::processCommandLine(int argc, char** argv)
 {
     while (optind < argc)
     {
-        int option = getopt(argc, argv, "w::h::d::?::c::f::v::");
+        int option = getopt(argc, argv, "w::h::d::?::c::f::v::l::");
         switch (option)
         {
             case 'd':
@@ -134,6 +141,13 @@ void Configuration::processCommandLine(int argc, char** argv)
                 }
                 break;
                 
+            case 'l':
+                if (atoi(optarg) < LOG_MAX_LEVEL)
+                {
+                    mLogLevelTrace = (LOG_MODES)atoi(optarg);
+                }
+                break;
+
             case 'v':
                 LOG_INFO("LayerManagerService", "Version: " << ILM_VERSION);
                 exit(-1);
