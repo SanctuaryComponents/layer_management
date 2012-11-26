@@ -18,14 +18,8 @@
  ****************************************************************************/
 
 #include "Layermanager.h"
-#include "config.h"
 #include "Configuration.h"
 #include "SignalHandler.h"
-#include "IRenderer.h"
-#include "ICommunicator.h"
-#include "ISceneProvider.h"
-#include "ICommandExecutor.h"
-#include "Scene.h"
 #include "Log.h"
 
 int main(int argc, char **argv)
