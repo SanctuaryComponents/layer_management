@@ -20,16 +20,30 @@
 #ifndef __IHEALTH_H__
 #define __IHEALTH_H__
 
+#include "ilm_types.h"
+
+class ICommandExecutor;
+class Configuration;
+
 class IHealth
 {
 public:
-    virtual void reportStartupComplete() = 0;
-    virtual void reportProcessId() = 0;
-    virtual int getWatchdogIntervalInMs() = 0;
-    virtual void signalWatchdog() = 0;
-    virtual bool watchdogEnabled() = 0;
-
+    IHealth(ICommandExecutor& executor, Configuration& config);
     virtual ~IHealth() {};
+
+    virtual t_ilm_bool start() = 0;
+    virtual t_ilm_bool stop() = 0;
+
+protected:
+    ICommandExecutor& mExecutor;
+    Configuration& mConfiguration;
 };
+
+inline
+IHealth::IHealth(ICommandExecutor& executor, Configuration& config)
+: mExecutor(executor)
+, mConfiguration(config)
+{
+}
 
 #endif // __IHEALTH_H__

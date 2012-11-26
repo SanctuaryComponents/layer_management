@@ -23,6 +23,7 @@
 #include "CommandList.h"
 #include "LayerList.h"
 #include "ICommand.h"
+#include "IHealth.h"
 #include "ICommunicator.h"
 #include "IRenderer.h"
 #include "ISceneProvider.h"
@@ -36,21 +37,21 @@
 
 #ifdef WITH_SYSTEMD
     #include "HealthSystemd.h"
-    #define HEALTH_CLASS_TYPE HealthSystemd
-#else
-    #include "HealthDefault.h"
-    #define HEALTH_CLASS_TYPE HealthDefault
 #endif
 
 static const char* NO_SENDER_NAME = "unknown";
 
 Layermanager::Layermanager(Configuration& config)
-: mConfiguration(config)
+: m_pHealth(NULL)
+, mConfiguration(config)
 {
     m_pScene = new Scene();
     m_pPluginManager = new PluginManager(*this, mConfiguration);
     m_pApplicationReferenceMap = new ApplicationReferenceMap();
-    m_pHealth = new HEALTH_CLASS_TYPE();
+
+#ifdef WITH_SYSTEMD
+    m_pHealth = new HealthSystemd(*this, mConfiguration);
+#endif
 
     m_pRendererList = m_pPluginManager->getRendererList();
     m_pCommunicatorList = m_pPluginManager->getCommunicatorList();
@@ -443,25 +444,6 @@ bool Layermanager::startAllCommunicators()
     return allStarted;
 }
 
-struct watchdogArguments
-{
-    IHealth* health;
-    Layermanager* layermanager;
-};
-
-void* watchdogThreadLoop(void* param)
-{
-    IHealth* health = ((watchdogArguments*)param)->health;
-    Layermanager* lm = ((watchdogArguments*)param)->layermanager;
-    int intervalInMs = health->getWatchdogIntervalInMs();
-    while (health->watchdogEnabled() && lm->getHealth())
-    {
-        health->signalWatchdog();
-        usleep(intervalInMs * 1000);
-    }
-    return NULL;
-}
-
 bool Layermanager::startManagement()
 {
     bool result = false;
@@ -477,20 +459,9 @@ bool Layermanager::startManagement()
              && delegateScene()
              && startAllCommunicators();
 
-    if (result)
-    {
-        if (m_pHealth->watchdogEnabled())
-        {
-            static watchdogArguments args = { m_pHealth, this };
-            if (0 != pthread_create(&m_pWatchdogThread, NULL, watchdogThreadLoop, (void*)&args))
-            {
-                LOG_ERROR("LayerManagerService:", "Failed to start watchdog thread.");
-                result = false;
-            }
-        }
-
-        m_pHealth->reportStartupComplete();
-    }
+#ifdef WITH_SYSTEMD
+    result &= m_pHealth->start();
+#endif
 
     return result;
 }
@@ -525,6 +496,9 @@ void Layermanager::stopAllCommunicators()
 
 bool Layermanager::stopManagement()
 {
+#ifdef WITH_SYSTEMD
+    m_pHealth->stop();
+#endif
     stopAllRenderers();
     stopAllCommunicators();
     return true; // TODO

@@ -16,22 +16,22 @@
 * limitations under the License.
 *
 ****************************************************************************/
+
 #include "HealthSystemd.h"
-#include "config.h"
+#include "Configuration.h"
 #include "Log.h"
+#include "ICommandExecutor.h"
+
 #include <unistd.h>
 #include <stdlib.h>
 
 #ifdef WITH_SYSTEMD
-    #include <systemd/sd-daemon.h>
-#else
-    #define sd_notify(a,b)
-    #define sd_notifyf(a,b,c)
-#endif
 
+#include <systemd/sd-daemon.h>
 
-HealthSystemd::HealthSystemd()
-: mIntervalInMs(-1)
+HealthSystemd::HealthSystemd(ICommandExecutor& executor, Configuration& config)
+: IHealth(executor, config)
+, mIntervalInMs(-1)
 {
     char* envVar = getenv("WATCHDOG_USEC");
     if (envVar)
@@ -46,35 +46,56 @@ HealthSystemd::HealthSystemd()
     }
 }
 
+t_ilm_bool HealthSystemd::start()
+{
+    LOG_INFO("HealthSystemd", "starting");
+    t_ilm_bool result = ILM_TRUE;
+    if (watchdogEnabled())
+    {
+        result &= threadCreate();
+        result &= threadInit();
+        result &= threadStart();
+    }
+    reportStartupComplete();
+    return result;
+}
+
+t_ilm_bool HealthSystemd::stop()
+{
+    LOG_INFO("HealthSystemd", "stopping");
+    t_ilm_bool result = ILM_TRUE;
+    if (watchdogEnabled())
+    {
+        result = threadStop();
+    }
+    return result;
+}
+
 void HealthSystemd::reportStartupComplete()
 {
     LOG_INFO("HealthSystemd", "reporting startup complete");
     sd_notify(0, "READY=1");
 }
 
-void HealthSystemd::reportProcessId()
-{
-    if (watchdogEnabled())
-    {
-        sd_notifyf(0, "MAINPID=%d", getpid());
-    }
-}
-
-int HealthSystemd::getWatchdogIntervalInMs()
-{
-    return mIntervalInMs;
-}
-
 void HealthSystemd::signalWatchdog()
 {
-    if (watchdogEnabled())
-    {
-        LOG_DEBUG("HealthSystemd", "Watchdog fired");
-        sd_notify(0, "WATCHDOG=1");
-    }
+    LOG_DEBUG("HealthSystemd", "Watchdog fired");
+    sd_notify(0, "WATCHDOG=1");
 }
 
 bool HealthSystemd::watchdogEnabled()
 {
     return (mIntervalInMs > 0);
 }
+
+t_ilm_bool HealthSystemd::threadMainLoop()
+{
+    if (watchdogEnabled() && mExecutor.getHealth())
+    {
+        signalWatchdog();
+        usleep(mIntervalInMs * 1000);
+    }
+    return ILM_TRUE;
+}
+
+#endif // WITH_SYSTEMD

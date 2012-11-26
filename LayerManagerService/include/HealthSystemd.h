@@ -21,17 +21,27 @@
 #define __HEALTHSYSTEMD_H__
 
 #include "IHealth.h"
+#include "ThreadBase.h"
 
-class HealthSystemd : public IHealth
+class HealthSystemd : public IHealth, protected ThreadBase
 {
 public:
-    HealthSystemd();
-    virtual void reportStartupComplete();
-    virtual void reportProcessId();
-    virtual int getWatchdogIntervalInMs();
-    virtual void signalWatchdog();
-    virtual bool watchdogEnabled();
+    HealthSystemd(ICommandExecutor& executor, Configuration& config);
 
+    // from IHealth
+    virtual t_ilm_bool start();
+    virtual t_ilm_bool stop();
+
+private:
+    void reportStartupComplete();
+    void reportProcessId();
+    int getWatchdogIntervalInMs();
+    void signalWatchdog();
+    bool watchdogEnabled();
+
+    // from ThreadBase
+    virtual t_ilm_bool threadMainLoop();
+    
 private:
     int mIntervalInMs;
 };
