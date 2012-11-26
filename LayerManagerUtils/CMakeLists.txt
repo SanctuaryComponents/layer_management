@@ -28,6 +28,7 @@ add_library(${PROJECT_NAME} STATIC
     src/IlmMatrix.cpp
     src/Log.cpp
     src/LogMessageBuffer.cpp
+    src/ThreadBase.cpp
 )
 
 set(INCLUDE_DIRS
