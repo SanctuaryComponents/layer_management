@@ -62,6 +62,8 @@ option (WITH_PLUGIN_SYSTEMD_HEALTH_MONITOR "Build plugin for systemd health moni
 
 option (WITH_TEXT_RENDERER  "Build renderer renderer (only logging)"              OFF)
 
+option (WITH_PLUGIN_EXAMPLE_SCENE_PROVIDER "Build scene provider plugin for example applciations" OFF)
+
 
 #==============================================================================
 # Internal global settings not available to user
@@ -139,7 +141,6 @@ endif(WITH_GLX_EXAMPLE)
 if (WITH_CLIENTEXAMPLES)
     add_subdirectory (LayerManagerExamples/LayerManagerClientExample)
     add_subdirectory (LayerManagerExamples/LayerManagerControl)
-    add_subdirectory (LayerManagerExamples/LayerSceneDescriptionExample)
     set (BUILD_UTILS_LIB ON)
 endif(WITH_CLIENTEXAMPLES)
 
@@ -158,6 +159,10 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Wno-long-long")
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-function")
 #set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
 #==============================================================================
+
+if (WITH_PLUGIN_EXAMPLE_SCENE_PROVIDER)
+    add_subdirectory (LayerManagerPlugins/SceneProvider/ExampleSceneProvider)
+endif(WITH_PLUGIN_EXAMPLE_SCENE_PROVIDER)
 
 if (WITH_PLUGIN_SYSTEMD_HEALTH_MONITOR)
     add_subdirectory (LayerManagerPlugins/HealthMonitor/SystemdHealthMonitor)

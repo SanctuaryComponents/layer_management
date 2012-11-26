@@ -53,7 +53,7 @@ const char* gCommunicatorPluginDirectories[] = { "/communicator" };
 
 uint gCommunicatorPluginDirectoriesCount = sizeof(gCommunicatorPluginDirectories) / sizeof(gCommunicatorPluginDirectories[0]);
 
-const char* gScenePluginDirectories[] = { "" };
+const char* gScenePluginDirectories[] = { "/sceneprovider" };
 
 uint gScenePluginDirectoriesCount = sizeof(gScenePluginDirectories) / sizeof(gScenePluginDirectories[0]);
 

@@ -17,7 +17,7 @@
  *
  ****************************************************************************/
 
-#include "LayerSceneProvider.h"
+#include "ExampleSceneProvider.h"
 #include "ICommandExecutor.h"
 #include "CommitCommand.h"
 #include "LayerCreateCommand.h"
@@ -26,13 +26,13 @@
 #include "LayerSetVisibilityCommand.h"
 #include "LayerSetOpacityCommand.h"
 #include "ScreenSetRenderOrderCommand.h"
-#include "LayerScene.h"
+#include "ExampleAppIds.h"
 #include "SurfaceCreateCommand.h"
 #include "SurfaceSetVisibilityCommand.h"
 #include "SurfaceSetOpacityCommand.h"
 #include <unistd.h>
 
-ExampleSceneProvider::LayerSceneProvider(ICommandExecutor* executor)
+ExampleSceneProvider::ExampleSceneProvider(ICommandExecutor* executor)
 : ISceneProvider(executor)
 {
 }
@@ -77,7 +77,7 @@ static surfaceScene gInitialSurfaceScene[] =
 };
 
 
-bool ExampleSceneProvider::delegateScene() 
+bool ExampleSceneProvider::delegateScene()
 {
     bool result = true;
     pid_t layermanagerPid = getpid();
@@ -100,7 +100,7 @@ bool ExampleSceneProvider::delegateScene()
             renderOrder[i]=gInitialLayerScene[i].layer;
         }        
         /* Finally set the first executed renderorder */
-        result &= m_executor->execute(new ScreenSetRenderOrderCommand(layermanagerPid, 0, renderOrder, numberOfLayers));
+        result &= m_executor->execute(new ScreenSetRenderOrderCommand(layermanagerPid, renderOrder, numberOfLayers));
         result &= m_executor->execute(new CommitCommand(layermanagerPid));
     }
     
@@ -119,12 +119,12 @@ bool ExampleSceneProvider::delegateScene()
     return result;
 }
 
-extern "C" ISceneProvider* createLayerScene(ICommandExecutor* executor)
+extern "C" ISceneProvider* createExampleSceneProvider(ICommandExecutor* executor)
 {
     return new ExampleSceneProvider(executor);
 }
 
-extern "C" void destroyLayerScene(ExampleSceneProvider* p)
+extern "C" void destroyExampleSceneProvider(ExampleSceneProvider* p)
 {
     delete p;
 }

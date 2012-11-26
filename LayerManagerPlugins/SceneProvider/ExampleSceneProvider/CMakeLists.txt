@@ -17,6 +17,22 @@
 #
 
 ############################################################################
+cmake_minimum_required (VERSION 2.6)
 
-# examples was moved to
-# <src_root>/LayerManagerPlugins/SceneProvider/ExampleSceneProvider
+project(ExampleSceneProvider)
+
+include_directories(
+    include
+    ${CMAKE_SOURCE_DIR}/LayerManagerCommands/include
+    ${CMAKE_SOURCE_DIR}/LayerManagerService/include
+)
+
+add_library(${PROJECT_NAME} SHARED
+    src/ExampleSceneProvider.cpp
+)
+
+target_link_libraries(${PROJECT_NAME} LayerManagerCommands ${LIBS})
+
+add_dependencies(${PROJECT_NAME} LayerManagerCommands)
+
+install (TARGETS ${PROJECT_NAME} DESTINATION lib/layermanager/sceneprovider)
