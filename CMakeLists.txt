@@ -58,7 +58,7 @@ option (WITH_SERVICE_BIN    "Build LayerManagerService Binary"                  
 option (WITH_CLIENT_LIB     "Build LayerManagement Client Lib"                    ON)
 option (WITH_COMMUNICATOR_GEN "Build Generic Communicator Plugin"                 ON)
 
-option (WITH_SYSTEMD        "Build with native systemd integration"               OFF)
+option (WITH_PLUGIN_SYSTEMD_HEALTH_MONITOR "Build plugin for systemd health monitoring" OFF)
 
 option (WITH_TEXT_RENDERER  "Build renderer renderer (only logging)"              OFF)
 
@@ -159,6 +159,10 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-function")
 #set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
 #==============================================================================
 
+if (WITH_PLUGIN_SYSTEMD_HEALTH_MONITOR)
+    add_subdirectory (LayerManagerPlugins/HealthMonitor/SystemdHealthMonitor)
+endif(WITH_PLUGIN_SYSTEMD_HEALTH_MONITOR)
+
 if (WITH_COMMUNICATOR_GEN)
     add_subdirectory (LayerManagerCommands)
     add_subdirectory (LayerManagerPlugins/Communicators/GenericCommunicator)
@@ -217,5 +221,3 @@ endif (BUILD_UTILS_LIB)
 if (WITH_TESTS)
     enable_testing()
 endif(WITH_TESTS)
-
-

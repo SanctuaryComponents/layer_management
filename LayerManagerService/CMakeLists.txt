@@ -47,10 +47,6 @@ set(LIBS ${LIBS}
          ${CMAKE_THREAD_LIBS_INIT}
          ${DLT_LIBRARY}) 
 
-if (WITH_SYSTEMD)
-    set(LIBS ${LIBS} systemd rt)
-endif (WITH_SYSTEMD)
-
 target_link_libraries(LayerManagerService ${LIBS})
 
 install (TARGETS LayerManagerService DESTINATION bin)
@@ -80,7 +76,6 @@ add_executable(LayerManagerService_Test
     src/GraphicalSurface.cpp
     src/Layermanager.cpp
     src/InputManager.cpp
-    src/HealthSystemd.cpp
     src/PluginBase.cpp
     src/PluginManager.cpp
     src/Scene.cpp

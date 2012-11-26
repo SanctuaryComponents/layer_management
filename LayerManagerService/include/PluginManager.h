@@ -23,6 +23,7 @@
 #include "RendererList.h"
 #include "CommunicatorList.h"
 #include "SceneProviderList.h"
+#include "HealthMonitorList.h"
 
 class ICommandExecutor;
 class Configuration;
@@ -36,6 +37,7 @@ public:
     RendererList* getRendererList();
     CommunicatorList* getCommunicatorList();
     SceneProviderList* getSceneProviderList();
+    HealthMonitorList* getHealthMonitorList();
 
 private:
     void createAndStartAllPlugins();
@@ -47,6 +49,7 @@ private:
     RendererList mRendererList;
     CommunicatorList mCommunicatorList;
     SceneProviderList mSceneProviderList;
+    HealthMonitorList mHealthMonitorList;
 };
 
 #endif // __PLUGINMANAGER_H__

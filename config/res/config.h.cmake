@@ -93,8 +93,8 @@
 // build tcp/ip ipc module
 #cmakedefine WITH_IPC_MODULE_TCP
 
-// build with native systemd support
-#cmakedefine WITH_SYSTEMD
+// build plugin for systemd health monitoring
+#cmakedefine WITH_PLUGIN_SYSTEMD_HEALTH_MONITOR
 
 
 //-----------------------------------------------------------------------------
@@ -142,7 +142,7 @@ const BuildFlag gBuildFlags[] =
     { DEBUG_FLAG, "WITH_WAYLAND_X11      = ${WITH_WAYLAND_X11}" },
     { DEBUG_FLAG, "WITH_WL_EXAMPLE       = ${WITH_WL_EXAMPLE}" },
     { DEBUG_FLAG, "WITH_X11_GLES         = ${WITH_X11_GLES}" },
-    { DEBUG_FLAG, "WITH_SYSTEMD          = ${WITH_SYSTEMD}" }
+    { DEBUG_FLAG, "WITH_PLUGIN_SYSTEMD.. = ${WITH_PLUGIN_SYSTEMD_HEALTH_MONITOR}" }
 };
 
 const int gBuildFlagCount = sizeof(gBuildFlags) / sizeof(gBuildFlags[0]);

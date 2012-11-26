@@ -25,9 +25,9 @@ set (CMAKE_CXX_FLAGS "")
 include_directories (".")
 
 # build systemd reference client library
-if (WITH_SYSTEMD)
+if (WITH_SYSTEMD_HEALTH_MONITOR)
     add_library(systemd systemd/sd-daemon.c)
-endif (WITH_SYSTEMD)
+endif (WITH_SYSTEMD_HEALTH_MONITOR)
 
 # build unit test frameworks, if tests are enabled
 if (WITH_TESTS)

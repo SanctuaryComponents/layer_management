@@ -17,7 +17,7 @@
 *
 ****************************************************************************/
 
-#include "HealthSystemd.h"
+#include "SystemdHealthMonitor.h"
 #include "Configuration.h"
 #include "Log.h"
 #include "ICommandExecutor.h"
@@ -25,12 +25,10 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-#ifdef WITH_SYSTEMD
-
 #include <systemd/sd-daemon.h>
 
-HealthSystemd::HealthSystemd(ICommandExecutor& executor, Configuration& config)
-: IHealth(executor, config)
+SystemdHealthMonitor::SystemdHealthMonitor(ICommandExecutor* executor)
+: IHealthMonitor(executor)
 , mIntervalInMs(-1)
 {
     char* envVar = getenv("WATCHDOG_USEC");
@@ -38,17 +36,17 @@ HealthSystemd::HealthSystemd(ICommandExecutor& executor, Configuration& config)
     {
         // to ms, watchdog should trigger twice the frequency
         mIntervalInMs = atoi(envVar) / 2000;
-        LOG_INFO("HealthSystemd", "Watchdog interval is " << mIntervalInMs << "ms");
+        LOG_INFO("SystemdHealthMonitor", "Watchdog interval is " << mIntervalInMs << "ms");
     }
     else
     {
-        LOG_INFO("HealthSystemd", "Watchdog interval not defined, watchdog disabled");
+        LOG_INFO("SystemdHealthMonitor", "Watchdog interval not defined, watchdog disabled");
     }
 }
 
-t_ilm_bool HealthSystemd::start()
+t_ilm_bool SystemdHealthMonitor::start()
 {
-    LOG_INFO("HealthSystemd", "starting");
+    LOG_INFO("SystemdHealthMonitor", "starting");
     t_ilm_bool result = ILM_TRUE;
     if (watchdogEnabled())
     {
@@ -60,9 +58,9 @@ t_ilm_bool HealthSystemd::start()
     return result;
 }
 
-t_ilm_bool HealthSystemd::stop()
+t_ilm_bool SystemdHealthMonitor::stop()
 {
-    LOG_INFO("HealthSystemd", "stopping");
+    LOG_INFO("SystemdHealthMonitor", "stopping");
     t_ilm_bool result = ILM_TRUE;
     if (watchdogEnabled())
     {
@@ -71,26 +69,26 @@ t_ilm_bool HealthSystemd::stop()
     return result;
 }
 
-void HealthSystemd::reportStartupComplete()
+void SystemdHealthMonitor::reportStartupComplete()
 {
-    LOG_INFO("HealthSystemd", "reporting startup complete");
+    LOG_INFO("SystemdHealthMonitor", "reporting startup complete");
     sd_notify(0, "READY=1");
 }
 
-void HealthSystemd::signalWatchdog()
+void SystemdHealthMonitor::signalWatchdog()
 {
-    LOG_DEBUG("HealthSystemd", "Watchdog fired");
+    LOG_DEBUG("SystemdHealthMonitor", "Watchdog fired");
     sd_notify(0, "WATCHDOG=1");
 }
 
-bool HealthSystemd::watchdogEnabled()
+bool SystemdHealthMonitor::watchdogEnabled()
 {
     return (mIntervalInMs > 0);
 }
 
-t_ilm_bool HealthSystemd::threadMainLoop()
+t_ilm_bool SystemdHealthMonitor::threadMainLoop()
 {
-    if (watchdogEnabled() && mExecutor.getHealth())
+    if (watchdogEnabled() && mExecutor->getHealth())
     {
         signalWatchdog();
         usleep(mIntervalInMs * 1000);
@@ -98,4 +96,12 @@ t_ilm_bool HealthSystemd::threadMainLoop()
     return ILM_TRUE;
 }
 
-#endif // WITH_SYSTEMD
+extern "C" IHealthMonitor* createSystemdHealthMonitor(ICommandExecutor* executor)
+{
+    return new SystemdHealthMonitor(executor);
+}
+
+extern "C" void destroyGenericCommunicator(SystemdHealthMonitor* p)
+{
+    delete p;
+}

@@ -23,6 +23,7 @@
 #include "RendererList.h"
 #include "CommunicatorList.h"
 #include "SceneProviderList.h"
+#include "HealthMonitorList.h"
 #include "ApplicationReferenceMap.h"
 #include "LayerType.h"
 #include "ObjectType.h"
@@ -136,30 +137,55 @@ public:
     virtual void removeCommunicator(ICommunicator* communicator) = 0;
     
     // scene provider management
-
+    
     /**
      * \brief get list of scene provider plugins currently used
      * \ingroup ServiceAPI
      * \return Pointer to internal list of communicators
      */
     virtual SceneProviderList* getSceneProviderList(void) = 0;
-
+    
     /**
-     *
+     * 
      * \brief add a scene provider to be used for layer management
      * \ingroup ServiceAPI
      * \param[in] sceneProvider pointer to scene provider object
      */
     virtual void addSceneProvider(ISceneProvider* sceneProvider) = 0;
-
+    
     /**
-     *
+     * 
      * \brief remove scene provider from layer management
      * \ingroup ServiceAPI
      * \param[in] sceneProvider pointer to scene provider object
      */
     virtual void removeSceneProvider(ISceneProvider* sceneProvider) = 0;
-
+    
+    // health monitor management
+    
+    /**
+     * \brief get list of health monitor plugins currently used
+     * \ingroup ServiceAPI
+     * \return Pointer to internal list of health monitors
+     */
+    virtual HealthMonitorList* getHealthMonitorList(void) = 0;
+    
+    /**
+     * 
+     * \brief add a health monitor to be used for layer management
+     * \ingroup ServiceAPI
+     * \param[in] healthMonitor pointer to health monitor object
+     */
+    virtual void addHealthMonitor(IHealthMonitor* healthMonitor) = 0;
+    
+    /**
+     * 
+     * \brief remove health monitor from layer management
+     * \ingroup ServiceAPI
+     * \param[in] healthMonitor pointer to health monitor object
+     */
+    virtual void removeHealthMonitor(IHealthMonitor* healthMonitor) = 0;
+    
     // client application management
 
     /**

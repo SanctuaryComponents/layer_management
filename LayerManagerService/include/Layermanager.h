@@ -31,7 +31,7 @@ class IRenderer;
 class ICommunicator;
 class ISceneProvider;
 class IApplicationReference;
-class IHealth;
+class IHealthMonitor;
 class IPlugin;
 class Configuration;
 class PluginManager;
@@ -64,6 +64,9 @@ public:
     virtual void addSceneProvider(ISceneProvider* sceneProvider);
     virtual void removeSceneProvider(ISceneProvider* sceneProvider);
 
+    virtual void addHealthMonitor(IHealthMonitor* healthMonitor);
+    virtual void removeHealthMonitor(IHealthMonitor* healthMonitor);
+    
     virtual void addApplicationReference(t_ilm_client_handle client, IApplicationReference* reference);
     virtual void removeApplicationReference(t_ilm_client_handle client);
     virtual t_ilm_uint getSenderPid(t_ilm_client_handle client);
@@ -77,6 +80,7 @@ public:
     virtual RendererList* getRendererList(void);
     virtual CommunicatorList* getCommunicatorList(void);
     virtual SceneProviderList* getSceneProviderList(void);
+    virtual HealthMonitorList* getHealthMonitorList(void);
 
     virtual void addClientNotification(GraphicalObject* object, t_ilm_notification_mask mask);
     virtual NotificationQueue& getClientNotificationQueue();
@@ -90,7 +94,9 @@ private:
     void printDebugInformation() const;
     bool startAllRenderers(const int width, const int height, const char *displayName);
     bool startAllCommunicators();
+    bool startAllHealthMonitors();
     bool delegateScene();
+    void stopAllHealthMonitors();
     void stopAllRenderers();
     void stopAllCommunicators();
     bool executeCommand(ICommand* commandToBeExecuted);
@@ -101,11 +107,11 @@ private:
     RendererList* m_pRendererList;
     CommunicatorList* m_pCommunicatorList;
     SceneProviderList* m_pSceneProviderList;
+    HealthMonitorList* m_pHealthMonitorList;
     NotificationQueue m_clientNotificationQueue;
     ApplicationReferenceMap* m_pApplicationReferenceMap;
     PidToProcessNameTable m_pidToProcessNameTable;
     CommandListMap m_EnqueuedCommands;
-    IHealth* m_pHealth;
     pthread_t m_pWatchdogThread;
     bool mHealthState;
     PluginList mMonitoredPlugins;
@@ -131,6 +137,11 @@ inline CommunicatorList* Layermanager::getCommunicatorList(void)
 inline SceneProviderList* Layermanager::getSceneProviderList(void)
 {
     return m_pSceneProviderList;
+}
+
+inline HealthMonitorList* Layermanager::getHealthMonitorList(void)
+{
+    return m_pHealthMonitorList;
 }
 
 inline ApplicationReferenceMap* Layermanager::getApplicationReferenceMap(void)

@@ -17,33 +17,31 @@
 *
 ****************************************************************************/
 
-#ifndef __HEALTHSYSTEMD_H__
-#define __HEALTHSYSTEMD_H__
+#ifndef __IHEALTH_H__
+#define __IHEALTH_H__
 
-#include "IHealth.h"
-#include "ThreadBase.h"
+#include "ilm_types.h"
 
-class HealthSystemd : public IHealth, protected ThreadBase
+class ICommandExecutor;
+class Configuration;
+
+class IHealthMonitor
 {
 public:
-    HealthSystemd(ICommandExecutor& executor, Configuration& config);
+    IHealthMonitor(ICommandExecutor* executor);
+    virtual ~IHealthMonitor() {};
 
-    // from IHealth
-    virtual t_ilm_bool start();
-    virtual t_ilm_bool stop();
+    virtual t_ilm_bool start() = 0;
+    virtual t_ilm_bool stop() = 0;
 
-private:
-    void reportStartupComplete();
-    void reportProcessId();
-    int getWatchdogIntervalInMs();
-    void signalWatchdog();
-    bool watchdogEnabled();
-
-    // from ThreadBase
-    virtual t_ilm_bool threadMainLoop();
-    
-private:
-    int mIntervalInMs;
+protected:
+    ICommandExecutor* mExecutor;
 };
 
-#endif // __HEALTHSYSTEMD_H__
+inline
+IHealthMonitor::IHealthMonitor(ICommandExecutor* executor)
+: mExecutor(executor)
+{
+}
+
+#endif // __IHEALTH_H__

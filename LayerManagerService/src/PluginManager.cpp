@@ -57,6 +57,10 @@ const char* gScenePluginDirectories[] = { "" };
 
 uint gScenePluginDirectoriesCount = sizeof(gScenePluginDirectories) / sizeof(gScenePluginDirectories[0]);
 
+const char* gHealthPluginDirectories[] = { "/health" };
+
+uint gHealthPluginDirectoriesCount = sizeof(gHealthPluginDirectories) / sizeof(gHealthPluginDirectories[0]);
+
 //===========================================================================
 // global functions for loading plugins
 //===========================================================================
@@ -165,6 +169,53 @@ void getSharedLibrariesFromDirectory(tFileList& fileList, string dirName)
     
     closedir(directory);
 }
+
+void loadHealthPlugins(HealthMonitorList& healthMonitorList, ICommandExecutor* executor)
+{
+    tFileList sharedLibraryNameList;
+    
+    // search sceneprovider plugins in configured directories
+    for (uint dirIndex = 0; dirIndex < gScenePluginDirectoriesCount; ++dirIndex)
+    {
+        char directoryName[1024];
+        strncpy(directoryName, gPluginLookupPath, sizeof(directoryName) - 1);
+        strncat(directoryName, gHealthPluginDirectories[dirIndex], sizeof(directoryName) - 1 - strlen(directoryName));
+        LOG_DEBUG("LayerManagerService", "Searching for HealthMonitors in: " << directoryName);
+        getSharedLibrariesFromDirectory(sharedLibraryNameList, directoryName);
+    }
+    
+    LOG_DEBUG("LayerManagerService", sharedLibraryNameList.size() << " HealthMonitor plugins found");
+    
+    // iterate all communicator plugins and start them
+    tFileListIterator iter = sharedLibraryNameList.begin();
+    tFileListIterator iterEnd = sharedLibraryNameList.end();
+    
+    for (; iter != iterEnd; ++iter)
+    {
+        LOG_INFO("LayerManagerService", "Loading HealthMonitor plugin " << *iter);
+        
+        IHealthMonitor* (*createFunc)(ICommandExecutor* executor);
+        createFunc = getCreateFunction<IHealthMonitor*(ICommandExecutor* executor)>(*iter);
+        
+        if (!createFunc)
+        {
+            LOG_DEBUG("LayerManagerService", "Entry point of HealthMonitor not found");
+            continue;
+        }
+        
+        LOG_DEBUG("LayerManagerService", "Creating HealthMonitor instance");
+        IHealthMonitor* newHealthMonitor = createFunc(executor);
+        
+        if (!newHealthMonitor)
+        {
+            LOG_ERROR("LayerManagerService","HealthMonitor initialization failed. Entry Function not callable");
+            continue;
+        }
+        
+        healthMonitorList.push_back(newHealthMonitor);
+    }
+}
+
 
 void loadScenePlugins(SceneProviderList& sceneProviderList, ICommandExecutor* executor)
 {
@@ -343,22 +394,28 @@ SceneProviderList* PluginManager::getSceneProviderList()
     return &mSceneProviderList;
 }
 
+HealthMonitorList* PluginManager::getHealthMonitorList()
+{
+    return &mHealthMonitorList;
+}
+
 void PluginManager::createAndStartAllPlugins()
 {
     gPluginLookupPath = mConfiguration.getPluginPath().c_str();
     
     LOG_INFO("LayerManagerService", "Used plugin directory is " << gPluginLookupPath);
     
-    // Create and load Renderer plugins
     LOG_DEBUG("LayerManagerService", "Loading renderer plugins.");
     loadRendererPlugins(mRendererList, mExecutor.getScene());
     
-    // Create and load communicator plugins
     LOG_DEBUG("LayerManagerService", "Loading communicator plugins.");
     loadCommunicatorPlugins(mCommunicatorList, &mExecutor);
     
     LOG_DEBUG("LayerManagerService", "Loading scene provider plugins.");
     loadScenePlugins(mSceneProviderList, &mExecutor);
+
+    LOG_DEBUG("LayerManagerService", "Loading health monitor plugins.");
+    loadHealthPlugins(mHealthMonitorList, &mExecutor);
 }
 
 void PluginManager::stopAndDestroyAllPlugins()

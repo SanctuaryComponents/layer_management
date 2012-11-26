@@ -23,7 +23,7 @@
 #include "CommandList.h"
 #include "LayerList.h"
 #include "ICommand.h"
-#include "IHealth.h"
+#include "IHealthMonitor.h"
 #include "ICommunicator.h"
 #include "IRenderer.h"
 #include "ISceneProvider.h"
@@ -35,37 +35,24 @@
 #include <pthread.h>
 #include <signal.h>
 
-#ifdef WITH_SYSTEMD
-    #include "HealthSystemd.h"
-#endif
-
 static const char* NO_SENDER_NAME = "unknown";
 
 Layermanager::Layermanager(Configuration& config)
-: m_pHealth(NULL)
-, mConfiguration(config)
+:mConfiguration(config)
 {
     m_pScene = new Scene();
     m_pPluginManager = new PluginManager(*this, mConfiguration);
     m_pApplicationReferenceMap = new ApplicationReferenceMap();
 
-#ifdef WITH_SYSTEMD
-    m_pHealth = new HealthSystemd(*this, mConfiguration);
-#endif
-
     m_pRendererList = m_pPluginManager->getRendererList();
     m_pCommunicatorList = m_pPluginManager->getCommunicatorList();
     m_pSceneProviderList = m_pPluginManager->getSceneProviderList();
+    m_pHealthMonitorList = m_pPluginManager->getHealthMonitorList();
     mHealthState = true;
 }
 
 Layermanager::~Layermanager()
 {
-    if (m_pHealth)
-    {
-        delete m_pHealth;
-    }
-
     if (m_pApplicationReferenceMap)
     {
         delete m_pApplicationReferenceMap;
@@ -179,7 +166,6 @@ void Layermanager::addSceneProvider(ISceneProvider* sceneProvider)
     {
         m_pSceneProviderList->push_back(sceneProvider);
     }
-
 }
 
 void Layermanager::removeSceneProvider(ISceneProvider* sceneProvider)
@@ -189,6 +175,23 @@ void Layermanager::removeSceneProvider(ISceneProvider* sceneProvider)
         m_pSceneProviderList->remove(sceneProvider);
     }
 }
+
+void Layermanager::addHealthMonitor(IHealthMonitor* healthMonitor)
+{
+    if (healthMonitor)
+    {
+        m_pHealthMonitorList->push_back(healthMonitor);
+    }
+}
+
+void Layermanager::removeHealthMonitor(IHealthMonitor* healthMonitor)
+{
+    if (healthMonitor)
+    {
+        m_pHealthMonitorList->remove(healthMonitor);
+    }
+}
+
 void Layermanager::addApplicationReference(t_ilm_client_handle client, IApplicationReference* reference)
 {
     if (client && reference)
@@ -421,10 +424,10 @@ bool Layermanager::delegateScene()
 bool Layermanager::startAllCommunicators()
 {
     bool allStarted = true;
-
+    
     CommunicatorListIterator communicatorIter = m_pCommunicatorList->begin();
     CommunicatorListIterator communicatorIterEnd = m_pCommunicatorList->end();
-
+    
     for (; communicatorIter != communicatorIterEnd; ++communicatorIter)
     {
         ICommunicator *communicator = *communicatorIter;
@@ -444,6 +447,32 @@ bool Layermanager::startAllCommunicators()
     return allStarted;
 }
 
+bool Layermanager::startAllHealthMonitors()
+{
+    bool allStarted = true;
+    
+    HealthMonitorListIterator iter = m_pHealthMonitorList->begin();
+    HealthMonitorListIterator iterEnd = m_pHealthMonitorList->end();
+    
+    for (; iter != iterEnd; ++iter)
+    {
+        IHealthMonitor* healthMonitor = *iter;
+        if (healthMonitor)
+        {
+            allStarted &= healthMonitor->start();
+        }
+        else
+        {
+            allStarted = false;
+        }
+    }
+    if (!allStarted)
+    {
+        LOG_ERROR("LayerManagerService","Could not start Health Monitors");
+    }
+    return allStarted;
+}
+
 bool Layermanager::startManagement()
 {
     bool result = false;
@@ -457,13 +486,24 @@ bool Layermanager::startManagement()
     // 3. start communication (after scene is ready to use)
     result = startAllRenderers(width, height, displayName)
              && delegateScene()
-             && startAllCommunicators();
-
-#ifdef WITH_SYSTEMD
-    result &= m_pHealth->start();
-#endif
+             && startAllCommunicators()
+             && startAllHealthMonitors();
 
     return result;
+}
+
+void Layermanager::stopAllHealthMonitors()
+{
+    HealthMonitorListIterator iter = m_pHealthMonitorList->begin();
+    HealthMonitorListIterator iterEnd = m_pHealthMonitorList->end();
+    for (; iter != iterEnd; ++iter)
+    {
+        IHealthMonitor* healthMonitor = *iter;
+        if (healthMonitor)
+        {
+            healthMonitor->stop();
+        }
+    }
 }
 
 void Layermanager::stopAllRenderers()
@@ -496,9 +536,7 @@ void Layermanager::stopAllCommunicators()
 
 bool Layermanager::stopManagement()
 {
-#ifdef WITH_SYSTEMD
-    m_pHealth->stop();
-#endif
+    stopAllHealthMonitors();
     stopAllRenderers();
     stopAllCommunicators();
     return true; // TODO
