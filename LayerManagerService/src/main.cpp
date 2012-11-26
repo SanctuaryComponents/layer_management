@@ -28,6 +28,8 @@
 #include "Scene.h"
 #include "Log.h"
 
+#include <unistd.h> // todo: remove
+
 int main(int argc, char **argv)
 {
     // collect all configuration settings
@@ -53,12 +55,7 @@ int main(int argc, char **argv)
 
             while (!signalHandler.shutdownSignalReceived())
             {
-                CommunicatorListIterator commIter = layermanager.getCommunicatorList()->begin();
-                CommunicatorListIterator commIterEnd = layermanager.getCommunicatorList()->end();
-                for (; commIter != commIterEnd; ++commIter)
-                {
-                    (*commIter)->process(-1);
-                }
+                sleep(1);
             }
             LOG_DEBUG("LayerManagerService", "Stopping service.");
             layermanager.stopManagement();

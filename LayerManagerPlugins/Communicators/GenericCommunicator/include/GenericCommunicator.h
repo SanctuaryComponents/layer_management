@@ -28,6 +28,7 @@
 #include "Log.h"
 #include "IpcModuleLoader.h"
 #include "ObjectType.h"
+#include "ThreadBase.h"
 #include <map>
 #include <list>
 #include <string>
@@ -51,16 +52,21 @@ typedef std::map<std::string,MethodTable> CallBackTable;
 //=============================================================================
 // interface
 //=============================================================================
-class GenericCommunicator: public ICommunicator
+class GenericCommunicator: public ICommunicator, protected ThreadBase
 {
 public:
     GenericCommunicator(ICommandExecutor* executor);
     virtual ~GenericCommunicator() {}
+
+    // from ICommunicator
     virtual bool start();
     virtual void stop();
     virtual void process(int timeout_ms);
     virtual void setdebug(bool onoff);
 
+    // from ThreadBase
+    virtual t_ilm_bool threadMainLoop();
+    
 private:
     void ServiceConnect(t_ilm_message message);
     void ServiceDisconnect(t_ilm_message message);

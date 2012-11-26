@@ -243,6 +243,10 @@ bool GenericCommunicator::start()
     m_running = ILM_TRUE;
     setHealth(HealthRunning);
 
+    threadCreate();
+    threadInit();
+    threadStart();
+
     return ILM_TRUE;
 }
 
@@ -250,6 +254,8 @@ void GenericCommunicator::stop()
 {
     LOG_INFO("GenericCommunicator","stopping");
 
+    threadStop();
+    
     if (m_running)
     {
         m_ipcModule.destroy();
@@ -340,6 +346,12 @@ void GenericCommunicator::process(int timeout_ms)
 void GenericCommunicator::setdebug(bool onoff)
 {
     (void)onoff; // TODO: remove, only prevents warning
+}
+
+t_ilm_bool GenericCommunicator::threadMainLoop()
+{
+    process(-1);
+    return ILM_TRUE;
 }
 
 void GenericCommunicator::ServiceConnect(t_ilm_message message)
