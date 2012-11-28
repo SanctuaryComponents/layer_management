@@ -19,40 +19,56 @@
 
 cmake_minimum_required (VERSION 2.6)
 
+project(GenericCommunicator)
+
 find_package(Threads)
 
 include_directories(
     "include"
     "${CMAKE_SOURCE_DIR}/LayerManagerClient/ilmClient/include"
-    "${PROJECT_SOURCE_DIR}/LayerManagerService/include"
-    "${PROJECT_SOURCE_DIR}/LayerManagerUtils/include"
-    "${PROJECT_SOURCE_DIR}/LayerManagerCommands/include"
-    "${PROJECT_SOURCE_DIR}/LayerManagerPlugins/IpcModules/IpcModuleLoader/include"
+    "${CMAKE_SOURCE_DIR}/LayerManagerService/include"
+    "${CMAKE_SOURCE_DIR}/LayerManagerUtils/include"
+    "${CMAKE_SOURCE_DIR}/LayerManagerCommands/include"
+    "${CMAKE_SOURCE_DIR}/LayerManagerPlugins/IpcModules/IpcModuleLoader/include"
 )
 
 set(LIBS
     ${LIBS}
     IpcModuleLoader
     LayerManagerCommands
-    ${CMAKE_THREAD_LIBS_INIT}
 )
 
-add_library(GenericCommunicator SHARED
+set(SRC_FILES
     src/GenericCommunicator.cpp
 )
 
-target_link_libraries(GenericCommunicator
+
+if (WITH_STATIC_PLUGINS)
+
+    add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
+    set (STATICALLY_LINKED_PLUGINS ${STATICALLY_LINKED_PLUGINS}
+        ${PROJECT_NAME} CACHE INTERNAL "list of static plugins")
+
+else(WITH_STATIC_PLUGINS)
+
+    add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
+
+endif(WITH_STATIC_PLUGINS)
+
+target_link_libraries(${PROJECT_NAME}
     ${LIBS}
 )
 
-add_dependencies(GenericCommunicator
-    LayerManagerService
+add_dependencies(${PROJECT_NAME}
     LayerManagerUtils
     LayerManagerCommands
     IpcModuleLoader
 )
 
-install (TARGETS GenericCommunicator LIBRARY DESTINATION lib/layermanager/communicator)
+install (TARGETS ${PROJECT_NAME}
+         LIBRARY DESTINATION lib/layermanager/communicator
+         ARCHIVE DESTINATION lib/layermanager/static
+)
 
 if (WITH_TESTS)
     enable_testing()

@@ -25,6 +25,7 @@
  */
 
 #include "ICommunicator.h"
+#include "PluginBase.h"
 #include "Log.h"
 #include "IpcModuleLoader.h"
 #include "ObjectType.h"
@@ -35,6 +36,8 @@
 
 class GenericCommunicator;
 class GraphicalObject;
+class ICommandExecutor;
+class Configuration;
 
 //=============================================================================
 // internal types
@@ -52,10 +55,10 @@ typedef std::map<std::string,MethodTable> CallBackTable;
 //=============================================================================
 // interface
 //=============================================================================
-class GenericCommunicator: public ICommunicator, protected ThreadBase
+class GenericCommunicator: public ICommunicator, protected ThreadBase, public PluginBase
 {
 public:
-    GenericCommunicator(ICommandExecutor* executor);
+    GenericCommunicator(ICommandExecutor& executor, Configuration& config);
     virtual ~GenericCommunicator() {}
 
     // from ICommunicator
@@ -67,6 +70,10 @@ public:
     // from ThreadBase
     virtual t_ilm_bool threadMainLoop();
     
+    // from PluginBase
+    virtual t_ilm_const_string pluginGetName() const;
+    virtual HealthCondition pluginGetHealth();
+
 private:
     void ServiceConnect(t_ilm_message message);
     void ServiceDisconnect(t_ilm_message message);
@@ -167,8 +174,6 @@ private:
     void SurfaceRemoveNotification(t_ilm_message message);
     void SetOptimizationMode(t_ilm_message message);
     void GetOptimizationMode(t_ilm_message message);
-
-    virtual HealthCondition getHealth();
 
 private:
     void RemoveApplicationReference(char* owner);

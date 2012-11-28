@@ -20,6 +20,7 @@
 #include "GenericCommunicator.h"
 #include "ilm_types.h"
 #include "Log.h"
+#include "Configuration.h"
 
 #include "ICommandExecutor.h"
 #include "CommitCommand.h"
@@ -103,8 +104,9 @@ const char* RESOURCE_NOT_FOUND = "Ressource not found";
 const char* NOT_IMPLEMENTED = "Feature not implemented";
 
 
-GenericCommunicator::GenericCommunicator(ICommandExecutor* executor)
-: ICommunicator(executor)
+GenericCommunicator::GenericCommunicator(ICommandExecutor& executor, Configuration& config)
+: ICommunicator(&executor)
+, PluginBase(executor, config, Communicator_Api_v1)
 , m_running(ILM_FALSE)
 {
     MethodTable manager_methods[] =
@@ -241,7 +243,7 @@ bool GenericCommunicator::start()
     LOG_DEBUG("GenericCommunicator", "Initializing IpcModule success.");
 
     m_running = ILM_TRUE;
-    setHealth(HealthRunning);
+    pluginSetHealth(HealthRunning);
 
     threadCreate();
     threadInit();
@@ -260,7 +262,7 @@ void GenericCommunicator::stop()
     {
         m_ipcModule.destroy();
     }
-    setHealth(HealthStopped);
+    pluginSetHealth(HealthStopped);
 }
 
 void GenericCommunicator::process(int timeout_ms)
@@ -352,6 +354,11 @@ t_ilm_bool GenericCommunicator::threadMainLoop()
 {
     process(-1);
     return ILM_TRUE;
+}
+
+t_ilm_const_string GenericCommunicator::pluginGetName() const
+{
+    return "GenericCommunicator";
 }
 
 void GenericCommunicator::ServiceConnect(t_ilm_message message)
@@ -2957,9 +2964,9 @@ void GenericCommunicator::sendNotification(GraphicalObject* object, t_ilm_notifi
     }
 }
 
-HealthCondition GenericCommunicator::getHealth()
+HealthCondition GenericCommunicator::pluginGetHealth()
 {
-    HealthCondition health = PluginBase::getHealth();
+    HealthCondition health = PluginBase::pluginGetHealth();
     if (0 != pthread_kill(mThreadId, 0))
     {
         health = HealthDead;
@@ -3024,13 +3031,4 @@ void GenericCommunicator::GetOptimizationMode(t_ilm_message message)
 
 }
 
-extern "C" ICommunicator* createGenericCommunicator(ICommandExecutor* executor)
-{
-    return new GenericCommunicator(executor);
-}
-
-extern "C" void destroyGenericCommunicator(GenericCommunicator* p)
-{
-    delete p;
-}
-
+DECLARE_LAYERMANAGEMENT_PLUGIN(GenericCommunicator)

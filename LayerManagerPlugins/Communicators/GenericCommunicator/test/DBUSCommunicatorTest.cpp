@@ -145,7 +145,8 @@ public:
         } else {
             DBUSCOMMAND = DBUSCOMMAND_SYSTEM;
         }
-        communicatorUnderTest = new GenericCommunicator(&mockCommandExecutor);
+        Configuration config(0, NULL);
+        communicatorUnderTest = new GenericCommunicator(mockCommandExecutor, config);
         this->communicatorUnderTest->start();
        
         DefaultValue<ApplicationReferenceMap*>::Set((ApplicationReferenceMap*) &this->refmap);

@@ -20,15 +20,13 @@
 #ifndef _ICOMMUNICATOR_H_
 #define _ICOMMUNICATOR_H_
 
-#include "PluginBase.h"
-
 class ICommandExecutor;
 
 /**
  * Abstract Base of all Communicator plugins.
  * \defgroup CommunicatorAPI Layer Management Communicator API
  */
-class ICommunicator : public PluginBase
+class ICommunicator
 {
 public:
     /**
