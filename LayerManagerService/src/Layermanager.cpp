@@ -44,15 +44,41 @@ Layermanager::Layermanager(Configuration& config)
     m_pPluginManager = new PluginManager(*this, mConfiguration);
     m_pApplicationReferenceMap = new ApplicationReferenceMap();
 
-    m_pRendererList = m_pPluginManager->getRendererList();
-    m_pCommunicatorList = m_pPluginManager->getCommunicatorList();
-    m_pSceneProviderList = m_pPluginManager->getSceneProviderList();
-    m_pHealthMonitorList = m_pPluginManager->getHealthMonitorList();
+    m_pRendererList = new RendererList();
+    m_pCommunicatorList = new CommunicatorList();
+    m_pSceneProviderList = new SceneProviderList();
+    m_pHealthMonitorList = new HealthMonitorList();
+
+    m_pPluginManager->getRendererList(*m_pRendererList);
+    m_pPluginManager->getCommunicatorList(*m_pCommunicatorList);
+    m_pPluginManager->getSceneProviderList(*m_pSceneProviderList);
+    m_pPluginManager->getHealthMonitorList(*m_pHealthMonitorList);
+
     mHealthState = true;
 }
 
 Layermanager::~Layermanager()
 {
+    if (m_pRendererList)
+    {
+        delete m_pRendererList;
+    }
+
+    if (m_pCommunicatorList)
+    {
+        delete m_pCommunicatorList;
+    }
+
+    if (m_pSceneProviderList)
+    {
+        delete m_pSceneProviderList;
+    }
+
+    if (m_pHealthMonitorList)
+    {
+        delete m_pHealthMonitorList;
+    }
+
     if (m_pApplicationReferenceMap)
     {
         delete m_pApplicationReferenceMap;

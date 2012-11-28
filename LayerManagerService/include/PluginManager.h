@@ -16,17 +16,23 @@
  * limitations under the License.
  *
  ****************************************************************************/
+
 #ifndef __PLUGINMANAGER_H__
 #define __PLUGINMANAGER_H__
 
-#include "ilm_types.h"
+#include "PluginList.h"
 #include "RendererList.h"
+#include "HealthMonitorList.h"
 #include "CommunicatorList.h"
 #include "SceneProviderList.h"
-#include "HealthMonitorList.h"
+#include "FileList.h"
 
 class ICommandExecutor;
 class Configuration;
+
+typedef IPlugin*(*StaticPluginCreateFunc)(ICommandExecutor&, Configuration&);
+typedef std::list<StaticPluginCreateFunc> StaticPluginCreateFuncList;
+
 
 class PluginManager
 {
@@ -34,22 +40,25 @@ public:
     PluginManager(ICommandExecutor& executor, Configuration& config);
     ~PluginManager();
     
-    RendererList* getRendererList();
-    CommunicatorList* getCommunicatorList();
-    SceneProviderList* getSceneProviderList();
-    HealthMonitorList* getHealthMonitorList();
-
+    void getRendererList(RendererList& list);
+    void getHealthMonitorList(HealthMonitorList& list);
+    void getSceneProviderList(SceneProviderList& list);
+    void getCommunicatorList(CommunicatorList& list);
+    
+    static bool registerStaticPluginCreateFunction(StaticPluginCreateFunc func);
+    
 private:
-    void createAndStartAllPlugins();
-    void stopAndDestroyAllPlugins();
+    void createStaticallyLinkedPlugins();
+    void getAllFilesInPluginPath(std::string path);
+    void createDynamicallyLinkedPlugins();
+    IPlugin* createDynamicallyLinkedPlugin(std::string path);
     
 private:
     ICommandExecutor& mExecutor;
     Configuration& mConfiguration;
-    RendererList mRendererList;
-    CommunicatorList mCommunicatorList;
-    SceneProviderList mSceneProviderList;
-    HealthMonitorList mHealthMonitorList;
+    FileList mFileList;
+    PluginList mPluginList;
+    static StaticPluginCreateFuncList mStaticPluginCreateFuncList;
 };
 
 #endif // __PLUGINMANAGER_H__
