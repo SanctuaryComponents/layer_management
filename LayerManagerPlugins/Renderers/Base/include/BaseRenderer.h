@@ -20,15 +20,16 @@
 #ifndef _BASERENDERER_H_
 #define _BASERENDERER_H_
 
+#include "PluginBase.h"
 #include "LayerType.h"
 #include "Scene.h"
 #include "IRenderer.h"
 #include "WindowSystems/BaseWindowSystem.h"
 
-class BaseRenderer: public IRenderer
+class BaseRenderer: public IRenderer, public PluginBase
 {
 public:
-    BaseRenderer(Scene* pScene);
+    BaseRenderer(ICommandExecutor& executor, Configuration& config);
     virtual ~BaseRenderer();
 
     bool start(int, int, const char*) = 0;

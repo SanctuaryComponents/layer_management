@@ -29,7 +29,7 @@
 class X11GLESRenderer : public BaseRenderer
 {
 public:
-    X11GLESRenderer(Scene* pScene);
+    X11GLESRenderer(ICommandExecutor& executor, Configuration& config);
     bool start(int, int, const char*);
     void stop();
     void doScreenShot(std::string fileToSave);
@@ -41,9 +41,12 @@ public:
     void signalWindowSystemRedraw();
     void forceCompositionWindowSystem();
     Shader* createShader(const string* vertexName, const string* fragmentName);
-    virtual HealthCondition getHealth();
     virtual bool setOptimizationMode(OptimizationType id, OptimizationModeType mode);
     virtual bool getOptimizationMode(OptimizationType id, OptimizationModeType *mode);
+
+    // from PluginBase
+    virtual HealthCondition pluginGetHealth();
+    virtual t_ilm_const_string pluginGetName() const;
 
 private:
     X11WindowSystem* m_pWindowSystem;

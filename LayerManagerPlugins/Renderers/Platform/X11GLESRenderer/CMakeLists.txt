@@ -21,19 +21,31 @@
 
 cmake_minimum_required (VERSION 2.6)
 
+project(X11GLESRenderer)
+
 include_directories ("include")
 include_directories ("../../Base/include")
 include_directories ("../../Graphic/include")
-include_directories ("${PROJECT_SOURCE_DIR}/config")
-include_directories ("${PROJECT_SOURCE_DIR}/LayerManagerService/include")
-include_directories ("${PROJECT_SOURCE_DIR}/LayerManagerUtils/include")
+include_directories ("${CMAKE_SOURCE_DIR}/config")
+include_directories ("${CMAKE_SOURCE_DIR}/LayerManagerService/include")
+include_directories ("${CMAKE_SOURCE_DIR}/LayerManagerUtils/include")
 
-file(GLOB SOURCES 
-		src/X11GLESRenderer.cpp
-        src/ShaderProgramGLES.cpp 
-		)
-		
-add_library(X11GLESRenderer SHARED ${SOURCES})
+set(SRC_FILES
+    src/X11GLESRenderer.cpp
+    src/ShaderProgramGLES.cpp
+)
+
+if (WITH_STATIC_PLUGINS)
+
+    add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
+    set (STATICALLY_LINKED_PLUGINS ${STATICALLY_LINKED_PLUGINS}
+        ${PROJECT_NAME} CACHE INTERNAL "list of static plugins")
+
+else(WITH_STATIC_PLUGINS)
+
+    add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
+
+endif(WITH_STATIC_PLUGINS)
 
 find_package(X11 REQUIRED)
 include_directories(${X11_INCLUDE_DIR})
@@ -46,13 +58,15 @@ include_directories(${GLESv2_INCLUDE_DIR})
 
 find_package (Threads)
 set(LIBS ${LIBS} ${CMAKE_THREAD_LIBS_INIT} ${EGL_LIBRARY} ${GLESv2_LIBRARIES} ${X11_Xcomposite_LIB} ${X11_Xdamage_LIB} LayerManagerGraphicGLESv2 LayerManagerUtils )
-target_link_libraries(X11GLESRenderer ${LIBS})
+target_link_libraries(${PROJECT_NAME} ${LIBS})
 
-add_dependencies(X11GLESRenderer LayerManagerService)
-add_dependencies(X11GLESRenderer LayerManagerUtils)
-add_dependencies(X11GLESRenderer LayerManagerGraphicGLESv2)
+add_dependencies(${PROJECT_NAME} LayerManagerUtils)
+add_dependencies(${PROJECT_NAME} LayerManagerGraphicGLESv2)
 
-install (TARGETS X11GLESRenderer DESTINATION lib/layermanager/renderer)
+install (TARGETS ${PROJECT_NAME}
+         LIBRARY DESTINATION lib/layermanager/renderer
+         ARCHIVE DESTINATION lib/layermanager/static
+)
 install (FILES renderer_frag_clear.glslf DESTINATION lib/layermanager/renderer)
 install (FILES renderer_frag.glslf DESTINATION lib/layermanager/renderer)
 install (FILES renderer_frag_no_blend.glslf DESTINATION lib/layermanager/renderer)

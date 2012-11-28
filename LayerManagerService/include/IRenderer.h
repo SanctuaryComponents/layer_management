@@ -21,7 +21,6 @@
 #define _IRENDERER_H_
 
 #include <string>
-#include "PluginBase.h"
 #include "LayerType.h"
 #include "Shader.h"
 #include "OptimizationType.h"
@@ -34,7 +33,7 @@ class InputManager;
  * Abstract Base of all CompositingControllers, ie Renderers.
  * \defgroup RendererAPI Layer Management Renderer API
  */
-class IRenderer : public PluginBase
+class IRenderer
 {
 public:
     /**

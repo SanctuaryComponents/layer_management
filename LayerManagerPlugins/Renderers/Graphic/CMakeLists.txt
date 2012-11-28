@@ -74,7 +74,6 @@ if (WITH_GLESv2_LIB)
     target_link_libraries(${GRAPHIC_LIB_NAME} ${LIBS})
     
     add_dependencies(${GRAPHIC_LIB_NAME}
-        LayerManagerService
         LayerManagerUtils
     )
 

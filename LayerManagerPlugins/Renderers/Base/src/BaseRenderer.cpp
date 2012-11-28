@@ -24,11 +24,13 @@
 
 bool BaseRenderer::debugMode = true;
 
-BaseRenderer::BaseRenderer(Scene* pScene) : m_pScene(pScene)
+BaseRenderer::BaseRenderer(ICommandExecutor& executor, Configuration& config)
+: PluginBase(executor, config, Renderer_Api_v1)
+, m_pScene(executor.getScene())
 {
     LOG_DEBUG("BaseRenderer", "Creating Renderer");
-    m_pInputManager = new InputManager(pScene);
-    setHealth(HealthRunning);
+    m_pInputManager = new InputManager(m_pScene);
+    pluginSetHealth(HealthRunning);
 }
 
 BaseRenderer::~BaseRenderer()
@@ -37,7 +39,7 @@ BaseRenderer::~BaseRenderer()
     {
         delete m_pInputManager;
     }
-    setHealth(HealthStopped);
+    pluginSetHealth(HealthStopped);
 }
 
 uint BaseRenderer::getLayerTypeCapabilities(LayerType layerType)

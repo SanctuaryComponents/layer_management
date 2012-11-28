@@ -18,7 +18,7 @@
 ****************************************************************************/
 
 #include "X11GLESRenderer.h"
-#include "config.h"
+#include "Configuration.h"
 #include "Shader.h"
 #include "ShaderProgramGLES.h"
 #include "X11/Xlib.h"
@@ -27,8 +27,8 @@
 #include <pthread.h>
 #include <signal.h>
 
-X11GLESRenderer::X11GLESRenderer(Scene* pScene)
-: BaseRenderer(pScene)
+X11GLESRenderer::X11GLESRenderer(ICommandExecutor& executor, Configuration& config)
+: BaseRenderer(executor, config)
 , m_pWindowSystem(0)
 , m_pGraphicSystem(0)
 , m_width(0)
@@ -179,6 +179,11 @@ bool X11GLESRenderer::getOptimizationMode(OptimizationType id, OptimizationModeT
     return m_pGraphicSystem->getOptimizationMode(id, mode);
 }
 
+t_ilm_const_string X11GLESRenderer::pluginGetName() const
+{
+    return "X11GLESRenderer";
+}
+
 Shader* X11GLESRenderer::createShader(const string* vertexName, const string* fragmentName)
 {
     Shader *result = NULL;
@@ -194,9 +199,9 @@ Shader* X11GLESRenderer::createShader(const string* vertexName, const string* fr
     return result;
 }
 
-HealthCondition X11GLESRenderer::getHealth()
+HealthCondition X11GLESRenderer::pluginGetHealth()
 {
-    HealthCondition health = PluginBase::getHealth();
+    HealthCondition health = PluginBase::pluginGetHealth();
     if (0 != pthread_kill(m_pWindowSystem->mThreadId, 0))
     {
         health = HealthDead;
@@ -204,11 +209,4 @@ HealthCondition X11GLESRenderer::getHealth()
     return health;
 }
 
-extern "C" BaseRenderer* createX11GLESRenderer(Scene* pScene){
-    return new X11GLESRenderer(pScene);
-}
-
-extern "C" void destroyX11GLESRenderer(X11GLESRenderer* p)
-{
-    delete p;
-}
+DECLARE_LAYERMANAGEMENT_PLUGIN(X11GLESRenderer)
