@@ -27,12 +27,27 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/LayerManagerService/include
 )
 
-add_library(${PROJECT_NAME} SHARED
+set(SRC_FILES
     src/ExampleSceneProvider.cpp
 )
+
+if (WITH_STATIC_PLUGINS)
+
+    add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
+    set (STATICALLY_LINKED_PLUGINS ${STATICALLY_LINKED_PLUGINS}
+        ${PROJECT_NAME} CACHE INTERNAL "list of static plugins")
+
+else(WITH_STATIC_PLUGINS)
+
+    add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
+
+endif(WITH_STATIC_PLUGINS)
 
 target_link_libraries(${PROJECT_NAME} LayerManagerCommands ${LIBS})
 
 add_dependencies(${PROJECT_NAME} LayerManagerCommands)
 
-install (TARGETS ${PROJECT_NAME} DESTINATION lib/layermanager/sceneprovider)
+install (TARGETS ${PROJECT_NAME}
+         LIBRARY DESTINATION lib/layermanager/sceneprovider
+         ARCHIVE DESTINATION lib/layermanager/static
+)

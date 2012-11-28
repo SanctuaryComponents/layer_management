@@ -21,24 +21,30 @@
 #define _LAYERSCENE_PROVIDER_H_
 
 #include "ISceneProvider.h"
+#include "PluginBase.h"
 
 class ICommandExecutor;
+class Configuration;
 
 /**
  * scene Providers to setup a inital layer scenary on target platform
  */
-class ExampleSceneProvider : public ISceneProvider
+class ExampleSceneProvider : public ISceneProvider, public PluginBase
 {
 public:
     
-    ExampleSceneProvider(ICommandExecutor* executor);
+    ExampleSceneProvider(ICommandExecutor& executor, Configuration& config);
     virtual ~ExampleSceneProvider() {}
-    /**
-     * Delegate Scene : this method will be called on LayerManager startup
-     * to delegate a initial scene description of Layers on the target Platform
-     */
-    virtual bool delegateScene();
-};
 
+    // from ISceneProvider
+    virtual bool delegateScene();
+
+    //from PluginBase
+    virtual t_ilm_const_string pluginGetName() const;
+    
+protected:
+    ICommandExecutor& mExecutor;
+    Configuration& mConfiguration;
+};
 
 #endif /* _LAYERSCENE_PROVIDER_H_ */
