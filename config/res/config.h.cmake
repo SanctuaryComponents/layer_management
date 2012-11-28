@@ -142,9 +142,30 @@ const BuildFlag gBuildFlags[] =
     { DEBUG_FLAG, "WITH_WAYLAND_X11      = ${WITH_WAYLAND_X11}" },
     { DEBUG_FLAG, "WITH_WL_EXAMPLE       = ${WITH_WL_EXAMPLE}" },
     { DEBUG_FLAG, "WITH_X11_GLES         = ${WITH_X11_GLES}" },
-    { DEBUG_FLAG, "WITH_PLUGIN_SYSTEMD.. = ${WITH_PLUGIN_SYSTEMD_HEALTH_MONITOR}" }
+    { DEBUG_FLAG, "WITH_SYSTEMD_HEALTH_MONITOR = ${WITH_SYSTEMD_HEALTH_MONITOR}" },
+    { DEBUG_FLAG, "WITH_EXAMPLE_SCENE_PROVIDER = ${WITH_EXAMPLE_SCENE_PROVIDER}" },
+    { DEBUG_FLAG, "WITH_STATIC_PLUGINS   = ${WITH_STATIC_PLUGINS}" }
 };
 
 const int gBuildFlagCount = sizeof(gBuildFlags) / sizeof(gBuildFlags[0]);
+
+
+//-----------------------------------------------------------------------------
+// manage list of statically linked plugins
+//-----------------------------------------------------------------------------
+#define REGISTER_PLUGIN(PLUGIN) \
+    extern "C" IPlugin* create ## PLUGIN(ICommandExecutor& executor, Configuration& config); \
+    static bool PLUGIN ## _instance = PluginManager::registerStaticPluginCreateFunction(create ## PLUGIN);
+
+#define STATIC_PLUGIN_REGISTRATION ${STATIC_PLUGIN_REGISTRATION}
+
+//-----------------------------------------------------------------------------
+// define plugin entry point depending on build settings
+//-----------------------------------------------------------------------------
+#define DECLARE_LAYERMANAGEMENT_PLUGIN(name) \
+extern "C" IPlugin* create ## name(ICommandExecutor& executor, Configuration& config) \
+{ \
+    return new name(executor, config); \
+}
 
 #endif // __CONFIG_H__

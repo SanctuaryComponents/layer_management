@@ -24,6 +24,10 @@ cmake_minimum_required (VERSION 2.6)
 
 message(STATUS "Generating config.h header file with build system configuration.")
 
+foreach(PLUGIN ${STATICALLY_LINKED_PLUGINS})
+    SET(STATIC_PLUGIN_REGISTRATION "${STATIC_PLUGIN_REGISTRATION} \\\n        REGISTER_PLUGIN(${PLUGIN})")
+endforeach(PLUGIN ${STATICALLY_LINKED_PLUGINS})
+
 configure_file(
     ${CMAKE_SOURCE_DIR}/config/res/config.h.cmake
     ${CMAKE_SOURCE_DIR}/config/config.h

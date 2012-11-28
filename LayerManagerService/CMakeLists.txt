@@ -41,11 +41,13 @@ add_dependencies(LayerManagerService LayerManagerCommands)
 
 find_package (Threads)
 set(LIBS ${LIBS}
-         LayerManagerUtils 
-         LayerManagerCommands
-         dl
-         ${CMAKE_THREAD_LIBS_INIT}
-         ${DLT_LIBRARY}) 
+    LayerManagerUtils 
+    LayerManagerCommands
+    dl
+    ${CMAKE_THREAD_LIBS_INIT}
+    ${DLT_LIBRARY}
+    ${STATICALLY_LINKED_PLUGINS}
+) 
 
 target_link_libraries(LayerManagerService ${LIBS})
 

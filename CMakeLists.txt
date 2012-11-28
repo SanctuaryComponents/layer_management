@@ -58,11 +58,13 @@ option (WITH_SERVICE_BIN    "Build LayerManagerService Binary"                  
 option (WITH_CLIENT_LIB     "Build LayerManagement Client Lib"                    ON)
 option (WITH_COMMUNICATOR_GEN "Build Generic Communicator Plugin"                 ON)
 
-option (WITH_PLUGIN_SYSTEMD_HEALTH_MONITOR "Build plugin for systemd health monitoring" OFF)
+option (WITH_SYSTEMD_HEALTH_MONITOR "Build plugin for systemd health monitoring" OFF)
 
 option (WITH_TEXT_RENDERER  "Build renderer renderer (only logging)"              OFF)
 
-option (WITH_PLUGIN_EXAMPLE_SCENE_PROVIDER "Build scene provider plugin for example applciations" OFF)
+option (WITH_EXAMPLE_SCENE_PROVIDER "Build scene provider plugin for example applciations" OFF)
+
+option (WITH_STATIC_PLUGINS "Link all plugins statically"                         OFF)
 
 
 #==============================================================================
@@ -71,6 +73,7 @@ option (WITH_PLUGIN_EXAMPLE_SCENE_PROVIDER "Build scene provider plugin for exam
 set (WITH_WAYLAND    OFF)
 set (BUILD_UTILS_LIB  OFF)
 set (INSTALL_UTILS_LIB  OFF)
+set (STATICALLY_LINKED_PLUGINS "" CACHE INTERNAL "list of static plugins" FORCE)
 
 
 #==============================================================================
@@ -105,7 +108,6 @@ endif(NumberOfWaylandRenderers GREATER 1)
 # set default build parameters
 #==============================================================================
 add_subdirectory(cmake/optionalFeatures)
-add_subdirectory(config)
 
 include_directories ("${PROJECT_SOURCE_DIR}/config")
 include_directories ("${PROJECT_SOURCE_DIR}/3rdParty/")
@@ -160,13 +162,13 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-function")
 #set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
 #==============================================================================
 
-if (WITH_PLUGIN_EXAMPLE_SCENE_PROVIDER)
+if (WITH_EXAMPLE_SCENE_PROVIDER)
     add_subdirectory (LayerManagerPlugins/SceneProvider/ExampleSceneProvider)
-endif(WITH_PLUGIN_EXAMPLE_SCENE_PROVIDER)
+endif(WITH_EXAMPLE_SCENE_PROVIDER)
 
-if (WITH_PLUGIN_SYSTEMD_HEALTH_MONITOR)
+if (WITH_SYSTEMD_HEALTH_MONITOR)
     add_subdirectory (LayerManagerPlugins/HealthMonitor/SystemdHealthMonitor)
-endif(WITH_PLUGIN_SYSTEMD_HEALTH_MONITOR)
+endif(WITH_SYSTEMD_HEALTH_MONITOR)
 
 if (WITH_COMMUNICATOR_GEN)
     add_subdirectory (LayerManagerCommands)
@@ -226,3 +228,8 @@ endif (BUILD_UTILS_LIB)
 if (WITH_TESTS)
     enable_testing()
 endif(WITH_TESTS)
+
+#==============================================================================
+# store used build configuration
+#==============================================================================
+add_subdirectory(config)
