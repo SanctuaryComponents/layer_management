@@ -35,17 +35,17 @@ set(SRC_FILES
     src/ShaderProgramGLES.cpp
 )
 
-if (WITH_STATIC_PLUGINS)
+if (WITH_STATIC_LIBRARIES)
 
     add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
     set (STATICALLY_LINKED_PLUGINS ${STATICALLY_LINKED_PLUGINS}
         ${PROJECT_NAME} CACHE INTERNAL "list of static plugins")
 
-else(WITH_STATIC_PLUGINS)
+else(WITH_STATIC_LIBRARIES)
 
     add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
 
-endif(WITH_STATIC_PLUGINS)
+endif(WITH_STATIC_LIBRARIES)
 
 find_package(X11 REQUIRED)
 include_directories(${X11_INCLUDE_DIR})
@@ -57,11 +57,12 @@ find_package(GLESv2 REQUIRED)
 include_directories(${GLESv2_INCLUDE_DIR})
 
 find_package (Threads)
-set(LIBS ${LIBS} ${CMAKE_THREAD_LIBS_INIT} ${EGL_LIBRARY} ${GLESv2_LIBRARIES} ${X11_Xcomposite_LIB} ${X11_Xdamage_LIB} LayerManagerGraphicGLESv2 LayerManagerUtils )
+set(LIBS ${LIBS} ${CMAKE_THREAD_LIBS_INIT} ${EGL_LIBRARY} ${GLESv2_LIBRARIES} ${X11_Xcomposite_LIB} ${X11_Xdamage_LIB} LayerManagerGraphicGLESv2 LayerManagerUtils LayerManagerBase)
 target_link_libraries(${PROJECT_NAME} ${LIBS})
 
 add_dependencies(${PROJECT_NAME} LayerManagerUtils)
 add_dependencies(${PROJECT_NAME} LayerManagerGraphicGLESv2)
+add_dependencies(${PROJECT_NAME} LayerManagerBase)
 
 install (TARGETS ${PROJECT_NAME}
          LIBRARY DESTINATION lib/layermanager/renderer

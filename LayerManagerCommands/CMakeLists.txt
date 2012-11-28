@@ -31,11 +31,11 @@ include_directories(
 file(GLOB LM_SOURCES src/*.cpp)
 file(GLOB LM_INCLUDES include/*.h)
 
-if (WITH_STATIC_PLUGINS)
+if (WITH_STATIC_LIBRARIES)
     add_library(${PROJECT_NAME} STATIC ${LM_SOURCES})
-else (WITH_STATIC_PLUGINS)
+else (WITH_STATIC_LIBRARIES)
     add_library(${PROJECT_NAME} SHARED ${LM_SOURCES})
-endif (WITH_STATIC_PLUGINS)
+endif (WITH_STATIC_LIBRARIES)
 
 set(LIBS ${LIBS} LayerManagerUtils LayerManagerBase)
 target_link_libraries(${PROJECT_NAME} ${LIBS})

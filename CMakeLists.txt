@@ -39,32 +39,27 @@ endif (NOT CMAKE_BUILD_TYPE)
 #==============================================================================
 # Platforms / A set of indiviual options at once
 #==============================================================================
-option (WITH_X11_GLES       "Build for X11 with GLES 2.0"                         ON )
-option (WITH_GLESv2_LIB     "Build development library for GLES2 Based Renderers" OFF)
-option (WITH_EGL_EXAMPLE    "Build EGL_EXAMPLE / X11"                             ON )
-option (WITH_WL_EXAMPLE     "Build EGL_EXAMPLE / Wayland"                         OFF)
-option (WITH_DESKTOP        "Build for Desktop / GLX"                             OFF)
-option (WITH_GLX_LIB        "Build development library for GLX Based Renderers"   OFF)
-option (WITH_GLX_EXAMPLE    "Build GLX_EXAMPLE "                                  OFF)
-option (WITH_FORCE_COPY     "Force Software Copy of Pixmaps"                      OFF)
-option (WITH_CLIENTEXAMPLES "Build client examples "                              ON )
-option (WITH_TESTS          "Build Available Tests "                              OFF)
-option (WITH_DLT            "Build with DLT support "                             OFF)
-option (WITH_WAYLAND_FBDEV  "Build Wayland with FBDEV backend"                    OFF)
-option (WITH_WAYLAND_X11    "Build Wayland with X11 backend"                      OFF)
-option (WITH_WAYLAND_DRM    "Build Wayland with drm backend"                      OFF)
-
-option (WITH_SERVICE_BIN    "Build LayerManagerService Binary"                    ON)
-option (WITH_CLIENT_LIB     "Build LayerManagement Client Lib"                    ON)
-option (WITH_COMMUNICATOR_GEN "Build Generic Communicator Plugin"                 ON)
-
-option (WITH_SYSTEMD_HEALTH_MONITOR "Build plugin for systemd health monitoring" OFF)
-
-option (WITH_TEXT_RENDERER  "Build renderer renderer (only logging)"              OFF)
-
-option (WITH_EXAMPLE_SCENE_PROVIDER "Build scene provider plugin for example applciations" OFF)
-
-option (WITH_STATIC_PLUGINS "Link all plugins statically"                         OFF)
+option (WITH_X11_GLES               "Build for X11 with GLES 2.0"                         ON )
+option (WITH_GLESv2_LIB             "Build development library for GLES2 Based Renderers" OFF)
+option (WITH_EGL_EXAMPLE            "Build EGL_EXAMPLE / X11"                             ON )
+option (WITH_WL_EXAMPLE             "Build EGL_EXAMPLE / Wayland"                         OFF)
+option (WITH_DESKTOP                "Build for Desktop / GLX"                             OFF)
+option (WITH_GLX_LIB                "Build development library for GLX Based Renderers"   OFF)
+option (WITH_GLX_EXAMPLE            "Build GLX_EXAMPLE "                                  OFF)
+option (WITH_FORCE_COPY             "Force Software Copy of Pixmaps"                      OFF)
+option (WITH_CLIENTEXAMPLES         "Build client examples "                              ON )
+option (WITH_TESTS                  "Build Available Tests "                              OFF)
+option (WITH_DLT                    "Build with DLT support "                             OFF)
+option (WITH_WAYLAND_FBDEV          "Build Wayland with FBDEV backend"                    OFF)
+option (WITH_WAYLAND_X11            "Build Wayland with X11 backend"                      OFF)
+option (WITH_WAYLAND_DRM            "Build Wayland with drm backend"                      OFF)
+option (WITH_SERVICE_BIN            "Build LayerManagerService Binary"                    ON)
+option (WITH_CLIENT_LIB             "Build LayerManagement Client Lib"                    ON)
+option (WITH_GENERIC_COMMUNICATOR   "Build Generic Communicator Plugin"                   ON)
+option (WITH_SYSTEMD_HEALTH_MONITOR "Build plugin for systemd health monitoring"          OFF)
+option (WITH_EXAMPLE_SCENE_PROVIDER "Build scene provider plugin for examples"            OFF)
+option (WITH_STATIC_LIBRARIES       "Link all libraries statically"                       OFF)
+option (WITH_TEXT_RENDERER          "Build text renderer (only logging)"                  OFF)
 
 
 #==============================================================================
@@ -170,10 +165,10 @@ if (WITH_SYSTEMD_HEALTH_MONITOR)
     add_subdirectory (LayerManagerPlugins/HealthMonitor/SystemdHealthMonitor)
 endif(WITH_SYSTEMD_HEALTH_MONITOR)
 
-if (WITH_COMMUNICATOR_GEN)
+if (WITH_GENERIC_COMMUNICATOR)
     add_subdirectory (LayerManagerCommands)
     add_subdirectory (LayerManagerPlugins/Communicators/GenericCommunicator)
-endif(WITH_COMMUNICATOR_GEN)
+endif(WITH_GENERIC_COMMUNICATOR)
 
 if (WITH_DESKTOP)
     set (WITH_GLX_LIB ON CACHE BOOL "Build X11 GLX development lib" FORCE)

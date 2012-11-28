@@ -67,9 +67,14 @@ if (WITH_GLESv2_LIB)
         ${EGL_LIBRARY}
         ${GLESv2_LIBRARIES}
         LayerManagerUtils
+        LayerManagerBase
     )
 
-    add_library(${GRAPHIC_LIB_NAME} SHARED ${SOURCES})
+    if(WITH_STATIC_LIBRARIES)
+        add_library(${GRAPHIC_LIB_NAME} STATIC ${SOURCES})
+    else(WITH_STATIC_LIBRARIES)
+        add_library(${GRAPHIC_LIB_NAME} SHARED ${SOURCES})
+    endif(WITH_STATIC_LIBRARIES)
 
     target_link_libraries(${GRAPHIC_LIB_NAME} ${LIBS})
     
@@ -172,8 +177,12 @@ if (WITH_GLX_LIB)
         ${GLX_LIBRARIES}
         LayerManagerUtils
     )
-    
-    add_library(${GRAPHIC_LIB_NAME} SHARED ${SOURCES})
+
+    if(WITH_STATIC_LIBRARIES)
+        add_library(${GRAPHIC_LIB_NAME} STATIC ${SOURCES})
+    else(WITH_STATIC_LIBRARIES)
+        add_library(${GRAPHIC_LIB_NAME} SHARED ${SOURCES})
+    endif(WITH_STATIC_LIBRARIES)
 
     target_link_libraries(${GRAPHIC_LIB_NAME} ${LIBS})
 
@@ -342,7 +351,11 @@ if (WITH_WAYLAND)
     # common
     #=======================================================================
 
-    add_library(${GRAPHIC_LIB_NAME} SHARED ${SOURCES})
+    if(WITH_STATIC_LIBRARIES)
+            add_library(${GRAPHIC_LIB_NAME} STATIC ${SOURCES})
+        else(WITH_STATIC_LIBRARIES)
+            add_library(${GRAPHIC_LIB_NAME} SHARED ${SOURCES})
+    endif(WITH_STATIC_LIBRARIES)
     
     target_link_libraries(${GRAPHIC_LIB_NAME} ${LIBS})
 

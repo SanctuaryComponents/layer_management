@@ -48,9 +48,11 @@ PluginManager::PluginManager(ICommandExecutor& executor, Configuration& config)
     // create static plugins
     createStaticallyLinkedPlugins();
     
+#ifndef WITH_STATIC_LIBRARIES
     // create dynamic plugins
     getAllFilesInPluginPath(mConfiguration.getPluginPath());
     createDynamicallyLinkedPlugins();
+#endif
     
     LOG_INFO("PluginManager", "created " << mPluginList.size() << " plugins");
 }

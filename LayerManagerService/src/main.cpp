@@ -21,9 +21,15 @@
 #include "Configuration.h"
 #include "SignalHandler.h"
 #include "Log.h"
+#include <sys/time.h>
 
 int main(int argc, char **argv)
 {
+    // monitor startup performance
+    unsigned int startupTimeInMs = 0;
+    timeval start, end;
+    gettimeofday(&start, 0);
+
     // collect all configuration settings
     Configuration configuration(argc, argv);
 
@@ -43,7 +49,9 @@ int main(int argc, char **argv)
 
         if (layermanager.startManagement())
         {
-            LOG_INFO("LayerManagerService", "Startup complete. EnterMainloop");
+            gettimeofday(&end, 0);
+            startupTimeInMs = ((end.tv_sec - start.tv_sec) * 1000) + ((end.tv_usec - start.tv_usec) / 1000);
+            LOG_INFO("LayerManagerService", "Startup complete. EnterMainloop. " << startupTimeInMs << "ms");
             signalHandler.waitForShutdownSignal();
 
             LOG_DEBUG("LayerManagerService", "Stopping service.");

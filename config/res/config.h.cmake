@@ -96,6 +96,9 @@
 // build plugin for systemd health monitoring
 #cmakedefine WITH_PLUGIN_SYSTEMD_HEALTH_MONITOR
 
+// full static build enabled
+#cmakedefine WITH_STATIC_LIBRARIES
+
 
 //-----------------------------------------------------------------------------
 // platform configuration
@@ -144,7 +147,7 @@ const BuildFlag gBuildFlags[] =
     { DEBUG_FLAG, "WITH_X11_GLES         = ${WITH_X11_GLES}" },
     { DEBUG_FLAG, "WITH_SYSTEMD_HEALTH_MONITOR = ${WITH_SYSTEMD_HEALTH_MONITOR}" },
     { DEBUG_FLAG, "WITH_EXAMPLE_SCENE_PROVIDER = ${WITH_EXAMPLE_SCENE_PROVIDER}" },
-    { DEBUG_FLAG, "WITH_STATIC_PLUGINS   = ${WITH_STATIC_PLUGINS}" }
+    { DEBUG_FLAG, "WITH_STATIC_LIBRARIES = ${WITH_STATIC_LIBRARIES}" }
 };
 
 const int gBuildFlagCount = sizeof(gBuildFlags) / sizeof(gBuildFlags[0]);

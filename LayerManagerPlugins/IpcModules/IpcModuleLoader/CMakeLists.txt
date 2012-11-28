@@ -27,9 +27,11 @@ include_directories(
     "${CMAKE_SOURCE_DIR}/LayerManagerPlugins/IpcModules/IpcModuleLoader/include"
 )
 
-add_library(IpcModuleLoader SHARED
-    src/IpcModuleLoader.c
-)
+if(WITH_STATIC_LIBRARIES)
+    add_library(IpcModuleLoader STATIC src/IpcModuleLoader.c)
+else(WITH_STATIC_LIBRARIES)
+    add_library(IpcModuleLoader SHARED src/IpcModuleLoader.c)
+endif(WITH_STATIC_LIBRARIES)
 
 set(LIBS
     dl
@@ -40,6 +42,7 @@ target_link_libraries(IpcModuleLoader ${LIBS})
 install (
     TARGETS             IpcModuleLoader
     LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib/layermanager/static
 )
          
 install (
