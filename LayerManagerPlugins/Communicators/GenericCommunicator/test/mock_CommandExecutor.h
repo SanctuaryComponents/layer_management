@@ -37,16 +37,9 @@ class MockCommandExecutor : public ICommandExecutor {
   MOCK_METHOD0(getScene, Scene*());
 
   MOCK_METHOD0(getRendererList, RendererList*());
-  MOCK_METHOD1(addRenderer, void(IRenderer* renderer));
-  MOCK_METHOD1(removeRenderer, void(IRenderer* renderer));
-
   MOCK_METHOD0(getCommunicatorList, CommunicatorList*());
-  MOCK_METHOD1(addCommunicator, void(ICommunicator* renderer));
-  MOCK_METHOD1(removeCommunicator, void(ICommunicator* renderer));
-
   MOCK_METHOD0(getSceneProviderList, SceneProviderList*());
-  MOCK_METHOD1(addSceneProvider, void(ISceneProvider* provider));
-  MOCK_METHOD1(removeSceneProvider, void(ISceneProvider* provider));
+  MOCK_METHOD0(getHealthMonitorList, HealthMonitorList*());
 
   MOCK_METHOD0(getApplicationReferenceMap, ApplicationReferenceMap*());
   MOCK_METHOD2(addApplicationReference, void(t_ilm_client_handle client, IApplicationReference* reference));

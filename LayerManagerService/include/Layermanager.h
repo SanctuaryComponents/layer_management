@@ -55,24 +55,12 @@ public:
     virtual uint* getScreenResolution(const uint screenID) const;
     virtual uint* getScreenIDs(uint* length) const;
 
-    virtual void addRenderer(IRenderer* renderer);
-    virtual void removeRenderer(IRenderer* renderer);
-
-    virtual void addCommunicator(ICommunicator* communicator);
-    virtual void removeCommunicator(ICommunicator* communicator);
-
-    virtual void addSceneProvider(ISceneProvider* sceneProvider);
-    virtual void removeSceneProvider(ISceneProvider* sceneProvider);
-
-    virtual void addHealthMonitor(IHealthMonitor* healthMonitor);
-    virtual void removeHealthMonitor(IHealthMonitor* healthMonitor);
-    
     virtual void addApplicationReference(t_ilm_client_handle client, IApplicationReference* reference);
     virtual void removeApplicationReference(t_ilm_client_handle client);
     virtual t_ilm_uint getSenderPid(t_ilm_client_handle client);
     const char* getSenderName(t_ilm_client_handle client);
     const char* getSenderName(unsigned int pid);
-    
+
     virtual bool startManagement();
     virtual bool stopManagement();
 

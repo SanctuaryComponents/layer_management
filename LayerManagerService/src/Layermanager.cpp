@@ -167,57 +167,6 @@ void Layermanager::signalRendererRedraw()
 		renderer->signalWindowSystemRedraw();
 }
 
-void Layermanager::addRenderer(IRenderer* renderer)
-{
-    if (renderer)
-    {
-        m_pRendererList->push_back(renderer);
-        mMonitoredPlugins.push_back(renderer);
-    }
-
-}
-
-void Layermanager::removeRenderer(IRenderer* renderer)
-{
-    if (renderer)
-    {
-        m_pRendererList->remove(renderer);
-        mMonitoredPlugins.remove(renderer);
-    }
-}
-
-void Layermanager::addSceneProvider(ISceneProvider* sceneProvider)
-{
-    if (sceneProvider)
-    {
-        m_pSceneProviderList->push_back(sceneProvider);
-    }
-}
-
-void Layermanager::removeSceneProvider(ISceneProvider* sceneProvider)
-{
-    if (sceneProvider)
-    {
-        m_pSceneProviderList->remove(sceneProvider);
-    }
-}
-
-void Layermanager::addHealthMonitor(IHealthMonitor* healthMonitor)
-{
-    if (healthMonitor)
-    {
-        m_pHealthMonitorList->push_back(healthMonitor);
-    }
-}
-
-void Layermanager::removeHealthMonitor(IHealthMonitor* healthMonitor)
-{
-    if (healthMonitor)
-    {
-        m_pHealthMonitorList->remove(healthMonitor);
-    }
-}
-
 void Layermanager::addApplicationReference(t_ilm_client_handle client, IApplicationReference* reference)
 {
     if (client && reference)
@@ -281,24 +230,6 @@ const char* Layermanager::getSenderName(unsigned int pid)
     return result;
 }
 
-
-void Layermanager::addCommunicator(ICommunicator* communicator)
-{
-    if (communicator)
-    {
-        m_pCommunicatorList->push_back(communicator);
-        mMonitoredPlugins.push_back(communicator);
-    }
-}
-
-void Layermanager::removeCommunicator(ICommunicator* communicator)
-{
-    if (communicator)
-    {
-        m_pCommunicatorList->remove(communicator);
-        mMonitoredPlugins.remove(communicator);
-    }
-}
 
 void Layermanager::printDebugInformation() const
 {
