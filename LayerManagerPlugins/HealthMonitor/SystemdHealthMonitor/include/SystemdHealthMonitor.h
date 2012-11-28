@@ -22,15 +22,19 @@
 
 #include "IHealthMonitor.h"
 #include "ThreadBase.h"
+#include "PluginBase.h"
 
-class SystemdHealthMonitor : public IHealthMonitor, protected ThreadBase
+class SystemdHealthMonitor : public IHealthMonitor, protected ThreadBase, public PluginBase
 {
 public:
-    SystemdHealthMonitor(ICommandExecutor* executor);
+    SystemdHealthMonitor(ICommandExecutor& executor, Configuration& config);
 
-    // from IHealth
+    // from IHealthMonitor
     virtual t_ilm_bool start();
     virtual t_ilm_bool stop();
+
+    //from PluginBase
+    virtual t_ilm_const_string pluginGetName() const;
 
 private:
     void reportStartupComplete();

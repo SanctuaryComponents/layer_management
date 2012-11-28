@@ -21,8 +21,6 @@ cmake_minimum_required (VERSION 2.6)
 
 project(SystemdHealthMonitor)
 
-find_package(Threads)
-
 include_directories(
     include
     ${CMAKE_SOURCE_DIR}/LayerManagerClient/ilmClient/include
@@ -34,20 +32,35 @@ set(LIBS
     ${LIBS}
     LayerManagerUtils
     systemd
+    rt
 )
 
-add_library(${PROJECT_NAME} SHARED
+set(SRC_FILES
     src/SystemdHealthMonitor.cpp
 )
+
+if (WITH_STATIC_PLUGINS)
+
+    add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
+    set (STATICALLY_LINKED_PLUGINS ${STATICALLY_LINKED_PLUGINS}
+        ${PROJECT_NAME} CACHE INTERNAL "list of static plugins")
+
+else(WITH_STATIC_PLUGINS)
+
+    add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
+
+endif(WITH_STATIC_PLUGINS)
+
 
 target_link_libraries(${PROJECT_NAME}
     ${LIBS}
 )
 
 add_dependencies(${PROJECT_NAME}
-    LayerManagerService
     LayerManagerUtils
 )
 
 install (TARGETS ${PROJECT_NAME}
-         LIBRARY DESTINATION lib/layermanager/health)
+         LIBRARY DESTINATION lib/layermanager/health
+         ARCHIVE DESTINATION lib/layermanager/static
+)

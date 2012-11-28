@@ -27,8 +27,9 @@
 
 #include <systemd/sd-daemon.h>
 
-SystemdHealthMonitor::SystemdHealthMonitor(ICommandExecutor* executor)
-: IHealthMonitor(executor)
+SystemdHealthMonitor::SystemdHealthMonitor(ICommandExecutor& executor, Configuration& config)
+: IHealthMonitor(executor, config)
+, PluginBase(executor, config, HealthMonitor_Api_v1)
 , mIntervalInMs(-1)
 {
     char* envVar = getenv("WATCHDOG_USEC");
@@ -69,6 +70,11 @@ t_ilm_bool SystemdHealthMonitor::stop()
     return result;
 }
 
+t_ilm_const_string SystemdHealthMonitor::pluginGetName() const
+{
+    return "SystemdHealthMonitor";
+}
+
 void SystemdHealthMonitor::reportStartupComplete()
 {
     LOG_INFO("SystemdHealthMonitor", "reporting startup complete");
@@ -88,7 +94,7 @@ bool SystemdHealthMonitor::watchdogEnabled()
 
 t_ilm_bool SystemdHealthMonitor::threadMainLoop()
 {
-    if (watchdogEnabled() && mExecutor->getHealth())
+    if (watchdogEnabled() && PluginBase::mExecutor.getHealth())
     {
         signalWatchdog();
         usleep(mIntervalInMs * 1000);
@@ -96,12 +102,4 @@ t_ilm_bool SystemdHealthMonitor::threadMainLoop()
     return ILM_TRUE;
 }
 
-extern "C" IHealthMonitor* createSystemdHealthMonitor(ICommandExecutor* executor)
-{
-    return new SystemdHealthMonitor(executor);
-}
-
-extern "C" void destroyGenericCommunicator(SystemdHealthMonitor* p)
-{
-    delete p;
-}
+DECLARE_LAYERMANAGEMENT_PLUGIN(SystemdHealthMonitor)

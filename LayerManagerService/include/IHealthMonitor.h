@@ -28,19 +28,26 @@ class Configuration;
 class IHealthMonitor
 {
 public:
-    IHealthMonitor(ICommandExecutor* executor);
-    virtual ~IHealthMonitor() {};
+    IHealthMonitor(ICommandExecutor& executor, Configuration& config);
+    virtual ~IHealthMonitor();
 
     virtual t_ilm_bool start() = 0;
     virtual t_ilm_bool stop() = 0;
 
 protected:
-    ICommandExecutor* mExecutor;
+    ICommandExecutor& mExecutor;
+    Configuration& mConfiguration;
 };
 
 inline
-IHealthMonitor::IHealthMonitor(ICommandExecutor* executor)
+IHealthMonitor::IHealthMonitor(ICommandExecutor& executor, Configuration& config)
 : mExecutor(executor)
+, mConfiguration(config)
+{
+}
+
+inline
+IHealthMonitor::~IHealthMonitor()
 {
 }
 
