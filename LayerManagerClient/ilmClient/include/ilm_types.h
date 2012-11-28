@@ -312,4 +312,32 @@ enum HealthCondition
     HealthDead
 };
 
+/**
+ * enum for identifying plugin types and versions
+ *
+ * All plugins are started in the order defined by their value
+ * in this enum (lowest first, highest last).
+ * The plugins are stopped in opposite order (highest first,
+ * lowest last).
+ */
+typedef enum PluginApi
+{
+    Renderer_Api            = 0x00010000,
+    Renderer_Api_v1,
+
+    SceneProvider_Api       = 0x00020000,
+    SceneProvider_Api_v1,
+
+    Communicator_Api        = 0x00040000,
+    Communicator_Api_v1,
+
+    HealthMonitor_Api       = 0x00080000,
+    HealthMonitor_Api_v1
+} ilmPluginApi;
+
+#define PLUGIN_IS_COMMUNICATOR(x)  ((x) & Communicator_Api)
+#define PLUGIN_IS_RENDERER(x)      ((x) & Renderer_Api)
+#define PLUGIN_IS_SCENEPROVIDER(x) ((x) & SceneProvider_Api)
+#define PLUGIN_IS_HEALTHMONITOR(x) ((x) & HealthMonitor_Api)
+
 #endif // _ILM_TYPES_H_

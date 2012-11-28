@@ -21,17 +21,34 @@
 #include "ICommandExecutor.h"
 #include "Scene.h"
 
-PluginBase::PluginBase()
-: mHealth(HealthStopped)
+PluginBase::PluginBase(ICommandExecutor& executor, Configuration& config, ilmPluginApi api)
+: mExecutor(executor)
+, mConfiguration(config)
+, mApi(api)
+, mHealth(HealthStopped)
 {
 }
 
-HealthCondition PluginBase::getHealth()
+PluginBase::~PluginBase()
+{
+}
+
+PluginApi PluginBase::pluginGetApi() const
+{
+    return mApi;
+}
+
+t_ilm_const_string PluginBase::pluginGetName() const
+{
+    return "NoName";
+}
+
+HealthCondition PluginBase::pluginGetHealth()
 {
     return mHealth;
 }
 
-void PluginBase::setHealth(HealthCondition health)
+void PluginBase::pluginSetHealth(HealthCondition health)
 {
     mHealth = health;
 }

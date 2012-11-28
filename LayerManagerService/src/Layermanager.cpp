@@ -551,7 +551,7 @@ HealthCondition Layermanager::getHealth()
     while ((iter != iterEnd) && (HealthRunning == returnValue))
     {
         IPlugin* monitoredPlugin = *iter;
-        returnValue = monitoredPlugin->getHealth();
+        returnValue = monitoredPlugin->pluginGetHealth();
         ++iter;
     }
 

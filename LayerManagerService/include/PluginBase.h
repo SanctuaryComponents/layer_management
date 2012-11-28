@@ -21,17 +21,31 @@
 #define __PLUGINBASE_H__
 
 #include "IPlugin.h"
+#include "ilm_types.h"
+
+class ICommandExecutor;
+class Configuration;
 
 class PluginBase : public IPlugin
 {
 public:
-    PluginBase();
-    virtual HealthCondition getHealth();
+    PluginBase(ICommandExecutor& executor, Configuration& config, ilmPluginApi api);
+    virtual ~PluginBase();
+
+    // from IPlugin
+    virtual PluginApi pluginGetApi() const;
+    virtual t_ilm_const_string pluginGetName() const;
+    virtual HealthCondition pluginGetHealth();
 
 protected:
-    void setHealth(HealthCondition health);
+    void pluginSetHealth(HealthCondition health);
+
+protected:
+    ICommandExecutor& mExecutor;
+    Configuration& mConfiguration;
 
 private:
+    PluginApi mApi;
     HealthCondition mHealth;
 };
 

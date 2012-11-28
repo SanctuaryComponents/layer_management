@@ -25,7 +25,11 @@
 class IPlugin
 {
 public:
-    virtual HealthCondition getHealth() = 0;
+    virtual PluginApi pluginGetApi() const = 0;
+    virtual t_ilm_const_string pluginGetName() const = 0;
+    virtual HealthCondition pluginGetHealth() = 0;
+
+    virtual ~IPlugin() {}
 };
 
 #endif // __IPLUGIN_H__
