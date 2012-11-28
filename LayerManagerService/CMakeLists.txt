@@ -76,6 +76,7 @@ add_executable(LayerManagerService_Test
     src/GraphicalSurface.cpp
     src/Layermanager.cpp
     src/InputManager.cpp
+    src/PluginManager.cpp
     src/PluginBase.cpp
     src/PluginManager.cpp
     src/Scene.cpp
