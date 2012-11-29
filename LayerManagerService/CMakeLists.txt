@@ -81,6 +81,7 @@ add_executable(LayerManagerService_Test
     src/InputManager.cpp
     src/HealthSystemd.cpp
     src/PluginBase.cpp
+    src/PluginManager.cpp
     src/Scene.cpp
     src/shader/Shader.cpp
     src/shader/ShaderProgram.cpp
