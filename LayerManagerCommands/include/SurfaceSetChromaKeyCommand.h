@@ -30,7 +30,7 @@ public:
      * \action    This command sets the chroma key of a surface within the GENIVI LayerManagement
      * \frequency Called in order to rearrange graphical output.
      * \param[in] sender process id of application that sent this command
-     * \param[in] surfaceId Id of the surface to set the chromakey of.
+     * \param[in] surfaceid Id of the surface to set the chromakey of.
      * \param[in] array array of color value which is defined in red, green, blue
      * \param[in] length length of array provided as argument array
      * \ingroup Commands

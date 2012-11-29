@@ -52,6 +52,7 @@ public:
      * \brief Creates a new layer within the scene.
      * \ingroup SceneAPI
      * \param[in] id id of layer
+     * \param[in] creatorPid client process id that requested the creation of this layer
      * \return pointer to layer
      */
     virtual Layer* createLayer(const uint id, int creatorPid) = 0;
@@ -60,6 +61,7 @@ public:
      * \brief Creates a new surface within the scene.
      * \ingroup SceneAPI
      * \param[in] id id of surface
+     * \param[in] creatorPid client process id that requested the creation of this surface
      * \return pointer to surface
      */
     virtual Surface* createSurface(const uint id, int creatorPid) = 0;
@@ -68,6 +70,7 @@ public:
      * \brief Create a new layer group within the scene.
      * \ingroup SceneAPI
      * \param[in] id id of the layer group
+     * \param[in] creatorPid client process id that requested the creation of this layer group
      * \return pointer to layer group
      */
     virtual LayerGroup* createLayerGroup(const uint id, int creatorPid) = 0;
@@ -76,6 +79,7 @@ public:
      * \brief Create a new surface group within the scene.
      * \ingroup SceneAPI
      * \param[in] id id of the new surface group
+     * \param[in] creatorPid client process id that requested the creation of this surface group
      * \return pointer to surface group
      */
     virtual SurfaceGroup* createSurfaceGroup(const uint id, int creatorPid) = 0;

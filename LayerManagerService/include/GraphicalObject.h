@@ -79,9 +79,9 @@ public:
 
     /**
      * @brief Get chroma key values
-     * @param[out] The current Red Value between 0 and 255
-     * @param[out] The current Green Value between 0 and 255
-     * @param[out] The current Blue Value between 0 and 255
+     * @param[out] red The current Red Value between 0 and 255
+     * @param[out] green The current Green Value between 0 and 255
+     * @param[out] blue The current Blue Value between 0 and 255
      */
     void getChromaKey(unsigned char& red, unsigned char& green, unsigned char& blue) const;
 
@@ -118,13 +118,13 @@ public:
 
     /**
      * @brief add a client application to be notified on property changes of this graphical object.
-     * @param applicationHash UUID of application, as registered during ServiceConnect() in the client API
+     * \param[in] client handle to connected client that wants to receive notifications on changes of this object
      */
     void addNotification(t_ilm_client_handle client);
 
     /**
      * @brief remove a client application from the notification list on property changes of this graphical object.
-     * @param applicationHash UUID of application, as registered during ServiceConnect() in the client API
+     * \param[in] client handle to connected client that does not want to receive notifications on changes of this object any longer
      */
     void removeNotification(t_ilm_client_handle client);
 

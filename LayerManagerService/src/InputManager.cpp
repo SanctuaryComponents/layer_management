@@ -125,7 +125,7 @@ bool InputManager::updateInputEventAcceptanceOn(unsigned int surfId, InputDevice
 /**
  * @brief Report keyboard event.
  * @param[in] state The state of the key. Can be either INPUT_STATE_PRESSED or INPUT_STATE_RELEASED
- * @param[in] keyId A uniq identifier for the key being reported. See @ref<InputManager-KeypressedMap>.
+ * @param[in] keyId A uniq identifier for the key being reported.
  * @return The Surface to which to report the event, or NULL
  */
 Surface * InputManager::reportKeyboardEvent(InputEventState state, long keyId)

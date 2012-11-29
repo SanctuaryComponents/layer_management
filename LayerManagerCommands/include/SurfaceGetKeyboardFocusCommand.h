@@ -29,7 +29,7 @@ public:
      * \action    This command returns the identifier of the surface which currently hold the keyboard focus
      * \frequency Whenever it is needed
      * \param[in] sender process id of application that sent this command
-     * \param[out] id id of surface
+     * \param[out] pSurfId id of surface
      * \ingroup Commands
      */
     SurfaceGetKeyboardFocusCommand(pid_t sender, unsigned int *pSurfId)

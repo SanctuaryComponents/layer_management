@@ -66,9 +66,6 @@ public:
     /**
      * \brief start layer management
      * \ingroup ServiceAPI
-     * \param[in] width width of screen to be used for layer management
-     * \param[in] height height of screen to be used for layer management
-     * \param[in] displayName name of screen to be used for layer management
      * \return TRUE: start management successful
      * \return FALSE: start management failed
      */
@@ -174,6 +171,7 @@ public:
     /**
      * \brief add application to list of currently registered applications
      * \ingroup ServiceAPI
+     * \param[in] client handle to connected client application
      * \param[in] applicationReference pointer to application object
      */
     virtual void addApplicationReference(t_ilm_client_handle client, IApplicationReference* applicationReference) = 0;
@@ -181,7 +179,7 @@ public:
     /**
      * \brief remove application from list of currently registered applications
      * \ingroup ServiceAPI
-     * \param[in] applicationReference pointer to application object
+     * \param[in] client handle to connected client application
      */
     virtual void removeApplicationReference(t_ilm_client_handle client) = 0;
 

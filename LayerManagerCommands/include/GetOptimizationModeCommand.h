@@ -30,6 +30,7 @@ public:
     /*!
      * \action    This command returns the current mode for the specified
      * optimization.
+     * \param[in] sender client process id that sent this command
      * \param[in] id id of optimization
      * \param[in] returnMode location to store mode of optimization on execution
      * \ingroup Commands

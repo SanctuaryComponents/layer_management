@@ -84,6 +84,7 @@ public:
      * size, opacity, etc...
      *
      * @param uniforms   Uniform values
+     * @param texCount   texture count
      */
     void loadCommonUniforms(const ShaderProgram::CommonUniforms& uniforms, const int texCount) const
     {

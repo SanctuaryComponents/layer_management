@@ -30,6 +30,7 @@ public:
     /*!
      * \action    This command sets the mode for the specified optimization.
      * \frequency Infrequent.
+     * \param[in] sender client process id that sent this command
      * \param[in] id id of optimization
      * \param[in] mode optimization mode to set
      * \ingroup Commands

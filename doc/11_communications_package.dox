@@ -50,7 +50,7 @@ is needed to execute the command, the parameters, the type of command etc. Chang
 the list of layers and properties are then performed at a central point within the
 layermanager.
 
-An implementation of a communication library must subclass BaseCommunicator and
+An implementation of a communication library must subclass ICommunicator and
 implement the inherited start() and stop() methods, as well as a way to load the
 library dynamically at runtime.
 
@@ -73,7 +73,7 @@ Browser, Navigation) to hide the used InterProcessCommunication scheme.
 
 \section communicationsPackageExample Example: Create the communication library “MyCommunicator”
 
-(1) Create the class MyCommunicator, which inherits BaseCommunicator
+(1) Create the class MyCommunicator, which inherits ICommunicator
 
 (2) Implement the virtual class functions
 
@@ -105,10 +105,10 @@ void destroyMyCommunicator(MyCommunicator* pCommunicator)
 \section communicationsPackageReferenceImplementation Reference Implementation
 
 The LayerManagement package contains a reference 
-implementation for a communicator, which is based on DBUS.
+implementation for a communicator, which internally can use DBUS or TCP/IP.
 
 The source code is available in the
-\code <package_root>/LayerManagerPlugins/Communicators/DBUSCommunicator \endcode
+\code <package_root>/LayerManagerPlugins/Communicators/GenericCommunicator \endcode
 directory.
 
 \section communicationsPackagePublicInterface Public Interface

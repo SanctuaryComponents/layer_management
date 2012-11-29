@@ -36,7 +36,7 @@ struct serverinfo;
 extern const struct wl_interface serverinfo_interface;
 
 struct serverinfo_listener {
-	/**
+	/*
 	 * connection_id - (none)
 	 * @connection_id: (none)
 	 */

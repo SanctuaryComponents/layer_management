@@ -27,8 +27,10 @@ implemented.
 
 \section implementationNotesReferenceCommunicator Reference Communicator
 
-The GENIVI reference communicator implementation depends on
-\li DBUS interface.
+The GENIVI reference communicator implementation depends on either
+\li DBUS interface
+or
+\li TCP/IP sockets.
 
 \section implementationNotesOpenGLRenderer OpenGL Reference Renderer
 

@@ -169,7 +169,7 @@ public:
      * \return     TRUE: id is valid and mode was returned
      * \return     FALSE: id was invalid and/or mode was not returned
      */
-    virtual bool getOptimizationMode(OptimizationType, OptimizationModeType *mode) = 0;
+    virtual bool getOptimizationMode(OptimizationType id, OptimizationModeType *mode) = 0;
 };
 
 #endif /* _IRENDERER_H_ */

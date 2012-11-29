@@ -88,6 +88,7 @@ public:
      * size, opacity, etc...
      *
      * @param uniforms   Uniform values
+     * @param texCount   texture count
      */
     void loadCommonUniforms(const CommonUniforms& uniforms, const int texCount) const;
 
