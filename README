@@ -272,15 +272,23 @@ OpenGL ES Example
 OpenGL Example
 #> GLX11ApplicationExample &
 
-3. Running LayerManagerToolBox
+3. Running LayerManagerControl
 
-The LayerManagerToolbox can be used to change and debug 
+The LayerManagerControl can be used to change and debug 
 the runtime behaviour of the service.
 
 Please Call :
-LayerManagerToolBox -? to see the expected parameter
+LayerManagerControl without arguments to see a list of supported commands
 
-Example LayerManagerToolBox --change-surface sid:[0xa],src:[0,0,320,240],dest:[0,0,800,480],o:[1.0],v:[1]
+Examples
+        LayerManagerControl get scene
+        LayerManagerControl get layers
+        LayerManagerControl get layer 1000
+        LayerManagerControl get surfaces
+        LayerManagerControl get surface 0xa
+        LayerManagerControl analyze surface 10
+        LayerManagerControl scatter
+        LayerManagerControl watch surface 0xa
 
 precondition : 
 
@@ -290,5 +298,5 @@ LayerManagerService Running
 run:
 #> export DISPLAY=:0
 #> export LD_LIBRARY_PATH=/usr/local/lib:/usr/lib
-#> LayerManagerToolbox [options]
+#> LayerManagerControl [command]
 

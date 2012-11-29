@@ -69,7 +69,6 @@ rm -rf $RPM_BUILD_ROOT
 
 %{_bindir}/EGLX11ApplicationExample
 %{_bindir}/LayerManagerClientExample
-%{_bindir}/LayerManagerToolBox
 %{_bindir}/LayerManagerControl
 %{_bindir}/EGLX11MockNavigation
 
@@ -78,6 +77,8 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Thu Nov 28 2012 Timo Lotterbach <Timo.Lotterbach@bmw-carit.de> 0.9.9
+- removed LayerManagerToolBox
 * Mon Jun 11 2012 Timo Lotterbach <Timo.Lotterbach@bmw-carit.de> 0.9.6
 - added IpcModules
 - added IpcModuleLoader

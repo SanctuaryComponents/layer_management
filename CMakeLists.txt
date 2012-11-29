@@ -136,7 +136,6 @@ endif(WITH_GLX_EXAMPLE)
 
 if (WITH_CLIENTEXAMPLES)
     add_subdirectory (LayerManagerExamples/LayerManagerClientExample)
-    add_subdirectory (LayerManagerExamples/LayerManagerToolBox)
     add_subdirectory (LayerManagerExamples/LayerManagerControl)
     add_subdirectory (LayerManagerExamples/LayerSceneDescriptionExample)
     set (BUILD_UTILS_LIB ON)
