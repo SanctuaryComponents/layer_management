@@ -215,6 +215,8 @@ void printSurfaceProperties(unsigned int surfaceid, const char* prefix)
     ilmSurfaceProperties p;
     ilm_getPropertiesOfSurface(surfaceid, &p);
 
+    cout << prefix << "- created by pid:       " << p.creatorPid << "\n";
+
     cout << prefix << "- original size:      x=" << p.origSourceWidth << ", y="
             << p.origSourceHeight << "\n";
     cout << prefix << "- destination region: x=" << p.destX << ", y=" << p.destY
