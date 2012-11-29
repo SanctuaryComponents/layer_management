@@ -1,3 +1,24 @@
+Version 0.9.9
+------------------
+This version includes the following enhancements.
+
+Bugfixes :
+- fixed warnings and errors with gcc 4.7.2
+- fixed uint array handling in DbusIpcModule
+- renamed global BIT(x) macro to resolve name collision
+
+Improvements:
+- added documentation for API split into ilmClient and ilmControl
+- input support for wayland with X11, DRI and FBDEV backends
+- support for wayland 1.0.0 API
+- GLES multitexture support
+- support for health monitoring based on systemd watchdog
+- added new debugging features to LayerManagerControl
+- improved logging configuration (set trace log level)
+- added logging of client binary name and process id
+- Dbus now uses private connection
+- code refactorings for signal-, configuration- and plugin-handling
+
 Version 0.9.8
 ------------------
 This version includes the following enhancements.
