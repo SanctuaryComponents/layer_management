@@ -19,18 +19,26 @@
 
 cmake_minimum_required (VERSION 2.6)
 
-include_directories ("include")
-include_directories ("${PROJECT_SOURCE_DIR}/config")
-include_directories ("${PROJECT_SOURCE_DIR}/LayerManagerService/include")
-include_directories ("${PROJECT_SOURCE_DIR}/LayerManagerUtils/include")
+project(LayerManagerCommands)
+
+include_directories(
+    include
+    ${CMAKE_SOURCE_DIR}/config
+    ${CMAKE_SOURCE_DIR}/LayerManagerService/include
+    ${CMAKE_SOURCE_DIR}/LayerManagerUtils/include
+)
 
 file(GLOB LM_SOURCES src/*.cpp)
 file(GLOB LM_INCLUDES include/*.h)
 
-add_library(LayerManagerCommands SHARED ${LM_SOURCES})
+if (WITH_STATIC_PLUGINS)
+    add_library(${PROJECT_NAME} STATIC ${LM_SOURCES})
+else (WITH_STATIC_PLUGINS)
+    add_library(${PROJECT_NAME} SHARED ${LM_SOURCES})
+endif (WITH_STATIC_PLUGINS)
 
-set(LIBS ${LIBS} LayerManagerUtils)
-target_link_libraries(LayerManagerCommands ${LIBS})
+set(LIBS ${LIBS} LayerManagerUtils LayerManagerBase)
+target_link_libraries(${PROJECT_NAME} ${LIBS})
 
-install (TARGETS LayerManagerCommands DESTINATION lib)
+install (TARGETS ${PROJECT_NAME} DESTINATION lib)
 install (FILES ${LM_INCLUDES} DESTINATION include/layermanager)

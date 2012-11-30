@@ -104,7 +104,7 @@ bool ExampleSceneProvider::delegateScene()
             renderOrder[i]=gInitialLayerScene[i].layer;
         }        
         /* Finally set the first executed renderorder */
-        result &= mExecutor.execute(new ScreenSetRenderOrderCommand(layermanagerPid, renderOrder, numberOfLayers));
+        result &= mExecutor.execute(new ScreenSetRenderOrderCommand(layermanagerPid, 0, renderOrder, numberOfLayers));
         result &= mExecutor.execute(new CommitCommand(layermanagerPid));
     }
     

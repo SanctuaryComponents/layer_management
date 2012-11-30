@@ -21,8 +21,6 @@ cmake_minimum_required (VERSION 2.6)
 
 project(GenericCommunicator)
 
-find_package(Threads)
-
 include_directories(
     "include"
     "${CMAKE_SOURCE_DIR}/LayerManagerClient/ilmClient/include"

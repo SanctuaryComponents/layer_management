@@ -21,6 +21,8 @@ cmake_minimum_required (VERSION 2.6)
 
 project(LayerManagerUtils)
 
+find_package (Threads)
+
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 
 add_library(${PROJECT_NAME} STATIC
@@ -38,24 +40,25 @@ set(INCLUDE_DIRS
 
 set(LIBS
     ${LIBS}
+    ${CMAKE_THREAD_LIBS_INIT}
 )
 
 if (WITH_DLT)
 
     find_package(AutomotiveDlt REQUIRED)
-    
+
     set(INCLUDE_DIRS
         ${INCLUDE_DIRS}
         ${DLT_INCLUDE_DIR}
     )
-    
+
     set(LIBS
         ${LIBS}
         ${DLT_LIBRARY}
     )
-    
+
     target_link_libraries(${PROJECT_NAME} ${LIBS})
-    
+
 endif (WITH_DLT)
 
 include_directories(${INCLUDE_DIRS})
@@ -87,13 +90,14 @@ if (WITH_TESTS)
     )
 
     target_link_libraries(${PROJECT_NAME}_Test
+        ${LIBS}
         LayerManagerUtils
         gtest
         pthread
         ${DLT_LIBRARY}
     )
-    
+
     enable_testing()
     add_test(${PROJECT_NAME} ${PROJECT_NAME}_Test)
-    
+
 endif(WITH_TESTS) 

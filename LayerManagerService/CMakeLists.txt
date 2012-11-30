@@ -20,77 +20,98 @@
 cmake_minimum_required (VERSION 2.6)
 
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Xlinker -export-dynamic")
+
 if (WITH_DLT)
-find_package(AutomotiveDlt REQUIRED)
-include_directories(${DLT_INCLUDE_DIR})
+    find_package(AutomotiveDlt REQUIRED)
+    include_directories(${DLT_INCLUDE_DIR})
 endif (WITH_DLT)
 
-include_directories ("include")
-include_directories ("${CMAKE_SOURCE_DIR}/config")
-include_directories ("${CMAKE_SOURCE_DIR}/LayerManagerUtils/include")
-include_directories ("${CMAKE_SOURCE_DIR}/LayerManagerCommands/include")
+include_directories(
+    include
+    ${CMAKE_SOURCE_DIR}/config
+    ${CMAKE_SOURCE_DIR}/LayerManagerUtils/include
+    ${CMAKE_SOURCE_DIR}/LayerManagerCommands/include
+)
 
-file(GLOB LM_SOURCES src/*.cpp src/shader/*.cpp)
-file(GLOB LM_INCLUDES include/*.h)
+set(SRC_FILES
+    src/Configuration.cpp
+    src/GraphicalObject.cpp
+    src/GraphicalSurface.cpp
+    src/InputManager.cpp
+    src/Layermanager.cpp
+    src/PluginBase.cpp
+    src/PluginManager.cpp
+    src/Scene.cpp
+    src/SignalHandler.cpp
+    src/shader/Shader.cpp
+    src/shader/ShaderProgram.cpp
+    src/shader/ShaderProgramFactory.cpp
+    src/shader/ShaderUniform.cpp
+)
 
-add_executable(LayerManagerService ${LM_SOURCES} ${LM_INCLUDES} ${CMAKE_SOURCE_DIR}/config/config.h)
+add_library(LayerManagerBase STATIC ${SRC_FILES})
 
-add_dependencies(LayerManagerService LayerManagerUtils)
-add_dependencies(LayerManagerService LayerManagerCommands)
+add_executable(LayerManagerService src/main.cpp)
 
+add_dependencies(LayerManagerService LayerManagerBase)
+
+add_dependencies(LayerManagerBase
+    LayerManagerUtils
+)
 
 find_package (Threads)
 set(LIBS ${LIBS}
-    LayerManagerUtils 
-    LayerManagerCommands
+    LayerManagerUtils
     dl
     ${CMAKE_THREAD_LIBS_INIT}
     ${DLT_LIBRARY}
     ${STATICALLY_LINKED_PLUGINS}
 ) 
 
-target_link_libraries(LayerManagerService ${LIBS})
+target_link_libraries(LayerManagerBase ${LIBS})
+
+target_link_libraries(LayerManagerService LayerManagerBase)
+
+file(GLOB LM_INCLUDES include/*.h)
 
 install (TARGETS LayerManagerService DESTINATION bin)
 install (FILES ${LM_INCLUDES} DESTINATION include/layermanager)
 
 
 if (WITH_TESTS)
-enable_testing()
-set (CMAKE_CXX_FLAGS "")
-add_executable(LayerManagerService_Test
-    tests/SceneTest.cpp
-    tests/ScreenTest.cpp
-    tests/LayermanagerTest.cpp
-    tests/InputManagerTest.cpp
-    tests/GraphicalObjectTest.cpp
-    tests/GraphicalGroupTest.cpp
-    tests/GraphicalSurfaceTest.cpp
-    tests/SurfaceTest.cpp
-    tests/LayerTest.cpp
-    tests/ShaderTest.cpp
-    tests/ShaderUniformTest.cpp
-    tests/ShaderProgramTest.cpp
-    tests/ShaderProgramFactoryTest.cpp
-    tests/RectangleTest.cpp
-    
-    src/GraphicalObject.cpp
-    src/GraphicalSurface.cpp
-    src/Layermanager.cpp
-    src/InputManager.cpp
-    src/PluginManager.cpp
-    src/PluginBase.cpp
-    src/PluginManager.cpp
-    src/Scene.cpp
-    src/shader/Shader.cpp
-    src/shader/ShaderProgram.cpp
-    src/shader/ShaderProgramFactory.cpp
-    src/shader/ShaderUniform.cpp
-    src/Configuration.cpp
-)
-target_link_libraries(LayerManagerService_Test ${LIBS} gtest gmock)
 
-add_test(LayerManagerService LayerManagerService_Test )
+    find_package (Threads)
+
+    enable_testing()
+
+    set (CMAKE_CXX_FLAGS "")
+
+    add_executable(LayerManagerService_Test
+        tests/SceneTest.cpp
+        tests/ScreenTest.cpp
+        tests/LayermanagerTest.cpp
+        tests/InputManagerTest.cpp
+        tests/GraphicalObjectTest.cpp
+        tests/GraphicalGroupTest.cpp
+        tests/GraphicalSurfaceTest.cpp
+        tests/SurfaceTest.cpp
+        tests/LayerTest.cpp
+        tests/ShaderTest.cpp
+        tests/ShaderUniformTest.cpp
+        tests/ShaderProgramTest.cpp
+        tests/ShaderProgramFactoryTest.cpp
+        tests/RectangleTest.cpp
+    )
+
+    target_link_libraries(LayerManagerService_Test
+        ${LIBS}
+        LayerManagerBase
+        gtest
+        gmock
+        ${CMAKE_THREAD_LIBS_INIT}
+    )
+
+    add_test(LayerManagerService LayerManagerService_Test)
 
 endif(WITH_TESTS) 
 
