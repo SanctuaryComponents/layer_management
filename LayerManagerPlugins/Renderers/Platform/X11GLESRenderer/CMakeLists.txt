@@ -19,68 +19,187 @@
 #
 ############################################################################
 
+
 cmake_minimum_required (VERSION 2.6)
 
+#===========================================================================
+# plugin configuration
+#===========================================================================
 project(X11GLESRenderer)
 
-include_directories ("include")
-include_directories ("../../Base/include")
-include_directories ("../../Graphic/include")
-include_directories ("${CMAKE_SOURCE_DIR}/config")
-include_directories ("${CMAKE_SOURCE_DIR}/LayerManagerService/include")
-include_directories ("${CMAKE_SOURCE_DIR}/LayerManagerUtils/include")
+find_package(X11 REQUIRED)
+find_package(EGL REQUIRED)
+find_package(GLESv2 REQUIRED)
+find_package(Threads REQUIRED)
+
+include_directories(
+    include
+    ../../Base/include
+    ../../Graphic/include
+    ${CMAKE_SOURCE_DIR}/config
+    ${CMAKE_SOURCE_DIR}/LayerManagerService/include
+    ${CMAKE_SOURCE_DIR}/LayerManagerUtils/include
+    ${X11_INCLUDE_DIR}
+    ${EGL_INCLUDE_DIR}
+    ${GLESv2_INCLUDE_DIR}
+)
+
+set(LIBS
+    ${CMAKE_THREAD_LIBS_INIT}
+    ${EGL_LIBRARY}
+    ${GLESv2_LIBRARIES}
+    ${X11_Xcomposite_LIB}
+    ${X11_Xdamage_LIB}
+    LayerManagerGraphicGLESv2
+    LayerManagerUtils
+)
 
 set(SRC_FILES
     src/X11GLESRenderer.cpp
     src/ShaderProgramGLES.cpp
 )
 
+set(PLUGIN_INSTALL_PATH lib/layermanager/renderer)
+
+install(FILES
+    renderer_frag_clear.glslf
+    renderer_frag.glslf
+    renderer_frag_no_blend.glslf
+    renderer_frag_no_ualpha.glslf
+    renderer_frag_add_uchromakey.glslf
+    renderer_frag_no_blend_no_ualpha.glslf
+    renderer_frag_2surf.glslf
+    renderer_frag_2surf_no_blend.glslf
+    renderer_frag_2surf_no_ualpha.glslf
+    renderer_frag_2surf_no_blend_no_ualpha.glslf
+    renderer_frag_2surf_no_ualpha_0.glslf
+    renderer_frag_2surf_no_blend_no_ualpha_0.glslf
+    renderer_frag_2surf_no_ualpha_1.glslf
+    renderer_frag_2surf_no_blend_no_ualpha_1.glslf
+    renderer_vert.glslv
+    renderer_vert_2surf.glslv
+    DESTINATION
+        lib/layermanager/renderer
+)
+
+#===========================================================================
+# create statically linked plugin
+#===========================================================================
 if (WITH_STATIC_LIBRARIES)
 
     add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
+
     set (STATICALLY_LINKED_PLUGINS ${STATICALLY_LINKED_PLUGINS}
         ${PROJECT_NAME} CACHE INTERNAL "list of static plugins")
 
+#===========================================================================
+# create dynamically linked plugin
+#===========================================================================
 else(WITH_STATIC_LIBRARIES)
 
     add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
 
+    install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${PLUGIN_INSTALL_PATH})
+
 endif(WITH_STATIC_LIBRARIES)
 
-find_package(X11 REQUIRED)
-include_directories(${X11_INCLUDE_DIR})
 
-find_package(EGL REQUIRED)
-include_directories(${EGL_INCLUDE_DIR})
-
-find_package(GLESv2 REQUIRED)
-include_directories(${GLESv2_INCLUDE_DIR})
-
-find_package (Threads)
-set(LIBS ${LIBS} ${CMAKE_THREAD_LIBS_INIT} ${EGL_LIBRARY} ${GLESv2_LIBRARIES} ${X11_Xcomposite_LIB} ${X11_Xdamage_LIB} LayerManagerGraphicGLESv2 LayerManagerUtils LayerManagerBase)
+#===========================================================================
+# external libraries
+#===========================================================================
 target_link_libraries(${PROJECT_NAME} ${LIBS})
 
-add_dependencies(${PROJECT_NAME} LayerManagerUtils)
-add_dependencies(${PROJECT_NAME} LayerManagerGraphicGLESv2)
-add_dependencies(${PROJECT_NAME} LayerManagerBase)
+add_dependencies(${PROJECT_NAME} ${LIBS})
 
-install (TARGETS ${PROJECT_NAME}
-         LIBRARY DESTINATION lib/layermanager/renderer
-         ARCHIVE DESTINATION lib/layermanager/static
-)
-install (FILES renderer_frag_clear.glslf DESTINATION lib/layermanager/renderer)
-install (FILES renderer_frag.glslf DESTINATION lib/layermanager/renderer)
-install (FILES renderer_frag_no_blend.glslf DESTINATION lib/layermanager/renderer)
-install (FILES renderer_frag_no_ualpha.glslf DESTINATION lib/layermanager/renderer)
-install (FILES renderer_frag_add_uchromakey.glslf DESTINATION lib/layermanager/renderer)
-install (FILES renderer_frag_no_blend_no_ualpha.glslf DESTINATION lib/layermanager/renderer)
-install (FILES renderer_frag_2surf.glslf DESTINATION lib/layermanager/renderer)
-install (FILES renderer_frag_2surf_no_blend.glslf DESTINATION lib/layermanager/renderer)
-install (FILES renderer_frag_2surf_no_ualpha.glslf DESTINATION lib/layermanager/renderer)
-install (FILES renderer_frag_2surf_no_blend_no_ualpha.glslf DESTINATION lib/layermanager/renderer)
-install (FILES renderer_frag_2surf_no_ualpha_0.glslf DESTINATION lib/layermanager/renderer)
-install (FILES renderer_frag_2surf_no_blend_no_ualpha_0.glslf DESTINATION lib/layermanager/renderer)
-install (FILES renderer_frag_2surf_no_ualpha_1.glslf DESTINATION lib/layermanager/renderer)
-install (FILES renderer_frag_2surf_no_blend_no_ualpha_1.glslf DESTINATION lib/layermanager/renderer)
-install (FILES renderer_vert.glslv DESTINATION lib/layermanager/renderer)
-install (FILES renderer_vert_2surf.glslv DESTINATION lib/layermanager/renderer)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#cmake_minimum_required (VERSION 2.6)
+
+#project(X11GLESRenderer)
+
+#include_directories ("include")
+#include_directories ("../../Base/include")
+#include_directories ("../../Graphic/include")
+#include_directories ("${CMAKE_SOURCE_DIR}/config")
+#include_directories ("${CMAKE_SOURCE_DIR}/LayerManagerService/include")
+#include_directories ("${CMAKE_SOURCE_DIR}/LayerManagerUtils/include")
+
+#set(SRC_FILES
+#    src/X11GLESRenderer.cpp
+#    src/ShaderProgramGLES.cpp
+#)
+
+#if (WITH_STATIC_LIBRARIES)
+
+#    add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
+#    set (STATICALLY_LINKED_PLUGINS ${STATICALLY_LINKED_PLUGINS}
+#        ${PROJECT_NAME} CACHE INTERNAL "list of static plugins")
+
+#else(WITH_STATIC_LIBRARIES)
+
+#    add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
+
+#endif(WITH_STATIC_LIBRARIES)
+
+#find_package(X11 REQUIRED)
+#include_directories(${X11_INCLUDE_DIR})
+
+#find_package(EGL REQUIRED)
+#include_directories(${EGL_INCLUDE_DIR})
+
+#find_package(GLESv2 REQUIRED)
+#include_directories(${GLESv2_INCLUDE_DIR})
+
+#find_package (Threads)
+#set(LIBS ${LIBS} ${CMAKE_THREAD_LIBS_INIT} ${EGL_LIBRARY} ${GLESv2_LIBRARIES} ${X11_Xcomposite_LIB} ${X11_Xdamage_LIB} LayerManagerGraphicGLESv2 LayerManagerUtils LayerManagerBase)
+#target_link_libraries(${PROJECT_NAME} ${LIBS})
+
+#add_dependencies(${PROJECT_NAME} LayerManagerUtils)
+#add_dependencies(${PROJECT_NAME} LayerManagerGraphicGLESv2)
+#add_dependencies(${PROJECT_NAME} LayerManagerBase)
+
+#install (TARGETS ${PROJECT_NAME}
+#         LIBRARY DESTINATION lib/layermanager/renderer
+#         ARCHIVE DESTINATION lib/layermanager/static
+#)
+#install (FILES renderer_frag_clear.glslf DESTINATION lib/layermanager/renderer)
+#install (FILES renderer_frag.glslf DESTINATION lib/layermanager/renderer)
+#install (FILES renderer_frag_no_blend.glslf DESTINATION lib/layermanager/renderer)
+#install (FILES renderer_frag_no_ualpha.glslf DESTINATION lib/layermanager/renderer)
+#install (FILES renderer_frag_add_uchromakey.glslf DESTINATION lib/layermanager/renderer)
+#install (FILES renderer_frag_no_blend_no_ualpha.glslf DESTINATION lib/layermanager/renderer)
+#install (FILES renderer_frag_2surf.glslf DESTINATION lib/layermanager/renderer)
+#install (FILES renderer_frag_2surf_no_blend.glslf DESTINATION lib/layermanager/renderer)
+#install (FILES renderer_frag_2surf_no_ualpha.glslf DESTINATION lib/layermanager/renderer)
+#install (FILES renderer_frag_2surf_no_blend_no_ualpha.glslf DESTINATION lib/layermanager/renderer)
+#install (FILES renderer_frag_2surf_no_ualpha_0.glslf DESTINATION lib/layermanager/renderer)
+#install (FILES renderer_frag_2surf_no_blend_no_ualpha_0.glslf DESTINATION lib/layermanager/renderer)
+#install (FILES renderer_frag_2surf_no_ualpha_1.glslf DESTINATION lib/layermanager/renderer)
+#install (FILES renderer_frag_2surf_no_blend_no_ualpha_1.glslf DESTINATION lib/layermanager/renderer)
+#install (FILES renderer_vert.glslv DESTINATION lib/layermanager/renderer)
+#install (FILES renderer_vert_2surf.glslv DESTINATION lib/layermanager/renderer)
