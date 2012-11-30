@@ -36,11 +36,13 @@ ExecutionResult CommitCommand::execute(ICommandExecutor* executor)
         ICommand* command = (*iter);
         if (command)
         {
+            bool commandExecuteSuccess = true;
             ExecutionResult result = command->execute(executor);
 
             if (result == ExecutionFailed || result == ExecutionFailedRedraw)
             {
                 success = false;
+                commandExecuteSuccess = false;
             }
 
             if (result == ExecutionFailedRedraw || result == ExecutionSuccessRedraw)
@@ -48,10 +50,10 @@ ExecutionResult CommitCommand::execute(ICommandExecutor* executor)
                 redraw = true;
             }
 
-            unsigned int pid = getSenderPid();
+            unsigned int pid = command->getSenderPid();
             LOG_INFO("CommitCommand", "executed " << command->getString()
                     << " from " << executor->getSenderName(pid) << "(" << pid << ")"
-                    << (success ? "+" : "-"));
+                    << (commandExecuteSuccess ? "+" : "-"));
             delete command;
         }
     }
