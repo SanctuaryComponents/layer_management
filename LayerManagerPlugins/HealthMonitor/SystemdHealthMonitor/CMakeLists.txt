@@ -7,7 +7,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#               http://www.apache.org/licenses/LICENSE-2.0
+#               http:#www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,6 +19,9 @@
 
 cmake_minimum_required (VERSION 2.6)
 
+#===========================================================================
+# plugin configuration
+#===========================================================================
 project(SystemdHealthMonitor)
 
 include_directories(
@@ -29,7 +32,7 @@ include_directories(
 )
 
 set(LIBS
-    ${LIBS}
+    LayerManagerBase
     LayerManagerUtils
     systemd
     rt
@@ -39,28 +42,33 @@ set(SRC_FILES
     src/SystemdHealthMonitor.cpp
 )
 
+set(PLUGIN_INSTALL_PATH lib/layermanager/health)
+
+#===========================================================================
+# create statically linked plugin
+#===========================================================================
 if (WITH_STATIC_LIBRARIES)
 
     add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
+
     set (STATICALLY_LINKED_PLUGINS ${STATICALLY_LINKED_PLUGINS}
         ${PROJECT_NAME} CACHE INTERNAL "list of static plugins")
 
+#===========================================================================
+# create dynamically linked plugin
+#===========================================================================
 else(WITH_STATIC_LIBRARIES)
 
     add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
 
+    install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${PLUGIN_INSTALL_PATH})
+
 endif(WITH_STATIC_LIBRARIES)
 
 
-target_link_libraries(${PROJECT_NAME}
-    ${LIBS}
-)
+#===========================================================================
+# external libraries
+#===========================================================================
+target_link_libraries(${PROJECT_NAME} ${LIBS})
 
-add_dependencies(${PROJECT_NAME}
-    LayerManagerUtils
-)
-
-install (TARGETS ${PROJECT_NAME}
-         LIBRARY DESTINATION lib/layermanager/health
-         ARCHIVE DESTINATION lib/layermanager/static
-)
+add_dependencies(${PROJECT_NAME} ${LIBS})
