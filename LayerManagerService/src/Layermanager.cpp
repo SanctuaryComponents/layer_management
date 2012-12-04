@@ -20,6 +20,7 @@
 #include "Layermanager.h"
 #include "Log.h"
 #include <iomanip>
+#include "CommandList.h"
 #include "LayerList.h"
 #include "ICommand.h"
 #include "ICommunicator.h"
@@ -206,6 +207,15 @@ void Layermanager::removeApplicationReference(t_ilm_client_handle client)
         LOG_INFO("LayerManagerService", "Disconnect from application " << getSenderName(client) << "(" << pid << ")");
         m_pApplicationReferenceMap->erase(client);
         m_pidToProcessNameTable.erase(pid);
+
+        // if pid = 0, the client did not send ServiceConnect.
+        // since many client may use this configuration, we must
+        // not discard any pending commands here: we could discard
+        // commands of currently running applications
+        if (0 != pid)
+        {
+            m_EnqueuedCommands.erase(pid);
+        }
     }
 }
 
@@ -311,24 +321,22 @@ bool Layermanager::executeCommand(ICommand* commandToBeExecuted)
     return (status == ExecutionSuccess || status == ExecutionSuccessRedraw);
 }
 
-bool Layermanager::enqueueCommand(ICommand* commandToBeExecuted)
+bool Layermanager::enqueueCommand(ICommand* command)
 {
-    unsigned int sizeBefore;
-    unsigned int sizeAfter;
+    bool result = false;
 
-    m_pScene->lockScene();
-    sizeBefore = m_pScene->m_toBeCommittedList.size();
-    m_pScene->m_toBeCommittedList.push_back(commandToBeExecuted);
-    sizeAfter = m_pScene->m_toBeCommittedList.size();
-    m_pScene->unlockScene();
+    if (command)
+    {
+        const unsigned int commandPid = command->getSenderPid();
+        m_EnqueuedCommands[commandPid].push_back(command);
+        result = true;
 
-    unsigned int commandPid = commandToBeExecuted->getSenderPid();
-    LOG_DEBUG("LayerManagerService", "enqueued " << commandToBeExecuted->getString()
-            << " from " << getSenderName(commandPid) << "(" << commandPid << ")"
-                                     << ((sizeAfter == sizeBefore + 1) ? "+" : "-"));
+        LOG_DEBUG("LayerManagerService", "enqueued " << command->getString()
+                    << " from " << getSenderName(commandPid) << "(" << commandPid << ")"
+                    << (result ? "+" : "-"));
+    }
 
-    // if queue size increased by 1, enqueue command was successful
-    return (sizeAfter == sizeBefore + 1);
+    return result;
 }
 
 bool Layermanager::execute(ICommand* commandToBeExecuted)
@@ -537,3 +545,4 @@ HealthCondition Layermanager::getHealth()
 
     return returnValue;
 }
+

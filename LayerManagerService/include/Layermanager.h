@@ -22,6 +22,7 @@
 
 #include "ICommandExecutor.h"
 #include "NotificationQueue.h"
+#include "CommandList.h"
 #include <pthread.h>
 
 class Scene;
@@ -35,6 +36,7 @@ class IPlugin;
 class Configuration;
 class PluginManager;
 
+typedef std::map<unsigned int, CommandList> CommandListMap;
 typedef std::map<unsigned int, const char*> PidToProcessNameTable;
 typedef std::list<IPlugin*> PluginList;
 
@@ -82,6 +84,8 @@ public:
 
     virtual HealthCondition getHealth();
 
+    virtual CommandList& getEnqueuedCommands(unsigned int clientPid);
+
 private:
     void printDebugInformation() const;
     bool startAllRenderers(const int width, const int height, const char *displayName);
@@ -100,6 +104,7 @@ private:
     NotificationQueue m_clientNotificationQueue;
     ApplicationReferenceMap* m_pApplicationReferenceMap;
     PidToProcessNameTable m_pidToProcessNameTable;
+    CommandListMap m_EnqueuedCommands;
     IHealth* m_pHealth;
     pthread_t m_pWatchdogThread;
     bool mHealthState;
@@ -148,6 +153,11 @@ inline void Layermanager::addClientNotification(GraphicalObject* object, t_ilm_n
 inline NotificationQueue& Layermanager::getClientNotificationQueue()
 {
     return m_clientNotificationQueue;
+}
+
+inline CommandList& Layermanager::getEnqueuedCommands(unsigned int clientPid)
+{
+    return m_EnqueuedCommands[clientPid];
 }
 
 #endif /* _LAYERMANAGER_H_ */

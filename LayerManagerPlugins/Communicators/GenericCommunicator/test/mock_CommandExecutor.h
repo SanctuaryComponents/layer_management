@@ -64,6 +64,8 @@ class MockCommandExecutor : public ICommandExecutor {
   MOCK_METHOD0(getClientNotificationQueue, NotificationQueue&());
 
   MOCK_METHOD0(getHealth, HealthCondition());
+
+  MOCK_METHOD1(getEnqueuedCommands, CommandList&(unsigned int clientPid));
 };
 
 #endif /* MockCommandExecutor_H_ */

@@ -26,10 +26,11 @@ ExecutionResult CommitCommand::execute(ICommandExecutor* executor)
     bool success = true;
     bool redraw = false;
 
-    Scene* scene = (executor->getScene());
+    unsigned int commitCommandPid = getSenderPid();
 
-    CommandListIterator iter = scene->m_toBeCommittedList.begin();
-    CommandListIterator iterEnd = scene->m_toBeCommittedList.end();
+    CommandList& clientCommandQueue = executor->getEnqueuedCommands(commitCommandPid);
+    CommandListIterator iter = clientCommandQueue.begin();
+    CommandListIterator iterEnd = clientCommandQueue.end();
 
     for (; iter != iterEnd; ++iter)
     {
@@ -57,7 +58,7 @@ ExecutionResult CommitCommand::execute(ICommandExecutor* executor)
             delete command;
         }
     }
-    scene->m_toBeCommittedList.clear();
+    clientCommandQueue.clear();
 
     ExecutionResult returnValue = ExecutionFailed;
 

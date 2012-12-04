@@ -26,6 +26,7 @@
 #include "ApplicationReferenceMap.h"
 #include "LayerType.h"
 #include "ObjectType.h"
+#include "CommandList.h"
 #include "NotificationQueue.h"
 #include <pthread.h>
 
@@ -254,7 +255,15 @@ public:
      * \return reference to current list of updated scene elements
      */
     virtual NotificationQueue& getClientNotificationQueue() = 0;
-    
+
+    /**
+     * \brief get the list of enqueued commands for a client
+     * \ingroup ServiceAPI
+     * \param[in] clientPid process id of client
+     * \return Reference to command list for client
+     */
+    virtual CommandList& getEnqueuedCommands(unsigned int clientPid) = 0;
+
     /**
      * \brief get system health state
      * \ingroup ServiceAPI

@@ -92,7 +92,6 @@ private:
     void removeSurfaceFromAllSurfaceGroups(Surface* surface);
 
 private:
-    CommandList m_toBeCommittedList;
     ShaderMap m_shaderMap;
     pthread_mutex_t m_layerListMutex;
     LayerGroupMap m_layerGroupMap;
