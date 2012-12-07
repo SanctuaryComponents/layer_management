@@ -72,6 +72,8 @@ void X11EglImage::createClientBuffer(Surface* surface)
         if (windowPixmap == 0)
         {
             LOG_ERROR("X11EglImage", "didnt create pixmap!");
+        } else {
+            nativeSurface->pixmap = windowPixmap;
         }
 
         EGLImageKHR eglImage = 0;
@@ -114,11 +116,18 @@ PlatformSurface* X11EglImage::createPlatformSurface(Surface* surface)
 void X11EglImage::destroyClientBuffer(Surface* surface)
 {
     EglXPlatformSurface* nativeSurface = (EglXPlatformSurface*)surface->platform;
+    // We have to clean up the gpu texture memory
     if (nativeSurface && nativeSurface->eglImage)
     {
         m_pfEglDestroyImageKHR(m_eglDisplay, nativeSurface->eglImage);
         glDeleteTextures(1, &nativeSurface->texture);
         nativeSurface->eglImage = 0;
         nativeSurface->texture = 0;
+    }
+    // We have to clean up the XServer side pixmap too
+    if (nativeSurface && nativeSurface->pixmap )
+    {
+        XFreePixmap(m_x11display, nativeSurface->pixmap);
+        nativeSurface->pixmap = None;
     }
 }
