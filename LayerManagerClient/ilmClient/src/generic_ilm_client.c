@@ -48,20 +48,19 @@ const int gResponseTimeout = 500; // in ms
 //=============================================================================
 // global vars
 //=============================================================================
-extern char *__progname;
+extern char *__progname; // automatically gets assigned argv[0]
 
-struct IpcModule gIpcModule;
+static struct IpcModule gIpcModule;
 
-pthread_t gReceiveThread;
-pthread_mutex_t gNewMessageAvailable;
-pthread_mutex_t gCurrentMessageReleased;
-pthread_t gNotificationThread;
+static pthread_t gReceiveThread;
+static pthread_mutex_t gSendReceiveLock;
+static pthread_t gNotificationThread;
 
-mqd_t incomingMqRead;
-mqd_t incomingMqWrite;
+static mqd_t incomingMqRead;
+static mqd_t incomingMqWrite;
 
-mqd_t notificationMqRead;
-mqd_t notificationMqWrite;
+static mqd_t notificationMqRead;
+static mqd_t notificationMqWrite;
 
 static t_ilm_bool gInitialized = ILM_FALSE;
 
@@ -384,15 +383,28 @@ void calculateTimeout(struct timeval* currentTime, int giventimeout, struct time
     timeout->tv_sec  = currentTime->tv_sec + (newNanoSeconds / 1000000000 );
 }
 
-t_ilm_message waitForResponse(int timeoutInMs)
+t_ilm_bool sendAndWaitForResponse(t_ilm_message command, t_ilm_message* response, int timeoutInMs)
 {
-    t_ilm_message message = 0;
+    *response = 0;
+    t_ilm_message_type responseType = IpcMessageTypeNone;
 
-    if (-1 == mq_receive(incomingMqRead, (char*)&message, sizeof(t_ilm_message), NULL))
+    // send / receive may only be performed by one thread at a time
+    pthread_mutex_lock(&gSendReceiveLock);
+
+    if (gIpcModule.sendToService(command))
     {
-       fprintf(stderr,"waitForResponse: mq_receive failed, errno = %d\n", errno);
+        if (-1 == mq_receive(incomingMqRead, (char*)response, sizeof(t_ilm_message), NULL))
+        {
+            fprintf(stderr,"waitForResponse: mq_receive failed, errno = %d\n", errno);
+        }
+        else
+        {
+            responseType = gIpcModule.getMessageType(*response);
+        }
     }
-    return message;
+    pthread_mutex_unlock(&gSendReceiveLock);
+
+    return (*response && (IpcMessageTypeCommand == responseType));
 }
 
 //=============================================================================
@@ -444,11 +456,7 @@ ilmErrorTypes ilm_init()
                 return result;
             }
 
-            pthread_mutex_init(&gNewMessageAvailable, NULL);
-            pthread_mutex_init(&gCurrentMessageReleased, NULL);
-
-            pthread_mutex_lock(&gNewMessageAvailable);
-            pthread_mutex_lock(&gCurrentMessageReleased);
+            pthread_mutex_init(&gSendReceiveLock, NULL);
 
             pthread_attr_t notificationThreadAttributes;
             pthread_attr_init(&notificationThreadAttributes);
@@ -479,27 +487,26 @@ ilmErrorTypes ilm_init()
         }
         else
         {
+            result = ILM_FAILED;
             printf("Failed to initialize Client Ipc Module");
+            return result;
         }
 
+        t_ilm_message response = 0;
         t_ilm_message command = gIpcModule.createMessage("ServiceConnect");
         if (command
                 && gIpcModule.appendUint(command, pid)
                 && gIpcModule.appendString(command, __progname)
-                && gIpcModule.sendToService(command))
+                && sendAndWaitForResponse(command, &response, gResponseTimeout))
         {
-            t_ilm_message response = waitForResponse(gResponseTimeout);
-            if (response)
-            {
-                result = ILM_SUCCESS;
-            }
-            else
-            {
-                result = ILM_FAILED;
-                printf("Failed to connect to LayerManagerService.");
-            }
-            gIpcModule.destroyMessage(response);
+            result = ILM_SUCCESS;
         }
+        else
+        {
+            result = ILM_FAILED;
+            printf("Failed to connect to LayerManagerService.");
+        }
+        gIpcModule.destroyMessage(response);
         gIpcModule.destroyMessage(command);
     }
 
@@ -512,18 +519,15 @@ ilmErrorTypes ilm_destroy()
 {
     ilmErrorTypes result = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("ServiceDisconnect");
     if (command
         && gIpcModule.appendUint(command, getpid())
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response)
-        {
-            result = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        result = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
 
     // cancel worker threads
@@ -535,11 +539,9 @@ ilmErrorTypes ilm_destroy()
     pthread_join(gReceiveThread, &threadReturnValue);
     pthread_join(gNotificationThread, &threadReturnValue);
 
-    pthread_mutex_unlock(&gNewMessageAvailable);
-    pthread_mutex_unlock(&gCurrentMessageReleased);
+    pthread_mutex_unlock(&gSendReceiveLock);
 
-    pthread_mutex_destroy(&gNewMessageAvailable);
-    pthread_mutex_destroy(&gCurrentMessageReleased);
+    pthread_mutex_destroy(&gSendReceiveLock);
 
     gIpcModule.destroy();
 
@@ -558,44 +560,41 @@ ilmErrorTypes ilm_getPropertiesOfSurface(t_ilm_uint surfaceID, struct ilmSurface
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("GetPropertiesOfSurface");
+
     if (pSurfaceProperties
         && command
         && gIpcModule.appendUint(command, surfaceID)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout)
+        && gIpcModule.getDouble(response, &pSurfaceProperties->opacity)
+        && gIpcModule.getUint(response, &pSurfaceProperties->sourceX)
+        && gIpcModule.getUint(response, &pSurfaceProperties->sourceY)
+        && gIpcModule.getUint(response, &pSurfaceProperties->sourceWidth)
+        && gIpcModule.getUint(response, &pSurfaceProperties->sourceHeight)
+        && gIpcModule.getUint(response, &pSurfaceProperties->origSourceWidth)
+        && gIpcModule.getUint(response, &pSurfaceProperties->origSourceHeight)
+        && gIpcModule.getUint(response, &pSurfaceProperties->destX)
+        && gIpcModule.getUint(response, &pSurfaceProperties->destY)
+        && gIpcModule.getUint(response, &pSurfaceProperties->destWidth)
+        && gIpcModule.getUint(response, &pSurfaceProperties->destHeight)
+        && gIpcModule.getUint(response, &pSurfaceProperties->orientation)
+        && gIpcModule.getBool(response, &pSurfaceProperties->visibility)
+        && gIpcModule.getUint(response, &pSurfaceProperties->frameCounter)
+        && gIpcModule.getUint(response, &pSurfaceProperties->drawCounter)
+        && gIpcModule.getUint(response, &pSurfaceProperties->updateCounter)
+        && gIpcModule.getUint(response, &pSurfaceProperties->pixelformat)
+        && gIpcModule.getUint(response, &pSurfaceProperties->nativeSurface)
+        && gIpcModule.getUint(response, &pSurfaceProperties->inputDevicesAcceptance)
+        && gIpcModule.getBool(response, &pSurfaceProperties->chromaKeyEnabled)
+        && gIpcModule.getUint(response, &pSurfaceProperties->chromaKeyRed)
+        && gIpcModule.getUint(response, &pSurfaceProperties->chromaKeyGreen)
+        && gIpcModule.getUint(response, &pSurfaceProperties->chromaKeyBlue)
+        && gIpcModule.getInt(response, &pSurfaceProperties->creatorPid))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand
-            && gIpcModule.getDouble(response, &pSurfaceProperties->opacity)
-            && gIpcModule.getUint(response, &pSurfaceProperties->sourceX)
-            && gIpcModule.getUint(response, &pSurfaceProperties->sourceY)
-            && gIpcModule.getUint(response, &pSurfaceProperties->sourceWidth)
-            && gIpcModule.getUint(response, &pSurfaceProperties->sourceHeight)
-            && gIpcModule.getUint(response, &pSurfaceProperties->origSourceWidth)
-            && gIpcModule.getUint(response, &pSurfaceProperties->origSourceHeight)
-            && gIpcModule.getUint(response, &pSurfaceProperties->destX)
-            && gIpcModule.getUint(response, &pSurfaceProperties->destY)
-            && gIpcModule.getUint(response, &pSurfaceProperties->destWidth)
-            && gIpcModule.getUint(response, &pSurfaceProperties->destHeight)
-            && gIpcModule.getUint(response, &pSurfaceProperties->orientation)
-            && gIpcModule.getBool(response, &pSurfaceProperties->visibility)
-            && gIpcModule.getUint(response, &pSurfaceProperties->frameCounter)
-            && gIpcModule.getUint(response, &pSurfaceProperties->drawCounter)
-            && gIpcModule.getUint(response, &pSurfaceProperties->updateCounter)
-            && gIpcModule.getUint(response, &pSurfaceProperties->pixelformat)
-            && gIpcModule.getUint(response, &pSurfaceProperties->nativeSurface)
-            && gIpcModule.getUint(response, &pSurfaceProperties->inputDevicesAcceptance)
-            && gIpcModule.getBool(response, &pSurfaceProperties->chromaKeyEnabled)
-            && gIpcModule.getUint(response, &pSurfaceProperties->chromaKeyRed)
-            && gIpcModule.getUint(response, &pSurfaceProperties->chromaKeyGreen)
-            && gIpcModule.getUint(response, &pSurfaceProperties->chromaKeyBlue)
-            && gIpcModule.getInt(response, &pSurfaceProperties->creatorPid))
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -604,39 +603,35 @@ ilmErrorTypes ilm_getPropertiesOfLayer(t_ilm_uint layerID, struct ilmLayerProper
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("GetPropertiesOfLayer");
     if (pLayerProperties
         && command
         && gIpcModule.appendUint(command, layerID)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout)
+        && gIpcModule.getDouble(response, &pLayerProperties->opacity)
+        && gIpcModule.getUint(response, &pLayerProperties->sourceX)
+        && gIpcModule.getUint(response, &pLayerProperties->sourceY)
+        && gIpcModule.getUint(response, &pLayerProperties->sourceWidth)
+        && gIpcModule.getUint(response, &pLayerProperties->sourceHeight)
+        && gIpcModule.getUint(response, &pLayerProperties->origSourceWidth)
+        && gIpcModule.getUint(response, &pLayerProperties->origSourceHeight)
+        && gIpcModule.getUint(response, &pLayerProperties->destX)
+        && gIpcModule.getUint(response, &pLayerProperties->destY)
+        && gIpcModule.getUint(response, &pLayerProperties->destWidth)
+        && gIpcModule.getUint(response, &pLayerProperties->destHeight)
+        && gIpcModule.getUint(response, &pLayerProperties->orientation)
+        && gIpcModule.getBool(response, &pLayerProperties->visibility)
+        && gIpcModule.getUint(response, &pLayerProperties->type)
+        && gIpcModule.getBool(response, &pLayerProperties->chromaKeyEnabled)
+        && gIpcModule.getUint(response, &pLayerProperties->chromaKeyRed)
+        && gIpcModule.getUint(response, &pLayerProperties->chromaKeyGreen)
+        && gIpcModule.getUint(response, &pLayerProperties->chromaKeyBlue)
+        && gIpcModule.getInt(response, &pLayerProperties->creatorPid))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand
-            && gIpcModule.getDouble(response, &pLayerProperties->opacity)
-            && gIpcModule.getUint(response, &pLayerProperties->sourceX)
-            && gIpcModule.getUint(response, &pLayerProperties->sourceY)
-            && gIpcModule.getUint(response, &pLayerProperties->sourceWidth)
-            && gIpcModule.getUint(response, &pLayerProperties->sourceHeight)
-            && gIpcModule.getUint(response, &pLayerProperties->origSourceWidth)
-            && gIpcModule.getUint(response, &pLayerProperties->origSourceHeight)
-            && gIpcModule.getUint(response, &pLayerProperties->destX)
-            && gIpcModule.getUint(response, &pLayerProperties->destY)
-            && gIpcModule.getUint(response, &pLayerProperties->destWidth)
-            && gIpcModule.getUint(response, &pLayerProperties->destHeight)
-            && gIpcModule.getUint(response, &pLayerProperties->orientation)
-            && gIpcModule.getBool(response, &pLayerProperties->visibility)
-            && gIpcModule.getUint(response, &pLayerProperties->type)
-            && gIpcModule.getBool(response, &pLayerProperties->chromaKeyEnabled)
-            && gIpcModule.getUint(response, &pLayerProperties->chromaKeyRed)
-            && gIpcModule.getUint(response, &pLayerProperties->chromaKeyGreen)
-            && gIpcModule.getUint(response, &pLayerProperties->chromaKeyBlue)
-            && gIpcModule.getInt(response, &pLayerProperties->creatorPid))
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -645,21 +640,17 @@ ilmErrorTypes ilm_getNumberOfHardwareLayers(t_ilm_uint screenID, t_ilm_uint* pNu
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("GetNumberOfHardwareLayers");
     if (pNumberOfHardwareLayers
         && command
         && gIpcModule.appendUint(command, screenID)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout)
+        && gIpcModule.getUint(response, pNumberOfHardwareLayers))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand
-            && gIpcModule.getUint(response, pNumberOfHardwareLayers))
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -668,22 +659,18 @@ ilmErrorTypes ilm_getScreenResolution(t_ilm_uint screenID, t_ilm_uint* pWidth, t
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("GetScreenResolution");
     if (pWidth && pHeight
         && command
         && gIpcModule.appendUint(command, screenID)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout)
+        && gIpcModule.getUint(response, pWidth)
+        && gIpcModule.getUint(response, pHeight))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand
-            && gIpcModule.getUint(response, pWidth)
-            && gIpcModule.getUint(response, pHeight))
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -692,20 +679,16 @@ ilmErrorTypes ilm_getLayerIDs(t_ilm_int* pLength, t_ilm_layer** ppArray)
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("ListAllLayerIDS");
     if (pLength && ppArray
         && command
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout)
+        && gIpcModule.getUintArray(response, ppArray, pLength))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand
-            && gIpcModule.getUintArray(response, ppArray, pLength))
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -714,21 +697,17 @@ ilmErrorTypes ilm_getLayerIDsOnScreen(t_ilm_uint screenId, t_ilm_int* pLength, t
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("ListAllLayerIDsOnScreen");
     if (pLength && ppArray
         && command
         && gIpcModule.appendUint(command, screenId)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout)
+        && gIpcModule.getUintArray(response, ppArray, pLength))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand
-            && gIpcModule.getUintArray(response, ppArray, pLength))
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -737,20 +716,16 @@ ilmErrorTypes ilm_getSurfaceIDs(t_ilm_int* pLength, t_ilm_surface** ppArray)
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("ListAllSurfaceIDS");
     if (pLength && ppArray
         && command
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout)
+        && gIpcModule.getUintArray(response, ppArray, pLength))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand
-            && gIpcModule.getUintArray(response, ppArray, pLength))
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -759,20 +734,16 @@ ilmErrorTypes ilm_getLayerGroupIDs(t_ilm_int* pLength, t_ilm_layergroup** ppArra
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("ListAllLayerGroupIDS");
     if (pLength && ppArray
         && command
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout)
+        && gIpcModule.getUintArray(response, ppArray, pLength))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand
-            && gIpcModule.getUintArray(response, ppArray, pLength))
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -781,20 +752,16 @@ ilmErrorTypes ilm_getSurfaceGroupIDs(t_ilm_int* pLength, t_ilm_surfacegroup** pp
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("ListAllSurfaceGroupIDS");
     if (pLength && ppArray
         && command
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout)
+        && gIpcModule.getUintArray(response, ppArray, pLength))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand
-            && gIpcModule.getUintArray(response, ppArray, pLength))
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -803,21 +770,17 @@ ilmErrorTypes ilm_getSurfaceIDsOnLayer(t_ilm_layer layer, t_ilm_int* pLength, t_
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("ListSurfaceofLayer");
     if (pLength && ppArray
         && command
         && gIpcModule.appendUint(command, layer)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout)
+        && gIpcModule.getUintArray(response, ppArray, pLength))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand
-            && gIpcModule.getUintArray(response, ppArray, pLength))
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -828,37 +791,29 @@ ilmErrorTypes ilm_layerCreate(t_ilm_layer* pLayerId)
 
     if (pLayerId && (INVALID_ID != *pLayerId))
     {
+        t_ilm_message response = 0;
         t_ilm_message command = gIpcModule.createMessage("CreateLayerFromId");
         if (command
             && gIpcModule.appendUint(command, *pLayerId)
-            && gIpcModule.sendToService(command))
+            && sendAndWaitForResponse(command, &response, gResponseTimeout)
+            && gIpcModule.getUint(response, pLayerId))
         {
-            t_ilm_message response = waitForResponse(gResponseTimeout);
-            if (response
-                && gIpcModule.getMessageType(response) == IpcMessageTypeCommand
-                && gIpcModule.getUint(response, pLayerId))
-            {
-                returnValue = ILM_SUCCESS;
-            }
-            gIpcModule.destroyMessage(response);
+            returnValue = ILM_SUCCESS;
         }
+        gIpcModule.destroyMessage(response);
         gIpcModule.destroyMessage(command);
     }
     else
     {
+        t_ilm_message response = 0;
         t_ilm_message command = gIpcModule.createMessage("CreateLayer");
         if (command
-            && gIpcModule.sendToService(command))
+            && sendAndWaitForResponse(command, &response, gResponseTimeout)
+            && gIpcModule.getUint(response, pLayerId))
         {
-            t_ilm_message response = waitForResponse(gResponseTimeout);
-            if (response
-                && gIpcModule.getMessageType(response) == IpcMessageTypeCommand
-                && gIpcModule.getUint(response, pLayerId))
-            {
-                returnValue = ILM_SUCCESS;
-            }
-            gIpcModule.destroyMessage(response);
+            returnValue = ILM_SUCCESS;
         }
+        gIpcModule.destroyMessage(response);
         gIpcModule.destroyMessage(command);
     }
     return returnValue;
@@ -870,41 +825,33 @@ ilmErrorTypes ilm_layerCreateWithDimension(t_ilm_layer* pLayerId, t_ilm_uint wid
 
     if (pLayerId && (INVALID_ID != *pLayerId))
     {
+        t_ilm_message response = 0;
         t_ilm_message command = gIpcModule.createMessage("CreateLayerFromIdWithDimension");
         if (command
             && gIpcModule.appendUint(command, *pLayerId)
             && gIpcModule.appendUint(command, width)
             && gIpcModule.appendUint(command, height)
-            && gIpcModule.sendToService(command))
+            && sendAndWaitForResponse(command, &response, gResponseTimeout)
+            && gIpcModule.getUint(response, pLayerId))
         {
-            t_ilm_message response = waitForResponse(gResponseTimeout);
-            if (response
-                && gIpcModule.getMessageType(response) == IpcMessageTypeCommand
-                && gIpcModule.getUint(response, pLayerId))
-            {
-                returnValue = ILM_SUCCESS;
-            }
-            gIpcModule.destroyMessage(response);
+            returnValue = ILM_SUCCESS;
         }
+        gIpcModule.destroyMessage(response);
         gIpcModule.destroyMessage(command);
     }
     else
     {
+        t_ilm_message response = 0;
         t_ilm_message command = gIpcModule.createMessage("CreateLayerWithDimension");
         if (command
             && gIpcModule.appendUint(command, width)
             && gIpcModule.appendUint(command, height)
-            && gIpcModule.sendToService(command))
+            && sendAndWaitForResponse(command, &response, gResponseTimeout)
+            && gIpcModule.getUint(response, pLayerId))
         {
-            t_ilm_message response = waitForResponse(gResponseTimeout);
-            if (response
-                && gIpcModule.getMessageType(response) == IpcMessageTypeCommand
-                && gIpcModule.getUint(response, pLayerId))
-            {
-                returnValue = ILM_SUCCESS;
-            }
-            gIpcModule.destroyMessage(response);
+            returnValue = ILM_SUCCESS;
         }
+        gIpcModule.destroyMessage(response);
         gIpcModule.destroyMessage(command);
     }
     return returnValue;
@@ -914,19 +861,15 @@ ilmErrorTypes ilm_layerRemove(t_ilm_layer layerId)
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("RemoveLayer");
     if (command
         && gIpcModule.appendUint(command, layerId)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand)
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -935,20 +878,16 @@ ilmErrorTypes ilm_layerAddSurface(t_ilm_layer layerId, t_ilm_surface surfaceId)
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("AddSurfaceToLayer");
     if (command
         && gIpcModule.appendUint(command, surfaceId)
         && gIpcModule.appendUint(command, layerId)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand)
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -957,20 +896,16 @@ ilmErrorTypes ilm_layerRemoveSurface(t_ilm_layer layerId, t_ilm_surface surfaceI
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("RemoveSurfaceFromLayer");
     if (command
         && gIpcModule.appendUint(command, surfaceId)
         && gIpcModule.appendUint(command, layerId)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand)
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -979,21 +914,17 @@ ilmErrorTypes ilm_layerGetType(t_ilm_layer layerId, ilmLayerType* pLayerType)
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("GetLayerType");
     if (pLayerType
         && command
         && gIpcModule.appendUint(command, layerId)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout)
+        && gIpcModule.getUint(response, pLayerType))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand
-            && gIpcModule.getUint(response, pLayerType))
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -1002,20 +933,16 @@ ilmErrorTypes ilm_layerSetVisibility(t_ilm_layer layerId, t_ilm_bool newVisibili
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("SetLayerVisibility");
     if (command
         && gIpcModule.appendUint(command, layerId)
         && gIpcModule.appendBool(command, newVisibility)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand)
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -1024,21 +951,17 @@ ilmErrorTypes ilm_layerGetVisibility(t_ilm_layer layerId, t_ilm_bool *pVisibilit
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("GetLayerVisibility");
     if (pVisibility
         && command
         && gIpcModule.appendUint(command, layerId)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout)
+        && gIpcModule.getBool(response, pVisibility))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand
-            && gIpcModule.getBool(response, pVisibility))
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -1047,20 +970,16 @@ ilmErrorTypes ilm_layerSetOpacity(t_ilm_layer layerId, t_ilm_float opacity)
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("SetLayerOpacity");
     if (command
         && gIpcModule.appendUint(command, layerId)
         && gIpcModule.appendDouble(command, opacity)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand)
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -1069,21 +988,17 @@ ilmErrorTypes ilm_layerGetOpacity(t_ilm_layer layerId, t_ilm_float *pOpacity)
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("GetLayerOpacity");
     if (pOpacity
         && command
         && gIpcModule.appendUint(command, layerId)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout)
+        && gIpcModule.getDouble(response, pOpacity))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand
-            && gIpcModule.getDouble(response, pOpacity))
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -1092,6 +1007,7 @@ ilmErrorTypes ilm_layerSetSourceRectangle(t_ilm_layer layerId, t_ilm_uint x, t_i
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("SetLayerSourceRegion");
     if (command
         && gIpcModule.appendUint(command, layerId)
@@ -1099,16 +1015,11 @@ ilmErrorTypes ilm_layerSetSourceRectangle(t_ilm_layer layerId, t_ilm_uint x, t_i
         && gIpcModule.appendUint(command, y)
         && gIpcModule.appendUint(command, width)
         && gIpcModule.appendUint(command, height)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand)
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -1117,6 +1028,7 @@ ilmErrorTypes ilm_layerSetDestinationRectangle(t_ilm_layer layerId, t_ilm_int x,
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("SetLayerDestinationRegion");
     if (command
         && gIpcModule.appendUint(command, layerId)
@@ -1124,16 +1036,11 @@ ilmErrorTypes ilm_layerSetDestinationRectangle(t_ilm_layer layerId, t_ilm_int x,
         && gIpcModule.appendUint(command, y)
         && gIpcModule.appendUint(command, width)
         && gIpcModule.appendUint(command, height)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand)
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -1142,22 +1049,18 @@ ilmErrorTypes ilm_layerGetDimension(t_ilm_layer layerId, t_ilm_uint *pDimension)
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("GetLayerDimension");
     if (pDimension
         && command
         && gIpcModule.appendUint(command, layerId)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout)
+        && gIpcModule.getUint(response, &pDimension[0])
+        && gIpcModule.getUint(response, &pDimension[1]))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand
-            && gIpcModule.getUint(response, &pDimension[0])
-            && gIpcModule.getUint(response, &pDimension[1]))
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -1166,22 +1069,18 @@ ilmErrorTypes ilm_layerSetDimension(t_ilm_layer layerId, t_ilm_uint *pDimension)
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("SetLayerDimension");
     if (pDimension
         && command
         && gIpcModule.appendUint(command, layerId)
         && gIpcModule.appendUint(command, pDimension[0])
         && gIpcModule.appendUint(command, pDimension[1])
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand)
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -1190,22 +1089,18 @@ ilmErrorTypes ilm_layerGetPosition(t_ilm_layer layerId, t_ilm_uint *pPosition)
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("GetLayerPosition");
     if (pPosition
         && command
         && gIpcModule.appendUint(command, layerId)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout)
+        && gIpcModule.getUint(response, &pPosition[0])
+        && gIpcModule.getUint(response, &pPosition[1]))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand
-            && gIpcModule.getUint(response, &pPosition[0])
-            && gIpcModule.getUint(response, &pPosition[1]))
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -1214,22 +1109,18 @@ ilmErrorTypes ilm_layerSetPosition(t_ilm_layer layerId, t_ilm_uint *pPosition)
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("SetLayerPosition");
     if (pPosition
         && command
         && gIpcModule.appendUint(command, layerId)
         && gIpcModule.appendUint(command, pPosition[0])
         && gIpcModule.appendUint(command, pPosition[1])
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand)
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -1238,20 +1129,16 @@ ilmErrorTypes ilm_layerSetOrientation(t_ilm_layer layerId, ilmOrientation orient
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("SetLayerOrientation");
     if (command
         && gIpcModule.appendUint(command, layerId)
         && gIpcModule.appendUint(command, orientation)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand)
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -1260,21 +1147,17 @@ ilmErrorTypes ilm_layerGetOrientation(t_ilm_layer layerId, ilmOrientation *pOrie
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("GetLayerOrientation");
     if (pOrientation
         && command
         && gIpcModule.appendUint(command, layerId)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout)
+        && gIpcModule.getUint(response, pOrientation))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand
-            && gIpcModule.getUint(response, pOrientation))
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -1283,6 +1166,7 @@ ilmErrorTypes ilm_layerSetChromaKey(t_ilm_layer layerId, t_ilm_int* pColor)
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("SetLayerChromaKey");
     if (command
         && gIpcModule.appendUint(command, layerId))
@@ -1296,16 +1180,11 @@ ilmErrorTypes ilm_layerSetChromaKey(t_ilm_layer layerId, t_ilm_int* pColor)
             comResult = gIpcModule.appendUintArray(command, (t_ilm_uint *)pColor, number);
         }
         if (comResult
-            && gIpcModule.sendToService(command))
+            && sendAndWaitForResponse(command, &response, gResponseTimeout))
         {
-            t_ilm_message response = waitForResponse(gResponseTimeout);
-            if (response
-                && gIpcModule.getMessageType(response) == IpcMessageTypeCommand)
-            {
-               returnValue = ILM_SUCCESS;
-            }
-            gIpcModule.destroyMessage(response);
+            returnValue = ILM_SUCCESS;
         }
+        gIpcModule.destroyMessage(response);
     }
     gIpcModule.destroyMessage(command);
     return returnValue;
@@ -1315,21 +1194,17 @@ ilmErrorTypes ilm_layerSetRenderOrder(t_ilm_layer layerId, t_ilm_layer *pSurface
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("SetSurfaceRenderOrderWithinLayer");
     if (pSurfaceId
         && command
         && gIpcModule.appendUint(command, layerId)
         && gIpcModule.appendUintArray(command, pSurfaceId, number)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand)
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -1338,21 +1213,17 @@ ilmErrorTypes ilm_layerGetCapabilities(t_ilm_layer layerId, t_ilm_layercapabilit
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("GetLayerCapabilities");
     if (pCapabilities
         && command
         && gIpcModule.appendUint(command, layerId)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout)
+        && gIpcModule.getUint(response, pCapabilities))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand
-            && gIpcModule.getUint(response, pCapabilities))
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -1361,21 +1232,17 @@ ilmErrorTypes ilm_layerTypeGetCapabilities(ilmLayerType layerType, t_ilm_layerca
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("GetLayertypeCapabilities");
     if (pCapabilities
         && command
         && gIpcModule.appendUint(command, layerType)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout)
+        && gIpcModule.getUint(response, pCapabilities))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand
-            && gIpcModule.getUint(response, pCapabilities))
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -1386,39 +1253,31 @@ ilmErrorTypes ilm_layergroupCreate(t_ilm_layergroup *pLayergroup)
 
     if (pLayergroup && (INVALID_ID != *pLayergroup))
     {
+        t_ilm_message response = 0;
         t_ilm_message command = gIpcModule.createMessage("CreateLayerGroupFromId");
         if (pLayergroup
             && command
             && gIpcModule.appendUint(command, *pLayergroup)
-            && gIpcModule.sendToService(command))
+            && sendAndWaitForResponse(command, &response, gResponseTimeout)
+            && gIpcModule.getUint(response, pLayergroup))
         {
-            t_ilm_message response = waitForResponse(gResponseTimeout);
-            if (response
-                && gIpcModule.getMessageType(response) == IpcMessageTypeCommand
-                && gIpcModule.getUint(response, pLayergroup))
-            {
-                returnValue = ILM_SUCCESS;
-            }
-            gIpcModule.destroyMessage(response);
+            returnValue = ILM_SUCCESS;
         }
+        gIpcModule.destroyMessage(response);
         gIpcModule.destroyMessage(command);
     }
     else
     {
+        t_ilm_message response = 0;
         t_ilm_message command = gIpcModule.createMessage("CreateLayerGroup");
         if (pLayergroup
             && command
-            && gIpcModule.sendToService(command))
+            && sendAndWaitForResponse(command, &response, gResponseTimeout)
+            && gIpcModule.getUint(response, pLayergroup))
         {
-            t_ilm_message response = waitForResponse(gResponseTimeout);
-            if (response
-                && gIpcModule.getMessageType(response) == IpcMessageTypeCommand
-                && gIpcModule.getUint(response, pLayergroup))
-            {
-                returnValue = ILM_SUCCESS;
-            }
-            gIpcModule.destroyMessage(response);
+            returnValue = ILM_SUCCESS;
         }
+        gIpcModule.destroyMessage(response);
         gIpcModule.destroyMessage(command);
     }
     return returnValue;
@@ -1428,19 +1287,15 @@ ilmErrorTypes ilm_layergroupRemove(t_ilm_layergroup group)
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("RemoveLayerGroup");
     if (command
         && gIpcModule.appendUint(command, group)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand)
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -1449,20 +1304,16 @@ ilmErrorTypes ilm_layergroupAddLayer(t_ilm_layergroup group, t_ilm_layer layer)
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("AddLayerToLayerGroup");
     if (command
         && gIpcModule.appendUint(command, layer)
         && gIpcModule.appendUint(command, group)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand)
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -1471,20 +1322,16 @@ ilmErrorTypes ilm_layergroupRemoveLayer(t_ilm_layergroup group, t_ilm_layer laye
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("RemoveLayerFromLayerGroup");
     if (command
         && gIpcModule.appendUint(command, layer)
         && gIpcModule.appendUint(command, group)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand)
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -1493,20 +1340,16 @@ ilmErrorTypes ilm_layergroupSetVisibility(t_ilm_layergroup group, t_ilm_bool new
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("SetLayergroupVisibility");
     if (command
         && gIpcModule.appendUint(command, group)
         && gIpcModule.appendBool(command, newVisibility)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand)
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -1515,20 +1358,16 @@ ilmErrorTypes ilm_layergroupSetOpacity(t_ilm_layergroup group, t_ilm_float opaci
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("SetLayergroupOpacity");
     if (command
         && gIpcModule.appendUint(command, group)
         && gIpcModule.appendDouble(command, opacity)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand)
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -1539,6 +1378,7 @@ ilmErrorTypes ilm_surfaceCreate(t_ilm_nativehandle nativehandle, t_ilm_int width
 
     if (pSurfaceId && (INVALID_ID != *pSurfaceId))
     {
+        t_ilm_message response = 0;
         t_ilm_message command = gIpcModule.createMessage("CreateSurfaceFromId");
         if (command
             && gIpcModule.appendUint(command, nativehandle)
@@ -1546,38 +1386,29 @@ ilmErrorTypes ilm_surfaceCreate(t_ilm_nativehandle nativehandle, t_ilm_int width
             && gIpcModule.appendUint(command, height)
             && gIpcModule.appendUint(command, pixelFormat)
             && gIpcModule.appendUint(command, *pSurfaceId)
-            && gIpcModule.sendToService(command))
+            && sendAndWaitForResponse(command, &response, gResponseTimeout)
+            && gIpcModule.getUint(response, pSurfaceId))
         {
-            t_ilm_message response = waitForResponse(gResponseTimeout);
-            if (response
-                && gIpcModule.getMessageType(response) == IpcMessageTypeCommand
-                && gIpcModule.getUint(response, pSurfaceId))
-            {
-                returnValue = ILM_SUCCESS;
-            }
-            gIpcModule.destroyMessage(response);
+            returnValue = ILM_SUCCESS;
         }
+        gIpcModule.destroyMessage(response);
         gIpcModule.destroyMessage(command);
     }
     else
     {
+        t_ilm_message response = 0;
         t_ilm_message command = gIpcModule.createMessage("CreateSurface");
         if (command
             && gIpcModule.appendUint(command, nativehandle)
             && gIpcModule.appendUint(command, width)
             && gIpcModule.appendUint(command, height)
             && gIpcModule.appendUint(command, pixelFormat)
-            && gIpcModule.sendToService(command))
+            && sendAndWaitForResponse(command, &response, gResponseTimeout)
+            && gIpcModule.getUint(response, pSurfaceId))
         {
-            t_ilm_message response = waitForResponse(gResponseTimeout);
-            if (response
-                && gIpcModule.getMessageType(response) == IpcMessageTypeCommand
-                && gIpcModule.getUint(response, pSurfaceId))
-            {
-                returnValue = ILM_SUCCESS;
-            }
-            gIpcModule.destroyMessage(response);
+            returnValue = ILM_SUCCESS;
         }
+        gIpcModule.destroyMessage(response);
         gIpcModule.destroyMessage(command);
     }
     return returnValue;
@@ -1589,37 +1420,29 @@ ilmErrorTypes ilm_surfaceInitialize(t_ilm_surface *pSurfaceId)
 
     if (pSurfaceId && (INVALID_ID != *pSurfaceId))
     {
+        t_ilm_message response = 0;
         t_ilm_message command = gIpcModule.createMessage("InitializeSurfaceFromId");
         if (command
             && gIpcModule.appendUint(command, *pSurfaceId)
-            && gIpcModule.sendToService(command))
+            && sendAndWaitForResponse(command, &response, gResponseTimeout)
+            && gIpcModule.getUint(response, pSurfaceId))
         {
-            t_ilm_message response = waitForResponse(gResponseTimeout);
-            if (response
-                && gIpcModule.getMessageType(response) == IpcMessageTypeCommand
-                && gIpcModule.getUint(response, pSurfaceId))
-            {
-                returnValue = ILM_SUCCESS;
-            }
-            gIpcModule.destroyMessage(response);
+            returnValue = ILM_SUCCESS;
         }
+        gIpcModule.destroyMessage(response);
         gIpcModule.destroyMessage(command);
     }
     else
     {
+        t_ilm_message response = 0;
         t_ilm_message command = gIpcModule.createMessage("InitializeSurface");
         if (command
-            && gIpcModule.sendToService(command))
+            && sendAndWaitForResponse(command, &response, gResponseTimeout)
+            && gIpcModule.getUint(response, pSurfaceId))
         {
-            t_ilm_message response = waitForResponse(gResponseTimeout);
-            if (response
-                && gIpcModule.getMessageType(response) == IpcMessageTypeCommand
-                && gIpcModule.getUint(response, pSurfaceId))
-            {
-                returnValue = ILM_SUCCESS;
-            }
-            gIpcModule.destroyMessage(response);
+            returnValue = ILM_SUCCESS;
         }
+        gIpcModule.destroyMessage(response);
         gIpcModule.destroyMessage(command);
     }
     return returnValue;
@@ -1629,6 +1452,7 @@ ilmErrorTypes ilm_surfaceSetNativeContent(t_ilm_nativehandle nativehandle, t_ilm
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("SetSurfaceNativeContent");
     if (command
         && gIpcModule.appendUint(command, surfaceId)
@@ -1636,16 +1460,11 @@ ilmErrorTypes ilm_surfaceSetNativeContent(t_ilm_nativehandle nativehandle, t_ilm
         && gIpcModule.appendUint(command, width)
         && gIpcModule.appendUint(command, height)
         && gIpcModule.appendUint(command, pixelFormat)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand)
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -1654,19 +1473,15 @@ ilmErrorTypes ilm_surfaceRemoveNativeContent(t_ilm_surface surfaceId)
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("RemoveSurfaceNativeContent");
     if (command
         && gIpcModule.appendUint(command, surfaceId)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand)
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -1675,19 +1490,15 @@ ilmErrorTypes ilm_surfaceRemove(t_ilm_surface surfaceId)
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("RemoveSurface");
     if (command
         && gIpcModule.appendUint(command, surfaceId)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand)
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -1696,20 +1507,16 @@ ilmErrorTypes ilm_surfaceSetVisibility(t_ilm_surface surfaceId, t_ilm_bool newVi
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("SetSurfaceVisibility");
     if (command
         && gIpcModule.appendUint(command, surfaceId)
         && gIpcModule.appendBool(command, newVisibility)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand)
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -1718,21 +1525,17 @@ ilmErrorTypes ilm_surfaceGetVisibility(t_ilm_surface surfaceId, t_ilm_bool *pVis
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("GetSurfaceVisibility");
     if (pVisibility
         && command
         && gIpcModule.appendUint(command, surfaceId)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout)
+        && gIpcModule.getBool(response, pVisibility))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand
-            && gIpcModule.getBool(response, pVisibility))
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -1741,20 +1544,16 @@ ilmErrorTypes ilm_surfaceSetOpacity(t_ilm_surface surfaceId, t_ilm_float opacity
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("SetSurfaceOpacity");
     if (command
         && gIpcModule.appendUint(command, surfaceId)
         && gIpcModule.appendDouble(command, opacity)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand)
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -1763,21 +1562,17 @@ ilmErrorTypes ilm_surfaceGetOpacity(t_ilm_surface surfaceId, t_ilm_float *pOpaci
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("GetSurfaceOpacity");
     if (pOpacity
         && command
         && gIpcModule.appendUint(command, surfaceId)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout)
+        && gIpcModule.getDouble(response, pOpacity))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand
-            && gIpcModule.getDouble(response, pOpacity))
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -1786,6 +1581,7 @@ ilmErrorTypes ilm_surfaceSetSourceRectangle(t_ilm_surface surfaceId, t_ilm_int x
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("SetSurfaceSourceRegion");
     if (command
         && gIpcModule.appendUint(command, surfaceId)
@@ -1793,16 +1589,11 @@ ilmErrorTypes ilm_surfaceSetSourceRectangle(t_ilm_surface surfaceId, t_ilm_int x
         && gIpcModule.appendUint(command, y)
         && gIpcModule.appendUint(command, width)
         && gIpcModule.appendUint(command, height)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand)
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -1811,6 +1602,7 @@ ilmErrorTypes ilm_surfaceSetDestinationRectangle(t_ilm_surface surfaceId, t_ilm_
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("SetSurfaceDestinationRegion");
     if (command
         && gIpcModule.appendUint(command, surfaceId)
@@ -1818,16 +1610,11 @@ ilmErrorTypes ilm_surfaceSetDestinationRectangle(t_ilm_surface surfaceId, t_ilm_
         && gIpcModule.appendUint(command, y)
         && gIpcModule.appendUint(command, width)
         && gIpcModule.appendUint(command, height)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand)
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -1836,22 +1623,18 @@ ilmErrorTypes ilm_surfaceGetDimension(t_ilm_surface surfaceId, t_ilm_uint *pDime
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("GetSurfaceDimension");
     if (pDimension
         && command
         && gIpcModule.appendUint(command, surfaceId)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout)
+        && gIpcModule.getUint(response, &pDimension[0])
+        && gIpcModule.getUint(response, &pDimension[1]))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand
-            && gIpcModule.getUint(response, &pDimension[0])
-            && gIpcModule.getUint(response, &pDimension[1]))
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -1860,22 +1643,18 @@ ilmErrorTypes ilm_surfaceSetDimension(t_ilm_surface surfaceId, t_ilm_uint *pDime
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("SetSurfaceDimension");
     if (pDimension
         && command
         && gIpcModule.appendUint(command, surfaceId)
         && gIpcModule.appendUint(command, pDimension[0])
         && gIpcModule.appendUint(command, pDimension[1])
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand)
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -1884,22 +1663,18 @@ ilmErrorTypes ilm_surfaceGetPosition(t_ilm_surface surfaceId, t_ilm_uint *pPosit
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("GetSurfacePosition");
     if (pPosition
         && command
         && gIpcModule.appendUint(command, surfaceId)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout)
+        && gIpcModule.getUint(response, &pPosition[0])
+        && gIpcModule.getUint(response, &pPosition[1]))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand
-            && gIpcModule.getUint(response, &pPosition[0])
-            && gIpcModule.getUint(response, &pPosition[1]))
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -1908,22 +1683,18 @@ ilmErrorTypes ilm_surfaceSetPosition(t_ilm_surface surfaceId, t_ilm_uint *pPosit
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("SetSurfacePosition");
     if (pPosition
         && command
         && gIpcModule.appendUint(command, surfaceId)
         && gIpcModule.appendUint(command, pPosition[0])
         && gIpcModule.appendUint(command, pPosition[1])
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand)
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -1932,20 +1703,16 @@ ilmErrorTypes ilm_surfaceSetOrientation(t_ilm_surface surfaceId, ilmOrientation 
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("SetSurfaceOrientation");
     if (command
         && gIpcModule.appendUint(command, surfaceId)
         && gIpcModule.appendUint(command, orientation)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand)
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -1954,21 +1721,17 @@ ilmErrorTypes ilm_surfaceGetOrientation(t_ilm_surface surfaceId, ilmOrientation 
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("GetSurfaceOrientation");
     if (pOrientation
         && command
         && gIpcModule.appendUint(command, surfaceId)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout)
+        && gIpcModule.getUint(response, pOrientation))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand
-            && gIpcModule.getUint(response, pOrientation))
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -1977,21 +1740,17 @@ ilmErrorTypes ilm_surfaceGetPixelformat(t_ilm_layer surfaceId, ilmPixelFormat *p
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("GetSurfacePixelformat");
     if (pPixelformat
         && command
         && gIpcModule.appendUint(command, surfaceId)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout)
+        && gIpcModule.getUint(response, pPixelformat))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand
-            && gIpcModule.getUint(response, pPixelformat))
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -2000,6 +1759,7 @@ ilmErrorTypes ilm_surfaceSetChromaKey(t_ilm_surface surfaceId, t_ilm_int* pColor
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("SetSurfaceChromaKey");
     if (command
         && gIpcModule.appendUint(command, surfaceId))
@@ -2013,17 +1773,12 @@ ilmErrorTypes ilm_surfaceSetChromaKey(t_ilm_surface surfaceId, t_ilm_int* pColor
             comResult = gIpcModule.appendUintArray(command, (t_ilm_uint *)pColor, number);
         }
         if (comResult
-            && gIpcModule.sendToService(command))
+            && sendAndWaitForResponse(command, &response, gResponseTimeout))
         {
-            t_ilm_message response = waitForResponse(gResponseTimeout);
-            if (response
-                && gIpcModule.getMessageType(response) == IpcMessageTypeCommand)
-            {
-               returnValue = ILM_SUCCESS;
-            }
-            gIpcModule.destroyMessage(response);
+            returnValue = ILM_SUCCESS;
         }
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -2043,38 +1798,30 @@ ilmErrorTypes ilm_surfacegroupCreate(t_ilm_surfacegroup *pSurfacegroup)
 
     if (pSurfacegroup && (INVALID_ID != *pSurfacegroup))
     {
+        t_ilm_message response = 0;
         t_ilm_message command = gIpcModule.createMessage("CreateSurfaceGroupFromId");
         if (command
             && gIpcModule.appendUint(command, *pSurfacegroup)
-            && gIpcModule.sendToService(command))
+            && sendAndWaitForResponse(command, &response, gResponseTimeout)
+            && gIpcModule.getUint(response, pSurfacegroup))
         {
-            t_ilm_message response = waitForResponse(gResponseTimeout);
-            if (response
-                && gIpcModule.getMessageType(response) == IpcMessageTypeCommand
-                && gIpcModule.getUint(response, pSurfacegroup))
-            {
-                returnValue = ILM_SUCCESS;
-            }
-            gIpcModule.destroyMessage(response);
+            returnValue = ILM_SUCCESS;
         }
+        gIpcModule.destroyMessage(response);
         gIpcModule.destroyMessage(command);
     }
     else
     {
+        t_ilm_message response = 0;
         t_ilm_message command = gIpcModule.createMessage("CreateSurfaceGroup");
         if (pSurfacegroup
             && command
-            && gIpcModule.sendToService(command))
+            && sendAndWaitForResponse(command, &response, gResponseTimeout)
+            && gIpcModule.getUint(response, pSurfacegroup))
         {
-            t_ilm_message response = waitForResponse(gResponseTimeout);
-            if (response
-                && gIpcModule.getMessageType(response) == IpcMessageTypeCommand
-                && gIpcModule.getUint(response, pSurfacegroup))
-            {
-                returnValue = ILM_SUCCESS;
-            }
-            gIpcModule.destroyMessage(response);
+            returnValue = ILM_SUCCESS;
         }
+        gIpcModule.destroyMessage(response);
         gIpcModule.destroyMessage(command);
     }
     return returnValue;
@@ -2084,19 +1831,15 @@ ilmErrorTypes ilm_surfacegroupRemove(t_ilm_surfacegroup group)
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("RemoveSurfaceGroup");
     if (command
         && gIpcModule.appendUint(command, group)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand)
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -2105,20 +1848,16 @@ ilmErrorTypes ilm_surfacegroupAddSurface(t_ilm_surfacegroup group, t_ilm_surface
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("AddSurfaceToSurfaceGroup");
     if (command
         && gIpcModule.appendUint(command, surface)
         && gIpcModule.appendUint(command, group)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand)
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -2127,20 +1866,16 @@ ilmErrorTypes ilm_surfacegroupRemoveSurface(t_ilm_surfacegroup group, t_ilm_surf
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("RemoveSurfaceFromSurfaceGroup");
     if (command
         && gIpcModule.appendUint(command, surface)
         && gIpcModule.appendUint(command, group)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand)
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -2149,20 +1884,16 @@ ilmErrorTypes ilm_surfacegroupSetVisibility(t_ilm_surfacegroup group, t_ilm_bool
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("SetSurfacegroupVisibility");
     if (command
         && gIpcModule.appendUint(command, group)
         && gIpcModule.appendBool(command, newVisibility)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand)
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -2171,20 +1902,16 @@ ilmErrorTypes ilm_surfacegroupSetOpacity(t_ilm_surfacegroup group, t_ilm_float o
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("SetSurfacegroupOpacity");
     if (command
         && gIpcModule.appendUint(command, group)
         && gIpcModule.appendDouble(command, opacity)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand)
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -2193,21 +1920,17 @@ ilmErrorTypes ilm_displaySetRenderOrder(t_ilm_display display, t_ilm_layer *pLay
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("SetRenderOrderOfLayers");
     if (pLayerId
         && command
         && gIpcModule.appendUintArray(command, pLayerId, number)
         && gIpcModule.appendUint(command, display)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand)
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -2216,20 +1939,16 @@ ilmErrorTypes ilm_getScreenIDs(t_ilm_uint* pNumberOfIDs, t_ilm_uint** ppIDs)
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("GetScreenIDs");
     if (pNumberOfIDs && ppIDs
         && command
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout)
+        && gIpcModule.getUintArray(response, ppIDs, (t_ilm_int *)pNumberOfIDs))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand
-            && gIpcModule.getUintArray(response, ppIDs, (t_ilm_int *)pNumberOfIDs))
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -2238,20 +1957,16 @@ ilmErrorTypes ilm_takeScreenshot(t_ilm_uint screen, t_ilm_const_string filename)
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("ScreenShot");
     if (command
         && gIpcModule.appendUint(command, screen)
         && gIpcModule.appendString(command, filename)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand)
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -2260,20 +1975,16 @@ ilmErrorTypes ilm_takeLayerScreenshot(t_ilm_const_string filename, t_ilm_layer l
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("ScreenShotOfLayer");
     if (command
         && gIpcModule.appendString(command, filename)
         && gIpcModule.appendUint(command, layerid)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand)
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -2282,20 +1993,16 @@ ilmErrorTypes ilm_takeSurfaceScreenshot(t_ilm_const_string filename, t_ilm_surfa
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("ScreenShotOfSurface");
     if (command
         && gIpcModule.appendString(command, filename)
         && gIpcModule.appendUint(command, surfaceid)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand)
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -2304,19 +2011,15 @@ ilmErrorTypes ilm_SetKeyboardFocusOn(t_ilm_surface surfaceId)
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("SetKeyboardFocusOn");
     if (command
         && gIpcModule.appendUint(command, surfaceId)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand)
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -2325,19 +2028,15 @@ ilmErrorTypes ilm_GetKeyboardFocusSurfaceId(t_ilm_surface* pSurfaceId)
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("GetKeyboardFocusSurfaceId");
     if (command
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout)
+        && gIpcModule.getUint(response, pSurfaceId))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand
-            && gIpcModule.getUint(response, pSurfaceId))
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -2346,21 +2045,17 @@ ilmErrorTypes ilm_UpdateInputEventAcceptanceOn(t_ilm_surface surfaceId, ilmInput
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("UpdateInputEventAcceptanceOn");
     if (command
         && gIpcModule.appendUint(command, surfaceId)
         && gIpcModule.appendUint(command, devices)
         && gIpcModule.appendBool(command, acceptance)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand)
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -2369,21 +2064,16 @@ ilmErrorTypes ilm_SetOptimizationMode(ilmOptimization id, ilmOptimizationMode mo
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("SetOptimizationMode");
     if (command
         && gIpcModule.appendUint(command,id)
         && gIpcModule.appendUint(command,mode)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand )
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
-
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -2391,21 +2081,16 @@ ilmErrorTypes ilm_SetOptimizationMode(ilmOptimization id, ilmOptimizationMode mo
 ilmErrorTypes ilm_GetOptimizationMode(ilmOptimization id, ilmOptimizationMode* pMode)
 {
     ilmErrorTypes returnValue = ILM_FAILED;
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("GetOptimizationMode");
     if (command
         && gIpcModule.appendUint(command,id)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout)
+        && gIpcModule.getUint(response, pMode))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand
-            && gIpcModule.getUint(response,pMode) )
-        {
-            returnValue = ILM_SUCCESS;
-        }
-
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -2414,18 +2099,15 @@ ilmErrorTypes ilm_commitChanges()
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("CommitChanges");
+
     if (command
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand)
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -2439,20 +2121,16 @@ ilmErrorTypes ilm_layerAddNotification(t_ilm_layer layer, layerNotificationFunc 
         return ILM_ERROR_INVALID_ARGUMENTS;
     }
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("LayerAddNotification");
     if (command
         && gIpcModule.appendUint(command, layer)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand)
-        {
-            addLayerCallback(layer, callback);
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        addLayerCallback(layer, callback);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -2466,20 +2144,16 @@ ilmErrorTypes ilm_layerRemoveNotification(t_ilm_layer layer)
         return ILM_ERROR_INVALID_ARGUMENTS;
     }
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("LayerRemoveNotification");
     if (command
         && gIpcModule.appendUint(command, layer)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand)
-        {
-            removeLayerCallback(layer);
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        removeLayerCallback(layer);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -2493,20 +2167,16 @@ ilmErrorTypes ilm_surfaceAddNotification(t_ilm_surface surface, surfaceNotificat
         return ILM_ERROR_INVALID_ARGUMENTS;
     }
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("SurfaceAddNotification");
     if (command
         && gIpcModule.appendUint(command, surface)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand)
-        {
-            addSurfaceCallback(surface, callback);
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        addSurfaceCallback(surface, callback);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
@@ -2520,20 +2190,16 @@ ilmErrorTypes ilm_surfaceRemoveNotification(t_ilm_surface surface)
         return ILM_ERROR_INVALID_ARGUMENTS;
     }
 
+    t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("SurfaceRemoveNotification");
     if (command
         && gIpcModule.appendUint(command, surface)
-        && gIpcModule.sendToService(command))
+        && sendAndWaitForResponse(command, &response, gResponseTimeout))
     {
-        t_ilm_message response = waitForResponse(gResponseTimeout);
-        if (response
-            && gIpcModule.getMessageType(response) == IpcMessageTypeCommand)
-        {
-            removeSurfaceCallback(surface);
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
+        removeSurfaceCallback(surface);
+        returnValue = ILM_SUCCESS;
     }
+    gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
