@@ -19,7 +19,7 @@
 ****************************************************************************/
 
 #include "WaylandGLESRenderer.h"
-#include "config.h"
+#include "Configuration.h"
 #include "Shader.h"
 #include "ShaderProgramGLES.h"
 #include "TextureBinders/WaylandGLESTexture.h"
@@ -34,8 +34,8 @@
 #include "GraphicSystems/DrmGLESGraphicSystem.h"
 #endif // WITH_WAYLAND_DRM
 
-WaylandGLESRenderer::WaylandGLESRenderer(Scene* pScene)
-: BaseRenderer(pScene)
+WaylandGLESRenderer::WaylandGLESRenderer(ICommandExecutor& executor, Configuration& config)
+: BaseRenderer(executor, config)
 , m_pWindowSystem(0)
 , m_pGraphicSystem(0)
 , m_width(0)
@@ -187,6 +187,16 @@ bool WaylandGLESRenderer::getOptimizationMode(OptimizationType id, OptimizationM
     return m_pGraphicSystem->getOptimizationMode(id, mode);
 }
 
+HealthCondition WaylandGLESRenderer::pluginGetHealth()
+{
+    return BaseRenderer::pluginGetHealth();
+}
+
+t_ilm_const_string WaylandGLESRenderer::pluginGetName() const
+{
+    return "WaylandGLESRenderer";
+}
+
 Shader* WaylandGLESRenderer::createShader(const string* vertexName, const string* fragmentName)  
 {
     Shader *result = NULL;
@@ -199,11 +209,4 @@ Shader* WaylandGLESRenderer::createShader(const string* vertexName, const string
     return result;
 }
 
-extern "C" BaseRenderer* createWaylandGLESRenderer(Scene* pScene){
-    return new WaylandGLESRenderer(pScene);
-}
-
-extern "C" void destroyWaylandGLESRenderer(WaylandGLESRenderer* p)
-{
-    delete p;
-}
+DECLARE_LAYERMANAGEMENT_PLUGIN(WaylandGLESRenderer)

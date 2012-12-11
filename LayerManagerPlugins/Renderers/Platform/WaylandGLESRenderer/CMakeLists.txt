@@ -21,53 +21,92 @@
 
 cmake_minimum_required (VERSION 2.6)
 
-include_directories ("include")
-include_directories ("../X11GLESRenderer/include")
-include_directories ("../../Base/include")
-include_directories ("../../Graphic/include")
-include_directories ("${PROJECT_SOURCE_DIR}/config")
-include_directories ("${PROJECT_SOURCE_DIR}/LayerManagerService/include")
-include_directories ("${PROJECT_SOURCE_DIR}/LayerManagerUtils/include")
-
-file(GLOB SOURCES 
-        src/WaylandGLESRenderer.cpp
-        ../X11GLESRenderer/src/ShaderProgramGLES.cpp 
-        )
-        
-add_library(WaylandGLESRenderer SHARED ${SOURCES})
+#===========================================================================
+# plugin configuration
+#===========================================================================
+project(WaylandGLESRenderer)
 
 find_package(Wayland REQUIRED)
-include_directories(${WAYLAND_SERVER_INCLUDE_DIR})
-include_directories(${DRM_INCLUDE_DIR})
-
 find_package(EGL REQUIRED)
-include_directories(${EGL_INCLUDE_DIR})
-
 find_package(GLESv2 REQUIRED)
-include_directories(${GLESv2_INCLUDE_DIR})
+find_package(Threads REQUIRED)
 
-find_package (Threads)
-set(LIBS ${LIBS} ${CMAKE_THREAD_LIBS_INIT} ${EGL_LIBRARY} ${GLESv2_LIBRARIES} LayerManagerGraphicWaylandGLESv2 LayerManagerUtils )
-target_link_libraries(WaylandGLESRenderer ${LIBS})
+include_directories(
+    include
+    ../X11GLESRenderer/include
+    ../../Base/include
+    ../../Graphic/include
+    ${CMAKE_SOURCE_DIR}/config
+    ${CMAKE_SOURCE_DIR}/LayerManagerService/include
+    ${CMAKE_SOURCE_DIR}/LayerManagerUtils/include
+    ${WAYLAND_SERVER_INCLUDE_DIR}
+    ${DRM_INCLUDE_DIR}
+    ${EGL_INCLUDE_DIR}
+    ${GLESv2_INCLUDE_DIR}
+)
 
-add_dependencies(WaylandGLESRenderer LayerManagerService)
-add_dependencies(WaylandGLESRenderer LayerManagerUtils)
-add_dependencies(WaylandGLESRenderer LayerManagerGraphicWaylandGLESv2)
+set(LIBS
+    ${CMAKE_THREAD_LIBS_INIT}
+    ${EGL_LIBRARY}
+    ${GLESv2_LIBRARIES}
+    LayerManagerGraphicWaylandGLESv2
+    LayerManagerUtils
+)
 
-install (TARGETS WaylandGLESRenderer DESTINATION lib/layermanager/renderer)
-install (FILES ../X11GLESRenderer/renderer_frag_clear.glslf DESTINATION lib/layermanager/renderer)
-install (FILES ../X11GLESRenderer/renderer_frag.glslf DESTINATION lib/layermanager/renderer)
-install (FILES ../X11GLESRenderer/renderer_frag_no_blend.glslf DESTINATION lib/layermanager/renderer)
-install (FILES ../X11GLESRenderer/renderer_frag_no_ualpha.glslf DESTINATION lib/layermanager/renderer)
-install (FILES ../X11GLESRenderer/renderer_frag_add_uchromakey.glslf DESTINATION lib/layermanager/renderer)
-install (FILES ../X11GLESRenderer/renderer_frag_no_blend_no_ualpha.glslf DESTINATION lib/layermanager/renderer)
-install (FILES ../X11GLESRenderer/renderer_frag_2surf.glslf DESTINATION lib/layermanager/renderer)
-install (FILES ../X11GLESRenderer/renderer_frag_2surf_no_blend.glslf DESTINATION lib/layermanager/renderer)
-install (FILES ../X11GLESRenderer/renderer_frag_2surf_no_ualpha.glslf DESTINATION lib/layermanager/renderer)
-install (FILES ../X11GLESRenderer/renderer_frag_2surf_no_blend_no_ualpha.glslf DESTINATION lib/layermanager/renderer)
-install (FILES ../X11GLESRenderer/renderer_frag_2surf_no_ualpha_0.glslf DESTINATION lib/layermanager/renderer)
-install (FILES ../X11GLESRenderer/renderer_frag_2surf_no_blend_no_ualpha_0.glslf DESTINATION lib/layermanager/renderer)
-install (FILES ../X11GLESRenderer/renderer_frag_2surf_no_ualpha_1.glslf DESTINATION lib/layermanager/renderer)
-install (FILES ../X11GLESRenderer/renderer_frag_2surf_no_blend_no_ualpha_1.glslf DESTINATION lib/layermanager/renderer)
-install (FILES ../X11GLESRenderer/renderer_vert.glslv DESTINATION lib/layermanager/renderer)
-install (FILES ../X11GLESRenderer/renderer_vert_2surf.glslv DESTINATION lib/layermanager/renderer)
+set(SRC_FILES
+    src/WaylandGLESRenderer.cpp
+    ../X11GLESRenderer/src/ShaderProgramGLES.cpp
+)
+
+set(PLUGIN_INSTALL_PATH lib/layermanager/renderer)
+
+install(
+    FILES
+        renderer_frag_clear.glslf
+        renderer_frag.glslf
+        renderer_frag_no_blend.glslf
+        renderer_frag_no_ualpha.glslf
+        renderer_frag_add_uchromakey.glslf
+        renderer_frag_no_blend_no_ualpha.glslf
+        renderer_frag_2surf.glslf
+        renderer_frag_2surf_no_blend.glslf
+        renderer_frag_2surf_no_ualpha.glslf
+        renderer_frag_2surf_no_blend_no_ualpha.glslf
+        renderer_frag_2surf_no_ualpha_0.glslf
+        renderer_frag_2surf_no_blend_no_ualpha_0.glslf
+        renderer_frag_2surf_no_ualpha_1.glslf
+        renderer_frag_2surf_no_blend_no_ualpha_1.glslf
+        renderer_vert.glslv
+        renderer_vert_2surf.glslv
+    DESTINATION
+        lib/layermanager/renderer
+)
+
+#===========================================================================
+# create statically linked plugin
+#===========================================================================
+if (WITH_STATIC_LIBRARIES)
+
+    add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
+
+    set (STATICALLY_LINKED_PLUGINS ${STATICALLY_LINKED_PLUGINS}
+        ${PROJECT_NAME} CACHE INTERNAL "list of static plugins")
+
+#===========================================================================
+# create dynamically linked plugin
+#===========================================================================
+else(WITH_STATIC_LIBRARIES)
+
+    add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
+
+    install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${PLUGIN_INSTALL_PATH})
+
+endif(WITH_STATIC_LIBRARIES)
+
+
+#===========================================================================
+# external libraries
+#===========================================================================
+target_link_libraries(${PROJECT_NAME} ${LIBS})
+
+add_dependencies(${PROJECT_NAME} ${LIBS})

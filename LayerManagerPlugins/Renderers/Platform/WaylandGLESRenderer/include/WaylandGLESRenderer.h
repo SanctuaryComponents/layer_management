@@ -32,7 +32,7 @@ class ITextureBinder;
 class WaylandGLESRenderer : public BaseRenderer
 {
 public:
-    WaylandGLESRenderer(Scene* pScene);
+    WaylandGLESRenderer(ICommandExecutor& executor, Configuration& config);
     bool start(int, int, const char*);
     void stop();
     void doScreenShot(std::string fileToSave);
@@ -46,6 +46,10 @@ public:
     Shader* createShader(const string* vertexName, const string* fragmentName);
     virtual bool setOptimizationMode(OptimizationType id, OptimizationModeType mode);
     virtual bool getOptimizationMode(OptimizationType id, OptimizationModeType *mode);
+
+    // from PluginBase
+    virtual HealthCondition pluginGetHealth();
+    virtual t_ilm_const_string pluginGetName() const;
 
 private:
     WaylandBaseWindowSystem* m_pWindowSystem;
