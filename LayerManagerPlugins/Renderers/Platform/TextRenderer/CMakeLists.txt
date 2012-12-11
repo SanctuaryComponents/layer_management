@@ -1,6 +1,6 @@
 ############################################################################
 #
-# Copyright 2010-2012 BMW Car IT GmbH
+# Copyright 2012 BMW Car IT GmbH
 #
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,11 +17,13 @@
 #
 ############################################################################
 
+
 cmake_minimum_required (VERSION 2.6)
 
+#===========================================================================
+# plugin configuration
+#===========================================================================
 project(TextRenderer)
-
-find_package (Threads)
 
 include_directories(
     include
@@ -32,26 +34,44 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/LayerManagerUtils/include
 )
 
+set(LIBS
+    LayerManagerUtils
+    LayerManagerBase
+)
+
 set(SRC_FILES
     ../../Base/src/BaseRenderer.cpp
     src/TextRenderer.cpp
 )
 
-set(LIBS
-    ${LIBS}
-    ${CMAKE_THREAD_LIBS_INIT}
-    LayerManagerUtils
-)
+set(PLUGIN_INSTALL_PATH lib/layermanager/renderer)
 
-add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
+#===========================================================================
+# create statically linked plugin
+#===========================================================================
+if (WITH_STATIC_LIBRARIES)
 
+    add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
+
+    set (STATICALLY_LINKED_PLUGINS ${STATICALLY_LINKED_PLUGINS}
+        ${PROJECT_NAME} CACHE INTERNAL "list of static plugins")
+
+#===========================================================================
+# create dynamically linked plugin
+#===========================================================================
+else(WITH_STATIC_LIBRARIES)
+
+    add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
+
+    install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${PLUGIN_INSTALL_PATH})
+
+endif(WITH_STATIC_LIBRARIES)
+
+
+#===========================================================================
+# external libraries
+#===========================================================================
 target_link_libraries(${PROJECT_NAME} ${LIBS})
 
-add_dependencies(${PROJECT_NAME}
-    LayerManagerService
-    LayerManagerUtils
-)
+add_dependencies(${PROJECT_NAME} ${LIBS})
 
-install(TARGETS ${PROJECT_NAME}
-        DESTINATION lib/layermanager/renderer
-)

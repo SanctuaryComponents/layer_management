@@ -18,13 +18,13 @@
 ****************************************************************************/
 
 #include "TextRenderer.h"
-#include "config.h"
+#include "Configuration.h"
 #include "Log.h"
 #include <string.h>
 #include <fstream>
 
-TextRenderer::TextRenderer(Scene* pScene)
-: BaseRenderer(pScene)
+TextRenderer::TextRenderer(ICommandExecutor& executor, Configuration& config)
+: BaseRenderer(executor, config)
 , m_width(0)
 , m_height(0)
 {
@@ -136,11 +136,14 @@ bool TextRenderer::getOptimizationMode(OptimizationType id, OptimizationModeType
     return true;
 }
 
-extern "C" IRenderer* createTextRenderer(Scene* pScene) {
-    return new TextRenderer(pScene);
+HealthCondition TextRenderer::pluginGetHealth()
+{
+    return HealthRunning;
 }
 
-extern "C" void destroyTextRenderer(TextRenderer* p)
+t_ilm_const_string TextRenderer::pluginGetName() const
 {
-    delete p;
+    return "TextRenderer";
 }
+
+DECLARE_LAYERMANAGEMENT_PLUGIN(TextRenderer)

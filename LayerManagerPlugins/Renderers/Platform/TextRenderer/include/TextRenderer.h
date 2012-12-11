@@ -26,7 +26,7 @@
 class TextRenderer : public BaseRenderer
 {
 public:
-	TextRenderer(Scene* pScene);
+    TextRenderer(ICommandExecutor& executor, Configuration& config);
     virtual ~TextRenderer();
     void doScreenShot(std::string fileToSave);
     void doScreenShotOfLayer(std::string fileToSave, uint id);
@@ -42,6 +42,10 @@ public:
 
     virtual bool setOptimizationMode(OptimizationType id, OptimizationModeType mode);
     virtual bool getOptimizationMode(OptimizationType id, OptimizationModeType* mode);
+
+    // from PluginBase
+    virtual HealthCondition pluginGetHealth();
+    virtual t_ilm_const_string pluginGetName() const;
 
 private:
     uint m_width;
