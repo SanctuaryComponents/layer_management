@@ -54,6 +54,7 @@ option (WITH_WAYLAND_FBDEV          "Build Wayland with FBDEV backend"          
 option (WITH_WAYLAND_X11            "Build Wayland with X11 backend"                      OFF)
 option (WITH_WAYLAND_DRM            "Build Wayland with drm backend"                      OFF)
 option (WITH_SERVICE_BIN            "Build LayerManagerService Binary"                    ON)
+option (WITH_CONTROL_BIN            "Build LayerManagerControl Binary"                    ON)
 option (WITH_CLIENT_LIB             "Build LayerManagement Client Lib"                    ON)
 option (WITH_GENERIC_COMMUNICATOR   "Build Generic Communicator Plugin"                   ON)
 option (WITH_SYSTEMD_HEALTH_MONITOR "Build plugin for systemd health monitoring"          OFF)
@@ -118,7 +119,7 @@ add_subdirectory (3rdParty)
 
 
 #==============================================================================
-# use strict compiler settings for examples
+# use strict compiler settings for examples and tools
 #------------------------------------------------------------------------------
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra")
@@ -137,7 +138,6 @@ endif(WITH_GLX_EXAMPLE)
 
 if (WITH_CLIENTEXAMPLES)
     add_subdirectory (LayerManagerExamples/LayerManagerClientExample)
-    add_subdirectory (LayerManagerExamples/LayerManagerControl)
     set (BUILD_UTILS_LIB ON)
 endif(WITH_CLIENTEXAMPLES)
 
@@ -148,6 +148,11 @@ if (WITH_WL_EXAMPLE)
     add_subdirectory (LayerManagerExamples/EGLWLInputEventExample)
     set (BUILD_UTILS_LIB ON)
 endif(WITH_WL_EXAMPLE)
+
+if (WITH_CONTROL_BIN)
+    add_subdirectory (LayerManagerControl)
+    set (BUILD_UTILS_LIB ON)
+endif(WITH_CONTROL_BIN)
 
 #==============================================================================
 # use very strict compiler settings for internal components
