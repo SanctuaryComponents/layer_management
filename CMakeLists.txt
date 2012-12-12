@@ -60,6 +60,8 @@ option (WITH_COMMUNICATOR_GEN "Build Generic Communicator Plugin"               
 
 option (WITH_SYSTEMD        "Build with native systemd integration"               OFF)
 
+option (WITH_TEXT_RENDERER  "Build renderer renderer (only logging)"              OFF)
+
 
 #==============================================================================
 # Internal global settings not available to user
@@ -179,6 +181,10 @@ if (WITH_X11_GLES)
     set (WITH_GLESv2_LIB ON CACHE BOOL "Build X11 GLES development lib" FORCE)
     add_subdirectory (LayerManagerPlugins/Renderers/Platform/X11GLESRenderer)
 endif(WITH_X11_GLES)
+
+if (WITH_TEXT_RENDERER)
+    add_subdirectory (LayerManagerPlugins/Renderers/Platform/TextRenderer)
+endif(WITH_TEXT_RENDERER)
 
 if (WITH_SERVICE_BIN OR WITH_CLIENT_LIB)
     add_subdirectory (LayerManagerPlugins/IpcModules)
