@@ -1783,15 +1783,6 @@ ilmErrorTypes ilm_surfaceSetChromaKey(t_ilm_surface surfaceId, t_ilm_int* pColor
     return returnValue;
 }
 
-ilmErrorTypes ilm_surfaceInvalidateRectangle(t_ilm_surface surfaceId)
-{
-    ilmErrorTypes error = ILM_FAILED;
-
-    // TODO: Implement this on both server and client
-
-    return error;
-}
-
 ilmErrorTypes ilm_surfacegroupCreate(t_ilm_surfacegroup *pSurfacegroup)
 {
     ilmErrorTypes returnValue = ILM_FAILED;

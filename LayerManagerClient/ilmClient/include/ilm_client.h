@@ -118,16 +118,6 @@ ilmErrorTypes ilm_surfaceRemoveNativeContent(t_ilm_surface surfaceId);
 ilmErrorTypes ilm_surfaceSetSourceRectangle(t_ilm_surface surfaceId, t_ilm_int x, t_ilm_int y, t_ilm_int width, t_ilm_int height);
 
 /**
- * \brief Inform that a certain rectangle of a surface has been invalidated and must consequently be redrawn
- * \deprecated Function will be removed in Compliance 4.0. 
- * \ingroup ilmClient
- * \param[in] surfaceId Id of the surface
- * \return ILM_SUCCESS if the method call was successful
- * \return ILM_FAILED if the client can not call the method on the service.
- */
-ilmErrorTypes ilm_surfaceInvalidateRectangle(t_ilm_surface surfaceId);
-
-/**
  * \brief Set from which kind of devices the surface can accept input events.
  * By default, a surface accept input events from all kind of devices (keyboards, pointer, ...)
  * By calling this function, you can adjust surface preferences. Note that this function only
