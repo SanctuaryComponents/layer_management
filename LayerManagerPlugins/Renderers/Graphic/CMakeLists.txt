@@ -28,7 +28,7 @@ include_directories(
     "include"
     "../Base/include"
     "${PROJECT_SOURCE_DIR}/config"
-    "${PROJECT_SOURCE_DIR}/LayerManagerService/include"
+    "${PROJECT_SOURCE_DIR}/LayerManagerBase/include"
     "${PROJECT_SOURCE_DIR}/LayerManagerUtils/include"
 )
 

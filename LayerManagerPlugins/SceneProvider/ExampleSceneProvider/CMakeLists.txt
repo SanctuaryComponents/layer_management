@@ -27,7 +27,7 @@ project(ExampleSceneProvider)
 include_directories(
     include
     ${CMAKE_SOURCE_DIR}/LayerManagerCommands/include
-    ${CMAKE_SOURCE_DIR}/LayerManagerService/include
+    ${CMAKE_SOURCE_DIR}/LayerManagerBase/include
 )
 
 set(LIBS

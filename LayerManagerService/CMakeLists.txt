@@ -19,108 +19,26 @@
 
 cmake_minimum_required (VERSION 2.6)
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Xlinker -export-dynamic")
-
-if (WITH_DLT)
-    find_package(AutomotiveDlt REQUIRED)
-    include_directories(${DLT_INCLUDE_DIR})
-endif (WITH_DLT)
+project(LayerManagerService)
 
 include_directories(
-    include
     ${CMAKE_SOURCE_DIR}/config
+    ${CMAKE_SOURCE_DIR}/LayerManagerBase/include
     ${CMAKE_SOURCE_DIR}/LayerManagerUtils/include
-    ${CMAKE_SOURCE_DIR}/LayerManagerCommands/include
+)
+
+set(LIBS
+    LayerManagerBase
 )
 
 set(SRC_FILES
-    src/Configuration.cpp
-    src/GraphicalObject.cpp
-    src/GraphicalSurface.cpp
-    src/InputManager.cpp
-    src/Layermanager.cpp
-    src/PluginBase.cpp
-    src/PluginManager.cpp
-    src/Scene.cpp
-    src/SignalHandler.cpp
-    src/shader/Shader.cpp
-    src/shader/ShaderProgram.cpp
-    src/shader/ShaderProgramFactory.cpp
-    src/shader/ShaderUniform.cpp
+    src/main.cpp
 )
 
-add_library(LayerManagerBase STATIC ${SRC_FILES})
+add_executable(${PROJECT_NAME} ${SRC_FILES})
 
-add_executable(LayerManagerService src/main.cpp)
+add_dependencies(${PROJECT_NAME} ${LIBS})
 
-add_dependencies(LayerManagerService LayerManagerBase)
+target_link_libraries(${PROJECT_NAME} ${LIBS})
 
-add_dependencies(LayerManagerBase
-    LayerManagerUtils
-)
-
-find_package (Threads)
-set(LIBS ${LIBS}
-    LayerManagerUtils
-    dl
-    ${CMAKE_THREAD_LIBS_INIT}
-    ${DLT_LIBRARY}
-    ${STATICALLY_LINKED_PLUGINS}
-) 
-
-target_link_libraries(LayerManagerBase ${LIBS})
-
-target_link_libraries(LayerManagerService LayerManagerBase)
-
-file(GLOB LM_INCLUDES include/*.h)
-
-install (TARGETS LayerManagerService DESTINATION bin)
-install (FILES ${LM_INCLUDES} DESTINATION include/layermanager)
-
-
-if (WITH_TESTS)
-
-    find_package (Threads)
-
-    enable_testing()
-
-    set (CMAKE_CXX_FLAGS "")
-
-    add_executable(LayerManagerService_Test
-        tests/SceneTest.cpp
-        tests/ScreenTest.cpp
-        tests/LayermanagerTest.cpp
-        tests/InputManagerTest.cpp
-        tests/GraphicalObjectTest.cpp
-        tests/GraphicalGroupTest.cpp
-        tests/GraphicalSurfaceTest.cpp
-        tests/SurfaceTest.cpp
-        tests/LayerTest.cpp
-        tests/ShaderTest.cpp
-        tests/ShaderUniformTest.cpp
-        tests/ShaderProgramTest.cpp
-        tests/ShaderProgramFactoryTest.cpp
-        tests/RectangleTest.cpp
-    )
-
-    target_link_libraries(LayerManagerService_Test
-        ${LIBS}
-        LayerManagerBase
-        gtest
-        gmock
-        ${CMAKE_THREAD_LIBS_INIT}
-    )
-
-    add_test(LayerManagerService LayerManagerService_Test)
-
-endif(WITH_TESTS) 
-
-
-#=============================================================
-# configuration depending on system
-#=============================================================
-include(CheckFunctionExists)
-check_function_exists(backtrace_symbols HAVE_BACKTRACE)
-
-include(CheckIncludeFiles)
-check_include_files(execinfo.h HAVE_EXECINFO_H)
+install (TARGETS ${PROJECT_NAME} DESTINATION bin)

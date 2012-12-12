@@ -202,6 +202,7 @@ if (WITH_SERVICE_BIN OR WITH_CLIENT_LIB)
 
     if (WITH_SERVICE_BIN)
         add_subdirectory (LayerManagerPlugins/Renderers/Graphic)
+        add_subdirectory (LayerManagerBase)
         add_subdirectory (LayerManagerService)
         set (BUILD_UTILS_LIB ON)
         set (INSTALL_UTILS_LIB ON)

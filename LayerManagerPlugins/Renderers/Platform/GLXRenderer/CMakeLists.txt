@@ -22,9 +22,9 @@ cmake_minimum_required (VERSION 2.6)
 include_directories ("include")
 include_directories ("../../Base/include")
 include_directories ("../../Graphic/include")
-include_directories ("${PROJECT_SOURCE_DIR}/config")
-include_directories ("${PROJECT_SOURCE_DIR}/LayerManagerService/include")
-include_directories ("${PROJECT_SOURCE_DIR}/LayerManagerUtils/include")
+include_directories ("${CMAKE_SOURCE_DIR}/config")
+include_directories ("${CMAKE_SOURCE_DIR}/LayerManagerBase/include")
+include_directories ("${CMAKE_SOURCE_DIR}/LayerManagerUtils/include")
 
 file(GLOB SOURCES 
     src/X11GLXRenderer.cpp 

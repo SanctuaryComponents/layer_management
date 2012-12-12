@@ -24,7 +24,7 @@ project(LayerManagerCommands)
 include_directories(
     include
     ${CMAKE_SOURCE_DIR}/config
-    ${CMAKE_SOURCE_DIR}/LayerManagerService/include
+    ${CMAKE_SOURCE_DIR}/LayerManagerBase/include
     ${CMAKE_SOURCE_DIR}/LayerManagerUtils/include
 )
 
