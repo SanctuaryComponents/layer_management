@@ -318,8 +318,8 @@ void* notificationThreadLoop(void* param)
                 fprintf(stderr, "notification for surface %d received, but no callback set\n", id);
             }
         }
+        gIpcModule.destroyMessage(notification);
     }
-    gIpcModule.destroyMessage(notification);
     return NULL;
 }
 
