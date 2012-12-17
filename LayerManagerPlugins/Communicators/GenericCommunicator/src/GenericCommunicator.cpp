@@ -2259,10 +2259,12 @@ void GenericCommunicator::SetRenderOrderOfLayers(t_ilm_message message)
     t_ilm_uint clientPid = m_executor->getSenderPid(clientHandle);
     uint* array = NULL;
     int length = 0;
+    uint screenID = 0;
 
     m_ipcModule.getUintArray(message, &array, &length);
+    m_ipcModule.getUint(message, &screenID);
 
-    t_ilm_bool status = m_executor->execute(new ScreenSetRenderOrderCommand(clientPid, array, length));
+    t_ilm_bool status = m_executor->execute(new ScreenSetRenderOrderCommand(clientPid, screenID, array, length));
     if (status)
     {
         response = m_ipcModule.createResponse(message);
