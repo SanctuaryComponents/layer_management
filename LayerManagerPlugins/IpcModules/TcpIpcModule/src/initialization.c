@@ -72,7 +72,7 @@ t_ilm_bool initServiceMode()
         }
         else
         {
-            memcpy(&gState.serverAddrIn.sin_addr.s_addr, server->h_addr, server->h_length);
+            memcpy(&gState.serverAddrIn.sin_addr.s_addr, server->h_addr_list[0], server->h_length);
         }
 
         if (0 != connect(gState.socket,
@@ -166,7 +166,7 @@ t_ilm_bool initClientMode()
         }
         else
         {
-            memcpy(&gState.serverAddrIn.sin_addr.s_addr, server->h_addr, server->h_length);
+            memcpy(&gState.serverAddrIn.sin_addr.s_addr, server->h_addr_list[0], server->h_length);
         }
 
         if (0 != connect(gState.socket,
