@@ -41,6 +41,11 @@ public:
 
     void signalWindowSystemRedraw();
     void forceCompositionWindowSystem();
+
+    // from IRenderer
+    virtual bool getOptimizationMode(OptimizationType id, OptimizationModeType* mode);
+    virtual bool setOptimizationMode(OptimizationType id, OptimizationModeType mode);
+
 private:
     X11WindowSystem*  m_pWindowSystem;
     GLXGraphicsystem* m_pGraphicSystem;

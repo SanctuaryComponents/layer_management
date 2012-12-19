@@ -149,6 +149,16 @@ void X11GLXRenderer::forceCompositionWindowSystem()
     m_pWindowSystem->m_forceComposition = true;
 }
 
+bool X11GLXRenderer::getOptimizationMode(OptimizationType id, OptimizationModeType* mode)
+{
+    return m_pGraphicSystem->getOptimizationMode(id, (unsigned int*)mode);
+}
+
+bool X11GLXRenderer::setOptimizationMode(OptimizationType id, OptimizationModeType mode)
+{
+    return m_pGraphicSystem->setOptimizationMode(id, (unsigned int)mode);
+}
+
 extern "C" IRenderer* createX11GLXRenderer(Scene* pScene) {
     return new X11GLXRenderer(pScene);
 }
