@@ -18,7 +18,7 @@
 ****************************************************************************/
 
 #include "X11GLXRenderer.h"
-#include "config.h"
+#include "Configuration.h"
 #include "GraphicSystems/GLXGraphicsystem.h"
 #include "WindowSystems/X11WindowSystem.h"
 #include "TextureBinders/X11CopyGLX.h"
@@ -26,8 +26,8 @@
 #include "Log.h"
 #include <string.h>
 
-X11GLXRenderer::X11GLXRenderer(Scene* pScene)
-: BaseRenderer(pScene)
+X11GLXRenderer::X11GLXRenderer(ICommandExecutor& executor, Configuration& config)
+: BaseRenderer(executor, config)
 , m_pWindowSystem(0)
 , m_pGraphicSystem(0)
 , m_width(0)
@@ -164,11 +164,4 @@ bool X11GLXRenderer::setOptimizationMode(OptimizationType id, OptimizationModeTy
     return m_pGraphicSystem->setOptimizationMode(id, (unsigned int)mode);
 }
 
-extern "C" IRenderer* createX11GLXRenderer(Scene* pScene) {
-    return new X11GLXRenderer(pScene);
-}
-
-extern "C" void destroyX11GLXRenderer(X11GLXRenderer* p)
-{
-    delete p;
-}
+DECLARE_LAYERMANAGEMENT_PLUGIN(X11GLXRenderer)

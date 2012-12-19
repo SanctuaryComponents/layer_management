@@ -28,7 +28,7 @@
 class X11GLXRenderer : public BaseRenderer
 {
 public:
-    X11GLXRenderer(Scene* pScene);
+    X11GLXRenderer(ICommandExecutor& executor, Configuration& config);
     virtual ~X11GLXRenderer();
     void doScreenShot(std::string fileToSave);
     void doScreenShotOfLayer(std::string fileToSave, uint id);

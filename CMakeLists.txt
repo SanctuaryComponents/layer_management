@@ -178,7 +178,7 @@ endif(WITH_GENERIC_COMMUNICATOR)
 if (WITH_DESKTOP)
     set (WITH_GLX_LIB ON CACHE BOOL "Build X11 GLX development lib" FORCE)
     add_subdirectory (LayerManagerPlugins/Renderers/Platform/GLXRenderer)
-endif(WITH_DESKTOP)     
+endif(WITH_DESKTOP)
 
 if (WITH_WAYLAND)
     if (WITH_WAYLAND_VIVANTE_GAL)

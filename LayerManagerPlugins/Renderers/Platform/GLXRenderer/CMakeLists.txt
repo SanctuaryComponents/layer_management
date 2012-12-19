@@ -17,33 +17,94 @@
 #
 ############################################################################
 
+
 cmake_minimum_required (VERSION 2.6)
 
-include_directories ("include")
-include_directories ("../../Base/include")
-include_directories ("../../Graphic/include")
-include_directories ("${CMAKE_SOURCE_DIR}/config")
-include_directories ("${CMAKE_SOURCE_DIR}/LayerManagerBase/include")
-include_directories ("${CMAKE_SOURCE_DIR}/LayerManagerUtils/include")
-
-file(GLOB SOURCES 
-    src/X11GLXRenderer.cpp 
-)
-
-add_library(X11GLXRenderer SHARED ${SOURCES})
+#===========================================================================
+# plugin configuration
+#===========================================================================
+project(X11GLXRenderer)
 
 find_package(X11 REQUIRED)
-include_directories(${X11_INCLUDE_DIR})
-
 find_package(GLX REQUIRED)
-include_directories(${GLX_INCLUDE_DIR})
+find_package(Threads REQUIRED)
 
-find_package (Threads)
-set(LIBS ${LIBS} ${CMAKE_THREAD_LIBS_INIT} ${X11_X11_LIB} ${X11_Xcomposite_LIB} ${X11_Xdamage_LIB} ${GLX_LIBRARIES} LayerManagerGraphicGLX LayerManagerUtils)
-target_link_libraries(X11GLXRenderer ${LIBS})
+include_directories(
+    include
+    ../../Base/include
+    ../../Graphic/include
+    ${CMAKE_SOURCE_DIR}/config
+    ${CMAKE_SOURCE_DIR}/LayerManagerBase/include
+    ${CMAKE_SOURCE_DIR}/LayerManagerUtils/include
+    ${X11_INCLUDE_DIR}
+    ${GLX_INCLUDE_DIR}
+)
 
-add_dependencies(X11GLXRenderer LayerManagerService)
-add_dependencies(X11GLXRenderer LayerManagerUtils)
-add_dependencies(X11GLXRenderer LayerManagerGraphicGLX)
+set(LIBS
+    ${CMAKE_THREAD_LIBS_INIT}
+    ${X11_X11_LIB}
+    ${X11_Xcomposite_LIB}
+    ${X11_Xdamage_LIB}
+    ${GLX_LIBRARIES}
+    LayerManagerGraphicGLX
+    LayerManagerUtils
+)
 
-install (TARGETS X11GLXRenderer DESTINATION lib/layermanager/renderer)
+set(SRC_FILES
+    src/X11GLXRenderer.cpp
+)
+
+set(PLUGIN_INSTALL_PATH lib/layermanager/renderer)
+
+install(FILES   renderer_frag_clear.glslf
+                renderer_frag.glslf
+                renderer_frag_no_blend.glslf
+                renderer_frag_no_ualpha.glslf
+                renderer_frag_add_uchromakey.glslf
+                renderer_frag_no_blend_no_ualpha.glslf
+                renderer_frag_2surf.glslf
+                renderer_frag_2surf_no_blend.glslf
+                renderer_frag_2surf_no_ualpha.glslf
+                renderer_frag_2surf_no_blend_no_ualpha.glslf
+                renderer_frag_2surf_no_ualpha_0.glslf
+                renderer_frag_2surf_no_blend_no_ualpha_0.glslf
+                renderer_frag_2surf_no_ualpha_1.glslf
+                renderer_frag_2surf_no_blend_no_ualpha_1.glslf
+                renderer_vert.glslv
+                renderer_vert_2surf.glslv
+    DESTINATION lib/layermanager/renderer
+)
+
+#===========================================================================
+# create statically linked plugin
+#===========================================================================
+if (WITH_STATIC_LIBRARIES)
+
+    add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
+
+    set (STATICALLY_LINKED_PLUGINS ${STATICALLY_LINKED_PLUGINS}
+        ${PROJECT_NAME} CACHE INTERNAL "list of static plugins")
+
+#===========================================================================
+# create dynamically linked plugin
+#===========================================================================
+else(WITH_STATIC_LIBRARIES)
+
+    add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
+
+    install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${PLUGIN_INSTALL_PATH})
+
+endif(WITH_STATIC_LIBRARIES)
+
+#===========================================================================
+# external libraries
+#===========================================================================
+target_link_libraries(${PROJECT_NAME} ${LIBS})
+
+add_dependencies(${PROJECT_NAME} ${LIBS})
+
+
+
+
+
+
