@@ -29,6 +29,8 @@
 #include <signal.h>
 #include <mqueue.h>
 #include <fcntl.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 
 //=============================================================================
@@ -229,6 +231,8 @@ void removeSurfaceCallback(t_ilm_surface layer)
 //=============================================================================
 void* notificationThreadLoop(void* param)
 {
+    (void)param;
+
     t_ilm_message notification;
 
     while (-1 != mq_receive(notificationMqRead, (char*)&notification, sizeof(notification), NULL))
@@ -328,8 +332,9 @@ void* notificationThreadLoop(void* param)
 //=============================================================================
 void* receiveThreadLoop(void* param)
 {
+    (void)param;
+
     t_ilm_bool running = ILM_TRUE;
-    t_ilm_bool waitForMessageRelease = ILM_FALSE;
 
     while (running)
     {
@@ -385,6 +390,8 @@ void calculateTimeout(struct timeval* currentTime, int giventimeout, struct time
 
 t_ilm_bool sendAndWaitForResponse(t_ilm_message command, t_ilm_message* response, int timeoutInMs)
 {
+    (void)timeoutInMs;
+
     *response = 0;
     t_ilm_message_type responseType = IpcMessageTypeNone;
 
@@ -553,7 +560,7 @@ ilmErrorTypes ilm_destroy()
 
     gInitialized = ILM_FALSE;
 
-    return ILM_SUCCESS;
+    return result;
 }
 
 ilmErrorTypes ilm_getPropertiesOfSurface(t_ilm_uint surfaceID, struct ilmSurfaceProperties* pSurfaceProperties)

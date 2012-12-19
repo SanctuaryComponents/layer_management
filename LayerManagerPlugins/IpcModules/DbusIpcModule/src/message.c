@@ -139,13 +139,16 @@ t_ilm_message createNotification(t_ilm_const_string name)
 
 t_ilm_bool sendToClients(t_ilm_message message, t_ilm_client_handle* receiverList, int receiverCount)
 {
+    (void)receiverList;
+    (void)receiverCount;
+
     if (gDbus.isClient)
     {
         return ILM_FALSE;
     }
 
     dbusmessage* messageToSend = (dbusmessage*)message;
-    t_ilm_int serial = dbus_message_get_serial(messageToSend->pMessage);
+    t_ilm_uint serial = dbus_message_get_serial(messageToSend->pMessage);
 
     dbus_message_set_path(messageToSend->pMessage, ILM_PATH_COMPOSITE_SERVICE);
     dbus_message_set_interface(messageToSend->pMessage, ILM_INTERFACE_COMPOSITE_SERVICE);
@@ -169,7 +172,7 @@ t_ilm_bool sendToService(t_ilm_message message)
     }
 
     dbusmessage* messageToSend = (dbusmessage*)message;
-    t_ilm_int serial = 1;
+    t_ilm_uint serial = 1;
     pthread_mutex_lock(&gDbus.mutex);
     dbus_bool_t success = dbus_connection_send(gDbus.connection, messageToSend->pMessage, &serial);
     pthread_mutex_unlock(&gDbus.mutex);
@@ -277,7 +280,6 @@ t_ilm_const_string getSenderName(t_ilm_message message)
 
 t_ilm_client_handle getSenderHandle(t_ilm_message message)
 {
-    dbusmessage* msg = (dbusmessage*)message;
     t_ilm_uint result = 0;
 
     const char* sender = getSenderName(message);

@@ -32,6 +32,9 @@ t_ilm_message createResponse(t_ilm_message);
 
 DBusHandlerResult filterLayerManagerNotifications(DBusConnection *connection, DBusMessage *message, void *data)
 {
+    (void)connection;
+    (void)data;
+
     const char* interfaceName = dbus_message_get_interface(message);
     if (!interfaceName)
     {
@@ -61,6 +64,9 @@ DBusHandlerResult filterLayerManagerNotifications(DBusConnection *connection, DB
 
 DBusHandlerResult filterLayerManagerCommands(DBusConnection *connection, DBusMessage *message, void *data)
 {
+    (void)connection;
+    (void)data;
+
     const char* interfaceName = dbus_message_get_interface(message);
     if (!interfaceName)
     {
@@ -91,6 +97,9 @@ DBusHandlerResult filterLayerManagerCommands(DBusConnection *connection, DBusMes
 
 DBusHandlerResult filterLayerManagerErrors(DBusConnection *connection, DBusMessage *message, void *data)
 {
+    (void)connection;
+    (void)data;
+
     const char* interfaceName = dbus_message_get_interface(message);
     if (!interfaceName)
     {
@@ -113,7 +122,7 @@ DBusHandlerResult filterLayerManagerErrors(DBusConnection *connection, DBusMessa
         dbus_message_iter_init(gpIncomingMessage->pMessage, &gpIncomingMessage->iter);
 
         char errorMsg[256];
-        getString(gpIncomingMessage, &errorMsg);
+        getString(gpIncomingMessage, errorMsg);
         printf("DbusIpcModule: LayerManagerService returned error: %s\n", errorMsg);
 
         result = DBUS_HANDLER_RESULT_HANDLED;
@@ -123,6 +132,9 @@ DBusHandlerResult filterLayerManagerErrors(DBusConnection *connection, DBusMessa
 
 DBusHandlerResult filterLogging(DBusConnection *connection, DBusMessage *message, void *data)
 {
+    (void)connection;
+    (void)data;
+
     printf("---------------------------------\n");
     printf("received:\n");
     printf("\tmember:    %s\n", dbus_message_get_member(message));
@@ -155,6 +167,9 @@ DBusHandlerResult filterLogging(DBusConnection *connection, DBusMessage *message
 
 DBusHandlerResult filterNameAcquired(DBusConnection *connection, DBusMessage *message, void *data)
 {
+    (void)connection;
+    (void)data;
+
     if (dbus_message_is_signal(message, DBUS_INTERFACE_DBUS, "NameAcquired"))
     {
         gpIncomingMessage->pMessage = dbus_message_copy(message);
@@ -166,6 +181,9 @@ DBusHandlerResult filterNameAcquired(DBusConnection *connection, DBusMessage *me
 
 DBusHandlerResult filterNameOwnerChanged(DBusConnection *connection, DBusMessage *message, void *data)
 {
+    (void)connection;
+    (void)data;
+
     if (dbus_message_is_signal(message, DBUS_INTERFACE_DBUS, "NameOwnerChanged"))
     {
         char *name, *old, *new;
@@ -193,6 +211,9 @@ DBusHandlerResult filterNameOwnerChanged(DBusConnection *connection, DBusMessage
 
 DBusHandlerResult filterIntrospection(DBusConnection *connection, DBusMessage *message, void *data)
 {
+    (void)connection;
+    (void)data;
+
     if (dbus_message_is_method_call(message, DBUS_INTERFACE_INTROSPECTABLE, "Introspect"))
     {
         gpIncomingMessage->pMessage = dbus_message_copy(message);
@@ -226,6 +247,8 @@ DBusHandlerResult filterIntrospection(DBusConnection *connection, DBusMessage *m
 
 dbus_bool_t addWatch(DBusWatch* watch, void* data)
 {
+    (void)data;
+
     int sock = dbus_watch_get_unix_fd(watch);
     int flags = dbus_watch_get_flags(watch);
 
@@ -258,6 +281,8 @@ dbus_bool_t addWatch(DBusWatch* watch, void* data)
 
 void removeWatch(DBusWatch* watch, void* data)
 {
+    (void)data;
+
     int sock = dbus_watch_get_unix_fd(watch);
     int flags = dbus_watch_get_flags(watch);
 
@@ -276,6 +301,8 @@ void removeWatch(DBusWatch* watch, void* data)
 
 void toggleWatch(DBusWatch* watch, void* data)
 {
+    (void)data;
+
     if (dbus_watch_get_enabled(watch))
     {
         addWatch(watch, NULL);

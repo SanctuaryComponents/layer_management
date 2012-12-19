@@ -20,6 +20,7 @@
 #include "LayerScene.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #define LAYERWIDTH 800
 #define LAYERHEIGHT 480

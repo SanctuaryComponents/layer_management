@@ -68,6 +68,9 @@ dbusmessage* gpIncomingMessage;
 //=============================================================================
 void printTypeName(int type);
 void unregisterMessageFunc(DBusConnection* conn, void *user_data);
+t_ilm_bool appendString(t_ilm_message message, const char* value);
+t_ilm_bool getString(t_ilm_message message, char* value);
+t_ilm_bool sendToClients(t_ilm_message message, t_ilm_client_handle* receiverList, int receiverCount);
 
 //=============================================================================
 // callback functions

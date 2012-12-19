@@ -101,7 +101,7 @@ t_ilm_bool appendGenericArray(struct SocketMessage* msg, const char arraySize, c
     char i = 0;
     for (i = 0; i < arraySize; ++i)
     {
-        result &= appendGenericValue(msg, protocolType, size, value + i * size);
+        result &= appendGenericValue(msg, protocolType, size, (void*)((unsigned int)value + i * size));
     }
 
     return result;

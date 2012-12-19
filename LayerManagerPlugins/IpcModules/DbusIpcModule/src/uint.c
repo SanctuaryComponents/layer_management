@@ -61,7 +61,6 @@ t_ilm_bool getUintArray(t_ilm_message message, t_ilm_uint** valueArray, t_ilm_in
         returnValue = ILM_TRUE;
 
         DBusMessageIter arrayIter;
-        int index = 0;
 
         dbus_message_iter_recurse(&msg->iter, &arrayIter);
 
