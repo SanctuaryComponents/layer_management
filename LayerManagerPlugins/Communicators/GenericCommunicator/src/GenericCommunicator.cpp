@@ -363,8 +363,6 @@ t_ilm_const_string GenericCommunicator::pluginGetName() const
 
 void GenericCommunicator::ServiceConnect(t_ilm_message message)
 {
-    LOG_DEBUG("GenericCommunicator", "ServiceConnect called");
-
     t_ilm_message response;
     t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
 
@@ -375,6 +373,10 @@ void GenericCommunicator::ServiceConnect(t_ilm_message message)
 
     m_executor->addApplicationReference(clientHandle, new IApplicationReference(processName, processId));
 
+    LOG_DEBUG("GenericCommunicator", "ServiceConnect called from "
+              << m_executor->getSenderName(clientHandle)
+              << "(" << m_executor->getSenderPid(clientHandle) << ")");
+
     response = m_ipcModule.createResponse(message);
     m_ipcModule.sendToClients(response, &clientHandle, 1);
     m_ipcModule.destroyMessage(response);
@@ -382,10 +384,12 @@ void GenericCommunicator::ServiceConnect(t_ilm_message message)
 
 void GenericCommunicator::ServiceDisconnect(t_ilm_message message)
 {
-    LOG_DEBUG("GenericCommunicator", "ServiceDisconnect called");
-
     t_ilm_message response;
     t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
+
+    LOG_DEBUG("GenericCommunicator", "ServiceDisconnect called from "
+              << m_executor->getSenderName(clientHandle)
+              << "(" << m_executor->getSenderPid(clientHandle) << ")");
 
     m_executor->removeApplicationReference(clientHandle);
 
