@@ -52,6 +52,12 @@ bool WaylandGLESRenderer::start(int width, int height, const char* displayname)
     m_binder = NULL;
     m_width = width;
     m_height = height;
+
+    // add default screen
+    LmScreenList& screenList = m_pScene->getScreenList();
+    LmScreen* lmScreen = new LmScreen();
+    screenList.push_back(lmScreen);
+
     // create Wayland windows, register as composite manager etc
     m_pWindowSystem = NULL;
 #ifdef WITH_WAYLAND_FBDEV
