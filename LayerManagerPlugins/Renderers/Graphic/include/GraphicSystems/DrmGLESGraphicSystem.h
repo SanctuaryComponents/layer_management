@@ -59,6 +59,7 @@ struct DrmOutput {
 	int             fdDev;
 	struct gbm_surface*	surface[2];
 	EGLSurface	eglSurface[2];
+	uint32_t	screenID;
 };
 
 class DrmGLESGraphicSystem: public GLESGraphicsystem
@@ -72,6 +73,8 @@ public:
     virtual bool init(EGLNativeDisplayType display, EGLNativeWindowType window);
     virtual void activateGraphicContext();
     virtual void swapBuffers();
+    virtual void updateScreenList(LmScreenList& screenList);
+    virtual void switchScreen(uint screenid);
 
 // proterties
 private:
@@ -85,6 +88,7 @@ private:
 	int            m_crtcsNum;
 	uint32_t       m_crtcAllocator;
 	uint32_t       m_connectorAllocator;
+	DrmOutput*     m_currentOutput;
 
 	PFNEGLBINDWAYLANDDISPLAYWL						m_pfEglBindWaylandDisplayWL;
 	PFNEGLUNBINDWAYLANDDISPLAYWL					m_pfEglUnbindWaylandDisplayWL;

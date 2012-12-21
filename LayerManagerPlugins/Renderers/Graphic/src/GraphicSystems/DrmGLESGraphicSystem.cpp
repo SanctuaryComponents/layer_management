@@ -55,6 +55,7 @@ DrmGLESGraphicSystem::DrmGLESGraphicSystem(int windowWidth, int windowHeight,
 , m_crtcsNum(0)
 , m_crtcAllocator(0)
 , m_connectorAllocator(0)
+, m_currentOutput(NULL)
 {
     LOG_DEBUG("DrmGLESGraphicSystem", "creating DrmGLESGraphicSystem");
 
@@ -224,11 +225,43 @@ bool DrmGLESGraphicSystem::init(EGLNativeDisplayType display, EGLNativeWindowTyp
 
 void DrmGLESGraphicSystem::activateGraphicContext()
 {
-	struct DrmOutput* output = NULL;
-	wl_list_for_each(output, &m_outputList, link)
-	{
-		drmOutputPrepareRender(output);
-	}
+}
+
+void DrmGLESGraphicSystem::updateScreenList(LmScreenList& screenList)
+{
+    LmScreenListIterator iter = screenList.begin();
+    LmScreenListIterator iterEnd = screenList.end();
+    for (; iter != iterEnd; ++iter)
+    {
+        delete (*iter);
+    }
+    screenList.clear();
+
+    struct DrmOutput* output = NULL;
+    wl_list_for_each(output, &m_outputList, link)
+    {
+        LmScreen* lmScreen = new LmScreen(output->screenID, "");
+        screenList.push_back(lmScreen);
+    }
+}
+
+void DrmGLESGraphicSystem::switchScreen(uint screenID)
+{
+    // Actually, when renderSWLayers is called, rendering target buffer is switched
+    // because of avoiding overhead of switching display.
+    struct DrmOutput* output = NULL;
+    wl_list_for_each(output, &m_outputList, link)
+    {
+        if (output->screenID != screenID)
+        {
+            continue;
+        }
+
+        LOG_DEBUG("DrmGLESGraphicSystem", "switch screen:" << m_currentOutput->screenID);
+        m_currentOutput = output;
+        drmOutputPrepareRender(m_currentOutput);
+        break;
+    }
 }
 
 bool DrmGLESGraphicSystem::initializeSystem()
@@ -292,7 +325,6 @@ bool DrmGLESGraphicSystem::createOutputs()
 		}
 
 		drmModeFreeConnector(connector);
-		break;
 	}
 
 	if (wl_list_empty(&m_outputList))
@@ -373,7 +405,7 @@ int DrmGLESGraphicSystem::createOutputForConnector(drmModeRes* resources,
 			goto err_free;
 	}
 
-	drmMode = container_of(output->modeList.next, struct DrmMode, link);
+	drmMode = wl_container_of(output->modeList.next, drmMode, link);
 	output->currentMode = drmMode;
 	drmMode->flags = WL_OUTPUT_MODE_CURRENT | WL_OUTPUT_MODE_PREFERRED;
 
@@ -441,6 +473,10 @@ int DrmGLESGraphicSystem::createOutputForConnector(drmModeRes* resources,
 		goto err_egl_surface;
 	}
 
+        output->screenID = (uint)wl_list_length(&m_outputList);
+        m_currentOutput = output;
+        drmOutputPrepareRender(m_currentOutput);
+
 	wl_list_insert(m_outputList.prev, &output->link);
 
 	LOG_DEBUG("DrmGLESGraphicSystem", "createOutputForConnector OUT (NORMAL)");
@@ -504,6 +540,11 @@ void DrmGLESGraphicSystem::swapBuffers()
 
 	wl_list_for_each(output, &m_outputList, link)
 	{
+		if (output != m_currentOutput)
+		{
+			continue;
+		}
+
 		glFinish();
 
 		eglSwapBuffers(m_eglDisplay, output->eglSurface[output->current]);
@@ -525,6 +566,8 @@ void DrmGLESGraphicSystem::swapBuffers()
 		{
 			LOG_ERROR("DrmGLESGraphicSystem", "queueing pageflip failed");
 		}
+
+		break;
 	}
 
     LOG_DEBUG("DrmGLESGraphicSystem", "swapBuffers OUT");

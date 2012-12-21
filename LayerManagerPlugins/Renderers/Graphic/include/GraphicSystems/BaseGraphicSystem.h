@@ -26,6 +26,7 @@
 #include "PlatformSurface.h"
 #include "Surface.h"
 #include "Layer.h"
+#include "LmScreen.h"
 
 template<class DisplayType, class WindowType>
 class BaseGraphicSystem
@@ -75,6 +76,16 @@ public:
         return m_binder;
     }
     virtual void renderSurface(Surface*)=0;
+
+    virtual void updateScreenList(LmScreenList& screenList)
+    {
+        (void)screenList;
+    }
+
+    virtual void switchScreen(uint screenID)
+    {
+        (void)screenID;
+    }
 
 protected:
     BaseWindowSystem* m_baseWindowSystem;
