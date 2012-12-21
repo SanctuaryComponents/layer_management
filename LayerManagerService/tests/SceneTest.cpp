@@ -1,6 +1,7 @@
 /***************************************************************************
  *
  * Copyright 2010,2011 BMW Car IT GmbH
+ * Copyright (C) 2012 DENSO CORPORATION and Robert Bosch Car Multimedia Gmbh
  *
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,6 +23,8 @@
 #include "IScene.h"
 #include "Scene.h"
 #include "SurfaceMap.h"
+#include "LmScreenList.h"
+#include <vector>
 
 class SceneTest : public ::testing::Test
 {
@@ -30,12 +33,24 @@ public:
     {
         m_pScene = new Scene();
         ASSERT_TRUE(m_pScene);
+
+        LmScreenList& screenList = m_pScene->getScreenList();
+        LmScreen* pScreen = new LmScreen();
+        ASSERT_TRUE(pScreen);
+        screenList.push_back(pScreen);
     }
 
     void TearDown()
     {
         if (m_pScene)
         {
+            LmScreenList& screenList = m_pScene->getScreenList();
+            LmScreenListIterator iter = screenList.begin();
+            LmScreenListIterator iterEnd = screenList.end();
+            for (; iter != iterEnd; ++iter)
+            {
+                delete (*iter);
+            }
             delete m_pScene;
             m_pScene = 0;
         }
@@ -512,7 +527,7 @@ TEST_F(SceneTest, getLayerIDsOfScreen)
     ASSERT_EQ((uint)0, size);
 
     /// add 3 layers to screen
-    LayerList& llist = m_pScene->getCurrentRenderOrder();
+    LayerList& llist = m_pScene->getCurrentRenderOrder(screenId);
     llist.push_back(l1);
     llist.push_back(l3);
     llist.push_back(l4);
