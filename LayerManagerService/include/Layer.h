@@ -1,6 +1,7 @@
 /***************************************************************************
  *
  * Copyright 2010,2011 BMW Car IT GmbH
+ * Copyright (C) 2012 DENSO CORPORATION and Robert Bosch Car Multimedia Gmbh
  *
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -49,8 +50,11 @@ public:
     void applySurfaceTransform();
     SurfaceList& getAllSurfaces();
     bool removeAllSurfaces();
+    unsigned int getContainingScreenId();
+    void setContainingScreenId(unsigned int screenid);
 
 private:
+    unsigned int m_screenId;
     SurfaceList m_surfaces;
     LayerType m_layerType;
     uint m_capabilities;
@@ -58,6 +62,7 @@ private:
 
 inline Layer::Layer(int creatorPid)
 : GraphicalSurface(TypeLayer, creatorPid)
+, m_screenId(INVALID_ID)
 , m_layerType(Software_2D)
 , m_capabilities(0)
 {
@@ -65,6 +70,7 @@ inline Layer::Layer(int creatorPid)
 
 inline Layer::Layer(int id, int creatorPid)
 : GraphicalSurface(id, TypeLayer, creatorPid)
+, m_screenId(INVALID_ID)
 , m_layerType(Software_2D)
 , m_capabilities(0)
 {
@@ -146,6 +152,16 @@ inline bool Layer::removeAllSurfaces()
     m_surfaces.clear();
     renderPropertyChanged = true;
     return true;
+}
+
+inline unsigned int Layer::getContainingScreenId()
+{
+    return m_screenId;
+}
+
+inline void Layer::setContainingScreenId(unsigned int id)
+{
+    m_screenId = id;
 }
 
 inline void Layer::applySurfaceTransform()
