@@ -43,6 +43,11 @@ bool X11GLXRenderer::start(int width, int height, const char* displayname)
     m_width = width;
     m_height = height;
 
+    // add default screen
+    LmScreenList& screenList = m_pScene->getScreenList();
+    LmScreen* lmScreen = new LmScreen();
+    screenList.push_back(lmScreen);
+
     // create X11 windows, register as composite manager etc
     m_pWindowSystem  = new X11WindowSystem(displayname, width, height, m_pScene, m_pInputManager, GLXGraphicsystem::GetMatchingVisual);
     m_pGraphicSystem = new GLXGraphicsystem(width, height);
