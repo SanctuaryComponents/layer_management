@@ -43,6 +43,8 @@ protected:
     virtual bool createNativeContext();
     virtual bool initGraphicSystem();
     virtual bool createInputEvent();
+    virtual void checkForNewSurfaceNativeContent();
+    virtual void RedrawAllLayers(bool clear, bool swap);
 
 private:
     int m_fdDev;

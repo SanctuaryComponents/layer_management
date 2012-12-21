@@ -129,7 +129,7 @@ protected:
     void createServerinfo(WaylandBaseWindowSystem* windowSystem);
     struct native_surface* createNativeSurface();
     void postReleaseBuffer(struct wl_buffer *buffer);
-    void attachBufferToNativeSurface(struct wl_buffer* buffer, struct wl_surface* surface); // ADIT TODO:reconfirm!!
+    virtual void attachBufferToNativeSurface(struct wl_buffer* buffer, struct wl_surface* surface);
     void repaint(int msecs);
     void cleanup();
     void Screenshot();
@@ -137,7 +137,7 @@ protected:
     void shutdownCompositor();
     Surface* getSurfaceFromNativeSurface(struct native_surface* nativeSurface);
     struct native_surface* getNativeSurfaceFromSurface(Surface* surface);
-    void checkForNewSurfaceNativeContent();
+    virtual void checkForNewSurfaceNativeContent();
     void calculateFps();
     void calculateSurfaceFps(Surface *currentSurface, float time) ;
     void printDebug();

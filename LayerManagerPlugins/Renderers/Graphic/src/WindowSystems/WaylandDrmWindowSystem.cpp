@@ -59,7 +59,16 @@ WaylandDrmWindowSystem::~WaylandDrmWindowSystem()
 bool WaylandDrmWindowSystem::initGraphicSystem()
 {
 	graphicSystem->setBaseWindowSystem(this);
-    return graphicSystem->init((void*)m_gbm, (void*)NULL);
+    bool ans = graphicSystem->init((void*)m_gbm, (void*)NULL);
+    if (true != ans)
+    {
+        LOG_ERROR("WaylandDrmWindowSystem", "Failed to init graphic system");
+        return false;
+    }
+
+    graphicSystem->updateScreenList(m_pScene->getScreenList());
+
+    return true;
 }
 
 bool WaylandDrmWindowSystem::createNativeContext()
@@ -135,4 +144,89 @@ bool WaylandDrmWindowSystem::createInputEvent()
     m_inputEvent = new WaylandEvdevInputEvent(this);
     m_inputEvent->setupInputEvent();
     return true;
+}
+
+void WaylandDrmWindowSystem::checkForNewSurfaceNativeContent()
+{
+    m_pScene->lockScene();
+    LmScreenList screenList = m_pScene->getScreenList();
+    LmScreenListIterator iter = screenList.begin();
+    LmScreenListIterator iterEnd = screenList.end();
+    for (; iter != iterEnd; ++iter)
+    {
+        LayerList layers = m_pScene->getCurrentRenderOrder((*iter)->getID());
+        for(LayerListConstIterator current = layers.begin(); current != layers.end(); current++)
+        {
+            SurfaceList surfaces = (*current)->getAllSurfaces();
+            for(SurfaceListConstIterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++)
+            {
+                if ((*currentS)->hasNativeContent())
+                {
+                    graphicSystem->switchScreen((*iter)->getID());
+                    allocatePlatformSurface(*currentS);
+                }
+                else // While we are at it, also cleanup any stale native content
+                {
+                    deallocatePlatformSurface(*currentS);
+                }
+            }
+        }
+    }
+    m_pScene->unlockScene();
+}
+
+void WaylandDrmWindowSystem::RedrawAllLayers(bool clear, bool swap)
+{
+    LmScreenList screenList = m_pScene->getScreenList();
+    LmScreenListIterator iter = screenList.begin();
+    LmScreenListIterator iterEnd = screenList.end();
+    for (; iter != iterEnd; ++iter)
+    {
+        LayerList layers = m_pScene->getCurrentRenderOrder((*iter)->getID());
+        LayerList swLayers;
+        // TODO: bRedraw is overly conservative if layers includes a hardware layer
+        bool bRedraw = m_forceComposition || graphicSystem->needsRedraw(layers) || (m_systemState == REDRAW_STATE);
+
+        if (bRedraw)
+        {
+            graphicSystem->switchScreen((*iter)->getID());
+            graphicSystem->activateGraphicContext();
+            if (clear)
+            {
+                graphicSystem->clearBackground();
+            }
+        }
+        for(std::list<Layer*>::const_iterator current = layers.begin(); current != layers.end(); current++)
+        {
+            if ((*current)->getLayerType() == Hardware)
+            {
+                if (m_forceComposition || graphicSystem->needsRedraw(*current))
+                {
+                    renderHWLayer(*current);
+                }
+            }
+            else if (bRedraw)
+            {
+                swLayers.push_back(*current);
+            }
+        }
+        if (bRedraw)
+        {
+            graphicSystem->renderSWLayers(swLayers, false); // Already cleared
+            if (swap)
+            {
+                graphicSystem->swapBuffers();
+            }
+            graphicSystem->releaseGraphicContext();
+
+            if (m_debugMode)
+            {
+                printDebug();
+            }
+
+            calculateFps();
+
+            m_systemState = IDLE_STATE;
+        }
+    }
 }
