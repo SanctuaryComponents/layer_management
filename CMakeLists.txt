@@ -21,9 +21,12 @@
 cmake_minimum_required (VERSION 2.6)
 project (LayerManager)
 
+#==============================================================================
+# cmake configuration
+#==============================================================================
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/")
-
 include(${CMAKE_MODULE_PATH}/CMakeVersions.txt)
+include(${CMAKE_MODULE_PATH}/CustomMacros.txt)
 
 #==============================================================================
 # set default build type, if not defined by user
@@ -34,7 +37,6 @@ if (NOT CMAKE_BUILD_TYPE)
                          FORCE)
     message(STATUS "Build type not defined. Using default build type 'Release'.")
 endif (NOT CMAKE_BUILD_TYPE)
-
 
 #==============================================================================
 # Platforms / A set of indiviual options at once
@@ -62,15 +64,11 @@ option (WITH_EXAMPLE_SCENE_PROVIDER "Build scene provider plugin for examples"  
 option (WITH_STATIC_LIBRARIES       "Link all libraries statically"                       OFF)
 option (WITH_TEXT_RENDERER          "Build text renderer (only logging)"                  OFF)
 
-
 #==============================================================================
 # Internal global settings not available to user
 #==============================================================================
 set (WITH_WAYLAND    OFF)
-set (BUILD_UTILS_LIB  OFF)
-set (INSTALL_UTILS_LIB  OFF)
 set (STATICALLY_LINKED_PLUGINS "" CACHE INTERNAL "list of static plugins" FORCE)
-
 
 #==============================================================================
 # make sure, only one wayland based renderer was selected
@@ -110,13 +108,16 @@ include_directories ("${PROJECT_SOURCE_DIR}/3rdParty/")
 # ilm_types are used internally to LM, so we can include them by default
 include_directories ("${PROJECT_SOURCE_DIR}/LayerManagerClient/ilmClient/include")
 
-
 #==============================================================================
-# default compiler settings for 3rd party components
+# enable ctest if building with tests
+# run 'make test' after build to run all tests
+# be aware that some tests require a running layermanager
 #==============================================================================
-
-add_subdirectory (3rdParty)
-
+if (WITH_TESTS)
+    enable_testing()
+    add_subdirectory_once (3rdParty/gtest)
+    add_subdirectory_once (3rdParty/gmock)
+endif(WITH_TESTS)
 
 #==============================================================================
 # use strict compiler settings for examples and tools
@@ -126,32 +127,37 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra")
 #==============================================================================
 
 if (WITH_EGL_EXAMPLE)
-    add_subdirectory (LayerManagerExamples/EGLX11ApplicationExample)
-    add_subdirectory (LayerManagerExamples/EGLX11MockNavigation)
-    set (BUILD_UTILS_LIB ON)
+    add_subdirectory_once (LayerManagerUtils)
+    add_subdirectory_once (LayerManagerClient/ilmClient)
+    add_subdirectory_once (LayerManagerExamples/EGLX11ApplicationExample)
+    add_subdirectory_once (LayerManagerExamples/EGLX11MockNavigation)
 endif(WITH_EGL_EXAMPLE)
 
 if (WITH_GLX_EXAMPLE)
-    add_subdirectory (LayerManagerExamples/GLXApplicationExample)
-    set (BUILD_UTILS_LIB ON)
+    add_subdirectory_once (LayerManagerUtils)
+    add_subdirectory_once (LayerManagerClient/ilmClient)
+    add_subdirectory_once (LayerManagerExamples/GLXApplicationExample)
 endif(WITH_GLX_EXAMPLE)
 
 if (WITH_CLIENTEXAMPLES)
-    add_subdirectory (LayerManagerExamples/LayerManagerClientExample)
-    set (BUILD_UTILS_LIB ON)
+    add_subdirectory_once (LayerManagerUtils)
+    add_subdirectory_once (LayerManagerClient/ilmClient)
+    add_subdirectory_once (LayerManagerExamples/LayerManagerClientExample)
 endif(WITH_CLIENTEXAMPLES)
 
 if (WITH_WL_EXAMPLE)
-    add_subdirectory (LayerManagerExamples/EGLWLApplicationExample)
-    add_subdirectory (LayerManagerExamples/EGLWLMockNavigation)
-    add_subdirectory (LayerManagerExamples/WLChromakeyExample)
-    add_subdirectory (LayerManagerExamples/EGLWLInputEventExample)
-    set (BUILD_UTILS_LIB ON)
+    add_subdirectory_once (LayerManagerUtils)
+    add_subdirectory_once (LayerManagerClient/ilmClient)
+    add_subdirectory_once (LayerManagerExamples/EGLWLApplicationExample)
+    add_subdirectory_once (LayerManagerExamples/EGLWLMockNavigation)
+    add_subdirectory_once (LayerManagerExamples/WLChromakeyExample)
+    add_subdirectory_once (LayerManagerExamples/EGLWLInputEventExample)
 endif(WITH_WL_EXAMPLE)
 
 if (WITH_CONTROL_BIN)
-    add_subdirectory (LayerManagerControl)
-    set (BUILD_UTILS_LIB ON)
+    add_subdirectory_once (LayerManagerUtils)
+    add_subdirectory_once (LayerManagerClient/ilmClient)
+    add_subdirectory_once (LayerManagerControl)
 endif(WITH_CONTROL_BIN)
 
 #==============================================================================
@@ -163,70 +169,58 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-function")
 #==============================================================================
 
 if (WITH_EXAMPLE_SCENE_PROVIDER)
-    add_subdirectory (LayerManagerPlugins/SceneProvider/ExampleSceneProvider)
+    add_subdirectory_once (LayerManagerCommands)
+    add_subdirectory_once (LayerManagerBase)
+    add_subdirectory_once (LayerManagerPlugins/SceneProvider/ExampleSceneProvider)
 endif(WITH_EXAMPLE_SCENE_PROVIDER)
 
 if (WITH_SYSTEMD_HEALTH_MONITOR)
-    add_subdirectory (LayerManagerPlugins/HealthMonitor/SystemdHealthMonitor)
+    add_subdirectory_once (3rdParty/systemd)
+    add_subdirectory_once (LayerManagerUtils)
+    add_subdirectory_once (LayerManagerBase)
+    add_subdirectory_once (LayerManagerPlugins/HealthMonitor/SystemdHealthMonitor)
 endif(WITH_SYSTEMD_HEALTH_MONITOR)
 
 if (WITH_GENERIC_COMMUNICATOR)
-    add_subdirectory (LayerManagerCommands)
-    add_subdirectory (LayerManagerPlugins/Communicators/GenericCommunicator)
+    add_subdirectory_once (LayerManagerPlugins/IpcModules)
+    add_subdirectory_once (LayerManagerCommands)
+    add_subdirectory_once (LayerManagerPlugins/Communicators/GenericCommunicator)
 endif(WITH_GENERIC_COMMUNICATOR)
 
 if (WITH_DESKTOP)
     set (WITH_GLX_LIB ON CACHE BOOL "Build X11 GLX development lib" FORCE)
-    add_subdirectory (LayerManagerPlugins/Renderers/Platform/GLXRenderer)
+    add_subdirectory_once (LayerManagerPlugins/Renderers/Graphic)
+    add_subdirectory_once (LayerManagerPlugins/Renderers/Platform/GLXRenderer)
 endif(WITH_DESKTOP)
 
 if (WITH_WAYLAND)
-        add_subdirectory (LayerManagerPlugins/Renderers/Platform/WaylandGLESRenderer)
+    add_subdirectory_once (LayerManagerPlugins/Renderers/Platform/WaylandGLESRenderer)
 endif(WITH_WAYLAND)
 
 if (WITH_X11_GLES)
     set (WITH_GLESv2_LIB ON CACHE BOOL "Build X11 GLES development lib" FORCE)
-    add_subdirectory (LayerManagerPlugins/Renderers/Platform/X11GLESRenderer)
+    add_subdirectory_once (LayerManagerPlugins/Renderers/Graphic)
+    add_subdirectory_once (LayerManagerPlugins/Renderers/Platform/X11GLESRenderer)
 endif(WITH_X11_GLES)
 
 if (WITH_TEXT_RENDERER)
-    add_subdirectory (LayerManagerPlugins/Renderers/Platform/TextRenderer)
+    add_subdirectory_once (LayerManagerPlugins/Renderers/Platform/TextRenderer)
 endif(WITH_TEXT_RENDERER)
 
-if (WITH_SERVICE_BIN OR WITH_CLIENT_LIB)
-    add_subdirectory (LayerManagerPlugins/IpcModules)
+if (WITH_SERVICE_BIN)
+    add_subdirectory_once (LayerManagerUtils)
+    add_subdirectory_once (LayerManagerPlugins/IpcModules)
+    add_subdirectory_once (LayerManagerPlugins/Renderers/Graphic)
+    add_subdirectory_once (LayerManagerBase)
+    add_subdirectory_once (LayerManagerService)
+endif (WITH_SERVICE_BIN)
 
-    if (WITH_SERVICE_BIN)
-        add_subdirectory (LayerManagerPlugins/Renderers/Graphic)
-        add_subdirectory (LayerManagerBase)
-        add_subdirectory (LayerManagerService)
-        set (BUILD_UTILS_LIB ON)
-        set (INSTALL_UTILS_LIB ON)
-    endif (WITH_SERVICE_BIN)
-
-    if (WITH_CLIENT_LIB)
-        add_subdirectory (LayerManagerClient/ilmClient)
-    endif (WITH_CLIENT_LIB)
-
-endif (WITH_SERVICE_BIN OR WITH_CLIENT_LIB)
-
-#==============================================================================
-# build internal libraries, if required by other components
-#==============================================================================
-if (BUILD_UTILS_LIB)
-    add_subdirectory (LayerManagerUtils)
-endif (BUILD_UTILS_LIB)
-
-#==============================================================================
-# enable ctest if building with tests
-# run 'make test' after build to run all tests
-# be aware that some tests require a running layermanager
-#==============================================================================
-if (WITH_TESTS)
-    enable_testing()
-endif(WITH_TESTS)
+if (WITH_CLIENT_LIB)
+    add_subdirectory_once (LayerManagerPlugins/IpcModules)
+    add_subdirectory_once (LayerManagerClient/ilmClient)
+endif (WITH_CLIENT_LIB)
 
 #==============================================================================
 # store used build configuration
 #==============================================================================
-add_subdirectory(config)
+add_subdirectory_once(config)
