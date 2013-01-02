@@ -54,6 +54,7 @@ option (WITH_TESTS                  "Build Available Tests "                    
 option (WITH_DLT                    "Build with DLT support "                             OFF)
 option (WITH_WAYLAND_FBDEV          "Build Wayland with FBDEV backend"                    OFF)
 option (WITH_WAYLAND_X11            "Build Wayland with X11 backend"                      OFF)
+option (WITH_WAYLAND_X11_LIB        "Build development library for Wayland X11 Based Renderers" OFF)
 option (WITH_WAYLAND_DRM            "Build Wayland with drm backend"                      OFF)
 option (WITH_SERVICE_BIN            "Build LayerManagerService Binary"                    ON)
 option (WITH_CONTROL_BIN            "Build LayerManagerControl Binary"                    ON)
@@ -199,6 +200,10 @@ endif(WITH_GLX_LIB)
 if (WITH_WAYLAND)
     add_subdirectory_once (LayerManagerPlugins/Renderers/Platform/WaylandGLESRenderer)
 endif(WITH_WAYLAND)
+
+if (WITH_WAYLAND_X11_LIB)
+    add_subdirectory_once (LayerManagerPlugins/Renderers/GraphicLib/LayerManagerGraphicWaylandX11GLESv2)
+endif(WITH_WAYLAND_X11_LIB)
 
 if (WITH_X11_GLES)
     add_subdirectory_once (LayerManagerPlugins/Renderers/GraphicLib/LayerManagerGraphicGLESv2)

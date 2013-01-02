@@ -47,38 +47,6 @@ if (WITH_WAYLAND)
     include_directories(${WAYLAND_SERVER_INCLUDE_DIR})
 
     #=======================================================================
-    if (WITH_WAYLAND_X11)
-    #=======================================================================
-
-        set(GRAPHIC_LIB_NAME LayerManagerGraphicWaylandGLESv2)
-
-        find_package(X11 REQUIRED)
-        
-        include_directories(${X11_INCLUDE_DIR})
-        
-        set(LIBS
-                ${LIBS}
-                ${X11_X11_LIB}
-                ${WAYLAND_EGL_LIBRARIES}
-                ${XKB_LIBRARIES}
-        )
-        
-        set(SOURCES
-            ../Base/src/BaseRenderer.cpp
-            src/GraphicSystems/GLESGraphicSystem.cpp
-            src/WindowSystems/BaseWindowSystem.cpp
-            src/WindowSystems/WaylandBaseWindowSystem.cpp
-            src/WindowSystems/WaylandX11WindowSystem.cpp
-            src/WindowSystems/WaylandServerinfoProtocol.cpp  
-            src/WindowSystems/WaylandInputDevice.cpp
-            src/WindowSystems/WaylandInputEvent.cpp
-            src/WindowSystems/WaylandX11InputEvent.cpp
-            src/TextureBinders/WaylandGLESTexture.cpp
-        )
-        
-    endif (WITH_WAYLAND_X11)
-    
-    #=======================================================================
     if (WITH_WAYLAND_FBDEV)
     #=======================================================================
 
