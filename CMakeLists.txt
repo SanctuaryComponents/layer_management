@@ -53,6 +53,7 @@ option (WITH_CLIENTEXAMPLES         "Build client examples "                    
 option (WITH_TESTS                  "Build Available Tests "                              OFF)
 option (WITH_DLT                    "Build with DLT support "                             OFF)
 option (WITH_WAYLAND_FBDEV          "Build Wayland with FBDEV backend"                    OFF)
+option (WITH_WAYLAND_FBDEV_LIB      "Build development library for Wayland FBDEV Based Renderers" OFF)
 option (WITH_WAYLAND_X11            "Build Wayland with X11 backend"                      OFF)
 option (WITH_WAYLAND_X11_LIB        "Build development library for Wayland X11 Based Renderers" OFF)
 option (WITH_WAYLAND_DRM            "Build Wayland with drm backend"                      OFF)
@@ -209,6 +210,10 @@ endif(WITH_WAYLAND_X11_LIB)
 if (WITH_WAYLAND_DRM_LIB)
     add_subdirectory_once (LayerManagerPlugins/Renderers/GraphicLib/LayerManagerGraphicWaylandDrmGLESv2)
 endif(WITH_WAYLAND_DRM_LIB)
+
+if (WITH_WAYLAND_FBDEV_LIB)
+    add_subdirectory_once (LayerManagerPlugins/Renderers/GraphicLib/LayerManagerGraphicWaylandFbdevGLESv2)
+endif(WITH_WAYLAND_FBDEV_LIB)
 
 if (WITH_X11_GLES)
     add_subdirectory_once (LayerManagerPlugins/Renderers/GraphicLib/LayerManagerGraphicGLESv2)
