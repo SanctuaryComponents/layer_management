@@ -23,9 +23,6 @@
 #include "Shader.h"
 #include "ShaderProgramGLES.h"
 #include "TextureBinders/WaylandGLESTexture.h"
-#ifdef WITH_WAYLAND_FBDEV
-#include "WindowSystems/WaylandFbdevWindowSystem.h"
-#endif // WITH_WAYLAND_FBDEV
 #ifdef WITH_WAYLAND_DRM
 #include "WindowSystems/WaylandDrmWindowSystem.h"
 #include "GraphicSystems/DrmGLESGraphicSystem.h"
@@ -58,7 +55,7 @@ bool WaylandGLESRenderer::start(int width, int height, const char* displayname)
     // create Wayland windows, register as composite manager etc
     m_pWindowSystem = NULL;
 #ifdef WITH_WAYLAND_FBDEV
-    m_pWindowSystem = new WaylandFbdevWindowSystem(displayname, width, height, m_pScene, m_pInputManager);
+    m_pWindowSystem = getWindowSystem(displayname);
 #endif
 #ifdef WITH_WAYLAND_X11
     m_pWindowSystem = getWindowSystem(displayname);
