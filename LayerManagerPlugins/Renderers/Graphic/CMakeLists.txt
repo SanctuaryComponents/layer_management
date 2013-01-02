@@ -74,45 +74,6 @@ if (WITH_WAYLAND)
         )
 
     endif (WITH_WAYLAND_FBDEV)
-    
-    #=======================================================================
-    if (WITH_WAYLAND_DRM)
-    #=======================================================================
-
-        set(GRAPHIC_LIB_NAME LayerManagerGraphicWaylandGLESv2)
-
-        find_package (DRM REQUIRED)
-        
-        include_directories(${DRM_INCLUDE_DIR})
-        
-        set(LIBS
-                ${LIBS}
-                ${GRAPHIC_NATIVE_LIBS}
-                ${UDEV_LIBRARIES}
-                ${GBM_LIBRARIES}
-                ${DRM_LIBRARIES}
-                ${WAYLAND_EGL_LIBRARIES}
-                ${MTDEV_LIBRARIES}
-                ${XKB_LIBRARIES}
-        )
-        
-
-        file(GLOB SOURCES
-            ../Base/src/BaseRenderer.cpp
-            src/GraphicSystems/GLESGraphicSystem.cpp
-            src/GraphicSystems/DrmGLESGraphicSystem.cpp
-            src/WindowSystems/BaseWindowSystem.cpp
-            src/WindowSystems/WaylandBaseWindowSystem.cpp
-            src/WindowSystems/WaylandDrmWindowSystem.cpp
-            src/WindowSystems/WaylandServerinfoProtocol.cpp
-            src/WindowSystems/WaylandInputDevice.cpp
-            src/WindowSystems/WaylandInputEvent.cpp
-            src/WindowSystems/WaylandEvdevInputEvent.cpp
-            src/TextureBinders/WaylandGLESTexture.cpp
-        )
-
-    endif (WITH_WAYLAND_DRM)
-
 
     #=======================================================================
     # common
