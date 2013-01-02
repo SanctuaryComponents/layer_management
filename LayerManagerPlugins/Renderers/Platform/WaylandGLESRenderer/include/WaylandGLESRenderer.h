@@ -49,9 +49,12 @@ public:
 
     // from PluginBase
     virtual HealthCondition pluginGetHealth();
-    virtual t_ilm_const_string pluginGetName() const;
 
-private:
+    // implement in inheriting classes
+    virtual WaylandBaseWindowSystem* getWindowSystem(const char* displayname) = 0;
+    virtual GLESGraphicsystem* getGraphicSystem(PfnShaderProgramCreator shaderProgram) = 0;
+
+protected:
     WaylandBaseWindowSystem* m_pWindowSystem;
     GLESGraphicsystem* m_pGraphicSystem;
     uint m_width;

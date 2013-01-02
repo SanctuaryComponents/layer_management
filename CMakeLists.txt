@@ -70,36 +70,7 @@ option (WITH_TEXT_RENDERER          "Build text renderer (only logging)"        
 #==============================================================================
 # Internal global settings not available to user
 #==============================================================================
-set (WITH_WAYLAND    OFF)
 set (STATICALLY_LINKED_PLUGINS "" CACHE INTERNAL "list of static plugins" FORCE)
-
-#==============================================================================
-# make sure, only one wayland based renderer was selected
-#==============================================================================
-set(NumberOfWaylandRenderers 0)
-
-if (WITH_WAYLAND_X11)
-    set (WITH_GLESv2_LIB ON)
-    set (WITH_WAYLAND ON)
-    MATH(EXPR NumberOfWaylandRenderers "${NumberOfWaylandRenderers} + 1")
-endif(WITH_WAYLAND_X11)
-
-if (WITH_WAYLAND_FBDEV)
-    set (WITH_GLESv2_LIB)
-    set (WITH_WAYLAND ON)
-    MATH(EXPR NumberOfWaylandRenderers "${NumberOfWaylandRenderers} + 1")
-endif(WITH_WAYLAND_FBDEV)
-
-if (WITH_WAYLAND_DRM)
-    set (WITH_GLESv2_LIB ON)
-    set (WITH_WAYLAND ON)
-    MATH(EXPR NumberOfWaylandRenderers "${NumberOfWaylandRenderers} + 1")
-endif(WITH_WAYLAND_DRM)
-
-if(NumberOfWaylandRenderers GREATER 1) 
-    MESSAGE(FATAL_ERROR "More than one Wayland based renderer was selected. This is not supported.")
-endif(NumberOfWaylandRenderers GREATER 1)
-
 
 #==============================================================================
 # set default build parameters
@@ -199,9 +170,13 @@ if (WITH_GLX_LIB)
     add_subdirectory_once (LayerManagerPlugins/Renderers/GraphicLib/LayerManagerGraphicGLX)
 endif(WITH_GLX_LIB)
 
-if (WITH_WAYLAND)
+if (WITH_WAYLAND_X11)
+    add_subdirectory_once (LayerManagerUtils)
+    add_subdirectory_once (LayerManagerBase)
+    add_subdirectory_once (LayerManagerPlugins/Renderers/GraphicLib/LayerManagerGraphicWaylandX11GLESv2)
     add_subdirectory_once (LayerManagerPlugins/Renderers/Platform/WaylandGLESRenderer)
-endif(WITH_WAYLAND)
+    add_subdirectory_once (LayerManagerPlugins/Renderers/Platform/WaylandX11GLESRenderer)
+endif(WITH_WAYLAND_X11)
 
 if (WITH_WAYLAND_X11_LIB)
     add_subdirectory_once (LayerManagerPlugins/Renderers/GraphicLib/LayerManagerGraphicWaylandX11GLESv2)

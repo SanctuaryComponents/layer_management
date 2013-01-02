@@ -26,9 +26,6 @@
 #ifdef WITH_WAYLAND_FBDEV
 #include "WindowSystems/WaylandFbdevWindowSystem.h"
 #endif // WITH_WAYLAND_FBDEV
-#ifdef WITH_WAYLAND_X11
-#include "WindowSystems/WaylandX11WindowSystem.h"
-#endif // WITH_WAYLAND_X11
 #ifdef WITH_WAYLAND_DRM
 #include "WindowSystems/WaylandDrmWindowSystem.h"
 #include "GraphicSystems/DrmGLESGraphicSystem.h"
@@ -64,7 +61,7 @@ bool WaylandGLESRenderer::start(int width, int height, const char* displayname)
     m_pWindowSystem = new WaylandFbdevWindowSystem(displayname, width, height, m_pScene, m_pInputManager);
 #endif
 #ifdef WITH_WAYLAND_X11
-    m_pWindowSystem = new WaylandX11WindowSystem(displayname, width, height, m_pScene, m_pInputManager);
+    m_pWindowSystem = getWindowSystem(displayname);
 #endif
 #ifdef WITH_WAYLAND_DRM
     m_pWindowSystem = new WaylandDrmWindowSystem(displayname, width, height, m_pScene, m_pInputManager);
@@ -78,7 +75,7 @@ bool WaylandGLESRenderer::start(int width, int height, const char* displayname)
 #ifdef WITH_WAYLAND_DRM
     m_pGraphicSystem = new DrmGLESGraphicSystem(width,height, ShaderProgramGLES::createProgram);
 #else
-    m_pGraphicSystem = new GLESGraphicsystem(width,height, ShaderProgramGLES::createProgram);
+    m_pGraphicSystem = getGraphicSystem(ShaderProgramGLES::createProgram);
 #endif
 
     if (!m_pWindowSystem->init((BaseGraphicSystem<void*, void*>*) m_pGraphicSystem))
@@ -192,11 +189,6 @@ HealthCondition WaylandGLESRenderer::pluginGetHealth()
     return BaseRenderer::pluginGetHealth();
 }
 
-t_ilm_const_string WaylandGLESRenderer::pluginGetName() const
-{
-    return "WaylandGLESRenderer";
-}
-
 Shader* WaylandGLESRenderer::createShader(const string* vertexName, const string* fragmentName)  
 {
     Shader *result = NULL;
@@ -208,5 +200,3 @@ Shader* WaylandGLESRenderer::createShader(const string* vertexName, const string
     m_pWindowSystem->setSystemState(IDLE_STATE);
     return result;
 }
-
-DECLARE_LAYERMANAGEMENT_PLUGIN(WaylandGLESRenderer)

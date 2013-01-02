@@ -49,7 +49,6 @@ set(LIBS
     ${CMAKE_THREAD_LIBS_INIT}
     ${EGL_LIBRARY}
     ${GLESv2_LIBRARIES}
-    LayerManagerGraphicWaylandGLESv2
     LayerManagerUtils
 )
 
@@ -85,23 +84,7 @@ install(
 #===========================================================================
 # create statically linked plugin
 #===========================================================================
-if (WITH_STATIC_LIBRARIES)
-
-    add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
-
-    set (STATICALLY_LINKED_PLUGINS ${STATICALLY_LINKED_PLUGINS}
-        ${PROJECT_NAME} CACHE INTERNAL "list of static plugins")
-
-#===========================================================================
-# create dynamically linked plugin
-#===========================================================================
-else(WITH_STATIC_LIBRARIES)
-
-    add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
-
-    install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${PLUGIN_INSTALL_PATH})
-
-endif(WITH_STATIC_LIBRARIES)
+add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
 
 
 #===========================================================================
