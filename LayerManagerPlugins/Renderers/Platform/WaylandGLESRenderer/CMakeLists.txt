@@ -31,11 +31,15 @@ find_package(EGL REQUIRED)
 find_package(GLESv2 REQUIRED)
 find_package(Threads REQUIRED)
 
+SET(RENDERERBASE_DIR     ${CMAKE_SOURCE_DIR}/LayerManagerPlugins/Renderers/Base)
+SET(GRAPHIC_LIB_DIR      ${CMAKE_SOURCE_DIR}/LayerManagerPlugins/Renderers/Graphic)
+set(X11GLES_RENDERER_DIR ${CMAKE_SOURCE_DIR}/LayerManagerPlugins/Renderers/Platform/X11GLESRenderer)
+
 include_directories(
     include
-    ../X11GLESRenderer/include
-    ../../Base/include
-    ../../Graphic/include
+    ${X11GLES_RENDERER_DIR}/include
+    ${RENDERERBASE_DIR}/include
+    ${GRAPHIC_LIB_DIR}/include
     ${CMAKE_SOURCE_DIR}/config
     ${CMAKE_SOURCE_DIR}/LayerManagerBase/include
     ${CMAKE_SOURCE_DIR}/LayerManagerUtils/include
@@ -54,31 +58,7 @@ set(LIBS
 
 set(SRC_FILES
     src/WaylandGLESRenderer.cpp
-    ../X11GLESRenderer/src/ShaderProgramGLES.cpp
-)
-
-set(PLUGIN_INSTALL_PATH lib/layermanager/renderer)
-
-install(
-    FILES
-        renderer_frag_clear.glslf
-        renderer_frag.glslf
-        renderer_frag_no_blend.glslf
-        renderer_frag_no_ualpha.glslf
-        renderer_frag_add_uchromakey.glslf
-        renderer_frag_no_blend_no_ualpha.glslf
-        renderer_frag_2surf.glslf
-        renderer_frag_2surf_no_blend.glslf
-        renderer_frag_2surf_no_ualpha.glslf
-        renderer_frag_2surf_no_blend_no_ualpha.glslf
-        renderer_frag_2surf_no_ualpha_0.glslf
-        renderer_frag_2surf_no_blend_no_ualpha_0.glslf
-        renderer_frag_2surf_no_ualpha_1.glslf
-        renderer_frag_2surf_no_blend_no_ualpha_1.glslf
-        renderer_vert.glslv
-        renderer_vert_2surf.glslv
-    DESTINATION
-        lib/layermanager/renderer
+    ${X11GLES_RENDERER_DIR}/src/ShaderProgramGLES.cpp
 )
 
 #===========================================================================
