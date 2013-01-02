@@ -181,11 +181,7 @@ if (WITH_DESKTOP)
 endif(WITH_DESKTOP)
 
 if (WITH_WAYLAND)
-    if (WITH_WAYLAND_VIVANTE_GAL)
-        add_subdirectory (LayerManagerPlugins/Renderers/Platform/WaylandVivanteRenderer)
-    else (WITH_WAYLAND_VIVANTE_GAL)
         add_subdirectory (LayerManagerPlugins/Renderers/Platform/WaylandGLESRenderer)
-    endif (WITH_WAYLAND_VIVANTE_GAL)
 endif(WITH_WAYLAND)
 
 if (WITH_X11_GLES)
