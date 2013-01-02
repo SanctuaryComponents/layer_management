@@ -188,10 +188,13 @@ if (WITH_GENERIC_COMMUNICATOR)
 endif(WITH_GENERIC_COMMUNICATOR)
 
 if (WITH_DESKTOP)
-    set (WITH_GLX_LIB ON CACHE BOOL "Build X11 GLX development lib" FORCE)
-    add_subdirectory_once (LayerManagerPlugins/Renderers/Graphic)
+    add_subdirectory_once (LayerManagerPlugins/Renderers/GraphicLib/LayerManagerGraphicGLX)
     add_subdirectory_once (LayerManagerPlugins/Renderers/Platform/GLXRenderer)
 endif(WITH_DESKTOP)
+
+if (WITH_GLX_LIB)
+    add_subdirectory_once (LayerManagerPlugins/Renderers/GraphicLib/LayerManagerGraphicGLX)
+endif(WITH_GLX_LIB)
 
 if (WITH_WAYLAND)
     add_subdirectory_once (LayerManagerPlugins/Renderers/Platform/WaylandGLESRenderer)
