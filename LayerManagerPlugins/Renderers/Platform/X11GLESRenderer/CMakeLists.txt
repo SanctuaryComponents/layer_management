@@ -26,6 +26,7 @@ cmake_minimum_required (VERSION 2.6)
 # plugin configuration
 #===========================================================================
 project(X11GLESRenderer)
+project_type(PLUGIN)
 
 find_package(X11 REQUIRED)
 find_package(EGL REQUIRED)

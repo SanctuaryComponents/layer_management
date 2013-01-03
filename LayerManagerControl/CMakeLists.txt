@@ -18,6 +18,7 @@
 ############################################################################
 
 project (LayerManagerControl)
+project_type(CORE)
 
 # use default compiler settings here
 set (CMAKE_CXX_FLAGS "")

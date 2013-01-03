@@ -20,6 +20,7 @@
 
 cmake_minimum_required (VERSION 2.6)
 project(LayerManagerGraphicWaylandX11GLESv2)
+project_type(CORE)
 
 #===========================================================================
 # configuration

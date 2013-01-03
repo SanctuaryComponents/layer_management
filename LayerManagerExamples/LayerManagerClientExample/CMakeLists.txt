@@ -17,6 +17,9 @@
 #
 
 ############################################################################
+
+project_type(EXAMPLE)
+
 include_directories ("../../LayerManagerClient/ilmClient/include")
 include_directories ("../LayerSceneDescriptionExample/include")
 include_directories ("../../LayerManagerUtils/include")

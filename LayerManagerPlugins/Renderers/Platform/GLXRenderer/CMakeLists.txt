@@ -24,6 +24,7 @@ cmake_minimum_required (VERSION 2.6)
 # plugin configuration
 #===========================================================================
 project(X11GLXRenderer)
+project_type(PLUGIN)
 
 find_package(X11 REQUIRED)
 find_package(GLX REQUIRED)

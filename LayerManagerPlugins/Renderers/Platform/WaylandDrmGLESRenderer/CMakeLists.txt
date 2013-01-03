@@ -26,6 +26,7 @@ cmake_minimum_required (VERSION 2.6)
 # plugin configuration
 #===========================================================================
 project(WaylandDrmGLESRenderer)
+project_type(PLUGIN)
 
 find_package(Wayland REQUIRED)
 find_package(EGL REQUIRED)

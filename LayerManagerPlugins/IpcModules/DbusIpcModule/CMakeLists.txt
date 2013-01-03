@@ -20,6 +20,7 @@
 cmake_minimum_required (VERSION 2.6)
 
 project (DbusIpcModule)
+project_type(CORE)
 
 find_package(DBUS REQUIRED)
 

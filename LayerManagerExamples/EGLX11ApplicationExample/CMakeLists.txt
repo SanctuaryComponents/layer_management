@@ -19,6 +19,8 @@
 
 cmake_minimum_required (VERSION 2.6)
 
+project_type(EXAMPLE)
+
 include_directories ("include")
 include_directories ("../../LayerManagerClient/ilmClient/include")
 include_directories ("../LayerSceneDescriptionExample/include")

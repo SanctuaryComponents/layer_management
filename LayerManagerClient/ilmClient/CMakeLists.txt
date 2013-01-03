@@ -19,6 +19,9 @@
 
 cmake_minimum_required (VERSION 2.6)
 
+project(ilmClient)
+project_type(CORE)
+
 find_package(Threads)
 
 include_directories(
@@ -28,11 +31,11 @@ include_directories(
     "${CMAKE_SOURCE_DIR}/LayerManagerBase/include"
 )
 
-add_library(ilmClient SHARED
+add_library(${PROJECT_NAME} SHARED
     src/generic_ilm_client.c
 )
 
-add_dependencies(ilmClient
+add_dependencies(${PROJECT_NAME}
     IpcModuleLoader
 )
 
@@ -43,10 +46,10 @@ set(LIBS
     ${CMAKE_THREAD_LIBS_INIT}
 )
 
-target_link_libraries(ilmClient ${LIBS})
+target_link_libraries(${PROJECT_NAME} ${LIBS})
 
 install (
-    TARGETS             ilmClient
+    TARGETS             ${PROJECT_NAME}
     LIBRARY DESTINATION lib
 )
 
@@ -63,9 +66,9 @@ if (WITH_TESTS)
 
     enable_testing()
     
-    add_executable(ilmClient_Test tests/IlmCommandTest.cpp tests/IlmNotificationTest.cpp src/generic_ilm_client.c)
-    target_link_libraries(ilmClient_Test ilmClient ${LIBS} gtest)
+    add_executable(${PROJECT_NAME}_Test tests/IlmCommandTest.cpp tests/IlmNotificationTest.cpp src/generic_ilm_client.c)
+    target_link_libraries(${PROJECT_NAME}_Test ${PROJECT_NAME} ${LIBS} gtest)
     
-    add_test(ilmClient ilmClient_Test )
+    add_test(${PROJECT_NAME} ${PROJECT_NAME}_Test )
 
 endif(WITH_TESTS) 

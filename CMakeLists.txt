@@ -70,12 +70,6 @@ if (WITH_TESTS)
     add_subdirectory_once (3rdParty/gmock)
 endif(WITH_TESTS)
 
-#==============================================================================
-# use strict compiler settings for examples and tools
-#------------------------------------------------------------------------------
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMPILER_FLAGS_EXAMPLE}")
-#==============================================================================
-
 if (WITH_EGL_EXAMPLE)
     add_subdirectory_once (LayerManagerUtils)
     add_subdirectory_once (LayerManagerClient/ilmClient)
@@ -109,12 +103,6 @@ if (WITH_CONTROL_BIN)
     add_subdirectory_once (LayerManagerClient/ilmClient)
     add_subdirectory_once (LayerManagerControl)
 endif(WITH_CONTROL_BIN)
-
-#==============================================================================
-# use very strict compiler settings for internal components
-#------------------------------------------------------------------------------
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMPILER_FLAGS_CORE}")
-#==============================================================================
 
 if (WITH_EXAMPLE_SCENE_PROVIDER)
     add_subdirectory_once (LayerManagerCommands)

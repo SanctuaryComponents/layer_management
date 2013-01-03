@@ -23,6 +23,7 @@ cmake_minimum_required (VERSION 2.6)
 # plugin configuration
 #===========================================================================
 project(GenericCommunicator)
+project_type(PLUGIN)
 
 include_directories(
     include

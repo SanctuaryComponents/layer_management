@@ -19,6 +19,8 @@
 
 cmake_minimum_required (VERSION 2.6)
 
+project_type(EXAMPLE)
+
 find_package(GLESv2 REQUIRED)
 find_package(EGL REQUIRED)
 find_package(X11 REQUIRED)

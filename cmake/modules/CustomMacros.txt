@@ -24,3 +24,13 @@ MACRO(add_subdirectory_once path)
     endif (NOT ${subdir}_already_built)
 ENDMACRO(add_subdirectory_once)
 
+MACRO(project_type mode)
+    string(TOUPPER ${mode} mode_capital)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMPILER_FLAGS_${mode_capital}}")
+    set(CMAKE_C_FLAGS   "${CMAKE_CXX_FLAGS}")
+ENDMACRO(project_type)
+
+MACRO(build_flag name description defaultvalue)
+    LIST(APPEND BUILD_FLAG_LIST ${name})
+    option (${name} "${description}" ${defaultvalue})
+ENDMACRO(build_flag)

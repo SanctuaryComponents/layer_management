@@ -20,6 +20,7 @@
 
 cmake_minimum_required (VERSION 2.6)
 project(LayerManagerGraphicGLX)
+project_type(PLUGIN)
 
 #===========================================================================
 # configuration

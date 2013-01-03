@@ -20,6 +20,7 @@
 cmake_minimum_required (VERSION 2.6)
 
 project(LayerManagerService)
+project_type(CORE)
 
 include_directories(
     ${CMAKE_SOURCE_DIR}/config
@@ -29,6 +30,7 @@ include_directories(
 
 set(LIBS
     LayerManagerBase
+    ${STATICALLY_LINKED_PLUGINS}
 )
 
 set(SRC_FILES
