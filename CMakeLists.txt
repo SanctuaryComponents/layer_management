@@ -21,55 +21,36 @@
 cmake_minimum_required (VERSION 2.6)
 project (LayerManager)
 
-#==============================================================================
+#===========================================================================================================
 # cmake configuration
-#==============================================================================
+#===========================================================================================================
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/")
 include(${CMAKE_MODULE_PATH}/DefaultSettings.txt)
 include(${CMAKE_MODULE_PATH}/CMakeVersions.txt)
 include(${CMAKE_MODULE_PATH}/CustomMacros.txt)
 add_subdirectory(cmake/optionalFeatures)
 
-#==============================================================================
-# Platforms / A set of indiviual options at once
-#==============================================================================
-option (WITH_X11_GLES               "Build for X11 with GLES 2.0"                         ON )
-option (WITH_GLESv2_LIB             "Build development library for GLES2 Based Renderers" OFF)
-option (WITH_EGL_EXAMPLE            "Build EGL_EXAMPLE / X11"                             ON )
-option (WITH_WL_EXAMPLE             "Build EGL_EXAMPLE / Wayland"                         OFF)
-option (WITH_DESKTOP                "Build for Desktop / GLX"                             OFF)
-option (WITH_GLX_LIB                "Build development library for GLX Based Renderers"   OFF)
-option (WITH_GLX_EXAMPLE            "Build GLX_EXAMPLE "                                  OFF)
-option (WITH_FORCE_COPY             "Force Software Copy of Pixmaps"                      OFF)
-option (WITH_CLIENTEXAMPLES         "Build client examples "                              ON )
-option (WITH_TESTS                  "Build Available Tests "                              OFF)
-option (WITH_DLT                    "Build with DLT support "                             OFF)
-option (WITH_WAYLAND_FBDEV          "Build Wayland with FBDEV backend"                    OFF)
-option (WITH_WAYLAND_FBDEV_LIB      "Build development library for Wayland FBDEV Based Renderers" OFF)
-option (WITH_WAYLAND_X11            "Build Wayland with X11 backend"                      OFF)
-option (WITH_WAYLAND_X11_LIB        "Build development library for Wayland X11 Based Renderers" OFF)
-option (WITH_WAYLAND_DRM            "Build Wayland with drm backend"                      OFF)
-option (WITH_WAYLAND_DRM_LIB        "Build development library for Wayland DRM Based Renderers" OFF)
-option (WITH_SERVICE_BIN            "Build LayerManagerService Binary"                    ON)
-option (WITH_CONTROL_BIN            "Build LayerManagerControl Binary"                    ON)
-option (WITH_CLIENT_LIB             "Build LayerManagement Client Lib"                    ON)
-option (WITH_GENERIC_COMMUNICATOR   "Build Generic Communicator Plugin"                   ON)
-option (WITH_SYSTEMD_HEALTH_MONITOR "Build plugin for systemd health monitoring"          OFF)
-option (WITH_EXAMPLE_SCENE_PROVIDER "Build scene provider plugin for examples"            OFF)
-option (WITH_STATIC_LIBRARIES       "Link all libraries statically"                       OFF)
-option (WITH_TEXT_RENDERER          "Build text renderer (only logging)"                  OFF)
+#===========================================================================================================
+# global build flags
+#===========================================================================================================
+option (WITH_FORCE_COPY       "Force Software Copy of Pixmaps (compatibility for VMs)" OFF)
+option (WITH_DLT              "Build with DLT logging support"                         OFF)
+option (WITH_STATIC_LIBRARIES "Link all plugins and libraries statically"              OFF)
 
-#==============================================================================
-# enable ctest if building with tests
-# run 'make test' after build to run all tests
-# be aware that some tests require a running layermanager
-#==============================================================================
+#===========================================================================================================
+option (WITH_TESTS "Build unit test binaries for all enabled components" OFF)
+#===========================================================================================================
 if (WITH_TESTS)
+    # enable ctest if building with tests, run 'make test' after build to run all tests
+    # be aware that some tests require a running layermanager
     enable_testing()
     add_subdirectory_once (3rdParty/gtest)
     add_subdirectory_once (3rdParty/gmock)
 endif(WITH_TESTS)
 
+#===========================================================================================================
+option (WITH_EGL_EXAMPLE "Build examples for GLES/X11 based platforms" ON)
+#===========================================================================================================
 if (WITH_EGL_EXAMPLE)
     add_subdirectory_once (LayerManagerUtils)
     add_subdirectory_once (LayerManagerClient/ilmClient)
@@ -77,18 +58,27 @@ if (WITH_EGL_EXAMPLE)
     add_subdirectory_once (LayerManagerExamples/EGLX11MockNavigation)
 endif(WITH_EGL_EXAMPLE)
 
+#===========================================================================================================
+option (WITH_GLX_EXAMPLE "Build examples for OpenGL/X11 based platforms" OFF)
+#===========================================================================================================
 if (WITH_GLX_EXAMPLE)
     add_subdirectory_once (LayerManagerUtils)
     add_subdirectory_once (LayerManagerClient/ilmClient)
     add_subdirectory_once (LayerManagerExamples/GLXApplicationExample)
 endif(WITH_GLX_EXAMPLE)
 
+#===========================================================================================================
+option (WITH_CLIENTEXAMPLES "Build examples for client library usage" ON)
+#===========================================================================================================
 if (WITH_CLIENTEXAMPLES)
     add_subdirectory_once (LayerManagerUtils)
     add_subdirectory_once (LayerManagerClient/ilmClient)
     add_subdirectory_once (LayerManagerExamples/LayerManagerClientExample)
 endif(WITH_CLIENTEXAMPLES)
 
+#===========================================================================================================
+option (WITH_WL_EXAMPLE "Build examples for GLES/Wayland based platforms" OFF)
+#===========================================================================================================
 if (WITH_WL_EXAMPLE)
     add_subdirectory_once (LayerManagerUtils)
     add_subdirectory_once (LayerManagerClient/ilmClient)
@@ -98,18 +88,27 @@ if (WITH_WL_EXAMPLE)
     add_subdirectory_once (LayerManagerExamples/EGLWLInputEventExample)
 endif(WITH_WL_EXAMPLE)
 
+#===========================================================================================================
+option (WITH_CONTROL_BIN "Build LayerManagerControl binary" ON)
+#===========================================================================================================
 if (WITH_CONTROL_BIN)
     add_subdirectory_once (LayerManagerUtils)
     add_subdirectory_once (LayerManagerClient/ilmClient)
     add_subdirectory_once (LayerManagerControl)
 endif(WITH_CONTROL_BIN)
 
+#===========================================================================================================
+option (WITH_EXAMPLE_SCENE_PROVIDER "Build scene provider plugin to run example applications" OFF)
+#===========================================================================================================
 if (WITH_EXAMPLE_SCENE_PROVIDER)
     add_subdirectory_once (LayerManagerCommands)
     add_subdirectory_once (LayerManagerBase)
     add_subdirectory_once (LayerManagerPlugins/SceneProvider/ExampleSceneProvider)
 endif(WITH_EXAMPLE_SCENE_PROVIDER)
 
+#===========================================================================================================
+option (WITH_SYSTEMD_HEALTH_MONITOR "Build plugin for systemd based health monitoring" OFF)
+#===========================================================================================================
 if (WITH_SYSTEMD_HEALTH_MONITOR)
     add_subdirectory_once (3rdParty/systemd)
     add_subdirectory_once (LayerManagerUtils)
@@ -117,21 +116,33 @@ if (WITH_SYSTEMD_HEALTH_MONITOR)
     add_subdirectory_once (LayerManagerPlugins/HealthMonitor/SystemdHealthMonitor)
 endif(WITH_SYSTEMD_HEALTH_MONITOR)
 
+#===========================================================================================================
+option (WITH_GENERIC_COMMUNICATOR "Build Generic Communicator Plugin based on IpcModules" ON)
+#===========================================================================================================
 if (WITH_GENERIC_COMMUNICATOR)
     add_subdirectory_once (LayerManagerPlugins/IpcModules)
     add_subdirectory_once (LayerManagerCommands)
     add_subdirectory_once (LayerManagerPlugins/Communicators/GenericCommunicator)
 endif(WITH_GENERIC_COMMUNICATOR)
 
+#===========================================================================================================
+option (WITH_DESKTOP "Build renderer plugin for OpenGL/X11 based platforms" OFF)
+#===========================================================================================================
 if (WITH_DESKTOP)
     add_subdirectory_once (LayerManagerPlugins/Renderers/GraphicLib/LayerManagerGraphicGLX)
     add_subdirectory_once (LayerManagerPlugins/Renderers/Platform/GLXRenderer)
 endif(WITH_DESKTOP)
 
+#===========================================================================================================
+option (WITH_GLX_LIB "Build development library for OpenGL/X11 based renderers" OFF)
+#===========================================================================================================
 if (WITH_GLX_LIB)
     add_subdirectory_once (LayerManagerPlugins/Renderers/GraphicLib/LayerManagerGraphicGLX)
 endif(WITH_GLX_LIB)
 
+#===========================================================================================================
+option (WITH_WAYLAND_X11 "Build renderer plugin for GLES/Wayland with X11 backend" OFF)
+#===========================================================================================================
 if (WITH_WAYLAND_X11)
     add_subdirectory_once (LayerManagerUtils)
     add_subdirectory_once (LayerManagerBase)
@@ -140,10 +151,16 @@ if (WITH_WAYLAND_X11)
     add_subdirectory_once (LayerManagerPlugins/Renderers/Platform/WaylandX11GLESRenderer)
 endif(WITH_WAYLAND_X11)
 
+#===========================================================================================================
+option (WITH_WAYLAND_X11_LIB "Build development library for GLES/Wayland X11 based renderers" OFF)
+#===========================================================================================================
 if (WITH_WAYLAND_X11_LIB)
     add_subdirectory_once (LayerManagerPlugins/Renderers/GraphicLib/LayerManagerGraphicWaylandX11GLESv2)
 endif(WITH_WAYLAND_X11_LIB)
 
+#===========================================================================================================
+option (WITH_WAYLAND_DRM "Build renderer plugin for GLES/Wayland with DRM backend" OFF)
+#===========================================================================================================
 if (WITH_WAYLAND_DRM)
     add_subdirectory_once (LayerManagerUtils)
     add_subdirectory_once (LayerManagerBase)
@@ -152,10 +169,16 @@ if (WITH_WAYLAND_DRM)
     add_subdirectory_once (LayerManagerPlugins/Renderers/Platform/WaylandDrmGLESRenderer)
 endif(WITH_WAYLAND_DRM)
 
+#===========================================================================================================
+option (WITH_WAYLAND_DRM_LIB "Build development library for GLES/Wayland DRM based renderers" OFF)
+#===========================================================================================================
 if (WITH_WAYLAND_DRM_LIB)
     add_subdirectory_once (LayerManagerPlugins/Renderers/GraphicLib/LayerManagerGraphicWaylandDrmGLESv2)
 endif(WITH_WAYLAND_DRM_LIB)
 
+#===========================================================================================================
+option (WITH_WAYLAND_FBDEV "Build renderer plugin for GLES/Wayland with FBDEV backend" OFF)
+#===========================================================================================================
 if (WITH_WAYLAND_FBDEV)
     add_subdirectory_once (LayerManagerUtils)
     add_subdirectory_once (LayerManagerBase)
@@ -164,35 +187,53 @@ if (WITH_WAYLAND_FBDEV)
     add_subdirectory_once (LayerManagerPlugins/Renderers/Platform/WaylandFbdevGLESRenderer)
 endif(WITH_WAYLAND_FBDEV)
 
+#===========================================================================================================
+option (WITH_WAYLAND_FBDEV_LIB "Build development library for GLES/Wayland FBDEV based renderers" OFF)
+#===========================================================================================================
 if (WITH_WAYLAND_FBDEV_LIB)
     add_subdirectory_once (LayerManagerPlugins/Renderers/GraphicLib/LayerManagerGraphicWaylandFbdevGLESv2)
 endif(WITH_WAYLAND_FBDEV_LIB)
 
+#===========================================================================================================
+option (WITH_X11_GLES "Build renderer plugin for GLES/X11 based platforms" ON)
+#===========================================================================================================
 if (WITH_X11_GLES)
     add_subdirectory_once (LayerManagerPlugins/Renderers/GraphicLib/LayerManagerGraphicGLESv2)
     add_subdirectory_once (LayerManagerPlugins/Renderers/Platform/X11GLESRenderer)
 endif(WITH_X11_GLES)
 
+#===========================================================================================================
+option (WITH_GLESv2_LIB "Build development library for GLES/X11 based renderers" OFF)
+#===========================================================================================================
 if (WITH_GLESv2_LIB)
     add_subdirectory_once (LayerManagerPlugins/Renderers/GraphicLib/LayerManagerGraphicGLESv2)
 endif(WITH_GLESv2_LIB)
 
+#===========================================================================================================
+option (WITH_TEXT_RENDERER "Build renderer plugin with pure logging (no rendering)" OFF)
+#===========================================================================================================
 if (WITH_TEXT_RENDERER)
     add_subdirectory_once (LayerManagerPlugins/Renderers/Platform/TextRenderer)
 endif(WITH_TEXT_RENDERER)
 
+#===========================================================================================================
+option (WITH_SERVICE_BIN "Build LayerManagerService binary" ON)
+#===========================================================================================================
 if (WITH_SERVICE_BIN)
     add_subdirectory_once (LayerManagerUtils)
     add_subdirectory_once (LayerManagerBase)
     add_subdirectory_once (LayerManagerService)
 endif (WITH_SERVICE_BIN)
 
+#===========================================================================================================
+option (WITH_CLIENT_LIB "Build LayerManagement client library" ON)
+#===========================================================================================================
 if (WITH_CLIENT_LIB)
     add_subdirectory_once (LayerManagerPlugins/IpcModules)
     add_subdirectory_once (LayerManagerClient/ilmClient)
 endif (WITH_CLIENT_LIB)
 
-#==============================================================================
+#===========================================================================================================
 # store used build configuration
-#==============================================================================
+#===========================================================================================================
 add_subdirectory_once(config)
