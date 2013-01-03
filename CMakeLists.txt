@@ -73,8 +73,7 @@ endif(WITH_TESTS)
 #==============================================================================
 # use strict compiler settings for examples and tools
 #------------------------------------------------------------------------------
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wextra")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMPILER_FLAGS_EXAMPLE}")
 #==============================================================================
 
 if (WITH_EGL_EXAMPLE)
@@ -114,9 +113,7 @@ endif(WITH_CONTROL_BIN)
 #==============================================================================
 # use very strict compiler settings for internal components
 #------------------------------------------------------------------------------
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Wno-long-long")
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-function")
-#set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMPILER_FLAGS_CORE}")
 #==============================================================================
 
 if (WITH_EXAMPLE_SCENE_PROVIDER)

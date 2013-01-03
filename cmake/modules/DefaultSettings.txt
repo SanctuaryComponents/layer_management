@@ -37,6 +37,14 @@ endif (WITH_STATIC_LIBRARIES)
 
 
 #==============================================================================
+# default compiler flags
+#==============================================================================
+set (COMPILER_FLAGS_EXAMPLE "-Wall -Wextra")
+set (COMPILER_FLAGS_PLUGIN  "-Wall -Wextra -pedantic -Wno-long-long")
+set (COMPILER_FLAGS_CORE    "-Wall -Wextra -pedantic -Wno-long-long -Wno-unused-function")
+
+
+#==============================================================================
 # set default build parameters
 #==============================================================================
 include_directories(
