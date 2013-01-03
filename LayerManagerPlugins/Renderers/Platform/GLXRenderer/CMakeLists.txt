@@ -56,22 +56,23 @@ set(SRC_FILES
 
 set(PLUGIN_INSTALL_PATH lib/layermanager/renderer)
 
-install(FILES   renderer_frag_clear.glslf
-                renderer_frag.glslf
-                renderer_frag_no_blend.glslf
-                renderer_frag_no_ualpha.glslf
-                renderer_frag_add_uchromakey.glslf
-                renderer_frag_no_blend_no_ualpha.glslf
-                renderer_frag_2surf.glslf
-                renderer_frag_2surf_no_blend.glslf
-                renderer_frag_2surf_no_ualpha.glslf
-                renderer_frag_2surf_no_blend_no_ualpha.glslf
-                renderer_frag_2surf_no_ualpha_0.glslf
-                renderer_frag_2surf_no_blend_no_ualpha_0.glslf
-                renderer_frag_2surf_no_ualpha_1.glslf
-                renderer_frag_2surf_no_blend_no_ualpha_1.glslf
-                renderer_vert.glslv
-                renderer_vert_2surf.glslv
+set(X11GLES_RENDERER_PATH ${CMAKE_SOURCE_DIR}/LayerManagerPlugins/Renderers/Platform/X11GLESRenderer)
+install(FILES   ${X11GLES_RENDERER_PATH}/renderer_frag_clear.glslf
+                ${X11GLES_RENDERER_PATH}/renderer_frag.glslf
+                ${X11GLES_RENDERER_PATH}/renderer_frag_no_blend.glslf
+                ${X11GLES_RENDERER_PATH}/renderer_frag_no_ualpha.glslf
+                ${X11GLES_RENDERER_PATH}/renderer_frag_add_uchromakey.glslf
+                ${X11GLES_RENDERER_PATH}/renderer_frag_no_blend_no_ualpha.glslf
+                ${X11GLES_RENDERER_PATH}/renderer_frag_2surf.glslf
+                ${X11GLES_RENDERER_PATH}/renderer_frag_2surf_no_blend.glslf
+                ${X11GLES_RENDERER_PATH}/renderer_frag_2surf_no_ualpha.glslf
+                ${X11GLES_RENDERER_PATH}/renderer_frag_2surf_no_blend_no_ualpha.glslf
+                ${X11GLES_RENDERER_PATH}/renderer_frag_2surf_no_ualpha_0.glslf
+                ${X11GLES_RENDERER_PATH}/renderer_frag_2surf_no_blend_no_ualpha_0.glslf
+                ${X11GLES_RENDERER_PATH}/renderer_frag_2surf_no_ualpha_1.glslf
+                ${X11GLES_RENDERER_PATH}/renderer_frag_2surf_no_blend_no_ualpha_1.glslf
+                ${X11GLES_RENDERER_PATH}/renderer_vert.glslv
+                ${X11GLES_RENDERER_PATH}/renderer_vert_2surf.glslv
     DESTINATION lib/layermanager/renderer
 )
 
