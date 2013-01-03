@@ -116,6 +116,9 @@ endif(WITH_TESTS)
 #=============================================================
 include(CheckFunctionExists)
 check_function_exists(backtrace_symbols HAVE_BACKTRACE)
+export_build_flag(HAVE_BACKTRACE "platform support for backtrace command")
 
 include(CheckIncludeFiles)
 check_include_files(execinfo.h HAVE_EXECINFO_H)
+export_build_flag(HAVE_EXECINFO_H "platform has execinfo.h header file")
+

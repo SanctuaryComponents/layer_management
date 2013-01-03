@@ -7,5 +7,6 @@ doc_generated
 configure
 *.pdf
 config.h
+config.h.1stpass
 git.kdev4
 .kdev4

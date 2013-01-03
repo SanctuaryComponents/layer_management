@@ -42,73 +42,7 @@
 //-----------------------------------------------------------------------------
 // build flags
 //-----------------------------------------------------------------------------
-// build client examples
-#cmakedefine WITH_CLIENTEXAMPLES
-
-// build OpenGL/X11 based renderer
-#cmakedefine WITH_DESKTOP
-
-// build OpenGL ES 2.0 examples
-#cmakedefine WITH_EGL_EXAMPLE
-
-// build OpenGL ES 2.0 Wayland Examples
-#cmakedefine WITH_WL_EXAMPLE
-
-// force copy of graphic buffers
-#cmakedefine WITH_FORCE_COPY
-
-// build OpenGL/X11 examples
-#cmakedefine WITH_GLX_EXAMPLE
-
-// build unit tests for all projects
-#cmakedefine WITH_TESTS
-
-// build OpenGL ES 2.0 / X11 renderer
-#cmakedefine WITH_X11_GLES
-
-// use fbdev for wayland backend
-#cmakedefine WITH_WAYLAND_FBDEV
-
-// use x11 for wayland backend
-#cmakedefine WITH_WAYLAND_X11
-
-// use wayland-drm compositor
-#cmakedefine WITH_WAYLAND_DRM
-
-// use automotive dlt for logging
-#cmakedefine WITH_DLT
-
-// build LayerManagement client library
-#cmakedefine WITH_CLIENT_LIB
-
-// build LayerManagerService binary
-#cmakedefine WITH_SERVICE_BIN
-
-// build generic communicator plugin
-#cmakedefine WITH_COMMUNICATOR_GEN
-
-// build dbus ipc module
-#cmakedefine WITH_IPC_MODULE_DBUS
-
-// build tcp/ip ipc module
-#cmakedefine WITH_IPC_MODULE_TCP
-
-// build plugin for systemd health monitoring
-#cmakedefine WITH_PLUGIN_SYSTEMD_HEALTH_MONITOR
-
-// full static build enabled
-#cmakedefine WITH_STATIC_LIBRARIES
-
-
-//-----------------------------------------------------------------------------
-// platform configuration
-//-----------------------------------------------------------------------------
-// execinfo header file
-#cmakedefine HAVE_EXECINFO_H
-
-// backtrace available
-#cmakedefine HAVE_BACKTRACE
-
+${EXPORTED_BUILD_FLAGS}
 
 //-----------------------------------------------------------------------------
 // human readable report
@@ -126,28 +60,9 @@ const BuildFlag gBuildFlags[] =
 {
     { INFO_FLAG,  "Build Version         = ${ILM_VERSION}" },
     { DEBUG_FLAG, "Build Type            = ${CMAKE_BUILD_TYPE}" },
-    { DEBUG_FLAG, "Compiler Flags        = ${CMAKE_CXX_FLAGS}" },
-    { DEBUG_FLAG, "Install Prefix        = ${CMAKE_INSTALL_PREFIX}" },
-    { DEBUG_FLAG, "WITH_CLIENTEXAMPLES   = ${WITH_CLIENTEXAMPLES}" },
-    { DEBUG_FLAG, "WITH_CLIENT_LIB       = ${WITH_CLIENT_LIB}" },
-    { DEBUG_FLAG, "WITH_COMMUNICATOR_GEN = ${WITH_COMMUNICATOR_GEN}" },
-    { DEBUG_FLAG, "WITH_DESKTOP          = ${WITH_DESKTOP}" },
-    { DEBUG_FLAG, "WITH_DLT              = ${WITH_DLT}" },
-    { DEBUG_FLAG, "WITH_EGL_EXAMPLE      = ${WITH_EGL_EXAMPLE}" },
-    { DEBUG_FLAG, "WITH_FORCE_COPY       = ${WITH_FORCE_COPY}" },
-    { DEBUG_FLAG, "WITH_GLX_EXAMPLE      = ${WITH_GLX_EXAMPLE}" },
-    { DEBUG_FLAG, "WITH_IPC_MODULE_DBUS  = ${WITH_IPC_MODULE_DBUS}" },
-    { DEBUG_FLAG, "WITH_IPC_MODULE_TCP   = ${WITH_IPC_MODULE_TCP}" },
-    { DEBUG_FLAG, "WITH_SERVICE_BIN      = ${WITH_SERVICE_BIN}" },
-    { DEBUG_FLAG, "WITH_TESTS            = ${WITH_TESTS}" },
-    { DEBUG_FLAG, "WITH_WAYLAND_DRM      = ${WITH_WAYLAND_DRM}" },
-    { DEBUG_FLAG, "WITH_WAYLAND_FBDEV    = ${WITH_WAYLAND_FBDEV}" },
-    { DEBUG_FLAG, "WITH_WAYLAND_X11      = ${WITH_WAYLAND_X11}" },
-    { DEBUG_FLAG, "WITH_WL_EXAMPLE       = ${WITH_WL_EXAMPLE}" },
-    { DEBUG_FLAG, "WITH_X11_GLES         = ${WITH_X11_GLES}" },
-    { DEBUG_FLAG, "WITH_SYSTEMD_HEALTH_MONITOR = ${WITH_SYSTEMD_HEALTH_MONITOR}" },
-    { DEBUG_FLAG, "WITH_EXAMPLE_SCENE_PROVIDER = ${WITH_EXAMPLE_SCENE_PROVIDER}" },
-    { DEBUG_FLAG, "WITH_STATIC_LIBRARIES = ${WITH_STATIC_LIBRARIES}" }
+
+${EXPORTED_BUILD_FLAG_ARRAY}
+    { DEBUG_FLAG, "Install Prefix        = ${CMAKE_INSTALL_PREFIX}" }
 };
 
 const int gBuildFlagCount = sizeof(gBuildFlags) / sizeof(gBuildFlags[0]);

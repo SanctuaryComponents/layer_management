@@ -24,12 +24,26 @@ cmake_minimum_required (VERSION 2.6)
 
 message(STATUS "Generating config.h header file with build system configuration.")
 
+foreach(FLAG ${BUILD_FLAG_LIST})
+    SET(EXPORTED_BUILD_FLAGS "${EXPORTED_BUILD_FLAGS}${FLAG}\n")
+endforeach(FLAG ${BUILD_FLAG_LIST})
+
+LIST(SORT BUILD_FLAG_ARRAY BUILD_FLAG_ARRAY)
+foreach(FLAG ${BUILD_FLAG_ARRAY})
+    SET(EXPORTED_BUILD_FLAG_ARRAY "${EXPORTED_BUILD_FLAG_ARRAY}    { DEBUG_FLAG, \"${FLAG} = ${${FLAG}}\" },\n")
+endforeach(FLAG ${BUILD_FLAG_ARRAY})
+
 foreach(PLUGIN ${STATICALLY_LINKED_PLUGINS})
     SET(STATIC_PLUGIN_REGISTRATION "${STATIC_PLUGIN_REGISTRATION} \\\n        REGISTER_PLUGIN(${PLUGIN})")
 endforeach(PLUGIN ${STATICALLY_LINKED_PLUGINS})
 
 configure_file(
     ${CMAKE_SOURCE_DIR}/config/res/config.h.cmake
+    ${CMAKE_SOURCE_DIR}/config/config.h.1stpass
+)
+
+configure_file(
+    ${CMAKE_SOURCE_DIR}/config/config.h.1stpass
     ${CMAKE_SOURCE_DIR}/config/config.h
 )
 
