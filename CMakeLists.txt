@@ -25,18 +25,10 @@ project (LayerManager)
 # cmake configuration
 #==============================================================================
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/")
+include(${CMAKE_MODULE_PATH}/DefaultSettings.txt)
 include(${CMAKE_MODULE_PATH}/CMakeVersions.txt)
 include(${CMAKE_MODULE_PATH}/CustomMacros.txt)
-
-#==============================================================================
-# set default build type, if not defined by user
-#==============================================================================
-if (NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release CACHE STRING
-                         "Choose build type: Debug, Release, RelWithDebInfo, MinSizeRel."
-                         FORCE)
-    message(STATUS "Build type not defined. Using default build type 'Release'.")
-endif (NOT CMAKE_BUILD_TYPE)
+add_subdirectory(cmake/optionalFeatures)
 
 #==============================================================================
 # Platforms / A set of indiviual options at once
@@ -66,21 +58,6 @@ option (WITH_SYSTEMD_HEALTH_MONITOR "Build plugin for systemd health monitoring"
 option (WITH_EXAMPLE_SCENE_PROVIDER "Build scene provider plugin for examples"            OFF)
 option (WITH_STATIC_LIBRARIES       "Link all libraries statically"                       OFF)
 option (WITH_TEXT_RENDERER          "Build text renderer (only logging)"                  OFF)
-
-#==============================================================================
-# Internal global settings not available to user
-#==============================================================================
-set (STATICALLY_LINKED_PLUGINS "" CACHE INTERNAL "list of static plugins" FORCE)
-
-#==============================================================================
-# set default build parameters
-#==============================================================================
-add_subdirectory(cmake/optionalFeatures)
-
-include_directories ("${PROJECT_SOURCE_DIR}/config")
-include_directories ("${PROJECT_SOURCE_DIR}/3rdParty/")
-# ilm_types are used internally to LM, so we can include them by default
-include_directories ("${PROJECT_SOURCE_DIR}/LayerManagerClient/ilmClient/include")
 
 #==============================================================================
 # enable ctest if building with tests
