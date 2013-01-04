@@ -28,11 +28,7 @@ include_directories(
     "${CMAKE_SOURCE_DIR}/LayerManagerPlugins/IpcModules/IpcModuleLoader/include"
 )
 
-if(WITH_STATIC_LIBRARIES)
-    add_library(IpcModuleLoader STATIC src/IpcModuleLoader.c)
-else(WITH_STATIC_LIBRARIES)
-    add_library(IpcModuleLoader SHARED src/IpcModuleLoader.c)
-endif(WITH_STATIC_LIBRARIES)
+add_library(IpcModuleLoader ${LIBRARY_BUILDMODE} src/IpcModuleLoader.c)
 
 set(LIBS
     dl
