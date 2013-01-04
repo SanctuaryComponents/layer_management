@@ -19,6 +19,14 @@
 
 cmake_minimum_required (VERSION 2.6)
 
+# check configuration
+
+message(STATUS "Checking configuration, if valid.")
+if (WITH_TESTS AND WITH_STATIC_LIBRARIES)
+    message(FATAL_ERROR "unit tests (WITH_TESTS=ON) are not supported with static linking (WITH_STATIC_LIBRARIES=ON)")
+endif (WITH_TESTS AND WITH_STATIC_LIBRARIES)
+
+
 # generate cmake configuration header file, includes information on the
 # project configuration, compiler settings, ...
 
