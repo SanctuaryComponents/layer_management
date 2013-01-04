@@ -60,8 +60,6 @@ set(SRC_FILES
     src/ShaderProgramGLES.cpp
 )
 
-set(PLUGIN_INSTALL_PATH lib/layermanager/renderer)
-
 install(FILES
     renderer_frag_clear.glslf
     renderer_frag.glslf
@@ -84,26 +82,13 @@ install(FILES
 )
 
 #===========================================================================
-# create statically linked plugin
+# create plugin
 #===========================================================================
-if (WITH_STATIC_LIBRARIES)
+add_library(${PROJECT_NAME} ${LIBRARY_BUILDMODE} ${SRC_FILES})
 
-    add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
-
-    set (STATICALLY_LINKED_PLUGINS ${STATICALLY_LINKED_PLUGINS}
-        ${PROJECT_NAME} CACHE INTERNAL "list of static plugins")
-
-#===========================================================================
-# create dynamically linked plugin
-#===========================================================================
-else(WITH_STATIC_LIBRARIES)
-
-    add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
-
-    install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${PLUGIN_INSTALL_PATH})
-
-endif(WITH_STATIC_LIBRARIES)
-
+install(TARGETS             ${PROJECT_NAME}
+        LIBRARY DESTINATION lib/layermanager/renderer
+        ARCHIVE DESTINATION lib/layermanager/static)
 
 #===========================================================================
 # external libraries

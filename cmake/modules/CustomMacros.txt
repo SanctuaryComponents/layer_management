@@ -28,6 +28,12 @@ MACRO(project_type mode)
     string(TOUPPER ${mode} mode_capital)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMPILER_FLAGS_${mode_capital}}")
     set(CMAKE_C_FLAGS   "${CMAKE_CXX_FLAGS}")
+
+    if (mode_capital STREQUAL "PLUGIN" AND WITH_STATIC_LIBRARIES)
+        set (STATICALLY_LINKED_PLUGINS ${STATICALLY_LINKED_PLUGINS}
+             ${PROJECT_NAME} CACHE INTERNAL "list of static plugins")
+    endif (mode_capital STREQUAL "PLUGIN" AND WITH_STATIC_LIBRARIES)
+
 ENDMACRO(project_type)
 
 MACRO(export_build_flag name description)

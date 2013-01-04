@@ -52,8 +52,6 @@ set(SRC_FILES
     src/WaylandX11GLESRenderer.cpp
 )
 
-set(PLUGIN_INSTALL_PATH lib/layermanager/renderer)
-
 set(X11GLES_RENDERER_PATH ${CMAKE_SOURCE_DIR}/LayerManagerPlugins/Renderers/Platform/X11GLESRenderer)
 install(FILES   ${X11GLES_RENDERER_PATH}/renderer_frag_clear.glslf
                 ${X11GLES_RENDERER_PATH}/renderer_frag.glslf
@@ -75,26 +73,13 @@ install(FILES   ${X11GLES_RENDERER_PATH}/renderer_frag_clear.glslf
 )
 
 #===========================================================================
-# create statically linked plugin
+# create plugin
 #===========================================================================
-if (WITH_STATIC_LIBRARIES)
+add_library(${PROJECT_NAME} ${LIBRARY_BUILDMODE} ${SRC_FILES})
 
-    add_library(${PROJECT_NAME} STATIC ${SRC_FILES})
-
-    set (STATICALLY_LINKED_PLUGINS ${STATICALLY_LINKED_PLUGINS}
-        ${PROJECT_NAME} CACHE INTERNAL "list of static plugins")
-
-#===========================================================================
-# create dynamically linked plugin
-#===========================================================================
-else(WITH_STATIC_LIBRARIES)
-
-    add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
-
-    install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${PLUGIN_INSTALL_PATH})
-
-endif(WITH_STATIC_LIBRARIES)
-
+install(TARGETS             ${PROJECT_NAME}
+        LIBRARY DESTINATION lib/layermanager/renderer
+        ARCHIVE DESTINATION lib/layermanager/static)
 
 #===========================================================================
 # external libraries
