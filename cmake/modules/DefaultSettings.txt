@@ -58,4 +58,5 @@ include_directories(
 # Internal global settings not available to user
 #==============================================================================
 set (STATICALLY_LINKED_PLUGINS "" CACHE INTERNAL "list of static plugins")
+set (BUILD_FLAG_LIST           "" CACHE INTERNAL "list of build flag names")
 

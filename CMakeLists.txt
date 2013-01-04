@@ -33,12 +33,12 @@ add_subdirectory(cmake/optionalFeatures)
 #===========================================================================================================
 # global build flags
 #===========================================================================================================
-option (WITH_FORCE_COPY       "Force Software Copy of Pixmaps (compatibility for VMs)" OFF)
-option (WITH_DLT              "Build with DLT logging support"                         OFF)
-option (WITH_STATIC_LIBRARIES "Link all plugins and libraries statically"              OFF)
+build_flag (WITH_FORCE_COPY       "Force Software Copy of Pixmaps (compatibility for VMs)" OFF)
+build_flag (WITH_DLT              "Build with DLT logging support"                         OFF)
+build_flag (WITH_STATIC_LIBRARIES "Link all plugins and libraries statically"              OFF)
 
 #===========================================================================================================
-option (WITH_TESTS "Build unit test binaries for all enabled components" OFF)
+build_flag (WITH_TESTS "Build unit test binaries for all enabled components" OFF)
 #===========================================================================================================
 if (WITH_TESTS)
     # enable ctest if building with tests, run 'make test' after build to run all tests
@@ -49,7 +49,7 @@ if (WITH_TESTS)
 endif(WITH_TESTS)
 
 #===========================================================================================================
-option (WITH_EGL_EXAMPLE "Build examples for GLES/X11 based platforms" ON)
+build_flag (WITH_EGL_EXAMPLE "Build examples for GLES/X11 based platforms" ON)
 #===========================================================================================================
 if (WITH_EGL_EXAMPLE)
     add_subdirectory_once (LayerManagerUtils)
@@ -59,7 +59,7 @@ if (WITH_EGL_EXAMPLE)
 endif(WITH_EGL_EXAMPLE)
 
 #===========================================================================================================
-option (WITH_GLX_EXAMPLE "Build examples for OpenGL/X11 based platforms" OFF)
+build_flag (WITH_GLX_EXAMPLE "Build examples for OpenGL/X11 based platforms" OFF)
 #===========================================================================================================
 if (WITH_GLX_EXAMPLE)
     add_subdirectory_once (LayerManagerUtils)
@@ -68,7 +68,7 @@ if (WITH_GLX_EXAMPLE)
 endif(WITH_GLX_EXAMPLE)
 
 #===========================================================================================================
-option (WITH_CLIENTEXAMPLES "Build examples for client library usage" ON)
+build_flag (WITH_CLIENTEXAMPLES "Build examples for client library usage" ON)
 #===========================================================================================================
 if (WITH_CLIENTEXAMPLES)
     add_subdirectory_once (LayerManagerUtils)
@@ -77,7 +77,7 @@ if (WITH_CLIENTEXAMPLES)
 endif(WITH_CLIENTEXAMPLES)
 
 #===========================================================================================================
-option (WITH_WL_EXAMPLE "Build examples for GLES/Wayland based platforms" OFF)
+build_flag (WITH_WL_EXAMPLE "Build examples for GLES/Wayland based platforms" OFF)
 #===========================================================================================================
 if (WITH_WL_EXAMPLE)
     add_subdirectory_once (LayerManagerUtils)
@@ -89,7 +89,7 @@ if (WITH_WL_EXAMPLE)
 endif(WITH_WL_EXAMPLE)
 
 #===========================================================================================================
-option (WITH_CONTROL_BIN "Build LayerManagerControl binary" ON)
+build_flag (WITH_CONTROL_BIN "Build LayerManagerControl binary" ON)
 #===========================================================================================================
 if (WITH_CONTROL_BIN)
     add_subdirectory_once (LayerManagerUtils)
@@ -98,7 +98,7 @@ if (WITH_CONTROL_BIN)
 endif(WITH_CONTROL_BIN)
 
 #===========================================================================================================
-option (WITH_EXAMPLE_SCENE_PROVIDER "Build scene provider plugin to run example applications" OFF)
+build_flag (WITH_EXAMPLE_SCENE_PROVIDER "Build scene provider plugin to run example applications" OFF)
 #===========================================================================================================
 if (WITH_EXAMPLE_SCENE_PROVIDER)
     add_subdirectory_once (LayerManagerCommands)
@@ -107,7 +107,7 @@ if (WITH_EXAMPLE_SCENE_PROVIDER)
 endif(WITH_EXAMPLE_SCENE_PROVIDER)
 
 #===========================================================================================================
-option (WITH_SYSTEMD_HEALTH_MONITOR "Build plugin for systemd based health monitoring" OFF)
+build_flag (WITH_SYSTEMD_HEALTH_MONITOR "Build plugin for systemd based health monitoring" OFF)
 #===========================================================================================================
 if (WITH_SYSTEMD_HEALTH_MONITOR)
     add_subdirectory_once (3rdParty/systemd)
@@ -117,7 +117,7 @@ if (WITH_SYSTEMD_HEALTH_MONITOR)
 endif(WITH_SYSTEMD_HEALTH_MONITOR)
 
 #===========================================================================================================
-option (WITH_GENERIC_COMMUNICATOR "Build Generic Communicator Plugin based on IpcModules" ON)
+build_flag (WITH_GENERIC_COMMUNICATOR "Build Generic Communicator Plugin based on IpcModules" ON)
 #===========================================================================================================
 if (WITH_GENERIC_COMMUNICATOR)
     add_subdirectory_once (LayerManagerPlugins/IpcModules)
@@ -126,7 +126,7 @@ if (WITH_GENERIC_COMMUNICATOR)
 endif(WITH_GENERIC_COMMUNICATOR)
 
 #===========================================================================================================
-option (WITH_DESKTOP "Build renderer plugin for OpenGL/X11 based platforms" OFF)
+build_flag (WITH_DESKTOP "Build renderer plugin for OpenGL/X11 based platforms" OFF)
 #===========================================================================================================
 if (WITH_DESKTOP)
     add_subdirectory_once (LayerManagerPlugins/Renderers/GraphicLib/LayerManagerGraphicGLX)
@@ -134,14 +134,14 @@ if (WITH_DESKTOP)
 endif(WITH_DESKTOP)
 
 #===========================================================================================================
-option (WITH_GLX_LIB "Build development library for OpenGL/X11 based renderers" OFF)
+build_flag (WITH_GLX_LIB "Build development library for OpenGL/X11 based renderers" OFF)
 #===========================================================================================================
 if (WITH_GLX_LIB)
     add_subdirectory_once (LayerManagerPlugins/Renderers/GraphicLib/LayerManagerGraphicGLX)
 endif(WITH_GLX_LIB)
 
 #===========================================================================================================
-option (WITH_WAYLAND_X11 "Build renderer plugin for GLES/Wayland with X11 backend" OFF)
+build_flag (WITH_WAYLAND_X11 "Build renderer plugin for GLES/Wayland with X11 backend" OFF)
 #===========================================================================================================
 if (WITH_WAYLAND_X11)
     add_subdirectory_once (LayerManagerUtils)
@@ -152,14 +152,14 @@ if (WITH_WAYLAND_X11)
 endif(WITH_WAYLAND_X11)
 
 #===========================================================================================================
-option (WITH_WAYLAND_X11_LIB "Build development library for GLES/Wayland X11 based renderers" OFF)
+build_flag (WITH_WAYLAND_X11_LIB "Build development library for GLES/Wayland X11 based renderers" OFF)
 #===========================================================================================================
 if (WITH_WAYLAND_X11_LIB)
     add_subdirectory_once (LayerManagerPlugins/Renderers/GraphicLib/LayerManagerGraphicWaylandX11GLESv2)
 endif(WITH_WAYLAND_X11_LIB)
 
 #===========================================================================================================
-option (WITH_WAYLAND_DRM "Build renderer plugin for GLES/Wayland with DRM backend" OFF)
+build_flag (WITH_WAYLAND_DRM "Build renderer plugin for GLES/Wayland with DRM backend" OFF)
 #===========================================================================================================
 if (WITH_WAYLAND_DRM)
     add_subdirectory_once (LayerManagerUtils)
@@ -170,14 +170,14 @@ if (WITH_WAYLAND_DRM)
 endif(WITH_WAYLAND_DRM)
 
 #===========================================================================================================
-option (WITH_WAYLAND_DRM_LIB "Build development library for GLES/Wayland DRM based renderers" OFF)
+build_flag (WITH_WAYLAND_DRM_LIB "Build development library for GLES/Wayland DRM based renderers" OFF)
 #===========================================================================================================
 if (WITH_WAYLAND_DRM_LIB)
     add_subdirectory_once (LayerManagerPlugins/Renderers/GraphicLib/LayerManagerGraphicWaylandDrmGLESv2)
 endif(WITH_WAYLAND_DRM_LIB)
 
 #===========================================================================================================
-option (WITH_WAYLAND_FBDEV "Build renderer plugin for GLES/Wayland with FBDEV backend" OFF)
+build_flag (WITH_WAYLAND_FBDEV "Build renderer plugin for GLES/Wayland with FBDEV backend" OFF)
 #===========================================================================================================
 if (WITH_WAYLAND_FBDEV)
     add_subdirectory_once (LayerManagerUtils)
@@ -188,14 +188,14 @@ if (WITH_WAYLAND_FBDEV)
 endif(WITH_WAYLAND_FBDEV)
 
 #===========================================================================================================
-option (WITH_WAYLAND_FBDEV_LIB "Build development library for GLES/Wayland FBDEV based renderers" OFF)
+build_flag (WITH_WAYLAND_FBDEV_LIB "Build development library for GLES/Wayland FBDEV based renderers" OFF)
 #===========================================================================================================
 if (WITH_WAYLAND_FBDEV_LIB)
     add_subdirectory_once (LayerManagerPlugins/Renderers/GraphicLib/LayerManagerGraphicWaylandFbdevGLESv2)
 endif(WITH_WAYLAND_FBDEV_LIB)
 
 #===========================================================================================================
-option (WITH_X11_GLES "Build renderer plugin for GLES/X11 based platforms" ON)
+build_flag (WITH_X11_GLES "Build renderer plugin for GLES/X11 based platforms" ON)
 #===========================================================================================================
 if (WITH_X11_GLES)
     add_subdirectory_once (LayerManagerPlugins/Renderers/GraphicLib/LayerManagerGraphicGLESv2)
@@ -203,21 +203,21 @@ if (WITH_X11_GLES)
 endif(WITH_X11_GLES)
 
 #===========================================================================================================
-option (WITH_GLESv2_LIB "Build development library for GLES/X11 based renderers" OFF)
+build_flag (WITH_GLESv2_LIB "Build development library for GLES/X11 based renderers" OFF)
 #===========================================================================================================
 if (WITH_GLESv2_LIB)
     add_subdirectory_once (LayerManagerPlugins/Renderers/GraphicLib/LayerManagerGraphicGLESv2)
 endif(WITH_GLESv2_LIB)
 
 #===========================================================================================================
-option (WITH_TEXT_RENDERER "Build renderer plugin with pure logging (no rendering)" OFF)
+build_flag (WITH_TEXT_RENDERER "Build renderer plugin with pure logging (no rendering)" OFF)
 #===========================================================================================================
 if (WITH_TEXT_RENDERER)
     add_subdirectory_once (LayerManagerPlugins/Renderers/Platform/TextRenderer)
 endif(WITH_TEXT_RENDERER)
 
 #===========================================================================================================
-option (WITH_SERVICE_BIN "Build LayerManagerService binary" ON)
+build_flag (WITH_SERVICE_BIN "Build LayerManagerService binary" ON)
 #===========================================================================================================
 if (WITH_SERVICE_BIN)
     add_subdirectory_once (LayerManagerUtils)
@@ -226,7 +226,7 @@ if (WITH_SERVICE_BIN)
 endif (WITH_SERVICE_BIN)
 
 #===========================================================================================================
-option (WITH_CLIENT_LIB "Build LayerManagement client library" ON)
+build_flag (WITH_CLIENT_LIB "Build LayerManagement client library" ON)
 #===========================================================================================================
 if (WITH_CLIENT_LIB)
     add_subdirectory_once (LayerManagerPlugins/IpcModules)
