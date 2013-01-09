@@ -1,6 +1,7 @@
 /***************************************************************************
  *
  * Copyright 2010,2011 BMW Car IT GmbH
+ * Copyright (C) 2012 DENSO CORPORATION and Robert Bosch Car Multimedia Gmbh
  *
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,12 +30,14 @@ public:
      * \action    This command sets the render order of layers within the GENIVI LayerManagement
      * \frequency Called for rearranging graphical contents.
      * \param[in] sender process id of application that sent this command
+     * \param[in] screenID ID of screen
      * \param[in] array array of layer ids
      * \param[in] length length of array provided in parameter array
      * \ingroup Commands
      */
-    ScreenSetRenderOrderCommand(pid_t sender, unsigned int* array, unsigned int length)
+    ScreenSetRenderOrderCommand(pid_t sender, unsigned int screenID, unsigned int* array, unsigned int length)
     : ICommand(ExecuteAsynchronous, sender)
+    , m_screenID(screenID)
     , m_array(array)
     , m_length(length)
     {}
@@ -61,6 +64,7 @@ public:
     virtual const std::string getString();
 
 private:
+    unsigned int m_screenID;
     unsigned int* m_array;
     const unsigned int m_length;
 };

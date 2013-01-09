@@ -1,6 +1,7 @@
 /***************************************************************************
  *
  * Copyright 2010,2011 BMW Car IT GmbH
+ * Copyright (C) 2012 DENSO CORPORATION and Robert Bosch Car Multimedia Gmbh
  *
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -49,14 +50,14 @@ ExecutionResult ScreenSetRenderOrderCommand::execute(ICommandExecutor* executor)
     //                return false;
     //        } // TODO insert again later
 
-    if (scene.getCurrentRenderOrder().size() != 0)
+    if (scene.getCurrentRenderOrder(m_screenID).size() != 0)
     {
         IRenderer* renderer = *((executor->getRendererList())->begin());
         renderer->forceCompositionWindowSystem();
         result = ExecutionSuccessRedraw;
     }
 
-    scene.getCurrentRenderOrder().clear();
+    scene.getCurrentRenderOrder(m_screenID).clear();
 
     LOG_DEBUG("ScreenSetRenderOrderCommand", "Length to set: " << m_length);
 
@@ -67,7 +68,7 @@ ExecutionResult ScreenSetRenderOrderCommand::execute(ICommandExecutor* executor)
         if (layer)
         {
             LOG_DEBUG("ScreenSetRenderOrderCommand", "Adding Layer: " << m_array[i] << " to current render order");
-            scene.getCurrentRenderOrder().push_back(layer);
+            scene.getCurrentRenderOrder(m_screenID).push_back(layer);
             result = ExecutionSuccessRedraw;
         }
     }
@@ -79,7 +80,8 @@ const std::string ScreenSetRenderOrderCommand::getString()
 {
     std::stringstream description;
     description << "ScreenSetRenderOrderCommand("
-                << "m_array=[";
+                << "m_screenID=" << m_screenID
+                << ", m_array=[";
 
     for (unsigned int i = 0; i < m_length; ++i)
     {
