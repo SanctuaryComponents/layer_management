@@ -143,7 +143,7 @@ static Layer* createComplexLayer_1(IScene *m_pScene)
     pLayer->addSurface(pSurface);
 
 
-    m_pScene->getCurrentRenderOrder().push_back(pLayer);
+    m_pScene->getCurrentRenderOrder(0).push_back(pLayer);
     return pLayer;
 }
 
@@ -248,7 +248,7 @@ static Layer* createComplexLayer_2(IScene *m_pScene)
     pLayer->addSurface(pSurface);
 
 
-    m_pScene->getCurrentRenderOrder().push_back(pLayer);
+    m_pScene->getCurrentRenderOrder(0).push_back(pLayer);
     return pLayer;
 }
 
@@ -269,7 +269,7 @@ TEST_F(InputManagerTest, CreateComplexeScene)
 
     createComplexScene(m_pScene);
 
-    LayerList& ll = m_pScene->getCurrentRenderOrder();
+    LayerList& ll = m_pScene->getCurrentRenderOrder(0);
     EXPECT_EQ(ll.size(), (uint)2);
 
     // top layer to be rendered is LAY2

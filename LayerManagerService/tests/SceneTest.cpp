@@ -648,7 +648,7 @@ TEST_F(SceneTest, getCurrentRenderOrder)
     // TODO: how to test? return by typically reference can't be invalid.
 
     /// get render order
-    LayerList& llist = m_pScene->getCurrentRenderOrder();
+    LayerList& llist = m_pScene->getCurrentRenderOrder(0);
 
     /// make sure, list of layers is returned
     ASSERT_TRUE(&llist);
@@ -752,7 +752,7 @@ TEST_F(SceneTest, isLayerInCurrentRenderOrder)
     ASSERT_FALSE(m_pScene->isLayerInCurrentRenderOrder(layerId1));
 
     /// add layer to render order
-    LayerList& llist = m_pScene->getCurrentRenderOrder();
+    LayerList& llist = m_pScene->getCurrentRenderOrder(0);
     llist.push_back(l1);
 
     /// make sure, layer is in render order
