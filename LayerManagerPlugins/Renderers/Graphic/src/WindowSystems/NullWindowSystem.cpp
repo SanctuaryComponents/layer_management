@@ -44,7 +44,7 @@ void NullWindowSystem::printDebug(int posx, int posy)
     std::stringstream debugmessage;
     debugmessage << "Layer:  ID |   X  |   Y  |   W  |   H  | Al. \n";
     // loop the layers
-    std::list<Layer*> list = layerlist->getCurrentRenderOrder();
+    std::list<Layer*> list = layerlist->getCurrentRenderOrder(0);
     for(std::list<Layer*>::const_iterator currentLayer = list.begin(); currentLayer != list.end(); ++currentLayer)
     {
         Rectangle dest = (*currentLayer)->getDestinationRegion();
@@ -94,7 +94,7 @@ void NullWindowSystem::Redraw()
 //    LOG_INFO("NullWindowSystem","redraw");
     // draw all the layers
     graphicSystem->clearBackground();
-    std::list<Layer*> layers = layerlist->getCurrentRenderOrder();
+    std::list<Layer*> layers = layerlist->getCurrentRenderOrder(0);
     for(std::list<Layer*>::const_iterator current = layers.begin(); current != layers.end(); ++current)
     {
         Layer* currentLayer = (Layer*)*current;
@@ -169,7 +169,7 @@ void* NullWindowSystem::EventLoop(void * ptr)
         defaultLayer->setOpacity(1.0);
         defaultLayer->setDestinationRegion(Rectangle(0,0,windowsys->resolutionWidth,windowsys->resolutionHeight));
         defaultLayer->setSourceRegion(Rectangle(0,0,windowsys->resolutionWidth,windowsys->resolutionHeight));
-        windowsys->layerlist->getCurrentRenderOrder().push_back(defaultLayer);
+        windowsys->layerlist->getCurrentRenderOrder(0).push_back(defaultLayer);
     }
     LOG_DEBUG("NullWindowSystem", "Enter render loop");
     while (running)

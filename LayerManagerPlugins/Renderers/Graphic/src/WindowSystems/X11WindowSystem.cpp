@@ -163,7 +163,7 @@ void X11WindowSystem::printDebug(){
     std::stringstream debugmessage;
     debugmessage << "Layer:  ID |   X  |   Y  |   W  |   H  | Al. \n";
 
-    LayerList list = m_pScene->getCurrentRenderOrder();
+    LayerList list = m_pScene->getCurrentRenderOrder(0);
 
     // loop the layers
     LayerListConstIterator iter = list.begin();
@@ -230,7 +230,7 @@ Surface* X11WindowSystem::getSurfaceForWindow(Window w)
 void X11WindowSystem::checkForNewSurfaceNativeContent()
 {
     m_pScene->lockScene();
-    LayerList layers = m_pScene->getCurrentRenderOrder();
+    LayerList layers = m_pScene->getCurrentRenderOrder(0);
     for(LayerListConstIterator current = layers.begin(); current != layers.end(); current++)
     {
         SurfaceList surfaces = (*current)->getAllSurfaces();
@@ -574,7 +574,7 @@ void X11WindowSystem::calculateFps()
 {
     // we have rendered a frame
     Frame ++;
-    std::list<Layer*> layers = m_pScene->getCurrentRenderOrder();
+    std::list<Layer*> layers = m_pScene->getCurrentRenderOrder(0);
     // every 3 seconds, calculate & print fps
     gettimeofday(&tv, NULL);
     timeSinceLastCalc = (float)(tv.tv_sec-tv0.tv_sec) + 0.000001*((float)(tv.tv_usec-tv0.tv_usec));
@@ -602,7 +602,7 @@ void X11WindowSystem::calculateFps()
 
 void X11WindowSystem::RedrawAllLayers(bool clear, bool swap)
 {
-    LayerList layers = m_pScene->getCurrentRenderOrder();
+    LayerList layers = m_pScene->getCurrentRenderOrder(0);
     LayerList swLayers;
 
     // Refresh HW Layers, find SW Layers
@@ -809,7 +809,7 @@ init_complete:
         defaultLayer->setOpacity(1.0);
         defaultLayer->setDestinationRegion(Rectangle(0,0,this->resolutionWidth,this->resolutionHeight));
         defaultLayer->setSourceRegion(Rectangle(0,0,this->resolutionWidth,this->resolutionHeight));
-        this->m_pScene->getCurrentRenderOrder().push_back(defaultLayer);
+        this->m_pScene->getCurrentRenderOrder(0).push_back(defaultLayer);
     }
     LOG_INFO("X11WindowSystem", "Enter render loop");
 

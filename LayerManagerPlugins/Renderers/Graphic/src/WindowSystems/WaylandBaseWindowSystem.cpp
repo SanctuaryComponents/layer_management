@@ -162,7 +162,7 @@ void WaylandBaseWindowSystem::printDebug()
     std::stringstream debugmessage;
     debugmessage << "Layer:  ID |   X  |   Y  |   W  |   H  | Al. \n";
 
-    LayerList list = m_pScene->getCurrentRenderOrder();
+    LayerList list = m_pScene->getCurrentRenderOrder(0);
 
     // loop the layers
     LayerListConstIterator iter = list.begin();
@@ -246,7 +246,7 @@ WaylandBaseWindowSystem::getNativeSurfaceFromSurface(Surface* surface)
 void WaylandBaseWindowSystem::checkForNewSurfaceNativeContent()
 {
     m_pScene->lockScene();
-    LayerList layers = m_pScene->getCurrentRenderOrder();
+    LayerList layers = m_pScene->getCurrentRenderOrder(0);
     for(LayerListConstIterator current = layers.begin(); current != layers.end(); current++)
     {
         SurfaceList surfaces = (*current)->getAllSurfaces();
@@ -291,7 +291,7 @@ void WaylandBaseWindowSystem::calculateFps()
 
     // we have rendered a frame
     Frame ++;
-    std::list<Layer*> layers = m_pScene->getCurrentRenderOrder();
+    std::list<Layer*> layers = m_pScene->getCurrentRenderOrder(0);
     // every 3 seconds, calculate & print fps
     gettimeofday(&tv, NULL);
     timeSinceLastCalc = (float)(tv.tv_sec-tv0.tv_sec) + 0.000001*((float)(tv.tv_usec-tv0.tv_usec));
@@ -324,7 +324,7 @@ void WaylandBaseWindowSystem::calculateFps()
 
 void WaylandBaseWindowSystem::RedrawAllLayers(bool clear, bool swap)
 {
-    LayerList layers = m_pScene->getCurrentRenderOrder();
+    LayerList layers = m_pScene->getCurrentRenderOrder(0);
     LayerList swLayers;
     // TODO: bRedraw is overly conservative if layers includes a hardware layer
     bool bRedraw = m_forceComposition || graphicSystem->needsRedraw(layers) || (m_systemState == REDRAW_STATE);

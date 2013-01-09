@@ -21,7 +21,7 @@
 
 void BaseWindowSystem::ClearDamage()
 {
-    LayerList layers = m_pScene->getCurrentRenderOrder();
+    LayerList layers = m_pScene->getCurrentRenderOrder(0);
     for (LayerListIterator layer = layers.begin(); layer != layers.end(); layer++)
     {
         SurfaceList surfaces = (*layer)->getAllSurfaces();
