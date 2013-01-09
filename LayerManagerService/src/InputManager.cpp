@@ -209,7 +209,7 @@ Surface * InputManager::reportTouchEvent(PointVect& pv)
 Surface * InputManager::electSurfaceForPointerEvent(int& x, int& y)
 {
     Surface* surf;
-    LayerList &ll = m_pScene->getCurrentRenderOrder();
+    LayerList &ll = m_pScene->getCurrentRenderOrder(0);
     LayerListConstReverseIterator currentLayer;
     SurfaceListConstReverseIterator currentSurf;
     int x_SurfCoordinate, y_SurfCoordinate;
