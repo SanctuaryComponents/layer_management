@@ -1,6 +1,7 @@
 /***************************************************************************
  *
  * Copyright 2010,2011 BMW Car IT GmbH
+ * Copyright (C) 2012 DENSO CORPORATION and Robert Bosch Car Multimedia Gmbh
  *
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,6 +32,7 @@
 #include "LayerMap.h"
 #include "ShaderMap.h"
 #include "LayerList.h"
+#include "LmScreenList.h"
 #include <pthread.h>
 
 class Layer;
@@ -61,6 +63,8 @@ public:
     virtual bool removeLayer(Layer* layer);
     virtual bool removeSurface(Surface* surface);
     virtual void removeSurfaceNativeContent(Surface* surface);
+    virtual LmScreenList& getScreenList();
+    virtual LmScreen* getScreen(const uint id) const;
     virtual Layer* getLayer(const uint id);
     virtual Surface* getSurface(const uint id);
     virtual SurfaceGroup* getSurfaceGroup(const uint id);
@@ -75,7 +79,7 @@ public:
     virtual void lockScene();
     virtual void unlockScene();
 
-    virtual LayerList& getCurrentRenderOrder();
+    virtual LayerList& getCurrentRenderOrder(const uint id);
     virtual void removeSurfaceGroup(SurfaceGroup *surface);
     virtual void removeLayerGroup(LayerGroup *layer);
     virtual const SurfaceMap getAllSurfaces() const;
@@ -95,7 +99,8 @@ private:
     SurfaceGroupMap m_surfaceGroupMap;
     SurfaceMap m_surfaceMap;
     LayerMap m_layerMap;
-    LayerList m_currentRenderOrder;
+    LayerList m_nullRenderOrder;
+    LmScreenList m_screenList;
 };
 
 inline const LayerMap Scene::getAllLayers() const
@@ -103,9 +108,22 @@ inline const LayerMap Scene::getAllLayers() const
     return m_layerMap;
 }
 
-inline LayerList& Scene::getCurrentRenderOrder() // TODO: const
+inline LayerList& Scene::getCurrentRenderOrder(const uint id) // TODO: const
 {
-    return m_currentRenderOrder;
+    LmScreen* screen = Scene::getScreen(id);
+    if (NULL != screen)
+    {
+        return screen->getCurrentRenderOrder();
+    }
+    else
+    {
+        return m_nullRenderOrder;
+    }
+}
+
+inline LmScreenList& Scene::getScreenList()
+{
+    return m_screenList;
 }
 
 inline const SurfaceMap Scene::getAllSurfaces() const

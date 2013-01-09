@@ -1,6 +1,7 @@
 /***************************************************************************
  *
  * Copyright 2010,2011 BMW Car IT GmbH
+ * Copyright (C) 2012 DENSO CORPORATION and Robert Bosch Car Multimedia Gmbh
  *
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -142,6 +143,23 @@ LayerGroup* Scene::createLayerGroup(const uint layerGroupId, int creatorPid)
     return newLayerGroup;
 }
 
+
+LmScreen* Scene::getScreen(const uint screenId) const
+{
+    LmScreenListConstIterator iter = m_screenList.begin();
+    LmScreenListConstIterator iterEnd = m_screenList.end();
+    for (; iter != iterEnd; ++iter)
+    {
+        if (screenId == (*iter)->getID())
+        {
+            return (*iter);
+        }
+    }
+    LOG_WARNING("Scene","screen not found : id [ " << screenId << " ]");
+
+    return NULL;
+}
+
 Layer* Scene::getLayer(const uint layerId)
 {
     Layer* layer = NULL;
@@ -215,12 +233,22 @@ void Scene::removeLayerFromAllLayerGroups(Layer* layer)
 bool Scene::removeLayer(Layer* layer)
 {
     bool result = false;
+    LmScreenListIterator iter = m_screenList.begin();
+    LmScreenListIterator iterEnd = m_screenList.end();
 
     if (layer != NULL)
     {
         result = isLayerInCurrentRenderOrder(layer->getID());
         layer->removeAllSurfaces();
-        m_currentRenderOrder.remove(layer);
+        for (; iter != iterEnd; ++iter)
+        {
+            if (NULL == *iter)
+            {
+                LOG_WARNING("Scene", "screen invalid");
+                continue;
+            }
+            (*iter)->getCurrentRenderOrder().remove(layer);
+        }
         m_layerMap.erase(layer->getID());
         removeLayerFromAllLayerGroups(layer);
         delete layer;
@@ -320,19 +348,25 @@ bool Scene::getLayerIDsOfScreen(const uint screenID, uint* length,
         uint** array) const
 {
     // check if screen is valid, currently all layers are only on one screen
-    if (screenID != 0) // TODO: remove hard-coded value
+    LmScreen* screen = NULL;
+    uint numOfLayers = 0;
+    uint arrayPos = 0;
+    LayerList currentRenderOrder;
+
+    screen = getScreen(screenID);
+    if (NULL == screen)
     {
         return false;
     }
 
-    uint numOfLayers = m_currentRenderOrder.size();
-    uint arrayPos = 0;
+    currentRenderOrder = screen->getCurrentRenderOrder();
+    numOfLayers = currentRenderOrder.size();
 
     *length = numOfLayers;
     *array = new uint[numOfLayers]; // TODO: safe, if size = 0?
 
-    LayerListConstIterator iter = m_currentRenderOrder.begin();
-    LayerListConstIterator iterEnd = m_currentRenderOrder.end();
+    LayerListConstIterator iter = currentRenderOrder.begin();
+    LayerListConstIterator iterEnd = currentRenderOrder.end();
 
     for (; iter != iterEnd; ++iter)
     {
@@ -398,14 +432,25 @@ void Scene::getLayerGroupIDs(uint* length, uint** array) const
 
 bool Scene::isLayerInCurrentRenderOrder(const uint id)
 {
-    LayerListConstIterator iter = m_currentRenderOrder.begin();
-    LayerListConstIterator iterEnd = m_currentRenderOrder.end();
+    LmScreenListIterator iterScreen = m_screenList.begin();
+    LmScreenListIterator iterScreenEnd = m_screenList.end();
+    LayerList currentRenderOrder;
+    LayerListIterator iterLayer;
+    LayerListIterator iterLayerEnd;
 
-    for (; iter != iterEnd; ++iter)
+    for (; iterScreen != iterScreenEnd; ++iterScreen)
     {
-        if ((*iter)->getID() == id)
-            return true;
-    }
+        currentRenderOrder = (*iterScreen)->getCurrentRenderOrder();
 
+        iterLayer = currentRenderOrder.begin();
+        iterLayerEnd = currentRenderOrder.end();
+        for (; iterLayer != iterLayerEnd; ++iterLayer)
+        {
+            if (id == (*iterLayer)->getID())
+            {
+                return true;
+            }
+        }
+    }
     return false;
 }

@@ -1,6 +1,7 @@
 /***************************************************************************
  *
  * Copyright 2010,2011 BMW Car IT GmbH
+ * Copyright (C) 2012 DENSO CORPORATION and Robert Bosch Car Multimedia Gmbh
  *
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,6 +28,8 @@
 #include "SurfaceGroup.h"
 #include "LayerList.h"
 #include "SurfaceMap.h"
+#include "LmScreen.h"
+#include "LmScreenList.h"
 
 /**
  * \defgroup SceneAPI Layer Management Scene API
@@ -97,6 +100,14 @@ public:
      * \param[in] surface pointer to surface
      */
     virtual bool removeSurface(Surface* surface) = 0;
+
+    /**
+     * \brief Get a screen of the scene by id.
+     * \ingroup SceneAPI
+     * \param[in] id id of the screen
+     * \return pointer to the screen with id
+     */
+    virtual LmScreen* getScreen(const uint id) const = 0;
 
     /**
      * \brief Get a layer of the scene by id.
@@ -191,9 +202,17 @@ public:
     /**
      * \brief Get the current render order of the scene.
      * \ingroup SceneAPI
+     * \param[in] id screen id
      * \return reference to render order
      */
-    virtual LayerList& getCurrentRenderOrder() = 0;
+    virtual LayerList& getCurrentRenderOrder(const uint id) = 0;
+
+    /**
+     * \brief Get the screen list of the scene.
+     * \ingroup SceneAPI
+     * \return reference to screen list
+     */
+    virtual LmScreenList& getScreenList() = 0;
 
     /**
      * \brief Remove a surface group from scene.
