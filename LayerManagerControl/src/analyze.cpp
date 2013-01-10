@@ -76,7 +76,7 @@ void analyzeVisibilityAndOpacity(t_ilm_surface targetSurfaceId, t_scene_data& sc
     else
     {
         flag = "OK";
-        sprintf(description, "");
+        sprintf(description, "%s", "");
     }
 
     analyzePrintHelper(tag, flag, description);
@@ -90,7 +90,7 @@ void analyzeVisibilityAndOpacity(t_ilm_surface targetSurfaceId, t_scene_data& sc
     else
     {
         flag = "OK";
-        sprintf(description, "");
+        sprintf(description, "%s", "");
     }
 
     analyzePrintHelper(tag, flag, description);
@@ -110,7 +110,7 @@ void analyzeVisibilityAndOpacity(t_ilm_surface targetSurfaceId, t_scene_data& sc
     else
     {
         flag = "OK";
-        sprintf(description, "");
+        sprintf(description, "%s", "");
     }
 
     analyzePrintHelper(tag, flag, description);
@@ -129,7 +129,7 @@ void analyzeVisibilityAndOpacity(t_ilm_surface targetSurfaceId, t_scene_data& sc
     else
     {
         flag = "OK";
-        sprintf(description, "");
+        sprintf(description, "%s", "");
     }
 
     analyzePrintHelper(tag, flag, description);
@@ -152,7 +152,7 @@ void analyzeSurfaceDimensions(t_ilm_surface targetSurfaceId, t_scene_data& scene
     else
     {
         flag = "OK";
-        sprintf(description, "");
+        sprintf(description, "%s", "");
     }
 
     analyzePrintHelper(tag, flag, description);
@@ -166,7 +166,7 @@ void analyzeSurfaceDimensions(t_ilm_surface targetSurfaceId, t_scene_data& scene
     else
     {
         flag = "OK";
-        sprintf(description, "");
+        sprintf(description, "%s", "");
     }
 
     analyzePrintHelper(tag, flag, description);
@@ -180,7 +180,7 @@ void analyzeSurfaceDimensions(t_ilm_surface targetSurfaceId, t_scene_data& scene
     else
     {
         flag = "OK";
-        sprintf(description, "");
+        sprintf(description, "%s", "");
     }
 
     analyzePrintHelper(tag, flag, description);
@@ -194,7 +194,7 @@ void analyzeSurfaceDimensions(t_ilm_surface targetSurfaceId, t_scene_data& scene
     else
     {
         flag = "OK";
-        sprintf(description, "");
+        sprintf(description, "%s", "");
     }
 
     analyzePrintHelper(tag, flag, description);
@@ -208,7 +208,7 @@ void analyzeSurfaceDimensions(t_ilm_surface targetSurfaceId, t_scene_data& scene
     else
     {
         flag = "OK";
-        sprintf(description, "");
+        sprintf(description, "%s", "");
     }
 
     analyzePrintHelper(tag, flag, description);
@@ -222,7 +222,7 @@ void analyzeSurfaceDimensions(t_ilm_surface targetSurfaceId, t_scene_data& scene
     else
     {
         flag = "OK";
-        sprintf(description, "");
+        sprintf(description, "%s", "");
     }
 
     analyzePrintHelper(tag, flag, description);
@@ -245,7 +245,7 @@ void analyzeLayerDimensions(t_ilm_surface targetSurfaceId, t_scene_data& scene)
     else
     {
         flag = "OK";
-        sprintf(description, "");
+        sprintf(description, "%s", "");
     }
 
     analyzePrintHelper(tag, flag, description);
@@ -259,7 +259,7 @@ void analyzeLayerDimensions(t_ilm_surface targetSurfaceId, t_scene_data& scene)
     else
     {
         flag = "OK";
-        sprintf(description, "");
+        sprintf(description, "%s", "");
     }
 
     analyzePrintHelper(tag, flag, description);
@@ -273,7 +273,7 @@ void analyzeLayerDimensions(t_ilm_surface targetSurfaceId, t_scene_data& scene)
     else
     {
         flag = "OK";
-        sprintf(description, "");
+        sprintf(description, "%s", "");
     }
 
     analyzePrintHelper(tag, flag, description);
@@ -287,7 +287,7 @@ void analyzeLayerDimensions(t_ilm_surface targetSurfaceId, t_scene_data& scene)
     else
     {
         flag = "OK";
-        sprintf(description, "");
+        sprintf(description, "%s", "");
     }
 
     analyzePrintHelper(tag, flag, description);
@@ -301,7 +301,7 @@ void analyzeLayerDimensions(t_ilm_surface targetSurfaceId, t_scene_data& scene)
     else
     {
         flag = "OK";
-        sprintf(description, "");
+        sprintf(description, "%s", "");
     }
 
     analyzePrintHelper(tag, flag, description);
@@ -315,7 +315,7 @@ void analyzeLayerDimensions(t_ilm_surface targetSurfaceId, t_scene_data& scene)
     else
     {
         flag = "OK";
-        sprintf(description, "");
+        sprintf(description, "%s", "");
     }
 
     analyzePrintHelper(tag, flag, description);
@@ -351,7 +351,7 @@ void analyzeSurfaceCheckInsideLayer(t_ilm_surface targetSurfaceId, t_scene_data&
     else
     {
         flag = "OK";
-        sprintf(description, "");
+        sprintf(description, "%s", "");
     }
 
     analyzePrintHelper(tag, flag, description);
@@ -422,7 +422,7 @@ void analyzeOcclusion(t_ilm_surface targetSurfaceId,
     if (!occluded)
     {
         flag = "OK";
-        sprintf(description, "");
+        sprintf(description, "%s", "");
         analyzePrintHelper(tag, flag, description);
     }
 }
@@ -480,7 +480,7 @@ void analyzeOcclusion(t_ilm_surface targetSurfaceId, t_scene_data& scene)
     if (!occluded)
     {
         flag = "OK";
-        sprintf(description, "");
+        sprintf(description, "%s", "");
         analyzePrintHelper(tag, flag, description);
     }
 }
@@ -504,7 +504,7 @@ t_ilm_bool analyzeCheckSurfaceExists(t_ilm_surface targetSurfaceId, t_scene_data
     {
         exists = ILM_TRUE;
         flag = "OK";
-        sprintf(description, "");
+        sprintf(description, "%s", "");
     }
 
     analyzePrintHelper(tag, flag, description);
@@ -541,7 +541,7 @@ t_ilm_bool analyzeCheckRendered(t_ilm_surface targetSurfaceId, t_scene_data& sce
     else
     {
         flag = "OK";
-        sprintf(description, "");
+        sprintf(description, "%s", "");
     }
 
     analyzePrintHelper(tag, flag, description);
@@ -557,7 +557,7 @@ t_ilm_bool analyzeCheckRendered(t_ilm_surface targetSurfaceId, t_scene_data& sce
         else
         {
             flag = "OK";
-            sprintf(description, "");
+            sprintf(description, "%s", "");
         }
 
         analyzePrintHelper(tag, flag, description);
@@ -599,7 +599,7 @@ t_ilm_bool analyzeSharedNative(t_ilm_surface targetSurfaceId, t_scene_data& scen
     if (!shared)
     {
         flag = "OK";
-        sprintf(description, "");
+        sprintf(description, "%s", "");
         analyzePrintHelper(tag, flag, description);
     }
 
@@ -625,7 +625,7 @@ t_ilm_bool analyzeUpdateCounter(t_ilm_surface targetSurfaceId, t_scene_data& sce
     else
     {
         flag = "OK";
-        sprintf(description, "");
+        sprintf(description, "%s", "");
     }
 
     analyzePrintHelper(tag, flag, description);
