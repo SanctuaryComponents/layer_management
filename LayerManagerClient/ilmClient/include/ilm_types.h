@@ -237,6 +237,19 @@ struct ilmLayerProperties
 };
 
 /**
+ * \brief Typedef for representing a the screen properties structure
+ * \ingroup ilmControl
+ **/
+struct ilmScreenProperties
+{
+    t_ilm_uint layerCount;          /*!< number of layers displayed on the screen */
+    t_ilm_layer* layerIds;          /*!< array of layer ids */
+    t_ilm_uint harwareLayerCount;   /*!< number of hardware layers */
+    t_ilm_uint screenWidth;         /*!< width value of screen in pixels */
+    t_ilm_uint screenHeight;        /*!< height value of screen in pixels */
+};
+
+/**
  * enum representing all possible incoming events for ilmClient and
  * Communicator Plugin
  */

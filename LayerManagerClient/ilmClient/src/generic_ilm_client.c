@@ -1916,3 +1916,25 @@ ilmErrorTypes ilm_surfaceRemoveNotification(t_ilm_surface surface)
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
+
+ilmErrorTypes ilm_getPropertiesOfScreen(t_ilm_display screenID, struct ilmScreenProperties* pScreenProperties)
+{
+    ilmErrorTypes returnValue = ILM_FAILED;
+
+    t_ilm_message response = 0;
+    t_ilm_message command = gIpcModule.createMessage("GetPropertiesOfScreen");
+    if (pScreenProperties
+        && command
+        && gIpcModule.appendUint(command, screenID)
+        && sendAndWaitForResponse(command, &response, gResponseTimeout)
+        && gIpcModule.getUintArray(response, &pScreenProperties->layerIds, &pScreenProperties->layerCount)
+        && gIpcModule.getUint(response, &pScreenProperties->harwareLayerCount)
+        && gIpcModule.getUint(response, &pScreenProperties->screenWidth)
+        && gIpcModule.getUint(response, &pScreenProperties->screenHeight))
+    {
+        returnValue = ILM_SUCCESS;
+    }
+    gIpcModule.destroyMessage(response);
+    gIpcModule.destroyMessage(command);
+    return returnValue;
+}

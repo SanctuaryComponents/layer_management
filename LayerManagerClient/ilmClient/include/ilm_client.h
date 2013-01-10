@@ -770,6 +770,16 @@ ilmErrorTypes ilm_layerAddNotification(t_ilm_layer layer, layerNotificationFunc 
  */
 ilmErrorTypes ilm_layerRemoveNotification(t_ilm_layer layer);
 
+/**
+ * \brief Get the screen properties from the Layermanagement
+ * \ingroup ilmClient
+ * \param[in] screenID screen Indentifier
+ * \param[out] pScreenProperties pointer where the screen properties should be stored
+ * \return ILM_SUCCESS if the method call was successful
+ * \return ILM_FAILED if the client can not get the resolution.
+ */
+ilmErrorTypes ilm_getPropertiesOfScreen(t_ilm_display screenID, struct ilmScreenProperties* pScreenProperties);
+
 #ifdef __cplusplus
 } //
 #endif // __cplusplus

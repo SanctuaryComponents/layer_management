@@ -724,3 +724,38 @@ TEST_F(IlmCommandTest, SetGetOptimizationMode) {
     ilm_GetOptimizationMode(id, &retmode);
     ASSERT_EQ(mode, retmode);
 }
+
+TEST_F(IlmCommandTest, ilm_getPropertiesOfScreen) {
+    t_ilm_uint numberOfScreens = 0;
+    t_ilm_uint* screenIDs = NULL;
+    ilm_getScreenIDs(&numberOfScreens,&screenIDs);
+    ASSERT_TRUE(numberOfScreens>0);
+
+    t_ilm_display screen = screenIDs[0];
+    ilmScreenProperties screenProperties;
+
+    t_ilm_layer layerIds[3] = {100, 200, 300};//t_ilm_layer layerIds[3] = {0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF};
+    ilm_layerCreate(layerIds);
+    ilm_layerCreate(layerIds + 1);
+    ilm_layerCreate(layerIds + 2);
+
+    ilm_commitChanges();
+    
+    ilm_displaySetRenderOrder(screen, layerIds, 3);
+    
+    ilm_commitChanges();
+
+
+    ilm_getPropertiesOfScreen(screen, &screenProperties);
+    ASSERT_EQ(3, screenProperties.layerCount);
+    ASSERT_EQ(layerIds[0], screenProperties.layerIds[0]);
+    ASSERT_EQ(layerIds[1], screenProperties.layerIds[1]);
+    ASSERT_EQ(layerIds[2], screenProperties.layerIds[2]);
+
+    ASSERT_GT(screenProperties.screenWidth, 0u);
+    ASSERT_GT(screenProperties.screenHeight, 0u);
+
+    t_ilm_uint numberOfHardwareLayers;
+    ilm_getNumberOfHardwareLayers(screen, &numberOfHardwareLayers);
+    ASSERT_EQ(numberOfHardwareLayers, screenProperties.harwareLayerCount);
+}
