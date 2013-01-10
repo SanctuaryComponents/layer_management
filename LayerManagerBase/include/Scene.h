@@ -24,10 +24,6 @@
 #include "Layermanager.h"
 #include "CommandList.h"
 #include "ShaderMap.h"
-#include "LayerGroup.h"
-#include "LayerGroupMap.h"
-#include "SurfaceGroup.h"
-#include "SurfaceGroupMap.h"
 #include "SurfaceMap.h"
 #include "LayerMap.h"
 #include "ShaderMap.h"
@@ -57,8 +53,6 @@ public:
 
     virtual Layer* createLayer(const uint id, int creatorPid);
     virtual Surface *createSurface(const uint id, int creatorPid);
-    virtual LayerGroup *createLayerGroup(const uint id, int creatorPid);
-    virtual SurfaceGroup *createSurfaceGroup(const uint id, int creatorPid);
 
     virtual bool removeLayer(Layer* layer);
     virtual bool removeSurface(Surface* surface);
@@ -67,35 +61,23 @@ public:
     virtual LmScreen* getScreen(const uint id) const;
     virtual Layer* getLayer(const uint id);
     virtual Surface* getSurface(const uint id);
-    virtual SurfaceGroup* getSurfaceGroup(const uint id);
-    virtual LayerGroup* getLayerGroup(const uint id);
 
     virtual void getLayerIDs(uint* length, uint** array) const;
     virtual bool getLayerIDsOfScreen(const uint screenID, uint* length, uint** array) const;
-    virtual void getSurfaceGroupIDs(uint* length, uint** array) const;
-    virtual void getLayerGroupIDs(uint* length, uint** array) const;
     virtual void getSurfaceIDs(uint* length, uint** array) const;
 
     virtual void lockScene();
     virtual void unlockScene();
 
     virtual LayerList& getCurrentRenderOrder(const uint id);
-    virtual void removeSurfaceGroup(SurfaceGroup *surface);
-    virtual void removeLayerGroup(LayerGroup *layer);
     virtual const SurfaceMap getAllSurfaces() const;
     virtual bool isLayerInCurrentRenderOrder(const uint id);
 
     const LayerMap getAllLayers() const;
 
 private:
-    void removeLayerFromAllLayerGroups(Layer* layer);
-    void removeSurfaceFromAllSurfaceGroups(Surface* surface);
-
-private:
     ShaderMap m_shaderMap;
     pthread_mutex_t m_layerListMutex;
-    LayerGroupMap m_layerGroupMap;
-    SurfaceGroupMap m_surfaceGroupMap;
     SurfaceMap m_surfaceMap;
     LayerMap m_layerMap;
     LayerList m_nullRenderOrder;

@@ -1,3 +1,9 @@
+next
+------------------
+Improvements:
+- removed LayerGroups, SurfaceGroups
+
+
 Version 0.9.9
 ------------------
 This version includes the following enhancements.
@@ -382,7 +388,7 @@ and the service D-BUS is used.
 To support hardware layers and to get a better interoperability with other applications
 and platforms the API was extended by the following features :
 
-* Layer, Surface and Group Ids can be applied by from the client side too.
+* Layer and Surface and Group Ids can be applied by from the client side too.
 * IlmMatrix class is now available in the LayerManagerUtils library, to support
   simple 3D / 2D transformations
 

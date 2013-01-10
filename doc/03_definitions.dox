@@ -34,14 +34,6 @@
         <td>Logical container for multiple surfaces.</td>
     </tr>
     <tr>
-        <td>LayerGroup</td>
-        <td>Groups multiple layers to a logical group, so commands can target multiple layers at once.</td>
-    </tr>
-    <tr>
-        <td>SurfaceGroup</td>
-        <td>Groups multiple surfaces to a logical group, so commands can target multiple surfaces at once.</td>
-    </tr>
-    <tr>
         <td>IPC</td>
         <td>Inter Process Communication.</td>
     </tr>

@@ -69,19 +69,6 @@ public:
             ilm_surfaceRemove(surfaces[i]);
         };
 
-        t_ilm_layergroup* layergroups = NULL;
-        t_ilm_int numLayergroup=0;
-        ilm_getLayerGroupIDs(&numLayergroup, &layergroups);
-        for (t_ilm_int i=0; i<numLayergroup; i++ ){
-            ilm_layergroupRemove(layergroups[i]);
-        };
-
-        t_ilm_surfacegroup* surfacegroups = NULL;
-        t_ilm_int numSurfacegroup=0;
-        ilm_getSurfaceGroupIDs(&numSurfacegroup, &surfacegroups);
-        for (t_ilm_int i=0; i<numSurfacegroup; i++ ){
-            ilm_surfacegroupRemove(surfacegroups[i]);
-        };
         ilm_commitChanges();
       }
 
@@ -238,62 +225,6 @@ TEST_F(IlmCommandTest, SetGetLayerOpacity) {
     ASSERT_DOUBLE_EQ(0.001, opacity);
 }
 
-TEST_F(IlmCommandTest, SetGetLayerGroupOpacity) {
-    uint layer1 = 36;
-    uint layer2 = 44;
-    uint group = 99;
-    t_ilm_float opacity;
-
-    ilm_layerCreate(&layer1);
-    ilm_layerCreate(&layer2);
-    ilm_layergroupCreate(&group);
-    ilm_layergroupAddLayer(group, layer1);
-    ilm_layergroupAddLayer(group, layer2);
-    ilm_commitChanges();
-
-    ilm_layergroupSetOpacity(group,0.88);
-    ilm_commitChanges();
-    ilm_layerGetOpacity(layer1,&opacity);
-    ASSERT_DOUBLE_EQ(0.88, opacity);
-    ilm_layerGetOpacity(layer2,&opacity);
-    ASSERT_DOUBLE_EQ(0.88, opacity);
-
-    ilm_layergroupSetOpacity(group,0.001);
-    ilm_commitChanges();
-    ilm_layerGetOpacity(layer1,&opacity);
-    ASSERT_DOUBLE_EQ(0.001, opacity);
-    ilm_layerGetOpacity(layer2,&opacity);
-    ASSERT_DOUBLE_EQ(0.001, opacity);
-}
-
-TEST_F(IlmCommandTest, SetGetSurfaceGroupOpacity) {
-    uint surface1 = 36;
-    uint surface2 = 44;
-    uint group = 99;
-    t_ilm_float opacity;
-
-    ilm_surfaceCreate(0,0,0,ILM_PIXELFORMAT_RGBA_8888,&surface1);
-    ilm_surfaceCreate(0,0,0,ILM_PIXELFORMAT_RGBA_8888,&surface2);
-    ilm_surfacegroupCreate(&group);
-
-    ilm_surfacegroupAddSurface(group,surface1);
-    ilm_surfacegroupAddSurface(group,surface2);
-
-    ilm_surfacegroupSetOpacity(group,0.88);
-    ilm_commitChanges();
-    ilm_surfaceGetOpacity(surface1,&opacity);
-    ASSERT_DOUBLE_EQ(0.88, opacity);
-    ilm_surfaceGetOpacity(surface2,&opacity);
-    ASSERT_DOUBLE_EQ(0.88, opacity);
-
-    ilm_surfacegroupSetOpacity(group,0.001);
-    ilm_commitChanges();
-    ilm_surfaceGetOpacity(surface1,&opacity);
-    ASSERT_DOUBLE_EQ(0.001, opacity);
-    ilm_surfaceGetOpacity(surface2,&opacity);
-    ASSERT_DOUBLE_EQ(0.001, opacity);
-}
-
 TEST_F(IlmCommandTest, SetGetSurfaceVisibility) {
     uint surface1 = 36;
     t_ilm_bool visibility;
@@ -338,76 +269,6 @@ TEST_F(IlmCommandTest, SetGetLayerVisibility) {
     ASSERT_EQ(ILM_TRUE, visibility);
 }
 
-TEST_F(IlmCommandTest, SetGetLayerGroupVisibility) {
-    uint layer1 = 36;
-    uint layer2 = 44;
-    uint group = 99;
-    t_ilm_bool visibility;
-
-    ilm_layerCreate(&layer1);
-    ilm_layerCreate(&layer2);
-    printf("layers: %i %i", layer1, layer2);
-    ilm_layergroupCreate(&group);
-    ilm_layergroupAddLayer(group,layer1);
-    ilm_layergroupAddLayer(group,layer2);
-    ilm_commitChanges();
-
-    ilm_layergroupSetVisibility(group,ILM_TRUE);
-    ilm_commitChanges();
-    ilm_layerGetVisibility(layer1,&visibility);
-    ASSERT_EQ(ILM_TRUE, visibility);
-    ilm_layerGetVisibility(layer2,&visibility);
-    ASSERT_EQ(ILM_TRUE, visibility);
-
-    ilm_layergroupSetVisibility(group,ILM_FALSE);
-    ilm_commitChanges();
-    ilm_layerGetVisibility(layer1,&visibility);
-    ASSERT_EQ(ILM_FALSE, visibility);
-    ilm_layerGetVisibility(layer2,&visibility);
-    ASSERT_EQ(ILM_FALSE, visibility);
-
-    ilm_layergroupSetVisibility(group,ILM_TRUE);
-    ilm_commitChanges();
-    ilm_layerGetVisibility(layer1,&visibility);
-    ASSERT_EQ(ILM_TRUE, visibility);
-    ilm_layerGetVisibility(layer2,&visibility);
-    ASSERT_EQ(ILM_TRUE, visibility);
-}
-
-TEST_F(IlmCommandTest, SetGetSurfaceGroupVisibility) {
-    uint surface1 = 36;
-    uint surface2 = 44;
-    uint group = 99;
-    t_ilm_bool visibility;
-
-    ilm_surfaceCreate(0,0,0,ILM_PIXELFORMAT_RGBA_8888,&surface1);
-    ilm_surfaceCreate(0,0,0,ILM_PIXELFORMAT_RGBA_8888,&surface2);
-    ilm_surfacegroupCreate(&group);
-    ilm_surfacegroupAddSurface(group,surface1);
-    ilm_surfacegroupAddSurface(group,surface2);
-
-    ilm_surfacegroupSetVisibility(group,ILM_TRUE);
-    ilm_commitChanges();
-    ilm_surfaceGetVisibility(surface1,&visibility);
-    ASSERT_EQ(ILM_TRUE, visibility);
-    ilm_surfaceGetVisibility(surface1,&visibility);
-    ASSERT_EQ(ILM_TRUE, visibility);
-
-    ilm_surfacegroupSetVisibility(group,ILM_FALSE);
-    ilm_commitChanges();
-    ilm_surfaceGetVisibility(surface1,&visibility);
-    ASSERT_EQ(ILM_FALSE, visibility);
-    ilm_surfaceGetVisibility(surface1,&visibility);
-    ASSERT_EQ(ILM_FALSE, visibility);
-
-    ilm_surfacegroupSetVisibility(group,ILM_TRUE);
-    ilm_commitChanges();
-    ilm_surfaceGetVisibility(surface1,&visibility);
-    ASSERT_EQ(ILM_TRUE, visibility);
-    ilm_surfaceGetVisibility(surface1,&visibility);
-    ASSERT_EQ(ILM_TRUE, visibility);
-
-}
 TEST_F(IlmCommandTest, ilm_getScreenIDs) {
     t_ilm_uint numberOfScreens = 0;
     t_ilm_uint* screenIDs = NULL;
@@ -477,38 +338,6 @@ TEST_F(IlmCommandTest, ilm_getSurfaceIDs) {
 
     ASSERT_EQ(surface1,IDs[0]);
     ASSERT_EQ(surface2,IDs[1]);
-}
-
-TEST_F(IlmCommandTest, ilm_getSurfaceGroupIDs) {
-    uint surfacegroup1 = 3246;
-    uint surfacegroup2 = 46586;
-
-    ilm_surfacegroupCreate(&surfacegroup1);
-    ilm_surfacegroupCreate(&surfacegroup2);
-    ilm_commitChanges();
-
-    t_ilm_int length;
-    t_ilm_uint* IDs;
-    ilm_getSurfaceGroupIDs(&length,&IDs);
-
-    ASSERT_EQ(surfacegroup1,IDs[0]);
-    ASSERT_EQ(surfacegroup2,IDs[1]);
-}
-
-TEST_F(IlmCommandTest, ilm_getLayerGroupIDs) {
-    uint layergroup1 = 3246;
-    uint layergroup2 = 46586;
-
-    ilm_layergroupCreate(&layergroup1);
-    ilm_layergroupCreate(&layergroup2);
-    ilm_commitChanges();
-
-    t_ilm_int length;
-    t_ilm_uint* IDs;
-    ilm_getLayerGroupIDs(&length,&IDs);
-
-    ASSERT_EQ(layergroup1,IDs[0]);
-    ASSERT_EQ(layergroup2,IDs[1]);
 }
 
 TEST_F(IlmCommandTest, ilm_surfaceCreate_Remove) {
@@ -784,130 +613,6 @@ TEST_F(IlmCommandTest, ilm_surfaceGetPixelformat) {
     ASSERT_EQ(ILM_PIXELFORMAT_RGB_565,p5);
     ASSERT_EQ(ILM_PIXELFORMAT_RGB_888,p6);
     ASSERT_EQ(ILM_PIXELFORMAT_R_8,p7);
-}
-
-TEST_F(IlmCommandTest, ilm_surfacegroupCreate_ilm_surfacegroupRemove_ilm_surfacegroupAddSurface_ilm_surfacegroupRemoveSurface) {
-    uint surface1 = 36;
-    uint surface2 = 44;
-    uint group = 99;
-    t_ilm_bool visibility;
-
-    ilm_surfaceCreate(0,0,0,ILM_PIXELFORMAT_RGBA_8888,&surface1);
-    ilm_surfaceCreate(0,0,0,ILM_PIXELFORMAT_RGBA_8888,&surface2);
-    ilm_surfacegroupCreate(&group);
-    ilm_surfaceSetVisibility(surface1,true);
-    ilm_surfaceSetVisibility(surface2,true);
-    ilm_commitChanges();
-
-    ilm_surfaceGetVisibility(surface1,&visibility);
-    ASSERT_TRUE(visibility);
-    ilm_surfaceGetVisibility(surface2,&visibility);
-    ASSERT_TRUE(visibility);
-
-    ilm_surfacegroupSetVisibility(group,false);
-    ilm_commitChanges();
-    ilm_surfaceGetVisibility(surface1,&visibility);
-    ASSERT_TRUE(visibility);
-    ilm_surfaceGetVisibility(surface2,&visibility);
-    ASSERT_TRUE(visibility);
-
-    ilm_surfacegroupAddSurface(group,surface1);
-    ilm_surfacegroupSetVisibility(group,false);
-    ilm_commitChanges();
-    ilm_surfaceGetVisibility(surface1,&visibility);
-    ASSERT_FALSE(visibility);
-    ilm_surfaceGetVisibility(surface2,&visibility);
-    ASSERT_TRUE(visibility);
-
-    ilm_surfacegroupAddSurface(group,surface2);
-    ilm_surfacegroupSetVisibility(group,false);
-    ilm_commitChanges();
-    ilm_surfaceGetVisibility(surface1,&visibility);
-    ASSERT_FALSE(visibility);
-    ilm_surfaceGetVisibility(surface2,&visibility);
-    ASSERT_FALSE(visibility);
-
-    ilm_surfacegroupRemoveSurface(group,surface2);
-    ilm_surfacegroupSetVisibility(group,true);
-    ilm_commitChanges();
-    ilm_surfaceGetVisibility(surface1,&visibility);
-    ASSERT_TRUE(visibility);
-    ilm_surfaceGetVisibility(surface2,&visibility);
-    ASSERT_FALSE(visibility);
-
-    t_ilm_int length;
-    t_ilm_uint* IDs;
-    ilm_getSurfaceGroupIDs(&length,&IDs);
-    ASSERT_EQ(length,1);
-    ASSERT_EQ(group,IDs[0]);
-
-    ilm_surfacegroupRemove(group);
-    ilm_commitChanges();
-    ilm_getSurfaceGroupIDs(&length,&IDs);
-    ASSERT_EQ(length,0);
-
-}
-
-TEST_F(IlmCommandTest, ilm_layergroupCreate_ilm_layergroupRemove_ilm_layergroupAddlayer_ilm_layergroupRemovelayer) {
-    uint layer1 = 36;
-    uint layer2 = 44;
-    uint group = 99;
-    t_ilm_bool visibility;
-
-    ilm_layerCreate(&layer1);
-    ilm_layerCreate(&layer2);
-    ilm_layergroupCreate(&group);
-    ilm_layerSetVisibility(layer1,true);
-    ilm_layerSetVisibility(layer2,true);
-    ilm_commitChanges();
-
-    ilm_layerGetVisibility(layer1,&visibility);
-    ASSERT_TRUE(visibility);
-    ilm_layerGetVisibility(layer2,&visibility);
-    ASSERT_TRUE(visibility);
-
-    ilm_layergroupSetVisibility(group,false);
-    ilm_commitChanges();
-    ilm_layerGetVisibility(layer1,&visibility);
-    ASSERT_TRUE(visibility);
-    ilm_layerGetVisibility(layer2,&visibility);
-    ASSERT_TRUE(visibility);
-
-    ilm_layergroupAddLayer(group,layer1);
-    ilm_layergroupSetVisibility(group,false);
-    ilm_commitChanges();
-    ilm_layerGetVisibility(layer1,&visibility);
-    ASSERT_FALSE(visibility);
-    ilm_layerGetVisibility(layer2,&visibility);
-    ASSERT_TRUE(visibility);
-
-    ilm_layergroupAddLayer(group,layer2);
-    ilm_layergroupSetVisibility(group,false);
-    ilm_commitChanges();
-    ilm_layerGetVisibility(layer1,&visibility);
-    ASSERT_FALSE(visibility);
-    ilm_layerGetVisibility(layer2,&visibility);
-    ASSERT_FALSE(visibility);
-
-    ilm_layergroupRemoveLayer(group,layer2);
-    ilm_layergroupSetVisibility(group,true);
-    ilm_commitChanges();
-    ilm_layerGetVisibility(layer1,&visibility);
-    ASSERT_TRUE(visibility);
-    ilm_layerGetVisibility(layer2,&visibility);
-    ASSERT_FALSE(visibility);
-
-    t_ilm_int length;
-    t_ilm_uint* IDs;
-    ilm_getLayerGroupIDs(&length,&IDs);
-    ASSERT_EQ(length,1);
-    ASSERT_EQ(group,IDs[0]);
-
-    ilm_layergroupRemove(group);
-    ilm_commitChanges();
-    ilm_getLayerGroupIDs(&length,&IDs);
-    ASSERT_EQ(length,0);
-
 }
 
 TEST_F(IlmCommandTest, ilm_keyboard_focus)

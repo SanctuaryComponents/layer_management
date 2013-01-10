@@ -230,112 +230,6 @@ TEST_F(SceneTest, createSurface_twice)
     EXPECT_DOUBLE_EQ(expectedOpacity, pSurface2->getOpacity());
 }
 
-TEST_F(SceneTest, createLayerGroup)
-{
-    uint expectedId = 167;
-    LayerGroup* pLayerGroup;
-
-    /// make sure, expected layer group does not exist
-    pLayerGroup = m_pScene->getLayerGroup(expectedId);
-    ASSERT_FALSE(pLayerGroup);
-
-    /// create expected layer group
-    m_pScene->createLayerGroup(expectedId, 0);
-
-    /// make sure, expected layer group does exist
-    pLayerGroup = m_pScene->getLayerGroup(expectedId);
-    EXPECT_TRUE(pLayerGroup);
-}
-
-TEST_F(SceneTest, createLayerGroup_twice)
-{
-    uint expectedLayerGroupId = 169;
-    uint expectedLayerId = 170;
-    LayerGroup* pLayerGroup1;
-    LayerGroup* pLayerGroup2;
-    Layer layer(expectedLayerId);
-
-    /// make sure, expected layer group does not exist
-    pLayerGroup1 = m_pScene->getLayerGroup(expectedLayerGroupId);
-    ASSERT_FALSE(pLayerGroup1);
-
-    /// create expected layer group, get 1st handle to group
-    pLayerGroup1 = m_pScene->createLayerGroup(expectedLayerGroupId, 0);
-    ASSERT_TRUE(pLayerGroup1);
-
-    /// make sure, expected layer group does exist
-    EXPECT_TRUE(pLayerGroup1);
-
-    /// create expected layer group again, get 2nd handle to group
-    pLayerGroup2 = m_pScene->createLayerGroup(expectedLayerGroupId, 0);
-
-    /// make sure, expected layer group does exist
-    ASSERT_TRUE(pLayerGroup2);
-
-    /// add layer to layer group using 1st handle
-    pLayerGroup1->addElement(&layer);
-
-    /// make sure, layer can be accessed in layer group using 2nd handle
-    const LayerList& llist = pLayerGroup2->getList();
-    EXPECT_EQ((uint)1, llist.size());
-    LayerListConstIterator iter = llist.begin();
-    EXPECT_EQ(expectedLayerId, (*iter)->getID());
-    EXPECT_EQ(llist.end(), ++iter);
-}
-
-TEST_F(SceneTest, createSurfaceGroup)
-{
-    uint expectedSurfaceGroupId = 172;
-    SurfaceGroup* pSurfaceGroup;
-
-    /// make sure, expected Surface group does not exist
-    pSurfaceGroup = m_pScene->getSurfaceGroup(expectedSurfaceGroupId);
-    ASSERT_FALSE(pSurfaceGroup);
-
-    /// create expected Surface group, get 1st handle to group
-    pSurfaceGroup = m_pScene->createSurfaceGroup(expectedSurfaceGroupId, 0);
-    ASSERT_TRUE(pSurfaceGroup);
-
-    /// make sure, expected Surface group does exist
-    EXPECT_TRUE(pSurfaceGroup);
-
-}
-TEST_F(SceneTest, createSurfaceGroup_twice)
-{
-    uint expectedSurfaceGroupId = 172;
-    uint expectedSurfaceId = 173;
-    SurfaceGroup* pSurfaceGroup1;
-    SurfaceGroup* pSurfaceGroup2;
-    Surface Surface(expectedSurfaceId);
-
-    /// make sure, expected Surface group does not exist
-    pSurfaceGroup1 = m_pScene->getSurfaceGroup(expectedSurfaceGroupId);
-    ASSERT_FALSE(pSurfaceGroup1);
-
-    /// create expected Surface group, get 1st handle to group
-    pSurfaceGroup1 = m_pScene->createSurfaceGroup(expectedSurfaceGroupId, 0);
-    ASSERT_TRUE(pSurfaceGroup1);
-
-    /// make sure, expected Surface group does exist
-    EXPECT_TRUE(pSurfaceGroup1);
-
-    /// create expected Surface group again, get 2nd handle to group
-    pSurfaceGroup2 = m_pScene->createSurfaceGroup(expectedSurfaceGroupId, 0);
-
-    /// make sure, expected Surface group does exist
-    ASSERT_TRUE(pSurfaceGroup2);
-
-    /// add Surface to Surface group using 1st handle
-    pSurfaceGroup1->addElement(&Surface);
-
-    /// make sure, Surface can be accessed in Surface group using 2nd handle
-    const SurfaceList& llist = pSurfaceGroup2->getList();
-    EXPECT_EQ((uint)1, llist.size());
-    SurfaceListConstIterator iter = llist.begin();
-    EXPECT_EQ(expectedSurfaceId, (*iter)->getID());
-    EXPECT_EQ(llist.end(), ++iter);
-}
-
 TEST_F(SceneTest, removeLayer)
 {
     uint expectedLayerId = 188;
@@ -416,50 +310,6 @@ TEST_F(SceneTest, getSurface)
 
     /// try to get removed Surface
     ASSERT_FALSE(m_pScene->getSurface(expectedSurfaceId));
-}
-
-TEST_F(SceneTest, getSurfaceGroup)
-{
-    uint expectedSurfaceGroupId = 198;
-    SurfaceGroup* pSurfaceGroup;
-
-    /// try to get non existing SurfaceGroup
-    EXPECT_FALSE(m_pScene->getSurfaceGroup(expectedSurfaceGroupId));
-
-    /// create SurfaceGroup
-    pSurfaceGroup = m_pScene->createSurfaceGroup(expectedSurfaceGroupId, 0);
-    ASSERT_TRUE(pSurfaceGroup);
-
-    /// get SurfaceGroup
-    ASSERT_EQ(pSurfaceGroup, m_pScene->getSurfaceGroup(expectedSurfaceGroupId));
-
-    /// remove SurfaceGroup
-    m_pScene->removeSurfaceGroup(pSurfaceGroup);
-
-    /// try to get removed SurfaceGroup
-    ASSERT_FALSE(m_pScene->getSurfaceGroup(expectedSurfaceGroupId));
-}
-
-TEST_F(SceneTest, getLayerGroup)
-{
-    uint expectedLayerGroupId = 203;
-    LayerGroup* pLayerGroup;
-
-    /// try to get non existing LayerGroup
-    EXPECT_FALSE(m_pScene->getLayerGroup(expectedLayerGroupId));
-
-    /// create LayerGroup
-    pLayerGroup = m_pScene->createLayerGroup(expectedLayerGroupId, 0);
-    ASSERT_TRUE(pLayerGroup);
-
-    /// get LayerGroup
-    ASSERT_EQ(pLayerGroup, m_pScene->getLayerGroup(expectedLayerGroupId));
-
-    /// remove LayerGroup
-    m_pScene->removeLayerGroup(pLayerGroup);
-
-    /// try to get removed LayerGroup
-    ASSERT_FALSE(m_pScene->getLayerGroup(expectedLayerGroupId));
 }
 
 TEST_F(SceneTest, getLayerIDs)
@@ -579,62 +429,6 @@ TEST_F(SceneTest, getSurfaceIDs)
     EXPECT_EQ(surfaceId4, array[3]);
 }
 
-TEST_F(SceneTest, getLayerGroupIDs)
-{
-    unsigned int layergroupId1 = 201;
-    unsigned int layergroupId2 = 202;
-    unsigned int layergroupId3 = 203;
-    unsigned int layergroupId4 = 204;
-    unsigned int size;
-    unsigned int* array;
-
-    /// make sure, scene contains no layergroups
-    m_pScene->getLayerGroupIDs(&size, &array);
-    ASSERT_EQ((uint)0, size);
-
-    /// create 4 layergroups in scene
-    m_pScene->createLayerGroup(layergroupId1, 0);
-    m_pScene->createLayerGroup(layergroupId2, 0);
-    m_pScene->createLayerGroup(layergroupId3, 0);
-    m_pScene->createLayerGroup(layergroupId4, 0);
-
-    /// make sure, scene contains these 4 layergroups
-    m_pScene->getLayerGroupIDs(&size, &array);
-    ASSERT_EQ((uint)4, size);
-    EXPECT_EQ(layergroupId1, array[0]);
-    EXPECT_EQ(layergroupId2, array[1]);
-    EXPECT_EQ(layergroupId3, array[2]);
-    EXPECT_EQ(layergroupId4, array[3]);
-}
-
-TEST_F(SceneTest, getSurfaceGroupIDs)
-{
-    unsigned int surfacegroupId1 = 201;
-    unsigned int surfacegroupId2 = 202;
-    unsigned int surfacegroupId3 = 203;
-    unsigned int surfacegroupId4 = 204;
-    unsigned int size;
-    unsigned int* array;
-
-    /// make sure, scene contains no surfacegroups
-    m_pScene->getSurfaceGroupIDs(&size, &array);
-    ASSERT_EQ((uint)0, size);
-
-    /// create 4 surfacegroups in scene
-    m_pScene->createSurfaceGroup(surfacegroupId1, 0);
-    m_pScene->createSurfaceGroup(surfacegroupId2, 0);
-    m_pScene->createSurfaceGroup(surfacegroupId3, 0);
-    m_pScene->createSurfaceGroup(surfacegroupId4, 0);
-
-    /// make sure, scene contains these 4 surfacegroups
-    m_pScene->getSurfaceGroupIDs(&size, &array);
-    ASSERT_EQ((uint)4, size);
-    EXPECT_EQ(surfacegroupId1, array[0]);
-    EXPECT_EQ(surfacegroupId2, array[1]);
-    EXPECT_EQ(surfacegroupId3, array[2]);
-    EXPECT_EQ(surfacegroupId4, array[3]);
-}
-
 TEST_F(SceneTest, DISABLED_lockScene)
 {
 }
@@ -652,48 +446,6 @@ TEST_F(SceneTest, getCurrentRenderOrder)
 
     /// make sure, list of layers is returned
     ASSERT_TRUE(&llist);
-}
-
-TEST_F(SceneTest, removeSurfaceGroup)
-{
-    uint expectedSurfaceGroupId = 172;
-    SurfaceGroup* pSurfaceGroup;
-
-    /// create expected Surface group
-    pSurfaceGroup = m_pScene->createSurfaceGroup(expectedSurfaceGroupId, 0);
-    ASSERT_TRUE(pSurfaceGroup);
-
-    /// make sure, expected Surface group does exist
-    pSurfaceGroup = m_pScene->getSurfaceGroup(expectedSurfaceGroupId);
-    EXPECT_TRUE(pSurfaceGroup);
-
-    /// remove surface group
-    m_pScene->removeSurfaceGroup(pSurfaceGroup);
-
-    /// make sure, expected Surface group does not exist
-    pSurfaceGroup = m_pScene->getSurfaceGroup(expectedSurfaceGroupId);
-    ASSERT_FALSE(pSurfaceGroup);
-}
-
-TEST_F(SceneTest, removeLayerGroup)
-{
-    uint expectedLayerGroupId = 172;
-    LayerGroup* pLayerGroup;
-
-    /// create expected Layer group
-    pLayerGroup = m_pScene->createLayerGroup(expectedLayerGroupId, 0);
-    ASSERT_TRUE(pLayerGroup);
-
-    /// make sure, expected Layer group does exist
-    pLayerGroup = m_pScene->getLayerGroup(expectedLayerGroupId);
-    EXPECT_TRUE(pLayerGroup);
-
-    /// remove layer group
-    m_pScene->removeLayerGroup(pLayerGroup);
-
-    /// make sure, expected Layer group does not exist
-    pLayerGroup = m_pScene->getLayerGroup(expectedLayerGroupId);
-    ASSERT_FALSE(pLayerGroup);
 }
 
 TEST_F(SceneTest, getAllSurfaces)

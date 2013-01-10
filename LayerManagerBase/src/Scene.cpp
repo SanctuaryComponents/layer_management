@@ -24,8 +24,6 @@
 
 #include "Layer.h"
 #include "Surface.h"
-#include "LayerGroup.h"
-#include "SurfaceGroup.h"
 #include "Shader.h"
 #include "Scene.h"
 
@@ -93,57 +91,6 @@ Surface* Scene::createSurface(const uint surfaceId, int creatorPid)
     return newSurface;
 }
 
-SurfaceGroup* Scene::createSurfaceGroup(const uint surfaceGroupId, int creatorPid)
-{
-    SurfaceGroup* newSurfaceGroup = NULL;
-    if (surfaceGroupId == GraphicalObject::INVALID_ID)
-    {
-        newSurfaceGroup = new SurfaceGroup(creatorPid);
-        uint newSurfaceGroupId = newSurfaceGroup->getID();
-        m_surfaceGroupMap[newSurfaceGroupId] = newSurfaceGroup;
-    }
-    else
-    {
-        if (0 == m_surfaceGroupMap.count(surfaceGroupId))
-        {
-            newSurfaceGroup = new SurfaceGroup(surfaceGroupId, creatorPid);
-            uint newSurfaceGroupId = newSurfaceGroup->getID();
-            m_surfaceGroupMap[newSurfaceGroupId] = newSurfaceGroup;
-        }
-        else
-        {
-            newSurfaceGroup =  m_surfaceGroupMap[surfaceGroupId];
-        }
-    }
-    return newSurfaceGroup;
-}
-
-LayerGroup* Scene::createLayerGroup(const uint layerGroupId, int creatorPid)
-{
-    LayerGroup* newLayerGroup = NULL;
-    if (layerGroupId == GraphicalObject::INVALID_ID)
-    {
-        newLayerGroup = new LayerGroup(creatorPid);
-        uint newLayerGroupId = newLayerGroup->getID();
-        m_layerGroupMap[newLayerGroupId] = newLayerGroup;
-    }
-    else
-    {
-        if (0 == m_layerGroupMap.count(layerGroupId))
-        {
-            newLayerGroup = new LayerGroup(layerGroupId, creatorPid);
-            uint newLayerGroupId = newLayerGroup->getID();
-            m_layerGroupMap[newLayerGroupId] = newLayerGroup;
-        }
-        else
-        {
-            newLayerGroup = m_layerGroupMap[layerGroupId];
-        }
-    }
-    return newLayerGroup;
-}
-
-
 LmScreen* Scene::getScreen(const uint screenId) const
 {
     LmScreenListConstIterator iter = m_screenList.begin();
@@ -188,47 +135,6 @@ Surface* Scene::getSurface(const uint surfaceId)
     return surface;
 }
 
-SurfaceGroup* Scene::getSurfaceGroup(const uint surfaceGroupId)
-{
-    SurfaceGroup* surfaceGroup = NULL;
-    if (m_surfaceGroupMap.count(surfaceGroupId) > 0)
-    {
-        surfaceGroup = m_surfaceGroupMap[surfaceGroupId];
-    }
-    else
-    {
-        LOG_WARNING("Scene","SurfaceGroup not found : id [ " << surfaceGroupId << " ]");
-    }
-    return surfaceGroup;
-}
-
-LayerGroup* Scene::getLayerGroup(const uint layerGroupId)
-{
-    LayerGroup* layerGroup = NULL;
-    if (m_layerGroupMap.count(layerGroupId) > 0)
-    {
-        layerGroup = m_layerGroupMap[layerGroupId];
-    }
-    else
-    {
-        LOG_WARNING("Scene","LayerGroup not found : id [ " << layerGroupId << " ]");
-    }
-    return layerGroup;
-}
-
-/// \brief remove layer from all layergroups it might be part of
-void Scene::removeLayerFromAllLayerGroups(Layer* layer)
-{
-    LayerGroupMapIterator iter = m_layerGroupMap.begin();
-    LayerGroupMapIterator iterEnd = m_layerGroupMap.end();
-
-    for (; iter != iterEnd; ++iter)
-    {
-        LayerGroup *lg = iter->second;
-        lg->removeElement(layer);
-    }
-}
-
 /// \brief take layer out of list of layers
 bool Scene::removeLayer(Layer* layer)
 {
@@ -250,24 +156,10 @@ bool Scene::removeLayer(Layer* layer)
             (*iter)->getCurrentRenderOrder().remove(layer);
         }
         m_layerMap.erase(layer->getID());
-        removeLayerFromAllLayerGroups(layer);
         delete layer;
     }
 
     return result;
-}
-
-/// \brief remove surface from all surfacegroups it might be part of
-void Scene::removeSurfaceFromAllSurfaceGroups(Surface* surface)
-{
-    SurfaceGroupMapIterator iter = m_surfaceGroupMap.begin();
-    SurfaceGroupMapIterator iterEnd = m_surfaceGroupMap.end();
-
-    for (; iter != iterEnd; ++iter)
-    {
-        SurfaceGroup *sg = iter->second;
-        sg->removeElement(surface);
-    }
 }
 
 /// \brief take surface out of list of surfaces
@@ -290,39 +182,18 @@ bool Scene::removeSurface(Surface* surface)
         }
 
         m_surfaceMap.erase(surfaceId);
-        removeSurfaceFromAllSurfaceGroups(surface);
-
         delete surface;
     }
 
     return result;
 }
+
 /// \brief take removing applied native content
 void Scene::removeSurfaceNativeContent(Surface* surface)
 {
     if (surface != NULL)
     {
         surface->removeNativeContent();
-    }
-}
-
-void Scene::removeLayerGroup(LayerGroup* layerGroup)
-{
-    if (layerGroup != NULL)
-    {
-        uint layerGroupId = layerGroup->getID();
-        m_layerGroupMap.erase(layerGroupId);
-        delete layerGroup;
-    }
-}
-
-void Scene::removeSurfaceGroup(SurfaceGroup* surfaceGroup)
-{
-    if (surfaceGroup != NULL)
-    {
-        uint surfaceGroupId = surfaceGroup->getID();
-        m_surfaceGroupMap.erase(surfaceGroupId);
-        delete surfaceGroup;
     }
 }
 
@@ -386,42 +257,6 @@ void Scene::getSurfaceIDs(uint* length, uint** array) const
 
     SurfaceMapConstIterator iter = m_surfaceMap.begin();
     SurfaceMapConstIterator iterEnd = m_surfaceMap.end();
-
-    for (; iter != iterEnd; ++iter)
-    {
-        (*array)[arrayPos] = (*iter).first;
-        ++arrayPos;
-    }
-}
-
-void Scene::getSurfaceGroupIDs(uint* length, uint** array) const
-{
-    uint numOfSurfaceGroups = m_surfaceGroupMap.size();
-    uint arrayPos = 0;
-
-    *length = numOfSurfaceGroups;
-    *array = new uint[numOfSurfaceGroups]; // TODO: safe, if size = 0?
-
-    SurfaceGroupMapConstIterator iter = m_surfaceGroupMap.begin();
-    SurfaceGroupMapConstIterator iterEnd = m_surfaceGroupMap.end();
-
-    for (; iter != iterEnd; ++iter)
-    {
-        (*array)[arrayPos] = (*iter).first;
-        ++arrayPos;
-    }
-}
-
-void Scene::getLayerGroupIDs(uint* length, uint** array) const
-{
-    uint numOfLayergroups = m_layerGroupMap.size();
-    uint arrayPos = 0;
-
-    *length = numOfLayergroups;
-    *array = new uint[numOfLayergroups]; // TODO: safe, if size = 0?
-
-    LayerGroupMapConstIterator iter = m_layerGroupMap.begin();
-    LayerGroupMapConstIterator iterEnd = m_layerGroupMap.end();
 
     for (; iter != iterEnd; ++iter)
     {

@@ -65,7 +65,7 @@ public:
     unsigned int getShaderID() const;
 
 private:
-    /// detach shader from all surfaces, surface groups, etc... from surfaces
+    /// detach shader from all surfaces
     bool removeShaderFromAllSurfaces(const SurfaceMap & surfaceMap, Shader* shader);
 
     bool removeShaderFromAllLayers(const LayerMap & layerMap, Shader *& shader);

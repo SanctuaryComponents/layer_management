@@ -45,14 +45,4 @@ typedef enum e_surfaces
     SURFACE_EXAMPLE_VIDEO_APPLICATION = 40
 } sceneSurfaces;
 
-typedef enum e_surfaceGroups
-{
-    SURFACEGROUP_NEW = 0
-} sceneSurfaceGroups;
-
-typedef enum e_layerGroups
-{
-    LAYERGROUP_NEW = 0
-} sceneLayerGroups;
-
 #endif /* _LAYERSCENE_H_ */

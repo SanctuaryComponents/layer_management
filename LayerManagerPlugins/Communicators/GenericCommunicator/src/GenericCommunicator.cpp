@@ -25,9 +25,7 @@
 #include "ICommandExecutor.h"
 #include "CommitCommand.h"
 #include "LayerCreateCommand.h"
-#include "LayergroupCreateCommand.h"
 #include "SurfaceCreateCommand.h"
-#include "SurfacegroupCreateCommand.h"
 #include "SurfaceGetDimensionCommand.h"
 #include "LayerGetDimensionCommand.h"
 #include "SurfaceGetOpacityCommand.h"
@@ -39,28 +37,18 @@
 #include "LayerRemoveSurfaceCommand.h"
 #include "LayerRemoveCommand.h"
 #include "SurfaceRemoveCommand.h"
-#include "LayergroupRemoveCommand.h"
-#include "SurfacegroupRemoveCommand.h"
 #include "SurfaceGetOrientationCommand.h"
 #include "LayerGetOrientationCommand.h"
-#include "LayergroupAddLayerCommand.h"
-#include "LayergroupRemoveLayerCommand.h"
 #include "LayerSetDestinationRectangleCommand.h"
 #include "SurfaceSetDestinationRectangleCommand.h"
 #include "LayerSetOpacityCommand.h"
-#include "LayergroupSetOpacityCommand.h"
 #include "SurfaceSetOpacityCommand.h"
-#include "SurfacegroupSetOpacityCommand.h"
 #include "LayerSetSourceRectangleCommand.h"
 #include "SurfaceSetSourceRectangleCommand.h"
 #include "LayerSetOrientationCommand.h"
 #include "SurfaceSetOrientationCommand.h"
-#include "SurfacegroupAddSurfaceCommand.h"
-#include "SurfacegroupRemoveSurfaceCommand.h"
 #include "LayerSetVisibilityCommand.h"
 #include "SurfaceSetVisibilityCommand.h"
-#include "LayergroupSetVisibilityCommand.h"
-#include "SurfacegroupSetVisibilityCommand.h"
 #include "DebugCommand.h"
 #include "ExitCommand.h"
 #include "ScreenSetRenderOrderCommand.h"
@@ -123,10 +111,6 @@ GenericCommunicator::GenericCommunicator(ICommandExecutor& executor, Configurati
         { "ListAllLayerIDS",                  &GenericCommunicator::ListAllLayerIDS },
         { "ListAllLayerIDsOnScreen",          &GenericCommunicator::ListAllLayerIDsOnScreen },
         { "ListAllSurfaceIDS",                &GenericCommunicator::ListAllSurfaceIDS },
-        { "ListAllLayerGroupIDS",             &GenericCommunicator::ListAllLayerGroupIDS },
-        { "ListAllSurfaceGroupIDS",           &GenericCommunicator::ListAllSurfaceGroupIDS },
-        { "ListSurfacesOfSurfacegroup",       &GenericCommunicator::ListSurfacesOfSurfacegroup },
-        { "ListLayersOfLayergroup",           &GenericCommunicator::ListLayersOfLayergroup },
         { "ListSurfaceofLayer",               &GenericCommunicator::ListSurfaceofLayer },
         { "GetPropertiesOfSurface",           &GenericCommunicator::GetPropertiesOfSurface },
         { "GetPropertiesOfLayer",             &GenericCommunicator::GetPropertiesOfLayer },
@@ -142,18 +126,8 @@ GenericCommunicator::GenericCommunicator(ICommandExecutor& executor, Configurati
         { "CreateLayerWithDimension",         &GenericCommunicator::CreateLayerWithDimension },
         { "CreateLayerFromIdWithDimension",   &GenericCommunicator::CreateLayerFromIdWithDimension },
         { "RemoveLayer",                      &GenericCommunicator::RemoveLayer },
-        { "AddSurfaceToSurfaceGroup",         &GenericCommunicator::AddSurfaceToSurfaceGroup },
-        { "RemoveSurfaceFromSurfaceGroup",    &GenericCommunicator::RemoveSurfaceFromSurfaceGroup },
-        { "AddLayerToLayerGroup",             &GenericCommunicator::AddLayerToLayerGroup },
-        { "RemoveLayerFromLayerGroup",        &GenericCommunicator::RemoveLayerFromLayerGroup },
         { "AddSurfaceToLayer",                &GenericCommunicator::AddSurfaceToLayer },
         { "RemoveSurfaceFromLayer",           &GenericCommunicator::RemoveSurfaceFromLayer },
-        { "CreateSurfaceGroup",               &GenericCommunicator::CreateSurfaceGroup },
-        { "CreateSurfaceGroupFromId",         &GenericCommunicator::CreateSurfaceGroupFromId },
-        { "RemoveSurfaceGroup",               &GenericCommunicator::RemoveSurfaceGroup },
-        { "CreateLayerGroup",                 &GenericCommunicator::CreateLayerGroup },
-        { "CreateLayerGroupFromId",           &GenericCommunicator::CreateLayerGroupFromId },
-        { "RemoveLayerGroup",                 &GenericCommunicator::RemoveLayerGroup },
         { "SetSurfaceSourceRegion",           &GenericCommunicator::SetSurfaceSourceRegion },
         { "SetLayerSourceRegion",             &GenericCommunicator::SetLayerSourceRegion },
         { "SetSurfaceDestinationRegion",      &GenericCommunicator::SetSurfaceDestinationRegion },
@@ -168,8 +142,6 @@ GenericCommunicator::GenericCommunicator(ICommandExecutor& executor, Configurati
         { "GetSurfaceDimension",              &GenericCommunicator::GetSurfaceDimension },
         { "SetSurfaceOpacity",                &GenericCommunicator::SetSurfaceOpacity },
         { "SetLayerOpacity",                  &GenericCommunicator::SetLayerOpacity },
-        { "SetSurfacegroupOpacity",           &GenericCommunicator::SetSurfacegroupOpacity },
-        { "SetLayergroupOpacity",             &GenericCommunicator::SetLayergroupOpacity },
         { "GetSurfaceOpacity",                &GenericCommunicator::GetSurfaceOpacity },
         { "GetLayerOpacity",                  &GenericCommunicator::GetLayerOpacity },
         { "SetSurfaceOrientation",            &GenericCommunicator::SetSurfaceOrientation },
@@ -181,8 +153,6 @@ GenericCommunicator::GenericCommunicator(ICommandExecutor& executor, Configurati
         { "SetLayerVisibility",               &GenericCommunicator::SetLayerVisibility },
         { "GetSurfaceVisibility",             &GenericCommunicator::GetSurfaceVisibility },
         { "GetLayerVisibility",               &GenericCommunicator::GetLayerVisibility },
-        { "SetSurfacegroupVisibility",        &GenericCommunicator::SetSurfacegroupVisibility },
-        { "SetLayergroupVisibility",          &GenericCommunicator::SetLayergroupVisibility },
         { "SetRenderOrderOfLayers",           &GenericCommunicator::SetRenderOrderOfLayers },
         { "SetSurfaceRenderOrderWithinLayer", &GenericCommunicator::SetSurfaceRenderOrderWithinLayer },
         { "GetLayerType",                     &GenericCommunicator::GetLayerType },
@@ -589,111 +559,6 @@ void GenericCommunicator::ListAllSurfaceIDS(t_ilm_message message)
     m_executor->getScene()->unlockScene();
     response = m_ipcModule.createResponse(message);
     m_ipcModule.appendUintArray(response, array, length);
-    m_ipcModule.sendToClients(response, &clientHandle, 1);
-    m_ipcModule.destroyMessage(response);
-}
-
-void GenericCommunicator::ListAllLayerGroupIDS(t_ilm_message message)
-{
-    t_ilm_message response;
-    t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
-    uint* array = NULL;
-    uint length = 0;
-    m_executor->getScene()->lockScene();
-    m_executor->getScene()->getLayerGroupIDs(&length, &array);
-    m_executor->getScene()->unlockScene();
-    response = m_ipcModule.createResponse(message);
-    m_ipcModule.appendUintArray(response, array, length);
-    m_ipcModule.sendToClients(response, &clientHandle, 1);
-    m_ipcModule.destroyMessage(response);
-}
-
-void GenericCommunicator::ListAllSurfaceGroupIDS(t_ilm_message message)
-{
-    t_ilm_message response;
-    t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
-    uint* array = NULL;
-    uint length = 0;
-    m_executor->getScene()->lockScene();
-    m_executor->getScene()->getSurfaceGroupIDs(&length, &array);
-    m_executor->getScene()->unlockScene();
-    response = m_ipcModule.createResponse(message);
-    m_ipcModule.appendUintArray(response, array, length);
-    m_ipcModule.sendToClients(response, &clientHandle, 1);
-    m_ipcModule.destroyMessage(response);
-}
-
-void GenericCommunicator::ListSurfacesOfSurfacegroup(t_ilm_message message)
-{
-    t_ilm_message response;
-    t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
-    uint id = 0;
-    m_ipcModule.getUint(message, &id);
-    m_executor->getScene()->lockScene();
-    SurfaceGroup* sg = m_executor->getScene()->getSurfaceGroup(id);
-    if (NULL != sg)
-    {
-        std::list<Surface*> surfaces = sg->getList();
-        uint length = surfaces.size();
-        uint* array = new uint[length];
-        uint arrayPos = 0;
-
-        for (std::list<Surface*>::const_iterator it = surfaces.begin(); it != surfaces.end(); ++it)
-        {
-            Surface* s = *it;
-            array[arrayPos] = s->getID();
-            ++arrayPos;
-        }
-        m_executor->getScene()->unlockScene();
-
-        response = m_ipcModule.createResponse(message);
-        m_ipcModule.appendUintArray(response, array, length);
-    }
-    else
-    {
-        m_executor->getScene()->unlockScene();
-        response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
-    }
-
-    m_ipcModule.sendToClients(response, &clientHandle, 1);
-    m_ipcModule.destroyMessage(response);
-}
-
-void GenericCommunicator::ListLayersOfLayergroup(t_ilm_message message)
-{
-    t_ilm_message response;
-    t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
-    uint id = 0;
-    m_ipcModule.getUint(message, &id);
-    m_executor->getScene()->lockScene();
-    LayerGroup* sg = m_executor->getScene()->getLayerGroup(id);
-    if (NULL != sg)
-    {
-        std::list<Layer*> layers = sg->getList();
-
-        uint length = layers.size();
-        uint* array = new uint[length];
-        uint arrayPos = 0;
-
-        for (std::list<Layer*>::const_iterator it = layers.begin(); it != layers.end(); ++it)
-        {
-            Layer* l = *it;
-            array[arrayPos] = l->getID();
-            ++arrayPos;
-        }
-        m_executor->getScene()->unlockScene();
-
-        response = m_ipcModule.createResponse(message);
-        m_ipcModule.appendUintArray(response, array, length);
-    }
-    else
-    {
-        m_executor->getScene()->unlockScene();
-        response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
-    }
-
     m_ipcModule.sendToClients(response, &clientHandle, 1);
     m_ipcModule.destroyMessage(response);
 }
@@ -1177,110 +1042,6 @@ void GenericCommunicator::RemoveLayer(t_ilm_message message)
     m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::AddSurfaceToSurfaceGroup(t_ilm_message message)
-{
-    t_ilm_message response;
-    t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
-    t_ilm_uint clientPid = m_executor->getSenderPid(clientHandle);
-    uint surfaceid = 0;
-    uint surfacegroupid = 0;
-
-    m_ipcModule.getUint(message, &surfaceid);
-    m_ipcModule.getUint(message, &surfacegroupid);
-
-    t_ilm_bool status = m_executor->execute(new SurfacegroupAddSurfaceCommand(clientPid, surfacegroupid, surfaceid));
-    if (status)
-    {
-        response = m_ipcModule.createResponse(message);
-    }
-    else
-    {
-        response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
-    }
-
-    m_ipcModule.sendToClients(response, &clientHandle, 1);
-    m_ipcModule.destroyMessage(response);
-}
-
-void GenericCommunicator::RemoveSurfaceFromSurfaceGroup(t_ilm_message message)
-{
-    t_ilm_message response;
-    t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
-    t_ilm_uint clientPid = m_executor->getSenderPid(clientHandle);
-    uint surfaceid = 0;
-    uint surfacegroupid = 0;
-
-    m_ipcModule.getUint(message, &surfaceid);
-    m_ipcModule.getUint(message, &surfacegroupid);
-
-    t_ilm_bool status = m_executor->execute(new SurfacegroupRemoveSurfaceCommand(clientPid, surfacegroupid, surfaceid));
-    if (status)
-    {
-        response = m_ipcModule.createResponse(message);
-    }
-    else
-    {
-        response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
-    }
-
-    m_ipcModule.sendToClients(response, &clientHandle, 1);
-    m_ipcModule.destroyMessage(response);
-}
-
-void GenericCommunicator::AddLayerToLayerGroup(t_ilm_message message)
-{
-    t_ilm_message response;
-    t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
-    t_ilm_uint clientPid = m_executor->getSenderPid(clientHandle);
-    uint layerid = 0;
-    uint layergroupid = 0;
-
-    m_ipcModule.getUint(message, &layerid);
-    m_ipcModule.getUint(message, &layergroupid);
-
-    t_ilm_bool status = m_executor->execute(new LayergroupAddLayerCommand(clientPid, layergroupid, layerid));
-    if (status)
-    {
-        response = m_ipcModule.createResponse(message);
-    }
-    else
-    {
-        response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
-    }
-
-    m_ipcModule.sendToClients(response, &clientHandle, 1);
-    m_ipcModule.destroyMessage(response);
-}
-
-void GenericCommunicator::RemoveLayerFromLayerGroup(t_ilm_message message)
-{
-    t_ilm_message response;
-    t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
-    t_ilm_uint clientPid = m_executor->getSenderPid(clientHandle);
-    uint layerid = 0;
-    uint layergroupid = 0;
-
-    m_ipcModule.getUint(message, &layerid);
-    m_ipcModule.getUint(message, &layergroupid);
-
-    t_ilm_bool status = m_executor->execute(new LayergroupRemoveLayerCommand(clientPid, layergroupid, layerid));
-    if (status)
-    {
-        response = m_ipcModule.createResponse(message);
-    }
-    else
-    {
-        response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
-    }
-
-    m_ipcModule.sendToClients(response, &clientHandle, 1);
-    m_ipcModule.destroyMessage(response);
-}
-
 void GenericCommunicator::AddSurfaceToLayer(t_ilm_message message)
 {
     t_ilm_message response;
@@ -1318,148 +1079,6 @@ void GenericCommunicator::RemoveSurfaceFromLayer(t_ilm_message message)
     m_ipcModule.getUint(message, &layerid);
 
     t_ilm_bool status = m_executor->execute(new LayerRemoveSurfaceCommand(clientPid, layerid, surfaceid));
-    if (status)
-    {
-        response = m_ipcModule.createResponse(message);
-    }
-    else
-    {
-        response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
-    }
-
-    m_ipcModule.sendToClients(response, &clientHandle, 1);
-    m_ipcModule.destroyMessage(response);
-}
-
-void GenericCommunicator::CreateSurfaceGroup(t_ilm_message message)
-{
-    t_ilm_message response;
-    t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
-    t_ilm_uint clientPid = m_executor->getSenderPid(clientHandle);
-    uint newID = GraphicalObject::INVALID_ID;
-
-    t_ilm_bool status = m_executor->execute(new SurfacegroupCreateCommand(clientPid, &newID));
-    if (status)
-    {
-        response = m_ipcModule.createResponse(message);
-        m_ipcModule.appendUint(response, newID);
-    }
-    else
-    {
-        response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_ALREADY_INUSE);
-    }
-
-    m_ipcModule.sendToClients(response, &clientHandle, 1);
-    m_ipcModule.destroyMessage(response);
-}
-
-void GenericCommunicator::CreateSurfaceGroupFromId(t_ilm_message message)
-{
-    t_ilm_message response;
-    t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
-    t_ilm_uint clientPid = m_executor->getSenderPid(clientHandle);
-    uint newID = GraphicalObject::INVALID_ID;
-
-    m_ipcModule.getUint(message, &newID);
-
-    t_ilm_bool status = m_executor->execute(new SurfacegroupCreateCommand(clientPid, &newID));
-    if (status)
-    {
-        response = m_ipcModule.createResponse(message);
-        m_ipcModule.appendUint(response, newID);
-    }
-    else
-    {
-        response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_ALREADY_INUSE);
-    }
-
-    m_ipcModule.sendToClients(response, &clientHandle, 1);
-    m_ipcModule.destroyMessage(response);
-}
-
-void GenericCommunicator::RemoveSurfaceGroup(t_ilm_message message)
-{
-    t_ilm_message response;
-    t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
-    t_ilm_uint clientPid = m_executor->getSenderPid(clientHandle);
-    uint param = 0;
-    m_ipcModule.getUint(message, &param);
-
-    t_ilm_bool status = m_executor->execute(new SurfacegroupRemoveCommand(clientPid, param));
-    if (status)
-    {
-        response = m_ipcModule.createResponse(message);
-    }
-    else
-    {
-        response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
-    }
-
-    m_ipcModule.sendToClients(response, &clientHandle, 1);
-    m_ipcModule.destroyMessage(response);
-}
-
-void GenericCommunicator::CreateLayerGroup(t_ilm_message message)
-{
-    t_ilm_message response;
-    t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
-    t_ilm_uint clientPid = m_executor->getSenderPid(clientHandle);
-    uint newID = GraphicalObject::INVALID_ID;
-
-    t_ilm_bool status = m_executor->execute(new LayergroupCreateCommand(clientPid, &newID));
-    if (status)
-    {
-        response = m_ipcModule.createResponse(message);
-        m_ipcModule.appendUint(response, newID);
-    }
-    else
-    {
-        response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_ALREADY_INUSE);
-    }
-
-    m_ipcModule.sendToClients(response, &clientHandle, 1);
-    m_ipcModule.destroyMessage(response);
-}
-
-void GenericCommunicator::CreateLayerGroupFromId(t_ilm_message message)
-{
-    t_ilm_message response;
-    t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
-    t_ilm_uint clientPid = m_executor->getSenderPid(clientHandle);
-    uint newID = GraphicalObject::INVALID_ID;
-
-    m_ipcModule.getUint(message, &newID);
-
-    t_ilm_bool status = m_executor->execute(new LayergroupCreateCommand(clientPid, &newID));
-    if (status)
-    {
-        response = m_ipcModule.createResponse(message);
-        m_ipcModule.appendUint(response, newID);
-    }
-    else
-    {
-        response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_ALREADY_INUSE);
-    }
-
-    m_ipcModule.sendToClients(response, &clientHandle, 1);
-    m_ipcModule.destroyMessage(response);
-}
-
-void GenericCommunicator::RemoveLayerGroup(t_ilm_message message)
-{
-    t_ilm_message response;
-    t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
-    t_ilm_uint clientPid = m_executor->getSenderPid(clientHandle);
-    uint param = 0;
-    m_ipcModule.getUint(message, &param);
-
-    t_ilm_bool status = m_executor->execute(new LayergroupRemoveCommand(clientPid, param));
     if (status)
     {
         response = m_ipcModule.createResponse(message);
@@ -1878,58 +1497,6 @@ void GenericCommunicator::SetLayerOpacity(t_ilm_message message)
     m_ipcModule.destroyMessage(response);
 }
 
-void GenericCommunicator::SetSurfacegroupOpacity(t_ilm_message message)
-{
-    t_ilm_message response;
-    t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
-    t_ilm_uint clientPid = m_executor->getSenderPid(clientHandle);
-    uint id = 0;
-    double param = 0.0;
-
-    m_ipcModule.getUint(message, &id);
-    m_ipcModule.getDouble(message, &param);
-
-    t_ilm_bool status = m_executor->execute(new SurfacegroupSetOpacityCommand(clientPid, id, param));
-    if (status)
-    {
-        response = m_ipcModule.createResponse(message);
-    }
-    else
-    {
-        response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
-    }
-
-    m_ipcModule.sendToClients(response, &clientHandle, 1);
-    m_ipcModule.destroyMessage(response);
-}
-
-void GenericCommunicator::SetLayergroupOpacity(t_ilm_message message)
-{
-    t_ilm_message response;
-    t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
-    t_ilm_uint clientPid = m_executor->getSenderPid(clientHandle);
-    uint id = 0;
-    double param = 0.0;
-
-    m_ipcModule.getUint(message, &id);
-    m_ipcModule.getDouble(message, &param);
-
-    t_ilm_bool status = m_executor->execute(new LayergroupSetOpacityCommand(clientPid, id, param));
-    if (status)
-    {
-        response = m_ipcModule.createResponse(message);
-    }
-    else
-    {
-        response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
-    }
-
-    m_ipcModule.sendToClients(response, &clientHandle, 1);
-    m_ipcModule.destroyMessage(response);
-}
-
 void GenericCommunicator::GetSurfaceOpacity(t_ilm_message message)
 {
     t_ilm_message response;
@@ -2221,59 +1788,6 @@ void GenericCommunicator::GetLayerVisibility(t_ilm_message message)
     m_ipcModule.sendToClients(response, &clientHandle, 1);
     m_ipcModule.destroyMessage(response);
 }
-
-void GenericCommunicator::SetSurfacegroupVisibility(t_ilm_message message)
-{
-    t_ilm_message response;
-    t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
-    t_ilm_uint clientPid = m_executor->getSenderPid(clientHandle);
-    uint groupid = 0;
-    t_ilm_bool myparam = ILM_FALSE;
-
-    m_ipcModule.getUint(message, &groupid);
-    m_ipcModule.getBool(message, &myparam);
-
-    t_ilm_bool status = m_executor->execute(new SurfacegroupSetVisibilityCommand(clientPid, groupid, myparam));
-    if (status)
-    {
-        response = m_ipcModule.createResponse(message);
-    }
-    else
-    {
-        response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
-    }
-
-    m_ipcModule.sendToClients(response, &clientHandle, 1);
-    m_ipcModule.destroyMessage(response);
-}
-
-void GenericCommunicator::SetLayergroupVisibility(t_ilm_message message)
-{
-    t_ilm_message response;
-    t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
-    t_ilm_uint clientPid = m_executor->getSenderPid(clientHandle);
-    uint groupid = 0;
-    t_ilm_bool myparam = ILM_FALSE;
-
-    m_ipcModule.getUint(message, &groupid);
-    m_ipcModule.getBool(message, &myparam);
-
-    t_ilm_bool status = m_executor->execute(new LayergroupSetVisibilityCommand(clientPid, groupid, myparam));
-    if (status)
-    {
-        response = m_ipcModule.createResponse(message);
-    }
-    else
-    {
-        response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
-    }
-
-    m_ipcModule.sendToClients(response, &clientHandle, 1);
-    m_ipcModule.destroyMessage(response);
-}
-
 
 void GenericCommunicator::SetRenderOrderOfLayers(t_ilm_message message)
 {

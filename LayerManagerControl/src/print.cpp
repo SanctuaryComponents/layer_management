@@ -202,8 +202,6 @@ void printLayerProperties(unsigned int layerid, const char* prefix)
         }
     }
     cout << "\n";
-
-    // TODO: print layer groups, this layer is part of
 }
 
 void printSurfaceProperties(unsigned int surfaceid, const char* prefix)
@@ -321,8 +319,6 @@ void printSurfaceProperties(unsigned int surfaceid, const char* prefix)
         }
     }
     cout << "\n";
-
-    // TODO: print surface groups, this surface is part of
 }
 
 void printScene()

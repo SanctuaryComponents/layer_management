@@ -28,19 +28,13 @@ class MockLayerList : public Scene {
  public:
   MOCK_METHOD1(createLayer, Layer*(unsigned int));
   MOCK_METHOD1(createSurface, Surface*(unsigned int));
-  MOCK_METHOD1(createLayerGroup, LayerGroup*(unsigned int));
-  MOCK_METHOD1(createSurfaceGroup, SurfaceGroup*(unsigned int));
   MOCK_METHOD1(removeLayer, bool(Layer*));
   MOCK_METHOD1(removeSurface, bool(Surface*));
   MOCK_CONST_METHOD1(getLayer, Layer*(unsigned int));
   MOCK_CONST_METHOD1(getSurface, Surface*(unsigned int));
-  MOCK_CONST_METHOD1(getSurfaceGroup, SurfaceGroup*(unsigned int));
-  MOCK_CONST_METHOD1(getLayerGroup, LayerGroup*(unsigned int id));
   MOCK_CONST_METHOD2(getLayerIDs, void(unsigned int*,unsigned int**));
   MOCK_CONST_METHOD3(getLayerIDsOfScreen, bool(unsigned int,unsigned int*,unsigned int**));
   MOCK_CONST_METHOD2(getSurfaceIDs, void(unsigned int*,unsigned int**));
-  MOCK_CONST_METHOD2(getLayerGroupIDs, void(unsigned int*,unsigned int**));
-  MOCK_CONST_METHOD2(getSurfaceGroupIDs, void(unsigned int*,unsigned int**));
   MOCK_METHOD0(lockScene, void());
   MOCK_METHOD0(unlockScene, void());
 };

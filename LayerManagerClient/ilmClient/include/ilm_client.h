@@ -290,28 +290,6 @@ ilmErrorTypes ilm_getLayerIDsOnScreen(t_ilm_uint screenID, t_ilm_int* pLength,t_
 ilmErrorTypes ilm_getSurfaceIDs(t_ilm_int* pLength,t_ilm_surface** ppArray);
 
 /**
- * \brief Get all LayerGroupIds which are currently registered and managed by the services
- * \ingroup ilmControl
- * \param[out] pLength Pointer where array length of ids should be stored
- * \param[out] ppArray Array where the id should be stored,
- *                     the array will be allocated inside
- * \return ILM_SUCCESS if the method call was successful
- * \return ILM_FAILED if the client can not call the method on the service.
- */
-ilmErrorTypes ilm_getLayerGroupIDs(t_ilm_int* pLength,t_ilm_layergroup** ppArray);
-
-/**
- * \brief Get all SurfaceGroupIds which are currently registered and managed by the services
- * \ingroup ilmControl
- * \param[out] pLength Pointer where array length of ids should be stored
- * \param[out] ppArray Array where the id should be stored,
- *                     the array will be allocated inside
- * \return ILM_SUCCESS if the method call was successful
- * \return ILM_FAILED if the client can not call the method on the service.
- */
-ilmErrorTypes ilm_getSurfaceGroupIDs(t_ilm_int* pLength,t_ilm_surfacegroup** ppArray);
-
-/**
  * \brief Get all SurfaceIds which are currently registered to a given layer and are managed by the services
  * \ingroup ilmControl
  * \param[in] layer Id of the Layer whose surfaces are to be returned
@@ -550,68 +528,6 @@ ilmErrorTypes ilm_layerGetCapabilities(t_ilm_layer layerId, t_ilm_layercapabilit
 ilmErrorTypes ilm_layerTypeGetCapabilities(ilmLayerType layerType, t_ilm_layercapabilities *pCapabilities);
 
 /**
- * \brief Create a layergroup
- * \ingroup ilmControl
- * \param[out] pLayergroup The id of the created layergroup is returned in this parameter
- * \return ILM_SUCCESS if the method call was successful
- * \return ILM_FAILED if the client can not call the method on the service.
- */
-ilmErrorTypes ilm_layergroupCreate(t_ilm_layergroup *pLayergroup);
-
-/**
- * \brief Remove a layergroup
- * \ingroup ilmControl
- * \param[in] layergroup The layergroup to be removed
- * \return ILM_SUCCESS if the method call was successful
- * \return ILM_FAILED if the client can not call the method on the service.
- */
-ilmErrorTypes ilm_layergroupRemove(t_ilm_layergroup layergroup);
-
-/**
- * \brief Add a layer to a layergroup
- * \ingroup ilmControl
- * \param[in] group The layergroup to add the layer
- * \param[in] layer The layer to add to the group
- * \return ILM_SUCCESS if the method call was successful
- * \return ILM_FAILED if the client can not call the method on the service.
- */
-ilmErrorTypes ilm_layergroupAddLayer(t_ilm_layergroup group, t_ilm_layer layer);
-
-/**
- * \brief Remove a layer from a layergroup
- * \ingroup ilmControl
- * \param[in] layergroup The layergroup to remove the layer from
- * \param[in] layer The layer to be removed from the group
- *
- *
- * \return ILM_SUCCESS if the method call was successful
- * \return ILM_FAILED if the client can not call the method on the service.
- */
-ilmErrorTypes ilm_layergroupRemoveLayer(t_ilm_layergroup layergroup, t_ilm_layer layer);
-
-/**
- * \brief Set the visibility of a layergroup. If a layergroup is not visible, the layers and their
- * surfaces will not be rendered.
- * \ingroup ilmControl
- * \param[in] layergroup Id of the layergroup to set the visibility of
- * \param[in] newVisibility ILM_SUCCESS sets layergroup visible, ILM_FALSE disables the visibility.
- * \return ILM_SUCCESS if the method call was successful
- * \return ILM_FAILED if the client can not call the method on the service.
- */
-ilmErrorTypes ilm_layergroupSetVisibility(t_ilm_layergroup layergroup, t_ilm_bool newVisibility);
-
-/**
- * \brief Set the opacity of a layergroup.
- * \ingroup ilmControl
- * \param[in] group Id of the layergroup to set the opacity of.
- * \param[in] opacity 0.0 means the layergroup is fully transparent,
- *                    1.0 means the layergroup is fully opaque
- * \return ILM_SUCCESS if the method call was successful
- * \return ILM_FAILED if the client can not call the method on the service.
- */
-ilmErrorTypes ilm_layergroupSetOpacity(t_ilm_layergroup group, t_ilm_float opacity);
-
-/**
  * \brief Create the logical surface, which has no native buffer associated
  * \ingroup ilmControl
  * \param[in] pSurfaceId The value pSurfaceId points to is used as ID for new surface;
@@ -765,66 +681,6 @@ ilmErrorTypes ilm_surfaceGetPixelformat(t_ilm_layer surfaceId, ilmPixelFormat *p
  * \return ILM_FAILED if the client can not call the method on the service.
  */
 ilmErrorTypes ilm_surfaceSetChromaKey(t_ilm_surface surfaceId, t_ilm_int* pColor);
-
-/**
- * \brief Create a surfacegroup
- * \ingroup ilmControl 
- * \param[in] pSurfacegroup The created surfacegroup is returned in this parameter
- * \return ILM_SUCCESS if the method call was successful
- * \return ILM_FAILED if the client can not call the method on the service.
- */
-ilmErrorTypes ilm_surfacegroupCreate(t_ilm_surfacegroup *pSurfacegroup);
-
-/**
-*  \brief Remove a surfacegroup
- * \ingroup ilmControl
- * \param[in] surfacegroup The surfacegroup to be removed
- * \return ILM_SUCCESS if the method call was successful
- * \return ILM_FAILED if the client can not call the method on the service.
- */
-ilmErrorTypes ilm_surfacegroupRemove(t_ilm_surfacegroup surfacegroup);
-
-/**
- * \brief Add a surface to a surfacegroup
- * \ingroup ilmControl
- * \param[in] surfacegroup The surfacegroup to add the surface
- * \param[in] surface The surface to add to the group
- * \return ILM_SUCCESS if the method call was successful
- * \return ILM_FAILED if the client can not call the method on the service.
- */
-ilmErrorTypes ilm_surfacegroupAddSurface(t_ilm_surfacegroup surfacegroup, t_ilm_surface surface);
-
-/**
- * \brief Remove a surface from a surfacegroup
- * \ingroup ilmControl
- * \param[in] surfacegroup The surfacegroup to remove the surface from
- * \param[in] surface The surface to be removed from the group
- * \return ILM_SUCCESS if the method call was successful
- * \return ILM_FAILED if the client can not call the method on the service.
- */
-ilmErrorTypes ilm_surfacegroupRemoveSurface(t_ilm_surfacegroup surfacegroup, t_ilm_surface surface);
-
-/**
- * \brief Set the visibility of a surfacegroup. If a surfacegroup is not visible the contained
- * surfaces will not be rendered.
- * \ingroup ilmControl
- * \param[in] surfacegroup Id of the surfacegroup to set the visibility of
- * \param[in] newVisibility ILM_SUCCESS sets surfacegroup visible, ILM_FALSE disables the visibility.
- * \return ILM_SUCCESS if the method call was successful
- * \return ILM_FAILED if the client can not call the method on the service.
- */
-ilmErrorTypes ilm_surfacegroupSetVisibility(t_ilm_surfacegroup surfacegroup, t_ilm_bool newVisibility);
-
-/**
- * \brief Set the opacity of a surfacegroup.
- * \ingroup ilmControl
- * \param[in] surfacegroup Id of the surfacegroup to set the opacity of.
- * \param[in] opacity 0.0 means the surfacegroup is fully transparent,
- *                    1.0 means the surfacegroup is fully opaque
- * \return ILM_SUCCESS if the method call was successful
- * \return ILM_FAILED if the client can not call the method on the service.
- */
-ilmErrorTypes ilm_surfacegroupSetOpacity(t_ilm_surfacegroup surfacegroup, t_ilm_float opacity);
 
 /**
  * \brief Sets render order of layers on a display

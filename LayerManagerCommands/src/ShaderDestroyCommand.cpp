@@ -58,7 +58,7 @@ ExecutionResult ShaderDestroyCommand::execute(ICommandExecutor* executor)
     return result;
 }
 
-/// detach shader from all surfaces, surface groups, etc... from surfaces
+/// detach shader from all surfaces
 bool ShaderDestroyCommand::removeShaderFromAllSurfaces(const SurfaceMap & surfaceMap, Shader* shader)
 {
     bool result = false;

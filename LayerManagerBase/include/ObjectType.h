@@ -29,8 +29,6 @@ enum ObjectType
 {
     TypeSurface = ILM_SURFACE,
     TypeLayer = ILM_LAYER,
-    TypeSurfaceGroup = ILM_SURFACEGROUP,
-    TypeLayerGroup = ILM_LAYERGROUP,
     TypeMax
 };
 

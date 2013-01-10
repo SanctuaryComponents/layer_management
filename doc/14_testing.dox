@@ -50,7 +50,7 @@ the renderer (positioning, overlapping, transparency etc).
 \section testingScene Scene
 
 The implementation of the Scene can also be tested by automatic tests,
-inserting new layers, groups and surfaces, then changing properties and comparing
+inserting new layers and surfaces, then changing properties and comparing
 the results of subsequent calls to getter methods with the desired values.
 
 */

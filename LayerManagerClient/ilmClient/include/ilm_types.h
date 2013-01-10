@@ -87,9 +87,7 @@ typedef enum e_ilmLayerType
 typedef enum e_ilmObjectType
 {
     ILM_SURFACE = 0,                   /*!< Surface Object Type */
-    ILM_LAYER = 1,                     /*!< Layer Object Type */
-    ILM_SURFACEGROUP = 2,              /*!< SurfaceGroup Object Type */
-    ILM_LAYERGROUP = 3                 /*!< LayerGroup Object Type */
+    ILM_LAYER = 1                      /*!< Layer Object Type */
 } ilmObjectType;
 
 /**
@@ -148,18 +146,6 @@ typedef t_ilm_uint     t_ilm_layer;
  * \ingroup ilmClient
  **/
 typedef t_ilm_uint     t_ilm_surface;
-
-/**
- * \brief Typedef for representing a layergroup
- * \ingroup ilmControl
- **/
-typedef t_ilm_uint     t_ilm_layergroup;
-
-/**
- * \brief Typedef for representing a surfacegroup
- * \ingroup ilmControl
- **/
-typedef t_ilm_uint     t_ilm_surfacegroup;
 
 /**
  * \brief Typedef for representing a display number

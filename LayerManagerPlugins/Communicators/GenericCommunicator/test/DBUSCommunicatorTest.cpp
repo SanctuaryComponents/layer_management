@@ -30,9 +30,7 @@
 #include "ICommandExecutor.h"
 #include "CommitCommand.h"
 #include "LayerCreateCommand.h"
-#include "LayergroupCreateCommand.h"
 #include "SurfaceCreateCommand.h"
-#include "SurfacegroupCreateCommand.h"
 #include "SurfaceGetDimensionCommand.h"
 #include "LayerGetDimensionCommand.h"
 #include "SurfaceGetOpacityCommand.h"
@@ -44,28 +42,18 @@
 #include "LayerRemoveSurfaceCommand.h"
 #include "LayerRemoveCommand.h"
 #include "SurfaceRemoveCommand.h"
-#include "LayergroupRemoveCommand.h"
-#include "SurfacegroupRemoveCommand.h"
 #include "SurfaceGetOrientationCommand.h"
 #include "LayerGetOrientationCommand.h"
-#include "LayergroupAddLayerCommand.h"
-#include "LayergroupRemoveLayerCommand.h"
 #include "LayerSetDestinationRectangleCommand.h"
 #include "SurfaceSetDestinationRectangleCommand.h"
 #include "LayerSetOpacityCommand.h"
-#include "LayergroupSetOpacityCommand.h"
 #include "SurfaceSetOpacityCommand.h"
-#include "SurfacegroupSetOpacityCommand.h"
 #include "LayerSetSourceRectangleCommand.h"
 #include "SurfaceSetSourceRectangleCommand.h"
 #include "LayerSetOrientationCommand.h"
 #include "SurfaceSetOrientationCommand.h"
-#include "SurfacegroupAddSurfaceCommand.h"
-#include "SurfacegroupRemoveSurfaceCommand.h"
 #include "LayerSetVisibilityCommand.h"
 #include "SurfaceSetVisibilityCommand.h"
-#include "LayergroupSetVisibilityCommand.h"
-#include "SurfacegroupSetVisibilityCommand.h"
 #include "DebugCommand.h"
 #include "ExitCommand.h"
 #include "ScreenSetRenderOrderCommand.h"
@@ -181,49 +169,6 @@ TEST_F(DBUSCommunicatorTest, ListAllLayerIDS) {
     DefaultValue<Scene*>::Set((Scene*) &this->layerlist);
     EXPECT_CALL(this->layerlist, getLayerIDs(NotNull(),NotNull() )).Times(1);
     ASSERT_NE(-1, system((DBUSCOMMAND + std::string("ListAllLayerIDS")).c_str()));
-}
-
-TEST_F(DBUSCommunicatorTest, listAlllayerGroupIDS) {
-    std::list<int> defaultlist;
-    // Sets the default return value for type Bar.
-    DefaultValue<Scene*>::Set((Scene*) &this->layerlist);
-    DefaultValue<std::list<int> >::Set(defaultlist);
-    EXPECT_CALL(this->layerlist, getLayerGroupIDs(NotNull(),NotNull()) ).Times(1);
-    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("ListAllLayerGroupIDS")).c_str()));
-}
-
-TEST_F(DBUSCommunicatorTest, listAllSurfaceGroupIDS) {
-    std::list<int> defaultlist;
-    // Sets the default return value for type Bar.
-    DefaultValue<Scene*>::Set((Scene*) &this->layerlist);
-    DefaultValue<std::list<int> >::Set(defaultlist);
-    EXPECT_CALL(this->layerlist, getSurfaceGroupIDs(NotNull(),NotNull() )).Times(1);
-    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("ListAllSurfaceGroupIDS")).c_str()));
-}
-
-TEST_F(DBUSCommunicatorTest, listSurfacesOfSurfacegroup) {
-
-    std::list<int> defaultlist;
-    DefaultValue<Scene*>::Set((Scene*) &this->layerlist);
-    // Sets the default return value for type Bar.
-    DefaultValue<std::list<int> >::Set(defaultlist);
-    DefaultValue<SurfaceGroup*>::Set(new SurfaceGroup(0));
-    EXPECT_CALL(this->layerlist, getSurfaceGroup(Eq(84567u) )).Times(1);
-    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("ListSurfacesOfSurfacegroup uint32:84567")).c_str()));
-
-}
-
-TEST_F(DBUSCommunicatorTest, listlayersOflayergroup) {
-
-    std::list<int> defaultlist;
-    // Sets the default return value for type Bar.
-    DefaultValue<Scene*>::Set((Scene*) &this->layerlist);
-    DefaultValue<std::list<int> >::Set(defaultlist);
-    DefaultValue<LayerGroup*>::Set(new LayerGroup(0));
-
-    EXPECT_CALL(this->layerlist, getLayerGroup(Eq(345u) )).Times(1);
-    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("ListLayersOfLayergroup uint32:345")).c_str()));
-
 }
 
 TEST_F(DBUSCommunicatorTest, listSurfaceoflayer) {
@@ -492,34 +437,6 @@ TEST_F(DBUSCommunicatorTest, GetlayerOpacity) {
     ASSERT_NE(-1, system((DBUSCOMMAND + std::string("GetLayerOpacity uint32:44 ")).c_str()));
 }
 
-MATCHER_P2(SurfacegroupSetOpacityCommandEq, id, Opacity, "%(*)s") {
-    return ((SurfacegroupSetOpacityCommand*)arg)->m_id == id
-        && ((SurfacegroupSetOpacityCommand*)arg)->m_opacity == Opacity;
-}
-
-TEST_F(DBUSCommunicatorTest, SetSurfacegroupOpacity) {
-
-    EXPECT_CALL(this->mockCommandExecutor, execute(SurfacegroupSetOpacityCommandEq(36u,0.88))).Times(1);
-    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetSurfacegroupOpacity uint32:36 double:0.88")).c_str()));
-
-    EXPECT_CALL(this->mockCommandExecutor, execute(SurfacegroupSetOpacityCommandEq(44u,0.001))).Times(1);
-    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetSurfacegroupOpacity uint32:44 double:0.001")).c_str()));
-}
-
-MATCHER_P2(LayergroupSetOpacityCommandEq, id, Opacity, "%(*)s"){
-    return ((LayergroupSetOpacityCommand*)arg)->m_id == id
-        && ((LayergroupSetOpacityCommand*)arg)->m_opacity == Opacity;
-}
-
-TEST_F(DBUSCommunicatorTest, SetlayergroupOpacity) {
-
-    EXPECT_CALL(this->mockCommandExecutor, execute(LayergroupSetOpacityCommandEq(36u,0.88))).Times(1);
-    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetLayergroupOpacity uint32:36 double:0.88")).c_str()));
-
-    EXPECT_CALL(this->mockCommandExecutor, execute(LayergroupSetOpacityCommandEq(44u,0.001))).Times(1);
-    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetLayergroupOpacity uint32:44 double:0.001")).c_str()));
-}
-
 MATCHER_P2(SurfaceSetOrientationCommandEq, id, Orientation, "%(*)s") {
     return ((SurfaceSetOrientationCommand*)arg)->m_id == id
         && ((SurfaceSetOrientationCommand*)arg)->m_orientation == Orientation;
@@ -588,91 +505,6 @@ TEST_F(DBUSCommunicatorTest, SetlayerVisibility) {
     ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetLayerVisibility uint32:44 boolean:true")).c_str()));
 }
 
-MATCHER_P2(SurfacegroupSetVisibilityCommandEq, id, visibility, "%(*)s"){
-    return ((SurfacegroupSetVisibilityCommand*)arg)->m_idtoSet == id
-        && ((SurfacegroupSetVisibilityCommand*)arg)->m_visibility == visibility;
-}
-
-TEST_F(DBUSCommunicatorTest, SetSurfacegroupVisibility) {
-
-    EXPECT_CALL(this->mockCommandExecutor, execute(SurfacegroupSetVisibilityCommandEq(36u,false))).Times(1);
-    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetSurfacegroupVisibility uint32:36 boolean:false")).c_str()));
-
-    EXPECT_CALL(this->mockCommandExecutor, execute(SurfacegroupSetVisibilityCommandEq(44u,true))).Times(1);
-    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetSurfacegroupVisibility uint32:44 boolean:true")).c_str()));
-
-    EXPECT_CALL(this->mockCommandExecutor, execute(SurfacegroupSetVisibilityCommandEq(36u,false))).Times(1);
-    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetSurfacegroupVisibility uint32:36 boolean:false")).c_str()));
-
-    EXPECT_CALL(this->mockCommandExecutor, execute(SurfacegroupSetVisibilityCommandEq(44u,true))).Times(1);
-    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetSurfacegroupVisibility uint32:44 boolean:true")).c_str()));
-
-}
-
-MATCHER_P2(LayergroupSetVisibilityCommandEq, id, visibility, "%(*)s"){
-    return ((LayergroupSetVisibilityCommand*)arg)->m_idtoSet == id
-        && ((LayergroupSetVisibilityCommand*)arg)->m_visibility == visibility;
-}
-
-TEST_F(DBUSCommunicatorTest, SetlayergroupVisibility) {
-
-    EXPECT_CALL(this->mockCommandExecutor, execute(LayergroupSetVisibilityCommandEq(36u,false))).Times(1);
-    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetLayergroupVisibility uint32:36 boolean:false")).c_str()));
-
-    EXPECT_CALL(this->mockCommandExecutor, execute(LayergroupSetVisibilityCommandEq(44u,true))).Times(1);
-    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetLayergroupVisibility uint32:44 boolean:true")).c_str()));
-
-    EXPECT_CALL(this->mockCommandExecutor, execute(LayergroupSetVisibilityCommandEq(36u,false))).Times(1);
-    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetLayergroupVisibility uint32:36 boolean:false")).c_str()));
-
-    EXPECT_CALL(this->mockCommandExecutor, execute(LayergroupSetVisibilityCommandEq(44u,true))).Times(1);
-    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("SetLayergroupVisibility uint32:44 boolean:true")).c_str()));
-}
-
-MATCHER_P2(SurfacegroupAddSurfaceCommandEq, surfaceid, surfacegroupid, "%(*)s"){
-    return ((SurfacegroupAddSurfaceCommand*)arg)->m_surfacegroupid == surfacegroupid
-        && ((SurfacegroupAddSurfaceCommand*)arg)->m_surfaceid == surfaceid;
-
-}
-TEST_F(DBUSCommunicatorTest, AddSurfaceToSurfaceGroup) {
-
-    EXPECT_CALL(this->mockCommandExecutor, execute( SurfacegroupAddSurfaceCommandEq(36u,77u))).Times(1);
-    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("AddSurfaceToSurfaceGroup uint32:36 uint32:77")).c_str()));
-}
-
-MATCHER_P2(SurfacegroupRemoveSurfaceCommandEq, surfacegroupid, surfaceid, "%(*)s"){
-    return ((SurfacegroupRemoveSurfaceCommand*)arg)->m_surfacegroupid == surfacegroupid
-        && ((SurfacegroupRemoveSurfaceCommand*)arg)->m_surfaceid == surfaceid;
-}
-
-TEST_F(DBUSCommunicatorTest, RemoveSurfaceFromSurfaceGroup) {
-
-    EXPECT_CALL(this->mockCommandExecutor, execute( SurfacegroupAddSurfaceCommandEq(36u,77u))).Times(1);
-    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("RemoveSurfaceFromSurfaceGroup uint32:36 uint32:77")).c_str()));
-}
-
-MATCHER_P2(LayergroupAddLayerCommandEq, layerid, layergroupid, "%(*)s"){
-    return ((LayergroupAddLayerCommand*)arg)->m_layergroupid == layergroupid
-        && ((LayergroupAddLayerCommand*)arg)->m_layerid == layerid;
-}
-
-TEST_F(DBUSCommunicatorTest, AddlayerTolayerGroup) {
-
-    EXPECT_CALL(this->mockCommandExecutor, execute( LayergroupAddLayerCommandEq(36u,77u))).Times(1);
-    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("AddLayerToLayerGroup uint32:36 uint32:77")).c_str()));
-}
-
-MATCHER_P2(LayergroupRemoveLayerCommandEq, layerid,layergroupid, "%(*)s"){
-    return ((LayergroupRemoveLayerCommand*)arg)->m_layergroupid == layergroupid
-        && ((LayergroupRemoveLayerCommand*)arg)->m_layerid == layerid;
-}
-
-TEST_F(DBUSCommunicatorTest, RemovelayerFromlayerGroup) {
-
-    EXPECT_CALL(this->mockCommandExecutor, execute( LayergroupRemoveLayerCommandEq(36u,77u))).Times(1);
-    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("RemoveLayerFromLayerGroup uint32:36 uint32:77")).c_str()));
-}
-
 MATCHER_P2(LayerAddSurfaceCommandEq, surfaceid, layerid, "%(*)s"){
     return ((LayerAddSurfaceCommand*)arg)->m_layerid == layerid
         && ((LayerAddSurfaceCommand*)arg)->m_surfaceid == surfaceid;
@@ -693,54 +525,6 @@ TEST_F(DBUSCommunicatorTest, RemoveSurfaceFromlayer) {
 
     EXPECT_CALL(this->mockCommandExecutor, execute( LayerRemoveSurfaceCommandEq(36u,77u))).Times(1);
     ASSERT_NE(-1, system((DBUSCOMMAND + std::string("RemoveSurfaceFromLayer uint32:36 uint32:77")).c_str()));
-}
-
-/*
-TEST_F(DBUSCommunicatorTest, CreateSurfaceGroup) {
-
-    EXPECT_CALL(this->mockCommandExecutor, execute()).Times(1);
-    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("CreateSurfaceGroup")).c_str()));
-
-    EXPECT_CALL(this->mockCommandExecutor, execute( CreateCommandEq(0u,0u,0u,TypeSurfaceGroup,PIXELFORMAT_R8))).Times(1);
-    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("CreateSurfaceGroup")).c_str()));
-}
-*/
-
-MATCHER_P(SurfacegroupRemoveCommandEq, idToRemove, "%(*)s") {
-    return ((SurfacegroupRemoveCommand*)arg)->m_idToRemove == idToRemove;
-}
-
-TEST_F(DBUSCommunicatorTest, RemoveSurfaceGroup) {
-
-    EXPECT_CALL(this->mockCommandExecutor, execute(SurfacegroupRemoveCommandEq(8554u))).Times(1);
-    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("RemoveSurfaceGroup uint32:8554")).c_str()));
-
-    EXPECT_CALL(this->mockCommandExecutor, execute(SurfacegroupRemoveCommandEq(34589u))).Times(1);
-    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("RemoveSurfaceGroup uint32:34589")).c_str()));
-}
-
-/*
-TEST_F(DBUSCommunicatorTest, CreatelayerGroup) {
-
-    EXPECT_CALL(this->mockCommandExecutor, execute( CreateCommandEq(0u,0u,0u,TypeLayerGroup,PIXELFORMAT_R8))).Times(1);
-    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("CreateLayerGroup")).c_str()));
-
-    EXPECT_CALL(this->mockCommandExecutor, execute( CreateCommandEq(0u,0u,0u,TypeLayerGroup,PIXELFORMAT_R8))).Times(1);
-    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("CreateLayerGroup")).c_str()));
-}
-*/
-
-MATCHER_P(LayergroupRemoveCommandEq, idToRemove, "%(*)s") {
-    return ((LayergroupRemoveCommand*)arg)->m_idToRemove == idToRemove;
-}
-
-TEST_F(DBUSCommunicatorTest, RemovelayerGroup) {
-
-    EXPECT_CALL(this->mockCommandExecutor, execute(LayergroupRemoveCommandEq(8554u))).Times(1);
-    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("RemoveLayerGroup uint32:8554")).c_str()));
-
-    EXPECT_CALL(this->mockCommandExecutor, execute(LayergroupRemoveCommandEq(34589u))).Times(1);
-    ASSERT_NE(-1, system((DBUSCOMMAND + std::string("RemoveLayerGroup uint32:34589")).c_str()));
 }
 
 MATCHER_P(LayerGetDimensionCommandEq, id, "%(*)s") {

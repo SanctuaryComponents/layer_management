@@ -19,7 +19,7 @@
 
 #include "GraphicalObject.h"
 
-unsigned int GraphicalObject::nextGraphicId[TypeMax]={1,1,1,1};
+unsigned int GraphicalObject::nextGraphicId[TypeMax]={1,1};
 
 const unsigned int GraphicalObject::INVALID_ID=0xFFFFFFFF;
 

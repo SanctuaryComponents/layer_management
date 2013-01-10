@@ -87,7 +87,6 @@ if (WITH_TESTS)
         tests/LayermanagerTest.cpp
         tests/InputManagerTest.cpp
         tests/GraphicalObjectTest.cpp
-        tests/GraphicalGroupTest.cpp
         tests/GraphicalSurfaceTest.cpp
         tests/SurfaceTest.cpp
         tests/LayerTest.cpp

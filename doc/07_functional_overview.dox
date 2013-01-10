@@ -26,14 +26,12 @@ care of which application is shown by the end user needs. Therefore it is possib
 to change the content of the shown application during runtime, sometimes it is
 required that different application content is on top of other applications. An
 important aspect is that a defined interface is given to be able to change the
-application layout during runtime. Additionally means are provided in order to
-group surfaces of applications and layers containing surfaces for easier handling
-as a single entity.
+application layout during runtime.
 
-\image html ./doc/images/relation_of_display_layers_surfaces.png Relation of displays, surfaces and layers and groups thereof
-\image latex ./doc/images/relation_of_display_layers_surfaces.png Relation of displays, surfaces and layers and groups thereof
+\image html ./doc/images/relation_of_display_layers_surfaces.png Relation of displays, surfaces and layers (TODO: update picture - remove groups)
+\image latex ./doc/images/relation_of_display_layers_surfaces.png Relation of displays, surfaces and layers (TODO: update picture - remove groups)
 
-The Types Surface, Layer, SurfaceGroup and LayerGroup are logical entities contained
+The Types Surface and Layer are logical entities contained
 in corresponding classes within the layermanager. They are not platform dependant,
 they are just logical entities or data containers keeping the values for opacity,
 position etc. The class Surface contains a pointer to a platform dependant

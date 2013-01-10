@@ -57,7 +57,7 @@ and provides implementations for common classes, e.g.
 
 The control is responsible for loading communication and renderer packages to be used. The
 control initiates the main class, which in turn contains and manages the scene with the list
-of layers and their surfaces through the Scene object, and the list of logical groups.
+of layers and their surfaces through the Scene object.
 The renderer packages are given access to these lists by the control and the communication
 packages must be able to obtain information about properties requested by clients (e.g.
 “SurfaceGetVisibility”).

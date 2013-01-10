@@ -23,9 +23,7 @@
 
 #include <semaphore.h>
 #include "Layer.h"
-#include "LayerGroup.h"
 #include "Surface.h"
-#include "SurfaceGroup.h"
 #include "LayerList.h"
 #include "SurfaceMap.h"
 #include "LmScreen.h"
@@ -40,7 +38,6 @@
  *
  * Represents a scene with screens which have Layers which contain the Surfaces.
  * Sorting is based upon z-order of the contained layers.
- * Additionally surface and layer group can be used to apply attributes to multiple surfaces or layers at once.
  */
 class IScene
 {
@@ -68,24 +65,6 @@ public:
      * \return pointer to surface
      */
     virtual Surface* createSurface(const uint id, int creatorPid) = 0;
-
-    /**
-     * \brief Create a new layer group within the scene.
-     * \ingroup SceneAPI
-     * \param[in] id id of the layer group
-     * \param[in] creatorPid client process id that requested the creation of this layer group
-     * \return pointer to layer group
-     */
-    virtual LayerGroup* createLayerGroup(const uint id, int creatorPid) = 0;
-
-    /**
-     * \brief Create a new surface group within the scene.
-     * \ingroup SceneAPI
-     * \param[in] id id of the new surface group
-     * \param[in] creatorPid client process id that requested the creation of this surface group
-     * \return pointer to surface group
-     */
-    virtual SurfaceGroup* createSurfaceGroup(const uint id, int creatorPid) = 0;
 
     /**
      * \brief Remove a layer from the scene.
@@ -126,22 +105,6 @@ public:
     virtual Surface* getSurface(const uint id) = 0;
 
     /**
-     * \brief Get a surface group by id
-     * \ingroup SceneAPI
-     * \param[in] id id of surface group
-     * \return pointer to surface group with id
-     */
-    virtual SurfaceGroup* getSurfaceGroup(const uint id) = 0;
-
-    /**
-     * \brief Get a layer group by id
-     * \ingroup SceneAPI
-     * \param[in] id id of the layer group
-     * \return pointer to the layer group with id
-     */
-    virtual LayerGroup* getLayerGroup(const uint id) = 0;
-
-    /**
      * \brief Get list of ids of all layers currently existing.
      * \ingroup SceneAPI
      * \param[out] length length of array returned in array
@@ -170,24 +133,6 @@ public:
     virtual void getSurfaceIDs(uint* length, uint** array) const = 0;
 
     /**
-     * \brief Get list of ids of all layers currently existing.
-     * \ingroup SceneAPI
-     * \param[out] length length of array returned in array
-     * \param[out] array array containing the ids of all layer groups
-     * \return list of ids of all currently know layers
-     */
-    virtual void getLayerGroupIDs(uint* length, uint* array[]) const = 0;
-
-    /**
-     * \brief Get list of ids of all layers currently existing.
-     * \ingroup SceneAPI
-     * \param[out] length length of array returned in array
-     * \param[out] array array containing the ids of all surface groups
-     * \return list of ids of all currently know layers
-     */
-    virtual void getSurfaceGroupIDs(uint* length, uint* array[]) const = 0;
-
-    /**
      * \brief Lock the list for read and write access
      * \ingroup SceneAPI
      */
@@ -213,20 +158,6 @@ public:
      * \return reference to screen list
      */
     virtual LmScreenList& getScreenList() = 0;
-
-    /**
-     * \brief Remove a surface group from scene.
-     * \ingroup SceneAPI
-     * \param[in] surface pointer to surface to be removed
-     */
-    virtual void removeSurfaceGroup(SurfaceGroup *surface) = 0;
-
-    /**
-     * \brief Remove a layer group from scene.
-     * \ingroup SceneAPI
-     * \param[in] layer pointer to layer group to be removed
-     */
-    virtual void removeLayerGroup(LayerGroup *layer) = 0;
 
     /**
      * \brief Get a map of all surface from the scene.
