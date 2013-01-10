@@ -84,23 +84,18 @@ void printScreenProperties(unsigned int screenid, const char* prefix)
             << ")\n";
     cout << prefix << "---------------------------------------\n";
 
-    unsigned int resolutionX = 0;
-    unsigned int resolutionY = 0;
-    ilm_getScreenResolution(screenid, &resolutionX, &resolutionY);
-    cout << prefix << "- resolution:           x=" << resolutionX << ", y="
-            << resolutionY << "\n";
+    ilmScreenProperties screenProperties;
+    ilm_getPropertiesOfScreen(screenid, &screenProperties);
+    cout << prefix << "- resolution:           x=" << screenProperties.screenWidth << ", y="
+            << screenProperties.screenHeight << "\n";
 
-    unsigned int hwLayerCount = 0;
-    ilm_getNumberOfHardwareLayers(screenid, &hwLayerCount);
-    cout << prefix << "- hardware layer count: " << hwLayerCount << "\n";
+    cout << prefix << "- hardware layer count: " << screenProperties.harwareLayerCount << "\n";
 
     cout << prefix << "- layer render order:   ";
-    int layerCount = 0;
-    unsigned int* layerArray = NULL;
-    ilm_getLayerIDsOnScreen(screenid, &layerCount, &layerArray);
-    for (int layerIndex = 0; layerIndex < layerCount; ++layerIndex)
+
+    for (int layerIndex = 0; layerIndex < screenProperties.layerCount; ++layerIndex)
     {
-        unsigned int layerid = layerArray[layerIndex];
+        t_ilm_layer layerid = screenProperties.layerIds[layerIndex];
         cout << layerid << "(0x" << hex << layerid << dec << "), ";
     }
     cout << "\n";
