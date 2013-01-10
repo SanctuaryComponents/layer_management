@@ -154,6 +154,7 @@ private:
     void SurfaceRemoveNotification(t_ilm_message message);
     void SetOptimizationMode(t_ilm_message message);
     void GetOptimizationMode(t_ilm_message message);
+    void GetPropertiesOfScreen(t_ilm_message message);
 
 private:
     void RemoveApplicationReference(char* owner);

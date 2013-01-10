@@ -19,6 +19,7 @@
 
 #include "GenericCommunicator.h"
 #include "ilm_types.h"
+#include "LmScreen.h"
 #include "Log.h"
 #include "Configuration.h"
 
@@ -83,6 +84,7 @@
 #include <string>
 #include <pthread.h>
 #include <signal.h>
+#include <vector>
 
 #define DEFAULT_SCREEN 0
 
@@ -174,7 +176,8 @@ GenericCommunicator::GenericCommunicator(ICommandExecutor& executor, Configurati
         { "LayerRemoveNotification",          &GenericCommunicator::LayerRemoveNotification },
         { "SurfaceRemoveNotification",        &GenericCommunicator::SurfaceRemoveNotification },
         { "SetOptimizationMode",              &GenericCommunicator::SetOptimizationMode },
-        { "GetOptimizationMode",              &GenericCommunicator::GetOptimizationMode }
+        { "GetOptimizationMode",              &GenericCommunicator::GetOptimizationMode },
+        { "GetPropertiesOfScreen",            &GenericCommunicator::GetPropertiesOfScreen }
     };
 
     int entryCount = sizeof(manager_methods) / sizeof(MethodTable);
@@ -2549,4 +2552,44 @@ void GenericCommunicator::GetOptimizationMode(t_ilm_message message)
 
 }
 
+void GenericCommunicator::GetPropertiesOfScreen(t_ilm_message message)
+{
+    t_ilm_message response;
+    t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
+    uint id = 0;
+    m_ipcModule.getUint(message, &id);
+
+    LmScreen* screen = m_executor->getScene()->getScreen(id);
+    if (screen != NULL)
+    {
+        LayerList renderOrder = screen->getCurrentRenderOrder();
+        std::vector<t_ilm_layer> layerIdVector;
+
+        LayerListConstIterator iter = renderOrder.begin();
+        LayerListConstIterator end = renderOrder.end();
+        for (; iter != end; ++iter)
+        {
+            layerIdVector.push_back((*iter)->getID());
+        }
+
+        uint numberOfHardwareLayers = m_executor->getNumberOfHardwareLayers(id);
+        uint* resolution = m_executor->getScreenResolution(id);
+
+        response = m_ipcModule.createResponse(message);
+        m_ipcModule.appendUintArray(response, layerIdVector.data(), layerIdVector.size());
+        m_ipcModule.appendUint(response,numberOfHardwareLayers);
+        m_ipcModule.appendUint(response, resolution[0]);
+        m_ipcModule.appendUint(response, resolution[1]);
+    }
+    else
+    {
+        response = m_ipcModule.createErrorResponse(message);
+        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+    }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1);
+    m_ipcModule.destroyMessage(response);
+}
+
 DECLARE_LAYERMANAGEMENT_PLUGIN(GenericCommunicator)
+
