@@ -340,6 +340,12 @@ void setScene(t_scene_data* pScene, bool clean)
         t_ilm_display screen = *it;
         vector<t_ilm_layer>& layers = pScene->screenLayers[screen];
 
+        //if vector data is NULL (no data in vector)
+        if (layers.data() == NULL)
+        {
+            layers.reserve(1);
+        }
+
         ilm_displaySetRenderOrder(screen, layers.data(), layers.size());
     }
 
@@ -351,6 +357,11 @@ void setScene(t_scene_data* pScene, bool clean)
     {
         t_ilm_layer layer = it->first;
         vector<t_ilm_surface>& surfaces = it->second;
+        if(surfaces.data() == NULL)
+        {
+            surfaces.reserve(1);
+        }
+
         ilm_layerSetRenderOrder(layer, surfaces.data(), surfaces.size());
     }
 

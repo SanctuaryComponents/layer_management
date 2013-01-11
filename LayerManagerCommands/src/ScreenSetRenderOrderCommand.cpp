@@ -61,6 +61,11 @@ ExecutionResult ScreenSetRenderOrderCommand::execute(ICommandExecutor* executor)
 
     LOG_DEBUG("ScreenSetRenderOrderCommand", "Length to set: " << m_length);
 
+    if (m_length == 0)
+    {
+        result = ExecutionSuccessRedraw;
+    }
+
     for (unsigned int i = 0; i < m_length; i++)
     {
         LOG_DEBUG("ScreenSetRenderOrderCommand", "Trying to add layer: " << m_array[i] << " to current render order");
