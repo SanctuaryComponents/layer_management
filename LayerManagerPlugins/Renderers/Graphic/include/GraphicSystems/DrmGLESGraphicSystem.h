@@ -47,6 +47,13 @@ struct DrmMode {
 	wl_list			link;
 };
 
+struct DrmOutput;
+struct DrmFb {
+	struct gbm_bo    *bo;
+	struct DrmOutput *output;
+	uint32_t          fbId;
+};
+
 struct DrmOutput {
 	struct wl_list  link;
 	struct DrmMode*	currentMode;
@@ -54,12 +61,13 @@ struct DrmOutput {
 	uint32_t        crtcID;
 	uint32_t        connectorID;
 	drmModeCrtcPtr  orgCrtc;
-	uint32_t        fbID[2];
-	uint32_t        current;
+	int             pageFlipPending;
 	int             fdDev;
-	struct gbm_surface*	surface[2];
-	EGLSurface	eglSurface[2];
+	struct gbm_surface *surface;
+	struct DrmFb       *current, *next;
+	EGLSurface	eglSurface;
 	uint32_t	screenID;
+	BaseWindowSystem *windowSystem;
 };
 
 class DrmGLESGraphicSystem: public GLESGraphicsystem
@@ -81,8 +89,6 @@ private:
 	struct wl_list m_outputList;
 
 	gbm_device*    m_gbm;
-	struct gbm_surface*   m_dummySurface;
-	EGLSurface     m_dummyEglSurface;
 	int            m_fdDev;
 	uint32_t*      m_crtcs;
 	int            m_crtcsNum;
