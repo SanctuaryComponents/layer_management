@@ -22,7 +22,6 @@
 #include <string.h>
 #include <assert.h>
 #include "WLSurface.h"
-#include "InputManager.h"
 
 WLSurface::WLSurface(WLContext* wlContext)
 : m_wlContext(wlContext)
@@ -94,7 +93,7 @@ WLSurface::CreateIlmSurface(t_ilm_layer* layerId,
 
     rtnv = ilm_layerAddSurface(*layerId, *surfaceId);
     rtnv = ilm_UpdateInputEventAcceptanceOn(*surfaceId,
-                                            INPUT_DEVICE_POINTER | INPUT_DEVICE_TOUCH,
+                                            ILM_INPUT_DEVICE_POINTER | ILM_INPUT_DEVICE_TOUCH,
                                             ILM_TRUE);
     rtnv = ilm_SetKeyboardFocusOn(*surfaceId);
 
