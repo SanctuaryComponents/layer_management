@@ -20,33 +20,40 @@
 #ifndef __CONFIG_H__
 #define __CONFIG_H__
 
-// Auto-generated. Do not modify.
-// Variables configured by CMake build system
+/*
+ Auto-generated. Do not modify.
+ Variables configured by CMake build system
+*/
 
-//-----------------------------------------------------------------------------
-// string variables
-//-----------------------------------------------------------------------------
-// version of the LayerManagementService
+/*
+-----------------------------------------------------------------------------
+ string variables
+-----------------------------------------------------------------------------
+*/
+/* version of the LayerManagementService */
 #define ILM_VERSION          "${ILM_VERSION}"
 
-// CMake build type, e.g. Debug, Release
+/* CMake build type, e.g. Debug, Release */
 #define CMAKE_BUILD_TYPE     "${CMAKE_BUILD_TYPE}"
 
-// compiler flags used to build project
+/* compiler flags used to build project */
 #define CMAKE_CXX_FLAGS      "${CMAKE_CXX_FLAGS}"
 
-// install prefix of target platform
+/* install prefix of target platform */
 #define CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}"
 
-
-//-----------------------------------------------------------------------------
-// build flags
-//-----------------------------------------------------------------------------
+/*
+-----------------------------------------------------------------------------
+ build flags
+-----------------------------------------------------------------------------
+*/
 ${EXPORTED_BUILD_FLAGS}
 
-//-----------------------------------------------------------------------------
-// human readable report
-//-----------------------------------------------------------------------------
+/*
+-----------------------------------------------------------------------------
+ human readable report
+-----------------------------------------------------------------------------
+*/
 #define DEBUG_FLAG 1
 #define INFO_FLAG  2
 
@@ -67,23 +74,26 @@ ${EXPORTED_BUILD_FLAG_ARRAY}
 
 const int gBuildFlagCount = sizeof(gBuildFlags) / sizeof(gBuildFlags[0]);
 
-
-//-----------------------------------------------------------------------------
-// manage list of statically linked plugins
-//-----------------------------------------------------------------------------
+/*
+-----------------------------------------------------------------------------
+ manage list of statically linked plugins
+-----------------------------------------------------------------------------
+*/
 #define REGISTER_PLUGIN(PLUGIN) \
     extern "C" IPlugin* create ## PLUGIN(ICommandExecutor& executor, Configuration& config); \
     static bool PLUGIN ## _instance = PluginManager::registerStaticPluginCreateFunction(create ## PLUGIN);
 
 #define STATIC_PLUGIN_REGISTRATION ${STATIC_PLUGIN_REGISTRATION}
 
-//-----------------------------------------------------------------------------
-// define plugin entry point depending on build settings
-//-----------------------------------------------------------------------------
+/*
+-----------------------------------------------------------------------------
+ define plugin entry point depending on build settings
+-----------------------------------------------------------------------------
+*/
 #define DECLARE_LAYERMANAGEMENT_PLUGIN(name) \
 extern "C" IPlugin* create ## name(ICommandExecutor& executor, Configuration& config) \
 { \
     return new name(executor, config); \
 }
 
-#endif // __CONFIG_H__
+#endif /* __CONFIG_H__ */

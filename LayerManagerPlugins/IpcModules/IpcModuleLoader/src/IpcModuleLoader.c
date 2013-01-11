@@ -23,27 +23,24 @@
 #include <stdlib.h>
 #include <dlfcn.h>
 #include <errno.h>
-#include <dirent.h> // DIR
-#include <string.h> // strcpy, strcat, strstr
+#include <dirent.h> /* DIR*/
+#include <string.h> /* strcpy, strcat, strstr*/
 
-
-//=============================================================================
-// global variables
-//=============================================================================
+/*
+=============================================================================
+ global variables
+=============================================================================
+*/
 const char* gDefaultPluginLookupPath = CMAKE_INSTALL_PREFIX"/lib/layermanager";
 const char* gCommunicatorPluginDirectory = "ipcmodules";
 
-
-//=============================================================================
-// plugin loading
-//=============================================================================
+/*
+=============================================================================
+ plugin loading
+=============================================================================
+*/
 t_ilm_bool loadSymbolTable(struct IpcModule* ipcModule, char* path, char* file)
 {
-    t_ilm_bool returnValue = ILM_FALSE;
-    void* pluginLibHandle = 0;
-    char fullFilePath[1024];
-    fullFilePath[0] = '\0';
-
     struct ApiFunction
     {
         const char* name;
@@ -93,6 +90,11 @@ t_ilm_bool loadSymbolTable(struct IpcModule* ipcModule, char* path, char* file)
 
     const unsigned int apiFunctionCount = sizeof (ApiFunctionTable) / sizeof(struct ApiFunction);
     unsigned int symbolCount = 0;
+    t_ilm_bool returnValue = ILM_FALSE;
+    void* pluginLibHandle = 0;
+    char fullFilePath[1024];
+    fullFilePath[0] = '\0';
+
 
     snprintf(fullFilePath, sizeof(fullFilePath), "%s/%s", path, file);
 
@@ -109,11 +111,11 @@ t_ilm_bool loadSymbolTable(struct IpcModule* ipcModule, char* path, char* file)
             if (*func->funcPtr)
             {
                 symbolCount++;
-                //printf("[ OK ] symbol %s\n", func->name);
+                 /*printf("[ OK ] symbol %s\n", func->name);*/
             }
             else
             {
-                //printf("[FAIL] symbol %s\n", func->name);
+                 /*printf("[FAIL] symbol %s\n", func->name);*/
             }
         }
     }
@@ -136,9 +138,11 @@ t_ilm_bool loadSymbolTable(struct IpcModule* ipcModule, char* path, char* file)
         }
     }
 
-    // Note: will break plugin. must be done during shutdown,
-    // but currently there is no unloadIpcModule
-    //dlclose(pluginLibHandle);
+     /*
+      Note: will break plugin. must be done during shutdown,
+      but currently there is no unloadIpcModule
+     dlclose(pluginLibHandle);
+     */
 
     return returnValue;
 }
@@ -146,24 +150,25 @@ t_ilm_bool loadSymbolTable(struct IpcModule* ipcModule, char* path, char* file)
 t_ilm_bool loadIpcModule(struct IpcModule* communicator)
 {
     t_ilm_bool result = ILM_FALSE;
+    char path[1024];
+    DIR *directory;
 
-    // find communicator client plugin
+     /* find communicator client plugin*/
     char* pluginLookupPath = getenv("LM_PLUGIN_PATH");
     if  (pluginLookupPath)
     {
        gDefaultPluginLookupPath = pluginLookupPath;
     }
 
-    char path[1024];
 
     snprintf(path, sizeof(path), "%s/%s", gDefaultPluginLookupPath,
                                           gCommunicatorPluginDirectory);
 
-    // open directory
-    DIR *directory = opendir(path);
+     /* open directory*/
+    directory = opendir(path);
     if (directory)
     {
-        // iterate content of directory
+         /* iterate content of directory*/
         struct dirent *itemInDirectory = 0;
         while ((itemInDirectory = readdir(directory)) && !result)
         {

@@ -339,4 +339,4 @@ typedef enum PluginApi
 #define PLUGIN_IS_SCENEPROVIDER(x) ((x) & SceneProvider_Api)
 #define PLUGIN_IS_HEALTHMONITOR(x) ((x) & HealthMonitor_Api)
 
-#endif // _ILM_TYPES_H_
+#endif /* _ILM_TYPES_H_*/

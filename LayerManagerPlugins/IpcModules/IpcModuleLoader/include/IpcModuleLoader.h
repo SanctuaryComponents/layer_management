@@ -21,7 +21,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif // __cplusplus
+#endif /* __cplusplus*/
 
 #include "ilm_types.h"
 
@@ -46,7 +46,7 @@ struct IpcModule
     t_ilm_bool (*sendToClients)(t_ilm_message, t_ilm_client_handle*, int);
     t_ilm_bool (*sendToService)(t_ilm_message);
 
-    t_ilm_message (*receive)(t_ilm_int); // timeout in ms
+    t_ilm_message (*receive)(t_ilm_int); /* timeout in ms*/
 
     t_ilm_const_string (*getMessageName)(t_ilm_message);
     t_ilm_message_type (*getMessageType)(t_ilm_message);
@@ -69,7 +69,7 @@ struct IpcModule
 t_ilm_bool loadIpcModule(struct IpcModule* communicator);
 
 #ifdef __cplusplus
-}  // extern "C"
-#endif // __cplusplus
+}  /* extern "C"*/
+#endif /* __cplusplus*/
 
-#endif // __IPCMODULELOADER_H_
+#endif /* __IPCMODULELOADER_H_*/

@@ -37,7 +37,7 @@ MACRO(project_type mode)
 ENDMACRO(project_type)
 
 MACRO(export_build_flag name description)
-    set (descLine "// ${description}")
+    set (descLine "/* ${description} */")
     set (nameLine "#cmakedefine ${name}")
     SET(BUILD_FLAG_LIST  "${BUILD_FLAG_LIST};${descLine};${nameLine}; " CACHE INTERNAL "")
     SET(BUILD_FLAG_ARRAY "${BUILD_FLAG_ARRAY};${name}" CACHE INTERNAL "")
