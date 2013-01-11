@@ -186,6 +186,11 @@ void scatterHandleUserInput(t_scene_data* pOriginalScene, t_scene_data* pScatter
             pthread_join(highlightThread, NULL);
             break;
         }
+        else if (userInput[0] >= 'a' && userInput[0] <='z')
+        {
+            //switch to uppercase
+            userInput[0] += 'A' - 'a';
+        }
 
         userInput[1] = cin.get();
         //if the user presses Enter by mistake: reset input
