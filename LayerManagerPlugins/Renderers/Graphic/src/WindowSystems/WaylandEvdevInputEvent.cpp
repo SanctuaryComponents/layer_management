@@ -41,6 +41,8 @@
 #include "InputManager.h"
 #include "WindowSystems/WaylandEvdevInputEvent.h"
 
+#define ARRAY_LENGTH(a) (sizeof (a) / sizeof (a)[0])
+
 #define WL_UNUSED(A) (A)=(A)
 static const char default_seat[] = "seat0";
 
@@ -903,7 +905,11 @@ WaylandEvdevInputEvent::notifyKeyboardFocusIn(struct wl_array *keys,
     if ((wlSeat = m_inputDevice->seat()) == NULL){
         return;
     }
+    if (!wlSeat->keyboard){
+        return;
+    }
     serial = wl_display_next_serial(m_inputDevice->display());
+    wl_array_init(&wlSeat->keyboard->keys);
     wl_array_copy(&wlSeat->keyboard->keys, keys);
 
     struct wl_array *array = &wlSeat->keyboard->keys;
@@ -1591,10 +1597,10 @@ WaylandEvdevInputEvent::notifyModifiers(struct wl_seat *wlSeat, uint32_t serial)
     uint32_t mods_lookup;
     int changed = 0;
 
-    mods_depressed = xkb_state_serialize_mods(m_xkbState.state, XKB_STATE_DEPRESSED);
-    mods_latched   = xkb_state_serialize_mods(m_xkbState.state, XKB_STATE_LATCHED);
-    mods_locked    = xkb_state_serialize_mods(m_xkbState.state, XKB_STATE_LOCKED);
-    group          = xkb_state_serialize_mods(m_xkbState.state, XKB_STATE_EFFECTIVE);
+    mods_depressed = xkb_state_serialize_mods(m_xkbState.state, (xkb_state_component)XKB_STATE_DEPRESSED);
+    mods_latched   = xkb_state_serialize_mods(m_xkbState.state, (xkb_state_component)XKB_STATE_LATCHED);
+    mods_locked    = xkb_state_serialize_mods(m_xkbState.state, (xkb_state_component)XKB_STATE_LOCKED);
+    group          = xkb_state_serialize_mods(m_xkbState.state, (xkb_state_component)XKB_STATE_EFFECTIVE);
 
     if (mods_depressed != wlSeat->keyboard->modifiers.mods_depressed ||
         mods_latched   != wlSeat->keyboard->modifiers.mods_latched   ||
