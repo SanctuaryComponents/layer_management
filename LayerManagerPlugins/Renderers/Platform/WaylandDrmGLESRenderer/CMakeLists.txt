@@ -33,6 +33,7 @@ find_package(EGL REQUIRED)
 find_package(GLESv2 REQUIRED)
 find_package(Threads REQUIRED)
 
+set(X11GLES_RENDERER_PATH ${CMAKE_SOURCE_DIR}/LayerManagerPlugins/Renderers/Platform/X11GLESRenderer)
 include_directories(
     include
     ${CMAKE_SOURCE_DIR}/LayerManagerBase/include
@@ -40,9 +41,15 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/LayerManagerPlugins/Renderers/Base/include
     ${CMAKE_SOURCE_DIR}/LayerManagerPlugins/Renderers/Graphic/include
     ${CMAKE_SOURCE_DIR}/LayerManagerPlugins/Renderers/Platform/WaylandGLESRenderer/include
+    ${DRM_INCLUDE_DIR}
+    ${EGL_INCLUDE_DIR}
+    ${GLESv2_INCLUDE_DIR}
+    ${X11GLES_RENDERER_PATH}/include
 )
 
 set(LIBS
+    ${EGL_LIBRARY}
+    ${GLESv2_LIBRARIES}
     LayerManagerUtils
     WaylandGLESRenderer
     LayerManagerGraphicWaylandDrmGLESv2
@@ -50,9 +57,9 @@ set(LIBS
 
 set(SRC_FILES
     src/WaylandDrmGLESRenderer.cpp
+    ${X11GLES_RENDERER_PATH}/src/ShaderProgramGLES.cpp
 )
 
-set(X11GLES_RENDERER_PATH ${CMAKE_SOURCE_DIR}/LayerManagerPlugins/Renderers/Platform/X11GLESRenderer)
 install(FILES   ${X11GLES_RENDERER_PATH}/renderer_frag_clear.glslf
                 ${X11GLES_RENDERER_PATH}/renderer_frag.glslf
                 ${X11GLES_RENDERER_PATH}/renderer_frag_no_blend.glslf
