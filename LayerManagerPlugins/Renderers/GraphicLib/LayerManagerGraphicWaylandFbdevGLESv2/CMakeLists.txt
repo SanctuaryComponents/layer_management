@@ -19,7 +19,7 @@
 ############################################################################
 
 cmake_minimum_required (VERSION 2.6)
-project(LayerManagerGraphicWaylandX11GLESv2)
+project(LayerManagerGraphicWaylandFbdevGLESv2)
 project_type(CORE)
 
 #===========================================================================
@@ -32,7 +32,6 @@ SET(GRAPHIC_LIB_DIR ${CMAKE_SOURCE_DIR}/LayerManagerPlugins/Renderers/Graphic)
 # component
 #===========================================================================
 find_package(Wayland REQUIRED)
-find_package(X11 REQUIRED)
 
 include_directories(
     ${GRAPHIC_LIB_DIR}/include
@@ -40,8 +39,6 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/config
     ${CMAKE_SOURCE_DIR}/LayerManagerBase/include
     ${CMAKE_SOURCE_DIR}/LayerManagerUtils/include
-    ${X11_INCLUDE_DIR}
-    ${X11_INCLUDE_DIR}
     ${WAYLAND_SERVER_INCLUDE_DIR}
 )
 
