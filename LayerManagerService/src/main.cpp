@@ -28,8 +28,6 @@
 #include "Scene.h"
 #include "Log.h"
 
-#include <unistd.h> // todo: remove
-
 int main(int argc, char **argv)
 {
     // collect all configuration settings
@@ -52,11 +50,8 @@ int main(int argc, char **argv)
         if (layermanager.startManagement())
         {
             LOG_INFO("LayerManagerService", "Startup complete. EnterMainloop");
+            signalHandler.waitForShutdownSignal();
 
-            while (!signalHandler.shutdownSignalReceived())
-            {
-                sleep(1);
-            }
             LOG_DEBUG("LayerManagerService", "Stopping service.");
             layermanager.stopManagement();
         }

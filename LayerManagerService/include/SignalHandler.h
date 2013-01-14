@@ -27,7 +27,7 @@ class SignalHandler
 public:
     SignalHandler();
     ~SignalHandler();
-    t_ilm_bool shutdownSignalReceived();
+    void waitForShutdownSignal();
 };
 
 #endif // __SIGNALHADLER_H__

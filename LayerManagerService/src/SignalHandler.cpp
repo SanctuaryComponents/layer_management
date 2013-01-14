@@ -23,17 +23,17 @@
 
 #include <signal.h>
 #include <stdlib.h>   // exit
+#include <pthread.h>  // mutex
 
 #ifdef HAVE_EXECINFO_H
     #include <execinfo.h>
 #endif
 
 
-
 //===========================================================================
-// Prototypes
+// global variables
 //===========================================================================
-static t_ilm_bool gShutdownReceived = ILM_FALSE;
+static pthread_mutex_t gShutdownReceived = PTHREAD_MUTEX_INITIALIZER;
 
 //===========================================================================
 // Prototypes
@@ -46,6 +46,7 @@ void incomingSignalCallback(int sig);
 SignalHandler::SignalHandler()
 {
     LOG_DEBUG("LayerManagerService", "Enabled signal handling.");
+    pthread_mutex_lock(&gShutdownReceived); // no shutdown event received
     signal(SIGBUS, incomingSignalCallback);
     signal(SIGSEGV, incomingSignalCallback);
     signal(SIGTERM, incomingSignalCallback);
@@ -63,9 +64,12 @@ SignalHandler::~SignalHandler()
     signal(SIGABRT, SIG_DFL);
 }
 
-t_ilm_bool SignalHandler::shutdownSignalReceived()
+void SignalHandler::waitForShutdownSignal()
 {
-    return gShutdownReceived;
+    // this mutex is unlocked by the signal handler callback routine
+    // e.g. on incoming SIGTERM or SIGABRT
+    pthread_mutex_lock(&gShutdownReceived);
+    pthread_mutex_unlock(&gShutdownReceived);
 }
 
 //===========================================================================
@@ -98,30 +102,30 @@ void incomingSignalCallback(int sig)
     {
         case SIGTERM:
             LOG_INFO("LayerManagerService", "Signal SIGTERM received. Shutting down.");
-            gShutdownReceived = ILM_TRUE;
+            pthread_mutex_unlock(&gShutdownReceived);
             break;
             
         case SIGINT:
             LOG_INFO("LayerManagerService", "Signal SIGINT received. Shutting down.");
-            gShutdownReceived = ILM_TRUE;
+            pthread_mutex_unlock(&gShutdownReceived);
             break;
             
         case SIGBUS:
             LOG_ERROR("LayerManagerService", "Signal SIGBUS received. Shutting down.");
-            gShutdownReceived = ILM_TRUE;
             printStackTrace();
+            pthread_mutex_unlock(&gShutdownReceived);
             break;
             
         case SIGSEGV:
             LOG_ERROR("LayerManagerService", "Signal SIGSEGV received. Shutting down.");
-            gShutdownReceived = ILM_TRUE;
             printStackTrace();
+            pthread_mutex_unlock(&gShutdownReceived);
             break;
             
         case SIGABRT:
             LOG_ERROR("LayerManagerService", "Signal SIGABRT received. Shutting down.");
-            gShutdownReceived = ILM_TRUE;
             printStackTrace();
+            pthread_mutex_unlock(&gShutdownReceived);
             break;
             
         default:
