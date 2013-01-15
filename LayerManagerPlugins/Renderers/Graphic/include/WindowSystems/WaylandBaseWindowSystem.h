@@ -89,6 +89,8 @@ public:
     void doScreenShotOfSurface(std::string fileName, const uint id, const uint layer_id);
     int getWindowWidth() const;
     int getWindowHeight() const;
+    virtual void finishFrame();
+    virtual void scheduleRepaint(void *data);
 
 protected:
     struct wl_display* m_wlDisplay;
@@ -122,6 +124,10 @@ protected:
     bool m_error;
     int m_width;
     int m_height;
+    bool m_bRepaintNeeded;
+    bool m_bRepaintScheduled;
+    bool m_bUseFrameTimer;
+    struct wl_event_source* m_finishFrameTimer;
 
     struct wl_list m_listFrameCallback;
     struct wl_list m_nativeSurfaceList;
@@ -163,6 +169,7 @@ public:
     static void* eventLoopCallback(void* ptr);
     static void registryHandleGlobalClient(void* data, struct wl_registry* registry, uint32_t name, const char* interface, uint32_t version);
     static void surfaceListenerFrame(void* data, struct wl_callback* callback, uint32_t time);
+    static int finishFrameHandler(void *data);
 
     // wl_surface interface
     static void surfaceIFDestroy(struct wl_client *client, struct wl_resource *resource);

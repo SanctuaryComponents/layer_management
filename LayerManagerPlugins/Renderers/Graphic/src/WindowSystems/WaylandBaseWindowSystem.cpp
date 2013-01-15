@@ -111,6 +111,16 @@ extern "C" {
 
         m_serverInfo = (void*)serverInfo;
     }
+
+    int WaylandBaseWindowSystem::finishFrameHandler(void *data)
+    {
+        BaseWindowSystem* windowSystem = static_cast<BaseWindowSystem*>(data);
+        if (windowSystem)
+        {
+            windowSystem->finishFrame();
+        }
+        return 1;
+    }
 }
 
 WaylandBaseWindowSystem::WaylandBaseWindowSystem(const char* displayname, int width, int height, Scene* pScene, InputManager* pInputManager)
@@ -139,6 +149,10 @@ WaylandBaseWindowSystem::WaylandBaseWindowSystem(const char* displayname, int wi
 , m_error(false)
 , m_width(width)
 , m_height(height)
+, m_bRepaintNeeded(false)
+, m_bRepaintScheduled(false)
+, m_bUseFrameTimer(true)
+, m_finishFrameTimer(NULL)
 , m_listFrameCallback()
 , m_inputEvent(NULL)
 , m_connectionList()
@@ -387,6 +401,12 @@ void WaylandBaseWindowSystem::RedrawAllLayers(bool clear, bool swap)
         calculateFps();
 
         m_systemState = IDLE_STATE;
+    }
+
+    // update the frame timer
+    if (true == m_bUseFrameTimer)
+    {
+        wl_event_source_timer_update(m_finishFrameTimer, 10);
     }
 }
 
@@ -736,7 +756,7 @@ extern "C" void WaylandBaseWindowSystem::surfaceIFCommit(struct wl_client *clien
     wl_list_insert_list(windowSystem->m_listFrameCallback.prev, &nativeSurface->pending.frame_callback_list);
     wl_list_init(&nativeSurface->pending.frame_callback_list);
 
-    idleEventRepaint(windowSystem); 
+    windowSystem->scheduleRepaint(windowSystem);
 
     LOG_DEBUG("WaylandBaseWindowSystem", "surfaceIFCommit OUT");
 }
@@ -828,12 +848,41 @@ void WaylandBaseWindowSystem::repaint(int msecs)
     LOG_DEBUG("WaylandBaseWindowSystem", "repaint OUT");
 }
 
+void WaylandBaseWindowSystem::finishFrame()
+{
+    if (m_bRepaintNeeded)
+    {
+        repaint(getTime());
+        m_bRepaintNeeded = false;
+        return;
+    }
+    m_bRepaintScheduled = false;
+}
+
 void WaylandBaseWindowSystem::idleEventRepaint(void *data)
 {
-    WaylandBaseWindowSystem* windowSystem = static_cast<WaylandBaseWindowSystem*>( (WaylandBaseWindowSystem*)data);
     LOG_DEBUG("WaylandBaseWindowSystem", "idleEventRepaint IN");
-    windowSystem->repaint(getTime());
+    WaylandBaseWindowSystem* windowSystem = static_cast<WaylandBaseWindowSystem*>(data);
+    if (windowSystem)
+    {
+        windowSystem->finishFrame();
+    }
     LOG_DEBUG("WaylandBaseWindowSystem", "idleEventRepaint OUT");
+}
+
+void WaylandBaseWindowSystem::scheduleRepaint(void *data)
+{
+    m_bRepaintNeeded = true;
+
+    if (m_bRepaintScheduled)
+        return;
+
+    struct wl_event_loop *loop = wl_display_get_event_loop(m_wlDisplay);
+    if (loop)
+    {
+        wl_event_loop_add_idle(loop, WaylandBaseWindowSystem::idleEventRepaint, data);
+        m_bRepaintScheduled = true;
+    }
 }
 
 bool WaylandBaseWindowSystem::initCompositor()
@@ -946,6 +995,12 @@ void* WaylandBaseWindowSystem::eventLoop()
         }
         LOG_DEBUG("WaylandBaseWindowSystem", "SUCCESS:init GraphicSystem");
 
+        if (true == m_bUseFrameTimer)
+        {
+            struct wl_event_loop *loop = wl_display_get_event_loop(m_wlDisplay);
+            m_finishFrameTimer = wl_event_loop_add_timer(loop, finishFrameHandler, this);
+        }
+
         // create input event
         status = createInputEvent();
         if (false == status)
@@ -1014,7 +1069,6 @@ void WaylandBaseWindowSystem::signalRedrawEvent()
     struct wl_callback* callback = wl_surface_frame(m_wlSurfaceClient);
     wl_callback_add_listener(callback, &g_frameListener, NULL);
     wl_surface_commit(m_wlSurfaceClient);
-    wl_display_roundtrip(m_wlDisplayClient);
 }
 
 void WaylandBaseWindowSystem::cleanup()
