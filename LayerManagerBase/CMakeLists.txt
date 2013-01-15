@@ -80,8 +80,6 @@ if (WITH_TESTS)
 
     enable_testing()
 
-    set (CMAKE_CXX_FLAGS "")
-
     add_executable(${PROJECT_NAME}_Test
         tests/SceneTest.cpp
         tests/LayermanagerTest.cpp

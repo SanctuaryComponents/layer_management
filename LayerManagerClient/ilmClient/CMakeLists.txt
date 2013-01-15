@@ -62,8 +62,6 @@ install (
 
 if (WITH_TESTS)
 
-    set (CMAKE_CXX_FLAGS "")
-
     enable_testing()
     
     add_executable(${PROJECT_NAME}_Test tests/IlmCommandTest.cpp tests/IlmNotificationTest.cpp src/generic_ilm_client.c)

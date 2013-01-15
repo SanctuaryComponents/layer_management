@@ -17,9 +17,8 @@
 #
 ############################################################################
 
-# set default compiler flags for 3rdParty code
-set (CMAKE_C_FLAGS "")
-set (CMAKE_CXX_FLAGS "")
+project(systemd)
+project_Type(3RDPARTY)
 
 # build systemd reference client library
-add_library(systemd STATIC sd-daemon.c)
+add_library(${PROJECT_NAME} STATIC sd-daemon.c)

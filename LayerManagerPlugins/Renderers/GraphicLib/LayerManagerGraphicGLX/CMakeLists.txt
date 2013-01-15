@@ -99,11 +99,3 @@ install(FILES       ${RENDERERBASE_DIR}/include/BaseRenderer.h
                     ${RENDERERBASE_DIR}/include/RenderUtil.h
         DESTINATION include/layermanager/graphic/Base)
 
-#===========================================================================
-# test
-#===========================================================================
-if (WITH_TESTS)
-    set (CMAKE_CXX_FLAGS "")
-    enable_testing()
-    #add_subdirectory_once (${GRAPHIC_LIB_DIR}/tests)
-endif(WITH_TESTS)

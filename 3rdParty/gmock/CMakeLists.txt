@@ -17,12 +17,11 @@
 #
 ############################################################################
 
-# set default compiler flags for 3rdParty code
-set (CMAKE_C_FLAGS "")
-set (CMAKE_CXX_FLAGS "")
+project(gmock)
+project_Type(3RDPARTY)
 
 # include base path to 3rdParty code
 include_directories ("..")
 
 # build unit test frameworks, if tests are enabled
-add_library(gmock STATIC gmock-gtest-all.cc gmock_main.cc)
+add_library(${PROJECT_NAME} STATIC gmock-gtest-all.cc gmock_main.cc)
