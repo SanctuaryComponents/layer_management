@@ -82,6 +82,7 @@ if (WITH_TESTS)
 
     add_executable(${PROJECT_NAME}_Test
         tests/SceneTest.cpp
+        tests/ScreenTest.cpp
         tests/LayermanagerTest.cpp
         tests/InputManagerTest.cpp
         tests/GraphicalObjectTest.cpp
