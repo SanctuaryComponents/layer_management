@@ -46,6 +46,9 @@ WaylandDrmWindowSystem::WaylandDrmWindowSystem(const char* displayname, int widt
 , m_fdDev(-1), m_gbm(NULL)
 {
     LOG_DEBUG("WaylandDrmWindowSystem", "creating WaylandDrmWindowSystem width:" << width << " height:" << height);
+
+    // Because of using DrmMode, it's not necessary to use frame timer.
+    m_bUseFrameTimer = false;
 }
 
 WaylandDrmWindowSystem::~WaylandDrmWindowSystem()
