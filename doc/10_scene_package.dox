@@ -22,9 +22,9 @@
 
 \section scenePackageOverview Overview
 
-The scene is an entity for managing the list of layers, their surfaces and the
+The scene is an entity for managing the list of screens, layers, their surfaces and the
 respective properties. It is passed to the render packages so it can be used to
-iterate through the layers and surfaces and render these in the required render
+iterate through the screens, layers and surfaces and render these in the required render
 order.
 
 \image html ./doc/images/class_diagram_internal_container_types.png Class Diagram of Internal Container Types

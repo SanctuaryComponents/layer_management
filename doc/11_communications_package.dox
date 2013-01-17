@@ -47,8 +47,7 @@ in chapter 6. When receiving commands on this communication channel the package 
 one or more of the command objects described below and calls the execute method of the
 layermanager with these command objects. The command objects contain everything which
 is needed to execute the command, the parameters, the type of command etc. Changes to
-the list of layers and properties are then performed at a central point within the
-layermanager.
+the scene elements and their properties are then executed within the layermanager.
 
 An implementation of a communication library must subclass ICommunicator and
 implement the inherited start() and stop() methods, as well as a way to load the

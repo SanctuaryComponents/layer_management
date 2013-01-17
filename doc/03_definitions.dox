@@ -26,16 +26,32 @@
         <th>Definition</th>
     </tr>
     <tr>
-        <td>Surface</td>
-        <td>Graphical content of an application. One application can provide several surfaces.</td>
+        <td>Scene</td>
+        <td>Logical container for multiple screens, layers and surfaces.</td>
+    </tr>
+    <tr>
+        <td>Screen</td>
+        <td>Logical container for multiple layers.</td>
     </tr>
     <tr>
         <td>Layer</td>
         <td>Logical container for multiple surfaces.</td>
     </tr>
     <tr>
+        <td>Surface</td>
+        <td>Graphical content of an application. One application can provide several surfaces.</td>
+    </tr>
+    <tr>
+        <td>ILM</td>
+        <td>IVI Layer Management</td>
+    </tr>
+    <tr>
         <td>IPC</td>
         <td>Inter Process Communication.</td>
+    </tr>
+    <tr>
+        <td>IVI</td>
+        <td>In Vehicle Infotainment</td>
     </tr>
     <tr>
         <td>RenderOrder</td>
