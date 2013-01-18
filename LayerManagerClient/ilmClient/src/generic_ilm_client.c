@@ -1961,6 +1961,15 @@ ilmErrorTypes ilm_getPropertiesOfScreen(t_ilm_display screenID, struct ilmScreen
     {
         returnValue = ILM_SUCCESS;
     }
+    else
+    {
+        pScreenProperties->layerCount = 0;
+        pScreenProperties->harwareLayerCount = 0;
+        pScreenProperties->layerIds = NULL;
+        pScreenProperties->screenWidth = 0;
+        pScreenProperties->screenHeight = 0;
+    }
+
     gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
     return returnValue;

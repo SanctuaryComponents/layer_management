@@ -85,20 +85,27 @@ void printScreenProperties(unsigned int screenid, const char* prefix)
     cout << prefix << "---------------------------------------\n";
 
     ilmScreenProperties screenProperties;
-    ilm_getPropertiesOfScreen(screenid, &screenProperties);
-    cout << prefix << "- resolution:           x=" << screenProperties.screenWidth << ", y="
-            << screenProperties.screenHeight << "\n";
-
-    cout << prefix << "- hardware layer count: " << screenProperties.harwareLayerCount << "\n";
-
-    cout << prefix << "- layer render order:   ";
-
-    for (t_ilm_uint layerIndex = 0; layerIndex < screenProperties.layerCount; ++layerIndex)
+    if (ilm_getPropertiesOfScreen(screenid, &screenProperties) == ILM_SUCCESS)
     {
-        t_ilm_layer layerid = screenProperties.layerIds[layerIndex];
-        cout << layerid << "(0x" << hex << layerid << dec << "), ";
+        cout << prefix << "- resolution:           x=" << screenProperties.screenWidth << ", y="
+                << screenProperties.screenHeight << "\n";
+
+        cout << prefix << "- hardware layer count: " << screenProperties.harwareLayerCount << "\n";
+
+        cout << prefix << "- layer render order:   ";
+
+        for (t_ilm_uint layerIndex = 0; layerIndex < screenProperties.layerCount; ++layerIndex)
+        {
+            t_ilm_layer layerid = screenProperties.layerIds[layerIndex];
+            cout << layerid << "(0x" << hex << layerid << dec << "), ";
+        }
+        cout << "\n";
     }
-    cout << "\n";
+    else
+    {
+        cout << "No screen with ID :" << screenid;
+        cout << "\n";
+    }
 }
 
 void printLayerProperties(unsigned int layerid, const char* prefix)
