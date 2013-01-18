@@ -51,82 +51,98 @@ template<typename T> string getPrimitiveType(T var)
 
 template<typename T> string getPrimitiveType(T* var)
 {
+    (void) var;//suppress warning: unsued variable
     T var2=0;
     return getPrimitiveType(var2) + "*";
 }
 
 template<> string getPrimitiveType(bool var)
 {
+    (void) var;//suppress warning: unsued variable
     return "bool";
 }
 
 template<> string getPrimitiveType(char var)
 {
+    (void) var;//suppress warning: unsued variable
     return "char";
 }
 
 template<> string getPrimitiveType(signed char var)
 {
+    (void) var;//suppress warning: unsued variable
     return "signed char";
 }
 
 template<> string getPrimitiveType(unsigned char var)
 {
+    (void) var;//suppress warning: unsued variable
     return "unsigned char";
 }
 
 template<> string getPrimitiveType(wchar_t var)
 {
+    (void) var;//suppress warning: unsued variable
     return "wchar_t";
 }
 
 template<> string getPrimitiveType(short int var)
 {
+    (void) var;//suppress warning: unsued variable
     return "short int";
 }
 
 template<> string getPrimitiveType(unsigned short int var)
 {
+    (void) var;//suppress warning: unsued variable
     return "unsigned short int";
 }
 
 template<> string getPrimitiveType(long int var)
 {
+    (void) var;//suppress warning: unsued variable
     return "long int";
 }
 
 template<> string getPrimitiveType(unsigned long int var)
 {
+    (void) var;//suppress warning: unsued variable
     return "unsigned long int";
 }
 
 template<> string getPrimitiveType(int var)
 {
+    (void) var;//suppress warning: unsued variable
     return "int";
 }
 
 template<> string getPrimitiveType(unsigned int var)
 {
+    (void) var;//suppress warning: unsued variable
     return "unsigned int";
 }
 
 template<> string getPrimitiveType(float var)
 {
+    (void) var;//suppress warning: unsued variable
     return "float";
 }
 
 template<> string getPrimitiveType(double var)
 {
+    (void) var;//suppress warning: unsued variable
     return "double";
 }
 
 template<> string getPrimitiveType(long double var)
 {
+    (void) var;//suppress warning: unsued variable
     return "long double";
 }
 
 template<> string getPrimitiveType(string var)
 {
+    (void) var;//suppress warning: unsued variable
     return "string";
 }
 
@@ -134,21 +150,25 @@ template<> string getPrimitiveType(string var)
 #if defined(__GXX_EXPERIMENTAL_CXX0X) || __cplusplus >= 201103L
 template<> string getPrimitiveType(char16_t var)
 {
+    (void) var;//suppress warning: unsued variable
     return "char16_t";
 }
 
 template<> string getPrimitiveType(char32_t var)
 {
+    (void) var;//suppress warning: unsued variable
     return "char32_t";
 }
 
 template<> string getPrimitiveType(long long int var)
 {
+    (void) var;//suppress warning: unsued variable
     return "long long int";
 }
 
 template<> string getPrimitiveType(unsigned long long int var)
 {
+    (void) var;//suppress warning: unsued variable
     return "unsigned long long int";
 }
 #endif
@@ -171,7 +191,7 @@ public:
 
     virtual void fromString(string s)
     {
-
+        (void) s;//suppress warning: unsued variable
     }
 
     virtual string asString()
@@ -181,22 +201,24 @@ public:
 
     virtual void toStringMapTree(StringMapTree* parent)
     {
-
+        (void) parent;//suppress warning: unsued variable
     }
 
     virtual void toGrammarMapTree(StringMapTree* tree)
     {
-
+        (void) tree;//suppress warning: unsued variable
     }
 
     virtual WrapperHelper* tryClone(string type, StringMapTree* tree)
     {
+        (void) type;//suppress warning: unsued variable
+        (void) tree;//suppress warning: unsued variable
         return NULL;
     }
 
     virtual void addToComplexWrapper(WrapperHelper* wrapper)
     {
-
+        (void) wrapper;//suppress warning: unsued variable
     }
 
     virtual string getWrapperPrimitiveType()
@@ -361,10 +383,12 @@ map<int,string> _globalTypeIndexdToType;
 class class_name;\
 ostream& operator<<(ostream& out, class_name& obj )\
 {\
+    (void) obj;\
     return out;\
 }\
 istream& operator>>(istream& in, class_name& obj)\
 {\
+    (void) obj;\
     return in;\
 }\
 class class_name { \

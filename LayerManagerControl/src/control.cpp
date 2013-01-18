@@ -44,6 +44,7 @@ bool gBenchmark_running;
 
 void benchmarkSigHandler(int sig)
 {
+    (void) sig;
     gBenchmark_running = false;
 }
 

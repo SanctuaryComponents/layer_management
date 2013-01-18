@@ -65,7 +65,7 @@ bool X11CopyGLX::bindSurfaceTexture(Surface* surface)
                     int count = surface->OriginalSourceWidth*surface->OriginalSourceHeight;
                     for (int j=0;j<count; j++)
                     {
-                        xim->data[j*4+3]=255;
+                        xim->data[j*4+3] = (char)255;
                     }
                 }
             } else {

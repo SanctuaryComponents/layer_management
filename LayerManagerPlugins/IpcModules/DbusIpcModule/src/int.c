@@ -21,7 +21,7 @@
 #include "DBUSConfiguration.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>  // memcpy
+#include <string.h>  /* memcpy */
 
 
 t_ilm_bool appendInt(t_ilm_message message, const t_ilm_int value)
@@ -36,10 +36,10 @@ t_ilm_bool appendIntArray(t_ilm_message message, const int* valueArray, int arra
     t_ilm_bool returnValue = ILM_FALSE;
     char signature[2] = { DBUS_TYPE_UINT32, 0 };
     DBusMessageIter arrayIter;
+    t_ilm_int index = 0;
 
     returnValue = dbus_message_iter_open_container(&msg->iter, DBUS_TYPE_ARRAY, signature, &arrayIter);
 
-    t_ilm_int index = 0;
     for (index = 0; index < arraySize; ++index)
     {
         returnValue &= dbus_message_iter_append_basic(&arrayIter, DBUS_TYPE_INT32, &valueArray[index]);
@@ -57,12 +57,12 @@ t_ilm_bool getIntArray(t_ilm_message message, t_ilm_int** valueArray, t_ilm_int*
 
     t_ilm_int type = dbus_message_iter_get_arg_type(&msg->iter);
 
+    DBusMessageIter arrayIter;
+    int index = 0;
+
     if (DBUS_TYPE_ARRAY == type)
     {
         returnValue = ILM_TRUE;
-
-        DBusMessageIter arrayIter;
-        int index = 0;
 
         dbus_message_iter_recurse(&msg->iter, &arrayIter);
 

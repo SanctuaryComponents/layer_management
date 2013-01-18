@@ -21,7 +21,7 @@
 #include "DBUSConfiguration.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>  // memcpy
+#include <string.h>  /* memcpy */
 
 
 t_ilm_bool appendDouble(t_ilm_message message, const t_ilm_float value)

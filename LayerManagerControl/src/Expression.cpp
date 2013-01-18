@@ -107,7 +107,7 @@ int Expression::getInt(string name)
 
     if (!value)
     {
-        sscanf(stringVal.c_str(), "0x%x", &value);
+        sscanf(stringVal.c_str(), "0x%x", (unsigned int*) &value);
     }
     return value;
 }

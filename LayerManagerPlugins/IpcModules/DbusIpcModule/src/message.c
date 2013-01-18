@@ -22,29 +22,35 @@
 #include "introspection.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h> // strdup
+#include <string.h> /* strdup */
 #include <errno.h>
 
-//=============================================================================
-// prototypes internal functions
-//=============================================================================
+/*
+ * =============================================================================
+ * prototypes internal functions
+ * =============================================================================
+ */
 void handleWatchesForFds(fd_set in, fd_set out);
 t_ilm_bool dispatchIncomingMessages();
 
 void registerSignalForNotification(dbusmessage* message, char* signalName);
 void unregisterSignalForNotification(dbusmessage* message, char* signalName);
 
-//=============================================================================
-// message handling
-//=============================================================================
+/*
+ * =============================================================================
+ * message handling
+ * =============================================================================
+ */
 t_ilm_message createMessage(t_ilm_const_string name)
 {
+    dbusmessage* newMessage = NULL;
+
     if (!gDbus.initialized)
     {
         return 0;
     }
 
-    dbusmessage* newMessage = (dbusmessage*)malloc(sizeof(dbusmessage));
+    newMessage = (dbusmessage*)malloc(sizeof(dbusmessage));
     newMessage->type = IpcMessageTypeCommand;
     newMessage->dbusNativeType = DBUS_MESSAGE_TYPE_METHOD_CALL;
     pthread_mutex_lock(&gDbus.mutex);
@@ -59,12 +65,17 @@ t_ilm_message createMessage(t_ilm_const_string name)
 
 t_ilm_message createResponse(t_ilm_message message)
 {
+    dbusmessage* receivedMessage;
+    dbusmessage* newResponse;
+    const char* member = NULL;
+    const char* destination = NULL;
+
     if (!gDbus.initialized)
     {
         return NULL;
     }
-    dbusmessage* receivedMessage = (dbusmessage*)message;
-    dbusmessage* newResponse = (dbusmessage*)malloc(sizeof(dbusmessage));
+    receivedMessage = (dbusmessage*)message;
+    newResponse = (dbusmessage*)malloc(sizeof(dbusmessage));
 
     newResponse->type = IpcMessageTypeCommand;
     newResponse->dbusNativeType = DBUS_MESSAGE_TYPE_METHOD_RETURN;
@@ -73,8 +84,8 @@ t_ilm_message createResponse(t_ilm_message message)
     newResponse->pMessage = dbus_message_new(DBUS_MESSAGE_TYPE_METHOD_RETURN);
     pthread_mutex_unlock(&gDbus.mutex);
 
-    const char* member = dbus_message_get_member(receivedMessage->pMessage);
-    const char* destination = dbus_message_get_sender(receivedMessage->pMessage);
+    member = dbus_message_get_member(receivedMessage->pMessage);
+    destination = dbus_message_get_sender(receivedMessage->pMessage);
     dbus_message_set_member(newResponse->pMessage, member);
     dbus_message_set_destination(newResponse->pMessage, destination);
     dbus_message_set_reply_serial(newResponse->pMessage, receivedMessage->dbusSerial);
@@ -85,13 +96,18 @@ t_ilm_message createResponse(t_ilm_message message)
 
 t_ilm_message createErrorResponse(t_ilm_message message)
 {
+    dbusmessage* receivedMessage;
+    dbusmessage* newResponse;
+    char member[256];
+    char destination[256];
+
     if (!gDbus.initialized)
     {
         return 0;
     }
 
-    dbusmessage* receivedMessage = (dbusmessage*)message;
-    dbusmessage* newResponse = (dbusmessage*)malloc(sizeof(dbusmessage));
+    receivedMessage = (dbusmessage*)message;
+    newResponse = (dbusmessage*)malloc(sizeof(dbusmessage));
     memset(newResponse, 0, sizeof(dbusmessage));
 
     newResponse->type = IpcMessageTypeError;
@@ -101,8 +117,8 @@ t_ilm_message createErrorResponse(t_ilm_message message)
     newResponse->pMessage = dbus_message_new(DBUS_MESSAGE_TYPE_ERROR);
     pthread_mutex_unlock(&gDbus.mutex);
 
-    const char* member = dbus_message_get_member(receivedMessage->pMessage);
-    const char* destination = dbus_message_get_sender(receivedMessage->pMessage);
+    strcpy(member, dbus_message_get_member(receivedMessage->pMessage));
+    strcpy(destination, dbus_message_get_sender(receivedMessage->pMessage));
     dbus_message_set_member(newResponse->pMessage, member);
     dbus_message_set_destination(newResponse->pMessage, destination);
     dbus_message_set_error_name(newResponse->pMessage, DBUS_SERVICE_ERROR);
@@ -114,12 +130,14 @@ t_ilm_message createErrorResponse(t_ilm_message message)
 
 t_ilm_message createNotification(t_ilm_const_string name)
 {
+    dbusmessage* newNotification;
+
     if (!gDbus.initialized)
     {
         return 0;
     }
 
-    dbusmessage* newNotification = (dbusmessage*)malloc(sizeof(dbusmessage));
+    newNotification = (dbusmessage*)malloc(sizeof(dbusmessage));
 
     newNotification->type = IpcMessageTypeNotification;
     newNotification->dbusNativeType = DBUS_MESSAGE_TYPE_SIGNAL;
@@ -139,6 +157,10 @@ t_ilm_message createNotification(t_ilm_const_string name)
 
 t_ilm_bool sendToClients(t_ilm_message message, t_ilm_client_handle* receiverList, int receiverCount)
 {
+    dbusmessage* messageToSend;
+    t_ilm_uint serial;
+    dbus_bool_t success;
+
     (void)receiverList;
     (void)receiverCount;
 
@@ -147,13 +169,13 @@ t_ilm_bool sendToClients(t_ilm_message message, t_ilm_client_handle* receiverLis
         return ILM_FALSE;
     }
 
-    dbusmessage* messageToSend = (dbusmessage*)message;
-    t_ilm_uint serial = dbus_message_get_serial(messageToSend->pMessage);
+    messageToSend = (dbusmessage*)message;
+    serial = dbus_message_get_serial(messageToSend->pMessage);
 
     dbus_message_set_path(messageToSend->pMessage, ILM_PATH_COMPOSITE_SERVICE);
     dbus_message_set_interface(messageToSend->pMessage, ILM_INTERFACE_COMPOSITE_SERVICE);
     pthread_mutex_lock(&gDbus.mutex);
-    dbus_bool_t success = dbus_connection_send(gDbus.connection, messageToSend->pMessage, &serial);
+    success = dbus_connection_send(gDbus.connection, messageToSend->pMessage, &serial);
     pthread_mutex_unlock(&gDbus.mutex);
     if (!success)
     {
@@ -166,15 +188,20 @@ t_ilm_bool sendToClients(t_ilm_message message, t_ilm_client_handle* receiverLis
 
 t_ilm_bool sendToService(t_ilm_message message)
 {
+    dbusmessage* messageToSend;
+    t_ilm_uint serial;
+    dbus_bool_t success;
+    char msgName[256];
+
     if (!gDbus.isClient)
     {
         return ILM_FALSE;
     }
 
-    dbusmessage* messageToSend = (dbusmessage*)message;
-    t_ilm_uint serial = 1;
+    messageToSend = (dbusmessage*)message;
+    serial = 1;
     pthread_mutex_lock(&gDbus.mutex);
-    dbus_bool_t success = dbus_connection_send(gDbus.connection, messageToSend->pMessage, &serial);
+    success = dbus_connection_send(gDbus.connection, messageToSend->pMessage, &serial);
     pthread_mutex_unlock(&gDbus.mutex);
     if (!success)
     {
@@ -182,7 +209,7 @@ t_ilm_bool sendToService(t_ilm_message message)
         exit(1);
     }
 
-    const char* msgName = dbus_message_get_member(messageToSend->pMessage);
+    strcpy(msgName, dbus_message_get_member(messageToSend->pMessage));
 
     if (0 == strcmp(msgName, "LayerAddNotification"))
     {
@@ -209,6 +236,11 @@ t_ilm_bool sendToService(t_ilm_message message)
 
 t_ilm_message receive(t_ilm_int timeoutInMs)
 {
+    fd_set readFds;
+    fd_set writeFds;
+    int fdMax;
+    int fdsReady;
+
     gpIncomingMessage = (dbusmessage*)malloc(sizeof(dbusmessage));
     memset(gpIncomingMessage, 0, sizeof(dbusmessage));
 
@@ -222,12 +254,12 @@ t_ilm_message receive(t_ilm_int timeoutInMs)
         return (t_ilm_message)gpIncomingMessage;
     }
 
-    fd_set readFds = gDbus.incomingSockets;
-    fd_set writeFds = gDbus.outgoingSockets;
-    int fdMax = (gDbus.incomingSocketsMax > gDbus.outgoingSocketsMax) ?
+    readFds = gDbus.incomingSockets;
+    writeFds = gDbus.outgoingSockets;
+    fdMax = (gDbus.incomingSocketsMax > gDbus.outgoingSocketsMax) ?
                  gDbus.incomingSocketsMax : gDbus.outgoingSocketsMax;
 
-    int fdsReady = 0;
+    fdsReady = 0;
 
     if (timeoutInMs < 0)
     {
@@ -243,15 +275,15 @@ t_ilm_message receive(t_ilm_int timeoutInMs)
 
     switch (fdsReady)
     {
-    case -1: // error: select was cancelled -> shutdown
+    case -1: /* error: select was cancelled -> shutdown */
         gpIncomingMessage->type = IpcMessageTypeShutdown;
         break;
 
-    case 0: // timeout
+    case 0: /* timeout */
         gpIncomingMessage->type = IpcMessageTypeNone;
         break;
 
-    default: // message or shutdown
+    default: /* message or shutdown */
         handleWatchesForFds(readFds, writeFds);
         dispatchIncomingMessages();
         break;
@@ -280,13 +312,13 @@ t_ilm_const_string getSenderName(t_ilm_message message)
 
 t_ilm_client_handle getSenderHandle(t_ilm_message message)
 {
-    t_ilm_uint result = 0;
+    unsigned long result = 0;
 
     const char* sender = getSenderName(message);
     if (sender)
     {
         float f = atof(&sender[1]);
-        result = (t_ilm_uint)(f * 1000000);
+        result = (unsigned long)(f * 1000000);
     };
     return (t_ilm_client_handle)result;
 }
@@ -304,23 +336,28 @@ t_ilm_bool destroyMessage(t_ilm_message message)
     return ILM_TRUE;
 }
 
-//=============================================================================
-// prototypes internal functions
-//=============================================================================
+/*
+ * =============================================================================
+ * prototypes internal functions
+ * =============================================================================
+ */
 void handleWatchesForFds(fd_set in, fd_set out)
 {
     int fd = 0;
+    dbus_bool_t success;
 
     for (fd = 0; fd < gDbus.incomingSocketsMax; ++fd)
     {
+        DBusWatch* activeWatch;
+
         if (FD_ISSET(fd, &in))
         {
-            DBusWatch* activeWatch = gDbus.incomingWatch[fd];
+            activeWatch = gDbus.incomingWatch[fd];
 
             if (activeWatch)
             {
                 pthread_mutex_lock(&gDbus.mutex);
-                dbus_bool_t success = dbus_watch_handle(activeWatch, DBUS_WATCH_READABLE);
+                success = dbus_watch_handle(activeWatch, DBUS_WATCH_READABLE);
                 pthread_mutex_unlock(&gDbus.mutex);
 
                 if (!success)
@@ -337,14 +374,16 @@ void handleWatchesForFds(fd_set in, fd_set out)
 
     for (fd = 0; fd < gDbus.outgoingSocketsMax; ++fd)
     {
+        DBusWatch* activeWatch;
+
         if (FD_ISSET(fd, &out))
         {
-            DBusWatch* activeWatch = gDbus.outgoingWatch[fd];
+            activeWatch = gDbus.outgoingWatch[fd];
 
             if (activeWatch)
             {
                 pthread_mutex_lock(&gDbus.mutex);
-                dbus_bool_t success = dbus_watch_handle(activeWatch, DBUS_WATCH_WRITABLE);
+                success = dbus_watch_handle(activeWatch, DBUS_WATCH_WRITABLE);
                 pthread_mutex_unlock(&gDbus.mutex);
 
                 if (!success)
@@ -388,11 +427,13 @@ void registerSignalForNotification(dbusmessage* message, char* signalName)
             signalName,
             id);
 
-    // do not block here, race condition with receive thread.
-    // according to dbus documentation almost impossible to fail
-    // (only if out of memory)
-    // if result is important, create method call manually
-    // and use main loop for communication
+    /*
+     * do not block here, race condition with receive thread.
+     * according to dbus documentation almost impossible to fail
+     * (only if out of memory)
+     * if result is important, create method call manually
+     * and use main loop for communication
+     */
     pthread_mutex_lock(&gDbus.mutex);
     dbus_bus_add_match(gDbus.connection, rule, NULL);
     pthread_mutex_unlock(&gDbus.mutex);
@@ -414,11 +455,13 @@ void unregisterSignalForNotification(dbusmessage* message, char* signalName)
             signalName,
             id);
 
-    // do not block here, race condition with receive thread.
-    // according to dbus documentation almost impossible to fail
-    // (only if out of memory)
-    // if result is important, create method call manually
-    // and use main loop for communication
+    /*
+     * do not block here, race condition with receive thread.
+     * according to dbus documentation almost impossible to fail
+     * (only if out of memory)
+     * if result is important, create method call manually
+     * and use main loop for communication
+     */
     pthread_mutex_lock(&gDbus.mutex);
     dbus_bus_remove_match(gDbus.connection, rule, NULL);
     pthread_mutex_unlock(&gDbus.mutex);
@@ -426,9 +469,11 @@ void unregisterSignalForNotification(dbusmessage* message, char* signalName)
 
 
 
-//=============================================================================
-// print debug information
-//=============================================================================
+/*
+ * =============================================================================
+ * print debug information
+ * =============================================================================
+ */
 void printTypeName(int type)
 {
     switch (type)

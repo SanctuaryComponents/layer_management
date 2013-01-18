@@ -23,22 +23,34 @@
 #include <dbus/dbus.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h> // memset
+#include <string.h> /* memset */
 
 
-//=============================================================================
-// prototypes
-//=============================================================================
+/*
+ *=============================================================================
+ * prototypes
+ *=============================================================================
+ */
 t_ilm_bool initService();
 t_ilm_bool destroyClient();
 t_ilm_bool destroyService();
 
 
-//=============================================================================
-// setup
-//=============================================================================
+/*
+ *=============================================================================
+ * setup
+ *=============================================================================
+ */
 t_ilm_bool initServiceMode()
 {
+    char* useSessionBus;
+    int ret;
+
+    const char* rule = "type='signal',"
+                           "sender='"DBUS_INTERFACE_DBUS"',"
+                           "interface='"DBUS_INTERFACE_DBUS"',"
+                           "member='NameOwnerChanged'";
+
     memset(&gDbus, 0, sizeof(gDbus));
 
     gDbus.initialized = ILM_FALSE;
@@ -48,7 +60,7 @@ t_ilm_bool initServiceMode()
 
     dbus_error_init(&gDbus.error);
 
-    char* useSessionBus = getenv("LM_USE_SESSION_BUS");
+    useSessionBus = getenv("LM_USE_SESSION_BUS");
     if (useSessionBus && strcmp(useSessionBus, "enable") == 0 )
     {
         gDbus.type = DBUS_BUS_SESSION;
@@ -74,7 +86,7 @@ t_ilm_bool initServiceMode()
     if (!gDbus.isClient)
     {
         printf("DbusIpcmodule: registering dbus address %s\n", DBUS_SERVICE_PREFIX);
-        int ret = dbus_bus_request_name(gDbus.connection, DBUS_SERVICE_PREFIX, DBUS_NAME_FLAG_REPLACE_EXISTING, &gDbus.error);
+        ret = dbus_bus_request_name(gDbus.connection, DBUS_SERVICE_PREFIX, DBUS_NAME_FLAG_REPLACE_EXISTING, &gDbus.error);
 
         if (dbus_error_is_set(&gDbus.error))
         {
@@ -88,11 +100,6 @@ t_ilm_bool initServiceMode()
             printf("DbusIpcmodule: Not Primary Owner of %s (error %d)\n", DBUS_SERVICE_PREFIX, ret);
             gDbus.initialized = ILM_FALSE;
         }
-
-        const char* rule = "type='signal',"
-                           "sender='"DBUS_INTERFACE_DBUS"',"
-                           "interface='"DBUS_INTERFACE_DBUS"',"
-                           "member='NameOwnerChanged'";
 
         dbus_bus_add_match(gDbus.connection, rule, &gDbus.error);
         if (dbus_error_is_set(&gDbus.error))
@@ -164,6 +171,8 @@ t_ilm_bool initServiceMode()
 
 t_ilm_bool initClientMode()
 {
+    char* useSessionBus;
+
     memset(&gDbus, 0, sizeof(gDbus));
 
     gDbus.initialized = ILM_FALSE;
@@ -173,7 +182,7 @@ t_ilm_bool initClientMode()
 
     dbus_error_init(&gDbus.error);
 
-    char* useSessionBus = getenv("LM_USE_SESSION_BUS");
+    useSessionBus = getenv("LM_USE_SESSION_BUS");
     if (useSessionBus && strcmp(useSessionBus, "enable") == 0 )
     {
         gDbus.type = DBUS_BUS_SESSION;
@@ -287,15 +296,24 @@ t_ilm_bool destroy()
 }
 
 
-//=============================================================================
-// service specific
-//=============================================================================
+/*
+ *=============================================================================
+ * service specific
+ *=============================================================================
+ */
 t_ilm_bool destroyService()
 {
     DBusError err;
+    t_ilm_bool errorset;
+
+    const char* rule = "type='signal',"
+                       "sender='"DBUS_INTERFACE_DBUS"',"
+                       "interface='"DBUS_INTERFACE_DBUS"',"
+                       "member='NameOwnerChanged'";
+
     dbus_error_init(&err);
 
-    t_ilm_bool errorset = dbus_error_is_set(&err);
+    errorset = dbus_error_is_set(&err);
     if (errorset)
     {
         printf("DbusIpcmodule: there was an dbus error\n");
@@ -303,28 +321,23 @@ t_ilm_bool destroyService()
 
     dbus_bus_name_has_owner(gDbus.connection, DBUS_SERVICE_PREFIX, &err);
     errorset = dbus_error_is_set(&err);
-    
+
     if (errorset)
     {
         printf("DbusIpcmodule: there was an dbus error\n");
     }
 
     dbus_error_init(&err);
-    
-    const char* rule = "type='signal',"
-                       "sender='"DBUS_INTERFACE_DBUS"',"
-                       "interface='"DBUS_INTERFACE_DBUS"',"
-                       "member='NameOwnerChanged'";
 
     dbus_bus_remove_match(gDbus.connection, rule, &err);
 
     errorset = dbus_error_is_set(&err);
-    
+
     if (errorset)
     {
         printf("DbusIpcmodule: there was an dbus error\n");
     }
-    
+
     dbus_error_init(&err);
     dbus_bus_release_name(gDbus.connection, DBUS_SERVICE_PREFIX, &err);
 
@@ -332,13 +345,14 @@ t_ilm_bool destroyService()
 }
 
 
-//=============================================================================
-// client specific
-//=============================================================================
-
+/*
+ *=============================================================================
+ * client specific
+ *=============================================================================
+ */
 t_ilm_bool destroyClient()
 {
-    // private dbus connection must be closed
+    /* private dbus connection must be closed */
     if (dbus_connection_get_is_connected(gDbus.connection))
     {
         dbus_connection_close(gDbus.connection);

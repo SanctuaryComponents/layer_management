@@ -61,7 +61,7 @@ string rtrim(string s)
 
 string replaceAll(string s, string a, string b)
 {
-    int index = -b.size();
+    std::size_t index = -b.size();
 
     while ((index = s.find(a, index + b.size())) != string::npos)
     {
@@ -73,8 +73,7 @@ string replaceAll(string s, string a, string b)
 
 string replaceAll(string s, map<string, string> replacements)
 {
-    int index = 0;
-    for (int i = 0; i < s.size(); ++i)
+    for (std::size_t i = 0; i < s.size(); ++i)
     {
         for (map<string, string>::iterator it = replacements.begin(); it != replacements.end(); ++it)
         {
@@ -91,7 +90,7 @@ string replaceAll(string s, map<string, string> replacements)
 
 string replaceAll(string s, char a, char b)
 {
-    int index = -1;
+    std::size_t index = -1;
     while ((index = s.find(a, index + 1)) != string::npos)
     {
         s.replace(index, 1, string(1, b));
@@ -103,12 +102,12 @@ string replaceAll(string s, char a, char b)
 set<string> split(string s, char d)
 {
     set<string> result;
-    int start = 0;
+    std::size_t start = 0;
 
     while (start < s.size() && start != string::npos)
     {
         start = s.find_first_not_of(d, start);
-        int end = s.find(d, start);
+        std::size_t end = s.find(d, start);
         result.insert(s.substr(start, end - start));
 
         start = end;

@@ -21,7 +21,7 @@
 #include "DBUSConfiguration.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>  // memcpy
+#include <string.h>  /* memcpy */
 
 
 t_ilm_bool appendString(t_ilm_message message, const char* value)
@@ -40,9 +40,10 @@ t_ilm_bool getString(t_ilm_message message, char* value)
     if (DBUS_TYPE_STRING == type)
     {
         char* tmp = NULL;
+        int len;
         dbus_message_iter_get_basic(&msg->iter, &tmp);
         dbus_message_iter_next(&msg->iter);
-        int len = strlen(tmp);
+        len = strlen(tmp);
         strncpy(value, tmp, len);
         value[len] = '\0';
         returnValue = ILM_TRUE;

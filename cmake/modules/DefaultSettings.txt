@@ -39,10 +39,10 @@ endif (WITH_STATIC_LIBRARIES)
 #==============================================================================
 # default compiler flags
 #==============================================================================
-set (COMPILER_FLAGS_3RDPARTY "-fPIC")
-set (COMPILER_FLAGS_TEST     "-fPIC")
+set (COMPILER_FLAGS_3RDPARTY "-fPIC -Wno-variadic-macros -Wno-sign-compare")
+set (COMPILER_FLAGS_TEST     "-fPIC -Wno-variadic-macros -Wno-sign-compare")
 set (COMPILER_FLAGS_EXAMPLE  "-fPIC -Wall -Wextra")
-set (COMPILER_FLAGS_PLUGIN   "-fPIC -Wall -Wextra -pedantic -Wno-long-long")
+set (COMPILER_FLAGS_PLUGIN   "-fPIC -Wall -Wextra -pedantic -Wno-long-long -Wno-unused-function")
 set (COMPILER_FLAGS_CORE     "-fPIC -Wall -Wextra -pedantic -Wno-long-long -Wno-unused-function")
 
 

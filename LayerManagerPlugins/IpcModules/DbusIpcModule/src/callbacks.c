@@ -26,27 +26,29 @@
 
 t_ilm_message createResponse(t_ilm_message);
 
-//=============================================================================
-// message filters
-//=============================================================================
-
+/*
+ * =============================================================================
+ * message filters
+ * =============================================================================
+ */
 DBusHandlerResult filterLayerManagerNotifications(DBusConnection *connection, DBusMessage *message, void *data)
 {
+    const char* interfaceName = dbus_message_get_interface(message);
+
+    DBusHandlerResult result = DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+    int messageType = dbus_message_get_type(message);
+
     (void)connection;
     (void)data;
 
-    const char* interfaceName = dbus_message_get_interface(message);
     if (!interfaceName)
     {
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
-    if (strcmp(ILM_INTERFACE_COMPOSITE_SERVICE, interfaceName)) // 0 == equals
+    if (strcmp(ILM_INTERFACE_COMPOSITE_SERVICE, interfaceName)) /* 0 == equals */
     {
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
-
-    DBusHandlerResult result = DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
-    int messageType = dbus_message_get_type(message);
 
     if (gDbus.isClient && (messageType == DBUS_MESSAGE_TYPE_SIGNAL))
     {
@@ -64,21 +66,22 @@ DBusHandlerResult filterLayerManagerNotifications(DBusConnection *connection, DB
 
 DBusHandlerResult filterLayerManagerCommands(DBusConnection *connection, DBusMessage *message, void *data)
 {
+    const char* interfaceName = dbus_message_get_interface(message);
+
+    DBusHandlerResult result = DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+    int messageType = dbus_message_get_type(message);
+
     (void)connection;
     (void)data;
 
-    const char* interfaceName = dbus_message_get_interface(message);
     if (!interfaceName)
     {
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
-    if (strcmp(ILM_INTERFACE_COMPOSITE_SERVICE, interfaceName)) // 0 == equals
+    if (strcmp(ILM_INTERFACE_COMPOSITE_SERVICE, interfaceName)) /* 0 == equals */
     {
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
-
-    DBusHandlerResult result = DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
-    int messageType = dbus_message_get_type(message);
 
     if ((!gDbus.isClient && (messageType == DBUS_MESSAGE_TYPE_METHOD_CALL))
         || (gDbus.isClient && (messageType == DBUS_MESSAGE_TYPE_METHOD_RETURN)))
@@ -97,21 +100,24 @@ DBusHandlerResult filterLayerManagerCommands(DBusConnection *connection, DBusMes
 
 DBusHandlerResult filterLayerManagerErrors(DBusConnection *connection, DBusMessage *message, void *data)
 {
+    const char* interfaceName = dbus_message_get_interface(message);
+
+    DBusHandlerResult result = DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
+    int messageType = dbus_message_get_type(message);
+
+    char errorMsg[256];
+
     (void)connection;
     (void)data;
 
-    const char* interfaceName = dbus_message_get_interface(message);
     if (!interfaceName)
     {
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
-    if (strcmp(ILM_INTERFACE_COMPOSITE_SERVICE, interfaceName)) // 0 == equals
+    if (strcmp(ILM_INTERFACE_COMPOSITE_SERVICE, interfaceName)) /* 0 == equals */
     {
         return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     }
-
-    DBusHandlerResult result = DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
-    int messageType = dbus_message_get_type(message);
 
     if (messageType == DBUS_MESSAGE_TYPE_ERROR)
     {
@@ -121,7 +127,6 @@ DBusHandlerResult filterLayerManagerErrors(DBusConnection *connection, DBusMessa
 
         dbus_message_iter_init(gpIncomingMessage->pMessage, &gpIncomingMessage->iter);
 
-        char errorMsg[256];
         getString(gpIncomingMessage, errorMsg);
         printf("DbusIpcModule: LayerManagerService returned error: %s\n", errorMsg);
 
@@ -211,27 +216,33 @@ DBusHandlerResult filterNameOwnerChanged(DBusConnection *connection, DBusMessage
 
 DBusHandlerResult filterIntrospection(DBusConnection *connection, DBusMessage *message, void *data)
 {
+    char introspectionString[65536];
+
+    t_ilm_message introspectionResponse;
+    t_ilm_client_handle sender;
+
     (void)connection;
     (void)data;
 
     if (dbus_message_is_method_call(message, DBUS_INTERFACE_INTROSPECTABLE, "Introspect"))
     {
         gpIncomingMessage->pMessage = dbus_message_copy(message);
-        gpIncomingMessage->type = IpcMessageTypeNone; // none for client
+        gpIncomingMessage->type = IpcMessageTypeNone; /* none for client */
         gpIncomingMessage->dbusNativeType = DBUS_MESSAGE_TYPE_METHOD_CALL;
         gpIncomingMessage->dbusSerial = dbus_message_get_serial(message);
 
-        // generate introspection response content
-        char introspectionString[65536];
+        /* generate introspection response content */
         memset(introspectionString, 0, sizeof(introspectionString));
         generateIntrospectionString(introspectionString);
 
-        // create and send introspection reply
-        // note: we're in dispatch, so mutex is currently locked in this thread
+        /*
+         * create and send introspection reply
+         * note: we're in dispatch, so mutex is currently locked in this thread
+         */
         pthread_mutex_unlock(&gDbus.mutex);
-        t_ilm_message introspectionResponse = createResponse(gpIncomingMessage);
+        introspectionResponse = createResponse(gpIncomingMessage);
         appendString(introspectionResponse, introspectionString);
-        t_ilm_client_handle sender = (t_ilm_client_handle)dbus_message_get_sender(gpIncomingMessage->pMessage);
+        sender = (t_ilm_client_handle)dbus_message_get_sender(gpIncomingMessage->pMessage);
         sendToClients(introspectionResponse, &sender, 1);
         pthread_mutex_lock(&gDbus.mutex);
 
@@ -241,16 +252,17 @@ DBusHandlerResult filterIntrospection(DBusConnection *connection, DBusMessage *m
     return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
 }
 
-//=============================================================================
-// watches
-//=============================================================================
-
+/*
+ * =============================================================================
+ * watches
+ * =============================================================================
+ */
 dbus_bool_t addWatch(DBusWatch* watch, void* data)
 {
-    (void)data;
-
     int sock = dbus_watch_get_unix_fd(watch);
     int flags = dbus_watch_get_flags(watch);
+
+    (void)data;
 
     if (flags & DBUS_WATCH_READABLE)
     {
@@ -281,10 +293,10 @@ dbus_bool_t addWatch(DBusWatch* watch, void* data)
 
 void removeWatch(DBusWatch* watch, void* data)
 {
-    (void)data;
-
     int sock = dbus_watch_get_unix_fd(watch);
     int flags = dbus_watch_get_flags(watch);
+
+    (void)data;
 
     if (flags & DBUS_WATCH_READABLE)
     {

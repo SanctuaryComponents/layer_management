@@ -410,6 +410,7 @@ COMMAND("destroy surface <surfaceid>")
 COMMAND("get scene")
 //=============================================================================
 {
+    (void) input; //suppress warning: unused parameter
     printScene();
 }
 
@@ -417,7 +418,8 @@ COMMAND("get scene")
 COMMAND("get communicator performance")
 //=============================================================================
 {
-   getCommunicatorPerformance();
+    (void) input; //suppress warning: unused parameter
+    getCommunicatorPerformance();
 }
 
 //=============================================================================
@@ -433,6 +435,7 @@ COMMAND("set surface <surfaceid> keyboard focus")
 COMMAND("get keyboard focus")
 //=============================================================================
 {
+    (void) input; //suppress warning: unused parameter
     getKeyboardFocus();
 }
 
@@ -547,6 +550,7 @@ COMMAND("analyze surface <surfaceid>")
 COMMAND("scatter")
 //=============================================================================
 {
+    (void) input; //suppress warning: unused parameter
     scatter();
 }
 
@@ -554,6 +558,7 @@ COMMAND("scatter")
 COMMAND("scatter all")
 //=============================================================================
 {
+    (void) input; //suppress warning: unused parameter
     scatterAll();
 }
 
@@ -561,7 +566,7 @@ COMMAND("scatter all")
 COMMAND("demo <animation_mode>")
 //=============================================================================
 {
-    int mode = (int) input->getInt("animation_mode");
+    t_ilm_uint mode = (t_ilm_uint) input->getUint("animation_mode");
     demo(mode);
 }
 

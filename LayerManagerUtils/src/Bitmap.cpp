@@ -74,8 +74,8 @@ void writeBitmap(std::string FileName, char* imagedataRGB, int width, int height
     header.color2 = 0;
 
     // make sure parent directory exists
-    uint currentPos = 0;
-    uint lastPos = FileName.find_first_of("/",currentPos);
+    std::size_t currentPos = 0;
+    std::size_t lastPos = FileName.find_first_of("/",currentPos);
     while (lastPos != std::string::npos)
     {
         std::string directory = FileName.substr(0,lastPos);

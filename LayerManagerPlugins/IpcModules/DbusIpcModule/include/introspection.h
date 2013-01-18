@@ -24,4 +24,4 @@
 
 void generateIntrospectionString(char* msgBuffer);
 
-#endif // _DBUSINTROSPECTION_H_
+#endif /* _DBUSINTROSPECTION_H_ */

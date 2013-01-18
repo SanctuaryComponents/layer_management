@@ -229,6 +229,11 @@ void Log::unregisterDiagnosticInjectionCallback( unsigned int module_id )
 
 
 #ifdef WITH_DLT    
+
+// DLT macros will fail using -pedantic with
+// warning: ISO C++ forbids braced-groups within expressions
+#pragma GCC diagnostic ignored "-pedantic"
+
 void Log::LogToDltDaemon(LogContext logContext, LOG_MODES logMode, const std::string& moduleName, const std::basic_string<char>& output)
 {
     

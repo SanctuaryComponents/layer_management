@@ -73,7 +73,7 @@ t_ilm_bool initGlApplication(GLuint width, GLuint height)
 
     if (width <= height)
     {
-        glOrtho(-1.0, 1.0, 1.0 / aspectratio, 1.0 / aspectratio, 1.0, -1.0);
+        glOrtho(-1.0f, 1.0f, 1.0f / aspectratio, 1.0f / aspectratio, 1.0f, -1.0f);
     }
 
     glMatrixMode(GL_MODELVIEW);
@@ -107,8 +107,8 @@ void draw(t_ilm_uint animTime)
             IlmMatrixRotateZ(matrix, currentAngle);
             glLoadMatrixf(&matrix.f[0]);
 
-            float color[4] = { 1.0, 0.0, 1.0, 0.5 + (0.3 / (float) i) };
-            float lineColor[4] = { 0.0, 0.0, 0.0, 0.5 + (0.4 / (float) i) };
+            float color[4] = { 1.0f, 0.0f, 1.0f, 0.5f + (0.3f / (float) i) };
+            float lineColor[4] = { 0.0f, 0.0f, 0.0f, 0.5f + (0.4f / (float) i) };
 
             glBegin(GL_TRIANGLES);
 

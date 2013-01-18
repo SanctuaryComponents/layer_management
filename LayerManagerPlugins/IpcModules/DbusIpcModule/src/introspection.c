@@ -19,12 +19,14 @@
  ****************************************************************************/
 #include "introspection.h"
 #include "DBUSConfiguration.h"
-#include <string.h>  // memset
-#include <stdio.h>  // sprintf
+#include <string.h>  /* memset */
+#include <stdio.h>  /* sprintf */
 
-//=============================================================================
-// internal data types
-//=============================================================================
+/*
+ * =============================================================================
+ * internal data types
+ * =============================================================================
+ */
 struct IntrospectionTable
 {
     const char *name;
@@ -32,9 +34,11 @@ struct IntrospectionTable
     const char *reply;
 };
 
-//=============================================================================
-// internal prototypes
-//=============================================================================
+/*
+ * =============================================================================
+ * internal prototypes
+ * =============================================================================
+ */
 void generateString();
 unsigned int addHeader(char* msgBuffer);
 unsigned int openNode(char* msgBuffer, const char* nodename);
@@ -47,12 +51,14 @@ unsigned int closeInterface(char* msgBuffer);
 unsigned int closeNode(char* msgBuffer);
 
 
-//=============================================================================
-// implementation
-//=============================================================================
+/*
+ * =============================================================================
+ * implementation
+ * =============================================================================
+ */
 void generateIntrospectionString(char* msgBuffer)
 {
-    //LOG_DEBUG("DBUSCommunicator", "Generating introspection data");
+    /*LOG_DEBUG("DBUSCommunicator", "Generating introspection data"); */
 
     /* Introspection is a special feature of the DBUS IpcModule, which other
      * IpcModules do (most likely) not have.
@@ -140,6 +146,9 @@ void generateIntrospectionString(char* msgBuffer)
     };
 
     int introspectionInterfaceCount = sizeof(introspectionInterface) / sizeof(struct IntrospectionTable);
+    int index = 0;
+
+    int i = 0;
 
     msgBuffer += addHeader(msgBuffer);
     msgBuffer += openNode(msgBuffer, DBUS_SERVICE_PREFIX);
@@ -149,8 +158,6 @@ void generateIntrospectionString(char* msgBuffer)
     msgBuffer += closeMethod(msgBuffer);
     msgBuffer += closeInterface(msgBuffer);
     msgBuffer += openInterface(msgBuffer, DBUS_SERVICE_PREFIX);
-
-    int index = 0;
 
     for (index = 0; index < introspectionInterfaceCount; ++index)
     {
@@ -164,7 +171,6 @@ void generateIntrospectionString(char* msgBuffer)
 
         msgBuffer += openMethod(msgBuffer, methodName);
 
-        int i = 0;
         for(i = 0; i < parameterLength; ++i)
         {
             switch (parameter[i])

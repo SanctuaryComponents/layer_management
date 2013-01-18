@@ -187,12 +187,6 @@ void exportSceneToTXTHelper(ostream& stream, StringMapTree* tree, string prefix 
     stream << prefix + "}";
 }
 
-void importSceneFromXMLHelper(istream& stream, StringMapTree* node)
-{
-
-}
-
-
 string decodeEscapesequences(string s)
 {
     map<string, string> code;
@@ -416,7 +410,7 @@ void createSceneContentsHelper(IlmLayer* pIlmlayer)
 
 void createSceneContentsHelper(IlmDisplay* pIlmdisplay)
 {
-    t_ilm_display displayId;
+    t_ilm_display displayId = 0xFFFFFFFF;
     pIlmdisplay->get("id", &displayId);
 
     list<IlmLayer*> layerList;
@@ -463,7 +457,7 @@ void createSceneContents(IlmScene* pIlmscene)
 
 void restoreSceneHelper(IlmSurface* pIlmsurface)
 {
-    t_ilm_surface surfaceId;
+    t_ilm_surface surfaceId = 0xFFFFFFFF;
     pIlmsurface->get("id", &surfaceId);
     ilmSurfaceProperties props = getSurfaceProperties(pIlmsurface);
 
@@ -487,7 +481,7 @@ void restoreSceneHelper(IlmSurface* pIlmsurface)
 
 void restoreSceneHelper(IlmLayer* pIlmlayer)
 {
-    t_ilm_layer layerId;
+    t_ilm_layer layerId = 0xFFFFFFFF;
     pIlmlayer->get("id", &layerId);
 
     ilmLayerProperties props = getLayerProperties(pIlmlayer);
@@ -636,8 +630,8 @@ void importSceneFromFile(string filename)
 
         if (extension == ".xml")
         {
-            importSceneFromXMLHelper(stream, &sceneTree);
-            cout << "DONE READING XML" << endl;
+//             importSceneFromXMLHelper(stream, &sceneTree);
+            cout << "READING XML IS NOT SUPPORTED YET" << endl;
         }
         else if (extension == ".txt")
         {

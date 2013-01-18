@@ -141,7 +141,7 @@ void analyzeSurfaceDimensions(t_ilm_surface targetSurfaceId, t_scene_data& scene
     string tag, flag;
     char description[300] = "";
 
-    t_ilm_int minDimension = 32;
+    t_ilm_uint minDimension = 32;
 
     tag = "Surface dest width";
     if (targetSurfaceProperties.destWidth <= minDimension)
@@ -232,7 +232,7 @@ void analyzeLayerDimensions(t_ilm_surface targetSurfaceId, t_scene_data& scene)
 {
     t_ilm_layer targetSurfaceLayer = scene.surfaceLayer[targetSurfaceId];
     ilmLayerProperties& targetLayerProperties = scene.layerProperties[targetSurfaceLayer];
-    t_ilm_int minDimension = 32;
+    t_ilm_uint minDimension = 32;
 
     string tag, flag;
     char description[300] = "";

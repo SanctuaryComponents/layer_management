@@ -51,6 +51,8 @@ typedef void (*t_pDemoAnimatorFunc)(t_scene_data* pInitialScene, t_scene_data* p
 
 void demoAnimatorDownwards(t_scene_data* pInitialScene, t_scene_data* pDemoScene, bool* pStopDemo)
 {
+    (void) pInitialScene; //suppress warning: unused varaible
+
     //get rendered surfaces
     vector<t_ilm_surface> renderedSurfaces = getSceneRenderOrder(pDemoScene);
 
@@ -70,9 +72,7 @@ void demoAnimatorDownwards(t_scene_data* pInitialScene, t_scene_data* pDemoScene
     }
 
     //make random speeds (in pixel)
-    t_ilm_int maxSpeed = 6;
     t_ilm_int minSpeed = 2;
-    t_ilm_int rangeSpeed = maxSpeed - minSpeed;
 
     srand((unsigned) time(0));
     map<t_ilm_surface, t_ilm_int> surfaceSpeed;
@@ -112,7 +112,6 @@ void demoAnimatorDownwards(t_scene_data* pInitialScene, t_scene_data* pDemoScene
                 surfaceProperties.destY + static_cast<int>(surfaceScale[surface] * surfaceProperties.destHeight));
 
         //make random X position to make surfaces spread in the screen
-        int screenWidthMidpoint = pDemoScene->screenWidth / 2;
         int surfaceWidth = coordinates.z - coordinates.x;
 
         //make a random X position so that the surface stays totally displayable inside the screen
@@ -137,7 +136,6 @@ void demoAnimatorDownwards(t_scene_data* pInitialScene, t_scene_data* pDemoScene
             t_ilm_surface surface = *it;
             ilmSurfaceProperties& properties = pDemoScene->surfaceProperties[surface];
             tuple4& coordinates = surfaceCoordinates[surface];
-            int speed = surfaceSpeed[surface];
 
             //if out: get back to screen
             if (coordinates.y >= static_cast<int>(pDemoScene->screenHeight))
@@ -188,6 +186,8 @@ void demoAnimatorDownwards(t_scene_data* pInitialScene, t_scene_data* pDemoScene
 
 void demoAnimatorRandomDirections(t_scene_data* pInitialScene, t_scene_data* pDemoScene, bool* pStopDemo)
 {
+    (void) pInitialScene; //suppress warning: unused varaible
+
     //get rendered surfaces
     vector<t_ilm_surface> renderedSurfaces = getSceneRenderOrder(pDemoScene);
 
@@ -206,9 +206,7 @@ void demoAnimatorRandomDirections(t_scene_data* pInitialScene, t_scene_data* pDe
     }
 
     //make random speeds (in pixel)
-    t_ilm_int maxSpeed = 12;
     t_ilm_int minSpeed = 2;
-    t_ilm_int rangeSpeed = maxSpeed - minSpeed;
 
     srand((unsigned) time(0));
     map<t_ilm_surface, t_ilm_int> surfaceSpeed;
@@ -246,7 +244,6 @@ void demoAnimatorRandomDirections(t_scene_data* pInitialScene, t_scene_data* pDe
                 surfaceProperties.destY + static_cast<int>(surfaceScale[surface] * surfaceProperties.destHeight));
 
         //make random X position to make surfaces spread in the screen
-        int screenWidthMidpoint = pDemoScene->screenWidth / 2;
         int surfaceWidth = coordinates.z - coordinates.x;
 
         //make a random X position so that the surface stays totally displayable inside the screen
@@ -338,6 +335,8 @@ void demoAnimatorRandomDirections(t_scene_data* pInitialScene, t_scene_data* pDe
 
 void demoAnimatorWaterfall(t_scene_data* pInitialScene, t_scene_data* pDemoScene, bool* pStopDemo)
 {
+    (void) pInitialScene; //suppress warning: unused varaible
+
     //get rendered surfaces
     vector<t_ilm_surface> renderedSurfaces = getSceneRenderOrder(pDemoScene);
 
@@ -356,9 +355,7 @@ void demoAnimatorWaterfall(t_scene_data* pInitialScene, t_scene_data* pDemoScene
     }
 
     //make random speeds (in pixel)
-    t_ilm_int maxSpeed = 12;
     t_ilm_int minSpeed = 2;
-    t_ilm_int rangeSpeed = maxSpeed - minSpeed;
 
     srand((unsigned) time(0));
     map<t_ilm_surface, t_ilm_int> surfaceSpeed;
@@ -396,7 +393,6 @@ void demoAnimatorWaterfall(t_scene_data* pInitialScene, t_scene_data* pDemoScene
                 surfaceProperties.destY + static_cast<int>(surfaceScale[surface] * surfaceProperties.destHeight));
 
         //make random X position to make surfaces spread in the screen
-        int screenWidthMidpoint = pDemoScene->screenWidth / 2;
         int surfaceWidth = coordinates.z - coordinates.x;
 
         //make a random X position so that the surface stays totally displayable inside the screen
@@ -421,7 +417,6 @@ void demoAnimatorWaterfall(t_scene_data* pInitialScene, t_scene_data* pDemoScene
             t_ilm_surface surface = *it;
             ilmSurfaceProperties& properties = pDemoScene->surfaceProperties[surface];
             tuple4& coordinates = surfaceCoordinates[surface];
-            int speed = surfaceSpeed[surface];
 
             //if out: get back to screen
             if (coordinates.y >= static_cast<int>(pDemoScene->screenHeight))
@@ -483,6 +478,8 @@ void demoAnimatorWaterfall(t_scene_data* pInitialScene, t_scene_data* pDemoScene
 
 void demoAnimatorZooming(t_scene_data* pInitialScene, t_scene_data* pDemoScene, bool* pStopDemo)
 {
+    (void) pInitialScene; //suppress warning: unused varaible
+
     //get rendered surfaces
     vector<t_ilm_surface> renderedSurfaces = getSceneRenderOrder(pDemoScene);
 
@@ -568,6 +565,7 @@ void demoAnimatorZooming(t_scene_data* pInitialScene, t_scene_data* pDemoScene, 
 
 void demoAnimatorCascadedZooming(t_scene_data* pInitialScene, t_scene_data* pDemoScene, bool* pStopDemo)
 {
+    (void) pInitialScene; //suppress warning: unused varaible
     //get rendered surfaces
     vector<t_ilm_surface> renderedSurfaces = getSceneRenderOrder(pDemoScene);
 
@@ -576,7 +574,7 @@ void demoAnimatorCascadedZooming(t_scene_data* pInitialScene, t_scene_data* pDem
     int screenHorizontalMidpoint = pDemoScene->screenWidth / 2;
     int screenVerticalMidpoint = pDemoScene->screenHeight / 2;
 
-    for (int i = 0; i < renderedSurfaces.size(); ++i)
+    for (std::size_t i = 0; i < renderedSurfaces.size(); ++i)
     {
         t_ilm_surface surface = renderedSurfaces[i];
         ilmSurfaceProperties& surfaceProperties = pDemoScene->surfaceProperties[surface];
@@ -602,7 +600,7 @@ void demoAnimatorCascadedZooming(t_scene_data* pInitialScene, t_scene_data* pDem
 
     while (!*pStopDemo)
     {
-        for (int i = 0; i < renderedSurfaces.size(); ++i)
+        for (std::size_t i = 0; i < renderedSurfaces.size(); ++i)
         {
             t_ilm_surface surface = renderedSurfaces[i];
             ilmSurfaceProperties& surfaceProperties = pDemoScene->surfaceProperties[surface];
@@ -627,7 +625,7 @@ void demoAnimatorCascadedZooming(t_scene_data* pInitialScene, t_scene_data* pDem
                 ilm_commitChanges();
                 //update render order
                 t_ilm_surface firstSurface = renderedSurfaces[0];
-                for (int j = 1; j < renderedSurfaces.size(); ++j)
+                for (std::size_t j = 1; j < renderedSurfaces.size(); ++j)
                 {
                     renderedSurfaces[j - 1] = renderedSurfaces[j];
                 }
@@ -640,7 +638,7 @@ void demoAnimatorCascadedZooming(t_scene_data* pInitialScene, t_scene_data* pDem
             else
             {
                 //just some fancy function math that gives a special effect
-                scaleFactors[surface] = (1.0125, i + scaleFactors[surface] * 0.5);
+                scaleFactors[surface] = pow(1.2125, i * 0.85 + scaleFactors[surface] * 0.85);
 
                 int change = (int) scaleFactors[surface];
                 surfaceProperties.destX = max(0, (int) surfaceProperties.destX - change);
@@ -664,12 +662,15 @@ void demoAnimatorCascadedZooming(t_scene_data* pInitialScene, t_scene_data* pDem
     }
 }
 
+static vector<t_pDemoAnimatorFunc> animators;
+
 void* demoThreadCallback(void* param)
 {
     //call function on parameters
     map<string,void*>* paramMap = (map<string,void*>*) param;
 
-    t_pDemoAnimatorFunc animator = (t_pDemoAnimatorFunc) paramMap->at("pAnimator");
+    int* pAnimatorIndex = (int*) paramMap->at("pAnimatorIndex");
+    t_pDemoAnimatorFunc animator = animators[*pAnimatorIndex];
     t_scene_data* pInitialScene = (t_scene_data*) paramMap->at("pInitialScene");
     t_scene_data* pDemoScene = (t_scene_data*) paramMap->at("pDemoScene");
     bool*  pStopDemo= (bool*) paramMap->at("pStopDemo");
@@ -682,9 +683,9 @@ void* demoThreadCallback(void* param)
 
 } //end of anonymous namespace
 
-void demo(int mode)
+void demo(t_ilm_uint mode)
 {
-    vector<t_pDemoAnimatorFunc> animators;
+    animators.clear();
     animators.push_back(&demoAnimatorZooming);
     animators.push_back(&demoAnimatorCascadedZooming);
     animators.push_back(&demoAnimatorDownwards);
@@ -692,7 +693,7 @@ void demo(int mode)
     animators.push_back(&demoAnimatorWaterfall);
 
     //if valid mode entered
-    if (mode >= 0 && mode < animators.size())
+    if (mode < animators.size())
     {
         //capture initial scene
         t_scene_data initialScene;
@@ -708,7 +709,7 @@ void demo(int mode)
         volatile bool stopDemo = false;
 
         map<string, void*> paramMap;
-        paramMap["pAnimator"] = (void*) animators[mode];
+        paramMap["pAnimatorIndex"] = (void*) &mode;
         paramMap["pInitialScene"] = (void*) &initialScene;
         paramMap["pDemoScene"] = (void*) &demoScene;
         paramMap["pStopDemo"] = (void*) &stopDemo;

@@ -60,7 +60,7 @@ inline LmScreen::LmScreen()
 inline LmScreen::LmScreen(unsigned int id, const char* deviceName)
 : m_id(id)
 {
-    m_deviceName = new char[strlen(deviceName)];
+    m_deviceName = new char[strlen(deviceName) + 1];
     strcpy(m_deviceName, deviceName);
 }
 

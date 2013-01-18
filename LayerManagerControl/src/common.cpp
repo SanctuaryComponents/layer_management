@@ -162,7 +162,7 @@ void captureSceneData(t_scene_data* pScene)
     scene.screens = vector<t_ilm_display>(screenArray, screenArray + screenCount);
 
     //layers on each screen
-    for (int i = 0; i < screenCount; ++i)
+    for (unsigned int i = 0; i < screenCount; ++i)
     {
         t_ilm_display screenId = screenArray[i];
 
@@ -431,9 +431,7 @@ void emptyScene(t_scene_data* pScene)
     pScene->layerScreen.clear();
     pScene->layerSurfaces.clear();
     pScene->layers.clear();
-    pScene->screenHeight;
     pScene->screenLayers.clear();
-    pScene->screenWidth;
     pScene->screens.clear();
     pScene->surfaceLayer.clear();
     pScene->surfaceProperties.clear();
@@ -442,7 +440,7 @@ void emptyScene(t_scene_data* pScene)
     t_ilm_uint count;
     t_ilm_display* screenArray;
     ilm_getScreenIDs(&count, &screenArray);
-    for(int i = 0 ; i < count ; ++i)
+    for(t_ilm_uint i = 0 ; i < count ; ++i)
     {
         pScene->screens.push_back(screenArray[i]);
         ilm_getScreenResolution(screenArray[0], & pScene->screenWidth, & pScene->screenHeight);
@@ -597,6 +595,8 @@ static t_scene_data* global_pOriginalScene = NULL;
 
 void interruptSignalRestoreScene(int s)
 {
+    (void) s;
+
     cout<<"LayerManagerControl :Interrupt signal...\n";
     if (global_pOriginalScene != NULL)
     {

@@ -21,7 +21,7 @@
 #include "DBUSConfiguration.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>  // memcpy
+#include <string.h>  /* memcpy */
 
 t_ilm_bool appendUint(t_ilm_message message, const t_ilm_uint value)
 {
@@ -35,10 +35,10 @@ t_ilm_bool appendUintArray(t_ilm_message message, const t_ilm_uint* valueArray, 
     t_ilm_bool returnValue = ILM_FALSE;
     char signature[2] = { DBUS_TYPE_UINT32, 0 };
     DBusMessageIter arrayIter;
+    t_ilm_int index = 0;
 
     returnValue = dbus_message_iter_open_container(&msg->iter, DBUS_TYPE_ARRAY, signature, &arrayIter);
 
-    t_ilm_int index = 0;
     for (index = 0; index < arraySize; ++index)
     {
         returnValue &= dbus_message_iter_append_basic(&arrayIter, DBUS_TYPE_UINT32, &valueArray[index]);
@@ -58,17 +58,17 @@ t_ilm_bool getUintArray(t_ilm_message message, t_ilm_uint** valueArray, t_ilm_in
 
     if (DBUS_TYPE_ARRAY == type)
     {
-        returnValue = ILM_TRUE;
+        t_ilm_uint* dbusArrayPointer = NULL;
 
         DBusMessageIter arrayIter;
+        returnValue = ILM_TRUE;
 
         dbus_message_iter_recurse(&msg->iter, &arrayIter);
 
-        // get pointer to dbus internal array data (zero copy)
-        t_ilm_uint* dbusArrayPointer = NULL;
+        /* get pointer to dbus internal array data (zero copy) */
         dbus_message_iter_get_fixed_array(&arrayIter, &dbusArrayPointer, arraySize);
 
-        // create callers buffer, copy data to buffer
+        /* create callers buffer, copy data to buffer */
         *valueArray = malloc(sizeof(t_ilm_uint) * (*arraySize));
         memcpy(*valueArray, dbusArrayPointer, sizeof(t_ilm_uint) * (*arraySize));
 

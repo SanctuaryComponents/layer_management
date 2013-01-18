@@ -32,25 +32,30 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+/*
+ *=============================================================================
+ * global settings
+ *=============================================================================
+ */
+const int gReceiveTimeout  = -1;  /* in ms, negative value for infinite */
+const int gResponseTimeout = 500; /* in ms */
 
-//=============================================================================
-// global settings
-//=============================================================================
-const int gReceiveTimeout  = -1;  // in ms, negative value for infinite
-const int gResponseTimeout = 500; // in ms
-
-// must be same as GraphicalObject::INVALID_ID, but this is defined in C++
-// and can not be used here
+/*
+ * must be same as GraphicalObject::INVALID_ID, but this is defined in C++
+ * and can not be used here
+ */
 #define INVALID_ID 0xFFFFFFFF
 
-// queue names for incoming notifications and messages
+/* queue names for incoming notifications and messages */
 #define NOTIFICATION_QUEUE_NAME "/ilmClient%dNotification"
 #define INCOMING_QUEUE_NAME     "/ilmClient%dIncoming"
 
-//=============================================================================
-// global vars
-//=============================================================================
-extern char *__progname; // automatically gets assigned argv[0]
+/*
+ *=============================================================================
+ * global vars
+ *=============================================================================
+ */
+extern char *__progname; /* automatically gets assigned argv[0] */
 
 static struct IpcModule gIpcModule;
 
@@ -66,21 +71,23 @@ static mqd_t notificationMqWrite;
 
 static t_ilm_bool gInitialized = ILM_FALSE;
 
-//=============================================================================
-// notification management
-//=============================================================================
+/*
+ *=============================================================================
+ * notification management
+ *=============================================================================
+ */
 #define MAX_CALLBACK_COUNT 64
-struct
+static struct
 {
     t_ilm_uint id;
     layerNotificationFunc callback;
-} static gLayerNotificationCallbacks[MAX_CALLBACK_COUNT];
+} gLayerNotificationCallbacks[MAX_CALLBACK_COUNT];
 
-struct
+static struct
 {
     t_ilm_uint id;
     surfaceNotificationFunc callback;
-} static gSurfaceNotificationCallbacks[MAX_CALLBACK_COUNT];
+} gSurfaceNotificationCallbacks[MAX_CALLBACK_COUNT];
 
 void initNotificationCallbacks()
 {
@@ -124,7 +131,7 @@ t_ilm_bool findLayerCallback(t_ilm_layer layer)
 {
     int i = 0;
 
-    // try to overwrite existing entry for layer id
+    /* try to overwrite existing entry for layer id */
     for (i = 0; i < MAX_CALLBACK_COUNT; ++i)
     {
         if (gLayerNotificationCallbacks[i].id == layer)
@@ -144,7 +151,7 @@ t_ilm_bool addLayerCallback(t_ilm_layer layer, layerNotificationFunc func)
         return ILM_FALSE;
     }
 
-    // find free slot and store callback
+    /* find free slot and store callback */
     for (i = 0; i < MAX_CALLBACK_COUNT; ++i)
     {
         if (gLayerNotificationCallbacks[i].id == INVALID_ID)
@@ -162,7 +169,7 @@ t_ilm_bool findSurfaceCallback(t_ilm_surface surface)
 {
     int i = 0;
 
-    // try to overwrite existing entry for layer id
+    /* try to overwrite existing entry for layer id */
     for (i = 0; i < MAX_CALLBACK_COUNT; ++i)
     {
         if (gSurfaceNotificationCallbacks[i].id == surface)
@@ -182,7 +189,7 @@ t_ilm_bool addSurfaceCallback(t_ilm_surface surface, surfaceNotificationFunc fun
         return ILM_FALSE;
     }
 
-    // find free slot and store callback
+    /* find free slot and store callback */
     for (i = 0; i < MAX_CALLBACK_COUNT; ++i)
     {
         if (gSurfaceNotificationCallbacks[i].id == INVALID_ID)
@@ -224,27 +231,31 @@ void removeSurfaceCallback(t_ilm_surface layer)
     }
 }
 
-//=============================================================================
-// handling of internal notification thread for dispatching notifications
-// Note: notification callbacks may be blocked by client, but receive thread
-// must not be blocked
-//=============================================================================
+
+/*
+ *=============================================================================
+ * handling of internal notification thread for dispatching notifications
+ * Note: notification callbacks may be blocked by client, but receive thread
+ * must not be blocked
+ *=============================================================================
+ */
 void* notificationThreadLoop(void* param)
 {
-    (void)param;
-
     t_ilm_message notification;
+
+    (void)param;
 
     while (-1 != mq_receive(notificationMqRead, (char*)&notification, sizeof(notification), NULL))
     {
         t_ilm_const_string name = gIpcModule.getMessageName(notification);
 
-        // this depends on message name, but it is fast
+        /* this depends on message name, but it is fast */
         if ('L' == name[15])
         {
             t_ilm_uint id;
             t_ilm_uint mask;
             struct ilmLayerProperties properties;
+            layerNotificationFunc func;
 
             gIpcModule.getUint(notification, &id);
             gIpcModule.getUint(notification, &mask);
@@ -268,7 +279,7 @@ void* notificationThreadLoop(void* param)
             gIpcModule.getUint(notification, &properties.chromaKeyBlue);
             gIpcModule.getInt(notification, &properties.creatorPid);
 
-            layerNotificationFunc func = getLayerNotificationCallback(id);
+            func = getLayerNotificationCallback(id);
             if (func)
             {
                 (*func)(id, &properties, mask);
@@ -284,6 +295,7 @@ void* notificationThreadLoop(void* param)
             t_ilm_uint id;
             t_ilm_uint mask;
             struct ilmSurfaceProperties properties;
+            surfaceNotificationFunc func;
 
             gIpcModule.getUint(notification, &id);
             gIpcModule.getUint(notification, &mask);
@@ -312,7 +324,7 @@ void* notificationThreadLoop(void* param)
             gIpcModule.getUint(notification, &properties.chromaKeyBlue);
             gIpcModule.getInt(notification, &properties.creatorPid);
 
-            surfaceNotificationFunc func = getSurfaceNotificationCallback(id);
+            func = getSurfaceNotificationCallback(id);
             if (func)
             {
                 (*func)(id, &properties, mask);
@@ -327,14 +339,17 @@ void* notificationThreadLoop(void* param)
     return NULL;
 }
 
-//=============================================================================
-// handling of internal receive thread for event handling
-//=============================================================================
+
+/*
+ *=============================================================================
+ * handling of internal receive thread for event handling
+ *=============================================================================
+ */
 void* receiveThreadLoop(void* param)
 {
-    (void)param;
-
     t_ilm_bool running = ILM_TRUE;
+
+    (void)param;
 
     while (running)
     {
@@ -378,24 +393,25 @@ void* receiveThreadLoop(void* param)
 
 void calculateTimeout(struct timeval* currentTime, int giventimeout, struct timespec* timeout)
 {
-    // nanoseconds is old value in nanoseconds + the given milliseconds as nanoseconds
+    /* nanoseconds is old value in nanoseconds + the given milliseconds as nanoseconds */
     t_ilm_ulong newNanoSeconds = currentTime->tv_usec * 1000 + giventimeout * (1000 * 1000);
 
-    // only use non full seconds, otherwise overflow!
+    /* only use non full seconds, otherwise overflow! */
     timeout->tv_nsec = newNanoSeconds % (1000000000);
 
-    // new seconds are old seconds + full seconds from new nanoseconds part
+    /* new seconds are old seconds + full seconds from new nanoseconds part */
     timeout->tv_sec  = currentTime->tv_sec + (newNanoSeconds / 1000000000 );
 }
 
 t_ilm_bool sendAndWaitForResponse(t_ilm_message command, t_ilm_message* response, int timeoutInMs)
 {
+    t_ilm_message_type responseType = IpcMessageTypeNone;
+
     (void)timeoutInMs;
 
     *response = 0;
-    t_ilm_message_type responseType = IpcMessageTypeNone;
 
-    // send / receive may only be performed by one thread at a time
+    /* send / receive may only be performed by one thread at a time */
     pthread_mutex_lock(&gSendReceiveLock);
 
     if (gIpcModule.sendToService(command))
@@ -414,12 +430,17 @@ t_ilm_bool sendAndWaitForResponse(t_ilm_message command, t_ilm_message* response
     return (*response && (IpcMessageTypeCommand == responseType));
 }
 
-//=============================================================================
-// implementation
-//=============================================================================
+
+/*
+ *=============================================================================
+ * implementation
+ *=============================================================================
+ */
 ilmErrorTypes ilm_init()
 {
     ilmErrorTypes result = ILM_FAILED;
+    t_ilm_message response = 0;
+    t_ilm_message command;
 
     if (gInitialized)
     {
@@ -435,27 +456,28 @@ ilmErrorTypes ilm_init()
 
         if (gIpcModule.initClientMode())
         {
+            char mqName[30];
+            pthread_attr_t notificationThreadAttributes;
+            int ret;
+
+            struct mq_attr mqAttr;
+            mqAttr.mq_maxmsg = 4;
+            mqAttr.mq_msgsize = sizeof(t_ilm_message);
+            mqAttr.mq_flags = 0; /*O_NONBLOCK, */
+            mqAttr.mq_curmsgs = 0;
+
             result = ILM_SUCCESS;
 
-            struct mq_attr mqAttr =
-            {
-                .mq_maxmsg = 4,
-                .mq_msgsize = sizeof(t_ilm_message),
-                .mq_flags = 0, //O_NONBLOCK,
-                .mq_curmsgs = 0
-            };
-
-            char mqName[30];
             snprintf(mqName, sizeof(mqName), NOTIFICATION_QUEUE_NAME, getpid());
 
             notificationMqWrite = mq_open(mqName, O_WRONLY | O_CREAT, 0600, &mqAttr);
             notificationMqRead = mq_open(mqName, O_RDONLY);
-            mq_unlink(mqName); // is destroyed on closed filedescriptor
+            mq_unlink(mqName); /* is destroyed on closed filedescriptor */
 
             snprintf(mqName, sizeof(mqName), INCOMING_QUEUE_NAME, getpid());
             incomingMqWrite = mq_open(mqName, O_WRONLY | O_CREAT, 0600, &mqAttr);
             incomingMqRead = mq_open(mqName, O_RDONLY);
-            mq_unlink(mqName); // is destroyed on closed filedescriptor
+            mq_unlink(mqName); /* is destroyed on closed filedescriptor */
 
             if ((mqd_t)-1 == notificationMqRead || (mqd_t)-1 == notificationMqWrite)
             {
@@ -465,12 +487,11 @@ ilmErrorTypes ilm_init()
 
             pthread_mutex_init(&gSendReceiveLock, NULL);
 
-            pthread_attr_t notificationThreadAttributes;
             pthread_attr_init(&notificationThreadAttributes);
             pthread_attr_setdetachstate(&notificationThreadAttributes,
                                         PTHREAD_CREATE_JOINABLE);
 
-            int ret = pthread_create(&gReceiveThread,
+            ret = pthread_create(&gReceiveThread,
                                      &notificationThreadAttributes,
                                      receiveThreadLoop,
                                      NULL);
@@ -499,8 +520,7 @@ ilmErrorTypes ilm_init()
             return result;
         }
 
-        t_ilm_message response = 0;
-        t_ilm_message command = gIpcModule.createMessage("ServiceConnect");
+        command = gIpcModule.createMessage("ServiceConnect");
         if (command
                 && gIpcModule.appendUint(command, pid)
                 && gIpcModule.appendString(command, __progname)
@@ -525,6 +545,7 @@ ilmErrorTypes ilm_init()
 ilmErrorTypes ilm_destroy()
 {
     ilmErrorTypes result = ILM_FAILED;
+    void* threadReturnValue = NULL;
 
     t_ilm_message response = 0;
     t_ilm_message command = gIpcModule.createMessage("ServiceDisconnect");
@@ -537,9 +558,7 @@ ilmErrorTypes ilm_destroy()
     gIpcModule.destroyMessage(response);
     gIpcModule.destroyMessage(command);
 
-    // cancel worker threads
-    void* threadReturnValue = NULL;
-
+    /* cancel worker threads */
     pthread_cancel(gReceiveThread);
     pthread_cancel(gNotificationThread);
 
@@ -1144,7 +1163,7 @@ ilmErrorTypes ilm_layerSetChromaKey(t_ilm_layer layerId, t_ilm_int* pColor)
     {
         t_ilm_bool comResult = ILM_TRUE;
 
-        // Checking pColor has a content, otherwise chromakey is disabled
+        /* Checking pColor has a content, otherwise chromakey is disabled */
         if (pColor)
         {
             const t_ilm_uint number = 3;
@@ -1612,7 +1631,7 @@ ilmErrorTypes ilm_surfaceSetChromaKey(t_ilm_surface surfaceId, t_ilm_int* pColor
     {
         t_ilm_bool comResult = ILM_TRUE;
 
-        // Checking pColor has a content, otherwise chromakey is disabled
+        /* Checking pColor has a content, otherwise chromakey is disabled */
         if (pColor)
         {
             const t_ilm_uint number = 3;
@@ -1828,14 +1847,16 @@ ilmErrorTypes ilm_commitChanges()
 ilmErrorTypes ilm_layerAddNotification(t_ilm_layer layer, layerNotificationFunc callback)
 {
     ilmErrorTypes returnValue = ILM_FAILED;
+    t_ilm_message response;
+    t_ilm_message command;
 
     if (findLayerCallback(layer))
     {
         return ILM_ERROR_INVALID_ARGUMENTS;
     }
 
-    t_ilm_message response = 0;
-    t_ilm_message command = gIpcModule.createMessage("LayerAddNotification");
+    response = 0;
+    command = gIpcModule.createMessage("LayerAddNotification");
     if (command
         && gIpcModule.appendUint(command, layer)
         && sendAndWaitForResponse(command, &response, gResponseTimeout))
@@ -1851,14 +1872,16 @@ ilmErrorTypes ilm_layerAddNotification(t_ilm_layer layer, layerNotificationFunc 
 ilmErrorTypes ilm_layerRemoveNotification(t_ilm_layer layer)
 {
     ilmErrorTypes returnValue = ILM_FAILED;
+    t_ilm_message response;
+    t_ilm_message command;
 
     if (!findLayerCallback(layer))
     {
         return ILM_ERROR_INVALID_ARGUMENTS;
     }
 
-    t_ilm_message response = 0;
-    t_ilm_message command = gIpcModule.createMessage("LayerRemoveNotification");
+    response = 0;
+    command = gIpcModule.createMessage("LayerRemoveNotification");
     if (command
         && gIpcModule.appendUint(command, layer)
         && sendAndWaitForResponse(command, &response, gResponseTimeout))
@@ -1874,14 +1897,16 @@ ilmErrorTypes ilm_layerRemoveNotification(t_ilm_layer layer)
 ilmErrorTypes ilm_surfaceAddNotification(t_ilm_surface surface, surfaceNotificationFunc callback)
 {
     ilmErrorTypes returnValue = ILM_FAILED;
+    t_ilm_message response;
+    t_ilm_message command;
 
     if (findSurfaceCallback(surface))
     {
         return ILM_ERROR_INVALID_ARGUMENTS;
     }
 
-    t_ilm_message response = 0;
-    t_ilm_message command = gIpcModule.createMessage("SurfaceAddNotification");
+    response = 0;
+    command = gIpcModule.createMessage("SurfaceAddNotification");
     if (command
         && gIpcModule.appendUint(command, surface)
         && sendAndWaitForResponse(command, &response, gResponseTimeout))
@@ -1897,14 +1922,16 @@ ilmErrorTypes ilm_surfaceAddNotification(t_ilm_surface surface, surfaceNotificat
 ilmErrorTypes ilm_surfaceRemoveNotification(t_ilm_surface surface)
 {
     ilmErrorTypes returnValue = ILM_FAILED;
+    t_ilm_message response;
+    t_ilm_message command;
 
     if (!findSurfaceCallback(surface))
     {
         return ILM_ERROR_INVALID_ARGUMENTS;
     }
 
-    t_ilm_message response = 0;
-    t_ilm_message command = gIpcModule.createMessage("SurfaceRemoveNotification");
+    response = 0;
+    command = gIpcModule.createMessage("SurfaceRemoveNotification");
     if (command
         && gIpcModule.appendUint(command, surface)
         && sendAndWaitForResponse(command, &response, gResponseTimeout))
@@ -1927,7 +1954,7 @@ ilmErrorTypes ilm_getPropertiesOfScreen(t_ilm_display screenID, struct ilmScreen
         && command
         && gIpcModule.appendUint(command, screenID)
         && sendAndWaitForResponse(command, &response, gResponseTimeout)
-        && gIpcModule.getUintArray(response, &pScreenProperties->layerIds, &pScreenProperties->layerCount)
+        && gIpcModule.getUintArray(response, &pScreenProperties->layerIds, (int*)(&pScreenProperties->layerCount))
         && gIpcModule.getUint(response, &pScreenProperties->harwareLayerCount)
         && gIpcModule.getUint(response, &pScreenProperties->screenWidth)
         && gIpcModule.getUint(response, &pScreenProperties->screenHeight))

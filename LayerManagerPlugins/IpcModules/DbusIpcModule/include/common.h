@@ -25,9 +25,11 @@
 #include <pthread.h>
 
 
-//=============================================================================
-// data structures
-//=============================================================================
+/*
+ * =============================================================================
+ * data structures
+ * =============================================================================
+ */
 typedef struct
 {
     t_ilm_message_type type;
@@ -57,26 +59,33 @@ typedef struct
     int outgoingSocketsMax;
 } dbus;
 
-//=============================================================================
-// global variables
-//=============================================================================
+
+/*
+ * =============================================================================
+ * global variables
+ * =============================================================================
+ */
 dbus gDbus;
 dbusmessage* gpIncomingMessage;
 
-//=============================================================================
-// prototypes
-//=============================================================================
+/*
+ * =============================================================================
+ * prototypes
+ * =============================================================================
+ */
 void printTypeName(int type);
 void unregisterMessageFunc(DBusConnection* conn, void *user_data);
 t_ilm_bool appendString(t_ilm_message message, const char* value);
 t_ilm_bool getString(t_ilm_message message, char* value);
 t_ilm_bool sendToClients(t_ilm_message message, t_ilm_client_handle* receiverList, int receiverCount);
 
-//=============================================================================
-// callback functions
-//=============================================================================
+/*
+ * =============================================================================
+ * callback functions
+ * =============================================================================
+ */
 void callbackUnregister(DBusConnection *connection, void *user_data);
 DBusHandlerResult callbackMessage(DBusConnection *connection, DBusMessage *message, void *user_data);
 
 
-#endif // __COMMON_H__
+#endif /* __COMMON_H__ */

@@ -122,7 +122,6 @@ void* scatterThreadCallback(void* param)
 void scatterHandleUserInput(t_scene_data* pOriginalScene, t_scene_data* pScatteredScene)
 {
     int n = pScatteredScene->surfaces.size();
-    int rows = ceil(sqrt(n));
     int cols = ceil(sqrt(n));
 
     //make keys map

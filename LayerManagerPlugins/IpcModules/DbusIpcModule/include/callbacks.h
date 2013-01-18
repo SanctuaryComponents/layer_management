@@ -23,7 +23,7 @@
 #include <dbus/dbus.h>
 
 
-// message filters
+/* message filters */
 
 DBusHandlerResult filterLogging(DBusConnection *connection, DBusMessage *message, void *data);
 DBusHandlerResult filterNameAcquired(DBusConnection *connection, DBusMessage *message, void *data);
@@ -35,11 +35,11 @@ DBusHandlerResult filterLayerManagerNotifications(DBusConnection *connection, DB
 DBusHandlerResult filterDiscardUnexpected(DBusConnection *connection, DBusMessage *message, void *data);
 
 
-// watches
+/* watches */
 
 dbus_bool_t addWatch(DBusWatch* watch, void* data);
 void removeWatch(DBusWatch* watch, void* data);
 void toggleWatch(DBusWatch* watch, void* data);
 
 
-#endif // _CALLBACKS_H_
+#endif /* _CALLBACKS_H_ */

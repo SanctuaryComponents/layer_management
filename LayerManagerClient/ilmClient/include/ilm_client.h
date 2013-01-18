@@ -22,7 +22,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif // __cplusplus
+#endif /* __cplusplus */
 
 #include "ilm_types.h"
 /**
@@ -781,8 +781,8 @@ ilmErrorTypes ilm_layerRemoveNotification(t_ilm_layer layer);
 ilmErrorTypes ilm_getPropertiesOfScreen(t_ilm_display screenID, struct ilmScreenProperties* pScreenProperties);
 
 #ifdef __cplusplus
-} //
-#endif // __cplusplus
+} /**/
+#endif /* __cplusplus */
 
 #endif /* _ILM_CLIENT_H_ */
 
