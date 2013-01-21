@@ -67,315 +67,311 @@ COMMAND("tree")
 }
 
 //=============================================================================
-COMMAND("get screens")
+COMMAND("get scene|screens|layers|surfaces")
 //=============================================================================
 {
-    (void)input;
-    unsigned int count = 0;
-    unsigned int* array = NULL;
-    ilm_getScreenIDs(&count, &array);
-    printArray("Screen", array, count);
+    if (input->contains("scene"))
+    {
+        printScene();
+    }
+    else if (input->contains("screens"))
+    {
+        (void)input;
+        unsigned int count = 0;
+        unsigned int* array = NULL;
+        ilm_getScreenIDs(&count, &array);
+        printArray("Screen", array, count);
+    }
+    else if (input->contains("layers"))
+    {
+        (void)input;
+        int count = 0;
+        unsigned int* array = NULL;
+        ilm_getLayerIDs(&count, &array);
+        printArray("Layer", array, count);
+    }
+    else if (input->contains("surfaces"))
+    {
+        (void)input;
+        int count = 0;
+        unsigned int* array = NULL;
+        ilm_getSurfaceIDs(&count, &array);
+        printArray("Surface", array, count);
+    }
 }
 
 //=============================================================================
-COMMAND("get layers")
+COMMAND("get screen|layer|surface <id>")
 //=============================================================================
 {
-    (void)input;
-    int count = 0;
-    unsigned int* array = NULL;
-    ilm_getLayerIDs(&count, &array);
-    printArray("Layer", array, count);
+    if (input->contains("screen"))
+    {
+        printScreenProperties(input->getUint("id"));
+    }
+    else if (input->contains("layer"))
+    {
+        printLayerProperties(input->getUint("id"));
+    }
+    else if (input->contains("surface"))
+    {
+        printSurfaceProperties(input->getUint("id"));
+    }
 }
 
 //=============================================================================
-COMMAND("get surfaces")
+COMMAND("dump screen|layer|surface <id> to <file>")
 //=============================================================================
 {
-    (void)input;
-    int count = 0;
-    unsigned int* array = NULL;
-    ilm_getSurfaceIDs(&count, &array);
-    printArray("Surface", array, count);
+    if (input->contains("screen"))
+    {
+        ilm_takeScreenshot(input->getUint("id"),
+                           input->getString("file").c_str());
+    }
+    else if (input->contains("layer"))
+    {
+        ilm_takeLayerScreenshot(input->getString("file").c_str(),
+                                input->getUint("id"));
+    }
+    else if (input->contains("surface"))
+    {
+        ilm_takeSurfaceScreenshot(input->getString("file").c_str(),
+                                  input->getUint("id"));
+    }
 }
 
 //=============================================================================
-COMMAND("get screen <screenid>")
+COMMAND("set layer|surface <id> source region <x> <y> <w> <h>")
 //=============================================================================
 {
-    printScreenProperties(input->getUint("screenid"));
+    if (input->contains("layer"))
+    {
+        ilm_layerSetSourceRectangle(input->getUint("id"),
+                                    input->getUint("x"),
+                                    input->getUint("y"),
+                                    input->getUint("w"),
+                                    input->getUint("h"));
+        ilm_commitChanges();
+    }
+    else if (input->contains("surface"))
+    {
+        ilm_surfaceSetSourceRectangle(input->getUint("id"),
+                                      input->getUint("x"),
+                                      input->getUint("y"),
+                                      input->getUint("w"),
+                                      input->getUint("h"));
+            ilm_commitChanges();
+    }
 }
 
 //=============================================================================
-COMMAND("get layer <layerid>")
+COMMAND("set layer|surface <id> destination region <x> <y> <w> <h>")
 //=============================================================================
 {
-    printLayerProperties(input->getUint("layerid"));
+    if (input->contains("layer"))
+    {
+        ilm_layerSetDestinationRectangle(input->getUint("id"),
+                                        input->getUint("x"),
+                                        input->getUint("y"),
+                                        input->getUint("w"),
+                                        input->getUint("h"));
+        ilm_commitChanges();
+    }
+    else if (input->contains("surface"))
+    {
+        ilm_surfaceSetDestinationRectangle(input->getUint("id"),
+                                           input->getUint("x"),
+                                           input->getUint("y"),
+                                           input->getUint("w"),
+                                           input->getUint("h"));
+        ilm_commitChanges();
+    }
 }
 
 //=============================================================================
-COMMAND("get surface <surfaceid>")
+COMMAND("set layer|surface <id> opacity <opacity>")
 //=============================================================================
 {
-    printSurfaceProperties(input->getUint("surfaceid"));
+    if (input->contains("layer"))
+    {
+        ilm_layerSetOpacity(input->getUint("id"),
+                input->getDouble("opacity"));
+        ilm_commitChanges();
+    }
+    else if (input->contains("surface"))
+    {
+        ilm_surfaceSetOpacity(input->getUint("id"),
+                                  input->getDouble("opacity"));
+            ilm_commitChanges();
+    }
 }
 
 //=============================================================================
-COMMAND("dump screen <screenid> to <file>")
+COMMAND("set layer|surface <id> visibility <visibility>")
 //=============================================================================
 {
-    ilm_takeScreenshot(input->getUint("screenid"),
-                       input->getString("file").c_str());
+    if (input->contains("layer"))
+    {
+        ilm_layerSetVisibility(input->getUint("id"),
+                               input->getBool("visibility"));
+        ilm_commitChanges();
+    }
+    else if (input->contains("surface"))
+    {
+        ilm_surfaceSetVisibility(input->getUint("id"),
+                                 input->getBool("visibility"));
+        ilm_commitChanges();
+    }
 }
 
 //=============================================================================
-COMMAND("dump layer <layerid> to <file>")
+COMMAND("set layer|surface <id> orientation <orientation>")
 //=============================================================================
 {
-    ilm_takeLayerScreenshot(input->getString("file").c_str(),
-                            input->getUint("layerid"));
+    if (input->contains("layer"))
+    {
+        ilm_layerSetOrientation(input->getUint("id"),
+                    (ilmOrientation)input->getInt("orientation"));
+        ilm_commitChanges();
+    }
+    else if (input->contains("surface"))
+    {
+        ilm_surfaceSetOrientation(input->getUint("id"),
+                      (ilmOrientation)input->getInt("orientation"));
+        ilm_commitChanges();
+    }
+
 }
 
 //=============================================================================
-COMMAND("dump surface <surfaceid> to <file>")
+COMMAND("set screen|layer <id> render order [<idarray>]")
 //=============================================================================
 {
-    ilm_takeSurfaceScreenshot(input->getString("file").c_str(),
-                              input->getUint("surfaceid"));
+    if (input->contains("screen"))
+    {
+        if (input->contains("idarray"))
+        {
+            unsigned int count = 0;
+            unsigned int* array = NULL;
+            unsigned int screenid = input->getUint("id");
+            input->getUintArray("idarray", &array, &count);
+            ilm_displaySetRenderOrder(screenid, array, count);
+            ilm_commitChanges();
+        }
+        else
+        {
+            unsigned int screenid = input->getUint("id");
+            ilm_displaySetRenderOrder(screenid, NULL, 0);
+            ilm_commitChanges();
+        }
+    }
+    else if (input->contains("layer"))
+    {
+        if (input->contains("idarray"))
+        {
+            unsigned int count = 0;
+            unsigned int* array = NULL;
+            unsigned int layerid = input->getUint("id");
+            input->getUintArray("idarray", &array, &count);
+            ilm_layerSetRenderOrder(layerid, array, count);
+            ilm_commitChanges();
+        }
+        else
+        {
+            unsigned int layerid = input->getUint("id");
+            ilm_layerSetRenderOrder(layerid, NULL, 0);
+            ilm_commitChanges();
+        }
+    }
 }
 
 //=============================================================================
-COMMAND("set layer <layerid> source region <x> <y> <w> <h>")
+COMMAND("set layer|surface <id> width <width>")
 //=============================================================================
 {
-    ilm_layerSetSourceRectangle(input->getUint("layerid"),
-                                input->getUint("x"),
-                                input->getUint("y"),
-                                input->getUint("w"),
-                                input->getUint("h"));
-    ilm_commitChanges();
+    if (input->contains("layer"))
+    {
+        unsigned int dimension[2];
+        unsigned int layerid = input->getUint("id");
+        ilm_layerGetDimension(layerid, dimension);
+        dimension[0] = input->getUint("width");
+        ilm_layerSetDimension(layerid, dimension);
+        ilm_commitChanges();
+    }
+    else if (input->contains("surface"))
+    {
+        unsigned int dimension[2];
+        unsigned int surfaceid = input->getUint("id");
+        ilm_surfaceGetDimension(surfaceid, dimension);
+        dimension[0] = input->getUint("width");
+        ilm_surfaceSetDimension(surfaceid, dimension);
+        ilm_commitChanges();
+    }
 }
 
 //=============================================================================
-COMMAND("set surface <surfaceid> source region <x> <y> <w> <h>")
+COMMAND("set layer|surface <id> height <height>")
 //=============================================================================
 {
-    ilm_surfaceSetSourceRectangle(input->getUint("surfaceid"),
-                                  input->getUint("x"),
-                                  input->getUint("y"),
-                                  input->getUint("w"),
-                                  input->getUint("h"));
-    ilm_commitChanges();
+    if (input->contains("layer"))
+    {
+        unsigned int dimension[2];
+        unsigned int layerid = input->getUint("id");
+        ilm_layerGetDimension(layerid, dimension);
+        dimension[1] = input->getUint("height");
+        ilm_layerSetDimension(layerid, dimension);
+        ilm_commitChanges();
+    }
+    else if (input->contains("surface"))
+    {
+        unsigned int dimension[2];
+        unsigned int surfaceid = input->getUint("id");
+        ilm_surfaceGetDimension(surfaceid, dimension);
+        dimension[1] = input->getUint("height");
+        ilm_surfaceSetDimension(surfaceid, dimension);
+        ilm_commitChanges();
+    }
 }
 
 //=============================================================================
-COMMAND("set layer <layerid> destination region <x> <y> <w> <h>")
+COMMAND("set layer|surface <id> position <x> <y>")
 //=============================================================================
 {
-    ilm_layerSetDestinationRectangle(input->getUint("layerid"),
-                                     input->getUint("x"),
-                                     input->getUint("y"),
-                                     input->getUint("w"),
-                                     input->getUint("h"));
-    ilm_commitChanges();
+    if (input->contains("layer"))
+    {
+        unsigned int dimension[2];
+        unsigned int layerid = input->getUint("id");
+        dimension[0] = input->getUint("x");
+        dimension[1] = input->getUint("y");
+        ilm_layerSetPosition(layerid, dimension);
+        ilm_commitChanges();
+    }
+    else if (input->contains("surface"))
+    {
+        unsigned int dimension[2];
+        unsigned int surfaceid = input->getUint("id");
+        dimension[0] = input->getUint("x");
+        dimension[1] = input->getUint("y");
+        ilm_surfaceSetPosition(surfaceid, dimension);
+        ilm_commitChanges();
+    }
 }
 
 //=============================================================================
-COMMAND("set surface <surfaceid> destination region <x> <y> <w> <h>")
+COMMAND("create layer <layerid> [<width> <height>]")
 //=============================================================================
 {
-    ilm_surfaceSetDestinationRectangle(input->getUint("surfaceid"),
-                                       input->getUint("x"),
-                                       input->getUint("y"),
-                                       input->getUint("w"),
-                                       input->getUint("h"));
-    ilm_commitChanges();
-}
-
-//=============================================================================
-COMMAND("set layer <layerid> opacity <opacity>")
-//=============================================================================
-{
-    ilm_layerSetOpacity(input->getUint("layerid"),
-                        input->getDouble("opacity"));
-    ilm_commitChanges();
-}
-
-//=============================================================================
-COMMAND("set surface <surfaceid> opacity <opacity>")
-//=============================================================================
-{
-    ilm_surfaceSetOpacity(input->getUint("surfaceid"),
-                          input->getDouble("opacity"));
-    ilm_commitChanges();
-}
-
-//=============================================================================
-COMMAND("set layer <layerid> visibility <visibility>")
-//=============================================================================
-{
-    ilm_layerSetVisibility(input->getUint("layerid"),
-                           input->getBool("visibility"));
-    ilm_commitChanges();
-}
-
-//=============================================================================
-COMMAND("set surface <surfaceid> visibility <visibility>")
-//=============================================================================
-{
-    ilm_surfaceSetVisibility(input->getUint("surfaceid"),
-                             input->getBool("visibility"));
-    ilm_commitChanges();
-}
-
-//=============================================================================
-COMMAND("set layer <layerid> orientation <orientation>")
-//=============================================================================
-{
-    ilm_layerSetOrientation(input->getUint("layerid"),
-            (ilmOrientation)input->getInt("orientation"));
-    ilm_commitChanges();
-}
-
-//=============================================================================
-COMMAND("set surface <surfaceid> orientation <orientation>")
-//=============================================================================
-{
-    ilm_surfaceSetOrientation(input->getUint("surfaceid"),
-              (ilmOrientation)input->getInt("orientation"));
-    ilm_commitChanges();
-}
-
-//=============================================================================
-COMMAND("set screen <screenid> render order <layeridarray>")
-//=============================================================================
-{
-    unsigned int count = 0;
-    unsigned int* array = NULL;
-    unsigned int screenid = input->getUint("screenid");
-    input->getUintArray("layeridarray", &array, &count);
-    ilm_displaySetRenderOrder(screenid, array, count);
-    ilm_commitChanges();
-}
-
-//=============================================================================
-COMMAND("set screen <screenid> render order")
-//=============================================================================
-{
-    unsigned int screenid = input->getUint("screenid");
-    ilm_displaySetRenderOrder(screenid, NULL, 0);
-    ilm_commitChanges();
-}
-
-//=============================================================================
-COMMAND("set layer <layerid> render order <surfaceidarray>")
-//=============================================================================
-{
-    unsigned int count = 0;
-    unsigned int* array = NULL;
-    unsigned int layerid = input->getUint("layerid");
-    input->getUintArray("surfaceidarray", &array, &count);
-    ilm_layerSetRenderOrder(layerid, array, count);
-    ilm_commitChanges();
-}
-
-//=============================================================================
-COMMAND("set layer <layerid> render order")
-//=============================================================================
-{
-    unsigned int layerid = input->getUint("layerid");
-    ilm_layerSetRenderOrder(layerid, NULL, 0);
-    ilm_commitChanges();
-}
-
-//=============================================================================
-COMMAND("set layer <layerid> width <width>")
-//=============================================================================
-{
-    unsigned int dimension[2];
-    unsigned int layerid = input->getUint("layerid");
-    ilm_layerGetDimension(layerid, dimension);
-    dimension[0] = input->getUint("width");
-    ilm_layerSetDimension(layerid, dimension);
-    ilm_commitChanges();
-}
-
-//=============================================================================
-COMMAND("set surface <surfaceid> width <width>")
-//=============================================================================
-{
-    unsigned int dimension[2];
-    unsigned int surfaceid = input->getUint("surfaceid");
-    ilm_surfaceGetDimension(surfaceid, dimension);
-    dimension[0] = input->getUint("width");
-    ilm_surfaceSetDimension(surfaceid, dimension);
-    ilm_commitChanges();
-}
-
-//=============================================================================
-COMMAND("set layer <layerid> height <height>")
-//=============================================================================
-{
-    unsigned int dimension[2];
-    unsigned int layerid = input->getUint("layerid");
-    ilm_layerGetDimension(layerid, dimension);
-    dimension[1] = input->getUint("height");
-    ilm_layerSetDimension(layerid, dimension);
-    ilm_commitChanges();
-}
-
-//=============================================================================
-COMMAND("set surface <surfaceid> height <height>")
-//=============================================================================
-{
-    unsigned int dimension[2];
-    unsigned int surfaceid = input->getUint("surfaceid");
-    ilm_surfaceGetDimension(surfaceid, dimension);
-    dimension[1] = input->getUint("height");
-    ilm_surfaceSetDimension(surfaceid, dimension);
-    ilm_commitChanges();
-}
-
-//=============================================================================
-COMMAND("set layer <layerid> position <x> <y>")
-//=============================================================================
-{
-    unsigned int dimension[2];
-    unsigned int layerid = input->getUint("layerid");
-    dimension[0] = input->getUint("x");
-    dimension[1] = input->getUint("y");
-    ilm_layerSetPosition(layerid, dimension);
-    ilm_commitChanges();
-}
-
-//=============================================================================
-COMMAND("set surface <surfaceid> position <x> <y>")
-//=============================================================================
-{
-    unsigned int dimension[2];
-    unsigned int surfaceid = input->getUint("surfaceid");
-    dimension[0] = input->getUint("x");
-    dimension[1] = input->getUint("y");
-    ilm_surfaceSetPosition(surfaceid, dimension);
-    ilm_commitChanges();
-}
-
-//=============================================================================
-COMMAND("create layer <layerid>")
-//=============================================================================
-{
-    unsigned int layerid = input->getUint("layerid");
-    ilm_layerCreate(&layerid);
-}
-
-//=============================================================================
-COMMAND("create layer <layerid> <width> <height>")
-//=============================================================================
-{
-    unsigned int layerid = input->getUint("layerid");
-    unsigned int width = input->getUint("width");
-    unsigned int height = input->getUint("height");
-    ilm_layerCreateWithDimension(&layerid, width, height);
+    if (input->contains("width") && input->contains("height"))
+    {
+        unsigned int layerid = input->getUint("layerid");
+        unsigned int width = input->getUint("width");
+        unsigned int height = input->getUint("height");
+        ilm_layerCreateWithDimension(&layerid, width, height);
+    }
+    else
+    {
+        unsigned int layerid = input->getUint("layerid");
+        ilm_layerCreate(&layerid);
+    }
 }
 
 //=============================================================================
@@ -391,27 +387,19 @@ COMMAND("create surface <surfaceid> <nativehandle> <width> <height> <pixelformat
 }
 
 //=============================================================================
-COMMAND("destroy layer <layerid>")
+COMMAND("destroy layer|surface <id>")
 //=============================================================================
 {
-    unsigned int layerid = input->getUint("layerid");
-    ilm_layerRemove(layerid);
-}
-
-//=============================================================================
-COMMAND("destroy surface <surfaceid>")
-//=============================================================================
-{
-    unsigned int surfaceid = input->getUint("surfaceid");
-    ilm_surfaceRemove(surfaceid);
-}
-
-//=============================================================================
-COMMAND("get scene")
-//=============================================================================
-{
-    (void) input; //suppress warning: unused parameter
-    printScene();
+    if (input->contains("layer"))
+    {
+        unsigned int layerid = input->getUint("id");
+        ilm_layerRemove(layerid);
+    }
+    else if (input->contains("surface"))
+    {
+        unsigned int surfaceid = input->getUint("id");
+        ilm_surfaceRemove(surfaceid);
+    }
 }
 
 //=============================================================================
@@ -451,18 +439,34 @@ COMMAND("set surface <surfaceid> accept <acceptance> input events from devices <
 }
 
 //=============================================================================
-COMMAND("set surface <surfaceid> chromakey <red> <green> <blue>")
+COMMAND("set layer|surface <id> chromakey <red> <green> <blue>")
 //=============================================================================
 {
-    t_ilm_surface surface = input->getUint("surfaceid");
-    t_ilm_int color[3] =
+    if (input->contains("layer"))
     {
-        input->getInt("red"),
-        input->getInt("green"),
-        input->getInt("blue")
-    };
-    ilm_surfaceSetChromaKey(surface, color);
-    ilm_commitChanges();
+        t_ilm_layer layer = input->getUint("id");
+        t_ilm_int color[3] =
+        {
+            input->getInt("red"),
+            input->getInt("green"),
+            input->getInt("blue")
+        };
+
+        ilm_layerSetChromaKey(layer, color);
+        ilm_commitChanges();
+    }
+    else if (input->contains("surface"))
+    {
+        t_ilm_surface surface = input->getUint("id");
+        t_ilm_int color[3] =
+        {
+            input->getInt("red"),
+            input->getInt("green"),
+            input->getInt("blue")
+        };
+        ilm_surfaceSetChromaKey(surface, color);
+        ilm_commitChanges();
+    }
 }
 
 //=============================================================================
@@ -471,22 +475,6 @@ COMMAND("set surface <surfaceid> chromakey disabled")
 {
     t_ilm_surface surface = input->getUint("surfaceid");
     ilm_surfaceSetChromaKey(surface, NULL);
-    ilm_commitChanges();
-}
-
-//=============================================================================
-COMMAND("set layer <layerid> chromakey <red> <green> <blue>")
-//=============================================================================
-{
-    t_ilm_surface surface = input->getUint("layerid");
-    t_ilm_int color[3] =
-    {
-        input->getInt("red"),
-        input->getInt("green"),
-        input->getInt("blue")
-    };
-
-    ilm_layerSetChromaKey(surface, color);
     ilm_commitChanges();
 }
 
@@ -500,25 +488,25 @@ COMMAND("test notification layer <layerid>")
 }
 
 //=============================================================================
-COMMAND("watch layer <layeridarray>")
+COMMAND("watch layer|surface <idarray>")
 //=============================================================================
 {
-    unsigned int* layerids = NULL;
-    unsigned int layeridCount;
-    input->getUintArray("layeridarray", &layerids, &layeridCount);
+    if (input->contains("layer"))
+    {
+        unsigned int* layerids = NULL;
+        unsigned int layeridCount;
+        input->getUintArray("idarray", &layerids, &layeridCount);
 
-    watchLayer(layerids, layeridCount);
-}
+        watchLayer(layerids, layeridCount);
+    }
+    else if (input->contains("surface"))
+    {
+        unsigned int* surfaceids = NULL;
+        unsigned int surfaceidCount;
+        input->getUintArray("idarray", &surfaceids, &surfaceidCount);
 
-//=============================================================================
-COMMAND("watch surface <surfaceidarray>")
-//=============================================================================
-{
-    unsigned int* surfaceids = NULL;
-    unsigned int surfaceidCount;
-    input->getUintArray("surfaceidarray", &surfaceids, &surfaceidCount);
-
-    watchSurface(surfaceids, surfaceidCount);
+        watchSurface(surfaceids, surfaceidCount);
+    }
 }
 
 //=============================================================================
@@ -547,23 +535,21 @@ COMMAND("analyze surface <surfaceid>")
 }
 
 //=============================================================================
-COMMAND("scatter")
+COMMAND("scatter [all]")
 //=============================================================================
 {
-    (void) input; //suppress warning: unused parameter
-    scatter();
+    if (input->contains("all"))
+    {
+        scatterAll();
+    }
+    else
+    {
+        scatter();
+    }
 }
 
 //=============================================================================
-COMMAND("scatter all")
-//=============================================================================
-{
-    (void) input; //suppress warning: unused parameter
-    scatterAll();
-}
-
-//=============================================================================
-COMMAND("demo <animation_mode>")
+COMMAND("demo [<animation_mode=2>]")
 //=============================================================================
 {
     t_ilm_uint mode = (t_ilm_uint) input->getUint("animation_mode");

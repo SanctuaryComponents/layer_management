@@ -37,6 +37,10 @@ public:
     Expression* getPreviousExpression();
     void addNextExpression(Expression* word);
     Expression* getNextExpression(string text);
+    ExpressionList getNextExpressions();
+    ExpressionList getClosure(bool bypass);
+    ExpressionList getNextExpressionClosure(string text);
+    ExpressionList getClosureExecutables(bool canBypass);
 
     void setFunc(callback funcPtr);
     void execute();
@@ -51,6 +55,7 @@ public:
     int getInt(string name);
     double getDouble(string name);
     bool getBool(string name);
+    bool contains(string name);
 
     void printTree(int level = 0);
     void printList(string list = "");
@@ -61,6 +66,7 @@ private:
     Expression* mPreviousWord;
     callback mFuncPtr;
     string mVarValue;
+    string mMatchText;
 
 };
 

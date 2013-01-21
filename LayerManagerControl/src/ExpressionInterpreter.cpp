@@ -24,6 +24,8 @@
 #include <algorithm> // transform
 #include <ctype.h> // tolower
 
+#include <iostream>
+
 Expression* ExpressionInterpreter::mpRoot = NULL;
 
 ExpressionInterpreter::ExpressionInterpreter()
@@ -50,7 +52,6 @@ bool ExpressionInterpreter::addExpression(callback funcPtr, string command)
     {
         ss >> text;
         transform(text.begin(), text.end(), text.begin(), ::tolower);
-        string name = currentWord->getName();
 
         Expression* nextWord = currentWord->getNextExpression(text);
 
@@ -75,18 +76,28 @@ CommandResult ExpressionInterpreter::interpretCommand(string userInput)
     stringstream ss;
     ss << userInput;
 
-    Expression* currentWord = mpRoot;
+    ExpressionList currentState;
+    currentState.push_back(mpRoot);
+    ExpressionList nextState;
 
     while (result == CommandSuccess && !ss.eof())
     {
         ss >> text;
         transform(text.begin(), text.end(), text.begin(), ::tolower);
 
-        Expression* nextWord = currentWord->getNextExpression(text);
-
-        if (nextWord)
+        ExpressionList::const_iterator iter = currentState.begin();
+        ExpressionList::const_iterator end = currentState.end();
+        for (;iter != end; ++iter)
         {
-            currentWord = nextWord;
+            Expression* expr = *iter;
+            ExpressionList exprNextList = expr->getNextExpressionClosure(text);
+            nextState.splice(nextState.end(), exprNextList);
+        }
+
+        if (nextState.size() > 0)
+        {
+            currentState = nextState;
+            nextState.clear();
         }
         else
         {
@@ -95,28 +106,80 @@ CommandResult ExpressionInterpreter::interpretCommand(string userInput)
         }
     }
 
+    //remove impossible expressions in the final state before checking for ambiguity
+    nextState.clear();
+    ExpressionList::const_iterator iter = currentState.begin();
+    ExpressionList::const_iterator end = currentState.end();
+    for (;iter != end; ++iter)
+    {
+        Expression* expr = *iter;
+        if (expr->isExecutable())
+        {
+            nextState.push_back(expr);
+        }
+        else
+        {
+            ExpressionList children = expr->getNextExpressions();
+
+            bool flag = false;
+
+            ExpressionList::const_iterator iter = children.begin();
+            ExpressionList::const_iterator end = children.end();
+            for (;iter != end; ++iter)
+            {
+                if ((*iter)->getName()[0] == '[')
+                {
+                    flag = true;
+                }
+            }
+
+            if (flag || children.size() == 0)
+            {
+                nextState.push_back(expr);
+            }
+        }
+    }
+
+    currentState = nextState;
+
+    if (currentState.size() != 1)
+    {
+        mErrorText = "'" + text + "' ambiguous or incomplete.";
+        result = CommandInvalid;
+    }
+
+    //run command if executable and non-ambiguous
     if (result == CommandSuccess)
     {
-        if (currentWord->isExecutable())
+        Expression* expr = *(currentState.begin());
+
+        ExpressionList executables = expr->getClosureExecutables(false);
+        if (executables.size() == 1)
         {
             if (ILM_SUCCESS != ilm_init())
             {
                 mErrorText = "Could not connect to LayerManagerService.";
                 result = CommandExecutionFailed;
             }
-
             else
             {
-                currentWord->execute();
+                Expression* exec = executables.front();
+                exec->execute();
                 ilm_destroy();
             }
         }
-        else
+        else if (executables.size() == 0)
         {
             mErrorText = "command is incomplete.";
             result = CommandIncomplete;
         }
+        else
+        {
+            mErrorText = "command is ambiguous.";
+            result = CommandIncomplete;
+        }
     }
+
     return result;
 }
 
