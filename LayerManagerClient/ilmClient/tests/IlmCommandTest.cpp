@@ -22,7 +22,6 @@
  *
  *     ilm_surfaceInvalidateRectangle
  *     ilm_layerSetChromaKey
- *     ilm_layerSetRenderOrder
  *     ilm_getNumberOfHardwareLayers
  *     ilm_layerGetType(t_ilm_layer layerId,ilmLayerType* layerType);
      ilm_layerGetCapabilities(t_ilm_layer layerId, t_ilm_layercapabilities *capabilities);
@@ -739,9 +738,9 @@ TEST_F(IlmCommandTest, ilm_getPropertiesOfScreen) {
     ilm_layerCreate(layerIds + 2);
 
     ilm_commitChanges();
-    
+
     ilm_displaySetRenderOrder(screen, layerIds, 3);
-    
+
     ilm_commitChanges();
 
 
@@ -764,7 +763,7 @@ TEST_F(IlmCommandTest, DisplaySetRenderOrder_growing) {
     t_ilm_layer renderOrder[] = {0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF};
     t_ilm_uint layerCount = sizeof(renderOrder) / sizeof(renderOrder[0]);
 
-    for (int i = 0; i < layerCount; ++i)
+    for (unsigned int i = 0; i < layerCount; ++i)
     {
         ilm_layerCreateWithDimension(renderOrder + i, 300, 300);
         ilm_commitChanges();
@@ -774,13 +773,13 @@ TEST_F(IlmCommandTest, DisplaySetRenderOrder_growing) {
     t_ilm_uint screenCount;
     ilm_getScreenIDs(&screenCount, &screenIDs);
 
-    for(int i = 0; i < screenCount; ++i)
+    for(unsigned int i = 0; i < screenCount; ++i)
     {
         t_ilm_display screen = screenIDs[i];
         ilmScreenProperties screenProps;
 
         //trying different render orders with increasing sizes
-        for (int j = layerCount; j >= 0; --j)
+        for (unsigned int j = layerCount; j <= layerCount; --j) // note: using overflow here
         {
             //put them from end to beginning, so that in each loop iteration the order of layers change
             ilm_displaySetRenderOrder(screen, renderOrder + j, layerCount - j);
@@ -788,7 +787,7 @@ TEST_F(IlmCommandTest, DisplaySetRenderOrder_growing) {
             ilm_getPropertiesOfScreen(screen, &screenProps);
 
             ASSERT_EQ(layerCount - j, screenProps.layerCount);
-            for(int k = 0; k < layerCount - j; ++k)
+            for(unsigned int k = 0; k < layerCount - j; ++k)
             {
                 ASSERT_EQ(renderOrder[j + k], screenProps.layerIds[k]);
             }
@@ -801,7 +800,7 @@ TEST_F(IlmCommandTest, DisplaySetRenderOrder_shrinking) {
     t_ilm_layer renderOrder[] = {0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF};
     t_ilm_uint layerCount = sizeof(renderOrder) / sizeof(renderOrder[0]);
 
-    for (int i = 0; i < layerCount; ++i)
+    for (unsigned int i = 0; i < layerCount; ++i)
     {
         ilm_layerCreateWithDimension(renderOrder + i, 300, 300);
         ilm_commitChanges();
@@ -811,13 +810,13 @@ TEST_F(IlmCommandTest, DisplaySetRenderOrder_shrinking) {
     t_ilm_uint screenCount;
     ilm_getScreenIDs(&screenCount, &screenIDs);
 
-    for(int i = 0; i < screenCount; ++i)
+    for(unsigned int i = 0; i < screenCount; ++i)
     {
         t_ilm_display screen = screenIDs[i];
         ilmScreenProperties screenProps;
 
         //trying different render orders with decreasing sizes
-        for (int j = 0; j <= layerCount; ++j)
+        for (unsigned int j = 0; j <= layerCount; ++j)
         {
             //put them from end to beginning, so that in each loop iteration the order of layers change
             ilm_displaySetRenderOrder(screen, renderOrder + j, layerCount - j);
@@ -825,10 +824,182 @@ TEST_F(IlmCommandTest, DisplaySetRenderOrder_shrinking) {
             ilm_getPropertiesOfScreen(screen, &screenProps);
 
             ASSERT_EQ(layerCount - j, screenProps.layerCount);
-            for(int k = 0; k < layerCount - j; ++k)
+            for(unsigned int k = 0; k < layerCount - j; ++k)
             {
                 ASSERT_EQ(renderOrder[j + k], screenProps.layerIds[k]);
             }
         }
     }
+}
+
+TEST_F(IlmCommandTest, LayerSetRenderOrder_growing) {
+    //prepare needed layers and surfaces
+    t_ilm_layer renderOrder[] = {0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF};
+    t_ilm_uint surfaceCount = sizeof(renderOrder) / sizeof(renderOrder[0]);
+
+    for (unsigned int i = 0; i < surfaceCount; ++i)
+    {
+        ilm_surfaceCreate(0,100,100,ILM_PIXELFORMAT_RGBA_8888, renderOrder + i);
+        ilm_commitChanges();
+    }
+
+    t_ilm_layer layerIDs[] = {0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF};
+    t_ilm_uint layerCount = sizeof(layerIDs) / sizeof(layerIDs[0]);
+
+    for (unsigned int i = 0; i < layerCount; ++i)
+    {
+        ilm_layerCreateWithDimension(layerIDs + i, 300, 300);
+        ilm_commitChanges();
+    }
+
+    t_ilm_display* screenIDs;
+    t_ilm_uint screenCount;
+    ilm_getScreenIDs(&screenCount, &screenIDs);
+
+    for(unsigned int i = 0; i < layerCount; ++i)
+    {
+        t_ilm_layer layer = layerIDs[i];
+
+        t_ilm_int layerSurfaceCount;
+        t_ilm_surface* layerSurfaceIDs;
+
+        //trying different render orders with increasing sizes
+        for (unsigned int j = surfaceCount; j <= surfaceCount; --j) // note: using overflow here
+        {
+            //put them from end to beginning, so that in each loop iteration the order of surafces change
+            ilm_layerSetRenderOrder(layer, renderOrder + j, surfaceCount - j);
+            ilm_commitChanges();
+            ilm_getSurfaceIDsOnLayer(layer, &layerSurfaceCount, &layerSurfaceIDs);
+
+            ASSERT_EQ(surfaceCount - j, layerSurfaceCount);
+            for(unsigned int k = 0; k < surfaceCount - j; ++k)
+            {
+                ASSERT_EQ(renderOrder[j + k], layerSurfaceIDs[k]);
+            }
+        }
+
+        //set empty render order again
+        ilm_layerSetRenderOrder(layer, renderOrder, 0);
+        ilm_commitChanges();
+    }
+}
+
+TEST_F(IlmCommandTest, LayerSetRenderOrder_shrinking) {
+    //prepare needed layers and surfaces
+    t_ilm_layer renderOrder[] = {0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF};
+    t_ilm_uint surfaceCount = sizeof(renderOrder) / sizeof(renderOrder[0]);
+
+    for (unsigned int i = 0; i < surfaceCount; ++i)
+    {
+        ilm_surfaceCreate(0,100,100,ILM_PIXELFORMAT_RGBA_8888, renderOrder + i);
+        ilm_commitChanges();
+    }
+
+    t_ilm_layer layerIDs[] = {0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF};
+    t_ilm_uint layerCount = sizeof(layerIDs) / sizeof(layerIDs[0]);
+
+    for (unsigned int i = 0; i < layerCount; ++i)
+    {
+        ilm_layerCreateWithDimension(layerIDs + i, 300, 300);
+        ilm_commitChanges();
+    }
+
+    t_ilm_display* screenIDs;
+    t_ilm_uint screenCount;
+    ilm_getScreenIDs(&screenCount, &screenIDs);
+
+    for(unsigned int i = 0; i < layerCount; ++i)
+    {
+        t_ilm_layer layer = layerIDs[i];
+
+        t_ilm_int layerSurfaceCount;
+        t_ilm_surface* layerSurfaceIDs;
+
+        //trying different render orders with decreasing sizes
+        for (unsigned int j = 0; j <= layerCount; ++j)
+        {
+            //put them from end to beginning, so that in each loop iteration the order of surafces change
+            ilm_layerSetRenderOrder(layer, renderOrder + j, surfaceCount - j);
+            ilm_commitChanges();
+            ilm_getSurfaceIDsOnLayer(layer, &layerSurfaceCount, &layerSurfaceIDs);
+
+            ASSERT_EQ(surfaceCount - j, layerSurfaceCount);
+            for(unsigned int k = 0; k < surfaceCount - j; ++k)
+            {
+                ASSERT_EQ(renderOrder[j + k], layerSurfaceIDs[k]);
+            }
+        }
+
+        //set empty render order again
+        ilm_layerSetRenderOrder(layer, renderOrder, 0);
+        ilm_commitChanges();
+    }
+}
+
+TEST_F(IlmCommandTest, LayerSetRenderOrder_duplicates) {
+    //prepare needed layers and surfaces
+    t_ilm_layer renderOrder[] = {0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF};
+    t_ilm_uint surfaceCount = sizeof(renderOrder) / sizeof(renderOrder[0]);
+
+    for (unsigned int i = 0; i < surfaceCount; ++i)
+    {
+        ilm_surfaceCreate(0,100,100,ILM_PIXELFORMAT_RGBA_8888, renderOrder + i);
+        ilm_commitChanges();
+    }
+
+    t_ilm_surface duplicateRenderOrder[] = {renderOrder[0], renderOrder[1], renderOrder[0], renderOrder[1], renderOrder[0]};
+    t_ilm_int duplicateSurfaceCount = sizeof(duplicateRenderOrder) / sizeof(duplicateRenderOrder[0]);
+
+    t_ilm_layer layer;
+    ilm_layerCreateWithDimension(&layer, 300, 300);
+    ilm_commitChanges();
+
+    t_ilm_display* screenIDs;
+    t_ilm_uint screenCount;
+    ilm_getScreenIDs(&screenCount, &screenIDs);
+
+    t_ilm_int layerSurfaceCount;
+    t_ilm_surface* layerSurfaceIDs;
+
+    //trying duplicates
+    ilm_layerSetRenderOrder(layer, duplicateRenderOrder, duplicateSurfaceCount);
+    ilm_commitChanges();
+    ilm_getSurfaceIDsOnLayer(layer, &layerSurfaceCount, &layerSurfaceIDs);
+
+    ASSERT_EQ(2, layerSurfaceCount);
+}
+
+TEST_F(IlmCommandTest, LayerSetRenderOrder_empty) {
+    //prepare needed layers and surfaces
+    t_ilm_layer renderOrder[] = {0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF};
+    t_ilm_uint surfaceCount = sizeof(renderOrder) / sizeof(renderOrder[0]);
+
+    for (unsigned int i = 0; i < surfaceCount; ++i)
+    {
+        ilm_surfaceCreate(0,100,100,ILM_PIXELFORMAT_RGBA_8888, renderOrder + i);
+        ilm_commitChanges();
+    }
+
+    t_ilm_layer layer;
+    ilm_layerCreateWithDimension(&layer, 300, 300);
+    ilm_commitChanges();
+
+
+    t_ilm_display* screenIDs;
+    t_ilm_uint screenCount;
+    ilm_getScreenIDs(&screenCount, &screenIDs);
+
+    t_ilm_int layerSurfaceCount;
+    t_ilm_surface* layerSurfaceIDs;
+
+    //test start
+    ilm_layerSetRenderOrder(layer, renderOrder, surfaceCount);
+    ilm_commitChanges();
+
+    //set empty render order
+    ilm_layerSetRenderOrder(layer, renderOrder, 0);
+    ilm_commitChanges();
+    ilm_getSurfaceIDsOnLayer(layer, &layerSurfaceCount, &layerSurfaceIDs);
+
+    ASSERT_EQ(0, layerSurfaceCount);
 }
