@@ -20,7 +20,6 @@
 
 /* METHODS THAT ARE CURRENTLY NOT TESTED:
  *
- *     ilm_displaySetRenderOrder
  *     ilm_surfaceInvalidateRectangle
  *     ilm_layerSetChromaKey
  *     ilm_layerSetRenderOrder
@@ -758,4 +757,78 @@ TEST_F(IlmCommandTest, ilm_getPropertiesOfScreen) {
     t_ilm_uint numberOfHardwareLayers;
     ilm_getNumberOfHardwareLayers(screen, &numberOfHardwareLayers);
     ASSERT_EQ(numberOfHardwareLayers, screenProperties.harwareLayerCount);
+}
+
+TEST_F(IlmCommandTest, DisplaySetRenderOrder_growing) {
+    //prepare needed layers
+    t_ilm_layer renderOrder[] = {0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF};
+    t_ilm_uint layerCount = sizeof(renderOrder) / sizeof(renderOrder[0]);
+
+    for (int i = 0; i < layerCount; ++i)
+    {
+        ilm_layerCreateWithDimension(renderOrder + i, 300, 300);
+        ilm_commitChanges();
+    }
+
+    t_ilm_display* screenIDs;
+    t_ilm_uint screenCount;
+    ilm_getScreenIDs(&screenCount, &screenIDs);
+
+    for(int i = 0; i < screenCount; ++i)
+    {
+        t_ilm_display screen = screenIDs[i];
+        ilmScreenProperties screenProps;
+
+        //trying different render orders with increasing sizes
+        for (int j = layerCount; j >= 0; --j)
+        {
+            //put them from end to beginning, so that in each loop iteration the order of layers change
+            ilm_displaySetRenderOrder(screen, renderOrder + j, layerCount - j);
+            ilm_commitChanges();
+            ilm_getPropertiesOfScreen(screen, &screenProps);
+
+            ASSERT_EQ(layerCount - j, screenProps.layerCount);
+            for(int k = 0; k < layerCount - j; ++k)
+            {
+                ASSERT_EQ(renderOrder[j + k], screenProps.layerIds[k]);
+            }
+        }
+    }
+}
+
+TEST_F(IlmCommandTest, DisplaySetRenderOrder_shrinking) {
+    //prepare needed layers
+    t_ilm_layer renderOrder[] = {0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF};
+    t_ilm_uint layerCount = sizeof(renderOrder) / sizeof(renderOrder[0]);
+
+    for (int i = 0; i < layerCount; ++i)
+    {
+        ilm_layerCreateWithDimension(renderOrder + i, 300, 300);
+        ilm_commitChanges();
+    }
+
+    t_ilm_display* screenIDs;
+    t_ilm_uint screenCount;
+    ilm_getScreenIDs(&screenCount, &screenIDs);
+
+    for(int i = 0; i < screenCount; ++i)
+    {
+        t_ilm_display screen = screenIDs[i];
+        ilmScreenProperties screenProps;
+
+        //trying different render orders with decreasing sizes
+        for (int j = 0; j <= layerCount; ++j)
+        {
+            //put them from end to beginning, so that in each loop iteration the order of layers change
+            ilm_displaySetRenderOrder(screen, renderOrder + j, layerCount - j);
+            ilm_commitChanges();
+            ilm_getPropertiesOfScreen(screen, &screenProps);
+
+            ASSERT_EQ(layerCount - j, screenProps.layerCount);
+            for(int k = 0; k < layerCount - j; ++k)
+            {
+                ASSERT_EQ(renderOrder[j + k], screenProps.layerIds[k]);
+            }
+        }
+    }
 }
