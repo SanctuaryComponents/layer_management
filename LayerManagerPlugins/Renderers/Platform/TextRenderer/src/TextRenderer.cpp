@@ -36,6 +36,11 @@ bool TextRenderer::start(int width, int height, const char* displayname)
     m_height = height;
     m_width = width;
 
+    // add default screen
+    LmScreenList& screenList = m_pScene->getScreenList();
+    LmScreen* lmScreen = new LmScreen();
+    screenList.push_back(lmScreen);
+
     LOG_DEBUG("TextRenderer", "start("
               << "width=" << width
               << ", height=" << height
