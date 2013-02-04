@@ -61,13 +61,4 @@ install (
     DESTINATION include/ilm
 )
 
-if (WITH_TESTS)
-
-    enable_testing()
-    
-    add_executable(${PROJECT_NAME}_Test tests/IlmCommandTest.cpp tests/IlmNotificationTest.cpp src/generic_ilm_client.c)
-    target_link_libraries(${PROJECT_NAME}_Test ${PROJECT_NAME} ${LIBS} gtest)
-    
-    add_test(${PROJECT_NAME} ${PROJECT_NAME}_Test )
-
-endif(WITH_TESTS) 
+add_subdirectory(tests)
