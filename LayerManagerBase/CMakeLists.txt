@@ -74,41 +74,6 @@ file(GLOB LM_INCLUDES include/*.h)
 install (FILES ${LM_INCLUDES} DESTINATION include/layermanager)
 
 
-if (WITH_TESTS)
-
-    find_package (Threads)
-
-    enable_testing()
-
-    add_executable(${PROJECT_NAME}_Test
-        tests/SceneTest.cpp
-        tests/ScreenTest.cpp
-        tests/LayermanagerTest.cpp
-        tests/InputManagerTest.cpp
-        tests/GraphicalObjectTest.cpp
-        tests/GraphicalSurfaceTest.cpp
-        tests/SurfaceTest.cpp
-        tests/LayerTest.cpp
-        tests/ShaderTest.cpp
-        tests/ShaderUniformTest.cpp
-        tests/ShaderProgramTest.cpp
-        tests/ShaderProgramFactoryTest.cpp
-        tests/RectangleTest.cpp
-    )
-
-    target_link_libraries(${PROJECT_NAME}_Test
-        ${LIBS}
-        LayerManagerBase
-        gtest
-        gmock
-        ${CMAKE_THREAD_LIBS_INIT}
-    )
-
-    add_test(${PROJECT_NAME} ${PROJECT_NAME}_Test)
-
-endif(WITH_TESTS) 
-
-
 #=============================================================
 # configuration depending on system
 #=============================================================
@@ -120,3 +85,5 @@ include(CheckIncludeFiles)
 check_include_files(execinfo.h HAVE_EXECINFO_H)
 export_build_flag(HAVE_EXECINFO_H "platform has execinfo.h header file")
 
+
+add_subdirectory(tests)
