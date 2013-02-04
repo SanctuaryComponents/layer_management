@@ -17,6 +17,8 @@
 #
 ############################################################################
 
+project(DBUSCommunicatorTest)
+project_type(TEST)
 
 include_directories (".")
 include_directories ("../include")
