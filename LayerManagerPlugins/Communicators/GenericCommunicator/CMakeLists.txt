@@ -31,11 +31,9 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/LayerManagerBase/include
     ${CMAKE_SOURCE_DIR}/LayerManagerUtils/include
     ${CMAKE_SOURCE_DIR}/LayerManagerCommands/include
-    ${CMAKE_SOURCE_DIR}/LayerManagerPlugins/IpcModules/IpcModuleLoader/include
 )
 
 set(LIBS
-    IpcModuleLoader
     LayerManagerUtils
     LayerManagerCommands
 )

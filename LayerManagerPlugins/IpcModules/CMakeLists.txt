@@ -41,9 +41,3 @@ if (WITH_IPC_MODULE_DBUS)
     set (BUILD_LOADER ON)
 endif (WITH_IPC_MODULE_DBUS)
 
-#==============================================================================
-# IPC MODULE LOADER
-#==============================================================================
-if (BUILD_LOADER)
-    add_subdirectory(IpcModuleLoader)
-endif (BUILD_LOADER)

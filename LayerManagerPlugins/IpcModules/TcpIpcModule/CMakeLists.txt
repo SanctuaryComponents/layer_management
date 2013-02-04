@@ -26,6 +26,7 @@ include_directories(
     include
     ${CMAKE_SOURCE_DIR}/LayerManagerClient/ilmClient/include
     ${CMAKE_SOURCE_DIR}/LayerManagerPlugins/IpcModules/IpcModuleLoader/include
+    ${CMAKE_SOURCE_DIR}/LayerManagerUtils/include
 )
 
 add_library(${PROJECT_NAME} SHARED

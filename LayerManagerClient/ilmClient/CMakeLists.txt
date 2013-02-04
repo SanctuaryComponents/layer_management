@@ -27,8 +27,8 @@ find_package(Threads)
 include_directories(
     "include"
     "${CMAKE_SOURCE_DIR}/config"
-    "${CMAKE_SOURCE_DIR}/LayerManagerPlugins/IpcModules/IpcModuleLoader/include"
     "${CMAKE_SOURCE_DIR}/LayerManagerBase/include"
+    "${CMAKE_SOURCE_DIR}/LayerManagerUtils/include"
 )
 
 add_library(${PROJECT_NAME} SHARED
@@ -36,13 +36,14 @@ add_library(${PROJECT_NAME} SHARED
 )
 
 add_dependencies(${PROJECT_NAME}
-    IpcModuleLoader
+    LayerManagerUtils
 )
 
 set(LIBS
     ${LIBS}
-    IpcModuleLoader
+    LayerManagerUtils
     rt
+    dl
     ${CMAKE_THREAD_LIBS_INIT}
 )
 

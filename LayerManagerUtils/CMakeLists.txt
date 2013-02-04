@@ -30,6 +30,7 @@ add_library(${PROJECT_NAME} STATIC
     src/Log.cpp
     src/LogMessageBuffer.cpp
     src/ThreadBase.cpp
+    src/IpcModuleLoader.cpp
 )
 
 set(INCLUDE_DIRS
@@ -40,6 +41,7 @@ set(INCLUDE_DIRS
 set(LIBS
     ${LIBS}
     ${CMAKE_THREAD_LIBS_INIT}
+    dl
 )
 
 if (WITH_DLT)
@@ -85,10 +87,10 @@ if (WITH_TESTS)
     )
 
     target_link_libraries(${PROJECT_NAME}_Test
-        ${LIBS}
         LayerManagerUtils
         gtest
         pthread
+        ${LIBS}
         ${DLT_LIBRARY}
     )
 
