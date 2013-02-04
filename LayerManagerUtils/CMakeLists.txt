@@ -79,22 +79,5 @@ install(TARGETS
             lib/layermanager/static
 )
 
-if (WITH_TESTS)
+add_subdirectory(tests)
 
-    add_executable(${PROJECT_NAME}_Test
-        tests/BitmapTest.cpp
-        tests/LogTest.cpp
-    )
-
-    target_link_libraries(${PROJECT_NAME}_Test
-        LayerManagerUtils
-        gtest
-        pthread
-        ${LIBS}
-        ${DLT_LIBRARY}
-    )
-
-    enable_testing()
-    add_test(${PROJECT_NAME} ${PROJECT_NAME}_Test)
-
-endif(WITH_TESTS) 
