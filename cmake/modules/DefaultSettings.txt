@@ -37,7 +37,30 @@ endif (WITH_STATIC_LIBRARIES)
 
 
 #==============================================================================
-# default compiler flags
+# default compiler flags (and why we set them)
+#
+# -fPIC                     enable position independent code. required for
+#                           (at least) Linux 64bit builds
+#
+# -Wno-variadic-macros      required by google test framework
+#
+# -Wno-sign-compare         required by google test framework
+#
+# -Wall                     enable all default compiler warnings
+#
+# -Wextra                   enable more strict compiler warnings
+#
+# -Wpedantic                enable ISO C++ compliance warnings, aims for
+#                           best portability
+#
+# -Wno-long-long            ISO C++ does not provide long long support,
+#                           but the use of long long is a widely accepted
+#                           solution
+#
+# -Wno-unused-function      LayerManagement has a function, that is not used by
+#                           reference plugins, which turns into a warning
+#                           during compilation. This function can be used by
+#                           other implementations and will stay in the code.
 #==============================================================================
 set (COMPILER_FLAGS_3RDPARTY "-fPIC -Wno-variadic-macros -Wno-sign-compare")
 set (COMPILER_FLAGS_TEST     "-fPIC -Wno-variadic-macros -Wno-sign-compare")
