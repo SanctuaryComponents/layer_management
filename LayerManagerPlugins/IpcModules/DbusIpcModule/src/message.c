@@ -326,13 +326,13 @@ t_ilm_client_handle getSenderHandle(t_ilm_message message)
 t_ilm_bool destroyMessage(t_ilm_message message)
 {
     dbusmessage* msg = (dbusmessage*)message;
-    if (msg->pMessage)
+    if (msg && msg->pMessage)
     {
         pthread_mutex_lock(&gDbus.mutex);
         dbus_message_unref(msg->pMessage);
         pthread_mutex_unlock(&gDbus.mutex);
+        free(msg);
     }
-    free(msg);
     return ILM_TRUE;
 }
 
@@ -447,7 +447,6 @@ void unregisterSignalForNotification(dbusmessage* message, char* signalName)
                           DBUS_TYPE_UINT32, &id,
                           DBUS_TYPE_INVALID);
 
-    printf("DbusIpcModule: removing signal handler %s%d\n", signalName, id);
     sprintf(rule,
             "type='signal',sender='%s',interface='%s',member='%s%d'",
             ILM_INTERFACE_COMPOSITE_SERVICE,

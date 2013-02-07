@@ -46,11 +46,31 @@
  **/
 typedef enum e_ilmErrorTypes
 {
-    ILM_SUCCESS = 0,                  /*!< ErrorCode if the method call was successful */
-    ILM_FAILED= 1,                    /*!< ErrorCode if the method call has failed */
-    ILM_ERROR_INVALID_ARGUMENTS = 2,  /*!< ErrorCode if the method was called with invalid arguments */
-    ILM_ERROR_ON_CONNECTION = 3       /*!< ErrorCode if connection error has occured */
+    ILM_SUCCESS = 0,                       /*!< ErrorCode if the method call was successful */
+    ILM_FAILED = 1,                        /*!< ErrorCode if the method call has failed */
+    ILM_ERROR_INVALID_ARGUMENTS = 2,       /*!< ErrorCode if the method was called with invalid arguments */
+    ILM_ERROR_ON_CONNECTION = 3,           /*!< ErrorCode if connection error has occured */
+    ILM_ERROR_RESOURCE_ALREADY_INUSE = 4,  /*!< ErrorCode if resource is already in use */
+    ILM_ERROR_RESOURCE_NOT_FOUND = 5,      /*!< ErrorCode if resource was not found */
+    ILM_ERROR_NOT_IMPLEMENTED = 6,         /*!< ErrorCode if feature is not implemented */
+    ILM_ERROR_UNEXPECTED_MESSAGE = 7       /*!< ErrorCode if received message has unexpected type */
 } ilmErrorTypes;
+
+/**
+ * \brief Macro to translate error codes into error description strings
+ * \ingroup ilmClient
+ **/
+#define ILM_ERROR_STRING(x)                                                   \
+    ( (x) == ILM_SUCCESS                      ? "success"                     \
+    : (x) == ILM_FAILED                       ? "failed"                      \
+    : (x) == ILM_ERROR_INVALID_ARGUMENTS      ? "invalid arguments provided"  \
+    : (x) == ILM_ERROR_ON_CONNECTION          ? "connection error"            \
+    : (x) == ILM_ERROR_RESOURCE_ALREADY_INUSE ? "resource is already in use"  \
+    : (x) == ILM_ERROR_RESOURCE_NOT_FOUND     ? "resource was not found"      \
+    : (x) == ILM_ERROR_NOT_IMPLEMENTED        ? "feature is not implemented"  \
+    : (x) == ILM_ERROR_UNEXPECTED_MESSAGE     ? "unexpected message received" \
+    : "unknown error code"                                                    )
+
 
 /**
  * \brief Enumeration for supported pixelformats

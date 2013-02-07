@@ -88,12 +88,6 @@
 
 #define DEFAULT_SCREEN 0
 
-const char* RESOURCE_ALREADY_INUSE = "Ressource already in use";
-const char* INVALID_ARGUMENT = "Invalid argument";
-const char* RESOURCE_NOT_FOUND = "Ressource not found";
-const char* NOT_IMPLEMENTED = "Feature not implemented";
-
-
 GenericCommunicator::GenericCommunicator(ICommandExecutor& executor, Configuration& config)
 : ICommunicator(&executor)
 , PluginBase(executor, config, Communicator_Api_v1)
@@ -387,7 +381,7 @@ void GenericCommunicator::Debug(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, INVALID_ARGUMENT);
+        m_ipcModule.appendUint(response, ILM_ERROR_INVALID_ARGUMENTS);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -453,7 +447,7 @@ void GenericCommunicator::ScreenShot(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, INVALID_ARGUMENT);
+        m_ipcModule.appendUint(response, ILM_ERROR_INVALID_ARGUMENTS);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -478,7 +472,7 @@ void GenericCommunicator::ScreenShotOfLayer(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -502,7 +496,7 @@ void GenericCommunicator::ScreenShotOfSurface(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -544,7 +538,7 @@ void GenericCommunicator::ListAllLayerIDsOnScreen(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, INVALID_ARGUMENT);
+        m_ipcModule.appendUint(response, ILM_ERROR_INVALID_ARGUMENTS);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -597,7 +591,7 @@ void GenericCommunicator::ListSurfaceofLayer(t_ilm_message message)
     {
         m_executor->getScene()->unlockScene();
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -651,7 +645,7 @@ void GenericCommunicator::GetPropertiesOfSurface(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -700,7 +694,7 @@ void GenericCommunicator::GetPropertiesOfLayer(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -741,7 +735,7 @@ void GenericCommunicator::CreateSurface(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_ALREADY_INUSE);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_ALREADY_INUSE);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -782,7 +776,7 @@ void GenericCommunicator::CreateSurfaceFromId(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_ALREADY_INUSE);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_ALREADY_INUSE);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -805,7 +799,7 @@ void GenericCommunicator::InitializeSurface(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_ALREADY_INUSE);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_ALREADY_INUSE);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -828,7 +822,7 @@ void GenericCommunicator::InitializeSurfaceFromId(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_ALREADY_INUSE);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_ALREADY_INUSE);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -863,7 +857,7 @@ void GenericCommunicator::SetSurfaceNativeContent(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_ALREADY_INUSE);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_ALREADY_INUSE);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -886,7 +880,7 @@ void GenericCommunicator::RemoveSurfaceNativeContent(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_ALREADY_INUSE);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_ALREADY_INUSE);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -908,7 +902,7 @@ void GenericCommunicator::RemoveSurface(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_ALREADY_INUSE);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_ALREADY_INUSE);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -932,7 +926,7 @@ void GenericCommunicator::CreateLayer(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_ALREADY_INUSE);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_ALREADY_INUSE);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -958,7 +952,7 @@ void GenericCommunicator::CreateLayerFromId(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_ALREADY_INUSE);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_ALREADY_INUSE);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -986,7 +980,7 @@ void GenericCommunicator::CreateLayerWithDimension(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -1016,7 +1010,7 @@ void GenericCommunicator::CreateLayerFromIdWithDimension(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_ALREADY_INUSE);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_ALREADY_INUSE);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -1038,7 +1032,7 @@ void GenericCommunicator::RemoveLayer(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -1064,7 +1058,7 @@ void GenericCommunicator::AddSurfaceToLayer(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_ALREADY_INUSE);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_ALREADY_INUSE);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -1089,7 +1083,7 @@ void GenericCommunicator::RemoveSurfaceFromLayer(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -1121,7 +1115,7 @@ void GenericCommunicator::SetSurfaceSourceRegion(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -1153,7 +1147,7 @@ void GenericCommunicator::SetLayerSourceRegion(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -1185,7 +1179,7 @@ void GenericCommunicator::SetSurfaceDestinationRegion(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -1213,7 +1207,7 @@ void GenericCommunicator::SetSurfacePosition(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -1241,7 +1235,7 @@ void GenericCommunicator::GetSurfacePosition(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -1269,7 +1263,7 @@ void GenericCommunicator::SetSurfaceDimension(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -1301,7 +1295,7 @@ void GenericCommunicator::SetLayerDestinationRegion(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -1329,7 +1323,7 @@ void GenericCommunicator::SetLayerPosition(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -1357,7 +1351,7 @@ void GenericCommunicator::GetLayerPosition(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -1385,7 +1379,7 @@ void GenericCommunicator::SetLayerDimension(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -1413,7 +1407,7 @@ void GenericCommunicator::GetLayerDimension(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -1441,7 +1435,7 @@ void GenericCommunicator::GetSurfaceDimension(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -1467,7 +1461,7 @@ void GenericCommunicator::SetSurfaceOpacity(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -1493,7 +1487,7 @@ void GenericCommunicator::SetLayerOpacity(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -1519,7 +1513,7 @@ void GenericCommunicator::GetSurfaceOpacity(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -1545,7 +1539,7 @@ void GenericCommunicator::GetLayerOpacity(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -1574,7 +1568,7 @@ void GenericCommunicator::SetSurfaceOrientation(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -1600,7 +1594,7 @@ void GenericCommunicator::GetSurfaceOrientation(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -1629,7 +1623,7 @@ void GenericCommunicator::SetLayerOrientation(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -1655,7 +1649,7 @@ void GenericCommunicator::GetLayerOrientation(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -1681,7 +1675,7 @@ void GenericCommunicator::GetSurfacePixelformat(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -1707,7 +1701,7 @@ void GenericCommunicator::SetSurfaceVisibility(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -1733,7 +1727,7 @@ void GenericCommunicator::SetLayerVisibility(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -1759,7 +1753,7 @@ void GenericCommunicator::GetSurfaceVisibility(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -1785,7 +1779,7 @@ void GenericCommunicator::GetLayerVisibility(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -1812,7 +1806,7 @@ void GenericCommunicator::SetRenderOrderOfLayers(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -1839,7 +1833,7 @@ void GenericCommunicator::SetSurfaceRenderOrderWithinLayer(t_ilm_message message
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -1862,7 +1856,7 @@ void GenericCommunicator::GetLayerType(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -1903,7 +1897,7 @@ void GenericCommunicator::GetLayerCapabilities(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -1915,7 +1909,7 @@ void GenericCommunicator::FadeIn(t_ilm_message message)
     t_ilm_message response;
     t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     response = m_ipcModule.createErrorResponse(message);
-    m_ipcModule.appendString(response, NOT_IMPLEMENTED);
+    m_ipcModule.appendUint(response, ILM_ERROR_NOT_IMPLEMENTED);
     m_ipcModule.sendToClients(response, &clientHandle, 1);
     m_ipcModule.destroyMessage(response);
 }
@@ -1925,7 +1919,7 @@ void GenericCommunicator::SynchronizedFade(t_ilm_message message)
     t_ilm_message response;
     t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     response = m_ipcModule.createErrorResponse(message);
-    m_ipcModule.appendString(response, NOT_IMPLEMENTED);
+    m_ipcModule.appendUint(response, ILM_ERROR_NOT_IMPLEMENTED);
     m_ipcModule.sendToClients(response, &clientHandle, 1);
     m_ipcModule.destroyMessage(response);
 }
@@ -1935,7 +1929,7 @@ void GenericCommunicator::FadeOut(t_ilm_message message)
     t_ilm_message response;
     t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     response = m_ipcModule.createErrorResponse(message);
-    m_ipcModule.appendString(response, NOT_IMPLEMENTED);
+    m_ipcModule.appendUint(response, ILM_ERROR_NOT_IMPLEMENTED);
     m_ipcModule.sendToClients(response, &clientHandle, 1);
     m_ipcModule.destroyMessage(response);
 }
@@ -1953,7 +1947,7 @@ void GenericCommunicator::Exit(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, INVALID_ARGUMENT);
+        m_ipcModule.appendUint(response, ILM_ERROR_INVALID_ARGUMENTS);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -1973,7 +1967,7 @@ void GenericCommunicator::CommitChanges(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, INVALID_ARGUMENT);
+        m_ipcModule.appendUint(response, ILM_ERROR_INVALID_ARGUMENTS);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -2001,7 +1995,7 @@ void GenericCommunicator::CreateShader(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -2025,7 +2019,7 @@ void GenericCommunicator::DestroyShader(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -2051,7 +2045,7 @@ void GenericCommunicator::SetShader(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -2079,7 +2073,7 @@ void GenericCommunicator::SetUniforms(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -2103,7 +2097,7 @@ void GenericCommunicator::SetKeyboardFocusOn(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -2127,7 +2121,7 @@ void GenericCommunicator::GetKeyboardFocusSurfaceId(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -2159,7 +2153,7 @@ void GenericCommunicator::UpdateInputEventAcceptanceOn(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -2186,7 +2180,7 @@ void GenericCommunicator::SetSurfaceChromaKey(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -2213,7 +2207,7 @@ void GenericCommunicator::SetLayerChromaKey(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -2237,7 +2231,7 @@ void GenericCommunicator::LayerAddNotification(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, INVALID_ARGUMENT);
+        m_ipcModule.appendUint(response, ILM_ERROR_INVALID_ARGUMENTS);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -2261,7 +2255,7 @@ void GenericCommunicator::SurfaceAddNotification(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, INVALID_ARGUMENT);
+        m_ipcModule.appendUint(response, ILM_ERROR_INVALID_ARGUMENTS);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -2285,7 +2279,7 @@ void GenericCommunicator::LayerRemoveNotification(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, INVALID_ARGUMENT);
+        m_ipcModule.appendUint(response, ILM_ERROR_INVALID_ARGUMENTS);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -2309,7 +2303,7 @@ void GenericCommunicator::SurfaceRemoveNotification(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, INVALID_ARGUMENT);
+        m_ipcModule.appendUint(response, ILM_ERROR_INVALID_ARGUMENTS);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -2517,7 +2511,7 @@ void GenericCommunicator::SetOptimizationMode(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response,RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
     m_ipcModule.sendToClients(response,&clientHandle,1);
     m_ipcModule.destroyMessage(response);
@@ -2545,7 +2539,7 @@ void GenericCommunicator::GetOptimizationMode(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response,RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
     m_ipcModule.sendToClients(response,&clientHandle,1);
     m_ipcModule.destroyMessage(response);
@@ -2584,7 +2578,7 @@ void GenericCommunicator::GetPropertiesOfScreen(t_ilm_message message)
     else
     {
         response = m_ipcModule.createErrorResponse(message);
-        m_ipcModule.appendString(response, RESOURCE_NOT_FOUND);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);

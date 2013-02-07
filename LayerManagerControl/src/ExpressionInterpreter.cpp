@@ -156,9 +156,10 @@ CommandResult ExpressionInterpreter::interpretCommand(string userInput)
         ExpressionList executables = expr->getClosureExecutables(false);
         if (executables.size() == 1)
         {
-            if (ILM_SUCCESS != ilm_init())
+            ilmErrorTypes initResult = ilm_init();
+            if (ILM_SUCCESS != initResult)
             {
-                mErrorText = "Could not connect to LayerManagerService.";
+                mErrorText = ILM_ERROR_STRING(initResult);
                 result = CommandExecutionFailed;
             }
             else

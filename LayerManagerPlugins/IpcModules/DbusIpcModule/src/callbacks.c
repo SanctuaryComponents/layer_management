@@ -105,8 +105,6 @@ DBusHandlerResult filterLayerManagerErrors(DBusConnection *connection, DBusMessa
     DBusHandlerResult result = DBUS_HANDLER_RESULT_NOT_YET_HANDLED;
     int messageType = dbus_message_get_type(message);
 
-    char errorMsg[256];
-
     (void)connection;
     (void)data;
 
@@ -126,9 +124,6 @@ DBusHandlerResult filterLayerManagerErrors(DBusConnection *connection, DBusMessa
         gpIncomingMessage->dbusNativeType = messageType;
 
         dbus_message_iter_init(gpIncomingMessage->pMessage, &gpIncomingMessage->iter);
-
-        getString(gpIncomingMessage, errorMsg);
-        printf("DbusIpcModule: LayerManagerService returned error: %s\n", errorMsg);
 
         result = DBUS_HANDLER_RESULT_HANDLED;
     }

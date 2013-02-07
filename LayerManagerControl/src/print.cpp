@@ -85,27 +85,27 @@ void printScreenProperties(unsigned int screenid, const char* prefix)
     cout << prefix << "---------------------------------------\n";
 
     ilmScreenProperties screenProperties;
-    if (ilm_getPropertiesOfScreen(screenid, &screenProperties) == ILM_SUCCESS)
+    ilmErrorTypes result = ilm_getPropertiesOfScreen(screenid, &screenProperties);
+    if (ILM_SUCCESS != result)
     {
-        cout << prefix << "- resolution:           x=" << screenProperties.screenWidth << ", y="
-                << screenProperties.screenHeight << "\n";
-
-        cout << prefix << "- hardware layer count: " << screenProperties.harwareLayerCount << "\n";
-
-        cout << prefix << "- layer render order:   ";
-
-        for (t_ilm_uint layerIndex = 0; layerIndex < screenProperties.layerCount; ++layerIndex)
-        {
-            t_ilm_layer layerid = screenProperties.layerIds[layerIndex];
-            cout << layerid << "(0x" << hex << layerid << dec << "), ";
-        }
-        cout << "\n";
+        cout << "LayerManagerService returned: " << ILM_ERROR_STRING(result) << "\n";
+        cout << "No screen with ID " << screenid << " found\n";
+        return;
     }
-    else
+
+    cout << prefix << "- resolution:           x=" << screenProperties.screenWidth << ", y="
+            << screenProperties.screenHeight << "\n";
+
+    cout << prefix << "- hardware layer count: " << screenProperties.harwareLayerCount << "\n";
+
+    cout << prefix << "- layer render order:   ";
+
+    for (t_ilm_uint layerIndex = 0; layerIndex < screenProperties.layerCount; ++layerIndex)
     {
-        cout << "No screen with ID :" << screenid;
-        cout << "\n";
+        t_ilm_layer layerid = screenProperties.layerIds[layerIndex];
+        cout << layerid << "(0x" << hex << layerid << dec << "), ";
     }
+    cout << "\n";
 }
 
 void printLayerProperties(unsigned int layerid, const char* prefix)
@@ -115,7 +115,13 @@ void printLayerProperties(unsigned int layerid, const char* prefix)
     cout << prefix << "---------------------------------------\n";
 
     ilmLayerProperties p;
-    ilm_getPropertiesOfLayer(layerid, &p);
+    ilmErrorTypes result = ilm_getPropertiesOfLayer(layerid, &p);
+    if (ILM_SUCCESS != result)
+    {
+        cout << "LayerManagerService returned: " << ILM_ERROR_STRING(result) << "\n";
+        cout << "No layer with ID " << layerid << " found\n";
+        return;
+    }
 
     cout << prefix << "- created by pid:       " << p.creatorPid << "\n";
 
@@ -213,7 +219,13 @@ void printSurfaceProperties(unsigned int surfaceid, const char* prefix)
     cout << prefix << "---------------------------------------\n";
 
     ilmSurfaceProperties p;
-    ilm_getPropertiesOfSurface(surfaceid, &p);
+    ilmErrorTypes result = ilm_getPropertiesOfSurface(surfaceid, &p);
+    if (ILM_SUCCESS != result)
+    {
+        cout << "LayerManagerService returned: " << ILM_ERROR_STRING(result) << "\n";
+        cout << "No surface with ID " << surfaceid << " found\n";
+        return;
+    }
 
     cout << prefix << "- created by pid:       " << p.creatorPid << "\n";
 
