@@ -44,7 +44,7 @@ public:
     /**
      * \brief default destructor
      */
-    virtual ~LayerSetRenderOrderCommand() {}
+    virtual ~LayerSetRenderOrderCommand();
 
     /**
      * \brief Execute this command.

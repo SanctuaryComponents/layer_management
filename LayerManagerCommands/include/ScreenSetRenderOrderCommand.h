@@ -45,7 +45,7 @@ public:
     /**
      * \brief default destructor
      */
-    virtual ~ScreenSetRenderOrderCommand() {}
+    virtual ~ScreenSetRenderOrderCommand();
 
     /**
      * \brief Execute this command.

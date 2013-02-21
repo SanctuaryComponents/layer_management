@@ -22,6 +22,11 @@
 #include "Scene.h"
 #include "Log.h"
 
+ScreenSetRenderOrderCommand::~ScreenSetRenderOrderCommand()
+{
+    delete[] m_array;
+}
+
 ExecutionResult ScreenSetRenderOrderCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());

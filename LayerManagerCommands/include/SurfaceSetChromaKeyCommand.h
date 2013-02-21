@@ -45,7 +45,7 @@ public:
     /**
      * \brief default destructor
      */
-    virtual ~SurfaceSetChromaKeyCommand() {}
+    virtual ~SurfaceSetChromaKeyCommand();
 
     /**
      * \brief Execute this command.

@@ -22,6 +22,11 @@
 #include "Scene.h"
 #include "Log.h"
 
+SurfaceSetChromaKeyCommand::~SurfaceSetChromaKeyCommand()
+{
+    delete[] m_array;
+}
+
 ExecutionResult SurfaceSetChromaKeyCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());
@@ -54,7 +59,6 @@ ExecutionResult SurfaceSetChromaKeyCommand::execute(ICommandExecutor* executor)
                 result = ExecutionSuccess;
             }
         }
-        delete[] m_array;
     }
 
     return result;

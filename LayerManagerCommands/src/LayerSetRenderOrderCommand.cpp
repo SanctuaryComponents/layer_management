@@ -21,6 +21,11 @@
 #include "Scene.h"
 #include "Log.h"
 
+LayerSetRenderOrderCommand::~LayerSetRenderOrderCommand()
+{
+    delete[] m_array;
+}
+
 ExecutionResult LayerSetRenderOrderCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());
@@ -52,7 +57,6 @@ ExecutionResult LayerSetRenderOrderCommand::execute(ICommandExecutor* executor)
             }
         }
     }
-    delete[] m_array;
 
     return result;
 }

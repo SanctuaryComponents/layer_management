@@ -45,7 +45,7 @@ public:
     /**
      * \brief default destructor
      */
-    virtual ~LayerSetChromaKeyCommand() {}
+    virtual ~LayerSetChromaKeyCommand();
 
     /**
      * \brief Execute this command.

@@ -22,6 +22,11 @@
 #include "Scene.h"
 #include "Log.h"
 
+LayerSetChromaKeyCommand::~LayerSetChromaKeyCommand()
+{
+    delete[] m_array;
+}
+
 ExecutionResult LayerSetChromaKeyCommand::execute(ICommandExecutor* executor)
 {
     Scene& scene = *(executor->getScene());
@@ -55,7 +60,6 @@ ExecutionResult LayerSetChromaKeyCommand::execute(ICommandExecutor* executor)
                 result = ExecutionSuccess;
             }
         }
-        delete[] m_array;
     }
 
     return result;
