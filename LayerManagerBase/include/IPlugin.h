@@ -22,6 +22,16 @@
 
 #include "ilm_types.h"
 
+#define REGISTER_PLUGIN(PLUGIN) \
+    extern "C" IPlugin* create ## PLUGIN(ICommandExecutor& executor, Configuration& config); \
+    static bool PLUGIN ## _instance = PluginManager::registerStaticPluginCreateFunction(create ## PLUGIN);
+
+#define DECLARE_LAYERMANAGEMENT_PLUGIN(name) \
+extern "C" IPlugin* create ## name(ICommandExecutor& executor, Configuration& config) \
+{ \
+    return new name(executor, config); \
+}
+
 class IPlugin
 {
 public:
