@@ -148,7 +148,15 @@ void captureSceneData(t_scene_data* pScene)
 
     //get screen information
     t_ilm_uint screenWidth = 0, screenHeight = 0;
-    ilm_getScreenResolution(0, &screenWidth, &screenHeight);
+
+    ilmErrorTypes callResult = ilm_getScreenResolution(0, &screenWidth, &screenHeight);
+    if (ILM_SUCCESS != callResult)
+    {
+        cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+        cout << "Failed to get screen resolution for screen with ID " << 0 << "\n";
+        return;
+    }
+
     scene.screenWidth = screenWidth;
     scene.screenHeight = screenHeight;
 
@@ -158,7 +166,15 @@ void captureSceneData(t_scene_data* pScene)
     //get screens
     unsigned int screenCount = 0;
     t_ilm_display* screenArray = NULL;
-    ilm_getScreenIDs(&screenCount, &screenArray);
+
+    callResult = ilm_getScreenIDs(&screenCount, &screenArray);
+    if (ILM_SUCCESS != callResult)
+    {
+        cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+        cout << "Failed to get available screen IDs\n";
+        return;
+    }
+
     scene.screens = vector<t_ilm_display>(screenArray, screenArray + screenCount);
 
     //layers on each screen
@@ -168,7 +184,14 @@ void captureSceneData(t_scene_data* pScene)
 
         t_ilm_int layerCount = 0;
         t_ilm_layer* layerArray = NULL;
-        ilm_getLayerIDsOnScreen(screenId, &layerCount, &layerArray);
+
+        callResult = ilm_getLayerIDsOnScreen(screenId, &layerCount, &layerArray);
+        if (ILM_SUCCESS != callResult)
+        {
+            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+            cout << "Failed to get layers on screen with ID "<< screenId <<"\n";
+            return;
+        }
 
         scene.screenLayers[screenId] = vector<t_ilm_layer>(layerArray, layerArray + layerCount);
 
@@ -193,7 +216,15 @@ void captureSceneData(t_scene_data* pScene)
 
         //layer properties
         ilmLayerProperties lp;
-        ilm_getPropertiesOfLayer(layerId, &lp);
+
+        callResult = ilm_getPropertiesOfLayer(layerId, &lp);
+        if (ILM_SUCCESS != callResult)
+        {
+            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+            cout << "Failed to get properties of layer with ID "<< layerId <<"\n";
+            return;
+        }
+
         scene.layerProperties[layerId] = lp;
     }
 
@@ -205,7 +236,14 @@ void captureSceneData(t_scene_data* pScene)
         //surfaces on layer (in rendering order)
         int surfaceCount = 0;
         t_ilm_surface* surfaceArray = NULL;
-        ilm_getSurfaceIDsOnLayer(layerId, &surfaceCount, &surfaceArray);
+
+        callResult = ilm_getSurfaceIDsOnLayer(layerId, &surfaceCount, &surfaceArray);
+        if (ILM_SUCCESS != callResult)
+        {
+            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+            cout << "Failed to get surfaces on layer with ID "<< layerId <<"\n";
+            return;
+        }
 
         //rendering order on layer
         scene.layerSurfaces[layerId] = vector<t_ilm_surface>(surfaceArray, surfaceArray + surfaceCount);
@@ -221,7 +259,15 @@ void captureSceneData(t_scene_data* pScene)
     //get all surfaces (on layers and without layers)
     t_ilm_int surfaceCount = 0;
     t_ilm_surface* surfaceArray = NULL;
-    ilm_getSurfaceIDs(&surfaceCount, &surfaceArray);
+
+    callResult = ilm_getSurfaceIDs(&surfaceCount, &surfaceArray);
+    if (ILM_SUCCESS != callResult)
+    {
+        cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+        cout << "Failed to get available surfaces\n";
+        return;
+    }
+
     scene.surfaces = vector<t_ilm_surface>(surfaceArray, surfaceArray + surfaceCount);
 
     for (int k = 0; k < surfaceCount; ++k)
@@ -230,7 +276,15 @@ void captureSceneData(t_scene_data* pScene)
 
         //surface properties
         ilmSurfaceProperties sp;
-        ilm_getPropertiesOfSurface(surfaceId, &sp);
+
+        callResult = ilm_getPropertiesOfSurface(surfaceId, &sp);
+        if (ILM_SUCCESS != callResult)
+        {
+            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+            cout << "Failed to get properties of surface with ID " << surfaceId << "\n";
+            return;
+        }
+
         scene.surfaceProperties[surfaceId] = sp;
     }
 }
@@ -247,7 +301,13 @@ void setScene(t_scene_data* pScene, bool clean)
         t_ilm_surface surface = it->first;
         t_ilm_layer layer = it->second;
 
-        ilm_layerRemoveSurface(layer, surface);
+        ilmErrorTypes callResult = ilm_layerRemoveSurface(layer, surface);
+        if (ILM_SUCCESS != callResult)
+        {
+            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+            cout << "Failed to remove surface " << surface << " from layer " << layer << "\n";
+            return;
+        }
     }
 
     ilm_commitChanges();
@@ -264,7 +324,13 @@ void setScene(t_scene_data* pScene, bool clean)
             if (find(pScene->surfaces.begin(), pScene->surfaces.end(), surface) == pScene->surfaces.end())
             {
                 //remove surface !
-                ilm_surfaceRemove(surface);
+                ilmErrorTypes callResult = ilm_surfaceRemove(surface);
+                if (ILM_SUCCESS != callResult)
+                {
+                    cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+                    cout << "Failed to remove surface " << surface << "\n";
+                    return;
+                }
             }
         }
 
@@ -278,7 +344,13 @@ void setScene(t_scene_data* pScene, bool clean)
             if (find(pScene->layers.begin(), pScene->layers.end(), layer) == pScene->layers.end())
             {
                 //remove surface !
-                ilm_layerRemove(layer);
+                ilmErrorTypes callResult = ilm_layerRemove(layer);
+                if (ILM_SUCCESS != callResult)
+                {
+                    cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+                    cout << "Failed to remove layer " << layer << "\n";
+                    return;
+                }
             }
         }
 
@@ -294,7 +366,14 @@ void setScene(t_scene_data* pScene, bool clean)
         if (find(initialScene.layers.begin(), initialScene.layers.end(), layer) == initialScene.layers.end())
         {
             ilmLayerProperties& props = pScene->layerProperties[layer];
-            ilm_layerCreateWithDimension(&layer, props.origSourceWidth, props.origSourceHeight);
+
+            ilmErrorTypes callResult = ilm_layerCreateWithDimension(&layer, props.origSourceWidth, props.origSourceHeight);
+            if (ILM_SUCCESS != callResult)
+            {
+                cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+                cout << "Failed to create layer with ID " << layer << " and dimensions (" << props.origSourceWidth << " ," << props.origSourceHeight << ")\n";
+                return;
+            }
         }
     }
 
@@ -443,7 +522,14 @@ void emptyScene(t_scene_data* pScene)
     for(t_ilm_uint i = 0 ; i < count ; ++i)
     {
         pScene->screens.push_back(screenArray[i]);
-        ilm_getScreenResolution(screenArray[0], & pScene->screenWidth, & pScene->screenHeight);
+
+        ilmErrorTypes callResult = ilm_getScreenResolution(screenArray[0], & pScene->screenWidth, & pScene->screenHeight);
+        if (ILM_SUCCESS != callResult)
+        {
+            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+            cout << "Failed to get screen resolution for screen with ID " << screenArray[0] << "\n";
+            return;
+        }
     }
 }
 
@@ -457,7 +543,12 @@ t_scene_data cloneToUniLayerScene(t_scene_data* pScene)
         extraLayer = pScene->layers[0];
     }
 
-    ilm_layerCreate(&extraLayer);
+    ilmErrorTypes callResult = ilm_layerCreate(&extraLayer);
+    if (ILM_SUCCESS != callResult)
+    {
+        cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+        cout << "Failed to create layer\n";
+    }
 
     ilmLayerProperties extraLayerProperties;
     extraLayerProperties.destHeight = pScene->screenHeight;
@@ -573,7 +664,14 @@ void transformScene(t_scene_data* pInitialScene, t_scene_data* pFinalScene, t_il
                 t_ilm_surface surface = *it;
                 tuple4 coords = interpolateCoordinatesHelper(start[surface], end[surface], t);
 
-                ilm_surfaceSetDestinationRectangle(surface, coords.x, coords.y, coords.z - coords.x, coords.w - coords.y);
+                ilmErrorTypes callResult = ilm_surfaceSetDestinationRectangle(surface, coords.x, coords.y, coords.z - coords.x, coords.w - coords.y);
+                if (ILM_SUCCESS != callResult)
+                {
+                    cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+                    cout << "Failed to set destination rectangle (" << coords.x << "," << coords.y << ", "<< coords.z - coords.x << ", " << coords.w - coords.y
+                            <<") for surface with ID " << surface << "\n";
+                    return;
+                }
 
                 float opacity = t * pFinalScene->surfaceProperties[surface].opacity
                         + (1-t) * pInitialScene->surfaceProperties[surface].opacity;

@@ -79,7 +79,15 @@ COMMAND("get scene|screens|layers|surfaces")
         (void)input;
         unsigned int count = 0;
         unsigned int* array = NULL;
-        ilm_getScreenIDs(&count, &array);
+
+        ilmErrorTypes callResult = ilm_getScreenIDs(&count, &array);
+        if (ILM_SUCCESS != callResult)
+        {
+            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+            cout << "Failed to get screen IDs\n";
+            return;
+        }
+
         printArray("Screen", array, count);
     }
     else if (input->contains("layers"))
@@ -87,7 +95,15 @@ COMMAND("get scene|screens|layers|surfaces")
         (void)input;
         int count = 0;
         unsigned int* array = NULL;
-        ilm_getLayerIDs(&count, &array);
+
+        ilmErrorTypes callResult = ilm_getLayerIDs(&count, &array);
+        if (ILM_SUCCESS != callResult)
+        {
+            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+            cout << "Failed to get layer IDs\n";
+            return;
+        }
+
         printArray("Layer", array, count);
     }
     else if (input->contains("surfaces"))
@@ -95,7 +111,15 @@ COMMAND("get scene|screens|layers|surfaces")
         (void)input;
         int count = 0;
         unsigned int* array = NULL;
-        ilm_getSurfaceIDs(&count, &array);
+
+        ilmErrorTypes callResult = ilm_getSurfaceIDs(&count, &array);
+        if (ILM_SUCCESS != callResult)
+        {
+            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+            cout << "Failed to get surface IDs\n";
+            return;
+        }
+
         printArray("Surface", array, count);
     }
 }
@@ -124,18 +148,36 @@ COMMAND("dump screen|layer|surface <id> to <file>")
 {
     if (input->contains("screen"))
     {
-        ilm_takeScreenshot(input->getUint("id"),
-                           input->getString("file").c_str());
+        ilmErrorTypes callResult = ilm_takeScreenshot(input->getUint("id"),
+                                                        input->getString("file").c_str());
+        if (ILM_SUCCESS != callResult)
+        {
+            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+            cout << "Failed to take screenshot of screen with ID " << input->getUint("id") << "\n";
+            return;
+        }
     }
     else if (input->contains("layer"))
     {
-        ilm_takeLayerScreenshot(input->getString("file").c_str(),
-                                input->getUint("id"));
+        ilmErrorTypes callResult = ilm_takeLayerScreenshot(input->getString("file").c_str(),
+                                                            input->getUint("id"));
+        if (ILM_SUCCESS != callResult)
+        {
+            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+            cout << "Failed to take screenshot of layer with ID " << input->getUint("id") << "\n";
+            return;
+        }
     }
     else if (input->contains("surface"))
     {
-        ilm_takeSurfaceScreenshot(input->getString("file").c_str(),
-                                  input->getUint("id"));
+        ilmErrorTypes callResult = ilm_takeSurfaceScreenshot(input->getString("file").c_str(),
+                                                                input->getUint("id"));
+        if (ILM_SUCCESS != callResult)
+        {
+            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+            cout << "Failed to take screenshot of surface with ID " << input->getUint("id") << "\n";
+            return;
+        }
     }
 }
 
@@ -143,23 +185,35 @@ COMMAND("dump screen|layer|surface <id> to <file>")
 COMMAND("set layer|surface <id> source region <x> <y> <w> <h>")
 //=============================================================================
 {
+    t_ilm_uint id = input->getUint("id");
+    t_ilm_uint x = input->getUint("x");
+    t_ilm_uint y = input->getUint("y");
+    t_ilm_uint w = input->getUint("w");
+    t_ilm_uint h = input->getUint("h");
+
     if (input->contains("layer"))
     {
-        ilm_layerSetSourceRectangle(input->getUint("id"),
-                                    input->getUint("x"),
-                                    input->getUint("y"),
-                                    input->getUint("w"),
-                                    input->getUint("h"));
+        ilmErrorTypes callResult = ilm_layerSetSourceRectangle(id, x, y, w, h);
+        if (ILM_SUCCESS != callResult)
+        {
+            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+            cout << "Failed to set source rectangle (" << x << "," << y << ", "<< w << ", " << h <<") for layer with ID " << id << "\n";
+            return;
+        }
+
         ilm_commitChanges();
     }
     else if (input->contains("surface"))
     {
-        ilm_surfaceSetSourceRectangle(input->getUint("id"),
-                                      input->getUint("x"),
-                                      input->getUint("y"),
-                                      input->getUint("w"),
-                                      input->getUint("h"));
-            ilm_commitChanges();
+        ilmErrorTypes callResult = ilm_surfaceSetSourceRectangle(id, x, y, w, h);
+        if (ILM_SUCCESS != callResult)
+        {
+            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+            cout << "Failed to set source rectangle (" << x << ", " << y << ", "<< w << ", " << h <<") for surface with ID " << id << "\n";
+            return;
+        }
+
+        ilm_commitChanges();
     }
 }
 
@@ -167,22 +221,34 @@ COMMAND("set layer|surface <id> source region <x> <y> <w> <h>")
 COMMAND("set layer|surface <id> destination region <x> <y> <w> <h>")
 //=============================================================================
 {
+    t_ilm_uint id = input->getUint("id");
+    t_ilm_uint x = input->getUint("x");
+    t_ilm_uint y = input->getUint("y");
+    t_ilm_uint w = input->getUint("w");
+    t_ilm_uint h = input->getUint("h");
+
     if (input->contains("layer"))
     {
-        ilm_layerSetDestinationRectangle(input->getUint("id"),
-                                        input->getUint("x"),
-                                        input->getUint("y"),
-                                        input->getUint("w"),
-                                        input->getUint("h"));
+        ilmErrorTypes callResult = ilm_layerSetDestinationRectangle(id, x, y, w, h);
+        if (ILM_SUCCESS != callResult)
+        {
+            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+            cout << "Failed to set destination rectangle (" << x << ", " << y << ", "<< w << ", " << h <<") for layer with ID " << id << "\n";
+            return;
+        }
+
         ilm_commitChanges();
     }
     else if (input->contains("surface"))
     {
-        ilm_surfaceSetDestinationRectangle(input->getUint("id"),
-                                           input->getUint("x"),
-                                           input->getUint("y"),
-                                           input->getUint("w"),
-                                           input->getUint("h"));
+        ilmErrorTypes callResult = ilm_surfaceSetDestinationRectangle(id, x, y, w, h);
+        if (ILM_SUCCESS != callResult)
+        {
+            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+            cout << "Failed to set destination rectangle (" << x << ", " << y << ", "<< w << ", " << h <<") for surface with ID " << id << "\n";
+            return;
+        }
+
         ilm_commitChanges();
     }
 }
@@ -191,17 +257,32 @@ COMMAND("set layer|surface <id> destination region <x> <y> <w> <h>")
 COMMAND("set layer|surface <id> opacity <opacity>")
 //=============================================================================
 {
+    t_ilm_uint id = input->getUint("id");
+    double opacity = input->getDouble("opacity");
+
     if (input->contains("layer"))
     {
-        ilm_layerSetOpacity(input->getUint("id"),
-                input->getDouble("opacity"));
+        ilmErrorTypes callResult = ilm_layerSetOpacity(id, opacity);
+        if (ILM_SUCCESS != callResult)
+        {
+            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+            cout << "Failed to set opacity "<< opacity << " for layer with ID " << id << "\n";
+            return;
+        }
+
         ilm_commitChanges();
     }
     else if (input->contains("surface"))
     {
-        ilm_surfaceSetOpacity(input->getUint("id"),
-                                  input->getDouble("opacity"));
-            ilm_commitChanges();
+        ilmErrorTypes callResult = ilm_surfaceSetOpacity(id, opacity);
+        if (ILM_SUCCESS != callResult)
+        {
+            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+            cout << "Failed to set opacity "<< opacity << " for surface with ID " << id << "\n";
+            return;
+        }
+
+        ilm_commitChanges();
     }
 }
 
@@ -209,16 +290,31 @@ COMMAND("set layer|surface <id> opacity <opacity>")
 COMMAND("set layer|surface <id> visibility <visibility>")
 //=============================================================================
 {
+    t_ilm_uint id = input->getUint("id");
+    t_ilm_bool visibility = input->getBool("visibility");
+
     if (input->contains("layer"))
     {
-        ilm_layerSetVisibility(input->getUint("id"),
-                               input->getBool("visibility"));
+        ilmErrorTypes callResult = ilm_layerSetVisibility(id, visibility);
+        if (ILM_SUCCESS != callResult)
+        {
+            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+            cout << "Failed to set visibility "<< visibility << " for layer with ID " << id << "\n";
+            return;
+        }
+
         ilm_commitChanges();
     }
     else if (input->contains("surface"))
     {
-        ilm_surfaceSetVisibility(input->getUint("id"),
-                                 input->getBool("visibility"));
+        ilmErrorTypes callResult = ilm_surfaceSetVisibility(id, visibility);
+        if (ILM_SUCCESS != callResult)
+        {
+            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+            cout << "Failed to set visibility "<< visibility << " for surface with ID " << id << "\n";
+            return;
+        }
+
         ilm_commitChanges();
     }
 }
@@ -227,16 +323,31 @@ COMMAND("set layer|surface <id> visibility <visibility>")
 COMMAND("set layer|surface <id> orientation <orientation>")
 //=============================================================================
 {
+    t_ilm_uint id = input->getUint("id");
+    ilmOrientation orientation = (ilmOrientation)input->getInt("orientation");
+
     if (input->contains("layer"))
     {
-        ilm_layerSetOrientation(input->getUint("id"),
-                    (ilmOrientation)input->getInt("orientation"));
+        ilmErrorTypes callResult = ilm_layerSetOrientation(id, orientation);
+        if (ILM_SUCCESS != callResult)
+        {
+            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+            cout << "Failed to set orientation "<< orientation << " for layer with ID " << id << "\n";
+            return;
+        }
+
         ilm_commitChanges();
     }
     else if (input->contains("surface"))
     {
-        ilm_surfaceSetOrientation(input->getUint("id"),
-                      (ilmOrientation)input->getInt("orientation"));
+        ilmErrorTypes callResult = ilm_surfaceSetOrientation(id, orientation);
+        if (ILM_SUCCESS != callResult)
+        {
+            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+            cout << "Failed to set orientation "<< orientation << " for surface with ID " << id << "\n";
+            return;
+        }
+
         ilm_commitChanges();
     }
 
@@ -254,13 +365,29 @@ COMMAND("set screen|layer <id> render order [<idarray>]")
             unsigned int* array = NULL;
             unsigned int screenid = input->getUint("id");
             input->getUintArray("idarray", &array, &count);
-            ilm_displaySetRenderOrder(screenid, array, count);
+
+            ilmErrorTypes callResult = ilm_displaySetRenderOrder(screenid, array, count);
+            if (ILM_SUCCESS != callResult)
+            {
+                cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+                cout << "Failed to set render order for screen with ID " << screenid << "\n";
+                return;
+            }
+
             ilm_commitChanges();
         }
         else
         {
             unsigned int screenid = input->getUint("id");
-            ilm_displaySetRenderOrder(screenid, NULL, 0);
+
+            ilmErrorTypes callResult = ilm_displaySetRenderOrder(screenid, NULL, 0);
+            if (ILM_SUCCESS != callResult)
+            {
+                cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+                cout << "Failed to set render order for screen with ID " << screenid << "\n";
+                return;
+            }
+
             ilm_commitChanges();
         }
     }
@@ -272,13 +399,29 @@ COMMAND("set screen|layer <id> render order [<idarray>]")
             unsigned int* array = NULL;
             unsigned int layerid = input->getUint("id");
             input->getUintArray("idarray", &array, &count);
-            ilm_layerSetRenderOrder(layerid, array, count);
+
+            ilmErrorTypes callResult = ilm_layerSetRenderOrder(layerid, array, count);
+            if (ILM_SUCCESS != callResult)
+            {
+                cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+                cout << "Failed to set render order for layer with ID " << layerid << "\n";
+                return;
+            }
+
             ilm_commitChanges();
         }
         else
         {
             unsigned int layerid = input->getUint("id");
-            ilm_layerSetRenderOrder(layerid, NULL, 0);
+
+            ilmErrorTypes callResult = ilm_layerSetRenderOrder(layerid, NULL, 0);
+            if (ILM_SUCCESS != callResult)
+            {
+                cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+                cout << "Failed to set render order for layer with ID " << layerid << "\n";
+                return;
+            }
+
             ilm_commitChanges();
         }
     }
@@ -292,18 +435,50 @@ COMMAND("set layer|surface <id> width <width>")
     {
         unsigned int dimension[2];
         unsigned int layerid = input->getUint("id");
-        ilm_layerGetDimension(layerid, dimension);
+
+        ilmErrorTypes callResult = ilm_layerGetDimension(layerid, dimension);
+        if (ILM_SUCCESS != callResult)
+        {
+            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+            cout << "Failed to get dimensions of layer with ID " << layerid << "\n";
+            return;
+        }
+
         dimension[0] = input->getUint("width");
-        ilm_layerSetDimension(layerid, dimension);
+
+        callResult = ilm_layerSetDimension(layerid, dimension);
+        if (ILM_SUCCESS != callResult)
+        {
+            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+            cout << "Failed to set dimensions of layer with ID " << layerid << "\n";
+            return;
+        }
+
         ilm_commitChanges();
     }
     else if (input->contains("surface"))
     {
         unsigned int dimension[2];
         unsigned int surfaceid = input->getUint("id");
-        ilm_surfaceGetDimension(surfaceid, dimension);
+
+        ilmErrorTypes callResult = ilm_surfaceGetDimension(surfaceid, dimension);
+        if (ILM_SUCCESS != callResult)
+        {
+            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+            cout << "Failed to get dimensions of surface with ID " << surfaceid << "\n";
+            return;
+        }
+
         dimension[0] = input->getUint("width");
-        ilm_surfaceSetDimension(surfaceid, dimension);
+
+        callResult = ilm_surfaceSetDimension(surfaceid, dimension);
+        if (ILM_SUCCESS != callResult)
+        {
+            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+            cout << "Failed to set dimensions of surface with ID " << surfaceid << "\n";
+            return;
+        }
+
         ilm_commitChanges();
     }
 }
@@ -316,18 +491,50 @@ COMMAND("set layer|surface <id> height <height>")
     {
         unsigned int dimension[2];
         unsigned int layerid = input->getUint("id");
-        ilm_layerGetDimension(layerid, dimension);
+
+        ilmErrorTypes callResult = ilm_layerGetDimension(layerid, dimension);
+        if (ILM_SUCCESS != callResult)
+        {
+            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+            cout << "Failed to get dimensions of layer with ID " << layerid << "\n";
+            return;
+        }
+
         dimension[1] = input->getUint("height");
-        ilm_layerSetDimension(layerid, dimension);
+
+        callResult = ilm_layerSetDimension(layerid, dimension);
+        if (ILM_SUCCESS != callResult)
+        {
+            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+            cout << "Failed to set dimensions of layer with ID " << layerid << "\n";
+            return;
+        }
+
         ilm_commitChanges();
     }
     else if (input->contains("surface"))
     {
         unsigned int dimension[2];
         unsigned int surfaceid = input->getUint("id");
-        ilm_surfaceGetDimension(surfaceid, dimension);
+
+        ilmErrorTypes callResult = ilm_surfaceGetDimension(surfaceid, dimension);
+        if (ILM_SUCCESS != callResult)
+        {
+            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+            cout << "Failed to get dimensions of surface with ID " << surfaceid << "\n";
+            return;
+        }
+
         dimension[1] = input->getUint("height");
-        ilm_surfaceSetDimension(surfaceid, dimension);
+
+        callResult = ilm_surfaceSetDimension(surfaceid, dimension);
+        if (ILM_SUCCESS != callResult)
+        {
+            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+            cout << "Failed to set dimensions of surface with ID " << surfaceid << "\n";
+            return;
+        }
+
         ilm_commitChanges();
     }
 }
@@ -336,22 +543,33 @@ COMMAND("set layer|surface <id> height <height>")
 COMMAND("set layer|surface <id> position <x> <y>")
 //=============================================================================
 {
+    unsigned int id = input->getUint("id");
+    unsigned int dimension[2];
+    dimension[0] = input->getUint("x");
+    dimension[1] = input->getUint("y");
+
     if (input->contains("layer"))
     {
-        unsigned int dimension[2];
-        unsigned int layerid = input->getUint("id");
-        dimension[0] = input->getUint("x");
-        dimension[1] = input->getUint("y");
-        ilm_layerSetPosition(layerid, dimension);
+        ilmErrorTypes callResult = ilm_layerSetPosition(id, dimension);
+        if (ILM_SUCCESS != callResult)
+        {
+            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+            cout << "Failed to set position of layer with ID " << id << "\n";
+            return;
+        }
+
         ilm_commitChanges();
     }
     else if (input->contains("surface"))
     {
-        unsigned int dimension[2];
-        unsigned int surfaceid = input->getUint("id");
-        dimension[0] = input->getUint("x");
-        dimension[1] = input->getUint("y");
-        ilm_surfaceSetPosition(surfaceid, dimension);
+        ilmErrorTypes callResult = ilm_surfaceSetPosition(id, dimension);
+        if (ILM_SUCCESS != callResult)
+        {
+            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+            cout << "Failed to set position of surface with ID " << id << "\n";
+            return;
+        }
+
         ilm_commitChanges();
     }
 }
@@ -365,12 +583,26 @@ COMMAND("create layer <layerid> [<width> <height>]")
         unsigned int layerid = input->getUint("layerid");
         unsigned int width = input->getUint("width");
         unsigned int height = input->getUint("height");
-        ilm_layerCreateWithDimension(&layerid, width, height);
+
+        ilmErrorTypes callResult = ilm_layerCreateWithDimension(&layerid, width, height);
+        if (ILM_SUCCESS != callResult)
+        {
+            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+            cout << "Failed to create layer with ID " << layerid << "\n";
+            return;
+        }
     }
     else
     {
         unsigned int layerid = input->getUint("layerid");
-        ilm_layerCreate(&layerid);
+
+        ilmErrorTypes callResult = ilm_layerCreate(&layerid);
+        if (ILM_SUCCESS != callResult)
+        {
+            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+            cout << "Failed to create layer with ID " << layerid << "\n";
+            return;
+        }
     }
 }
 
@@ -383,7 +615,14 @@ COMMAND("create surface <surfaceid> <nativehandle> <width> <height> <pixelformat
     unsigned int width = input->getUint("width");
     unsigned int height = input->getUint("height");
     e_ilmPixelFormat pixelformat = (e_ilmPixelFormat)input->getUint("pixelformat");
-    ilm_surfaceCreate(nativeHandle, width, height, pixelformat, &surfaceid);
+
+    ilmErrorTypes callResult = ilm_surfaceCreate(nativeHandle, width, height, pixelformat, &surfaceid);
+    if (ILM_SUCCESS != callResult)
+    {
+        cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+        cout << "Failed to create surface with ID " << surfaceid << "\n";
+        return;
+    }
 }
 
 //=============================================================================
@@ -393,13 +632,29 @@ COMMAND("destroy layer|surface <id>")
     if (input->contains("layer"))
     {
         unsigned int layerid = input->getUint("id");
-        ilm_layerRemove(layerid);
+
+        ilmErrorTypes callResult = ilm_layerRemove(layerid);
+        if (ILM_SUCCESS != callResult)
+        {
+            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+            cout << "Failed to remove layer with ID " << layerid << "\n";
+            return;
+        }
     }
     else if (input->contains("surface"))
     {
         unsigned int surfaceid = input->getUint("id");
-        ilm_surfaceRemove(surfaceid);
+
+        ilmErrorTypes callResult = ilm_surfaceRemove(surfaceid);
+        if (ILM_SUCCESS != callResult)
+        {
+            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+            cout << "Failed to remove surface with ID " << surfaceid << "\n";
+            return;
+        }
     }
+
+    ilm_commitChanges();
 }
 
 //=============================================================================
@@ -442,29 +697,36 @@ COMMAND("set surface <surfaceid> accept <acceptance> input events from devices <
 COMMAND("set layer|surface <id> chromakey <red> <green> <blue>")
 //=============================================================================
 {
+    t_ilm_layer id = input->getUint("id");
+    t_ilm_int color[3] =
+    {
+        input->getInt("red"),
+        input->getInt("green"),
+        input->getInt("blue")
+    };
+
     if (input->contains("layer"))
     {
-        t_ilm_layer layer = input->getUint("id");
-        t_ilm_int color[3] =
+        ilmErrorTypes callResult = ilm_layerSetChromaKey(id, color);
+        if (ILM_SUCCESS != callResult)
         {
-            input->getInt("red"),
-            input->getInt("green"),
-            input->getInt("blue")
-        };
+            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+            cout << "Failed to set chroma key (" << color[0] << ", " << color[1] << ", " << color[2] << ") for layer with ID " << id << "\n";
+            return;
+        }
 
-        ilm_layerSetChromaKey(layer, color);
         ilm_commitChanges();
     }
     else if (input->contains("surface"))
     {
-        t_ilm_surface surface = input->getUint("id");
-        t_ilm_int color[3] =
+        ilmErrorTypes callResult = ilm_surfaceSetChromaKey(id, color);
+        if (ILM_SUCCESS != callResult)
         {
-            input->getInt("red"),
-            input->getInt("green"),
-            input->getInt("blue")
-        };
-        ilm_surfaceSetChromaKey(surface, color);
+            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+            cout << "Failed to set chroma key (" << color[0] << ", " << color[1] << ", " << color[2] << ") for surface with ID " << id << "\n";
+            return;
+        }
+
         ilm_commitChanges();
     }
 }
@@ -474,7 +736,15 @@ COMMAND("set surface <surfaceid> chromakey disabled")
 //=============================================================================
 {
     t_ilm_surface surface = input->getUint("surfaceid");
-    ilm_surfaceSetChromaKey(surface, NULL);
+
+    ilmErrorTypes callResult = ilm_surfaceSetChromaKey(surface, NULL);
+    if (ILM_SUCCESS != callResult)
+    {
+        cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+        cout << "Failed to disable chroma key for surface with ID " << surface << "\n";
+        return;
+    }
+
     ilm_commitChanges();
 }
 

@@ -24,6 +24,7 @@
 using std::max;
 using std::min;
 
+#include <cstdlib>
 
 #include <iostream>
 using std::cout;
@@ -106,11 +107,23 @@ void* scatterThreadCallback(void* param)
         {
             t_ilm_surface currentSurface = *surface;
 
-            ilm_surfaceSetVisibility(currentSurface, false);
+            ilmErrorTypes callResult = ilm_surfaceSetVisibility(currentSurface, false);
+            if (ILM_SUCCESS != callResult)
+            {
+                cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+                cout << "Failed to set visibility "<< false << " for surface with ID " << currentSurface << "\n";
+            }
+
             ilm_commitChanges();
             usleep(100000);
 
-            ilm_surfaceSetVisibility(currentSurface, true);
+            callResult = ilm_surfaceSetVisibility(currentSurface, true);
+            if (ILM_SUCCESS != callResult)
+            {
+                cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+                cout << "Failed to set visibility "<< true << " for surface with ID " << currentSurface << "\n";
+            }
+
             ilm_commitChanges();
         }
 

@@ -64,7 +64,16 @@ void getCommunicatorPerformance()
 
     while (gBenchmark_running)
     {
-        ilm_getNumberOfHardwareLayers(0, &hwLayerCnt);
+        t_ilm_uint screenid = 0;
+
+        ilmErrorTypes callResult = ilm_getNumberOfHardwareLayers(screenid, &hwLayerCnt);
+        if (ILM_SUCCESS != callResult)
+        {
+            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+            cout << "Failed to get number of hardware layers for screen with ID " << screenid << "\n";
+            return;
+        }
+
         ++runs;
     }
 
@@ -75,22 +84,29 @@ void getCommunicatorPerformance()
 
 void setSurfaceKeyboardFocus(t_ilm_surface surface)
 {
-    if (ilm_SetKeyboardFocusOn(surface) != ILM_SUCCESS)
+    ilmErrorTypes callResult = ilm_SetKeyboardFocusOn(surface);
+    if (ILM_SUCCESS != callResult)
     {
-        cerr << "Error during communication" << endl;
+        cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+        cout << "Failed to set keyboard focus at surface with ID " << surface << "\n";
+        return;
     }
 }
 
 void getKeyboardFocus()
 {
     t_ilm_surface surfaceId;
-    if (ilm_GetKeyboardFocusSurfaceId(&surfaceId) == ILM_SUCCESS)
+
+    ilmErrorTypes callResult = ilm_GetKeyboardFocusSurfaceId(&surfaceId);
+    if (ILM_SUCCESS == callResult)
     {
         cout << "keyboardFocusSurfaceId == " << surfaceId << endl;
     }
     else
     {
-        cerr << "Error during communication" << endl;
+        cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+        cout << "Failed to get keyboard focus surface ID\n";
+        return;
     }
 }
 
@@ -126,7 +142,14 @@ void setSurfaceAcceptsInput(t_ilm_surface surfaceId, string kbdPointerTouch, t_i
         tok = strtok(NULL, ":");
     }
 
-    ilm_UpdateInputEventAcceptanceOn(surfaceId, devices, acceptance);
+    ilmErrorTypes callResult = ilm_UpdateInputEventAcceptanceOn(surfaceId, devices, acceptance);
+    if (ILM_SUCCESS != callResult)
+    {
+        cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+        cout << "Failed to update input event acceptance on surface with ID " << surfaceId << "\n";
+        return;
+    }
+
     ilm_commitChanges();
 
     delete[] str;
@@ -172,14 +195,14 @@ void layerNotificationCallback(t_ilm_layer layer, struct ilmLayerProperties* pro
 
 void testNotificationLayer(t_ilm_layer layerid)
 {
-
-    ilmErrorTypes ret;
     cout << "Setup notification for layer " << layerid << " \n";
-    ret = ilm_layerAddNotification(layerid, layerNotificationCallback);
 
-    if (ret != ILM_SUCCESS)
+    ilmErrorTypes callResult = ilm_layerAddNotification(layerid, layerNotificationCallback);
+    if (ILM_SUCCESS != callResult)
     {
-        cerr << "ilm_layerAddNotification returned error " << ret << "\n";
+        cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+        cout << "Failed to add notification callback to layer with ID " << layerid << "\n";
+        return;
     }
 
     for  (int i = 0; i < 2; ++i)
@@ -212,11 +235,12 @@ void watchLayer(unsigned int* layerids, unsigned int layeridCount)
     {
         unsigned int layerid = layerids[i];
         cout << "Setup notification for layer " << layerid << "\n";
-        ilmErrorTypes ret = ilm_layerAddNotification(layerid, layerNotificationCallback);
 
-        if (ret != ILM_SUCCESS)
+        ilmErrorTypes callResult = ilm_layerAddNotification(layerid, layerNotificationCallback);
+        if (ILM_SUCCESS != callResult)
         {
-            cerr << "ilm_layerAddNotification(" << layerid << ") returned error " << ret << "\n";
+            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+            cout << "Failed to add notification callback to layer with ID " << layerid << "\n";
             return;
         }
     }
@@ -229,7 +253,14 @@ void watchLayer(unsigned int* layerids, unsigned int layeridCount)
     {
         unsigned int layerid = layerids[i];
         cout << "Removing notification for layer " << layerid << "\n";
-        ilm_layerRemoveNotification(layerid);
+
+        ilmErrorTypes callResult = ilm_layerRemoveNotification(layerid);
+        if (ILM_SUCCESS != callResult)
+        {
+            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+            cout << "Failed to remove notification callback of layer with ID " << layerid << "\n";
+            return;
+        }
     }
 
     if (layerids)
@@ -282,11 +313,12 @@ void watchSurface(unsigned int* surfaceids, unsigned int surfaceidCount)
     {
         unsigned int surfaceid = surfaceids[i];
         cout << "Setup notification for surface " << surfaceid << "\n";
-        ilmErrorTypes ret = ilm_surfaceAddNotification(surfaceid, surfaceNotificationCallback);
 
-        if (ret != ILM_SUCCESS)
+        ilmErrorTypes callResult = ilm_surfaceAddNotification(surfaceid, surfaceNotificationCallback);
+        if (ILM_SUCCESS != callResult)
         {
-            cerr << "ilm_surfaceAddNotification(" << surfaceid << ") returned error " << ret << "\n";
+            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+            cout << "Failed to add notification callback to surface with ID " << surfaceid << "\n";
             return;
         }
     }
@@ -299,7 +331,14 @@ void watchSurface(unsigned int* surfaceids, unsigned int surfaceidCount)
     {
         unsigned int surfaceid = surfaceids[i];
         cout << "Removing notification for surface " << surfaceid << "\n";
-        ilm_surfaceRemoveNotification(surfaceid);
+
+        ilmErrorTypes callResult = ilm_surfaceRemoveNotification(surfaceid);
+        if (ILM_SUCCESS != callResult)
+        {
+            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+            cout << "Failed to remove notification callback of surface with ID " << surfaceid << "\n";
+            return;
+        }
     }
 
     if (surfaceids)
@@ -310,10 +349,13 @@ void watchSurface(unsigned int* surfaceids, unsigned int surfaceidCount)
 
 void setOptimization(t_ilm_uint id, t_ilm_uint mode)
 {
-    if (ilm_SetOptimizationMode((ilmOptimization)id,
-                                    (ilmOptimizationMode)mode) != ILM_SUCCESS)
+    ilmErrorTypes callResult = ilm_SetOptimizationMode((ilmOptimization)id,
+                                    (ilmOptimizationMode)mode);
+    if (ILM_SUCCESS != callResult)
     {
-        cerr << "Error during communication" << endl;
+        cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+        cout << "Failed to set optimization with ID "<< id <<" mode " << mode << "\n";
+        return;
     }
 
     ilm_commitChanges();
@@ -323,7 +365,9 @@ void getOptimization(t_ilm_uint id)
 {
     ilmOptimization optimizationId = (ilmOptimization)id;
     ilmOptimizationMode optimizationMode;
-    if (ilm_GetOptimizationMode(optimizationId, &optimizationMode) == ILM_SUCCESS)
+
+    ilmErrorTypes callResult = ilm_GetOptimizationMode(optimizationId, &optimizationMode);
+    if (callResult == ILM_SUCCESS)
     {
         switch ( optimizationId )
         {
@@ -362,7 +406,9 @@ void getOptimization(t_ilm_uint id)
     }
     else
     {
-        cerr << "Error during communication" << endl;
+        cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+        cout << "Failed to get mode for optimization with ID "<< optimizationId << "\n";
+        return;
     }
 
     ilm_commitChanges();

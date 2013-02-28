@@ -154,26 +154,53 @@ void demoAnimatorDownwards(t_scene_data* pInitialScene, t_scene_data* pDemoScene
             {
                 //set source region to only the visible part of the surface
                 int ySource = static_cast<int>(-coordinates.y / surfaceScale[surface]);
-                ilm_surfaceSetSourceRectangle(surface, 0, ySource, properties.sourceWidth, properties.sourceHeight - ySource);
+
+                ilmErrorTypes callResult = ilm_surfaceSetSourceRectangle(surface, 0, ySource, properties.sourceWidth, properties.sourceHeight - ySource);
+                if (ILM_SUCCESS != callResult)
+                {
+                    cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+                    cout << "Failed to set source rectangle (" << 0 << "," << ySource << ", "<< properties.sourceWidth << ", " << properties.sourceHeight - ySource
+                            <<") for surface with ID " << surface << "\n";
+                }
 
                 //set the destination region AT THE TOP of the layer used for displaying the surface
-                ilm_surfaceSetDestinationRectangle(surface,
+                callResult = ilm_surfaceSetDestinationRectangle(surface,
                         coordinates.x,
                         0,
                         max(0, coordinates.z - coordinates.x),
                         max(0, coordinates.w));
+
+                if (ILM_SUCCESS != callResult)
+                {
+                    cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+                    cout << "Failed to set destination rectangle (" << coordinates.x << "," << 0 << ", "<< max(0, coordinates.z - coordinates.x) << ", "
+                            << max(0, coordinates.w) <<") for surface with ID " << surface << "\n";
+                }
             }
             else
             {
                 //set source region to whole surface
-                ilm_surfaceSetSourceRectangle(surface, 0, 0, properties.sourceWidth, properties.sourceHeight);
+                ilmErrorTypes callResult = ilm_surfaceSetSourceRectangle(surface, 0, 0, properties.sourceWidth, properties.sourceHeight);
+                if (ILM_SUCCESS != callResult)
+                {
+                    cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+                    cout << "Failed to set source rectangle (" << 0 << "," << 0 << ", "<< properties.sourceWidth << ", " << properties.sourceHeight
+                            <<") for surface with ID " << surface << "\n";
+                }
 
                 //set destination region to the region on the layer used for displaying the surface
-                ilm_surfaceSetDestinationRectangle(surface,
+                callResult = ilm_surfaceSetDestinationRectangle(surface,
                         coordinates.x,
                         coordinates.y,
                         max(0, coordinates.z - coordinates.x),
                         max(0, coordinates.w - coordinates.y));
+
+                if (ILM_SUCCESS != callResult)
+                {
+                    cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+                    cout << "Failed to set destination rectangle (" << coordinates.x << "," << coordinates.y << ", "<< max(0, coordinates.z - coordinates.x) << ", "
+                            << max(0, coordinates.w - coordinates.y) <<") for surface with ID " << surface << "\n";
+                }
             }
 
             surfaceCoordinates[surface] = coordinates;
@@ -269,7 +296,13 @@ void demoAnimatorRandomDirections(t_scene_data* pInitialScene, t_scene_data* pDe
             t_ilm_surface surface = *it;
 
             float opacity = min(1.0, 1.1 - surfaceScale[surface]);
-            ilm_surfaceSetOpacity(surface, opacity);
+
+            ilmErrorTypes callResult = ilm_surfaceSetOpacity(surface, opacity);
+            if (ILM_SUCCESS != callResult)
+            {
+                cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+                cout << "Failed to set opacity " << opacity <<" for surface with ID " << surface << "\n";
+            }
         }
 
         for (vector<t_ilm_surface>::iterator it = renderedSurfaces.begin();
@@ -303,26 +336,53 @@ void demoAnimatorRandomDirections(t_scene_data* pInitialScene, t_scene_data* pDe
             {
                 //set source region to only the visible part of the surface
                 int ySource = static_cast<int>(-coordinates.y / surfaceScale[surface]);
-                ilm_surfaceSetSourceRectangle(surface, 0, ySource, properties.sourceWidth, properties.sourceHeight - ySource);
+
+                ilmErrorTypes callResult = ilm_surfaceSetSourceRectangle(surface, 0, ySource, properties.sourceWidth, properties.sourceHeight - ySource);
+                if (ILM_SUCCESS != callResult)
+                {
+                    cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+                    cout << "Failed to set source rectangle (" << 0 << "," << ySource << ", "<< properties.sourceWidth << ", " << properties.sourceHeight - ySource
+                            <<") for surface with ID " << surface << "\n";
+                }
 
                 //set the destination region AT THE TOP of the layer used for displaying the surface
-                ilm_surfaceSetDestinationRectangle(surface,
+                callResult = ilm_surfaceSetDestinationRectangle(surface,
                         coordinates.x,
                         0,
                         max(0, coordinates.z - coordinates.x),
                         max(0, coordinates.w));
+
+                if (ILM_SUCCESS != callResult)
+                {
+                    cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+                    cout << "Failed to set destination rectangle (" << coordinates.x << "," << 0 << ", "<< max(0, coordinates.z - coordinates.x) << ", " << max(0, coordinates.w)
+                            <<") for surface with ID " << surface << "\n";
+                }
             }
             else
             {
                 //set source region to whole surface
-                ilm_surfaceSetSourceRectangle(surface, 0, 0, properties.sourceWidth, properties.sourceHeight);
+                ilmErrorTypes callResult = ilm_surfaceSetSourceRectangle(surface, 0, 0, properties.sourceWidth, properties.sourceHeight);
+                if (ILM_SUCCESS != callResult)
+                {
+                    cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+                    cout << "Failed to set source rectangle (" << 0 << "," << 0 << ", "<< properties.sourceWidth << ", " << properties.sourceHeight
+                            <<") for surface with ID " << surface << "\n";
+                }
 
                 //set destination region to the region on the layer used for displaying the surface
-                ilm_surfaceSetDestinationRectangle(surface,
+                callResult = ilm_surfaceSetDestinationRectangle(surface,
                         coordinates.x,
                         coordinates.y,
                         max(0, coordinates.z - coordinates.x),
                         max(0, coordinates.w - coordinates.y));
+
+                if (ILM_SUCCESS != callResult)
+                {
+                    cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+                    cout << "Failed to set destination rectangle (" << coordinates.x << "," << coordinates.y << ", "<< max(0, coordinates.z - coordinates.x) << ", "
+                            << max(0, coordinates.w - coordinates.y) <<") for surface with ID " << surface << "\n";
+                }
             }
 
             surfaceCoordinates[surface] = coordinates;
@@ -431,7 +491,13 @@ void demoAnimatorWaterfall(t_scene_data* pInitialScene, t_scene_data* pDemoScene
             int displacement = static_cast<int>(t * abs(surfaceSpeed[surface]));
 
             t_ilm_float opacity = min(1.0, max(0.0, 1 - fraction)); //between 0 and 1
-            ilm_surfaceSetOpacity(surface, opacity);
+
+            ilmErrorTypes callResult = ilm_surfaceSetOpacity(surface, opacity);
+            if (ILM_SUCCESS != callResult)
+            {
+                cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+                cout << "Failed to set opacity " << opacity <<" for surface with ID " << surface << "\n";
+            }
 
             //move
             coordinates.y += displacement;
@@ -442,30 +508,57 @@ void demoAnimatorWaterfall(t_scene_data* pInitialScene, t_scene_data* pDemoScene
             {
                 //set source region to only the visible part of the surface
                 int ySource = static_cast<int>(-coordinates.y / surfaceScale[surface]);
-                ilm_surfaceSetSourceRectangle(surface,
+                ilmErrorTypes callResult = ilm_surfaceSetSourceRectangle(surface,
                         0,
                         ySource,
                         properties.sourceWidth,
                         properties.sourceHeight - ySource);
 
+                if (ILM_SUCCESS != callResult)
+                {
+                    cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+                    cout << "Failed to set source rectangle (" << 0 << "," << ySource << ", "<< properties.sourceWidth << ", " << properties.sourceHeight - ySource
+                            <<") for surface with ID " << surface << "\n";
+                }
+
                 //set the destination region AT THE TOP of the layer used for displaying the surface
-                ilm_surfaceSetDestinationRectangle(surface,
+                callResult = ilm_surfaceSetDestinationRectangle(surface,
                         coordinates.x,
                         0,
                         max(0, coordinates.z - coordinates.x),
                         max(0, coordinates.w));
+
+                if (ILM_SUCCESS != callResult)
+                {
+                    cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+                    cout << "Failed to set destination rectangle (" << coordinates.x << "," << 0 << ", "<< max(0, coordinates.z - coordinates.x) << ", " << max(0, coordinates.w)
+                            <<") for surface with ID " << surface << "\n";
+                }
             }
             else
             {
                 //set source region to whole surface
-                ilm_surfaceSetSourceRectangle(surface, 0, 0, properties.sourceWidth, properties.sourceHeight);
+                ilmErrorTypes callResult = ilm_surfaceSetSourceRectangle(surface, 0, 0, properties.sourceWidth, properties.sourceHeight);
+                if (ILM_SUCCESS != callResult)
+                {
+                    cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+                    cout << "Failed to set source rectangle (" << 0 << "," << 0 << ", "<< properties.sourceWidth << ", " << properties.sourceHeight
+                            <<") for surface with ID " << surface << "\n";
+                }
 
                 //set destination region to the region on the layer used for displaying the surface
-                ilm_surfaceSetDestinationRectangle(surface,
+                callResult = ilm_surfaceSetDestinationRectangle(surface,
                         coordinates.x,
                         coordinates.y,
                         max(0, coordinates.z - coordinates.x),
                         max(0, coordinates.w - coordinates.y));
+
+                if (ILM_SUCCESS != callResult)
+                {
+                    cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+                    cout << "Failed to set destination rectangle (" << coordinates.x << "," << coordinates.y << ", "<< max(0, coordinates.z - coordinates.x) << ", "
+                            << max(0, coordinates.w - coordinates.y) <<") for surface with ID " << surface << "\n";
+                }
             }
 
             surfaceCoordinates[surface] = coordinates;
@@ -498,11 +591,19 @@ void demoAnimatorZooming(t_scene_data* pInitialScene, t_scene_data* pDemoScene, 
         surfaceProperties.destHeight = 0;
         surfaceProperties.destWidth = 0;
 
-        ilm_surfaceSetDestinationRectangle(surface,
+        ilmErrorTypes callResult = ilm_surfaceSetDestinationRectangle(surface,
                 surfaceProperties.destX,
                 surfaceProperties.destY,
                 surfaceProperties.destWidth,
                 surfaceProperties.destHeight);
+
+        if (ILM_SUCCESS != callResult)
+        {
+            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+            cout << "Failed to set destination rectangle (" << surfaceProperties.destX << "," << surfaceProperties.destY << ", "<< surfaceProperties.destWidth << ", "
+                    << surfaceProperties.destHeight <<") for surface with ID " << surface << "\n";
+        }
+
     }
 
     //sleeping time
@@ -531,13 +632,26 @@ void demoAnimatorZooming(t_scene_data* pInitialScene, t_scene_data* pDemoScene, 
             currentSurfaceIndex = (currentSurfaceIndex + 1) % renderedSurfaces.size();
             t_ilm_layer layer = pDemoScene->screenLayers.begin()->second[0];
 
-            ilm_surfaceSetDestinationRectangle(surface,
+            ilmErrorTypes callResult = ilm_surfaceSetDestinationRectangle(surface,
                     surfaceProperties.destX,
                     surfaceProperties.destY,
                     surfaceProperties.destWidth,
                     surfaceProperties.destHeight);
 
-            ilm_layerSetRenderOrder(layer, renderedSurfaces.data() + currentSurfaceIndex, 1);
+            if (ILM_SUCCESS != callResult)
+            {
+                cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+                cout << "Failed to set destination rectangle (" << surfaceProperties.destX << "," << surfaceProperties.destY << ", "<< surfaceProperties.destWidth << ", "
+                        << surfaceProperties.destHeight <<") for surface with ID " << surface << "\n";
+            }
+
+            callResult = ilm_layerSetRenderOrder(layer, renderedSurfaces.data() + currentSurfaceIndex, 1);
+
+            if (ILM_SUCCESS != callResult)
+            {
+                cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+                cout << "Failed to set render order for layer with ID " << layer << "\n";
+            }
         }
         else
         {
@@ -548,14 +662,27 @@ void demoAnimatorZooming(t_scene_data* pInitialScene, t_scene_data* pDemoScene, 
             surfaceProperties.destWidth += 2 * change;
             surfaceProperties.destHeight += 2 * change;
 
-            ilm_surfaceSetDestinationRectangle(surface,
+            ilmErrorTypes callResult = ilm_surfaceSetDestinationRectangle(surface,
                     surfaceProperties.destX,
                     surfaceProperties.destY,
                     surfaceProperties.destWidth,
                     surfaceProperties.destHeight);
 
+            if (ILM_SUCCESS != callResult)
+            {
+                cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+                cout << "Failed to set destination rectangle (" << surfaceProperties.destX << "," << surfaceProperties.destY << ", "<< surfaceProperties.destWidth << ", "
+                        << surfaceProperties.destHeight <<") for surface with ID " << surface << "\n";
+            }
+
             float opacity = 1 / pow(t, 0.4);
-            ilm_surfaceSetOpacity(surface, opacity);
+
+            callResult = ilm_surfaceSetOpacity(surface, opacity);
+            if (ILM_SUCCESS != callResult)
+            {
+                cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+                cout << "Failed to set opacity " << opacity <<" for surface with ID " << surface << "\n";
+            }
         }
 
         ilm_commitChanges();
@@ -584,11 +711,18 @@ void demoAnimatorCascadedZooming(t_scene_data* pInitialScene, t_scene_data* pDem
         surfaceProperties.destHeight = 0;
         surfaceProperties.destWidth = 0;
 
-        ilm_surfaceSetDestinationRectangle(surface,
+        ilmErrorTypes callResult = ilm_surfaceSetDestinationRectangle(surface,
                 surfaceProperties.destX,
                 surfaceProperties.destY,
                 surfaceProperties.destWidth,
                 surfaceProperties.destHeight);
+
+        if (ILM_SUCCESS != callResult)
+        {
+            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+            cout << "Failed to set destination rectangle (" << surfaceProperties.destX << "," << surfaceProperties.destY << ", "<< surfaceProperties.destWidth << ", "
+                    << surfaceProperties.destHeight <<") for surface with ID " << surface << "\n";
+        }
 
         scaleFactors[surface] = 1;
     }
@@ -616,11 +750,18 @@ void demoAnimatorCascadedZooming(t_scene_data* pInitialScene, t_scene_data* pDem
 
                 t_ilm_layer layer = pDemoScene->screenLayers.begin()->second[0];
 
-                ilm_surfaceSetDestinationRectangle(surface,
+                ilmErrorTypes callResult = ilm_surfaceSetDestinationRectangle(surface,
                         surfaceProperties.destX,
                         surfaceProperties.destY,
                         surfaceProperties.destWidth,
                         surfaceProperties.destHeight);
+
+                if (ILM_SUCCESS != callResult)
+                {
+                    cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+                    cout << "Failed to set destination rectangle (" << surfaceProperties.destX << "," << surfaceProperties.destY << ", "<< surfaceProperties.destWidth << ", "
+                            << surfaceProperties.destHeight <<") for surface with ID " << surface << "\n";
+                }
 
                 ilm_commitChanges();
                 //update render order
@@ -632,7 +773,14 @@ void demoAnimatorCascadedZooming(t_scene_data* pInitialScene, t_scene_data* pDem
 
                 renderedSurfaces[renderedSurfaces.size() - 1] = firstSurface;
 
-                ilm_layerSetRenderOrder(layer, renderedSurfaces.data(), renderedSurfaces.size());
+                callResult = ilm_layerSetRenderOrder(layer, renderedSurfaces.data(), renderedSurfaces.size());
+
+                if (ILM_SUCCESS != callResult)
+                {
+                    cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+                    cout << "Failed to set render order for layer with ID " << layer << "\n";
+                }
+
                 ilm_commitChanges();
             }
             else
@@ -646,14 +794,27 @@ void demoAnimatorCascadedZooming(t_scene_data* pInitialScene, t_scene_data* pDem
                 surfaceProperties.destWidth += 2 * change;
                 surfaceProperties.destHeight += 2 * change;
 
-                ilm_surfaceSetDestinationRectangle(surface,
+                ilmErrorTypes callResult = ilm_surfaceSetDestinationRectangle(surface,
                         surfaceProperties.destX,
                         surfaceProperties.destY,
                         surfaceProperties.destWidth,
                         surfaceProperties.destHeight);
 
+                if (ILM_SUCCESS != callResult)
+                {
+                    cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+                    cout << "Failed to set destination rectangle (" << surfaceProperties.destX << "," << surfaceProperties.destY << ", "<< surfaceProperties.destWidth << ", "
+                            << surfaceProperties.destHeight <<") for surface with ID " << surface << "\n";
+                }
+
                 float opacity = 1 / pow(scaleFactors[surface], 0.4f);
-                ilm_surfaceSetOpacity(surface, opacity);
+
+                callResult = ilm_surfaceSetOpacity(surface, opacity);
+                if (ILM_SUCCESS != callResult)
+                {
+                    cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+                    cout << "Failed to set opacity " << opacity <<" for surface with ID " << surface << "\n";
+                }
             }
         }
 

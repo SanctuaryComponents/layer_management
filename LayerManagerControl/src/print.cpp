@@ -85,11 +85,12 @@ void printScreenProperties(unsigned int screenid, const char* prefix)
     cout << prefix << "---------------------------------------\n";
 
     ilmScreenProperties screenProperties;
-    ilmErrorTypes result = ilm_getPropertiesOfScreen(screenid, &screenProperties);
-    if (ILM_SUCCESS != result)
+
+    ilmErrorTypes callResult = ilm_getPropertiesOfScreen(screenid, &screenProperties);
+    if (ILM_SUCCESS != callResult)
     {
-        cout << "LayerManagerService returned: " << ILM_ERROR_STRING(result) << "\n";
-        cout << "No screen with ID " << screenid << " found\n";
+        cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+        cout << "Failed to get properties of screen with ID " << screenid << " found\n";
         return;
     }
 
@@ -115,11 +116,12 @@ void printLayerProperties(unsigned int layerid, const char* prefix)
     cout << prefix << "---------------------------------------\n";
 
     ilmLayerProperties p;
-    ilmErrorTypes result = ilm_getPropertiesOfLayer(layerid, &p);
-    if (ILM_SUCCESS != result)
+
+    ilmErrorTypes callResult = ilm_getPropertiesOfLayer(layerid, &p);
+    if (ILM_SUCCESS != callResult)
     {
-        cout << "LayerManagerService returned: " << ILM_ERROR_STRING(result) << "\n";
-        cout << "No layer with ID " << layerid << " found\n";
+        cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+        cout << "Failed to get properties of layer with ID " << layerid << " found\n";
         return;
     }
 
@@ -179,9 +181,18 @@ void printLayerProperties(unsigned int layerid, const char* prefix)
             << "(r=" << p.chromaKeyRed << ", g=" << p.chromaKeyGreen << ", b=" << p.chromaKeyBlue << ")\n";
 
     cout << prefix << "- surface render order: ";
+
     int surfaceCount = 0;
     unsigned int* surfaceArray = NULL;
-    ilm_getSurfaceIDsOnLayer(layerid, &surfaceCount, &surfaceArray);
+
+    callResult = ilm_getSurfaceIDsOnLayer(layerid, &surfaceCount, &surfaceArray);
+    if (ILM_SUCCESS != callResult)
+    {
+        cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+        cout << "Failed to get surfaces on layer with ID " << layerid << " \n";
+        return;
+    }
+
     for (int surfaceIndex = 0; surfaceIndex < surfaceCount; ++surfaceIndex)
     {
         cout << surfaceArray[surfaceIndex] << "(0x" << hex
@@ -190,16 +201,33 @@ void printLayerProperties(unsigned int layerid, const char* prefix)
     cout << "\n";
 
     cout << prefix << "- on screen:            ";
+
     unsigned int screenCount = 0;
     unsigned int* screenArray = NULL;
-    ilm_getScreenIDs(&screenCount, &screenArray);
+
+    callResult = ilm_getScreenIDs(&screenCount, &screenArray);
+    if (ILM_SUCCESS != callResult)
+    {
+        cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+        cout << "Failed to get available screens\n";
+        return;
+    }
+
     for (unsigned int screenIndex = 0; screenIndex < screenCount;
             ++screenIndex)
     {
         unsigned int screenid = screenArray[screenIndex];
         int layerCount = 0;
         unsigned int* layerArray = NULL;
-        ilm_getLayerIDsOnScreen(screenid, &layerCount, &layerArray);
+
+        callResult = ilm_getLayerIDsOnScreen(screenid, &layerCount, &layerArray);
+        if (ILM_SUCCESS != callResult)
+        {
+            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+            cout << "Failed to get available layers on screen with ID" << screenid << "\n";
+            return;
+        }
+
         for (int layerIndex = 0; layerIndex < layerCount; ++layerIndex)
         {
             unsigned int id = layerArray[layerIndex];
@@ -219,10 +247,11 @@ void printSurfaceProperties(unsigned int surfaceid, const char* prefix)
     cout << prefix << "---------------------------------------\n";
 
     ilmSurfaceProperties p;
-    ilmErrorTypes result = ilm_getPropertiesOfSurface(surfaceid, &p);
-    if (ILM_SUCCESS != result)
+
+    ilmErrorTypes callResult = ilm_getPropertiesOfSurface(surfaceid, &p);
+    if (ILM_SUCCESS != callResult)
     {
-        cout << "LayerManagerService returned: " << ILM_ERROR_STRING(result) << "\n";
+        cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
         cout << "No surface with ID " << surfaceid << " found\n";
         return;
     }
@@ -298,7 +327,13 @@ void printSurfaceProperties(unsigned int surfaceid, const char* prefix)
             << "\n";
 
     t_ilm_surface keyboardFocusSurfaceId;
-    ilm_GetKeyboardFocusSurfaceId(&keyboardFocusSurfaceId);
+    callResult = ilm_GetKeyboardFocusSurfaceId(&keyboardFocusSurfaceId);
+    if (ILM_SUCCESS != callResult)
+    {
+        cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+        cout << "Failed to get keyboard focus surface ID\n";
+        return;
+    }
 
     cout << prefix << "- has keyboard focus: "
             << (keyboardFocusSurfaceId == surfaceid ? "true" : "false")
@@ -315,13 +350,29 @@ void printSurfaceProperties(unsigned int surfaceid, const char* prefix)
     cout << prefix << "- on layer:           ";
     int layerCount = 0;
     unsigned int* layerArray = NULL;
-    ilm_getLayerIDs(&layerCount, &layerArray);
+
+    callResult = ilm_getLayerIDs(&layerCount, &layerArray);
+    if (ILM_SUCCESS != callResult)
+    {
+        cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+        cout << "Failed to get available layer IDs\n";
+        return;
+    }
+
     for (int layerIndex = 0; layerIndex < layerCount; ++layerIndex)
     {
         unsigned int layerid = layerArray[layerIndex];
         int surfaceCount = 0;
         unsigned int* surfaceArray = NULL;
-        ilm_getSurfaceIDsOnLayer(layerid, &surfaceCount, &surfaceArray);
+
+        callResult = ilm_getSurfaceIDsOnLayer(layerid, &surfaceCount, &surfaceArray);
+        if (ILM_SUCCESS != callResult)
+        {
+            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+            cout << "Failed to get surface IDs on layer" << layerid << "\n";
+            return;
+        }
+
         for (int surfaceIndex = 0; surfaceIndex < surfaceCount;
                 ++surfaceIndex)
         {
@@ -340,7 +391,13 @@ void printScene()
     unsigned int screenCount = 0;
     unsigned int* screenArray = NULL;
 
-    ilm_getScreenIDs(&screenCount, &screenArray);
+    ilmErrorTypes callResult = ilm_getScreenIDs(&screenCount, &screenArray);
+    if (ILM_SUCCESS != callResult)
+    {
+        cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+        cout << "Failed to get available screen IDs\n";
+        return;
+    }
 
     for (unsigned int screenIndex = 0; screenIndex < screenCount; ++screenIndex)
     {
@@ -350,7 +407,15 @@ void printScene()
 
         int layerCount = 0;
         unsigned int* layerArray = NULL;
-        ilm_getLayerIDsOnScreen(screenid, &layerCount, &layerArray);
+
+        callResult = ilm_getLayerIDsOnScreen(screenid, &layerCount, &layerArray);
+        if (ILM_SUCCESS != callResult)
+        {
+            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+            cout << "Failed to get available layers on screen with ID" << screenid << "\n";
+            return;
+        }
+
         for (int layerIndex = 0; layerIndex < layerCount; ++layerIndex)
         {
             unsigned int layerid = layerArray[layerIndex];
@@ -359,7 +424,15 @@ void printScene()
 
             int surfaceCount = 0;
             unsigned int* surfaceArray = NULL;
-            ilm_getSurfaceIDsOnLayer(layerid, &surfaceCount, &surfaceArray);
+
+            callResult = ilm_getSurfaceIDsOnLayer(layerid, &surfaceCount, &surfaceArray);
+            if (ILM_SUCCESS != callResult)
+            {
+                cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+                cout << "Failed to get available surfaces on layer with ID" << layerid << "\n";
+                return;
+            }
+
             for (int surfaceIndex = 0; surfaceIndex < surfaceCount; ++surfaceIndex)
             {
                 unsigned int surfaceid = surfaceArray[surfaceIndex];
