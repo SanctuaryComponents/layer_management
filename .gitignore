@@ -10,3 +10,5 @@ config.h
 config.h.1stpass
 git.kdev4
 .kdev4
+*.pyc
+*.pyo
