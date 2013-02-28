@@ -31,11 +31,28 @@ include(${CMAKE_MODULE_PATH}/CustomMacros.txt)
 add_subdirectory(cmake/optionalFeatures)
 
 #===========================================================================================================
-# global build flags
+build_flag (WITH_FORCE_COPY "Force Software Copy of Pixmaps (compatibility for VMs)" OFF)
 #===========================================================================================================
-build_flag (WITH_FORCE_COPY       "Force Software Copy of Pixmaps (compatibility for VMs)" OFF)
-build_flag (WITH_DLT              "Build with DLT logging support"                         OFF)
-build_flag (WITH_STATIC_LIBRARIES "Link all plugins and libraries statically"              OFF)
+# no dedicated actions required here
+
+#===========================================================================================================
+build_flag (WITH_DLT "Build with DLT logging support" OFF)
+#===========================================================================================================
+# no dedicated actions required here
+
+#===========================================================================================================
+build_flag (WITH_STATIC_LIBRARIES "Link all plugins and libraries statically" OFF)
+#===========================================================================================================
+# no dedicated actions required here
+
+#===========================================================================================================
+build_flag (WITH_STYLE_CHECKING "Report styleguide problems during build (requires python)" OFF)
+#===========================================================================================================
+if (WITH_STYLE_CHECKING)
+    set(CMAKE_C_COMPILE_OBJECT "${CMAKE_C_COMPILE_OBJECT}; echo 'Checking style...<SOURCE>'; ${CMAKE_SOURCE_DIR}/scripts/check_all_styles.py <SOURCE>")
+    set(CMAKE_CXX_COMPILE_OBJECT "${CMAKE_CXX_COMPILE_OBJECT}; ${CMAKE_SOURCE_DIR}/scripts/check_all_styles.py <SOURCE>")
+endif (WITH_STYLE_CHECKING)
+add_custom_target(check-style COMMAND ${CMAKE_SOURCE_DIR}/scripts/check_style.sh)
 
 #===========================================================================================================
 build_flag (WITH_TESTS "Build unit test binaries for all enabled components" OFF)
