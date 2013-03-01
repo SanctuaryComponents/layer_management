@@ -23,7 +23,7 @@
 #include "ICommand.h"
 #include "OrientationType.h"
 
-class LayerGetOrientationCommand: public ICommand
+class LayerGetOrientationCommand : public ICommand
 {
 public:
     /*!

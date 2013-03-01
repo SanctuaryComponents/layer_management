@@ -17,8 +17,8 @@
  * limitations under the License.
  *
  ****************************************************************************/
-#ifndef _WL_CONTEXT_H_
-#define _WL_CONTEXT_H_
+#ifndef _WLCONTEXT_H_
+#define _WLCONTEXT_H_
 
 #include <wayland-client.h>
 #include <wayland-client-protocol.h>
@@ -120,4 +120,4 @@ inline void WLContext::SetWLKeyboard(struct wl_keyboard* wlKeyboard)
 inline void WLContext::SetWLTouch(struct wl_touch* wlTouch)
     { m_wlTouch = wlTouch; }
 
-#endif
+#endif /* _WLCONTEXT_H_ */

@@ -30,8 +30,8 @@ ExecutionResult SurfaceSetDimensionCommand::execute(ICommandExecutor* executor)
     Surface* surface = scene.getSurface(m_id);
     if (surface)
     {
-		unsigned int layerid = surface->getContainingLayerId();
-        if(surface->setDimension(m_width, m_height))
+        unsigned int layerid = surface->getContainingLayerId();
+        if (surface->setDimension(m_width, m_height))
         {
             executor->addClientNotification(surface, ILM_NOTIFICATION_DEST_RECT);
             result = ExecutionSuccessRedraw;
@@ -41,10 +41,11 @@ ExecutionResult SurfaceSetDimensionCommand::execute(ICommandExecutor* executor)
             result = ExecutionSuccess;
         }
 
-        if ( layerid != Surface::INVALID_ID ) 
-        { 			
-			surface->calculateTargetDestination(scene.getLayer(layerid)->getSourceRegion(),scene.getLayer(layerid)->getDestinationRegion());
-		}		        
+        if (layerid != Surface::INVALID_ID)
+        {
+            surface->calculateTargetDestination(scene.getLayer(layerid)->getSourceRegion(),
+                                                scene.getLayer(layerid)->getDestinationRegion());
+        }
     }
 
     return result;

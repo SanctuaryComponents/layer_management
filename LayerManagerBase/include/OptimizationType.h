@@ -18,8 +18,8 @@
 *
 ****************************************************************************/
 
-#ifndef _OPTIMIZATION_H
-#define _OPTIMIZATION_H
+#ifndef _OPTIMIZATIONTYPE_H
+#define _OPTIMIZATIONTYPE_H
 
 #include "ilm_types.h"
 
@@ -44,4 +44,4 @@ enum OptimizationModeType
 
 const int OPT_MODE_COUNT = 4;
 
-#endif /* _OPTIMIZATION_H */
+#endif /* _OPTIMIZATIONTYPE_H */

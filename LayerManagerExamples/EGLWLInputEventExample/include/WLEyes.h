@@ -17,8 +17,8 @@
  * limitations under the License.
  *
  ****************************************************************************/
-#ifndef _WL_EYES_H_
-#define _WL_EYES_H_
+#ifndef _WLEYES_H_
+#define _WLEYES_H_
 
 #include "transform.h"
 
@@ -82,4 +82,4 @@ private:
     WLEyes();
 };
 
-#endif
+#endif /* _WLEYES_H_ */

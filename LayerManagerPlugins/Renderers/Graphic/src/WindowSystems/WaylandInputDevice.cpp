@@ -40,7 +40,8 @@ static struct wl_resource*
 findResourceForClient(struct wl_list *list, struct wl_client *client)
 {
     struct wl_resource *r;
-    wl_list_for_each(r, list, link){
+    wl_list_for_each(r, list, link)
+    {
         if (r->client == client)
             return r;
     }
@@ -58,9 +59,9 @@ WaylandInputDevice::WaylandInputDevice(struct wl_display *display)
 {
     wl_seat_init(&m_wlSeat);
     wl_display_add_global(m_wlDisplay,
-                          &wl_seat_interface,
-                          this,
-                          WaylandInputDevice::bindInputDevice);
+                            &wl_seat_interface,
+                            this,
+                            WaylandInputDevice::bindInputDevice);
 }
 
 WaylandInputDevice::~WaylandInputDevice()
@@ -162,10 +163,12 @@ void
 WaylandInputDevice::destroyResource(struct wl_resource *resource)
 {
     WaylandInputDevice *inputDevice = static_cast<WaylandInputDevice*>(resource->data);
-    if (inputDevice->keyboardDevice()->focus_resource == resource){
+    if (inputDevice->keyboardDevice()->focus_resource == resource)
+    {
         inputDevice->keyboardDevice()->focus_resource = 0;
     }
-    if (inputDevice->pointerDevice()->focus_resource == resource){
+    if (inputDevice->pointerDevice()->focus_resource == resource)
+    {
         inputDevice->pointerDevice()->focus_resource = 0;
     }
 
@@ -299,10 +302,12 @@ WaylandInputDevice::sendKeyPressEvent(struct wl_surface* surface,
                                       uint32_t time, uint32_t code)
 {
     wl_keyboard *keyboard = keyboardDevice();
-    if (!keyboard->focus){
+    if (!keyboard->focus)
+    {
         setKeyboardFocus(surface);
     }
-    if (keyboard->focus_resource){
+    if (keyboard->focus_resource)
+    {
         uint32_t serial = wl_display_next_serial(m_wlDisplay);
         wl_keyboard_send_key(keyboard->focus_resource,
                              serial, time, code, 1);
@@ -314,10 +319,11 @@ WaylandInputDevice::sendKeyReleaseEvent(struct wl_surface* /*surface*/,
                                         uint32_t time, uint32_t code)
 {
     wl_keyboard *keyboard = keyboardDevice();
-    if (keyboard->focus_resource){
+    if (keyboard->focus_resource)
+    {
         uint32_t serial = wl_display_next_serial(m_wlDisplay);
         wl_keyboard_send_key(keyboard->focus_resource,
-                             serial, time, code, 0);
+                            serial, time, code, 0);
     }
 }
 
@@ -325,25 +331,30 @@ void
 WaylandInputDevice::sendTouchPointEvent(struct wl_surface* surface, uint32_t time,
                                         int touchId, int touchState, const Point& touchPos)
 {
-    switch (touchState){
+    switch (touchState)
+    {
     case WL_TOUCH_DOWN:
         ++m_nTp;
-        if (m_nTp == 1){
+        if (m_nTp == 1)
+        {
             setTouchFocus(surface);
         }
-        if (m_wlTouchFocusResource && m_wlTouchFocus){
+        if (m_wlTouchFocusResource && m_wlTouchFocus)
+        {
             wl_touch_send_down(m_wlTouchFocusResource,
-                               0 /*serial*/, time,
-                               &m_wlTouchFocus->resource, touchId,
-                               wl_fixed_from_double(touchPos.x),
-                               wl_fixed_from_double(touchPos.y));
+                                0 /*serial*/, time,
+                                &m_wlTouchFocus->resource, touchId,
+                                wl_fixed_from_double(touchPos.x),
+                                wl_fixed_from_double(touchPos.y));
         }
         break;
     case WL_TOUCH_MOTION:
-        if (!m_wlTouchFocus){
+        if (!m_wlTouchFocus)
+        {
             break;
         }
-        if (m_wlTouchFocusResource){
+        if (m_wlTouchFocusResource)
+        {
             wl_touch_send_motion(m_wlTouchFocusResource,
                                  time, touchId,
                                  wl_fixed_from_double(touchPos.x),
@@ -352,10 +363,12 @@ WaylandInputDevice::sendTouchPointEvent(struct wl_surface* surface, uint32_t tim
         break;
     case WL_TOUCH_UP:
         --m_nTp;
-        if (m_wlTouchFocusResource){
+        if (m_wlTouchFocusResource)
+        {
             wl_touch_send_up(m_wlTouchFocusResource, 0 /*serial*/, time, touchId);
         }
-        if (m_nTp == 0){
+        if (m_nTp == 0)
+        {
             setTouchFocus(NULL);
         }
         break;
@@ -367,7 +380,8 @@ WaylandInputDevice::sendTouchFrameEvent()
 {
     wl_touch *touch = touchDevice();
     wl_resource *resource = touch->focus_resource;
-    if (resource){
+    if (resource)
+    {
         wl_touch_send_frame(resource);
     }
 }
@@ -377,15 +391,16 @@ WaylandInputDevice::sendTouchCancelEvent()
 {
     wl_touch *touch = touchDevice();
     wl_resource *resource = touch->focus_resource;
-    if (resource){
+    if (resource)
+    {
         wl_touch_send_cancel(resource);
     }
 }
 
 void
 WaylandInputDevice::setMouseFocus(struct wl_surface* surface,
-                                  const Point& globalPos,
-                                  const Point& localPos)
+                                    const Point& globalPos,
+                                    const Point& localPos)
 {
     wl_pointer* pointer = pointerDevice();
     pointer->x = wl_fixed_from_double(globalPos.x);
@@ -413,16 +428,19 @@ WaylandInputDevice::setTouchFocus(struct wl_surface* surface)
     if (m_wlTouchFocus == surface)
         return;
 
-    if (surface){
+    if (surface)
+    {
         resource = findResourceForClient(&m_wlSeat.touch->resource_list,
-                                         surface->resource.client);
-        if (!resource){
+                                        surface->resource.client);
+        if (!resource)
+        {
             return;
         }
         m_wlSeat.touch->focus = surface;
         m_wlSeat.touch->focus_resource = resource;
     }
-    else {
+    else
+    {
         m_wlSeat.touch->focus = NULL;
         m_wlSeat.touch->focus_resource = NULL;
     }
@@ -434,8 +452,8 @@ WaylandInputDevice::sendModifiers(uint32_t serial)
     struct wl_keyboard *keyboard = keyboardDevice();
     struct wl_keyboard_grab *grab = keyboard->grab;
     grab->interface->modifiers(grab, serial,
-                               keyboard->modifiers.mods_depressed,
-                               keyboard->modifiers.mods_latched,
-                               keyboard->modifiers.mods_locked,
-                               keyboard->modifiers.group);
+                                keyboard->modifiers.mods_depressed,
+                                keyboard->modifiers.mods_latched,
+                                keyboard->modifiers.mods_locked,
+                                keyboard->modifiers.group);
 }

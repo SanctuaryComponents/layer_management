@@ -22,7 +22,7 @@
 
 #include "ICommand.h"
 
-class LayerGetDimensionCommand: public ICommand
+class LayerGetDimensionCommand : public ICommand
 {
 public:
     /*!

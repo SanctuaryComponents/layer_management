@@ -17,8 +17,8 @@
  * limitations under the License.
  *
  ****************************************************************************/
-#ifndef _WL_EYES_RENDERER_H_
-#define _WL_EYES_RENDERER_H_
+#ifndef _WLEYESRENDERER_H_
+#define _WLEYESRENDERER_H_
 
 #include <wayland-client.h>
 #include "WLEGLSurface.h"
@@ -66,4 +66,4 @@ extern const struct wl_pointer_listener PointerListener;
 extern const struct wl_keyboard_listener KeyboardListener;
 extern const struct wl_touch_listener TouchListener;
 
-#endif
+#endif /* _WLEYESRENDERER_H_ */

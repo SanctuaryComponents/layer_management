@@ -22,7 +22,7 @@
 
 #include "ICommand.h"
 
-class SurfaceGetDimensionCommand: public ICommand
+class SurfaceGetDimensionCommand : public ICommand
 {
 public:
     /*!

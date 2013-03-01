@@ -59,7 +59,6 @@ public:
 private:
     unsigned int* m_pSurfId;
 
-
     // for unit testing
     friend class GetKeyboardFocusSurfaceIdCommandEqMatcher;
 };

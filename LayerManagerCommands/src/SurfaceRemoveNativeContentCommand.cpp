@@ -31,7 +31,7 @@ ExecutionResult SurfaceRemoveNativeContentCommand::execute(ICommandExecutor* exe
 
     if (surface)
     {
-        if(surface->hasNativeContent())
+        if (surface->hasNativeContent())
         {
             surface->removeNativeContent();
             result = ExecutionSuccessRedraw;

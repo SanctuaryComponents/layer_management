@@ -29,14 +29,14 @@ ShaderBase::ShaderBase(string vertexCode, string fragmentCode, IlmMatrix* projec
 , m_fragmentCode(fragmentCode)
 , m_projectionMatrix(projectionMatrix)
 {
-	m_vertexCode = "uniform mediump mat4 u_projectionMatrix;\n";
-	m_vertexCode += vertexCode;
-	initShader();
+    m_vertexCode = "uniform mediump mat4 u_projectionMatrix;\n";
+    m_vertexCode += vertexCode;
+    initShader();
 }
 
 ShaderBase::~ShaderBase()
 {
-	destroyShader();
+    destroyShader();
 }
 
 bool ShaderBase::initShader()
@@ -57,7 +57,8 @@ bool ShaderBase::initShader()
 
     if (glResult == GL_FALSE)
     {
-        t_ilm_int infoLength, numberChars;
+        t_ilm_int infoLength;
+        t_ilm_int numberChars;
         glGetShaderiv(fragmentShaderId, GL_INFO_LOG_LENGTH, &infoLength);
 
         // Allocate Log Space
@@ -84,7 +85,8 @@ bool ShaderBase::initShader()
 
     if (glResult == GL_FALSE)
     {
-        t_ilm_int infoLength, numberChars;
+        t_ilm_int infoLength;
+        t_ilm_int numberChars;
         glGetShaderiv(vertexShaderId, GL_INFO_LOG_LENGTH, &infoLength);
 
         // Allocate Log Space
@@ -110,7 +112,8 @@ bool ShaderBase::initShader()
 
     if (glResult == GL_FALSE)
     {
-        t_ilm_int infoLength, numberChars;
+        t_ilm_int infoLength;
+        t_ilm_int numberChars;
         glGetShaderiv(shaderProgramId, GL_INFO_LOG_LENGTH, &infoLength);
 
         // Allocate Log Space
@@ -144,9 +147,9 @@ bool ShaderBase::destroyShader()
 
 void ShaderBase::use(vec3f* position, vec4f* color)
 {
-	(void)position; // prevent warning
-	(void)color; // prevent warning
+    (void)position; // prevent warning
+    (void)color; // prevent warning
 
-	glUseProgram(shaderProgramId);
-	glUniformMatrix4fv(m_uniformProjectionMatrix, 1, GL_FALSE, m_projectionMatrix->f);
+    glUseProgram(shaderProgramId);
+    glUniformMatrix4fv(m_uniformProjectionMatrix, 1, GL_FALSE, m_projectionMatrix->f);
 }

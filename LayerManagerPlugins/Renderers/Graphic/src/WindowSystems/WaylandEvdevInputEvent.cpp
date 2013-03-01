@@ -71,7 +71,7 @@ struct evdev_dispatch_interface fallback_interface = {
 };
 
 // Function prototypes
-void acceleratorFilter (struct motion_filter *, struct motion_params *, void *, uint32_t);
+void acceleratorFilter(struct motion_filter *, struct motion_params *, void *, uint32_t);
 void acceleratorDestroy(struct motion_filter *);
 
 struct motion_filter_interface accelerator_interface = {
@@ -92,16 +92,19 @@ static struct touchpad_model_spec touchpad_spec_table[] = {
 static int
 isMotionEvent(struct input_event *e)
 {
-    switch (e->type){
+    switch (e->type)
+    {
     case EV_REL:
-        switch (e->code){
+        switch (e->code)
+        {
         case REL_X:
         case REL_Y:
             return 1;
         }
         break;
     case EV_ABS:
-        switch (e->code){
+        switch (e->code)
+        {
         case ABS_X:
         case ABS_Y:
         case ABS_MT_POSITION_X:
@@ -122,10 +125,12 @@ getTouchpadModel(struct evdev_input_device *device)
     if (ioctl(device->fd, EVIOCGID, &id) < 0)
         return TOUCHPAD_MODEL_UNKNOWN;
 
-    for (i = 0; i < sizeof(touchpad_spec_table); ++i){
+    for (i = 0; i < sizeof(touchpad_spec_table); ++i)
+    {
         if (touchpad_spec_table[i].vendor == id.vendor &&
             (!touchpad_spec_table[i].product ||
-            touchpad_spec_table[i].product == id.product)){
+            touchpad_spec_table[i].product == id.product))
+        {
             return touchpad_spec_table[i].model;
         }
     }
@@ -135,19 +140,20 @@ getTouchpadModel(struct evdev_input_device *device)
 
 static void
 configureTouchpadPressure(struct touchpad_dispatch *touchpad,
-                          int32_t pressure_min, int32_t pressure_max)
+                            int32_t pressure_min, int32_t pressure_max)
 {
     int32_t range = pressure_max - pressure_min + 1;
     touchpad->has_pressure = 1;
 
     // Magic numbers from xf86-input-synaptics
-    switch (touchpad->model){
+    switch (touchpad->model)
+    {
     case TOUCHPAD_MODEL_ELANTECH:
-        touchpad->pressure.touch_low  = pressure_min + 1;
+        touchpad->pressure.touch_low = pressure_min + 1;
         touchpad->pressure.touch_high = pressure_min + 1;
         break;
     default:
-        touchpad->pressure.touch_low  = pressure_min + range * (25.0/256.0);
+        touchpad->pressure.touch_low = pressure_min + range * (25.0/256.0);
         touchpad->pressure.touch_high = pressure_min + range * (30.0/256.0);
         break;
     }
@@ -203,7 +209,7 @@ createFallbackDispatch()
 {
     struct evdev_dispatch *dispatch =
         (struct evdev_dispatch*)malloc(sizeof(*dispatch));
-    if (dispatch ==   NULL)
+    if (dispatch == NULL)
         return NULL;
 
     dispatch->interface = &fallback_interface;
@@ -215,9 +221,10 @@ createFallbackDispatch()
 
 static void
 processTouch(struct evdev_input_device *device, struct input_event *e,
-             int screen_width, int screen_height)
+                int screen_width, int screen_height)
 {
-    switch (e->code) {
+    switch (e->code)
+    {
     case ABS_MT_SLOT:
         device->mt.slot = e->value;
         break;
@@ -246,9 +253,10 @@ processTouch(struct evdev_input_device *device, struct input_event *e,
 
 static void
 processAbsoluteMotion(struct evdev_input_device *device, struct input_event *e,
-                      int screen_width, int screen_height)
+                        int screen_width, int screen_height)
 {
-    switch (e->code) {
+    switch (e->code)
+    {
     case ABS_X:
         device->abs.x =
             (e->value - device->abs.min_x) * screen_width /
@@ -328,14 +336,14 @@ touchpadGetDelta(struct touchpad_dispatch *touchpad, double *dx, double *dy)
 
 static void
 filterDispatch(struct motion_filter *filter, struct motion_params *motion,
-               void *data, uint32_t time)
+                void *data, uint32_t time)
 {
     filter->interface->filter(filter, motion, data, time);
 }
 
 static void
 filterMotion(struct touchpad_dispatch *touchpad,
-             double *dx, double *dy, uint32_t time)
+                double *dx, double *dy, uint32_t time)
 {
     struct motion_filter *filter;
     struct motion_params  motion;
@@ -343,7 +351,8 @@ filterMotion(struct touchpad_dispatch *touchpad,
     motion.dx = *dx;
     motion.dy = *dy;
 
-    wl_list_for_each(filter, &touchpad->motion_filters, link){
+    wl_list_for_each(filter, &touchpad->motion_filters, link)
+    {
         filterDispatch(filter, &motion, touchpad, time);
     }
 
@@ -355,10 +364,12 @@ static int
 getDirection(int dx, int dy)
 {
     int dir = UNDEFINED_DIRECTION;
-    int d1, d2;
+    int d1;
+    int d2;
     double r;
 
-    if (abs(dx) < 2 && abs(dy) < 2) {
+    if (abs(dx) < 2 && abs(dy) < 2)
+    {
         if (dx > 0 && dy > 0)
             dir = S | SE | E;
         else if (dx > 0 && dy < 0)
@@ -376,7 +387,8 @@ getDirection(int dx, int dy)
         else if (dy < 0)
             dir = NE | N | NW;
     }
-    else {
+    else
+    {
         // Calculate r within the interval  [0 to 8)
         //
         // r = [0 .. 2π] where 0 is North
@@ -399,12 +411,14 @@ getDirection(int dx, int dy)
 
 static void
 feedTrackers(struct pointer_accelerator *accel,
-             double dx, double dy, uint32_t time)
+                double dx, double dy, uint32_t time)
 {
-    int i, current;
+    int i;
+    int current;
     struct pointer_tracker *trackers = accel->trackers;
 
-    for (i = 0; i < NUM_POINTER_TRACKERS; ++i){
+    for (i = 0; i < NUM_POINTER_TRACKERS; ++i)
+    {
         trackers[i].dx += dx;
         trackers[i].dy += dy;
     }
@@ -415,7 +429,7 @@ feedTrackers(struct pointer_accelerator *accel,
     trackers[current].dx = 0.0;
     trackers[current].dy = 0.0;
     trackers[current].time = time;
-    trackers[current].dir  = getDirection(dx, dy);
+    trackers[current].dir = getDirection(dx, dy);
 }
 
 static struct pointer_tracker*
@@ -453,7 +467,8 @@ calculateVelocity(struct pointer_accelerator *accel, uint32_t time)
     unsigned int dir = trackerByOffset(accel, 0)->dir;
 
     // Find first velocity
-    for (offset = 1; offset < NUM_POINTER_TRACKERS; offset++) {
+    for (offset = 1; offset < NUM_POINTER_TRACKERS; offset++)
+    {
         tracker = trackerByOffset(accel, offset);
 
         if (time <= tracker->time)
@@ -467,7 +482,8 @@ calculateVelocity(struct pointer_accelerator *accel, uint32_t time)
 
     // Find least recent vector within a timelimit, maximum velocity diff
     // and direction threshold.
-    for (; offset < NUM_POINTER_TRACKERS; offset++) {
+    for (; offset < NUM_POINTER_TRACKERS; offset++)
+    {
         tracker = trackerByOffset(accel, offset);
 
         // Stop if too far away in time
@@ -502,16 +518,16 @@ accelerationProfile(struct pointer_accelerator *accel,
 
 static double
 calculateAcceleration(struct pointer_accelerator *accel,
-                      void *data, double velocity, uint32_t time)
+                        void *data, double velocity, uint32_t time)
 {
     double factor;
 
-    factor  = accelerationProfile(accel, data, velocity, time);
+    factor = accelerationProfile(accel, data, velocity, time);
     factor += accelerationProfile(accel, data, accel->last_velocity, time);
     factor += 4.0 *
-              accelerationProfile(accel, data,
-                                 (accel->last_velocity + velocity) / 2,
-                                  time);
+                    accelerationProfile(accel, data,
+                                    (accel->last_velocity + velocity) / 2,
+                                    time);
     factor = factor / 6.0;
     return factor;
 }
@@ -519,7 +535,8 @@ calculateAcceleration(struct pointer_accelerator *accel,
 static double
 softenDelta(double lastDelta, double delta)
 {
-    if (delta < -1.0 || delta > 1.0){
+    if (delta < -1.0 || delta > 1.0)
+    {
         if (delta > lastDelta)
             return delta - 0.5;
         else if (delta < lastDelta)
@@ -530,7 +547,7 @@ softenDelta(double lastDelta, double delta)
 
 static void
 applySoftening(struct pointer_accelerator *accel,
-               struct motion_params *motion)
+                struct motion_params *motion)
 {
     motion->dx = softenDelta(accel->last_dx, motion->dx);
     motion->dy = softenDelta(accel->last_dy, motion->dy);
@@ -538,7 +555,7 @@ applySoftening(struct pointer_accelerator *accel,
 
 void
 acceleratorFilter(struct motion_filter *filter, struct motion_params *motion,
-                  void *data, uint32_t time)
+                    void *data, uint32_t time)
 {
     struct pointer_accelerator *accel = (struct pointer_accelerator*)filter;
     double velocity;
@@ -581,13 +598,15 @@ WaylandEvdevInputEvent::WaylandEvdevInputEvent(WaylandBaseWindowSystem* windowSy
 
 WaylandEvdevInputEvent::~WaylandEvdevInputEvent()
 {
-    if (m_udev){
+    if (m_udev)
+    {
         udev_unref(m_udev);
     }
 
     struct evdev_input_device *device, *next;
 
-    wl_list_for_each_safe(device, next, &m_deviceList, link){
+    wl_list_for_each_safe(device, next, &m_deviceList, link)
+    {
         removeDevice(device);
     }
 }
@@ -616,12 +635,13 @@ WaylandEvdevInputEvent::setupInputEvent()
 
     WaylandInputEvent::setupInputEvent();
 
-    m_screenWidth  = m_windowSystem->getWindowWidth();
+    m_screenWidth = m_windowSystem->getWindowWidth();
     m_screenHeight = m_windowSystem->getWindowHeight();
 
     do {
         bool bRet = addDevices();
-        if (!bRet){
+        if (!bRet)
+        {
             break;
         }
     } while (0);
@@ -634,7 +654,8 @@ WaylandEvdevInputEvent::addDevices()
 {
     if (!m_udev)
         m_udev = udev_new();
-    if (!m_udev){
+    if (!m_udev)
+    {
         LOG_ERROR("WaylandEvdevInputEvent", "Failed to initialize udev context");
         return false;
     }
@@ -646,12 +667,14 @@ WaylandEvdevInputEvent::addDevices()
     struct udev_list_entry *entry;
     const char *path, *sysname;
     struct udev_device *device;
-    udev_list_entry_foreach(entry, udev_enumerate_get_list_entry(e)){
+    udev_list_entry_foreach(entry, udev_enumerate_get_list_entry(e))
+    {
         path = udev_list_entry_get_name(entry);
         device = udev_device_new_from_syspath(m_udev, path);
 
         sysname = udev_device_get_sysname(device);
-        if (strncmp("event", sysname, 5) != 0){
+        if (strncmp("event", sysname, 5) != 0)
+        {
             udev_device_unref(device);
             continue;
         }
@@ -663,7 +686,8 @@ WaylandEvdevInputEvent::addDevices()
 
     notifyKeyboardFocus();
 
-    if (wl_list_empty(&m_deviceList)){
+    if (wl_list_empty(&m_deviceList))
+    {
         LOG_WARNING("WaylandEvdevInputEvent", "No input devices on entering service");
     }
 
@@ -691,25 +715,28 @@ WaylandEvdevInputEvent::createInputDevice(struct wl_display *display, const char
     struct wl_event_loop      *eventLoop;
 
     device = (struct evdev_input_device*)malloc(sizeof(*device));
-    if (device == NULL){
+    if (device == NULL)
+    {
         return;
     }
 
-    device->master   = this;
-    device->isMt     = 0;
-    device->mtdev    = NULL;
-    device->devnode  = strdup(path);
-    device->mt.slot  = -1;
-    device->rel.dx   = 0;
-    device->rel.dy   = 0;
+    device->master = this;
+    device->isMt = 0;
+    device->mtdev = NULL;
+    device->devnode = strdup(path);
+    device->mt.slot = -1;
+    device->rel.dx = 0;
+    device->rel.dy = 0;
     device->dispatch = NULL;
 
     device->fd = open(path, O_RDWR | O_NONBLOCK);
-    if (device->fd < 0){
+    if (device->fd < 0)
+    {
         goto err0;
     }
 
-    if (configureDevice(device) < 0){
+    if (configureDevice(device) < 0)
+    {
         goto err1;
     }
 
@@ -719,18 +746,21 @@ WaylandEvdevInputEvent::createInputDevice(struct wl_display *display, const char
     if (device->dispatch == NULL)
         goto err1;
 
-    if (device->isMt){
+    if (device->isMt)
+    {
         device->mtdev = mtdev_new_open(device->fd);
-        if  (!device->mtdev){
+        if (!device->mtdev)
+        {
             LOG_WARNING("WaylandEvdevInputEvent", "mtdev failed to open for " << path);
         }
     }
 
     eventLoop = wl_display_get_event_loop(display);
     device->source = wl_event_loop_add_fd(eventLoop, device->fd, WL_EVENT_READABLE,
-                                          WaylandEvdevInputEvent::handleInputEvent,
-                                          device);
-    if (device->source == NULL){
+                                            WaylandEvdevInputEvent::handleInputEvent,
+                                            device);
+    if (device->source == NULL)
+    {
         goto err2;
     }
 
@@ -763,58 +793,71 @@ WaylandEvdevInputEvent::configureDevice(struct evdev_input_device *device)
     device->caps = 0;
 
     ioctl(device->fd, EVIOCGBIT(0, sizeof(ev_bits)), ev_bits);
-    if (TEST_BIT(ev_bits, EV_ABS)){
+    if (TEST_BIT(ev_bits, EV_ABS))
+    {
         hasAbs = 1;
 
         ioctl(device->fd, EVIOCGBIT(EV_ABS, sizeof(abs_bits)), abs_bits);
-        if (TEST_BIT(abs_bits, ABS_X)){
+        if (TEST_BIT(abs_bits, ABS_X))
+        {
             ioctl(device->fd, EVIOCGABS(ABS_X), &absinfo);
             device->abs.min_x = absinfo.minimum;
             device->abs.max_x = absinfo.maximum;
             device->caps |= EVDEV_MOTION_ABS;
         }
-        if (TEST_BIT(abs_bits, ABS_Y)){
+        if (TEST_BIT(abs_bits, ABS_Y))
+        {
             ioctl(device->fd, EVIOCGABS(ABS_Y), &absinfo);
             device->abs.min_y = absinfo.minimum;
             device->abs.max_y = absinfo.maximum;
             device->caps |= EVDEV_MOTION_ABS;
         }
-        if (TEST_BIT(abs_bits, ABS_MT_SLOT)){
+        if (TEST_BIT(abs_bits, ABS_MT_SLOT))
+        {
             device->isMt = 1;
             device->mt.slot = 0;
             device->caps |= EVDEV_TOUCH;
         }
     }
-    if (TEST_BIT(ev_bits, EV_REL)){
+    if (TEST_BIT(ev_bits, EV_REL))
+    {
         ioctl(device->fd, EVIOCGBIT(EV_REL, sizeof(rel_bits)), rel_bits);
-        if (TEST_BIT(rel_bits, REL_X) || TEST_BIT(rel_bits, REL_Y)){
+        if (TEST_BIT(rel_bits, REL_X) || TEST_BIT(rel_bits, REL_Y))
+        {
             device->caps |= EVDEV_MOTION_REL;
         }
     }
-    if (TEST_BIT(ev_bits, EV_KEY)){
+    if (TEST_BIT(ev_bits, EV_KEY))
+    {
         hasKey = 1;
         ioctl(device->fd, EVIOCGBIT(EV_KEY, sizeof(key_bits)), key_bits);
         if (TEST_BIT(key_bits, BTN_TOOL_FINGER) &&
-            !TEST_BIT(key_bits, BTN_TOOL_PEN) && hasAbs){
+            !TEST_BIT(key_bits, BTN_TOOL_PEN) && hasAbs)
+        {
             device->dispatch = createTouchpad(device);
         }
 
-        for (i = KEY_ESC; i < KEY_MAX; ++i){
+        for (i = KEY_ESC; i < KEY_MAX; ++i)
+        {
             if (i >= BTN_MISC && i < KEY_OK)
                 continue;
-            if (TEST_BIT(key_bits, i)){
+            if (TEST_BIT(key_bits, i))
+            {
                 device->caps |= EVDEV_KEYBOARD;
                 break;
             }
         }
-        for (i = BTN_MISC; i < KEY_OK; ++i){
-            if (TEST_BIT(key_bits, i)){
+        for (i = BTN_MISC; i < KEY_OK; ++i)
+        {
+            if (TEST_BIT(key_bits, i))
+            {
                 device->caps |= EVDEV_BUTTON;
                 break;
             }
         }
     }
-    if (TEST_BIT(ev_bits, EV_LED)){
+    if (TEST_BIT(ev_bits, EV_LED))
+    {
         device->caps |= EVDEV_KEYBOARD;
     }
 
@@ -836,7 +879,8 @@ WaylandEvdevInputEvent::configureDevice(struct evdev_input_device *device)
             (device->caps & EVDEV_MOTION_ABS) ? "TRUE" : "FALSE",
             (device->caps & EVDEV_MOTION_REL) ? "TRUE" : "FALSE",
             (device->caps & EVDEV_TOUCH)      ? "TRUE" : "FALSE");
-    if (device->caps & EVDEV_MOTION_ABS){
+    if (device->caps & EVDEV_MOTION_ABS)
+    {
         fprintf(stdout, "        abs: min_x(%4d), min_y(%4d)\n", device->abs.min_x, device->abs.min_y);
         fprintf(stdout, "             max_x(%4d), max_y(%4d)\n", device->abs.max_x, device->abs.max_y);
         fprintf(stdout, "                 x(%4d),     y(%4d)\n", device->abs.x, device->abs.y);
@@ -844,13 +888,16 @@ WaylandEvdevInputEvent::configureDevice(struct evdev_input_device *device)
     fprintf(stdout, "\n");
 #endif
 
-    if ((device->caps & (EVDEV_MOTION_ABS | EVDEV_MOTION_REL | EVDEV_BUTTON))){
+    if ((device->caps & (EVDEV_MOTION_ABS | EVDEV_MOTION_REL | EVDEV_BUTTON)))
+    {
         initPointerDevice();
     }
-    if ((device->caps & (EVDEV_KEYBOARD))){
+    if ((device->caps & (EVDEV_KEYBOARD)))
+    {
         initKeyboardDevice(NULL);
     }
-    if ((device->caps & (EVDEV_TOUCH))){
+    if ((device->caps & (EVDEV_TOUCH)))
+    {
         initTouchDevice();
     }
 
@@ -868,23 +915,28 @@ WaylandEvdevInputEvent::notifyKeyboardFocus()
     int ret;
 
     memset(all_keys, 0, sizeof(all_keys));
-    wl_list_for_each(device, &m_deviceList, link){
+    wl_list_for_each(device, &m_deviceList, link)
+    {
         memset(evdev_keys, 0, sizeof(evdev_keys));
         ret = ioctl(device->fd, EVIOCGKEY(sizeof(evdev_keys)), evdev_keys);
-        if (ret < 0){
+        if (ret < 0)
+        {
             LOG_WARNING("WaylandEvdevInputEvent", "Failed to get keys for device: " <<
                         device->devnode);
             continue;
         }
-        for (i = 0; i < ARRAY_LENGTH(evdev_keys); ++i){
+        for (i = 0; i < ARRAY_LENGTH(evdev_keys); ++i)
+        {
             all_keys[i] |= evdev_keys[i];
         }
     }
 
     wl_array_init(&keys);
-    for (i = 0; i < KEY_CNT; ++i){
+    for (i = 0; i < KEY_CNT; ++i)
+    {
         set = all_keys[i >> 3] & (1 << (i & 7));
-        if (set){
+        if (set)
+        {
             k = (uint32_t*)wl_array_add(&keys, sizeof(*k));
             *k = i;
         }
@@ -897,15 +949,18 @@ WaylandEvdevInputEvent::notifyKeyboardFocus()
 
 void
 WaylandEvdevInputEvent::notifyKeyboardFocusIn(struct wl_array *keys,
-                                              enum key_state_update updateState)
+                                                enum key_state_update updateState)
 {
     struct wl_seat *wlSeat;
-    uint32_t *k, serial;
+    uint32_t *k;
+    uint32_t serial;
 
-    if ((wlSeat = m_inputDevice->seat()) == NULL){
+    if ((wlSeat = m_inputDevice->seat()) == NULL)
+    {
         return;
     }
-    if (!wlSeat->keyboard){
+    if (!wlSeat->keyboard)
+    {
         return;
     }
     serial = wl_display_next_serial(m_inputDevice->display());
@@ -915,8 +970,10 @@ WaylandEvdevInputEvent::notifyKeyboardFocusIn(struct wl_array *keys,
     struct wl_array *array = &wlSeat->keyboard->keys;
     for (k = (uint32_t*)array->data;
         (const char*)k < (const char*)array->data + array->size;
-        ++k){
-        if (updateState == STATE_UPDATE_AUTOMATIC){
+        ++k)
+    {
+        if (updateState == STATE_UPDATE_AUTOMATIC)
+        {
             updateModifierState(wlSeat, serial, *k, WL_KEYBOARD_KEY_STATE_PRESSED);
         }
     }
@@ -961,7 +1018,7 @@ WaylandEvdevInputEvent::createTouchpad(struct evdev_input_device *device)
 
 void
 WaylandEvdevInputEvent::configureTouchpad(struct touchpad_dispatch *touchpad,
-                                          struct evdev_input_device *device)
+                                            struct evdev_input_device *device)
 {
     struct motion_filter *accel;
 
@@ -977,11 +1034,12 @@ WaylandEvdevInputEvent::configureTouchpad(struct touchpad_dispatch *touchpad,
 
     // Configure pressure
     ioctl(device->fd, EVIOCGBIT(EV_ABS, sizeof(abs_bits)), abs_bits);
-    if (TEST_BIT(abs_bits, ABS_PRESSURE)) {
+    if (TEST_BIT(abs_bits, ABS_PRESSURE))
+    {
         ioctl(device->fd, EVIOCGABS(ABS_PRESSURE), &absinfo);
         configureTouchpadPressure(touchpad,
-                                  absinfo.minimum,
-                                  absinfo.maximum);
+                                absinfo.minimum,
+                                absinfo.maximum);
     }
 
     // Configure acceleration factor
@@ -1025,20 +1083,22 @@ WaylandEvdevInputEvent::handleInputEvent(int fd, uint32_t mask, void *data)
     struct input_event ev[32];
     int len;
     do {
-        if (device->mtdev){
+        if (device->mtdev)
+        {
             len = mtdev_get(device->mtdev, fd, ev,
                 ARRAY_LENGTH(ev)) * sizeof(struct input_event);
         }
-        else {
+        else
+        {
             len = read(fd, &ev, sizeof(ev));
         }
 
-        if (len < 0 || len % sizeof(ev[0]) != 0){
+        if (len < 0 || len % sizeof(ev[0]) != 0)
+        {
             return 1;
         }
 
         WaylandEvdevInputEvent::processEvents(device, ev, len / sizeof(ev[0]));
-
     } while (len > 0);
 
     return 1;
@@ -1046,8 +1106,8 @@ WaylandEvdevInputEvent::handleInputEvent(int fd, uint32_t mask, void *data)
 
 void
 WaylandEvdevInputEvent::processEvents(struct evdev_input_device *device,
-                                      struct input_event *ev,
-                                      int count)
+                                        struct input_event *ev,
+                                        int count)
 {
     struct evdev_dispatch *dispatch = device->dispatch;
     struct input_event *e, *end;
@@ -1057,10 +1117,12 @@ WaylandEvdevInputEvent::processEvents(struct evdev_input_device *device,
 
     e = ev;
     end = e + count;
-    for (; e < end; ++e){
+    for (; e < end; ++e)
+    {
         time = e->time.tv_sec * 1000 + e->time.tv_usec / 1000;
 
-        if (!isMotionEvent(e)){
+        if (!isMotionEvent(e))
+        {
             WaylandEvdevInputEvent::flushMotion(device, time);
         }
 
@@ -1081,40 +1143,46 @@ WaylandEvdevInputEvent::flushMotion(struct evdev_input_device *device,
     if (!inputEvent)
         return;
 
-    if (device->pending_events & EVDEV_RELATIVE_MOTION){
+    if (device->pending_events & EVDEV_RELATIVE_MOTION)
+    {
         struct wl_seat *wlSeat = inputEvent->inputDevice().seat();
-        if (wlSeat){
+        if (wlSeat)
+        {
             // notify_motion
             notifyMotion(device, time,
-                         wlSeat->pointer->x + device->rel.dx,
-                         wlSeat->pointer->y + device->rel.dy);
+                        wlSeat->pointer->x + device->rel.dx,
+                        wlSeat->pointer->y + device->rel.dy);
         }
         device->pending_events &= ~EVDEV_RELATIVE_MOTION;
         device->rel.dx = 0;
         device->rel.dy = 0;
     }
-    if (device->pending_events & EVDEV_ABSOLUTE_MT_DOWN){
+    if (device->pending_events & EVDEV_ABSOLUTE_MT_DOWN)
+    {
         // notify_touch
         notifyTouch(device);
         device->pending_events &= ~EVDEV_ABSOLUTE_MT_DOWN;
         device->pending_events &= ~EVDEV_ABSOLUTE_MT_MOTION;
     }
-    if (device->pending_events & EVDEV_ABSOLUTE_MT_MOTION){
+    if (device->pending_events & EVDEV_ABSOLUTE_MT_MOTION)
+    {
         // notify_touch
         notifyTouch(device);
         device->pending_events &= ~EVDEV_ABSOLUTE_MT_DOWN;
         device->pending_events &= ~EVDEV_ABSOLUTE_MT_MOTION;
     }
-    if (device->pending_events & EVDEV_ABSOLUTE_MT_UP){
+    if (device->pending_events & EVDEV_ABSOLUTE_MT_UP)
+    {
         // notify_touch
         notifyTouch(device);
         device->pending_events &= ~EVDEV_ABSOLUTE_MT_UP;
     }
-    if (device->pending_events & EVDEV_ABSOLUTE_MOTION){
+    if (device->pending_events & EVDEV_ABSOLUTE_MOTION)
+    {
         // notify_motion
         notifyMotion(device, time,
-                     wl_fixed_from_int(device->abs.x),
-                     wl_fixed_from_int(device->abs.y));
+                    wl_fixed_from_int(device->abs.x),
+                    wl_fixed_from_int(device->abs.y));
         device->pending_events &= ~EVDEV_ABSOLUTE_MOTION;
     }
 }
@@ -1129,7 +1197,8 @@ WaylandEvdevInputEvent::fallbackProcess(struct evdev_dispatch *dispatch,
 {
     WL_UNUSED(dispatch);
 
-    switch (e->type){
+    switch (e->type)
+    {
     case EV_REL:
         evdevProcessRelative(device, time, e);
         break;
@@ -1150,9 +1219,10 @@ WaylandEvdevInputEvent::fallbackDestroy(struct evdev_dispatch *dispatch)
 
 void
 WaylandEvdevInputEvent::evdevProcessRelative(struct evdev_input_device *device,
-                                             uint32_t /*time*/, struct input_event *e)
+                                            uint32_t /*time*/, struct input_event *e)
 {
-    switch (e->code){
+    switch (e->code)
+    {
     case REL_X:
         device->rel.dx += wl_fixed_from_int(e->value);
         device->pending_events |= EVDEV_RELATIVE_MOTION;
@@ -1179,9 +1249,12 @@ WaylandEvdevInputEvent::evdevProcessAbsolute(struct evdev_input_device *device,
     int w = inputEvent->m_screenWidth;
     int h = inputEvent->m_screenHeight;
 
-    if (device->isMt){
+    if (device->isMt)
+    {
         processTouch(device, e, w, h);
-    } else {
+    }
+    else
+    {
         processAbsoluteMotion(device, e, w, h);
     }
 }
@@ -1193,7 +1266,8 @@ WaylandEvdevInputEvent::evdevProcessKey(struct evdev_input_device *device,
     if (e->value == 2)
         return;
 
-    switch (e->code){
+    switch (e->code)
+    {
     case BTN_LEFT:
     case BTN_RIGHT:
     case BTN_MIDDLE:
@@ -1228,7 +1302,8 @@ WaylandEvdevInputEvent::touchpadProcess(struct evdev_dispatch *dispatch,
 {
     struct touchpad_dispatch *touchpad = (struct touchpad_dispatch*)dispatch;
 
-    switch (e->type){
+    switch (e->type)
+    {
     case EV_SYN:
         if (e->code == SYN_REPORT)
             touchpad->event_mask |= TOUCHPAD_EVENT_REPORT;
@@ -1251,7 +1326,8 @@ WaylandEvdevInputEvent::touchpadDestroy(struct evdev_dispatch *dispatch)
     struct motion_filter *filter;
     struct motion_filter *next;
 
-    wl_list_for_each_safe(filter, next, &touchpad->motion_filters, link){
+    wl_list_for_each_safe(filter, next, &touchpad->motion_filters, link)
+    {
         filter->interface->destroy(filter);
     }
 
@@ -1265,27 +1341,31 @@ WaylandEvdevInputEvent::touchpadProcessAbsolute(struct touchpad_dispatch *touchp
 {
     WL_UNUSED(device);
 
-    switch (e->code){
+    switch (e->code)
+    {
     case ABS_PRESSURE:
         if (e->value > touchpad->pressure.press)
             touchpad->state = TOUCHPAD_STATE_PRESS;
         else if (e->value > touchpad->pressure.touch_high)
             touchpad->state = TOUCHPAD_STATE_TOUCH;
-        else if (e->value < touchpad->pressure.touch_low){
+        else if (e->value < touchpad->pressure.touch_low)
+        {
             if (touchpad->state > TOUCHPAD_STATE_NONE)
                 touchpad->reset = 1;
             touchpad->state = TOUCHPAD_STATE_NONE;
         }
         break;
     case ABS_X:
-        if (touchpad->state >= TOUCHPAD_STATE_TOUCH){
+        if (touchpad->state >= TOUCHPAD_STATE_TOUCH)
+        {
             touchpad->hw_abs.x = e->value;
             touchpad->event_mask |= TOUCHPAD_EVENT_ABSOLUTE_ANY;
             touchpad->event_mask |= TOUCHPAD_EVENT_ABSOLUTE_X;
         }
         break;
     case ABS_Y:
-        if (touchpad->state >= TOUCHPAD_STATE_TOUCH){
+        if (touchpad->state >= TOUCHPAD_STATE_TOUCH)
+        {
             touchpad->hw_abs.y = e->value;
             touchpad->event_mask |= TOUCHPAD_EVENT_ABSOLUTE_ANY;
             touchpad->event_mask |= TOUCHPAD_EVENT_ABSOLUTE_Y;
@@ -1300,14 +1380,18 @@ WaylandEvdevInputEvent::touchpadProcessKey(struct touchpad_dispatch *touchpad,
                                            struct input_event *e,
                                            uint32_t time)
 {
-    switch (e->code){
+    switch (e->code)
+    {
     case BTN_TOUCH:
-        if (!touchpad->has_pressure){
-            if (!e->value){
+        if (!touchpad->has_pressure)
+        {
+            if (!e->value)
+            {
                 touchpad->state = TOUCHPAD_STATE_NONE;
                 touchpad->reset = 1;
             }
-            else {
+            else
+            {
                 touchpad->state = e->value ? TOUCHPAD_STATE_TOUCH
                                            : TOUCHPAD_STATE_NONE;
             }
@@ -1355,11 +1439,14 @@ WaylandEvdevInputEvent::touchpadUpdateState(struct touchpad_dispatch *touchpad,
                                             uint32_t time)
 {
     int motion_index;
-    int center_x, center_y;
-    double dx, dy;
+    int center_x;
+    int center_y;
+    double dx;
+    double dy;
 
     if (touchpad->reset ||
-        touchpad->last_finger_state != touchpad->finger_state) {
+        touchpad->last_finger_state != touchpad->finger_state)
+    {
         touchpad->reset = 0;
         touchpad->motion_count = 0;
         touchpad->event_mask = TOUCHPAD_EVENT_NONE;
@@ -1386,7 +1473,8 @@ WaylandEvdevInputEvent::touchpadUpdateState(struct touchpad_dispatch *touchpad,
 
     // Avoid noice by moving center only when delta reaches a threshold
     // distance from the old center
-    if (touchpad->motion_count > 0) {
+    if (touchpad->motion_count > 0)
+    {
         center_x = hysteresis(touchpad->hw_abs.x,
                       touchpad->hysteresis.center_x,
                       touchpad->hysteresis.margin_x);
@@ -1394,7 +1482,8 @@ WaylandEvdevInputEvent::touchpadUpdateState(struct touchpad_dispatch *touchpad,
                       touchpad->hysteresis.center_y,
                       touchpad->hysteresis.margin_y);
     }
-    else {
+    else
+    {
         center_x = touchpad->hw_abs.x;
         center_y = touchpad->hw_abs.y;
     }
@@ -1411,7 +1500,8 @@ WaylandEvdevInputEvent::touchpadUpdateState(struct touchpad_dispatch *touchpad,
     if (touchpad->motion_count < 4)
         touchpad->motion_count++;
 
-    if (touchpad->motion_count >= 4) {
+    if (touchpad->motion_count >= 4)
+    {
         touchpadGetDelta(touchpad, &dx, &dy);
 
         filterMotion(touchpad, &dx, &dy, time);
@@ -1440,8 +1530,10 @@ WaylandEvdevInputEvent::notifyButton(struct evdev_input_device *device,
     wlSeat = inputEvent->inputDevice().seat();
     serial = wl_display_next_serial(inputEvent->inputDevice().display());
 
-    if (state == WL_POINTER_BUTTON_STATE_PRESSED){
-        if (wlSeat->pointer->button_count == 0){
+    if (state == WL_POINTER_BUTTON_STATE_PRESSED)
+    {
+        if (wlSeat->pointer->button_count == 0)
+        {
             wlSeat->pointer->grab_button = button;
             wlSeat->pointer->grab_time = time;
             wlSeat->pointer->grab_x = wlSeat->pointer->x;
@@ -1449,7 +1541,8 @@ WaylandEvdevInputEvent::notifyButton(struct evdev_input_device *device,
         }
         ++wlSeat->pointer->button_count;
     }
-    else {
+    else
+    {
         --wlSeat->pointer->button_count;
     }
     wlEvent.x = wl_fixed_to_int(wlSeat->pointer->x);
@@ -1461,7 +1554,8 @@ WaylandEvdevInputEvent::notifyButton(struct evdev_input_device *device,
         state == WL_POINTER_BUTTON_STATE_PRESSED ? INPUT_STATE_PRESSED :
         INPUT_STATE_RELEASED, &wlEvent);
 
-    if (wlSeat->pointer->button_count == 1){
+    if (wlSeat->pointer->button_count == 1)
+    {
         wlSeat->pointer->grab_serial =
             wl_display_get_serial(inputEvent->inputDevice().display());
     }
@@ -1476,9 +1570,11 @@ WaylandEvdevInputEvent::notifyMotion(struct evdev_input_device *device,
 
     WLEvent         wlEvent;
     struct wl_seat *wlSeat = NULL;
-    int             x, y;
+    int             x;
+    int             y;
     //int             old_x, old_y;
-    int             w, h;
+    int             w;
+    int             h;
 
     WaylandEvdevInputEvent *inputEvent = static_cast<WaylandEvdevInputEvent*>(device->master);
     if (!inputEvent)
@@ -1517,21 +1613,25 @@ WaylandEvdevInputEvent::notifyKey(struct evdev_input_device *device,
 
     WLEvent wlEvent;
     struct wl_seat *wlSeat = NULL;
-    uint32_t *k, *end;
+    uint32_t *k;
+    uint32_t *end;
 
     WaylandEvdevInputEvent *inputEvent = static_cast<WaylandEvdevInputEvent*>(device->master);
     if (!inputEvent)
         return;
 
     wlSeat = inputEvent->inputDevice().seat();
-    if (state == WL_KEYBOARD_KEY_STATE_PRESSED){
+    if (state == WL_KEYBOARD_KEY_STATE_PRESSED)
+    {
         wlSeat->keyboard->grab_key = key;
         wlSeat->keyboard->grab_time = time;
     }
 
     end = (uint32_t*)(((unsigned char*)wlSeat->keyboard->keys.data) + wlSeat->keyboard->keys.size);
-    for (k = (uint32_t*)wlSeat->keyboard->keys.data; k < end; ++k){
-        if (*k == key){
+    for (k = (uint32_t*)wlSeat->keyboard->keys.data; k < end; ++k)
+    {
+        if (*k == key)
+        {
             // Ignore server-generated repeats
             if (state == WL_KEYBOARD_KEY_STATE_PRESSED)
                 return;
@@ -1539,7 +1639,8 @@ WaylandEvdevInputEvent::notifyKey(struct evdev_input_device *device,
         }
     }
     wlSeat->keyboard->keys.size = end - (uint32_t*)wlSeat->keyboard->keys.data;
-    if (state == WL_KEYBOARD_KEY_STATE_PRESSED){
+    if (state == WL_KEYBOARD_KEY_STATE_PRESSED)
+    {
         k = (uint32_t*)wl_array_add(&wlSeat->keyboard->keys, sizeof(*k));
         *k = key;
     }
@@ -1562,28 +1663,32 @@ WaylandEvdevInputEvent::notifyTouch(struct evdev_input_device *device)
     if (!inputEvent)
         return;
 
-    if (device->pending_events & EVDEV_ABSOLUTE_MT_DOWN){
+    if (device->pending_events & EVDEV_ABSOLUTE_MT_DOWN)
+    {
         wlEvent.x = (int)wl_fixed_from_int(device->mt.x[device->mt.slot]);
         wlEvent.y = (int)wl_fixed_from_int(device->mt.y[device->mt.slot]);
         wlEvent.touchId = device->mt.slot;
         wlEvent.touchType = WL_TOUCH_DOWN;
         eventState = INPUT_STATE_PRESSED;
-    } else
-    if (device->pending_events & EVDEV_ABSOLUTE_MT_MOTION){
+    }
+    else if (device->pending_events & EVDEV_ABSOLUTE_MT_MOTION)
+    {
         wlEvent.x = (int)wl_fixed_from_int(device->mt.x[device->mt.slot]);
         wlEvent.y = (int)wl_fixed_from_int(device->mt.y[device->mt.slot]);
         wlEvent.touchId = device->mt.slot;
         wlEvent.touchType = WL_TOUCH_MOTION;
         eventState = INPUT_STATE_MOTION;
-    } else
-    if (device->pending_events & EVDEV_ABSOLUTE_MT_UP){
+    }
+    else if (device->pending_events & EVDEV_ABSOLUTE_MT_UP)
+    {
         wlEvent.x = 0;
         wlEvent.y = 0;
         wlEvent.touchId = device->mt.slot;
         wlEvent.touchType = WL_TOUCH_UP;
         eventState = INPUT_STATE_RELEASED;
     }
-    else {
+    else
+    {
         return;
     }
 
@@ -1593,26 +1698,30 @@ WaylandEvdevInputEvent::notifyTouch(struct evdev_input_device *device)
 void
 WaylandEvdevInputEvent::notifyModifiers(struct wl_seat *wlSeat, uint32_t serial)
 {
-    uint32_t mods_depressed, mods_latched, mods_locked, group;
+    uint32_t mods_depressed;
+    uint32_t mods_latched;
+    uint32_t mods_locked;
+    uint32_t group;
     uint32_t mods_lookup;
     int changed = 0;
 
     mods_depressed = xkb_state_serialize_mods(m_xkbState.state, (xkb_state_component)XKB_STATE_DEPRESSED);
-    mods_latched   = xkb_state_serialize_mods(m_xkbState.state, (xkb_state_component)XKB_STATE_LATCHED);
-    mods_locked    = xkb_state_serialize_mods(m_xkbState.state, (xkb_state_component)XKB_STATE_LOCKED);
-    group          = xkb_state_serialize_mods(m_xkbState.state, (xkb_state_component)XKB_STATE_EFFECTIVE);
+    mods_latched = xkb_state_serialize_mods(m_xkbState.state, (xkb_state_component)XKB_STATE_LATCHED);
+    mods_locked = xkb_state_serialize_mods(m_xkbState.state, (xkb_state_component)XKB_STATE_LOCKED);
+    group = xkb_state_serialize_mods(m_xkbState.state, (xkb_state_component)XKB_STATE_EFFECTIVE);
 
     if (mods_depressed != wlSeat->keyboard->modifiers.mods_depressed ||
-        mods_latched   != wlSeat->keyboard->modifiers.mods_latched   ||
-        mods_locked    != wlSeat->keyboard->modifiers.mods_locked    ||
-        group          != wlSeat->keyboard->modifiers.group){
+        mods_latched != wlSeat->keyboard->modifiers.mods_latched ||
+        mods_locked != wlSeat->keyboard->modifiers.mods_locked ||
+        group != wlSeat->keyboard->modifiers.group)
+    {
         changed = 1;
     }
 
     wlSeat->keyboard->modifiers.mods_depressed = mods_depressed;
-    wlSeat->keyboard->modifiers.mods_latched   = mods_latched;
-    wlSeat->keyboard->modifiers.mods_locked    = mods_locked;
-    wlSeat->keyboard->modifiers.group          = group;
+    wlSeat->keyboard->modifiers.mods_latched = mods_latched;
+    wlSeat->keyboard->modifiers.mods_locked = mods_locked;
+    wlSeat->keyboard->modifiers.group = group;
 
     // And update the modifier_state for bindings
     mods_lookup = mods_depressed | mods_latched;
@@ -1622,7 +1731,8 @@ WaylandEvdevInputEvent::notifyModifiers(struct wl_seat *wlSeat, uint32_t serial)
     if (mods_lookup & (1 << m_xkbInfo.super_mod)) m_modifierState |= MODIFIER_SUPER;
     if (mods_lookup & (1 << m_xkbInfo.shift_mod)) m_modifierState |= MODIFIER_SHIFT;
 
-    if (changed){
+    if (changed)
+    {
         m_inputDevice->sendModifiers(serial);
     }
 }

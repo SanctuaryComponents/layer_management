@@ -49,12 +49,12 @@ bool X11GLXRenderer::start(int width, int height, const char* displayname)
     screenList.push_back(lmScreen);
 
     // create X11 windows, register as composite manager etc
-    m_pWindowSystem  = new X11WindowSystem(displayname, width, height, m_pScene, m_pInputManager, GLXGraphicsystem::GetMatchingVisual);
+    m_pWindowSystem = new X11WindowSystem(displayname, width, height, m_pScene, m_pInputManager, GLXGraphicsystem::GetMatchingVisual);
     m_pGraphicSystem = new GLXGraphicsystem(width, height);
     m_pGraphicSystem->setBaseWindowSystem(m_pWindowSystem);
 
     LOG_DEBUG("X11GLXRenderer", "init windowsystem");
-    if ( m_pWindowSystem->init(m_pGraphicSystem ) )
+    if (m_pWindowSystem->init(m_pGraphicSystem))
     {
         Display* x11Display = m_pWindowSystem->getNativeDisplayHandle();
         if (x11Display)
@@ -75,7 +75,7 @@ bool X11GLXRenderer::start(int width, int height, const char* displayname)
                     binder = new X11CopyGLX(x11Display);
                 }
 #endif // WITH_FORCE_COPY
-                if ( binder != NULL )
+                if (binder != NULL)
                 {
                     m_pGraphicSystem->setTextureBinder(binder);
                     result = m_pWindowSystem->start();
@@ -101,13 +101,14 @@ void X11GLXRenderer::doScreenShot(std::string fileToSave)
     m_pWindowSystem->doScreenShot(fileToSave);
 }
 
-void X11GLXRenderer::doScreenShotOfLayer(std::string fileToSave,uint id)
+void X11GLXRenderer::doScreenShotOfLayer(std::string fileToSave, uint id)
 {
-    m_pWindowSystem->doScreenShotOfLayer(fileToSave,id);
+    m_pWindowSystem->doScreenShotOfLayer(fileToSave, id);
 }
 
-void X11GLXRenderer::doScreenShotOfSurface(std::string fileToSave, uint id, uint layer_id){
-    m_pWindowSystem->doScreenShotOfSurface(fileToSave,id,layer_id);
+void X11GLXRenderer::doScreenShotOfSurface(std::string fileToSave, uint id, uint layer_id)
+{
+    m_pWindowSystem->doScreenShotOfSurface(fileToSave, id, layer_id);
 }
 
 uint X11GLXRenderer::getNumberOfHardwareLayers(uint screenID)

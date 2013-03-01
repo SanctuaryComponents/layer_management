@@ -23,7 +23,7 @@
 
 #include "ICommand.h"
 
-class ScreenSetRenderOrderCommand: public ICommand
+class ScreenSetRenderOrderCommand : public ICommand
 {
 public:
     /*!

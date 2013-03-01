@@ -17,8 +17,8 @@
 *
 ****************************************************************************/
 
-#ifndef MockRenderer_H_
-#define MockRenderer_H_
+#ifndef MOCK_RENDERER_H_
+#define MOCK_RENDERER_H_
 
 #include "AbstractRenderer.h"
 #include <list>
@@ -33,4 +33,4 @@ class MockRenderer : public AbstractRenderer {
 };
 
 
-#endif /* MockRenderer_H_ */
+#endif /* MOCK_RENDERER_H_ */

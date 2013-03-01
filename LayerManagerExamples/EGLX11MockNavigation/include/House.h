@@ -16,8 +16,8 @@
  * limitations under the License.
  *
  ****************************************************************************/
-#ifndef _MockNaviHouse_h
-#define _MockNaviHouse_h
+#ifndef _HOUSE_H
+#define _HOUSE_H
 
 #include "IRenderable.h"
 #include "IUpdateable.h"
@@ -51,4 +51,4 @@ private:
     ShaderBase* m_pShader;
 };
 
-#endif
+#endif /* _HOUSE_H */

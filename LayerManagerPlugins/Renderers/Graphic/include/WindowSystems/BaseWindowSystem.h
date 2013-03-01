@@ -26,7 +26,7 @@
 class BaseWindowSystem
 {
 public:
-    BaseWindowSystem(Scene* pScene, InputManager* pInputManager )
+    BaseWindowSystem(Scene* pScene, InputManager* pInputManager)
 
     : m_pInputManager(pInputManager)
     , m_pScene(pScene)

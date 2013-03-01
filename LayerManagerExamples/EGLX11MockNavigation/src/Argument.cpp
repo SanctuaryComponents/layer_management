@@ -23,10 +23,12 @@
 BoolArgument::BoolArgument(string name, bool default_value, int argc, const char * const argv[])
 : value(default_value)
 {
-    for (int arg = 1; arg < argc; ++arg) {
+    for (int arg = 1; arg < argc; ++arg)
+    {
         const char* lpArgNow = argv[arg];
-        
-        if ((lpArgNow[0] == '-') && (name == &lpArgNow[1])) {
+
+        if ((lpArgNow[0] == '-') && (name == &lpArgNow[1]))
+        {
             value = !value;
         }
     }

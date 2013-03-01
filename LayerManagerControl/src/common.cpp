@@ -51,7 +51,7 @@ tuple4 getSurfaceScreenCoordinates(ilmSurfaceProperties targetSurfaceProperties,
                     1.0 * targetLayerProperties.destWidth / targetLayerProperties.sourceWidth : 0;
 
     t_ilm_float targetX1 = targetLayerProperties.destX + horizontalScale
-            * (targetSurfaceProperties.destX- targetLayerProperties.sourceX);
+            * (targetSurfaceProperties.destX - targetLayerProperties.sourceX);
     t_ilm_float targetX2 = targetX1 + horizontalScale * targetSurfaceProperties.destWidth;
 
     t_ilm_float verticalScale = targetLayerProperties.sourceHeight ?
@@ -190,7 +190,7 @@ void captureSceneData(t_scene_data* pScene)
         if (ILM_SUCCESS != callResult)
         {
             cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
-            cout << "Failed to get layers on screen with ID "<< screenId <<"\n";
+            cout << "Failed to get layers on screen with ID " << screenId << "\n";
             return;
         }
 
@@ -222,7 +222,7 @@ void captureSceneData(t_scene_data* pScene)
         if (ILM_SUCCESS != callResult)
         {
             cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
-            cout << "Failed to get properties of layer with ID "<< layerId <<"\n";
+            cout << "Failed to get properties of layer with ID " << layerId << "\n";
             return;
         }
 
@@ -242,7 +242,7 @@ void captureSceneData(t_scene_data* pScene)
         if (ILM_SUCCESS != callResult)
         {
             cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
-            cout << "Failed to get surfaces on layer with ID "<< layerId <<"\n";
+            cout << "Failed to get surfaces on layer with ID " << layerId << "\n";
             return;
         }
 
@@ -437,7 +437,7 @@ void setScene(t_scene_data* pScene, bool clean)
     {
         t_ilm_layer layer = it->first;
         vector<t_ilm_surface>& surfaces = it->second;
-        if(surfaces.data() == NULL)
+        if (surfaces.data() == NULL)
         {
             surfaces.reserve(1);
         }
@@ -520,7 +520,7 @@ void emptyScene(t_scene_data* pScene)
     t_ilm_uint count;
     t_ilm_display* screenArray;
     ilm_getScreenIDs(&count, &screenArray);
-    for(t_ilm_uint i = 0 ; i < count ; ++i)
+    for (t_ilm_uint i = 0; i < count; ++i)
     {
         pScene->screens.push_back(screenArray[i]);
 
@@ -539,7 +539,7 @@ t_scene_data cloneToUniLayerScene(t_scene_data* pScene)
     //prepare values needed for dummy (animation) scene
     t_ilm_layer extraLayer = -1;
     //if the scene is already uni layer just reuse same layer
-    if(pScene->layers.size() == 1)
+    if (pScene->layers.size() == 1)
     {
         extraLayer = pScene->layers[0];
     }
@@ -646,7 +646,7 @@ void transformScene(t_scene_data* pInitialScene, t_scene_data* pFinalScene, t_il
         //sleep time
         long sleepMillis = durationMillis / frameCount;
         struct timespec sleepTime;
-        sleepTime.tv_nsec = (sleepMillis% 1000) * 1000000;
+        sleepTime.tv_nsec = (sleepMillis % 1000) * 1000000;
         sleepTime.tv_sec = sleepMillis / 1000;
 
         struct timespec remTime;
@@ -654,7 +654,7 @@ void transformScene(t_scene_data* pInitialScene, t_scene_data* pFinalScene, t_il
         //start and end coordinates of surfaces
         map<t_ilm_surface, tuple4> start;
         map<t_ilm_surface, tuple4> end;
-        for(vector<t_ilm_surface>::iterator it = dummyScene.surfaces.begin();
+        for (vector<t_ilm_surface>::iterator it = dummyScene.surfaces.begin();
                 it != dummyScene.surfaces.end(); ++it)
         {
             t_ilm_surface surface = *it;
@@ -668,23 +668,25 @@ void transformScene(t_scene_data* pInitialScene, t_scene_data* pFinalScene, t_il
             float t = 1.0 * i / frameCount;
 
             //interpolate properties of each surface
-            for(vector<t_ilm_surface>::iterator it = dummyScene.surfaces.begin();
+            for (vector<t_ilm_surface>::iterator it = dummyScene.surfaces.begin();
                     it != dummyScene.surfaces.end(); ++it)
             {
                 t_ilm_surface surface = *it;
                 tuple4 coords = interpolateCoordinatesHelper(start[surface], end[surface], t);
 
-                ilmErrorTypes callResult = ilm_surfaceSetDestinationRectangle(surface, coords.x, coords.y, coords.z - coords.x, coords.w - coords.y);
+                ilmErrorTypes callResult = ilm_surfaceSetDestinationRectangle(surface, coords.x, coords.y,
+                                                                                coords.z - coords.x, coords.w - coords.y);
                 if (ILM_SUCCESS != callResult)
                 {
                     cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
-                    cout << "Failed to set destination rectangle (" << coords.x << "," << coords.y << ", "<< coords.z - coords.x << ", " << coords.w - coords.y
+                    cout << "Failed to set destination rectangle (" << coords.x << "," << coords.y << ", "
+                            << coords.z - coords.x << ", " << coords.w - coords.y
                             <<") for surface with ID " << surface << "\n";
                     return;
                 }
 
                 float opacity = t * pFinalScene->surfaceProperties[surface].opacity
-                        + (1-t) * pInitialScene->surfaceProperties[surface].opacity;
+                        + (1 - t) * pInitialScene->surfaceProperties[surface].opacity;
                 ilm_surfaceSetOpacity(surface, opacity);
             }
 
@@ -705,7 +707,7 @@ void interruptSignalRestoreScene(int s)
 {
     (void) s;
 
-    cout<<"LayerManagerControl :Interrupt signal...\n";
+    cout << "LayerManagerControl :Interrupt signal...\n";
     if (global_pOriginalScene != NULL)
     {
         setScene(global_pOriginalScene, true);

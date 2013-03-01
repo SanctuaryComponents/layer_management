@@ -35,7 +35,7 @@ public:
      * \param[in] returnMode location to store mode of optimization on execution
      * \ingroup Commands
      */
-    GetOptimizationModeCommand(pid_t sender,OptimizationType id, OptimizationModeType* returnMode)
+    GetOptimizationModeCommand(pid_t sender, OptimizationType id, OptimizationModeType* returnMode)
     : ICommand(ExecuteSynchronous, sender)
     , m_id(id)
     , m_pReturnMode(returnMode)

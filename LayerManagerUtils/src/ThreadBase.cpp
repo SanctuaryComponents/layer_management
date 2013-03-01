@@ -1,5 +1,5 @@
 /***************************************************************************
- * 
+ *
  * Copyright 2010,2011 BMW Car IT GmbH
  *
  *
@@ -48,7 +48,7 @@ static void threadBaseMainLoopCleanup(void* arg)
     ((ThreadArgument*)arg)->obj->threadDestroyInThreadContext();
     pthread_mutex_unlock(((ThreadArgument*)arg)->runLock);
     *(((ThreadArgument*)arg)->running) = ILM_FALSE;
-    delete (ThreadArgument*)arg;
+    delete((ThreadArgument*)arg);
 }
 
 //===========================================================================
@@ -61,40 +61,40 @@ static void* threadBaseMainLoop(void* arg)
         LOG_ERROR("ThreadBase", "invalid thread argument (arg)");
         return NULL;
     }
-    
+
     if (!((ThreadArgument*)arg)->obj)
     {
         LOG_ERROR("ThreadBase", "invalid thread argument (obj)");
         return NULL;
     }
-    
+
     if (!((ThreadArgument*)arg)->running)
     {
         LOG_ERROR("ThreadBase", "invalid thread argument (running)");
         return NULL;
     }
-    
+
     // register cleanup function
     pthread_cleanup_push(threadBaseMainLoopCleanup, arg);
-    
+
     // init in thread context
     *(((ThreadArgument*)arg)->running) = ((ThreadArgument*)arg)->obj->threadInitInThreadContext();
-    
+
     // indicate initialization complete
     pthread_mutex_unlock(((ThreadArgument*)arg)->initLock);
-    
+
     // wait for start permit
     pthread_mutex_lock(((ThreadArgument*)arg)->runLock);
-    
+
     // run thread
     while (*(((ThreadArgument*)arg)->running))
     {
         *(((ThreadArgument*)arg)->running) = ((ThreadArgument*)arg)->obj->threadMainLoop();
     }
-    
+
     // execute cleanup handlers
     pthread_cleanup_pop(1);
-    
+
     return NULL;
 }
 
@@ -107,7 +107,7 @@ ThreadBase::ThreadBase()
 {
     pthread_mutex_init(&mRunLock, NULL);
     pthread_mutex_lock(&mRunLock);
-    
+
     pthread_mutex_init(&mInitLock, NULL);
     pthread_mutex_lock(&mInitLock);
 }
@@ -116,7 +116,7 @@ ThreadBase::~ThreadBase()
 {
     pthread_mutex_unlock(&mInitLock);
     pthread_mutex_destroy(&mInitLock);
-    
+
     pthread_mutex_unlock(&mRunLock);
     pthread_mutex_destroy(&mRunLock);
 }
@@ -128,7 +128,7 @@ pthread_t ThreadBase::threadGetId() const
 
 t_ilm_bool ThreadBase::threadIsRunning()
 {
-    if(0 == pthread_mutex_trylock(&mRunLock))
+    if (0 == pthread_mutex_trylock(&mRunLock))
     {
         pthread_mutex_unlock(&mRunLock);
         mRunning = ILM_FALSE;
@@ -146,17 +146,17 @@ t_ilm_bool ThreadBase::threadCreate()
     pthread_attr_init(&notificationThreadAttributes);
     pthread_attr_setdetachstate(&notificationThreadAttributes,
                                 PTHREAD_CREATE_JOINABLE);
-    
+
     ThreadArgument* arg = new ThreadArgument();
     arg->obj = this;
     arg->runLock = &mRunLock;
     arg->initLock = &mInitLock;
     arg->running = &mRunning;
-    
+
     int ret = pthread_create(&mThreadId,
-                             &notificationThreadAttributes,
-                             threadBaseMainLoop,
-                             (void*)arg);
+                                &notificationThreadAttributes,
+                                threadBaseMainLoop,
+                                (void*)arg);
     if (0 != ret)
     {
         LOG_ERROR("ThreadBase", "Failed to start thread.");
@@ -167,7 +167,7 @@ t_ilm_bool ThreadBase::threadCreate()
         LOG_DEBUG("ThreadBase", "Started thread (now " << mGlobalThreadCount << ")");
         mRunning = ILM_TRUE;
     }
-    
+
     return threadIsRunning();
 }
 
@@ -184,9 +184,9 @@ t_ilm_bool ThreadBase::threadStart()
 t_ilm_bool ThreadBase::threadStop()
 {
     t_ilm_bool result = ILM_TRUE;
-    
+
     mRunning = threadIsRunning();
-    
+
     if (mRunning)
     {
         LOG_INFO("ThreadBase", "pthread_cancel");
@@ -205,13 +205,13 @@ t_ilm_bool ThreadBase::threadStop()
             }
         }
     }
-    
+
     if (result)
     {
         --mGlobalThreadCount;
         LOG_DEBUG("ThreadBase", "Stopped thread (now " << mGlobalThreadCount << ")");
     }
-    
+
     return result;
 }
 

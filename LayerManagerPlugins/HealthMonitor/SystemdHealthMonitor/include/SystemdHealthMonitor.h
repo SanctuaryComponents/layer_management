@@ -17,8 +17,8 @@
 *
 ****************************************************************************/
 
-#ifndef __HEALTHSYSTEMD_H__
-#define __HEALTHSYSTEMD_H__
+#ifndef __SYSTEMDHEALTHMONITOR_H__
+#define __SYSTEMDHEALTHMONITOR_H__
 
 #include "IHealthMonitor.h"
 #include "ThreadBase.h"
@@ -45,9 +45,9 @@ private:
 
     // from ThreadBase
     virtual t_ilm_bool threadMainLoop();
-    
+
 private:
     int mIntervalInMs;
 };
 
-#endif // __HEALTHSYSTEMD_H__
+#endif // __SYSTEMDHEALTHMONITOR_H__

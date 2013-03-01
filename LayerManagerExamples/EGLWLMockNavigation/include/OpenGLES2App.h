@@ -17,8 +17,8 @@
  * limitations under the License.
  *
  ****************************************************************************/
-#ifndef _OpenGLES2App_h
-#define _OpenGLES2App_h
+#ifndef _OPENGLES2APP_H
+#define _OPENGLES2APP_H
 
 #include "wayland-client.h"
 #include "wayland-egl.h"
@@ -100,4 +100,4 @@ protected:
     WLContextStruct m_wlContextStruct;
 };
 
-#endif
+#endif /* _OPENGLES2APP_H */

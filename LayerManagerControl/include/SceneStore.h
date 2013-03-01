@@ -17,8 +17,8 @@
  *
  ****************************************************************************/
 
-#ifndef __SCENE_STORE_H__
-#define __SCENE_STORE_H__
+#ifndef __SCENESTORE_H__
+#define __SCENESTORE_H__
 
 
 //=========================================================================
@@ -52,7 +52,7 @@ template<typename T> string getPrimitiveType(T var)
 template<typename T> string getPrimitiveType(T* var)
 {
     (void) var;//suppress warning: unsued variable
-    T var2=0;
+    T var2 = 0;
     return getPrimitiveType(var2) + "*";
 }
 
@@ -174,19 +174,17 @@ template<> string getPrimitiveType(unsigned long long int var)
 #endif
 
 
-class WrapperHelper
+struct WrapperHelper
 {
 public:
     const string mType;
     WrapperHelper(string t) :
             mType(t)
     {
-
     }
 
     virtual ~WrapperHelper()
     {
-
     }
 
     virtual void fromString(string s)
@@ -228,7 +226,7 @@ public:
 };
 
 template<typename T>
-class ComplexWrapper: public WrapperHelper
+struct ComplexWrapper : public WrapperHelper
 {
 public:
     list<T> components;
@@ -236,12 +234,11 @@ public:
     ComplexWrapper(string t) :
             WrapperHelper(t)
     {
-
     }
 
     virtual void toStringMapTree(StringMapTree* parent)
     {
-        for(typename list<T>::iterator it = components.begin(); it != components.end(); ++it)
+        for (typename list<T>::iterator it = components.begin(); it != components.end(); ++it)
         {
             StringMapTree* node = new StringMapTree;
             (*it)->toStringMapTree(node);
@@ -251,7 +248,7 @@ public:
 };
 
 template<typename T>
-class BasicWrapper: public WrapperHelper
+struct BasicWrapper : public WrapperHelper
 {
 public:
     T value;
@@ -259,14 +256,13 @@ public:
     BasicWrapper(string t) :
             WrapperHelper(t)
     {
-
     }
 
     virtual void fromString(string s)
     {
         stringstream ss;
         ss.str(s);
-        ss >> std::skipws>> value;
+        ss >> std::skipws >> value;
     }
 
     virtual string asString()
@@ -280,7 +276,6 @@ public:
     {
         return getPrimitiveType(value);
     }
-
 };
 
 template<>
@@ -292,7 +287,6 @@ public:
     BasicWrapper(string t) :
             WrapperHelper(t)
     {
-
     }
 
     virtual void fromString(string s)
@@ -320,7 +314,6 @@ public:
     BasicWrapper(char* t) :
             WrapperHelper(t)
     {
-
     }
 
     virtual void fromString(string s)
@@ -340,7 +333,7 @@ public:
 };
 
 template<typename T>
-class DummyWrapper: public WrapperHelper
+struct DummyWrapper : public WrapperHelper
 {
 public:
     T value;
@@ -348,9 +341,7 @@ public:
     DummyWrapper(string t) :
             WrapperHelper(t)
     {
-
     }
-
 
     virtual WrapperHelper* tryClone(string type, StringMapTree* tree)
     {
@@ -369,7 +360,6 @@ public:
         value.toGrammarMapTree(tree);
     }
 
-
     virtual void addToComplexWrapper(WrapperHelper* wrapper)
     {
         ComplexWrapper<T*>* complexWrapper = static_cast<ComplexWrapper<T*>* >(wrapper);
@@ -377,7 +367,7 @@ public:
     }
 };
 
-map<int,string> _globalTypeIndexdToType;
+map<int, string> _globalTypeIndexdToType;
 
 #define OBJECT(class_name) \
 class class_name;\
@@ -536,20 +526,20 @@ public:\
         }\
     }\
     void fromStringMapTree(StringMapTree* node)\
-       {\
+    {\
         mClassName = node->mNodeLabel;\
-           for(map<string,pair<string,string> >::iterator it = node->mNodeValues.begin(); it != node->mNodeValues.end();++it)\
-           {\
-               properties[it->first]->fromString(it->second.second);\
-           }\
-           for(list<StringMapTree*>::iterator it = node->mChildren.begin(); it != node->mChildren.end(); ++it )\
-           {\
-               string type = (*it)->mNodeLabel;\
-               WrapperHelper* wrapper = dummyComponentClones[type]->tryClone(type, (*it));\
-               WrapperHelper* complexWrapper = components[type];\
-               wrapper->addToComplexWrapper(complexWrapper);\
-           }\
-       }\
+        for(map<string,pair<string,string> >::iterator it = node->mNodeValues.begin(); it != node->mNodeValues.end();++it)\
+        {\
+            properties[it->first]->fromString(it->second.second);\
+        }\
+        for(list<StringMapTree*>::iterator it = node->mChildren.begin(); it != node->mChildren.end(); ++it )\
+        {\
+            string type = (*it)->mNodeLabel;\
+            WrapperHelper* wrapper = dummyComponentClones[type]->tryClone(type, (*it));\
+            WrapperHelper* complexWrapper = components[type];\
+            wrapper->addToComplexWrapper(complexWrapper);\
+        }\
+    }\
 };
 
 
@@ -623,4 +613,4 @@ OBJECT(IlmScene)
     CONTAINS(IlmDisplay)
 OBJECTEND
 
-#endif
+#endif /* __SCENESTORE_H__ */

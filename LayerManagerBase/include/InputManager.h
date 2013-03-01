@@ -75,67 +75,64 @@ typedef PointVect::iterator PointVectIterator;
 
 class InputManager
 {
-    public:
-        /** Ctor / Dtor
-         */
-        InputManager(IScene* s);
-        ~InputManager();
+public:
+    /** Ctor / Dtor
+        */
+    InputManager(IScene* s);
+    ~InputManager();
+
+    /** Methods to report input events
+        *  They all return the surface to transfer the event to, or NULL if the event should not be dispatched
+        */
+    Surface * reportKeyboardEvent(InputEventState state, long keyId);
+    Surface * reportTouchEvent(PointVect& pv);
+    Surface * reportPointerEvent(Point& p);
+
+    /** Methods to control the focus
+        */
+    bool setKeyboardFocusOn(unsigned int surfId);
+    bool updateInputEventAcceptanceOn(unsigned int surfId, InputDevice devices, bool accept);
+
+    /** Few getters
+        */
+    unsigned int getKeyboardFocusSurfaceId();
+
+private:
+    Surface * electSurfaceForPointerEvent(int& x, int& y);
+    void transformGlobalToLocalCoordinates(Surface* surf, int& x, int& y);
+
+    /*
+        * Private Getters / Setters
+        * Needed because access to their associated member requires exclusive area
+        */
+
+    /** \brief Set the keyboard focus on a particular surface */
+    void _setKbdFocus(Surface * s);
+    /** \brief Get the surface which has keyboard focus */
+    Surface * _getKbdFocus();
+    /** \brief Set the pointer focus on a particular surface */
+    void _setPointerFocus(Surface * s);
+    /** \brief Get the surface which has pointer focus */
+    Surface * _getPointerFocus();
+    /** \brief Set the touch focus on a particular surface */
+    void _setTouchFocus(Surface * s);
+    /** \brief Get the surface which has touch focus */
+    Surface * _getTouchFocus();
 
 
-        /** Methods to report input events
-         *  They all return the surface to transfer the event to, or NULL if the event should not be dispatched
-         */
-        Surface * reportKeyboardEvent(InputEventState state, long keyId);
-        Surface * reportTouchEvent(PointVect& pv);
-        Surface * reportPointerEvent(Point& p);
+private:
+    IScene * m_pScene;                  /*!< Pointer to the scene */
+    std::map<long, Surface*> m_KeyMap;  /*!< Map that associate keypressed event to the surface it has been forward to.
+                                            See @ref<InputManager-KeypressedMap>. */
+    pthread_mutex_t m_mutex;            /*!< Mutex to avoid concurrent access to shared variables */
 
-
-        /** Methods to control the focus
-         */
-        bool setKeyboardFocusOn(unsigned int surfId);
-        bool updateInputEventAcceptanceOn(unsigned int surfId, InputDevice devices, bool accept);
-
-        /** Few getters
-         */
-        unsigned int getKeyboardFocusSurfaceId();
-
-    private:
-        Surface * electSurfaceForPointerEvent(int& x, int& y);
-        void transformGlobalToLocalCoordinates(Surface* surf, int& x, int& y);
-
-
-        /*
-         * Private Getters / Setters
-         * Needed because access to their associated member requires exclusive area
-         */
-
-        /** \brief Set the keyboard focus on a particular surface */
-        void _setKbdFocus(Surface * s);
-        /** \brief Get the surface which has keyboard focus */
-        Surface * _getKbdFocus();
-        /** \brief Set the pointer focus on a particular surface */
-        void _setPointerFocus(Surface * s);
-        /** \brief Get the surface which has pointer focus */
-        Surface * _getPointerFocus();
-        /** \brief Set the touch focus on a particular surface */
-        void _setTouchFocus(Surface * s);
-        /** \brief Get the surface which has touch focus */
-        Surface * _getTouchFocus();
-
-
-    private:
-        IScene * m_pScene;                  /*!< Pointer to the scene */
-        std::map<long, Surface*> m_KeyMap;  /*!< Map that associate keypressed event to the surface it has been forward to. See @ref<InputManager-KeypressedMap>. */
-        pthread_mutex_t m_mutex;            /*!< Mutex to avoid concurrent access to shared variables */
-
-        /* Access to the below members must be protected by mutex to avoid concurrent accesses */
-        Surface * m_KbdFocus;               /*!< Pointer to the surface which has the focus for keyboard event.
-                                                 Should only be accessed via its getter / setter */
-        Surface * m_PointerFocus;           /*!< Pointer to the surface which has the focus for pointer event.
-                                                 Should only be accessed via its getter / setter */
-        Surface * m_TouchFocus;             /*!< Pointer to the surface which has the focus for touch event.
-                                                 Should only be accessed via its getter / setter */
-
+    /* Access to the below members must be protected by mutex to avoid concurrent accesses */
+    Surface * m_KbdFocus;               /*!< Pointer to the surface which has the focus for keyboard event.
+                                                Should only be accessed via its getter / setter */
+    Surface * m_PointerFocus;           /*!< Pointer to the surface which has the focus for pointer event.
+                                                Should only be accessed via its getter / setter */
+    Surface * m_TouchFocus;             /*!< Pointer to the surface which has the focus for touch event.
+                                                Should only be accessed via its getter / setter */
 };
 
 
@@ -188,8 +185,8 @@ class InputManager
  *  \anchor<LM_INPUT_REQ_06>
  *  <li>
  *    LM_INPUT_REQ_06:
- *    A surface can request to not receive particular input events. In this case, the surface should not be considered for focus election & the events
- *    must be dispatched to an other surface, if relevant.
+ *    A surface can request to not receive particular input events. In this case, the surface should not be considered
+ *    for focus election & the events must be dispatched to an other surface, if relevant.
  *  </li>
  *
  *  </ul>
@@ -206,7 +203,8 @@ class InputManager
  * 3- The command "surfaceSetKeyboardFocus" is called on S2, so the surface S2 is now the keyboard elected one
  * 4- Key X is released.
  * We should then forward the KeyRelased event to S1 since we have reported the pressed event to it.
- * So we need a map that associate keyPressed  -> Surface. When the same key is released, we must forward that event to the original surface, and not to the elected one.
+ * So we need a map that associate keyPressed  -> Surface. When the same key is released, we must forward that event
+ * to the original surface, and not to the elected one.
  *
  *
  */

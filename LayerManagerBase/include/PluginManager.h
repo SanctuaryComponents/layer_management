@@ -1,5 +1,5 @@
 /***************************************************************************
- * 
+ *
  * Copyright 2012 BMW Car IT GmbH
  *
  *
@@ -39,20 +39,20 @@ class PluginManager
 public:
     PluginManager(ICommandExecutor& executor, Configuration& config);
     ~PluginManager();
-    
+
     void getRendererList(RendererList& list);
     void getHealthMonitorList(HealthMonitorList& list);
     void getSceneProviderList(SceneProviderList& list);
     void getCommunicatorList(CommunicatorList& list);
-    
+
     static bool registerStaticPluginCreateFunction(StaticPluginCreateFunc func);
-    
+
 private:
     void createStaticallyLinkedPlugins();
     void getAllFilesInPluginPath(std::string path);
     void createDynamicallyLinkedPlugins();
     IPlugin* createDynamicallyLinkedPlugin(std::string path);
-    
+
 private:
     ICommandExecutor& mExecutor;
     Configuration& mConfiguration;

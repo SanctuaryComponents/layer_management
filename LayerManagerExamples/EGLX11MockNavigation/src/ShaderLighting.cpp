@@ -20,25 +20,25 @@
 #include "IlmMatrix.h"
 
 const char* vertexShaderCode =
-		    "attribute mediump vec4 a_vertex;                                 \
-		     uniform mediump mat4 u_modelMatrix;                              \
-		     varying mediump vec4 v_normal;                                   \
-             void main(void)                                                  \
-             {                                                                \
-                 gl_Position = u_projectionMatrix * u_modelMatrix * a_vertex; \
-		         v_normal = normalize(a_vertex);                              \
-             }";
+            "attribute mediump vec4 a_vertex;                                 \
+            uniform mediump mat4 u_modelMatrix;                              \
+            varying mediump vec4 v_normal;                                   \
+            void main(void)                                                  \
+            {                                                                \
+                gl_Position = u_projectionMatrix * u_modelMatrix * a_vertex; \
+                v_normal = normalize(a_vertex);                              \
+            }";
 
 const char* fragmentShaderCode =
-		    "uniform mediump vec4 u_color;   \
-		     varying mediump vec4 v_normal;  \
-		     mediump vec4 lightPosition;     \
-             void main (void)                \
-		     {                               \
-		         lightPosition = normalize(vec4(-3.0, -5.0, 10.0, 1.0));   \
-		         gl_FragColor = max(dot(v_normal, lightPosition), 0.0) * 0.5 * u_color + 0.8 * u_color;   \
-		         gl_FragColor.a = 1.0;   \
-		     }";
+            "uniform mediump vec4 u_color;   \
+            varying mediump vec4 v_normal;  \
+            mediump vec4 lightPosition;     \
+            void main (void)                \
+            {                               \
+                lightPosition = normalize(vec4(-3.0, -5.0, 10.0, 1.0));   \
+                gl_FragColor = max(dot(v_normal, lightPosition), 0.0) * 0.5 * u_color + 0.8 * u_color;   \
+                gl_FragColor.a = 1.0;   \
+            }";
 
 ShaderLighting::ShaderLighting(IlmMatrix* projectionMatrix)
 : ShaderBase(vertexShaderCode, fragmentShaderCode, projectionMatrix)
@@ -54,13 +54,12 @@ ShaderLighting::~ShaderLighting()
 
 void ShaderLighting::use(vec3f* position, vec4f* color)
 {
-	ShaderBase::use(position, color);
+    ShaderBase::use(position, color);
 
     IlmMatrix translation;
-	IlmMatrixTranslation(translation, position->x, position->y, position->z);
+    IlmMatrixTranslation(translation, position->x, position->y, position->z);
 
-	glUseProgram(shaderProgramId);
-	glUniformMatrix4fv(m_uniformModelMatrix, 1, GL_FALSE, translation.f);
+    glUseProgram(shaderProgramId);
+    glUniformMatrix4fv(m_uniformModelMatrix, 1, GL_FALSE, translation.f);
     glUniform4fv(m_uniformColor, 1, &color->r);
-
 }

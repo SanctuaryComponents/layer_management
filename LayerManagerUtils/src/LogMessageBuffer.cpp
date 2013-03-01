@@ -44,7 +44,7 @@ LogMessageBuffer::LogMessageBuffer()
 
 LogMessageBuffer::~LogMessageBuffer()
 {
-    if (stream) 
+    if (stream)
     {
         delete stream;
     }

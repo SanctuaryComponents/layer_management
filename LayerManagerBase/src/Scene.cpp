@@ -58,7 +58,7 @@ Layer* Scene::createLayer(const uint layerId, int creatorPid)
         }
         else
         {
-            LOG_DEBUG("Scene","createLayer: Layer with id " << layerId << " already exists ");
+            LOG_DEBUG("Scene", "createLayer: Layer with id " << layerId << " already exists ");
             newLayer = m_layerMap[layerId];
         }
     }
@@ -85,7 +85,7 @@ Surface* Scene::createSurface(const uint surfaceId, int creatorPid)
         else
         {
             newSurface = m_surfaceMap[surfaceId];
-            LOG_DEBUG("Scene","Surface with id [ " << surfaceId << " ] " << " already exists " );
+            LOG_DEBUG("Scene", "Surface with id [ " << surfaceId << " ] " << " already exists ");
         }
     }
     return newSurface;
@@ -102,7 +102,7 @@ LmScreen* Scene::getScreen(const uint screenId) const
             return (*iter);
         }
     }
-    LOG_WARNING("Scene","screen not found : id [ " << screenId << " ]");
+    LOG_WARNING("Scene", "screen not found : id [ " << screenId << " ]");
 
     return NULL;
 }
@@ -116,7 +116,7 @@ Layer* Scene::getLayer(const uint layerId)
     }
     else
     {
-        LOG_WARNING("Scene","layer not found : id [ " << layerId << " ]");
+        LOG_WARNING("Scene", "layer not found : id [ " << layerId << " ]");
     }
     return layer;
 }
@@ -130,7 +130,7 @@ Surface* Scene::getSurface(const uint surfaceId)
     }
     else
     {
-        LOG_WARNING("Scene","surface not found : id [ " << surfaceId << " ]");
+        LOG_WARNING("Scene", "surface not found : id [ " << surfaceId << " ]");
     }
     return surface;
 }

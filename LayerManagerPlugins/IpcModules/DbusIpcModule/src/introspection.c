@@ -69,80 +69,80 @@ void generateIntrospectionString(char* msgBuffer)
      */
     struct IntrospectionTable introspectionInterface[] =
     {
-        { "ServiceConnect",                   "u",     ""               },
-        { "ServiceDisconnect",                "u",     ""               },
-        { "Debug",                            "b",     ""               },
-        { "ScreenShot",                       "us",    ""               },
-        { "ScreenShotOfLayer",                "su",    ""               },
-        { "ScreenShotOfSurface",              "su",    ""               },
-        { "GetScreenResolution",              "u",     "uu"             },
-        { "GetNumberOfHardwareLayers",        "u",     "u"              },
-        { "GetScreenIDs",                     "",      "au"             },
-        { "ListAllLayerIDS",                  "",      "au"             },
-        { "ListAllLayerIDsOnScreen",          "u",     "au"             },
-        { "ListAllSurfaceIDS",                "",      "au"             },
-        { "ListSurfaceofLayer",               "u",     "au"             },
-        { "GetPropertiesOfSurface",           "u",     "duuuuuuuuuuybu" },
-        { "GetPropertiesOfLayer",             "u",     "duuuuuuuuuuyb"  },
-        { "CreateSurface",                    "uuuu",  "u"              },
-        { "CreateSurfaceFromId",              "uuuuu", "u"              },
-        { "InitializeSurface",                "",      "u"              },
-        { "InitializeSurfaceFromId",          "u",     "u"              },
-        { "SetSurfaceNativeContent",          "uuuuu", ""               },
-        { "RemoveSurfaceNativeContent",       "u",     ""               },
-        { "RemoveSurface",                    "u",     ""               },
-        { "CreateLayer",                      "",      "u"              },
-        { "CreateLayerFromId",                "u",     "u"              },
-        { "CreateLayerWithDimension",         "uu",    "u"              },
-        { "CreateLayerFromIdWithDimension",   "uuu",   "u"              },
-        { "RemoveLayer",                      "u",     ""               },
-        { "AddSurfaceToLayer",                "uu",    ""               },
-        { "RemoveSurfaceFromLayer",           "uu",    ""               },
-        { "SetSurfaceSourceRegion",           "uuuuu", ""               },
-        { "SetLayerSourceRegion",             "uuuuu", ""               },
-        { "SetSurfaceDestinationRegion",      "uuuuu", ""               },
-        { "SetSurfacePosition",               "uuu",   ""               },
-        { "GetSurfacePosition",               "u",     "uu"             },
-        { "SetSurfaceDimension",              "uuu",   ""               },
-        { "SetLayerDestinationRegion",        "uuuuu", ""               },
-        { "SetLayerPosition",                 "uuu",   ""               },
-        { "GetLayerPosition",                 "u",     "uu"             },
-        { "SetLayerDimension",                "uuu",   ""               },
-        { "GetLayerDimension",                "u",     "uu"             },
-        { "GetSurfaceDimension",              "u",     "uu"             },
-        { "SetSurfaceOpacity",                "ud",    ""               },
-        { "SetLayerOpacity",                  "ud",    ""               },
-        { "GetSurfaceOpacity",                "u",     "d"              },
-        { "GetLayerOpacity",                  "u",     "d"              },
-        { "SetSurfaceOrientation",            "uu",    ""               },
-        { "GetSurfaceOrientation",            "uu",    ""               },
-        { "SetLayerOrientation",              "uu",    ""               },
-        { "GetLayerOrientation",              "uu",    ""               },
-        { "GetSurfacePixelformat",            "u",     "u"              },
-        { "SetSurfaceVisibility",             "ub",    ""               },
-        { "SetLayerVisibility",               "ub",    ""               },
-        { "GetSurfaceVisibility",             "u",     "b"              },
-        { "GetLayerVisibility",               "u",     "b"              },
-        { "SetRenderOrderOfLayers",           "auu",   ""               },
-        { "SetSurfaceRenderOrderWithinLayer", "uau",   ""               },
-        { "GetLayerType",                     "u",     "u"              },
-        { "GetLayertypeCapabilities",         "u",     "u"              },
-        { "GetLayerCapabilities",             "u",     "u"              },
-        { "Exit",                             "",      ""               },
-        { "CommitChanges",                    "",      ""               },
-        { "CreateShader",                     "ss",    "u"              },
-        { "DestroyShader",                    "u",     ""               },
-        { "SetShader",                        "uu",    ""               },
-        { "SetUniforms",                      "uas",   ""               },
-        { "SetKeyboardFocusOn",               "u",     ""               },
-        { "GetKeyboardFocusSurfaceId",        "",      "u"              },
-        { "UpdateInputEventAcceptanceOn",     "uub",   ""               },
-        { "LayerAddNotification",             "u",     ""               },
-        { "LayerRemoveNotification",          "u",     ""               },
-        { "SurfaceAddNotification",           "u",     ""               },
-        { "SurfaceRemoveNotification",        "u",     ""               },
-        { "SetOptimizationMode",              "uu",    ""               },
-        { "GetOptimizationMode",              "u",     "u"              }
+        { "ServiceConnect", "u", "" },
+        { "ServiceDisconnect", "u", "" },
+        { "Debug", "b", ""},
+        { "ScreenShot", "us", "" },
+        { "ScreenShotOfLayer", "su", "" },
+        { "ScreenShotOfSurface", "su", "" },
+        { "GetScreenResolution", "u", "uu" },
+        { "GetNumberOfHardwareLayers", "u", "u" },
+        { "GetScreenIDs", "", "au" },
+        { "ListAllLayerIDS", "", "au" },
+        { "ListAllLayerIDsOnScreen", "u", "au" },
+        { "ListAllSurfaceIDS", "", "au" },
+        { "ListSurfaceofLayer", "u", "au" },
+        { "GetPropertiesOfSurface", "u", "duuuuuuuuuuybu" },
+        { "GetPropertiesOfLayer", "u", "duuuuuuuuuuyb" },
+        { "CreateSurface", "uuuu", "u" },
+        { "CreateSurfaceFromId", "uuuuu", "u" },
+        { "InitializeSurface", "", "u" },
+        { "InitializeSurfaceFromId", "u", "u" },
+        { "SetSurfaceNativeContent", "uuuuu", "" },
+        { "RemoveSurfaceNativeContent", "u", "" },
+        { "RemoveSurface", "u", "" },
+        { "CreateLayer", "", "u" },
+        { "CreateLayerFromId", "u", "u" },
+        { "CreateLayerWithDimension", "uu", "u" },
+        { "CreateLayerFromIdWithDimension", "uuu", "u" },
+        { "RemoveLayer", "u", "" },
+        { "AddSurfaceToLayer", "uu", "" },
+        { "RemoveSurfaceFromLayer", "uu", "" },
+        { "SetSurfaceSourceRegion", "uuuuu", "" },
+        { "SetLayerSourceRegion", "uuuuu", "" },
+        { "SetSurfaceDestinationRegion", "uuuuu", "" },
+        { "SetSurfacePosition", "uuu", "" },
+        { "GetSurfacePosition", "u", "uu" },
+        { "SetSurfaceDimension", "uuu", "" },
+        { "SetLayerDestinationRegion", "uuuuu", "" },
+        { "SetLayerPosition", "uuu", "" },
+        { "GetLayerPosition", "u", "uu" },
+        { "SetLayerDimension", "uuu", "" },
+        { "GetLayerDimension", "u", "uu" },
+        { "GetSurfaceDimension", "u", "uu" },
+        { "SetSurfaceOpacity", "ud", "" },
+        { "SetLayerOpacity", "ud", "" },
+        { "GetSurfaceOpacity", "u", "d" },
+        { "GetLayerOpacity", "u", "d" },
+        { "SetSurfaceOrientation", "uu", "" },
+        { "GetSurfaceOrientation", "uu", "" },
+        { "SetLayerOrientation", "uu", "" },
+        { "GetLayerOrientation", "uu", "" },
+        { "GetSurfacePixelformat", "u", "u" },
+        { "SetSurfaceVisibility", "ub", "" },
+        { "SetLayerVisibility", "ub", "" },
+        { "GetSurfaceVisibility", "u", "b" },
+        { "GetLayerVisibility", "u", "b" },
+        { "SetRenderOrderOfLayers", "auu", "" },
+        { "SetSurfaceRenderOrderWithinLayer", "uau", "" },
+        { "GetLayerType", "u", "u" },
+        { "GetLayertypeCapabilities", "u", "u" },
+        { "GetLayerCapabilities", "u", "u" },
+        { "Exit", "", "" },
+        { "CommitChanges", "", "" },
+        { "CreateShader", "ss", "u" },
+        { "DestroyShader", "u", "" },
+        { "SetShader", "uu", "" },
+        { "SetUniforms", "uas", "" },
+        { "SetKeyboardFocusOn", "u", "" },
+        { "GetKeyboardFocusSurfaceId", "", "u" },
+        { "UpdateInputEventAcceptanceOn", "uub", "" },
+        { "LayerAddNotification", "u", "" },
+        { "LayerRemoveNotification", "u", "" },
+        { "SurfaceAddNotification", "u", "" },
+        { "SurfaceRemoveNotification", "u", "" },
+        { "SetOptimizationMode", "uu", "" },
+        { "GetOptimizationMode", "u", "u" }
     };
 
     int introspectionInterfaceCount = sizeof(introspectionInterface) / sizeof(struct IntrospectionTable);
@@ -171,31 +171,31 @@ void generateIntrospectionString(char* msgBuffer)
 
         msgBuffer += openMethod(msgBuffer, methodName);
 
-        for(i = 0; i < parameterLength; ++i)
+        for (i = 0; i < parameterLength; ++i)
         {
             switch (parameter[i])
             {
-                case 'a':
-                    i++;
-                    msgBuffer += addArrayArgument(msgBuffer, "", "in", &parameter[i]);
-                    break;
-                default:
-                    msgBuffer += addArgument(msgBuffer, "", "in", &parameter[i]);
-                    break;
+            case 'a':
+                i++;
+                msgBuffer += addArrayArgument(msgBuffer, "", "in", &parameter[i]);
+                break;
+            default:
+                msgBuffer += addArgument(msgBuffer, "", "in", &parameter[i]);
+                break;
             }
         }
 
-        for(i = 0; i < returnValueLength; ++i)
+        for (i = 0; i < returnValueLength; ++i)
         {
             switch (returnValue[i])
             {
-                case 'a':
-                    i++;
-                    msgBuffer += addArrayArgument(msgBuffer, "", "out", &returnValue[i]);
-                    break;
-                default:
-                    msgBuffer += addArgument(msgBuffer, "", "out", &returnValue[i]);
-                    break;
+            case 'a':
+                i++;
+                msgBuffer += addArrayArgument(msgBuffer, "", "out", &returnValue[i]);
+                break;
+            default:
+                msgBuffer += addArgument(msgBuffer, "", "out", &returnValue[i]);
+                break;
             }
         }
 

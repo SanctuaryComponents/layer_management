@@ -17,8 +17,8 @@
  * limitations under the License.
  *
  ****************************************************************************/
-#ifndef _WL_SURFACE_H_
-#define _WL_SURFACE_H_
+#ifndef _WLSURFACE_H_
+#define _WLSURFACE_H_
 
 #include "ilm_client.h"
 #include "WLContext.h"
@@ -57,4 +57,4 @@ inline struct wl_surface* WLSurface::GetWLSurface() const { return m_wlSurface; 
 inline struct wl_display* WLSurface::GetWLDisplay() const
     { return m_wlContext->GetWLDisplay(); }
 
-#endif
+#endif /* _WLSURFACE_H_ */

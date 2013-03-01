@@ -257,7 +257,7 @@ t_ilm_message receive(t_ilm_int timeoutInMs)
     readFds = gDbus.incomingSockets;
     writeFds = gDbus.outgoingSockets;
     fdMax = (gDbus.incomingSocketsMax > gDbus.outgoingSocketsMax) ?
-                 gDbus.incomingSocketsMax : gDbus.outgoingSocketsMax;
+                gDbus.incomingSocketsMax : gDbus.outgoingSocketsMax;
 
     fdsReady = 0;
 
@@ -417,8 +417,8 @@ void registerSignalForNotification(dbusmessage* message, char* signalName)
     char rule[1024];
     t_ilm_uint id;
     dbus_message_get_args(message->pMessage, NULL,
-                          DBUS_TYPE_UINT32, &id,
-                          DBUS_TYPE_INVALID);
+                            DBUS_TYPE_UINT32, &id,
+                            DBUS_TYPE_INVALID);
 
     sprintf(rule,
             "type='signal',sender='%s',interface='%s',member='%s%u'",
@@ -444,8 +444,8 @@ void unregisterSignalForNotification(dbusmessage* message, char* signalName)
     char rule[1024];
     t_ilm_uint id;
     dbus_message_get_args(message->pMessage, NULL,
-                          DBUS_TYPE_UINT32, &id,
-                          DBUS_TYPE_INVALID);
+                            DBUS_TYPE_UINT32, &id,
+                            DBUS_TYPE_INVALID);
 
     sprintf(rule,
             "type='signal',sender='%s',interface='%s',member='%s%d'",

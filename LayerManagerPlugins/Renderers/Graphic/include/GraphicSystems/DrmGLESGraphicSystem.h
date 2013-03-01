@@ -38,44 +38,47 @@
 
 struct gbm_device;
 
-struct DrmMode {
-	uint32_t		flags;
-	int32_t			width;
-	int32_t			height;
-	uint32_t		refresh;
-	drmModeModeInfo	modeInfo;
-	wl_list			link;
+struct DrmMode
+{
+    uint32_t        flags;
+    int32_t         width;
+    int32_t         height;
+    uint32_t        refresh;
+    drmModeModeInfo modeInfo;
+    wl_list         link;
 };
 
 struct DrmOutput;
-struct DrmFb {
-	struct gbm_bo    *bo;
-	struct DrmOutput *output;
-	uint32_t          fbId;
+struct DrmFb
+{
+    struct gbm_bo    *bo;
+    struct DrmOutput *output;
+    uint32_t          fbId;
 };
 
-struct DrmOutput {
-	struct wl_list  link;
-	struct DrmMode*	currentMode;
-	struct wl_list	modeList;
-	uint32_t        crtcID;
-	uint32_t        connectorID;
-	drmModeCrtcPtr  orgCrtc;
-	int             pageFlipPending;
-	int             fdDev;
-	struct gbm_surface *surface;
-	struct DrmFb       *current, *next;
-	EGLSurface	eglSurface;
-	uint32_t	screenID;
-	BaseWindowSystem *windowSystem;
+struct DrmOutput
+{
+    struct wl_list  link;
+    struct DrmMode* currentMode;
+    struct wl_list  modeList;
+    uint32_t        crtcID;
+    uint32_t        connectorID;
+    drmModeCrtcPtr  orgCrtc;
+    int             pageFlipPending;
+    int             fdDev;
+    struct gbm_surface *surface;
+    struct DrmFb       *current, *next;
+    EGLSurface  eglSurface;
+    uint32_t    screenID;
+    BaseWindowSystem *windowSystem;
 };
 
-class DrmGLESGraphicSystem: public GLESGraphicsystem
+class DrmGLESGraphicSystem : public GLESGraphicsystem
 {
 // functions
 public:
     DrmGLESGraphicSystem(int windowWidth, int windowHeight,
-                 PfnShaderProgramCreator shaderProgram);
+                        PfnShaderProgramCreator shaderProgram);
     virtual ~DrmGLESGraphicSystem();
 
     virtual bool init(EGLNativeDisplayType display, EGLNativeWindowType window);
@@ -86,26 +89,26 @@ public:
 
 // proterties
 private:
-	struct wl_list m_outputList;
+    struct wl_list m_outputList;
 
-	gbm_device*    m_gbm;
-	int            m_fdDev;
-	uint32_t*      m_crtcs;
-	int            m_crtcsNum;
-	uint32_t       m_crtcAllocator;
-	uint32_t       m_connectorAllocator;
-	DrmOutput*     m_currentOutput;
+    gbm_device*    m_gbm;
+    int            m_fdDev;
+    uint32_t*      m_crtcs;
+    int            m_crtcsNum;
+    uint32_t       m_crtcAllocator;
+    uint32_t       m_connectorAllocator;
+    DrmOutput*     m_currentOutput;
 
-	PFNEGLBINDWAYLANDDISPLAYWL						m_pfEglBindWaylandDisplayWL;
-	PFNEGLUNBINDWAYLANDDISPLAYWL					m_pfEglUnbindWaylandDisplayWL;
+    PFNEGLBINDWAYLANDDISPLAYWL      m_pfEglBindWaylandDisplayWL;
+    PFNEGLUNBINDWAYLANDDISPLAYWL    m_pfEglUnbindWaylandDisplayWL;
 
 // private functions
 private:
     bool initializeSystem();
-	bool createOutputs();
-	int  createOutputForConnector(drmModeRes* resources, drmModeConnector* connector, int x, int y);
-	int  drmOutputAddMode(struct DrmOutput* output, drmModeModeInfo* info);
-	int  drmOutputPrepareRender(struct DrmOutput* output);
+    bool createOutputs();
+    int  createOutputForConnector(drmModeRes* resources, drmModeConnector* connector, int x, int y);
+    int  drmOutputAddMode(struct DrmOutput* output, drmModeModeInfo* info);
+    int  drmOutputPrepareRender(struct DrmOutput* output);
 };
 
 #endif /* _DRMGLESGRAPHICSYSTEM_H_ */

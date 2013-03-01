@@ -41,7 +41,7 @@ typedef std::map<unsigned int, const char*> PidToProcessNameTable;
 typedef std::list<IPlugin*> PluginList;
 
 
-class Layermanager: public ICommandExecutor
+class Layermanager : public ICommandExecutor
 {
 public:
     Layermanager(Configuration& config);

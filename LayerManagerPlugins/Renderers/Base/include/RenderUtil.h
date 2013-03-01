@@ -30,16 +30,16 @@
 // Loads a file containing shader code
 static char* RenderUtilLoadShaderFile(const char *szFilename)
 {
-    if(!szFilename)
+    if (!szFilename)
     {
-        return(NULL);
+        return (NULL);
     }
 
     FILE* pFile = fopen(szFilename, "rb");
-    if(!pFile)
+    if (!pFile)
     {
-        LOG_ERROR("RenderUtilLoadShaderFile","Unable to open ShaderFile " << szFilename);
-        return(NULL);
+        LOG_ERROR("RenderUtilLoadShaderFile", "Unable to open ShaderFile " << szFilename);
+        return (NULL);
     }
 
     fseek(pFile, 0, SEEK_END);
@@ -47,33 +47,33 @@ static char* RenderUtilLoadShaderFile(const char *szFilename)
 
     if (size < 0)
     {
-        LOG_ERROR("RenderUtilLoadShaderFile","Unable get size of ShaderFile " << szFilename);
+        LOG_ERROR("RenderUtilLoadShaderFile", "Unable get size of ShaderFile " << szFilename);
         fclose(pFile);
-        return(NULL);
+        return (NULL);
     }
 
     fseek(pFile, 0, SEEK_SET);
 
-    char *pBuffer = new char[size+1];
-    if(!pBuffer)
+    char *pBuffer = new char[size + 1];
+    if (!pBuffer)
     {
-        LOG_ERROR("RenderUtilLoadShaderFile","Unable to allocate Memory for ShaderFile " << szFilename);
+        LOG_ERROR("RenderUtilLoadShaderFile", "Unable to allocate Memory for ShaderFile " << szFilename);
         fclose(pFile);
-        return(NULL);
+        return (NULL);
     }
 
-    if(1 != fread(pBuffer, size, 1, pFile))
+    if (1 != fread(pBuffer, size, 1, pFile))
     {
-        LOG_ERROR("RenderUtilLoadShaderFile","Unable to allocate Memory for ShaderFile " << szFilename);
+        LOG_ERROR("RenderUtilLoadShaderFile", "Unable to allocate Memory for ShaderFile " << szFilename);
         fclose(pFile);
         delete [] pBuffer;
-        return(NULL);
+        return (NULL);
     }
 
     pBuffer[size] = 0;
     fclose(pFile);
-    LOG_DEBUG("RenderUtilShaderDebug","loaded file with bytes: " << size);
-    return(pBuffer);
+    LOG_DEBUG("RenderUtilShaderDebug", "loaded file with bytes: " << size);
+    return (pBuffer);
 }
 
 
@@ -106,11 +106,11 @@ static void RenderUtilShaderDebug(GLuint obj, GLenum status, const char* op)
     }
     if (str != NULL && *str != '\0')
     {
-        strncpy(errorMessage, "--- ",1024); // TODO: sizeof(errorMessage)
+        strncpy(errorMessage, "--- ", 1024); // TODO: sizeof(errorMessage)
         strncat(errorMessage, op, 1000); // TODO: why 1000? dangerous
         strncat(errorMessage, " log ---", 8);
-        LOG_ERROR("RenderUtilShaderDebug",errorMessage);
-        LOG_ERROR("RenderUtilShaderDebug",str);
+        LOG_ERROR("RenderUtilShaderDebug", errorMessage);
+        LOG_ERROR("RenderUtilShaderDebug", str);
     }
 
     if (str)
@@ -131,11 +131,11 @@ static void RenderUtilShaderDebug(GLuint obj, GLenum status, const char* op)
                 glGetShaderSource(obj, len, NULL, str);
                 if (str != NULL && *str != '\0')
                 {
-                    strncpy(errorMessage, "--- ",1024);// TODO: sizeof(errorMessage)
-                    strncat(errorMessage,op, 1000); // TODO: why 1000? dangerous
+                    strncpy(errorMessage, "--- ", 1024);// TODO: sizeof(errorMessage)
+                    strncat(errorMessage, op, 1000); // TODO: why 1000? dangerous
                     strncat(errorMessage, " log ---", 8);
-                    LOG_ERROR("RenderUtilShaderDebug",errorMessage);
-                    LOG_ERROR("RenderUtilShaderDebug",str);
+                    LOG_ERROR("RenderUtilShaderDebug", errorMessage);
+                    LOG_ERROR("RenderUtilShaderDebug", str);
                 }
                 delete[] str;
             }
@@ -148,10 +148,10 @@ static void RenderUtilShaderDebug(GLuint obj, GLenum status, const char* op)
 
     if (!success)
     {
-        strncpy(errorMessage, "--- ",1024);// TODO: sizeof(errorMessage)
-           strncat(errorMessage,op, 1000); // TODO: why 1000? dangerous
-          strncat(errorMessage, " failed ---", 7);
-        LOG_ERROR("RenderUtilShaderDebug",errorMessage);
+        strncpy(errorMessage, "--- ", 1024);// TODO: sizeof(errorMessage)
+        strncat(errorMessage, op, 1000); // TODO: why 1000? dangerous
+        strncat(errorMessage, " failed ---", 7);
+        LOG_ERROR("RenderUtilShaderDebug", errorMessage);
     }
 }
 
@@ -163,7 +163,7 @@ static GLuint RenderUtilLoadShaderBinaries(
     GLuint binaryFormat,
     GLboolean debugging)
 {
-    LOG_DEBUG("RenderUtil","Loading shaders binaries. Size " << vertBinSize << " : " << fragBinSize );
+    LOG_DEBUG("RenderUtil", "Loading shaders binaries. Size " << vertBinSize << " : " << fragBinSize);
     // Binary shaders not supportable for non-ES OpenGL
     GLuint prog;
     GLuint vertShader;
@@ -194,7 +194,7 @@ static GLuint RenderUtilLoadShaderBinaries(
 
     // Link the shader program
     glLinkProgram(prog);
-    if (debugging) 
+    if (debugging)
     {
         RenderUtilShaderDebug(prog, GL_LINK_STATUS, "Program Link");
     }
@@ -205,9 +205,9 @@ static GLuint RenderUtilLoadShaderBinaries(
 // Takes shader source files, compiles them, and builds a shader program
 static GLuint RenderUtilLoadShaderSources(const char* vertFile, const char* fragFile, GLboolean debugging)
 {
-    LOG_DEBUG("RenderUtilShaderDebug","loading shaders sources");
-    LOG_DEBUG("RenderUtilShaderDebug","loading vertex shader: " << vertFile);
-    LOG_DEBUG("RenderUtilShaderDebug","loading fragment shader: " << fragFile);
+    LOG_DEBUG("RenderUtilShaderDebug", "loading shaders sources");
+    LOG_DEBUG("RenderUtilShaderDebug", "loading vertex shader: " << vertFile);
+    LOG_DEBUG("RenderUtilShaderDebug", "loading fragment shader: " << fragFile);
 
     GLuint prog = 0;
     char*  vertSource;
@@ -220,19 +220,19 @@ static GLuint RenderUtilLoadShaderSources(const char* vertFile, const char* frag
     GLint linked;
 
     // Load the shader files
-    vertSource    =RenderUtilLoadShaderFile(vertFile);
-    fragSource    = RenderUtilLoadShaderFile(fragFile);
-    LOG_DEBUG("RenderUtilShaderDebug","loaded shaders source files");
+    vertSource = RenderUtilLoadShaderFile(vertFile);
+    fragSource = RenderUtilLoadShaderFile(fragFile);
+    LOG_DEBUG("RenderUtilShaderDebug", "loaded shaders source files");
     if (!vertSource || !fragSource) goto done;
     vertSourceLen = (GLint)strlen(vertSource);
     fragSourceLen = (GLint)strlen(fragSource);
 
     // Create the program
     prog = glCreateProgram();
-    if (prog==0)
+    if (prog == 0)
     {
-        LOG_DEBUG("RenderUtilShaderDebug","glError occured : " << glGetError()); 
-        LOG_DEBUG("RenderUtilShaderDebug","could not create prog, prog is 0");
+        LOG_DEBUG("RenderUtilShaderDebug", "glError occured : " << glGetError());
+        LOG_DEBUG("RenderUtilShaderDebug", "could not create prog, prog is 0");
     }
 
     // Create the GL shader objects
@@ -283,17 +283,17 @@ static GLuint RenderUtilLoadShaderSources(const char* vertFile, const char* frag
             glGetProgramiv(prog, GL_LINK_STATUS, &linked);
             if (!linked)
             {
-                LOG_DEBUG("RenderUtilShaderDebug","could not link shader");
+                LOG_DEBUG("RenderUtilShaderDebug", "could not link shader");
             }
         }
         else
         {
-         LOG_DEBUG("RenderUtilShaderDebug","could not compile fragment shader");
+            LOG_DEBUG("RenderUtilShaderDebug", "could not compile fragment shader");
         }
     }
     else
     {
-        LOG_DEBUG("RenderUtilShaderDebug","could not compile vertex shader");
+        LOG_DEBUG("RenderUtilShaderDebug", "could not compile vertex shader");
     }
 
     if (!compiled || !linked)
@@ -302,7 +302,7 @@ static GLuint RenderUtilLoadShaderSources(const char* vertFile, const char* frag
         prog = 0;
     }
 
-    done:
+done:
 
     delete[] fragSource;
     delete[] vertSource;

@@ -51,7 +51,7 @@ public:
      */
     virtual void use(void) const;
 
-    virtual int getUniformLocation(const char* name) 
+    virtual int getUniformLocation(const char* name)
     {
         return glGetUniformLocation(m_progHandle, name);
     }

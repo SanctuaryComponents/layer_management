@@ -30,7 +30,7 @@ ExecutionResult SurfaceSetNativeContentCommand::execute(ICommandExecutor* execut
 
     if (surface)
     {
-        if(!surface->hasNativeContent())
+        if (!surface->hasNativeContent())
         {
             surface->setNativeContent(m_nativeHandle);
             surface->setPixelFormat(m_pixelformat);
@@ -43,7 +43,7 @@ ExecutionResult SurfaceSetNativeContentCommand::execute(ICommandExecutor* execut
 
             result = ExecutionSuccessRedraw;
         }
-        else if( (unsigned int) surface->getNativeContent() == m_nativeHandle)
+        else if ((unsigned int) surface->getNativeContent() == m_nativeHandle)
         {
             result = ExecutionSuccess;
         }

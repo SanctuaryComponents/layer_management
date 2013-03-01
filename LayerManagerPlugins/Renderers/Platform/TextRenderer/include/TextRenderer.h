@@ -17,8 +17,8 @@
 *
 ****************************************************************************/
 
-#ifndef DEBUGRENDERER_H_
-#define DEBUGRENDERER_H_
+#ifndef TEXTRENDERER_H_
+#define TEXTRENDERER_H_
 
 #include "LayerList.h"
 #include "BaseRenderer.h"
@@ -53,4 +53,4 @@ private:
     OptimizationModeType m_optimizationMode;
 };
 
-#endif /* DEBUGRENDERER_H_ */
+#endif /* TEXTRENDERER_H_ */

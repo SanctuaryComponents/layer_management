@@ -17,8 +17,8 @@
 *
 ****************************************************************************/
 
-#ifndef MockCommandExecutor_H_
-#define MockCommandExecutor_H_
+#ifndef MOCK_COMMANDEXECUTOR_H_
+#define MOCK_COMMANDEXECUTOR_H_
 
 #include "GraphicalSurface.h"
 #include "ICommand.h"
@@ -61,4 +61,4 @@ class MockCommandExecutor : public ICommandExecutor {
   MOCK_METHOD1(getEnqueuedCommands, CommandList&(unsigned int clientPid));
 };
 
-#endif /* MockCommandExecutor_H_ */
+#endif /* MOCK_COMMANDEXECUTOR_H_ */

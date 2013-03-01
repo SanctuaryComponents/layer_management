@@ -18,8 +18,8 @@
  ****************************************************************************/
 
 
-#ifndef __STRING_MAP_TREE_H__
-#define __STRING_MAP_TREE_H__
+#ifndef __STRINGMAPTREE_H__
+#define __STRINGMAPTREE_H__
 
 #include <map>
 #include <list>
@@ -33,16 +33,16 @@ class StringMapTree
 {
 public:
     string mNodeLabel;
-    map<string,pair<string,string> > mNodeValues;//key: property name, value= pair(type, property value)
+    map<string, pair<string, string> > mNodeValues;//key: property name, value= pair(type, property value)
     list<StringMapTree*> mChildren;// pair(type, child component node)
 
-    string toString(string prefix="")
+    string toString(string prefix = "")
     {
         string result;
-        result += prefix + mNodeLabel+ ":{\n";
-        for(map<string,pair<string,string> >::iterator it = mNodeValues.begin(); it != mNodeValues.end() ; ++it)
+        result += prefix + mNodeLabel + ":{\n";
+        for(map<string, pair<string, string> >::iterator it = mNodeValues.begin(); it != mNodeValues.end(); ++it)
         {
-            result += prefix + "\t[" + it->first + ":"+ it->second.first + "]=[" + it->second.second + "]\n";
+            result += prefix + "\t[" + it->first + ":" + it->second.first + "]=[" + it->second.second + "]\n";
         }
         for(list<StringMapTree*>::iterator it = mChildren.begin(); it != mChildren.end(); ++it)
         {
@@ -62,6 +62,4 @@ public:
     }
 };
 
-
-
-#endif
+#endif /* __STRINGMAPTREE_H__ */

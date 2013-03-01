@@ -16,8 +16,8 @@
  * limitations under the License.
  *
  ****************************************************************************/
-#ifndef _LAYERSCENE_H_
-#define _LAYERSCENE_H_
+#ifndef _EXAMPLEAPPIDS_H_
+#define _EXAMPLEAPPIDS_H_
 
 typedef enum e_layers
 {
@@ -45,4 +45,4 @@ typedef enum e_surfaces
     SURFACE_EXAMPLE_VIDEO_APPLICATION = 40
 } sceneSurfaces;
 
-#endif /* _LAYERSCENE_H_ */
+#endif /* _EXAMPLEAPPIDS_H_ */

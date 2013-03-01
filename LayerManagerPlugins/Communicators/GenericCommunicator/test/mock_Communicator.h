@@ -17,8 +17,8 @@
 *
 ****************************************************************************/
 
-#ifndef MockCommunicator_H_
-#define MockCommunicator_H_
+#ifndef MOCK_COMMUNICATOR_H_
+#define MOCK_COMMUNICATOR_H_
 
 #include "AbstractCommunicator.h"
 #include <list>
@@ -32,4 +32,4 @@ class MockCommunicator : public AbstractCommunicator {
 
 };
 
-#endif /* MockCommunicator_H_ */
+#endif /* MOCK_COMMUNICATOR_H_ */

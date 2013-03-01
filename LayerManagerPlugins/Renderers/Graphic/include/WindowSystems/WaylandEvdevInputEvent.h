@@ -39,7 +39,8 @@
 //////////////////////////////////////////////////////////////////////////////
 #define MAX_SLOTS 16
 
-enum evdev_event_type {
+enum evdev_event_type
+{
     EVDEV_ABSOLUTE_MOTION    = (1 << 0),
     EVDEV_ABSOLUTE_MT_DOWN   = (1 << 1),
     EVDEV_ABSOLUTE_MT_MOTION = (1 << 2),
@@ -47,7 +48,8 @@ enum evdev_event_type {
     EVDEV_RELATIVE_MOTION    = (1 << 4)
 };
 
-enum evdev_device_capability {
+enum evdev_device_capability
+{
     EVDEV_KEYBOARD   = (1 << 0),
     EVDEV_BUTTON     = (1 << 1),
     EVDEV_MOTION_ABS = (1 << 2),
@@ -55,7 +57,8 @@ enum evdev_device_capability {
     EVDEV_TOUCH      = (1 << 4)
 };
 
-enum key_state_update {
+enum key_state_update
+{
     STATE_UPDATE_AUTOMATIC,
     STATE_UPDATE_NONE
 };
@@ -63,27 +66,37 @@ enum key_state_update {
 class WaylandEvdevInputEvent;
 struct evdev_dispatch;
 
-struct evdev_input_device {
+struct evdev_input_device
+{
     WaylandEvdevInputEvent *master;
     struct wl_list          link;
     struct wl_event_source *source;
     struct evdev_dispatch  *dispatch;
     char *devnode;
     int   fd;
-    struct {
-        int min_x, max_x, min_y, max_y;
-        int32_t x, y;
+    struct
+    {
+        int min_x;
+        int max_x;
+        int min_y;
+        int max_y;
+
+        int32_t x;
+        int32_t y;
     } abs;
 
-    struct {
+    struct
+    {
         int slot;
         int32_t x[MAX_SLOTS];
         int32_t y[MAX_SLOTS];
     } mt;
     struct mtdev* mtdev;
 
-    struct {
-        wl_fixed_t dx, dy;
+    struct
+    {
+        wl_fixed_t dx;
+        wl_fixed_t dy;
     } rel;
 
     unsigned int pending_events;
@@ -91,7 +104,8 @@ struct evdev_input_device {
     int isMt;
 };
 
-struct evdev_dispatch_interface {
+struct evdev_dispatch_interface
+{
     // Process an evdev input event
     void (*process)(struct evdev_dispatch *dispatch,
                     struct evdev_input_device *device,
@@ -102,7 +116,8 @@ struct evdev_dispatch_interface {
     void (*destroy)(struct evdev_dispatch *dispatch);
 };
 
-struct evdev_dispatch {
+struct evdev_dispatch
+{
     struct evdev_dispatch_interface *interface;
 };
 
@@ -114,7 +129,8 @@ struct evdev_dispatch {
 #define DEFAULT_MAX_ACCEL_FACTOR 1.0
 #define DEFAULT_HYSTERESIS_MARGIN_DENOMINATOR 700.0
 
-enum touchpad_model {
+enum touchpad_model
+{
     TOUCHPAD_MODEL_UNKNOWN = 0,
     TOUCHPAD_MODEL_SYNAPTICS,
     TOUCHPAD_MODEL_ALPS,
@@ -128,13 +144,15 @@ enum touchpad_model {
 #define TOUCHPAD_EVENT_ABSOLUTE_Y    (1 << 2)
 #define TOUCHPAD_EVENT_REPORT        (1 << 3)
 
-struct touchpad_model_spec {
+struct touchpad_model_spec
+{
     short vendor;
     short product;
     enum touchpad_model model;
 };
 
-enum touchpad_state {
+enum touchpad_state
+{
     TOUCHPAD_STATE_NONE = 0,
     TOUCHPAD_STATE_TOUCH,
     TOUCHPAD_STATE_PRESS
@@ -142,18 +160,21 @@ enum touchpad_state {
 
 #define TOUCHPAD_HISTORY_LENGTH 4
 
-struct touchpad_motion {
+struct touchpad_motion
+{
     int32_t x;
     int32_t y;
 };
 
-enum touchpad_fingers_state {
+enum touchpad_fingers_state
+{
     TOUCHPAD_FINGERS_ONE   = (1 << 0),
     TOUCHPAD_FINGERS_TWO   = (1 << 1),
     TOUCHPAD_FINGERS_THREE = (1 << 2)
 };
 
-struct touchpad_dispatch {
+struct touchpad_dispatch
+{
     struct evdev_dispatch base;
     struct evdev_input_device *device;
 
@@ -171,19 +192,22 @@ struct touchpad_dispatch {
 
     int reset;
 
-    struct {
+    struct
+    {
         int32_t x;
         int32_t y;
     } hw_abs;
 
     int has_pressure;
-    struct {
+    struct
+    {
         int32_t touch_low;
         int32_t touch_high;
         int32_t press;
     } pressure;
 
-    struct {
+    struct
+    {
         int32_t margin_x;
         int32_t margin_y;
         int32_t center_x;
@@ -197,37 +221,43 @@ struct touchpad_dispatch {
     struct wl_list motion_filters;
 };
 
-struct motion_params {
-    double dx, dy;
+struct motion_params
+{
+    double dx;
+    double dy;
 };
 
 struct motion_filter;
 
-struct motion_filter_interface {
+struct motion_filter_interface
+{
     void (*filter)(struct motion_filter *filter,
-                   struct motion_params *motion,
-                   void *data, uint32_t time);
+                    struct motion_params *motion,
+                    void *data, uint32_t time);
     void (*destroy)(struct motion_filter *filter);
 };
 
-struct motion_filter {
+struct motion_filter
+{
     struct motion_filter_interface *interface;
     struct wl_list link;
 };
 
 typedef double (*accel_profile_func_t)(struct motion_filter *filter,
-                                       void *data,
-                                       double velocity,
-                                       uint32_t time);
+                                        void *data,
+                                        double velocity,
+                                        uint32_t time);
 
-struct pointer_tracker {
+struct pointer_tracker
+{
     double   dx;
     double   dy;
     uint32_t time;
     int      dir;
 };
 
-struct pointer_accelerator {
+struct pointer_accelerator
+{
     struct motion_filter base;
     accel_profile_func_t profile;
 
@@ -240,14 +270,15 @@ struct pointer_accelerator {
     int cur_tracker;
 };
 
-enum directions {
-    N  = 1 << 0,
+enum directions
+{
+    N = 1 << 0,
     NE = 1 << 1,
-    E  = 1 << 2,
+    E = 1 << 2,
     SE = 1 << 3,
-    S  = 1 << 4,
+    S = 1 << 4,
     SW = 1 << 5,
-    W  = 1 << 6,
+    W = 1 << 6,
     NW = 1 << 7,
     UNDEFINED_DIRECTION = 0xff
 };
@@ -289,13 +320,13 @@ public:
 private:
     static int  handleInputEvent(int fd, uint32_t mask, void *data);
     static void processEvents(struct evdev_input_device *device,
-                              struct input_event *ev, int count);
+                                struct input_event *ev, int count);
 
     // Default event handler
     static void evdevProcessRelative(struct evdev_input_device *device,
-                                     uint32_t time, struct input_event *e);
+                                        uint32_t time, struct input_event *e);
     static void evdevProcessAbsolute(struct evdev_input_device *device,
-                                     struct input_event *e);
+                                        struct input_event *e);
     static void evdevProcessKey(struct evdev_input_device *device,
                                 uint32_t time, struct input_event *e);
 
@@ -304,20 +335,20 @@ private:
                                         struct evdev_input_device *device,
                                         struct input_event *e);
     static void touchpadProcessKey(struct touchpad_dispatch *touchpad,
-                                   struct evdev_input_device *device,
-                                   struct input_event *e,
-                                   uint32_t time);
+                                    struct evdev_input_device *device,
+                                    struct input_event *e,
+                                    uint32_t time);
     static void touchpadUpdateState(struct touchpad_dispatch *touchpad,
                                     uint32_t time);
 
     // Notifier
     static void notifyButton(struct evdev_input_device *device, uint32_t time,
-                             int32_t button, enum wl_pointer_button_state state);
+                                int32_t button, enum wl_pointer_button_state state);
     static void notifyMotion(struct evdev_input_device *device, uint32_t time,
-                             wl_fixed_t fx, wl_fixed_t fy);
+                                wl_fixed_t fx, wl_fixed_t fy);
     static void notifyKey(struct evdev_input_device *device, uint32_t time,
-                          uint32_t key, enum wl_keyboard_key_state state,
-                          bool bUpdateAutomatic);
+                            uint32_t key, enum wl_keyboard_key_state state,
+                            bool bUpdateAutomatic);
     static void notifyTouch(struct evdev_input_device *device);
 
     bool addDevices();
@@ -326,18 +357,17 @@ private:
     void createInputDevice(struct wl_display *display, const char *path);
     int  configureDevice(struct evdev_input_device *device);
     void dispatchProcess(struct evdev_input_device *device,
-                         struct input_event *ev,
-                         uint32_t time);
+                            struct input_event *ev,
+                            uint32_t time);
     void notifyKeyboardFocus();
     void notifyKeyboardFocusIn(struct wl_array *keys, enum key_state_update updateState);
     void updateModifierState(struct wl_seat *wlSeat, uint32_t serial, uint32_t key,
-                             enum wl_keyboard_key_state state);
+                                enum wl_keyboard_key_state state);
     void notifyModifiers(struct wl_seat *wlSeat, uint32_t serial);
 
     struct evdev_dispatch* createTouchpad(struct evdev_input_device *device);
     void configureTouchpad(struct touchpad_dispatch *touchpad,
-                           struct evdev_input_device *device);
-
+                            struct evdev_input_device *device);
 };
 
 #endif /* _WAYLANDEVDEVINPUTEVENT_H_ */

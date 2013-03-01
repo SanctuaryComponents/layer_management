@@ -27,7 +27,7 @@
 class GLXGraphicsystem : public BaseGraphicSystem<Display*, Window>
 {
 public:
-    GLXGraphicsystem( int windowWidth, int windowHeight);
+    GLXGraphicsystem(int windowWidth, int windowHeight);
     virtual ~GLXGraphicsystem();
     static XVisualInfo* GetMatchingVisual(Display *dpy);
     virtual bool init(Display* x11Display, Window x11Window);
@@ -47,8 +47,8 @@ public:
     virtual void swapBuffers();
     virtual void saveScreenShotOfFramebuffer(std::string fileToSave);
     GLXFBConfig* GetMatchingPixmapConfig(Display *curDisplay);
-    bool CheckConfigValue(Display *curDisplay,GLXFBConfig currentConfig, int attribute, int expectedValue);
-    bool CheckConfigMask(Display *curDisplay,GLXFBConfig currentConfig, int attribute, int expectedValue);
+    bool CheckConfigValue(Display *curDisplay, GLXFBConfig currentConfig, int attribute, int expectedValue);
+    bool CheckConfigMask(Display *curDisplay, GLXFBConfig currentConfig, int attribute, int expectedValue);
     virtual void renderSurface(Surface* currentSurface);
     virtual void activateGraphicContext();
     virtual void releaseGraphicContext();

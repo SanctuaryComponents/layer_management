@@ -1,6 +1,6 @@
 /***************************************************************************
  *
- * Copyright 2010, 2011 BMW Car IT GmbH  
+ * Copyright 2010, 2011 BMW Car IT GmbH
  * Copyright (C) 2011 DENSO CORPORATION and Robert Bosch Car Multimedia Gmbh
  *
  *
@@ -27,7 +27,7 @@
 #include "EGL/eglext.h"
 #include "WaylandPlatformSurface.h"
 
-class EglWaylandPlatformSurface: public WaylandPlatformSurface
+class EglWaylandPlatformSurface : public WaylandPlatformSurface
 {
 public:
     EglWaylandPlatformSurface(Surface* surface)

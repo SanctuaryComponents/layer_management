@@ -39,7 +39,7 @@ ExecutionResult LayerSetChromaKeyCommand::execute(ICommandExecutor* executor)
     {
         if (layer)
         {
-            LOG_DEBUG("LayerSetChromaKeyCommand","new chromakey disable for id: " << m_layerid);
+            LOG_DEBUG("LayerSetChromaKeyCommand", "new chromakey disable for id: " << m_layerid);
             result = layer->setChromaKeyEnabled(false) ? ExecutionSuccessRedraw : ExecutionSuccess;
         }
     }
@@ -47,7 +47,7 @@ ExecutionResult LayerSetChromaKeyCommand::execute(ICommandExecutor* executor)
     {
         if (layer)
         {
-            LOG_DEBUG("LayerSetChromaKeyCommand","new chromakey ("
+            LOG_DEBUG("LayerSetChromaKeyCommand", "new chromakey ("
                 << m_array[0] << ", " << m_array[1] << ", " << m_array[2] << ") for id: " << m_layerid);
             bool ansSetEnabled = layer->setChromaKeyEnabled(true);
             bool ansSetValues = layer->setChromaKey((unsigned char)m_array[0], (unsigned char)m_array[1], (unsigned char)m_array[2]);

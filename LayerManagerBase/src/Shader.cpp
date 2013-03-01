@@ -19,7 +19,7 @@
 
 #include <Shader.h>
 
-unsigned int Shader::m_nextUniqueShaderId=1;
+unsigned int Shader::m_nextUniqueShaderId = 1;
 
 Shader* Shader::createShader(const string& vertFileName, const string& fragFileName)
 {
@@ -92,7 +92,7 @@ void Shader::loadUniforms(void)
     UniformMapConstIterator iterEnd = m_uniformMap.end();
 
     for (; iter != iterEnd; ++iter)
-    {       
+    {
         ShaderUniform* uniform = (*iter).second;
         uniform->load(m_program);
     }

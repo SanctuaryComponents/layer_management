@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010, 2011 BMW Car IT GmbH 
+* Copyright 2010, 2011 BMW Car IT GmbH
 * Copyright (C) 2011 DENSO CORPORATION and Robert Bosch Car Multimedia Gmbh
 *
 *
@@ -50,10 +50,10 @@ bool WaylandGLESRenderer::start(int width, int height, const char* displayname)
 
     // create Wayland windows, register as composite manager etc
     m_pWindowSystem = getWindowSystem(displayname);
-    if( m_pWindowSystem == NULL )
+    if (m_pWindowSystem == NULL)
     {
-    LOG_ERROR("WaylandGLESRenderer", "Window system is not specified. Consider to specify WITH_WAYLAND_X11 or WITH_WAYLAND_FBDEV");
-    goto fail; // TODO bad style
+        LOG_ERROR("WaylandGLESRenderer", "Window system is not specified. Consider to specify WITH_WAYLAND_X11 or WITH_WAYLAND_FBDEV");
+        goto fail; // TODO bad style
     }
 
     m_pGraphicSystem = getGraphicSystem(ShaderProgramGLES::createProgram);
@@ -88,7 +88,7 @@ bool WaylandGLESRenderer::start(int width, int height, const char* displayname)
     }
     return true;
 
-    fail: // TODO bad style
+fail: // TODO bad style
 
     LOG_ERROR("WaylandGLESRenderer", "Initialization failed !");
     return false;
@@ -97,7 +97,7 @@ bool WaylandGLESRenderer::start(int width, int height, const char* displayname)
 void WaylandGLESRenderer::stop()
 {
     m_pWindowSystem->stop();
-    if(m_binder)
+    if (m_binder)
     {
         delete m_binder;
     }
@@ -110,12 +110,12 @@ void WaylandGLESRenderer::doScreenShot(std::string fileToSave)
 
 void WaylandGLESRenderer::doScreenShotOfLayer(std::string fileToSave, uint id)
 {
-    m_pWindowSystem->doScreenShotOfLayer(fileToSave,id);
+    m_pWindowSystem->doScreenShotOfLayer(fileToSave, id);
 }
 
 void WaylandGLESRenderer::doScreenShotOfSurface(std::string fileToSave, uint id, uint layer_id)
 {
-    m_pWindowSystem->doScreenShotOfSurface(fileToSave,id,layer_id);
+    m_pWindowSystem->doScreenShotOfSurface(fileToSave, id, layer_id);
 }
 
 uint WaylandGLESRenderer::getNumberOfHardwareLayers(uint screenID)
@@ -169,13 +169,13 @@ HealthCondition WaylandGLESRenderer::pluginGetHealth()
     return BaseRenderer::pluginGetHealth();
 }
 
-Shader* WaylandGLESRenderer::createShader(const string* vertexName, const string* fragmentName)  
+Shader* WaylandGLESRenderer::createShader(const string* vertexName, const string* fragmentName)
 {
     Shader *result = NULL;
     m_pWindowSystem->setSystemState(WAKEUP_STATE);
     m_pWindowSystem->wakeUpRendererThread();
     m_pGraphicSystem->activateGraphicContext();
-    result = Shader::createShader(*vertexName,*fragmentName);
+    result = Shader::createShader(*vertexName, *fragmentName);
     m_pGraphicSystem->releaseGraphicContext();
     m_pWindowSystem->setSystemState(IDLE_STATE);
     return result;

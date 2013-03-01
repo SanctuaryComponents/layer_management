@@ -44,7 +44,6 @@ public:
 
     // Reference to platform independant surface type for access to size etc
     Surface* s;
-
 };
 
 #endif /* _PLATFORMSURFACE_H_ */

@@ -39,11 +39,11 @@ MockNavi::MockNavi(float fps, float animationSpeed, SurfaceConfiguration* config
 
 void MockNavi::update(int currentTimeInMs, int lastFrameTime)
 {
-	m_camera.update(currentTimeInMs, lastFrameTime);
+    m_camera.update(currentTimeInMs, lastFrameTime);
 
-	list<IUpdateable*>::const_iterator iter = m_updateList.begin();
+    list<IUpdateable*>::const_iterator iter = m_updateList.begin();
     list<IUpdateable*>::const_iterator iterEnd = m_updateList.end();
-    
+
     for (; iter != iterEnd; ++iter)
     {
         (*iter)->update(currentTimeInMs, lastFrameTime);
@@ -54,7 +54,7 @@ void MockNavi::render()
 {
     list<IRenderable*>::const_iterator iter = m_renderList.begin();
     list<IRenderable*>::const_iterator iterEnd = m_renderList.end();
-        
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     for (; iter != iterEnd; ++iter)
@@ -65,11 +65,11 @@ void MockNavi::render()
 
 void MockNavi::generateCity()
 {
-	IlmMatrix* projection = m_camera.getViewProjectionMatrix();
+    IlmMatrix* projection = m_camera.getViewProjectionMatrix();
     ShaderLighting* pShader = new ShaderLighting(projection);
 
     // generate base plate
-	vec4f groundColor(0.8, 0.8, 0.6, 1.0);
+    vec4f groundColor(0.8, 0.8, 0.6, 1.0);
     vec3f position = vec3f(0.0, -0.001, 0.0);
     vec3f size = vec3f(CITY_GRID_SIZE * 3, 0.0, -CITY_GRID_SIZE * 2.0 * m_houseCount);
     Ground* ground = new Ground(position, size, groundColor, pShader);
@@ -101,7 +101,7 @@ void MockNavi::generateCity()
     m_renderList.push_back(car);
 
     // generate houses
-	vec4f houseColor(0.6, 0.6, 0.8, 1.0);
+    vec4f houseColor(0.6, 0.6, 0.8, 1.0);
     for (int x = 0; x < 2; ++x)
     {
         for (int z = 0; z < m_houseCount; ++z)

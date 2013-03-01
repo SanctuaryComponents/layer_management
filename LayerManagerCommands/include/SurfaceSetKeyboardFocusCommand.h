@@ -26,41 +26,40 @@
 
 class SurfaceSetKeyboardFocusCommand : public ICommand
 {
-    public:
-        /*!
-         * \action    This command sets the keyboard focus on a particular surface
-         * \frequency Called whenever a surface needs to receive keyboard events
-         * \param[in] sender process id of application that sent this command
-         * \param[in] surfId id of surface
-         * \ingroup Commands
-         */
-        SurfaceSetKeyboardFocusCommand(pid_t sender, unsigned int surfId)
-        : ICommand(ExecuteSynchronous, sender)
-        , m_surfId(surfId)
-        {}
+public:
+    /*!
+        * \action    This command sets the keyboard focus on a particular surface
+        * \frequency Called whenever a surface needs to receive keyboard events
+        * \param[in] sender process id of application that sent this command
+        * \param[in] surfId id of surface
+        * \ingroup Commands
+        */
+    SurfaceSetKeyboardFocusCommand(pid_t sender, unsigned int surfId)
+    : ICommand(ExecuteSynchronous, sender)
+    , m_surfId(surfId)
+    {}
 
-        /**
-         * \brief default destructor
-         */
-        virtual ~SurfaceSetKeyboardFocusCommand() {}
+    /**
+        * \brief default destructor
+        */
+    virtual ~SurfaceSetKeyboardFocusCommand() {}
 
-        /**
-         * \brief Execute this command.
-         * \param[in] executor Pointer to instance executing the LayerManagement Commands
-         * \return ExecutionSuccess: execution successful
-         * \return ExecutionFailed: execution failed
-         */
-        virtual ExecutionResult execute(ICommandExecutor* executor);
+    /**
+        * \brief Execute this command.
+        * \param[in] executor Pointer to instance executing the LayerManagement Commands
+        * \return ExecutionSuccess: execution successful
+        * \return ExecutionFailed: execution failed
+        */
+    virtual ExecutionResult execute(ICommandExecutor* executor);
 
-        /**
-         * \brief Get description string for this command.
-         * \return String object with description of this command object
-         */
-        virtual const std::string getString();
-    
-    private:
-        const unsigned int m_surfId;
+    /**
+        * \brief Get description string for this command.
+        * \return String object with description of this command object
+        */
+    virtual const std::string getString();
 
+private:
+    const unsigned int m_surfId;
 
     // for unit testing
     template <typename surfaceid_type> friend class SetKeyboardFocusOnCommandEqMatcherP;

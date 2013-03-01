@@ -16,8 +16,8 @@
  * limitations under the License.
  *
  ****************************************************************************/
-#ifndef _Ground_h
-#define _Ground_h
+#ifndef _GROUND_H
+#define _GROUND_H
 
 #include "IRenderable.h"
 #include "vec.h"
@@ -44,4 +44,4 @@ private:
     ShaderBase* m_pShader;
 };
 
-#endif
+#endif /* _GROUND_H */

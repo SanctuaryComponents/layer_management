@@ -45,11 +45,11 @@ string Expression::getString(string name)
 {
     //remove brackets if needed
     string noBrackets = mName;
-    noBrackets = noBrackets[0] == '['? noBrackets.substr(1, noBrackets.size()-1) : noBrackets;
-    noBrackets = noBrackets[noBrackets.size()-1] == ']'? noBrackets.substr(0, noBrackets.size()-1) : noBrackets;
+    noBrackets = noBrackets[0] == '[' ? noBrackets.substr(1, noBrackets.size() - 1) : noBrackets;
+    noBrackets = noBrackets[noBrackets.size() - 1] == ']' ? noBrackets.substr(0, noBrackets.size() - 1) : noBrackets;
 
-    noBrackets = noBrackets[0] == '<'? noBrackets.substr(1, noBrackets.size()-1) : noBrackets;
-    noBrackets = noBrackets[noBrackets.size()-1] == '>'? noBrackets.substr(0, noBrackets.size()-1) : noBrackets;
+    noBrackets = noBrackets[0] == '<' ? noBrackets.substr(1, noBrackets.size() - 1) : noBrackets;
+    noBrackets = noBrackets[noBrackets.size() - 1] == '>' ? noBrackets.substr(0, noBrackets.size() - 1) : noBrackets;
 
     //remove default value (if needed)
     string exprName = noBrackets.substr(0, noBrackets.find("="));
@@ -98,7 +98,7 @@ void Expression::getUintArray(string name, unsigned int** array, unsigned int* c
     *count = 0;
 
     string stringVal;
-    while (getline( ss, stringVal, ',' ))
+    while (getline(ss, stringVal, ','))
     {
         sscanf(stringVal.c_str(), "%u", &buffer[*count]);
 
@@ -168,7 +168,7 @@ ExpressionList Expression::getClosure(bool bypass)
 {
     ExpressionList closure;
 
-    if(bypass)
+    if (bypass)
     {
         //if expression is end of the optional expression
         bool bypassChildren = mName[mName.length() - 1] != ']';
@@ -222,11 +222,11 @@ ExpressionList Expression::getNextExpressionClosure(string text)
                 string exprName = expr->mName;
 
                 //remove brakcets
-                exprName = exprName[0] == '['? exprName.substr(1, exprName.size()-1) : exprName;
-                exprName = exprName[exprName.size()-1] == ']'? exprName.substr(0, exprName.size()-1) : exprName;
+                exprName = exprName[0] == '[' ? exprName.substr(1, exprName.size() - 1) : exprName;
+                exprName = exprName[exprName.size() - 1] == ']' ? exprName.substr(0, exprName.size() - 1) : exprName;
 
-                exprName = exprName[0] == '<'? exprName.substr(1, exprName.size()-1) : exprName;
-                exprName = exprName[exprName.size()-1] == '>'? exprName.substr(0, exprName.size()-1) : exprName;
+                exprName = exprName[0] == '<' ? exprName.substr(1, exprName.size()-1) : exprName;
+                exprName = exprName[exprName.size() - 1] == '>' ? exprName.substr(0, exprName.size() - 1) : exprName;
 
                 //remove default value (if needed)
                 exprName = exprName.substr(0, exprName.find("="));
@@ -237,8 +237,8 @@ ExpressionList Expression::getNextExpressionClosure(string text)
             {
                 //remove brackets if needed
                 string exprName = expr->mName;
-                exprName = exprName[0] == '['? exprName.substr(1, exprName.size()-1) : exprName;
-                exprName = exprName[exprName.size()-1] == ']'? exprName.substr(0, exprName.size()-1) : exprName;
+                exprName = exprName[0] == '[' ? exprName.substr(1, exprName.size() - 1) : exprName;
+                exprName = exprName[exprName.size() - 1] == ']' ? exprName.substr(0, exprName.size() - 1) : exprName;
 
                 //check all alternatives (in case there are alternatives)
                 while (exprName.length() > 0)

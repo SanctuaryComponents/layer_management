@@ -16,8 +16,8 @@
  * limitations under the License.
  *
  ****************************************************************************/
-#ifndef _Car_h
-#define _Car_h
+#ifndef _CAR_H
+#define _CAR_H
 
 #include "IRenderable.h"
 #include "vec.h"
@@ -43,4 +43,4 @@ private:
     ShaderBase* m_pShader;
 };
 
-#endif
+#endif /* _CAR_H */

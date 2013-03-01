@@ -71,12 +71,14 @@ createTmpFileCloexec(char *tmpname)
     int fd;
 #ifdef HAVE_MKOSTEMP
     fd = mkostemp(tmpname, O_CLOEXEC);
-    if (fd >= 0){
+    if (fd >= 0)
+    {
         unlink(tmpname);
     }
 #else
     fd = mkstemp(tmpname);
-    if (fd >= 0){
+    if (fd >= 0)
+    {
         fd = setCloexecOrClose(fd);
         unlink(tmpname);
     }
@@ -124,7 +126,8 @@ WaylandInputEvent::initInputEvent()
 {
     LOG_DEBUG("WaylandInputEvent", "initInputEvent IN");
     m_inputDevice = new WaylandInputDevice(m_windowSystem->getNativeDisplayHandle());
-    if (!m_inputDevice){
+    if (!m_inputDevice)
+    {
         LOG_ERROR("WaylandInputEvent", "Failed to create WaylandInputDevice");
         return;
     }
@@ -139,16 +142,18 @@ WaylandInputEvent::initInputEvent()
 void
 WaylandInputEvent::setupInputEvent()
 {
-    if (!m_xkbContext){
+    if (!m_xkbContext)
+    {
         m_xkbContext = xkb_context_new((enum xkb_context_flags)0);
-        if (!m_xkbContext){
+        if (!m_xkbContext)
+        {
             LOG_ERROR("WaylandInputEvent", "Failed to create XKB context");
             return;
         }
     }
 
-    m_xkbNames.rules  = strdup("evdev");
-    m_xkbNames.model  = strdup("pc105");
+    m_xkbNames.rules = strdup("evdev");
+    m_xkbNames.model = strdup("pc105");
     m_xkbNames.layout = strdup("us");
 }
 
@@ -166,15 +171,19 @@ WaylandInputEvent::initKeyboardDevice(struct xkb_keymap *keymap)
     if (m_inputDevice->hasKeyboard())
         return;
 
-    if (keymap){
+    if (keymap)
+    {
         m_xkbInfo.keymap = xkb_map_ref(keymap);
         createNewKeymap();
-    } else {
+    }
+    else
+    {
         buildGlobalKeymap();
     }
 
     m_xkbState.state = xkb_state_new(m_xkbInfo.keymap);
-    if (!m_xkbState.state){
+    if (!m_xkbState.state)
+    {
         LOG_ERROR("WaylandInputEvent", "Failed to initialize XKB state");
         return;
     }
@@ -199,12 +208,14 @@ WaylandInputEvent::createAnonymousFile(off_t size)
     int fd;
 
     path = getenv("XDG_RUNTIME_DIR");
-    if (!path){
+    if (!path)
+    {
         return -1;
     }
 
     name = (char*)malloc(strlen(path) + sizeof(temp));
-    if (!name){
+    if (!name)
+    {
         return -1;
     }
 
@@ -213,11 +224,13 @@ WaylandInputEvent::createAnonymousFile(off_t size)
     fd = createTmpFileCloexec(name);
 
     free(name);
-    if (fd < 0){
+    if (fd < 0)
+    {
         return -1;
     }
 
-    if (ftruncate(fd, size) < 0){
+    if (ftruncate(fd, size) < 0)
+    {
         close(fd);
         return -1;
     }
@@ -228,27 +241,29 @@ WaylandInputEvent::createAnonymousFile(off_t size)
 void
 WaylandInputEvent::createNewKeymap()
 {
-    m_xkbInfo.shift_mod  = xkb_map_mod_get_index(m_xkbInfo.keymap, XKB_MOD_NAME_SHIFT);
-    m_xkbInfo.caps_mod   = xkb_map_mod_get_index(m_xkbInfo.keymap, XKB_MOD_NAME_CAPS);
-    m_xkbInfo.ctrl_mod   = xkb_map_mod_get_index(m_xkbInfo.keymap, XKB_MOD_NAME_CTRL);
-    m_xkbInfo.alt_mod    = xkb_map_mod_get_index(m_xkbInfo.keymap, XKB_MOD_NAME_ALT);
-    m_xkbInfo.mod2_mod   = xkb_map_mod_get_index(m_xkbInfo.keymap, "Mod2");
-    m_xkbInfo.mod3_mod   = xkb_map_mod_get_index(m_xkbInfo.keymap, "Mod3");
-    m_xkbInfo.super_mod  = xkb_map_mod_get_index(m_xkbInfo.keymap, XKB_MOD_NAME_LOGO);
-    m_xkbInfo.mod5_mod   = xkb_map_mod_get_index(m_xkbInfo.keymap, "Mod5");
-    m_xkbInfo.num_led    = xkb_map_led_get_index(m_xkbInfo.keymap, XKB_LED_NAME_NUM);
-    m_xkbInfo.caps_led   = xkb_map_led_get_index(m_xkbInfo.keymap, XKB_LED_NAME_CAPS);
+    m_xkbInfo.shift_mod = xkb_map_mod_get_index(m_xkbInfo.keymap, XKB_MOD_NAME_SHIFT);
+    m_xkbInfo.caps_mod = xkb_map_mod_get_index(m_xkbInfo.keymap, XKB_MOD_NAME_CAPS);
+    m_xkbInfo.ctrl_mod = xkb_map_mod_get_index(m_xkbInfo.keymap, XKB_MOD_NAME_CTRL);
+    m_xkbInfo.alt_mod = xkb_map_mod_get_index(m_xkbInfo.keymap, XKB_MOD_NAME_ALT);
+    m_xkbInfo.mod2_mod = xkb_map_mod_get_index(m_xkbInfo.keymap, "Mod2");
+    m_xkbInfo.mod3_mod = xkb_map_mod_get_index(m_xkbInfo.keymap, "Mod3");
+    m_xkbInfo.super_mod = xkb_map_mod_get_index(m_xkbInfo.keymap, XKB_MOD_NAME_LOGO);
+    m_xkbInfo.mod5_mod = xkb_map_mod_get_index(m_xkbInfo.keymap, "Mod5");
+    m_xkbInfo.num_led = xkb_map_led_get_index(m_xkbInfo.keymap, XKB_LED_NAME_NUM);
+    m_xkbInfo.caps_led = xkb_map_led_get_index(m_xkbInfo.keymap, XKB_LED_NAME_CAPS);
     m_xkbInfo.scroll_led = xkb_map_led_get_index(m_xkbInfo.keymap, XKB_LED_NAME_SCROLL);
 
     char *keymapStr = xkb_map_get_as_string(m_xkbInfo.keymap);
-    if (keymapStr == NULL){
+    if (keymapStr == NULL)
+    {
         LOG_ERROR("WaylandX11InputEvent", "Failed to get string version of keymap");
         return;
     }
     m_xkbInfo.keymap_size = strlen(keymapStr) + 1;
 
     m_xkbInfo.keymap_fd = createAnonymousFile(m_xkbInfo.keymap_size);
-    if (m_xkbInfo.keymap_fd < 0){
+    if (m_xkbInfo.keymap_fd < 0)
+    {
         LOG_WARNING("WaylandX11InputEvent", "Creating a keymap file for " <<
                     (unsigned long)m_xkbInfo.keymap_size <<
                     " bytes failed");
@@ -261,7 +276,8 @@ WaylandInputEvent::createNewKeymap()
                                         MAP_SHARED,
                                         m_xkbInfo.keymap_fd,
                                         0);
-    if (m_xkbInfo.keymap_area == MAP_FAILED){
+    if (m_xkbInfo.keymap_area == MAP_FAILED)
+    {
         LOG_WARNING("WaylandX11InputEvent", "Failed to mmap() " <<
                     (unsigned long) m_xkbInfo.keymap_size <<
                     " bytes");
@@ -288,13 +304,14 @@ WaylandInputEvent::buildGlobalKeymap()
         return;
 
     m_xkbInfo.keymap = xkb_map_new_from_names(m_xkbContext,
-                                              &m_xkbNames,
-                                              static_cast<xkb_map_compile_flags>(0));
-    if (m_xkbInfo.keymap == NULL){
+                                                &m_xkbNames,
+                                                static_cast<xkb_map_compile_flags>(0));
+    if (m_xkbInfo.keymap == NULL)
+    {
         LOG_ERROR("WaylandInputEvent", "Failed to compile global XKB keymap");
         LOG_ERROR("WaylandInputEvent", "  tried rules: " << m_xkbNames.rules <<
-                                       ", model: "       << m_xkbNames.model <<
-                                       ", layout: "      << m_xkbNames.layout);
+                                        ", model: " << m_xkbNames.model <<
+                                        ", layout: " << m_xkbNames.layout);
         return;
     }
 

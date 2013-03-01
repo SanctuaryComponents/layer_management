@@ -43,7 +43,8 @@ ExecutionResult SurfaceSetPositionCommand::execute(ICommandExecutor* executor)
         }
         if (layerid != Surface::INVALID_ID)
         {
-            surface->calculateTargetDestination(scene.getLayer(layerid)->getSourceRegion(),scene.getLayer(layerid)->getDestinationRegion());
+            surface->calculateTargetDestination(scene.getLayer(layerid)->getSourceRegion(),
+                                                scene.getLayer(layerid)->getDestinationRegion());
         }
     }
     return result;

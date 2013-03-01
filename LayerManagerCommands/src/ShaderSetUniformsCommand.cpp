@@ -43,7 +43,7 @@ ExecutionResult ShaderSetUniformsCommand::execute(ICommandExecutor* executor)
             const std::vector<std::string> uniformDesc = m_uniforms;
             std::vector<std::string>::const_iterator uiterator;
 
-            for (uiterator=uniformDesc.begin(); uiterator != uniformDesc.end(); ++uiterator)
+            for (uiterator = uniformDesc.begin(); uiterator != uniformDesc.end(); ++uiterator)
             {
                 // parse description string and create uniform object
                 ShaderUniform* uniform = ShaderUniform::createFromStringDescription(*uiterator);
@@ -69,7 +69,7 @@ ExecutionResult ShaderSetUniformsCommand::execute(ICommandExecutor* executor)
     else
     {
         // shader not found
-        LOG_ERROR("ShaderSetUniformsCommand", "shader ID "<<m_shaderid<<" not found");
+        LOG_ERROR("ShaderSetUniformsCommand", "shader ID " << m_shaderid << " not found");
         result = ExecutionFailed;
     }
 

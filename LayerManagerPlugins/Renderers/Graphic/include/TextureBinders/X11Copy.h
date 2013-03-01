@@ -26,7 +26,7 @@
 #include "PlatformSurfaces/XPlatformSurface.h"
 #include <X11/extensions/Xcomposite.h>
 
-class X11Copy: public ITextureBinder
+class X11Copy : public ITextureBinder
 {
 public:
     X11Copy(Display* display);

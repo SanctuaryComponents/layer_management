@@ -37,5 +37,6 @@ enum PixelFormat
     PIXELFORMAT_UNKNOWN = ILM_PIXEL_FORMAT_UNKNOWN
 };
 
-#define PixelFormatHasAlpha(pf) ((pf == PIXELFORMAT_RGBA8888) || (pf == PIXELFORMAT_RGBA5551) || (pf == PIXELFORMAT_RGBA6661) || (pf == PIXELFORMAT_RGBA4444))
+#define PixelFormatHasAlpha(pf) \
+    ((pf == PIXELFORMAT_RGBA8888) || (pf == PIXELFORMAT_RGBA5551) || (pf == PIXELFORMAT_RGBA6661) || (pf == PIXELFORMAT_RGBA4444))
 #endif /* _PIXELFORMAT_H_ */

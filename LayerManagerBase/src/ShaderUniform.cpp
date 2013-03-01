@@ -27,15 +27,16 @@
 using namespace std;
 
 const int ShaderUniform::m_vectorSizesOfDataTypes[] =
-{ 0, // Undefined
-        1, // Vector1f
-        2, // Vector2f
-        3, // Vector3f
-        4, // Vector4f
-        4, // Matrix2f
-        9, // Matrix3f
-        16 // Matrix4f
-        };
+{
+    0, // Undefined
+    1, // Vector1f
+    2, // Vector2f
+    3, // Vector3f
+    4, // Vector4f
+    4, // Matrix2f
+    9, // Matrix3f
+    16 // Matrix4f
+};
 
 ShaderUniform* ShaderUniform::createFromStringDescription(
         const string& description)
@@ -81,7 +82,7 @@ ShaderUniform* ShaderUniform::createFromStringDescription(
     }
     else
     {
-        LOG_ERROR("Shader Uniform","Can not parse Type " << token);
+        LOG_ERROR("Shader Uniform", "Can not parse Type " << token);
         return NULL;
     }
 
@@ -91,7 +92,7 @@ ShaderUniform* ShaderUniform::createFromStringDescription(
     if (iss.fail())
     {
         // failed to parse element count
-        LOG_ERROR("Shader Uniform","Fail to parse element count.");
+        LOG_ERROR("Shader Uniform", "Fail to parse element count.");
         return NULL;
     }
 
@@ -101,7 +102,7 @@ ShaderUniform* ShaderUniform::createFromStringDescription(
     {
         if ((iss >> transpose).fail())
         {
-            LOG_ERROR("Shader Uniform","Fail to parse value ");
+            LOG_ERROR("Shader Uniform", "Fail to parse value ");
             return NULL;
         }
     }
@@ -115,7 +116,7 @@ ShaderUniform* ShaderUniform::createFromStringDescription(
         if (iss.fail())
         {
             // failed to parse value
-            LOG_ERROR("Shader Uniform","Fail to parse value " << value);
+            LOG_ERROR("Shader Uniform", "Fail to parse value " << value);
             return NULL;
         }
         floatData.push_back(value);
@@ -123,7 +124,7 @@ ShaderUniform* ShaderUniform::createFromStringDescription(
 
     if (floatData.size() != numValuesExpected)
     {
-        LOG_ERROR("Shader Uniform","Invalid number of values");
+        LOG_ERROR("Shader Uniform", "Invalid number of values");
         return NULL;
     }
 
@@ -178,16 +179,16 @@ void ShaderUniform::setData(const ShaderUniform& other)
 
 void ShaderUniform::load(ShaderProgram& program)
 {
-    LOG_DEBUG("ShaderUniform","Load Uniform " << getName() << " location " << m_location);
-    if ( m_location == 0 ) 
+    LOG_DEBUG("ShaderUniform", "Load Uniform " << getName() << " location " << m_location);
+    if (m_location == 0)
     {
         m_location = program.getUniformLocation(getName().c_str());
     }
-    LOG_DEBUG("ShaderUniform","Load Uniform " << getName() << " location " << m_location);
+    LOG_DEBUG("ShaderUniform", "Load Uniform " << getName() << " location " << m_location);
     if (m_location == -1)
     {
         // TODO: error? or silently fail?
-        LOG_WARNING("ShaderUniform","Load Uniform failed, location not defined" );
+        LOG_WARNING("ShaderUniform", "Load Uniform failed, location not defined");
         return;
     }
 
@@ -197,22 +198,22 @@ void ShaderUniform::load(ShaderProgram& program)
     switch (m_type)
     {
     case Vector1f:
-        LOG_DEBUG("ShaderUniform","Load Uniform1fv : " << values[0] );
+        LOG_DEBUG("ShaderUniform", "Load Uniform1fv : " << values[0]);
         program.uniform1fv(m_location, m_count, values);
         break;
 
     case Vector2f:
-        LOG_DEBUG("ShaderUniform","Load Uniform2fv : " << values[0] << "," << values[1] );
+        LOG_DEBUG("ShaderUniform", "Load Uniform2fv : " << values[0] << ", " << values[1]);
         program.uniform2fv(m_location, m_count, values);
         break;
 
     case Vector3f:
-        LOG_DEBUG("ShaderUniform","Load Uniform3fv : " << values[0] << "," << values[1] << "," << values[2] );
+        LOG_DEBUG("ShaderUniform", "Load Uniform3fv : " << values[0] << ", " << values[1] << ", " << values[2]);
         program.uniform3fv(m_location, m_count, values);
         break;
 
     case Vector4f:
-        LOG_DEBUG("ShaderUniform","Load Uniform4fv : " << values[0] << "," << values[1] << "," << values[2] << "," << values[3] );
+        LOG_DEBUG("ShaderUniform", "Load Uniform4fv : " << values[0] << ", " << values[1] << ", " << values[2] << ", " << values[3]);
         program.uniform4fv(m_location, m_count, values);
         break;
 

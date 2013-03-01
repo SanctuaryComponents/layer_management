@@ -35,30 +35,30 @@ Ground::Ground(vec3f position, vec3f size, vec4f color, ShaderBase* pShader)
 , m_color(color)
 , m_pShader(pShader)
 {
-	m_index[0] = vec3u(0, 1, 2);
-	m_index[1] = vec3u(2, 3, 0);
-    
+    m_index[0] = vec3u(0, 1, 2);
+    m_index[1] = vec3u(2, 3, 0);
+
     //                             y  z
     //     3-------------2         | /
     //    /             /          |/
     //   /             /           ------x
     //  0-------------1
-    
-	m_vertex[0].x = m_position.x;
-	m_vertex[0].y = m_position.y;
-	m_vertex[0].z = m_position.z;
-    
-	m_vertex[1].x = m_position.x + m_size.x;
-	m_vertex[1].y = m_position.y;
-	m_vertex[1].z = m_position.z;
-    
-	m_vertex[2].x = m_position.x + m_size.x;
-	m_vertex[2].y = m_position.y;
-	m_vertex[2].z = m_position.z + m_size.z;
-    
-	m_vertex[3].x = m_position.x;
-	m_vertex[3].y = m_position.y;
-	m_vertex[3].z = m_position.z + m_size.z;
+
+    m_vertex[0].x = m_position.x;
+    m_vertex[0].y = m_position.y;
+    m_vertex[0].z = m_position.z;
+
+    m_vertex[1].x = m_position.x + m_size.x;
+    m_vertex[1].y = m_position.y;
+    m_vertex[1].z = m_position.z;
+
+    m_vertex[2].x = m_position.x + m_size.x;
+    m_vertex[2].y = m_position.y;
+    m_vertex[2].z = m_position.z + m_size.z;
+
+    m_vertex[3].x = m_position.x;
+    m_vertex[3].y = m_position.y;
+    m_vertex[3].z = m_position.z + m_size.z;
 }
 
 void Ground::render()

@@ -17,8 +17,8 @@
  *
  ****************************************************************************/
 
-#ifndef _ISCENE_PROVIDER_H_
-#define _ISCENE_PROVIDER_H_
+#ifndef _ISCENEPROVIDER_H_
+#define _ISCENEPROVIDER_H_
 
 class ICommandExecutor;
 
@@ -39,7 +39,7 @@ public:
      * Delegate Scene : this method will be called on LayerManager startup
      * to delegate a initial scene description of Layers on the target Platform
      */
-     virtual bool delegateScene() = 0;
+    virtual bool delegateScene() = 0;
 
 protected:
     ICommandExecutor* m_executor;
@@ -50,4 +50,4 @@ inline ISceneProvider::ISceneProvider(ICommandExecutor* executor)
 {
 }
 
-#endif /* _ISCENE_PROVIDER_H_ */
+#endif /* _ISCENEPROVIDER_H_ */

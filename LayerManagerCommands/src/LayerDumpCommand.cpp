@@ -23,22 +23,22 @@
 
 ExecutionResult LayerDumpCommand::execute(ICommandExecutor* executor)
 {
-	ExecutionResult result = ExecutionFailed;
+    ExecutionResult result = ExecutionFailed;
     Scene& scene = *(executor->getScene());
     RendererList& m_rendererList = *(executor->getRendererList());
 
     bool status = false;
 
-    LOG_INFO("LayerDumpCommand","making screenshot, output file: " << m_filename);
+    LOG_INFO("LayerDumpCommand", "making screenshot, output file: " << m_filename);
 
-	if (scene.getLayer(m_id))
-	{
-		status = scene.isLayerInCurrentRenderOrder(m_id);
-		if (!status)
-		{
-			LOG_WARNING("LayerDumpCommand","Requested layer: " << m_id << " does not belong to the current render order");
-		}
-	}
+    if (scene.getLayer(m_id))
+    {
+        status = scene.isLayerInCurrentRenderOrder(m_id);
+        if (!status)
+        {
+            LOG_WARNING("LayerDumpCommand", "Requested layer: " << m_id << " does not belong to the current render order");
+        }
+    }
 
     if (status)
     {

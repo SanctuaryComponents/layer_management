@@ -16,8 +16,8 @@
  * limitations under the License.
  *
  ****************************************************************************/
-#ifndef _Argument_h
-#define _Argument_h
+#ifndef _ARGUMENT_H
+#define _ARGUMENT_H
 
 #include <string>
 using std::string;
@@ -58,4 +58,4 @@ private:
     unsigned int value;
 };
 
-#endif
+#endif /* _ARGUMENT_H */

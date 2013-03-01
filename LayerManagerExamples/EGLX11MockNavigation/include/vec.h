@@ -16,8 +16,8 @@
  * limitations under the License.
  *
  ****************************************************************************/
-#ifndef _vec_h
-#define _vec_h
+#ifndef _VEC_H
+#define _VEC_H
 
 #include <GLES2/gl2.h>
 
@@ -121,4 +121,4 @@ typedef vec4<GLfloat> vec4f;
 typedef vec4<GLint>   vec4i;
 typedef vec4<GLuint>  vec4u;
 
-#endif
+#endif /* _VEC_H */

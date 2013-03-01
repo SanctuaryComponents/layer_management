@@ -85,7 +85,7 @@ ilmErrorTypes createLayers(t_ilm_uint LayerWidth, t_ilm_uint LayerHeight)
     for(index = 0; index < 3; ++index)
     {
         printf("Creating Layer... ");
-        error = ilm_layerCreateWithDimension(&layer[index],LayerWidth,LayerHeight);
+        error = ilm_layerCreateWithDimension(&layer[index], LayerWidth, LayerHeight);
         if(ILM_SUCCESS == error)
         {
             printf("success\n");
@@ -100,7 +100,7 @@ ilmErrorTypes createLayers(t_ilm_uint LayerWidth, t_ilm_uint LayerHeight)
         printf("Setting Layer source rectangle(0, 0, %d, %d)... \n", LayerWidth, LayerHeight);
         error = ilm_layerSetSourceRectangle(layer[index], 0, 0, LayerWidth, LayerHeight);
         printf("Setting Layer visibility(%d)... \n", 1);
-        error = ilm_layerSetVisibility(layer[index],1);
+        error = ilm_layerSetVisibility(layer[index], 1);
         if(ILM_SUCCESS == error)
         {
             printf("success\n");
@@ -144,14 +144,14 @@ int main(int argc, char **argv)
     t_ilm_uint LayerWidth = LAYERWIDTH;
     t_ilm_uint LayerHeight = LAYERHEIGHT;
 
-    if (ILM_SUCCESS != init())
+    if(ILM_SUCCESS != init())
     {
         return -1;
     }
 
     ilm_getScreenResolution(0, &LayerWidth, &LayerHeight);
 
-    if (argc == 2 && atoi(argv[1]) == 1)
+    if(argc == 2 && atoi(argv[1]) == 1)
     {
         doSceneLayeout(LayerWidth, LayerHeight);
 
@@ -162,7 +162,7 @@ int main(int argc, char **argv)
 
         changeLayerOpacity();
     }
-    else if (argc == 2 && atoi(argv[1]) == 2)
+    else if(argc == 2 && atoi(argv[1]) == 2)
     {
         RemoveSceneLayout();
     }

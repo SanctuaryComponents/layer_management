@@ -1,5 +1,5 @@
 /***************************************************************************
- * 
+ *
  * Copyright 2010,2011 BMW Car IT GmbH
  *
  *
@@ -52,4 +52,3 @@ void PluginBase::pluginSetHealth(HealthCondition health)
 {
     mHealth = health;
 }
-    

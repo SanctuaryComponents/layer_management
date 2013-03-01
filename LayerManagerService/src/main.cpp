@@ -27,7 +27,8 @@ int main(int argc, char **argv)
 {
     // monitor startup performance
     unsigned int startupTimeInMs = 0;
-    timeval start, end;
+    timeval start;
+    timeval end;
     gettimeofday(&start, 0);
 
     // collect all configuration settings
@@ -39,7 +40,7 @@ int main(int argc, char **argv)
     Log::dltLogLevel = (LOG_MODES)configuration.getLogLevelTrace();
 
     LOG_INFO("LayerManagerService", "Starting Layermanager (version: " << ILM_VERSION << ")");
-    
+
     // log configuration options
     configuration.logAllSettings();
 

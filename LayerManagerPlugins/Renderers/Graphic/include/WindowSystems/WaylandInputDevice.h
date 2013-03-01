@@ -50,7 +50,8 @@ private:
     struct wl_resource* m_wlTouchFocusResource;
     struct wl_listener  m_wlTouchFocusResourceListener;
 
-    struct {
+    struct
+    {
         struct wl_pointer  wlPointer;
         struct wl_keyboard wlKeyboard;
         struct wl_touch    wlTouch;
@@ -79,18 +80,18 @@ public:
     const struct wl_touch    *touchDevice() const;
 
     void sendMousePressEvent(const Point& globalPos, const Point& localPos,
-                             uint32_t button, uint32_t time);
+                                uint32_t button, uint32_t time);
     void sendMouseReleaseEvent(const Point& globalPos, const Point& localPos,
-                               uint32_t button, uint32_t time);
+                                uint32_t button, uint32_t time);
     void sendMouseMotionEvent(struct wl_surface *surface,
-                              const Point& globalPos, const Point& localPos, uint32_t time);
+                                const Point& globalPos, const Point& localPos, uint32_t time);
 
     void sendKeyPressEvent(struct wl_surface *surface, uint32_t time, uint32_t code);
     void sendKeyReleaseEvent(struct wl_surface *surface, uint32_t time, uint32_t code);
     void setKeyboardFocus(struct wl_surface *surface);
 
     void sendTouchPointEvent(struct wl_surface *surface, uint32_t time,
-                             int touchId, int touchState, const Point& touchPos);
+                                int touchId, int touchState, const Point& touchPos);
     void sendTouchFrameEvent();
     void sendTouchCancelEvent();
 
@@ -101,11 +102,11 @@ private:
     void cleanupDataDeviceForClient(struct wl_client *client, bool destroyDev);
 
     void setMouseFocus(struct wl_surface *surface,
-                       const Point& globalPos,
-                       const Point& localPos);
+                        const Point& globalPos,
+                        const Point& localPos);
     void sendMouseMotionEvent(const Point& globalPos,
-                              const Point& localPos,
-                              uint32_t time);
+                                const Point& localPos,
+                                uint32_t time);
 
     void setTouchFocus(struct wl_surface *surface);
 
@@ -119,34 +120,69 @@ private:
     static void destroyDeviceResource(struct wl_resource *resource);
 
     static void getPointer(struct wl_client *client,
-                           struct wl_resource *resource,
-                           uint32_t id);
+                            struct wl_resource *resource,
+                            uint32_t id);
     static void getKeyboard(struct wl_client *client,
                             struct wl_resource *resource,
                             uint32_t id);
     static void getTouch(struct wl_client *client,
-                         struct wl_resource *resource,
-                         uint32_t id);
+                            struct wl_resource *resource,
+                            uint32_t id);
 };
 
-inline struct wl_display* WaylandInputDevice::display() { return m_wlDisplay; }
-inline struct wl_seat* WaylandInputDevice::seat() { return &m_wlSeat; }
-inline bool WaylandInputDevice::hasPointer() const { return m_hasPointer; }
-inline bool WaylandInputDevice::hasKeyboard() const { return m_hasKeyboard; }
-inline bool WaylandInputDevice::hasTouch() const { return m_hasTouch; }
+inline struct wl_display* WaylandInputDevice::display()
+{
+    return m_wlDisplay;
+}
+
+inline struct wl_seat* WaylandInputDevice::seat()
+{
+    return &m_wlSeat;
+}
+
+inline bool WaylandInputDevice::hasPointer() const
+{
+    return m_hasPointer;
+}
+
+inline bool WaylandInputDevice::hasKeyboard() const
+{
+    return m_hasKeyboard;
+}
+
+inline bool WaylandInputDevice::hasTouch() const
+{
+    return m_hasTouch;
+}
 
 inline struct wl_pointer* WaylandInputDevice::pointerDevice()
-    { return &m_deviceInterfaces.wlPointer; }
+{
+    return &m_deviceInterfaces.wlPointer;
+}
+
 inline struct wl_keyboard* WaylandInputDevice::keyboardDevice()
-    { return &m_deviceInterfaces.wlKeyboard; }
+{
+    return &m_deviceInterfaces.wlKeyboard;
+}
+
 inline struct wl_touch* WaylandInputDevice::touchDevice()
-    { return &m_deviceInterfaces.wlTouch; }
+{
+    return &m_deviceInterfaces.wlTouch;
+}
 
 inline const struct wl_pointer* WaylandInputDevice::pointerDevice() const
-    { return &m_deviceInterfaces.wlPointer; }
+{
+    return &m_deviceInterfaces.wlPointer;
+}
+
 inline const struct wl_keyboard* WaylandInputDevice::keyboardDevice() const
-    { return &m_deviceInterfaces.wlKeyboard; }
+{
+    return &m_deviceInterfaces.wlKeyboard;
+}
+
 inline const struct wl_touch* WaylandInputDevice::touchDevice() const
-    { return &m_deviceInterfaces.wlTouch; }
+{
+    return &m_deviceInterfaces.wlTouch;
+}
 
 #endif /* _WAYLANDINPUTDEVICE_H_ */

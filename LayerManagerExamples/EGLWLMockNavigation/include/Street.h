@@ -16,8 +16,8 @@
  * limitations under the License.
  *
  ****************************************************************************/
-#ifndef _Street_h
-#define _Street_h
+#ifndef _STREET_H
+#define _STREET_H
 
 #include "IRenderable.h"
 #include "IUpdateable.h"
@@ -45,4 +45,4 @@ private:
     ShaderBase* m_shader;
 };
 
-#endif
+#endif /* _STREET_H */

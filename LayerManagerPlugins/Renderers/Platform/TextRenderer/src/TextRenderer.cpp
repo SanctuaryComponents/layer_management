@@ -42,9 +42,9 @@ bool TextRenderer::start(int width, int height, const char* displayname)
     screenList.push_back(lmScreen);
 
     LOG_DEBUG("TextRenderer", "start("
-              << "width=" << width
-              << ", height=" << height
-              << ", displayname=" << displayname << ")");
+                << "width=" << width
+                << ", height=" << height
+                << ", displayname=" << displayname << ")");
     return true;
 }
 
@@ -61,24 +61,24 @@ TextRenderer::~TextRenderer()
 void TextRenderer::doScreenShot(std::string fileToSave)
 {
     LOG_DEBUG("TextRenderer", "doScreenShot("
-              << "fileToSave=" << fileToSave << ")");
+                << "fileToSave=" << fileToSave << ")");
     std::fstream file(fileToSave.c_str());
 }
 
-void TextRenderer::doScreenShotOfLayer(std::string fileToSave,uint id)
+void TextRenderer::doScreenShotOfLayer(std::string fileToSave, uint id)
 {
     LOG_DEBUG("TextRenderer", "doScreenShotOfLayer("
-              << "fileToSave=" << fileToSave
-              << ", id=" << id << ")");
+                << "fileToSave=" << fileToSave
+                << ", id=" << id << ")");
     std::fstream file(fileToSave.c_str());
 }
 
 void TextRenderer::doScreenShotOfSurface(std::string fileToSave, uint id, uint layer_id)
 {
     LOG_DEBUG("TextRenderer", "doScreenShotOfSurface("
-              << "fileToSave=" << fileToSave
-              << ", id=" << id
-              << ", layer_id=" << layer_id << ")");
+                << "fileToSave=" << fileToSave
+                << ", id=" << id
+                << ", layer_id=" << layer_id << ")");
     std::fstream file(fileToSave.c_str());
 }
 
@@ -126,8 +126,8 @@ void TextRenderer::forceCompositionWindowSystem()
 bool TextRenderer::setOptimizationMode(OptimizationType id, OptimizationModeType mode)
 {
     LOG_DEBUG("TextRenderer", "setOptimizationMode("
-              << "id=" << id
-              << ", mode=" << mode << ")");
+                << "id=" << id
+                << ", mode=" << mode << ")");
     m_optimizationMode = mode;
     return true;
 }
@@ -136,7 +136,7 @@ bool TextRenderer::getOptimizationMode(OptimizationType id, OptimizationModeType
 {
     (void)mode;
     LOG_DEBUG("TextRenderer", "getOptimizationMode("
-              << "id=" << id << ")");
+                << "id=" << id << ")");
     *mode = m_optimizationMode;
     return true;
 }

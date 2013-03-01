@@ -47,12 +47,12 @@ ExecutionResult LayerSetRenderOrderCommand::execute(ICommandExecutor* executor)
                 unsigned int layer_id = surface->getContainingLayerId();
                 if (layer->addSurface(surface))
                 {
-                    LOG_DEBUG("LayerSetRenderOrderCommand","Adding surface " << surface->getID() << " to renderorder of layer " << m_layerid);
+                    LOG_DEBUG("LayerSetRenderOrderCommand", "Adding surface " << surface->getID() << " to renderorder of layer " << m_layerid);
                     result = ExecutionSuccessRedraw;
                 }
                 else
                 {
-                    LOG_WARNING("LayerSetRenderOrderCommand","surface : id [ " << m_array[surfaceIndex] << " ] already belongs to layer : id [ " << layer_id << " ]");
+                    LOG_WARNING("LayerSetRenderOrderCommand", "surface : id [ " << m_array[surfaceIndex] << " ] already belongs to layer : id [ " << layer_id << " ]");
                 }
             }
         }

@@ -9,9 +9,9 @@
  *
  *        http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed in writing, software
+ * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either inputess or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
@@ -198,7 +198,7 @@ COMMAND("set layer|surface <id> source region <x> <y> <w> <h>")
         if (ILM_SUCCESS != callResult)
         {
             cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
-            cout << "Failed to set source rectangle (" << x << "," << y << ", "<< w << ", " << h <<") for layer with ID " << id << "\n";
+            cout << "Failed to set source rectangle (" << x << "," << y << ", " << w << ", " << h << ") for layer with ID " << id << "\n";
             return;
         }
 
@@ -210,7 +210,7 @@ COMMAND("set layer|surface <id> source region <x> <y> <w> <h>")
         if (ILM_SUCCESS != callResult)
         {
             cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
-            cout << "Failed to set source rectangle (" << x << ", " << y << ", "<< w << ", " << h <<") for surface with ID " << id << "\n";
+            cout << "Failed to set source rectangle (" << x << ", " << y << ", " << w << ", " << h << ") for surface with ID " << id << "\n";
             return;
         }
 
@@ -234,7 +234,7 @@ COMMAND("set layer|surface <id> destination region <x> <y> <w> <h>")
         if (ILM_SUCCESS != callResult)
         {
             cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
-            cout << "Failed to set destination rectangle (" << x << ", " << y << ", "<< w << ", " << h <<") for layer with ID " << id << "\n";
+            cout << "Failed to set destination rectangle (" << x << ", " << y << ", " << w << ", " << h << ") for layer with ID " << id << "\n";
             return;
         }
 
@@ -246,7 +246,7 @@ COMMAND("set layer|surface <id> destination region <x> <y> <w> <h>")
         if (ILM_SUCCESS != callResult)
         {
             cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
-            cout << "Failed to set destination rectangle (" << x << ", " << y << ", "<< w << ", " << h <<") for surface with ID " << id << "\n";
+            cout << "Failed to set destination rectangle (" << x << ", " << y << ", " << w << ", " << h << ") for surface with ID " << id << "\n";
             return;
         }
 
@@ -267,7 +267,7 @@ COMMAND("set layer|surface <id> opacity <opacity>")
         if (ILM_SUCCESS != callResult)
         {
             cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
-            cout << "Failed to set opacity "<< opacity << " for layer with ID " << id << "\n";
+            cout << "Failed to set opacity " << opacity << " for layer with ID " << id << "\n";
             return;
         }
 
@@ -279,7 +279,7 @@ COMMAND("set layer|surface <id> opacity <opacity>")
         if (ILM_SUCCESS != callResult)
         {
             cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
-            cout << "Failed to set opacity "<< opacity << " for surface with ID " << id << "\n";
+            cout << "Failed to set opacity " << opacity << " for surface with ID " << id << "\n";
             return;
         }
 
@@ -300,7 +300,7 @@ COMMAND("set layer|surface <id> visibility <visibility>")
         if (ILM_SUCCESS != callResult)
         {
             cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
-            cout << "Failed to set visibility "<< visibility << " for layer with ID " << id << "\n";
+            cout << "Failed to set visibility " << visibility << " for layer with ID " << id << "\n";
             return;
         }
 
@@ -312,7 +312,7 @@ COMMAND("set layer|surface <id> visibility <visibility>")
         if (ILM_SUCCESS != callResult)
         {
             cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
-            cout << "Failed to set visibility "<< visibility << " for surface with ID " << id << "\n";
+            cout << "Failed to set visibility " << visibility << " for surface with ID " << id << "\n";
             return;
         }
 
@@ -333,7 +333,7 @@ COMMAND("set layer|surface <id> orientation <orientation>")
         if (ILM_SUCCESS != callResult)
         {
             cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
-            cout << "Failed to set orientation "<< orientation << " for layer with ID " << id << "\n";
+            cout << "Failed to set orientation " << orientation << " for layer with ID " << id << "\n";
             return;
         }
 
@@ -345,13 +345,12 @@ COMMAND("set layer|surface <id> orientation <orientation>")
         if (ILM_SUCCESS != callResult)
         {
             cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
-            cout << "Failed to set orientation "<< orientation << " for surface with ID " << id << "\n";
+            cout << "Failed to set orientation " << orientation << " for surface with ID " << id << "\n";
             return;
         }
 
         ilm_commitChanges();
     }
-
 }
 
 //=============================================================================

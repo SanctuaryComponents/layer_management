@@ -41,7 +41,8 @@
 #include <fstream>
 #include <pthread.h>
 #include <map>
-typedef enum {
+typedef enum
+{
     LOG_DISABLED = 0,
     LOG_ERROR = 1,
     LOG_INFO = 2,
@@ -62,44 +63,47 @@ typedef void (*diagnosticInjectionCallback)(unsigned int module_id, void *data, 
 class Log
 {
 public:
-    
+
     typedef struct diagnosticCallbackData_t
     {
         unsigned int module_id;
         void *userdata;
         diagnosticInjectionCallback diagFunc;
     } diagnosticCallbackData;
-    
+
     typedef std::map<unsigned int, diagnosticCallbackData*> DiagnosticCallbackMap;
-    
+
     virtual ~Log();
     static LOG_MODES fileLogLevel;
     static LOG_MODES consoleLogLevel;
     static LOG_MODES dltLogLevel;
     static Log* getInstance();
-    static DiagnosticCallbackMap* getDiagnosticCallbackMap(){return getInstance()->m_diagnosticCallbackMap;};
-    void warning (LogContext logContext, const std::string& moduleName, const std::basic_string<char>& output);
-    void info (LogContext logContext, const std::string& moduleName, const std::basic_string<char>& output);
-    void error (LogContext logContext, const std::string& moduleName, const std::basic_string<char>& output);
-    void debug (LogContext logContext, const std::string& moduleName, const std::basic_string<char>& output);
+    static DiagnosticCallbackMap* getDiagnosticCallbackMap()
+    {
+        return getInstance()->m_diagnosticCallbackMap;
+    }
+    void warning(LogContext logContext, const std::string& moduleName, const std::basic_string<char>& output);
+    void info(LogContext logContext, const std::string& moduleName, const std::basic_string<char>& output);
+    void error(LogContext logContext, const std::string& moduleName, const std::basic_string<char>& output);
+    void debug(LogContext logContext, const std::string& moduleName, const std::basic_string<char>& output);
     void log(LogContext logContext, LOG_MODES logMode, const std::string& moduleName, const std::basic_string<char>& output);
-    void registerDiagnosticInjectionCallback( unsigned int module_id, diagnosticInjectionCallback diagFunc, void* userdata );
-    void unregisterDiagnosticInjectionCallback( unsigned int module_id );
+    void registerDiagnosticInjectionCallback(unsigned int module_id, diagnosticInjectionCallback diagFunc, void* userdata);
+    void unregisterDiagnosticInjectionCallback(unsigned int module_id);
     LogContext getLogContext();
     static void closeInstance();
 private:
     Log();
     void LogToFile(std::string logMode, const std::string& moduleName, const std::basic_string<char>& output);
-    void LogToConsole(std::string logMode, const std::string& moduleName,const std::basic_string<char>& output);
-    void LogToDltDaemon(LogContext logContext, LOG_MODES logMode,const std::string& moduleName,const std::basic_string<char>& output);
+    void LogToConsole(std::string logMode, const std::string& moduleName, const std::basic_string<char>& output);
+    void LogToDltDaemon(LogContext logContext, LOG_MODES logMode, const std::string& moduleName, const std::basic_string<char>& output);
 
 private:
     std::ofstream* m_fileStream;
     pthread_mutex_t m_LogBufferMutex;
     LogContext m_logContext;
     static DiagnosticCallbackMap* m_diagnosticCallbackMap;
-    
-    static Log* m_instance;    
+
+    static Log* m_instance;
 };
 
 //#define LOG_ERROR(logcontext,module, message)

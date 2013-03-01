@@ -22,7 +22,7 @@
 
 #include "ICommand.h"
 
-class ExitCommand: public ICommand
+class ExitCommand : public ICommand
 {
 public:
 
@@ -36,7 +36,7 @@ public:
     : ICommand(ExecuteSynchronous, sender)
     {}
 
-     /**
+    /**
      * \brief default destructor
      */
     virtual ~ExitCommand() {}

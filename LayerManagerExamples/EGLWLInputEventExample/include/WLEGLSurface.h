@@ -17,8 +17,8 @@
  * limitations under the License.
  *
  ****************************************************************************/
-#ifndef _WL_EGL_SURFACE_H_
-#define _WL_EGL_SURFACE_H_
+#ifndef _WLEGLSURFACE_H_
+#define _WLEGLSURFACE_H_
 
 #include <EGL/egl.h>
 #include <wayland-egl.h>
@@ -51,4 +51,4 @@ inline EGLDisplay WLEGLSurface::GetEGLDisplay() const { return m_eglDisplay; }
 inline EGLSurface WLEGLSurface::GetEGLSurface() const { return m_eglSurface; }
 inline EGLContext WLEGLSurface::GetEGLContext() const { return m_eglContext; }
 
-#endif
+#endif /* _WLEGLSURFACE_H_ */

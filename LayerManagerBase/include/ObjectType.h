@@ -17,8 +17,8 @@
 *
 ****************************************************************************/
 
-#ifndef _GRAPHICALOBJECTTYPE_H_
-#define _GRAPHICALOBJECTTYPE_H_
+#ifndef _OBJECTTYPE_H_
+#define _OBJECTTYPE_H_
 
 #include "ilm_types.h"
 
@@ -32,4 +32,4 @@ enum ObjectType
     TypeMax
 };
 
-#endif /* _GRAPHICALOBJECTTYPE_H_ */
+#endif /* _OBJECTTYPE_H_ */

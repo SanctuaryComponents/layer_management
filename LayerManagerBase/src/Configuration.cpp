@@ -92,18 +92,18 @@ void Configuration::logAllSettings()
     LOG_INFO("LayerManagerService", "Display " << mDisplayName << " size: " << mDisplayWidth << "x" << mDisplayHeight);
     LOG_INFO("LayerManagerService", "Plugin path: " << mPluginPath);
     LOG_DEBUG("LayerManagerService", "Log level: console " << mLogLevelConsole << ", file " << mLogLevelFile << ", trace " << mLogLevelTrace);
-    
+
     for (int i = 0; i < mBuildFlagCount; ++i)
     {
         const BuildFlag& flag = mpBuildFlags[i];
         switch (flag.type)
         {
-            case DEBUG_FLAG:
-                LOG_DEBUG("LayerManagerService", flag.description);
-                break;
-            case INFO_FLAG:
-                LOG_INFO("LayerManagerService", flag.description);
-                break;
+        case DEBUG_FLAG:
+            LOG_DEBUG("LayerManagerService", flag.description);
+            break;
+        case INFO_FLAG:
+            LOG_INFO("LayerManagerService", flag.description);
+            break;
         }
     }
 }
@@ -115,49 +115,49 @@ void Configuration::processCommandLine(int argc, char** argv)
         int option = getopt(argc, argv, "w::h::d::?::c::f::v::l::");
         switch (option)
         {
-            case 'd':
-                mDisplayName = optarg;
-                break;
-                
-            case 'w':
-                mDisplayWidth = atoi(optarg);
-                break;
-                
-            case 'h':
-                mDisplayHeight = atoi(optarg);
-                break;
-                
-            case 'c':
-                if (atoi(optarg) < LOG_MAX_LEVEL)
-                {
-                    mLogLevelConsole = (LOG_MODES)atoi(optarg);
-                }
-                break;
-                
-            case 'f':
-                if (atoi(optarg) < LOG_MAX_LEVEL)
-                {
-                    mLogLevelFile = (LOG_MODES)atoi(optarg);
-                }
-                break;
-                
-            case 'l':
-                if (atoi(optarg) < LOG_MAX_LEVEL)
-                {
-                    mLogLevelTrace = (LOG_MODES)atoi(optarg);
-                }
-                break;
+        case 'd':
+            mDisplayName = optarg;
+            break;
 
-            case 'v':
-                LOG_INFO("LayerManagerService", "Version: " << ILM_VERSION);
-                exit(-1);
-                break;
-                
-            case '?':
-            default:
-                LOG_INFO("LayerManagerService", "Version: " << ILM_VERSION);
-                puts(USAGE_DESCRIPTION);
-                exit(-1);
+        case 'w':
+            mDisplayWidth = atoi(optarg);
+            break;
+
+        case 'h':
+            mDisplayHeight = atoi(optarg);
+            break;
+
+        case 'c':
+            if (atoi(optarg) < LOG_MAX_LEVEL)
+            {
+                mLogLevelConsole = (LOG_MODES)atoi(optarg);
+            }
+            break;
+
+        case 'f':
+            if (atoi(optarg) < LOG_MAX_LEVEL)
+            {
+                mLogLevelFile = (LOG_MODES)atoi(optarg);
+            }
+            break;
+
+        case 'l':
+            if (atoi(optarg) < LOG_MAX_LEVEL)
+            {
+                mLogLevelTrace = (LOG_MODES)atoi(optarg);
+            }
+            break;
+
+        case 'v':
+            LOG_INFO("LayerManagerService", "Version: " << ILM_VERSION);
+            exit(-1);
+            break;
+
+        case '?':
+        default:
+            LOG_INFO("LayerManagerService", "Version: " << ILM_VERSION);
+            puts(USAGE_DESCRIPTION);
+            exit(-1);
         }
     }
 

@@ -23,7 +23,7 @@
 #include "ICommand.h"
 #include <string>
 
-class ScreenDumpCommand: public ICommand
+class ScreenDumpCommand : public ICommand
 {
 public:
     /*!

@@ -28,59 +28,59 @@
 
 class SurfaceUpdateInputEventAcceptance : public ICommand
 {
-    public:
-        /*!
-         * \action    This command update the list of input devices the surface
-         * can accept events from. Call this method if you do not want a surface
-         * to receive particular type of event (touch, keyboard, ...)
-         *
-         * \frequency Preferably at init. This could lead to weird results
-         * if you update the acceptance at runtime, while the surface has already
-         * a focus (touch, keyboard, ...)
-         *
-         * \param[in] sender process id of application that sent this command
-         * \param[in] surfId id of surface
-         * \param[in] devices Bitmask of ilmInputDevice. To set the acceptance status of one or more input device.
-         *            Note that this method will only the acceptance status for the specified InputDeviced in the
-         *            "devices" parameter. Not specified input device status will remain unchanged.
-         * \param[in] accept if TRUE, input events from all specified devices will be accepted
-         *
-         * \ingroup Commands
-         */
-        SurfaceUpdateInputEventAcceptance(pid_t sender, unsigned int surfId, InputDevice devices, bool accept)
-        : ICommand(ExecuteSynchronous, sender)
-        , m_surfId(surfId)
-        , m_devices(devices)
-        , m_accept(accept)
-        {}
+public:
+    /*!
+        * \action    This command update the list of input devices the surface
+        * can accept events from. Call this method if you do not want a surface
+        * to receive particular type of event (touch, keyboard, ...)
+        *
+        * \frequency Preferably at init. This could lead to weird results
+        * if you update the acceptance at runtime, while the surface has already
+        * a focus (touch, keyboard, ...)
+        *
+        * \param[in] sender process id of application that sent this command
+        * \param[in] surfId id of surface
+        * \param[in] devices Bitmask of ilmInputDevice. To set the acceptance status of one or more input device.
+        *            Note that this method will only the acceptance status for the specified InputDeviced in the
+        *            "devices" parameter. Not specified input device status will remain unchanged.
+        * \param[in] accept if TRUE, input events from all specified devices will be accepted
+        *
+        * \ingroup Commands
+        */
+    SurfaceUpdateInputEventAcceptance(pid_t sender, unsigned int surfId, InputDevice devices, bool accept)
+    : ICommand(ExecuteSynchronous, sender)
+    , m_surfId(surfId)
+    , m_devices(devices)
+    , m_accept(accept)
+    {}
 
-        /**
-         * \brief default destructor
-         */
-        virtual ~SurfaceUpdateInputEventAcceptance() {}
+    /**
+        * \brief default destructor
+        */
+    virtual ~SurfaceUpdateInputEventAcceptance() {}
 
-        /**
-         * \brief Execute this command.
-         * \param[in] executor Pointer to instance executing the LayerManagement Commands
-         * \return ExecutionSuccess: execution successful
-         * \return ExecutionFailed: execution failed
-         */
-        virtual ExecutionResult execute(ICommandExecutor* executor);
+    /**
+        * \brief Execute this command.
+        * \param[in] executor Pointer to instance executing the LayerManagement Commands
+        * \return ExecutionSuccess: execution successful
+        * \return ExecutionFailed: execution failed
+        */
+    virtual ExecutionResult execute(ICommandExecutor* executor);
 
-        /**
-         * \brief Get description string for this command.
-         * \return String object with description of this command object
-         */
-        virtual const std::string getString();
+    /**
+        * \brief Get description string for this command.
+        * \return String object with description of this command object
+        */
+    virtual const std::string getString();
 
-    private:
-        const unsigned int m_surfId;
-        const InputDevice m_devices;
-        const bool m_accept;
-
+private:
+    const unsigned int m_surfId;
+    const InputDevice m_devices;
+    const bool m_accept;
 
     // for unit testing
-    template <typename surfaceid_type, typename devices_type, typename acceptance_type> friend class UpdateInputEventAcceptanceOnCommandEqMatcherP3;
+    template <typename surfaceid_type, typename devices_type, typename acceptance_type>
+    friend class UpdateInputEventAcceptanceOnCommandEqMatcherP3;
 };
 
 #endif  /* ! _SURFACEUPDATEINPUTEVENTACCEPTANCE_H_ */

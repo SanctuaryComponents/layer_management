@@ -16,8 +16,8 @@
 * limitations under the License.
 *
 ****************************************************************************/
-#ifndef _APPLICATION_REFERENCE_LIST_H_
-#define _APPLICATION_REFERENCE_LIST_H_
+#ifndef _APPLICATIONREFERENCELIST_H_
+#define _APPLICATIONREFERENCELIST_H_
 
 #include <list>
 
@@ -25,4 +25,4 @@ typedef std::list<t_ilm_client_handle> ApplicationReferenceList;
 typedef std::list<t_ilm_client_handle>::iterator ApplicationReferenceListIterator;
 typedef std::list<t_ilm_client_handle>::const_iterator ApplicationReferenceListConstIterator;
 
-#endif // _APPLICATION_REFERENCE_LIST_H_
+#endif // _APPLICATIONREFERENCELIST_H_

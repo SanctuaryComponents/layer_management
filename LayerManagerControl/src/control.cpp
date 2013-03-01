@@ -119,7 +119,7 @@ void setSurfaceAcceptsInput(t_ilm_surface surfaceId, string kbdPointerTouch, t_i
     ilmInputDevice devices = (ilmInputDevice)0;
 
     str = new char [kbdPointerTouch.size()+1];
-    strcpy (str, kbdPointerTouch.c_str());
+    strcpy(str, kbdPointerTouch.c_str());
     tok = strtok(str, ":");
     while (tok != NULL)
     {
@@ -178,19 +178,19 @@ void layerNotificationCallback(t_ilm_layer layer, struct ilmLayerProperties* pro
     if (ILM_NOTIFICATION_SOURCE_RECT & mask)
     {
         cout << "\tsource rect = x:" << properties->sourceX
-             << ", y:" << properties->sourceY
-             << ", width:" << properties->sourceWidth
-             << ", height:" << properties->sourceHeight
-             << "\n";
+                << ", y:" << properties->sourceY
+                << ", width:" << properties->sourceWidth
+                << ", height:" << properties->sourceHeight
+                << "\n";
     }
 
     if (ILM_NOTIFICATION_DEST_RECT & mask)
     {
         cout << "\tdest rect = x:" << properties->destX
-             << ", y:" << properties->destY
-             << ", width:" << properties->destWidth
-             << ", height:" << properties->destHeight
-             << "\n";
+                << ", y:" << properties->destY
+                << ", width:" << properties->destWidth
+                << ", height:" << properties->destHeight
+                << "\n";
     }
 }
 
@@ -206,7 +206,7 @@ void testNotificationLayer(t_ilm_layer layerid)
         return;
     }
 
-    for  (int i = 0; i < 2; ++i)
+    for (int i = 0; i < 2; ++i)
     {
         usleep(100 * 1000);
         cout << "Set layer 1000 visbility to FALSE\n";
@@ -292,19 +292,19 @@ void surfaceNotificationCallback(t_ilm_layer surface, struct ilmSurfacePropertie
     if (ILM_NOTIFICATION_SOURCE_RECT & mask)
     {
         cout << "\tsource rect = x:" << properties->sourceX
-             << ", y:" << properties->sourceY
-             << ", width:" << properties->sourceWidth
-             << ", height:" << properties->sourceHeight
-             << "\n";
+                << ", y:" << properties->sourceY
+                << ", width:" << properties->sourceWidth
+                << ", height:" << properties->sourceHeight
+                << "\n";
     }
 
     if (ILM_NOTIFICATION_DEST_RECT & mask)
     {
         cout << "\tdest rect = x:" << properties->destX
-             << ", y:" << properties->destY
-             << ", width:" << properties->destWidth
-             << ", height:" << properties->destHeight
-             << "\n";
+                << ", y:" << properties->destY
+                << ", width:" << properties->destWidth
+                << ", height:" << properties->destHeight
+                << "\n";
     }
 }
 
@@ -355,7 +355,7 @@ void setOptimization(t_ilm_uint id, t_ilm_uint mode)
     if (ILM_SUCCESS != callResult)
     {
         cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
-        cout << "Failed to set optimization with ID "<< id <<" mode " << mode << "\n";
+        cout << "Failed to set optimization with ID " << id << " mode " << mode << "\n";
         return;
     }
 
@@ -370,7 +370,7 @@ void getOptimization(t_ilm_uint id)
     ilmErrorTypes callResult = ilm_GetOptimizationMode(optimizationId, &optimizationMode);
     if (callResult == ILM_SUCCESS)
     {
-        switch ( optimizationId )
+        switch (optimizationId)
         {
         case ILM_OPT_MULTITEXTURE :
             cout << "Optimization " << (int)optimizationId << " (Multitexture Optimization)" << endl;
@@ -401,14 +401,14 @@ void getOptimization(t_ilm_uint id)
             break;
 
         default:
-            cout <<"Mode " << "unknown" << endl ;
+            cout << "Mode " << "unknown" << endl;
             break;
         }
     }
     else
     {
         cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
-        cout << "Failed to get mode for optimization with ID "<< optimizationId << "\n";
+        cout << "Failed to get mode for optimization with ID " << optimizationId << "\n";
         return;
     }
 

@@ -52,7 +52,6 @@ using std::vector;
 
 namespace
 {
-
 void analyzePrintHelper(string tag, string flag, string description)
 {
     cout << left << setw(25) << tag << " | " << setw(7) << flag << " | " << description << endl;
@@ -63,7 +62,8 @@ void analyzeVisibilityAndOpacity(t_ilm_surface targetSurfaceId, t_scene_data& sc
     t_ilm_layer targetSurfaceLayer = scene.surfaceLayer[targetSurfaceId];
     ilmSurfaceProperties& targetSurfaceProperties = scene.surfaceProperties[targetSurfaceId];
     ilmLayerProperties& targetLayerProperties = scene.layerProperties[targetSurfaceLayer];
-    string tag, flag;
+    string tag;
+    string flag;
     char description[300] = "";
 
     //check visibility
@@ -138,7 +138,8 @@ void analyzeVisibilityAndOpacity(t_ilm_surface targetSurfaceId, t_scene_data& sc
 void analyzeSurfaceDimensions(t_ilm_surface targetSurfaceId, t_scene_data& scene)
 {
     ilmSurfaceProperties& targetSurfaceProperties = scene.surfaceProperties[targetSurfaceId];
-    string tag, flag;
+    string tag;
+    string flag;
     char description[300] = "";
 
     t_ilm_uint minDimension = 32;
@@ -234,7 +235,8 @@ void analyzeLayerDimensions(t_ilm_surface targetSurfaceId, t_scene_data& scene)
     ilmLayerProperties& targetLayerProperties = scene.layerProperties[targetSurfaceLayer];
     t_ilm_uint minDimension = 32;
 
-    string tag, flag;
+    string tag;
+    string flag;
     char description[300] = "";
     tag = "Layer dest width";
     if (targetLayerProperties.destWidth <= minDimension)
@@ -323,7 +325,6 @@ void analyzeLayerDimensions(t_ilm_surface targetSurfaceId, t_scene_data& scene)
 
 void analyzeDimensions(t_ilm_surface targetSurfaceId, t_scene_data& scene)
 {
-
     analyzeSurfaceDimensions(targetSurfaceId, scene);
     analyzeLayerDimensions(targetSurfaceId, scene);
 }
@@ -333,7 +334,8 @@ void analyzeSurfaceCheckInsideLayer(t_ilm_surface targetSurfaceId, t_scene_data&
     t_ilm_layer targetSurfaceLayer = scene.surfaceLayer[targetSurfaceId];
     tuple4 targetSurfaceCoordinates = getSurfaceScreenCoordinates(&scene, targetSurfaceId);
     ilmLayerProperties& targetLayerProperties = scene.layerProperties[targetSurfaceLayer];
-    string tag, flag;
+    string tag;
+    string flag;
     char description[300] = "";
 
     tuple4 layerCoordinates(targetLayerProperties.destX,
@@ -363,7 +365,8 @@ void analyzeOcclusion(t_ilm_surface targetSurfaceId,
         map<t_ilm_layer, ilmLayerProperties>& layerProperties,
         vector<t_ilm_surface>& allSurfaces, tuple4 targetSurfaceCoordinates)
 {
-    string tag, flag;
+    string tag;
+    string flag;
     char description[300] = "";
 
     vector<t_ilm_surface> occludingSurfaces;
@@ -389,7 +392,7 @@ void analyzeOcclusion(t_ilm_surface targetSurfaceId,
         //coordinates of the surface on screen
         t_ilm_int horizontalScale = layerProperties[surfaceLayer].destWidth / layerProperties[surfaceLayer].sourceWidth;
         t_ilm_int surfaceX1 = layerProperties[surfaceLayer].destX + horizontalScale
-                * (surfaceProperties[surfaceId].destX- layerProperties[surfaceLayer].sourceX);
+                * (surfaceProperties[surfaceId].destX - layerProperties[surfaceLayer].sourceX);
         t_ilm_int surfaceX2 = surfaceX1 + horizontalScale * surfaceProperties[surfaceId].destWidth;
 
         t_ilm_int verticalScale = layerProperties[surfaceLayer].destHeight / layerProperties[surfaceLayer].sourceHeight;
@@ -407,7 +410,6 @@ void analyzeOcclusion(t_ilm_surface targetSurfaceId,
             analyzePrintHelper(tag, flag, description);
 
             occluded = ILM_TRUE;
-
         }
         //if the surface is partially occluded
         else if (intersect(targetSurfaceCoordinates, surfaceCoordinates))
@@ -429,7 +431,8 @@ void analyzeOcclusion(t_ilm_surface targetSurfaceId,
 
 void analyzeOcclusion(t_ilm_surface targetSurfaceId, t_scene_data& scene)
 {
-    string tag, flag;
+    string tag;
+    string flag;
     char description[300] = "";
 
     vector<t_ilm_surface> renderedSurfaces = getSceneRenderOrder(&scene);
@@ -437,7 +440,7 @@ void analyzeOcclusion(t_ilm_surface targetSurfaceId, t_scene_data& scene)
 
     vector<t_ilm_surface>::iterator it = find(renderedSurfaces.begin(), renderedSurfaces.end(), targetSurfaceId);
 
-    tuple4 targetSurfaceCoordinates = getSurfaceScreenCoordinates( &scene, targetSurfaceId);
+    tuple4 targetSurfaceCoordinates = getSurfaceScreenCoordinates(&scene, targetSurfaceId);
 
     t_ilm_bool occluded = ILM_FALSE;
     tag = "Occlusion";
@@ -489,7 +492,8 @@ t_ilm_bool analyzeCheckSurfaceExists(t_ilm_surface targetSurfaceId, t_scene_data
 {
     t_ilm_bool exists = ILM_FALSE;
 
-    string tag, flag;
+    string tag;
+    string flag;
     char description[300] = "";
 
     tag = "Surface existance";
@@ -529,7 +533,8 @@ t_ilm_bool analyzeCheckRendered(t_ilm_surface targetSurfaceId, t_scene_data& sce
     }
 
     //output
-    string tag, flag;
+    string tag;
+    string flag;
     char description[300] = "";
 
     tag = "Surface on layer";
@@ -568,7 +573,8 @@ t_ilm_bool analyzeCheckRendered(t_ilm_surface targetSurfaceId, t_scene_data& sce
 
 t_ilm_bool analyzeSharedNative(t_ilm_surface targetSurfaceId, t_scene_data& scene)
 {
-    string tag, flag;
+    string tag;
+    string flag;
     char description[300] = "";
 
     tag = "Shared native";
@@ -611,7 +617,8 @@ t_ilm_bool analyzeUpdateCounter(t_ilm_surface targetSurfaceId, t_scene_data& sce
     ilmSurfaceProperties& targetSurfaceProperties = scene.surfaceProperties[targetSurfaceId];
 
     t_ilm_bool problem = targetSurfaceProperties.updateCounter == 0;
-    string tag, flag;
+    string tag;
+    string flag;
     char description[300] = "";
 
     tag = "Update Counter";
@@ -632,7 +639,6 @@ t_ilm_bool analyzeUpdateCounter(t_ilm_surface targetSurfaceId, t_scene_data& sce
 
     return !problem;
 }
-
 } //end of anonymous namespace
 
 

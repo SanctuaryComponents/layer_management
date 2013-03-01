@@ -26,18 +26,18 @@ ExecutionResult LayerCreateCommand::execute(ICommandExecutor* executor)
     Scene& scene = *(executor->getScene());
     ExecutionResult result = ExecutionFailed;
 
-	Layer *layer = scene.createLayer(*m_idReturn, getSenderPid());
-	if (layer)
-	{
-		*m_idReturn = layer->getID();
+    Layer *layer = scene.createLayer(*m_idReturn, getSenderPid());
+    if (layer)
+    {
+        *m_idReturn = layer->getID();
 
-		layer->setDestinationRegion(Rectangle(0, 0, m_originalWidth, m_originalHeight));
-		layer->setSourceRegion(Rectangle(0, 0, m_originalWidth, m_originalHeight));
-		layer->OriginalSourceWidth = m_originalWidth;
-		layer->OriginalSourceHeight = m_originalHeight;
+        layer->setDestinationRegion(Rectangle(0, 0, m_originalWidth, m_originalHeight));
+        layer->setSourceRegion(Rectangle(0, 0, m_originalWidth, m_originalHeight));
+        layer->OriginalSourceWidth = m_originalWidth;
+        layer->OriginalSourceHeight = m_originalHeight;
 
-		LOG_DEBUG("LayerCreateCommand", "created layer with id: " << layer->getID() << "width: " << m_originalWidth << " height: " << m_originalHeight);
-		result = ExecutionSuccess;
+        LOG_DEBUG("LayerCreateCommand", "created layer with id: " << layer->getID() << "width: " << m_originalWidth << " height: " << m_originalHeight);
+        result = ExecutionSuccess;
     }
     return result;
 }

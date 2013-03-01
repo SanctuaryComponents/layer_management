@@ -16,8 +16,8 @@
  * limitations under the License.
  *
  ****************************************************************************/
-#ifndef _Camera_h
-#define _Camera_h
+#ifndef _CAMERA_H
+#define _CAMERA_H
 
 #include "IUpdateable.h"
 #include "IlmMatrix.h"
@@ -42,4 +42,4 @@ private:
     IlmMatrix m_identityMatrix;
 };
 
-#endif
+#endif /* _CAMERA_H */

@@ -18,27 +18,27 @@
  *
  ****************************************************************************/
 
-#ifndef _IAPPLICATION_REFERENCE_H_
-#define _IAPPLICATION_REFERENCE_H_
+#ifndef _IAPPLICATIONREFERENCE_H_
+#define _IAPPLICATIONREFERENCE_H_
 #include <locale>
 #include <string.h>
 #include <stdlib.h>
 
 /**
- * Abstract Base Class for all Application References 
+ * Abstract Base Class for all Application References
  */
 class IApplicationReference
 {
 public:
     /**
      * Constructor: Contructs a Object with the provided Application id and SerialId
-     * 
+     *
      */
     IApplicationReference(char* processName, unsigned int processId);
     ~IApplicationReference();
 
-     const char* getProcessName();
-     unsigned int getProcessId();
+    const char* getProcessName();
+    unsigned int getProcessId();
 
 protected:
     char* m_processName;
@@ -69,4 +69,4 @@ inline const char* IApplicationReference::getProcessName()
     return m_processName;
 }
 
-#endif /* _IAPPLICATION_REFERENCE_H_ */
+#endif /* _IAPPLICATIONREFERENCE_H_ */

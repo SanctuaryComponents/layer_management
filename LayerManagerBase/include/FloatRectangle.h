@@ -1,6 +1,6 @@
 /***************************************************************************
  *
- * Copyright 2010,2011 BMW Car IT GmbH
+ * Copyright 2013 BMW Car IT GmbH
  *
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,39 +16,44 @@
  * limitations under the License.
  *
  ****************************************************************************/
-#ifndef _HOUSE_H
-#define _HOUSE_H
 
-#include "IRenderable.h"
-#include "IUpdateable.h"
-#include "IlmMatrix.h"
-#include "vec.h"
+#ifndef _FLOATRECTANGLE_H_
+#define _FLOATRECTANGLE_H_
 
-class ShaderBase;
+#include <ostream>
+#include "FloatRectangle.h"
 
-class House : public IRenderable, public IUpdateable
+class FloatRectangle
 {
 public:
-    House(vec3f position, vec3f size, vec4f houseColor, ShaderBase* pShader);
-    virtual ~House();
+    FloatRectangle()
+    : x(0.0f)
+    , y(0.0f)
+    , width(0.0f)
+    , height(0.0f)
+    {
+    }
 
-    virtual void render();
-    virtual void update(int currentTimeInMs, int lastFrameTime);
+    FloatRectangle(float x, float y, float width, float height)
+    : x(x)
+    , y(y)
+    , width(width)
+    , height(height)
+    {
+    }
 
-private:
-    void attachVertexBuffer();
-    void detachVertexBuffer();
+    FloatRectangle(const Rectangle& rhs)
+    : x(rhs.x)
+    , y(rhs.y)
+    , width(rhs.width)
+    , height(rhs.height)
+    {
+    }
 
-private:
-    vec3f m_position;
-    vec3f m_size;
-    vec4f m_color;
-    
-    vec3f m_normals[6];
-    vec3u m_index[12];
-    vec3f m_vertex[8];
-
-    ShaderBase* m_pShader;
+    float x;
+    float y;
+    float width;
+    float height;
 };
 
-#endif /* _HOUSE_H */
+#endif /* _FLOATRECTANGLE_H_ */

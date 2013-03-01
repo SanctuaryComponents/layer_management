@@ -162,9 +162,11 @@ uint* Layermanager::getScreenIDs(uint* length) const
 // via the renderer for a redraw because of a rendering property change
 void Layermanager::signalRendererRedraw()
 {
-	IRenderer* renderer = *m_pRendererList->begin();
-	if (NULL!=renderer)
-		renderer->signalWindowSystemRedraw();
+    IRenderer* renderer = *m_pRendererList->begin();
+    if (renderer)
+    {
+        renderer->signalWindowSystemRedraw();
+    }
 }
 
 void Layermanager::addApplicationReference(t_ilm_client_handle client, IApplicationReference* reference)
@@ -269,15 +271,15 @@ bool Layermanager::executeCommand(ICommand* commandToBeExecuted)
 
     if (status == ExecutionFailedRedraw || status == ExecutionSuccessRedraw)
     {
-    	// either a command that has changed the output was executed, or
-    	// commit command was executed which contained commands that requested redraw was executed.
-    	signalRendererRedraw();
+        // either a command that has changed the output was executed, or
+        // commit command was executed which contained commands that requested redraw was executed.
+        signalRendererRedraw();
     }
 
     unsigned int commandPid = commandToBeExecuted->getSenderPid();
     LOG_INFO("LayerManagerService", "executed " << commandToBeExecuted->getString()
-                                     << " from " << getSenderName(commandPid) << "(" << commandPid << ")"
-                                     << ((status == ExecutionSuccess || status == ExecutionSuccessRedraw) ? "+" : "-"));
+                                        << " from " << getSenderName(commandPid) << "(" << commandPid << ")"
+                                        << ((status == ExecutionSuccess || status == ExecutionSuccessRedraw) ? "+" : "-"));
 
     return (status == ExecutionSuccess || status == ExecutionSuccessRedraw);
 }
@@ -342,12 +344,12 @@ bool Layermanager::startAllRenderers(const int width, const int height,
         }
         if (renderer == NULL || allStarted == false)
         {
-          break;   
+            break;
         }
     }
     if (!allStarted)
     {
-        LOG_ERROR("LayerManagerService","Could not start Compositing Controllers");
+        LOG_ERROR("LayerManagerService", "Could not start Compositing Controllers");
     }
     return allStarted;
 }
@@ -373,7 +375,7 @@ bool Layermanager::delegateScene()
     }
     if (!allStarted)
     {
-        LOG_WARNING("LayerManagerService","Could not start delegate Scenes, initial Scene is lost");
+        LOG_WARNING("LayerManagerService", "Could not start delegate Scenes, initial Scene is lost");
     }
     return allStarted;
 }
@@ -381,10 +383,10 @@ bool Layermanager::delegateScene()
 bool Layermanager::startAllCommunicators()
 {
     bool allStarted = true;
-    
+
     CommunicatorListIterator communicatorIter = m_pCommunicatorList->begin();
     CommunicatorListIterator communicatorIterEnd = m_pCommunicatorList->end();
-    
+
     for (; communicatorIter != communicatorIterEnd; ++communicatorIter)
     {
         ICommunicator *communicator = *communicatorIter;
@@ -399,7 +401,7 @@ bool Layermanager::startAllCommunicators()
     }
     if (!allStarted)
     {
-        LOG_ERROR("LayerManagerService","Could not start Communication Controllers");
+        LOG_ERROR("LayerManagerService", "Could not start Communication Controllers");
     }
     return allStarted;
 }
@@ -407,10 +409,10 @@ bool Layermanager::startAllCommunicators()
 bool Layermanager::startAllHealthMonitors()
 {
     bool allStarted = true;
-    
+
     HealthMonitorListIterator iter = m_pHealthMonitorList->begin();
     HealthMonitorListIterator iterEnd = m_pHealthMonitorList->end();
-    
+
     for (; iter != iterEnd; ++iter)
     {
         IHealthMonitor* healthMonitor = *iter;
@@ -425,7 +427,7 @@ bool Layermanager::startAllHealthMonitors()
     }
     if (!allStarted)
     {
-        LOG_ERROR("LayerManagerService","Could not start Health Monitors");
+        LOG_ERROR("LayerManagerService", "Could not start Health Monitors");
     }
     return allStarted;
 }
@@ -437,14 +439,14 @@ bool Layermanager::startManagement()
     const int width = mConfiguration.getDisplayWidth();
     const int height = mConfiguration.getDisplayHeight();
     const char* displayName = mConfiguration.getDisplayName().c_str();
-    
+
     // 1. start renderers, no prerequisites
     // 2. execute scene provider plugins
     // 3. start communication (after scene is ready to use)
     result = startAllRenderers(width, height, displayName)
-             && delegateScene()
-             && startAllCommunicators()
-             && startAllHealthMonitors();
+                && delegateScene()
+                && startAllCommunicators()
+                && startAllHealthMonitors();
 
     return result;
 }

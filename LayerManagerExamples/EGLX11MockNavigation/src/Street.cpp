@@ -35,30 +35,30 @@ Street::Street(vec3f position, vec3f size, vec4f color, ShaderBase* shader)
 , m_color(color)
 , m_shader(shader)
 {
-	m_index[0] = vec3u(0, 3, 2);
-	m_index[1] = vec3u(2, 1, 0);
-    
+    m_index[0] = vec3u(0, 3, 2);
+    m_index[1] = vec3u(2, 1, 0);
+
     //                             y  z
     //     3-------------2         | /
     //    /             /          |/
     //   /             /           ------x
     //  0-------------1
-    
-	m_vertex[0].x = m_position.x;
-	m_vertex[0].y = m_position.y;
-	m_vertex[0].z = m_position.z;
 
-	m_vertex[1].x = m_position.x + m_size.x;
-	m_vertex[1].y = m_position.y;
-	m_vertex[1].z = m_position.z;
-    
-	m_vertex[2].x = m_position.x + m_size.x;
-	m_vertex[2].y = m_position.y;
-	m_vertex[2].z = m_position.z + m_size.z;
-    
-	m_vertex[3].x = m_position.x;
-	m_vertex[3].y = m_position.y;
-	m_vertex[3].z = m_position.z + m_size.z;
+    m_vertex[0].x = m_position.x;
+    m_vertex[0].y = m_position.y;
+    m_vertex[0].z = m_position.z;
+
+    m_vertex[1].x = m_position.x + m_size.x;
+    m_vertex[1].y = m_position.y;
+    m_vertex[1].z = m_position.z;
+
+    m_vertex[2].x = m_position.x + m_size.x;
+    m_vertex[2].y = m_position.y;
+    m_vertex[2].z = m_position.z + m_size.z;
+
+    m_vertex[3].x = m_position.x;
+    m_vertex[3].y = m_position.y;
+    m_vertex[3].z = m_position.z + m_size.z;
 }
 
 void Street::render()
@@ -73,11 +73,11 @@ void Street::render()
 
 void Street::update(int currentTimeInMs, int lastFrameTime)
 {
-	(void)currentTimeInMs; //prevent warning
-	m_position.z += 0.0005 * lastFrameTime;
+    (void)currentTimeInMs; //prevent warning
+    m_position.z += 0.0005 * lastFrameTime;
 
-	if (m_position.z > 3.0)
-	{
-		m_position.z -= 2 * 2.0;
-	}
+    if (m_position.z > 3.0)
+    {
+        m_position.z -= 2 * 2.0;
+    }
 }

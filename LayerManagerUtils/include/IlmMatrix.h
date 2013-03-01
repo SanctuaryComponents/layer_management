@@ -35,8 +35,8 @@
 * 3. This notice may not be removed or altered from any source distribution.
 ****************************************************************************/
 
-#ifndef _ILM_MATRIX_H_
-#define _ILM_MATRIX_H_
+#ifndef _ILMMATRIX_H_
+#define _ILMMATRIX_H_
 
 #define MAT00     0
 #define MAT01     1
@@ -104,4 +104,4 @@ void IlmMatrixRotateZ(IlmMatrix &mOut, const float angle);
 void IlmMatrixProjection(IlmMatrix &mOut, const float fov, const float near, const float far, const float aspectRatio);
 
 
-#endif /* _ILMMATRIX_H*/
+#endif /* _ILMMATRIX_H_*/

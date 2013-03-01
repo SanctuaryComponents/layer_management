@@ -49,52 +49,51 @@ t_ilm_bool loadSymbolTable(struct IpcModule* ipcModule, char* path, char* file)
 
     struct ApiFunction ApiFunctionTable[] =
     {
-        { "initClientMode",      (void**)&ipcModule->initClientMode },
-        { "initServiceMode",     (void**)&ipcModule->initServiceMode },
+        { "initClientMode", (void**)&ipcModule->initClientMode },
+        { "initServiceMode", (void**)&ipcModule->initServiceMode },
 
-        { "createMessage",       (void**)&ipcModule->createMessage },
-        { "createResponse",      (void**)&ipcModule->createResponse },
+        { "createMessage", (void**)&ipcModule->createMessage },
+        { "createResponse", (void**)&ipcModule->createResponse },
         { "createErrorResponse", (void**)&ipcModule->createErrorResponse },
-        { "createNotification",  (void**)&ipcModule->createNotification },
+        { "createNotification", (void**)&ipcModule->createNotification },
 
-        { "appendBool",          (void**)&ipcModule->appendBool },
-        { "appendDouble",        (void**)&ipcModule->appendDouble },
-        { "appendString",        (void**)&ipcModule->appendString },
-        { "appendInt",           (void**)&ipcModule->appendInt },
-        { "appendIntArray",      (void**)&ipcModule->appendIntArray },
-        { "appendUint",          (void**)&ipcModule->appendUint },
-        { "appendUintArray",     (void**)&ipcModule->appendUintArray },
+        { "appendBool", (void**)&ipcModule->appendBool },
+        { "appendDouble", (void**)&ipcModule->appendDouble },
+        { "appendString", (void**)&ipcModule->appendString },
+        { "appendInt", (void**)&ipcModule->appendInt },
+        { "appendIntArray", (void**)&ipcModule->appendIntArray },
+        { "appendUint", (void**)&ipcModule->appendUint },
+        { "appendUintArray", (void**)&ipcModule->appendUintArray },
 
-        { "sendToClients",       (void**)&ipcModule->sendToClients },
-        { "sendToService",       (void**)&ipcModule->sendToService },
+        { "sendToClients", (void**)&ipcModule->sendToClients },
+        { "sendToService", (void**)&ipcModule->sendToService },
 
-        { "receive",             (void**)&ipcModule->receive },
+        { "receive", (void**)&ipcModule->receive },
 
-        { "getMessageName",      (void**)&ipcModule->getMessageName },
-        { "getMessageType",      (void**)&ipcModule->getMessageType },
-        { "getSenderName",       (void**)&ipcModule->getSenderName },
-        { "getSenderHandle",     (void**)&ipcModule->getSenderHandle },
+        { "getMessageName", (void**)&ipcModule->getMessageName },
+        { "getMessageType", (void**)&ipcModule->getMessageType },
+        { "getSenderName", (void**)&ipcModule->getSenderName },
+        { "getSenderHandle", (void**)&ipcModule->getSenderHandle },
 
-        { "getBool",             (void**)&ipcModule->getBool },
-        { "getDouble",           (void**)&ipcModule->getDouble },
-        { "getString",           (void**)&ipcModule->getString },
-        { "getInt",              (void**)&ipcModule->getInt },
-        { "getIntArray",         (void**)&ipcModule->getIntArray },
-        { "getUint",             (void**)&ipcModule->getUint },
-        { "getUintArray",        (void**)&ipcModule->getUintArray },
+        { "getBool", (void**)&ipcModule->getBool },
+        { "getDouble", (void**)&ipcModule->getDouble },
+        { "getString", (void**)&ipcModule->getString },
+        { "getInt", (void**)&ipcModule->getInt },
+        { "getIntArray", (void**)&ipcModule->getIntArray },
+        { "getUint", (void**)&ipcModule->getUint },
+        { "getUintArray", (void**)&ipcModule->getUintArray },
 
-        { "destroyMessage",      (void**)&ipcModule->destroyMessage },
+        { "destroyMessage", (void**)&ipcModule->destroyMessage },
 
-        { "destroy",             (void**)&ipcModule->destroy }
+        { "destroy", (void**)&ipcModule->destroy }
     };
 
-    const unsigned int apiFunctionCount = sizeof (ApiFunctionTable) / sizeof(struct ApiFunction);
+    const unsigned int apiFunctionCount = sizeof(ApiFunctionTable) / sizeof(struct ApiFunction);
     unsigned int symbolCount = 0;
     t_ilm_bool returnValue = ILM_FALSE;
     void* pluginLibHandle = 0;
     char fullFilePath[1024];
     fullFilePath[0] = '\0';
-
 
     snprintf(fullFilePath, sizeof(fullFilePath), "%s/%s", path, file);
 
@@ -111,11 +110,11 @@ t_ilm_bool loadSymbolTable(struct IpcModule* ipcModule, char* path, char* file)
             if (*func->funcPtr)
             {
                 symbolCount++;
-                 /*printf("[ OK ] symbol %s\n", func->name);*/
+                /*printf("[ OK ] symbol %s\n", func->name);*/
             }
             else
             {
-                 /*printf("[FAIL] symbol %s\n", func->name);*/
+                /*printf("[FAIL] symbol %s\n", func->name);*/
             }
         }
     }
@@ -138,10 +137,10 @@ t_ilm_bool loadSymbolTable(struct IpcModule* ipcModule, char* path, char* file)
         }
     }
 
-     /*
-      Note: will break plugin. must be done during shutdown,
-      but currently there is no unloadIpcModule
-     dlclose(pluginLibHandle);
+    /*
+     * Note: will break plugin. must be done during shutdown,
+     * but currently there is no unloadIpcModule
+     * dlclose(pluginLibHandle);
      */
 
     return returnValue;
@@ -153,13 +152,12 @@ t_ilm_bool loadIpcModule(struct IpcModule* communicator)
     char path[1024];
     DIR *directory;
 
-     /* find communicator client plugin*/
+    /* find communicator client plugin*/
     char* pluginLookupPath = getenv("LM_PLUGIN_PATH");
-    if  (pluginLookupPath)
+    if (pluginLookupPath)
     {
-       gDefaultPluginLookupPath = pluginLookupPath;
+        gDefaultPluginLookupPath = pluginLookupPath;
     }
-
 
     snprintf(path, sizeof(path), "%s/%s", gDefaultPluginLookupPath,
                                           gCommunicatorPluginDirectory);
@@ -168,7 +166,7 @@ t_ilm_bool loadIpcModule(struct IpcModule* communicator)
     directory = opendir(path);
     if (directory)
     {
-         /* iterate content of directory*/
+        /* iterate content of directory*/
         struct dirent *itemInDirectory = 0;
         while ((itemInDirectory = readdir(directory)) && !result)
         {

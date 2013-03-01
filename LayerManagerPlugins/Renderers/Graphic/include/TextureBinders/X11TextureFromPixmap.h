@@ -27,7 +27,7 @@
 #include "TextureBinders/ITextureBinder.h"
 #include "PlatformSurfaces/GLXPlatformSurface.h"
 
-class X11TextureFromPixmap: public ITextureBinder
+class X11TextureFromPixmap : public ITextureBinder
 {
 public:
     X11TextureFromPixmap(Display* display, GLXFBConfig pixmapConfig);

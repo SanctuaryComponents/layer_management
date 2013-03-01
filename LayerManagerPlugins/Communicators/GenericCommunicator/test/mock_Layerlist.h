@@ -17,8 +17,8 @@
 *
 ****************************************************************************/
 
-#ifndef MockLayerList_H_
-#define MockLayerList_H_
+#ifndef MOCK_LAYERLIST_H_
+#define MOCK_LAYERLIST_H_
 
 #include "Scene.h"
 #include <list>
@@ -39,4 +39,4 @@ class MockLayerList : public Scene {
   MOCK_METHOD0(unlockScene, void());
 };
 
-#endif /* MockLayerList_H_ */
+#endif /* MOCK_LAYERLIST_H_ */

@@ -23,7 +23,7 @@
 #include "ICommand.h"
 #include "OrientationType.h"
 
-class SurfaceGetOrientationCommand: public ICommand
+class SurfaceGetOrientationCommand : public ICommand
 {
 public:
     /*!

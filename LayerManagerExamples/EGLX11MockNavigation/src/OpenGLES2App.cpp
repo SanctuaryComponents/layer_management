@@ -103,7 +103,8 @@ bool OpenGLES2App::createX11Context(SurfaceConfiguration* config)
     XSetWindowAttributes windowAttributes;
     unsigned int windowMask;
     int colorDepth;
-    int widthCorrected, heightCorrected;
+    int widthCorrected;
+    int heightCorrected;
 
     m_x11ContextStruct.x11Window = 0;
     m_x11ContextStruct.x11Display = NULL;
@@ -182,14 +183,16 @@ bool OpenGLES2App::createEGLContext()
     m_eglContextStruct.eglSurface = NULL;
     m_eglContextStruct.eglContext = NULL;
 
-    m_eglContextStruct.eglDisplay = eglGetDisplay((EGLNativeDisplayType) m_x11ContextStruct.x11Display); // TODO: remove all C style casts in C++ code; use C++ casts
+    m_eglContextStruct.eglDisplay = eglGetDisplay(
+                        (EGLNativeDisplayType) m_x11ContextStruct.x11Display); // TODO: remove all C style casts in C++ code; use C++ casts
     EGLint eglstatus = eglGetError();
     if (!m_eglContextStruct.eglDisplay)
     {
         cout << "Error: eglGetDisplay() failed.\n";
     }
 
-    EGLint iMajorVersion, iMinorVersion;
+    EGLint iMajorVersion;
+    EGLint iMinorVersion;
     if (!eglInitialize(m_eglContextStruct.eglDisplay, &iMajorVersion,
             &iMinorVersion))
     {
@@ -258,7 +261,7 @@ bool OpenGLES2App::setupLayerMangement(SurfaceConfiguration* config)
     float opacity = config->opacity;
 
     cout << "creating surface " << surfaceid << "\n";
-    ilm_surfaceCreate( (t_ilm_nativehandle) m_x11ContextStruct.x11Window, width, height,
+    ilm_surfaceCreate((t_ilm_nativehandle) m_x11ContextStruct.x11Window, width, height,
             ILM_PIXELFORMAT_RGBA_8888, &surfaceid);
 
     cout << "set surface " << surfaceid << " dest region " << posX << ", " << posY << ", " << width << ", " << height << "\n";

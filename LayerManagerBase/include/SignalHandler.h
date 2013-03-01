@@ -17,8 +17,8 @@
  *
  ****************************************************************************/
 
-#ifndef __SIGNALHADLER_H__
-#define __SIGNALHADLER_H__
+#ifndef __SIGNALHANDLER_H__
+#define __SIGNALHANDLER_H__
 
 #include "ilm_types.h"
 
@@ -30,4 +30,4 @@ public:
     void waitForShutdownSignal();
 };
 
-#endif // __SIGNALHADLER_H__
+#endif // __SIGNALHANDLER_H__

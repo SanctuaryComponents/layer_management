@@ -27,12 +27,12 @@ ExecutionResult SurfaceGetPixelformatCommand::execute(ICommandExecutor* executor
 
     ExecutionResult result = ExecutionFailed;
 
-	Surface* surface = scene.getSurface(m_id);
-	if (surface)
-	{
-		*m_pFormatreturn = surface->getPixelFormat();
-		result = ExecutionSuccess;
-	}
+    Surface* surface = scene.getSurface(m_id);
+    if (surface)
+    {
+        *m_pFormatreturn = surface->getPixelFormat();
+        result = ExecutionSuccess;
+    }
 
     return result;
 }

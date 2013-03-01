@@ -17,8 +17,8 @@
  * limitations under the License.
  *
  ****************************************************************************/
-#ifndef SERVERINFO_CLIENT_PROTOCOL_H
-#define SERVERINFO_CLIENT_PROTOCOL_H
+#ifndef SERVERINFO-CLIENT-PROTOCOL_H
+#define SERVERINFO-CLIENT-PROTOCOL_H
 
 #ifdef  __cplusplus
 extern "C" {
@@ -84,4 +84,4 @@ serverinfo_get_connection_id(struct serverinfo *serverinfo)
 }
 #endif
 
-#endif /* SERVERINFO_CLIENT_PROTOCOL_H */
+#endif /* SERVERINFO-CLIENT-PROTOCOL_H */

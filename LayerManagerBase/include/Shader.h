@@ -31,7 +31,7 @@ using std::string;
  * Represents a shader instance.
  *
  * It stores a set of uniform parameters and refers to an OpenGL program object.
- * Some uniform variables are pre-defined, like surface position and size, 
+ * Some uniform variables are pre-defined, like surface position and size,
  * opacity, etc... Additionally, there may be user-defined uniforms.
  */
 class Shader

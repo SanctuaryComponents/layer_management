@@ -23,7 +23,7 @@
 #include "ICommand.h"
 #include <string>
 
-class LayerDumpCommand: public ICommand
+class LayerDumpCommand : public ICommand
 {
 public:
     /*!

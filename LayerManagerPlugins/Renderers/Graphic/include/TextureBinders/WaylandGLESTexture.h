@@ -27,7 +27,7 @@
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
 
-class WaylandGLESTexture: public ITextureBinder
+class WaylandGLESTexture : public ITextureBinder
 {
 public:
     virtual PlatformSurface* createPlatformSurface(Surface* surface);

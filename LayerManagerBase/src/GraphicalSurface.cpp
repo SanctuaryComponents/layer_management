@@ -22,31 +22,30 @@
 
 bool GraphicalSurface::isInside(unsigned int x_DestCoordinateSyst, unsigned int y_DestCoordinateSyst) const
 {
-	bool ret;
+    bool ret;
 
-	switch (m_orientation)
-	{
-		case Zero:
-			ret = (
-			           ((x_DestCoordinateSyst >= m_destinationViewport.x) && (x_DestCoordinateSyst < m_destinationViewport.x + m_destinationViewport.width))
-			        &&
-			           ((y_DestCoordinateSyst >= m_destinationViewport.y) && (y_DestCoordinateSyst < m_destinationViewport.y + m_destinationViewport.height))
-			      );
-			break;
+    switch (m_orientation)
+    {
+    case Zero:
+        ret = ((x_DestCoordinateSyst >= m_destinationViewport.x)
+            && (x_DestCoordinateSyst < m_destinationViewport.x + m_destinationViewport.width)
+            && (y_DestCoordinateSyst >= m_destinationViewport.y)
+            && (y_DestCoordinateSyst < m_destinationViewport.y + m_destinationViewport.height));
+        break;
 
-		case Ninety:
-		case OneEighty:
-		case TwoSeventy:
-			/* Not yet supported */
-			ret = false;
-			break;
+    case Ninety:
+    case OneEighty:
+    case TwoSeventy:
+        /* Not yet supported */
+        ret = false;
+        break;
 
-		default:
-			ret = false;
-			break;
-	}
+    default:
+        ret = false;
+        break;
+    }
 
-	return ret;
+    return ret;
 }
 
 
@@ -63,39 +62,42 @@ bool GraphicalSurface::isInside(unsigned int x_DestCoordinateSyst, unsigned int 
  */
 bool GraphicalSurface::DestToSourceCoordinates(int *x, int *y, bool check) const
 {
-	bool 	ret;
-	int   	TVxD, TVyD;  /* Translation vector x,y in destination system */	
-	int   	TVxS, TVyS;  /* Translation vector x,y in source system */
-	float 	SFx, SFy;    /* Scaling factor x,y  */
+    bool     ret;
+    int       TVxD;   /* Translation vector x in destination system */
+    int       TVyD;   /* Translation vector y in destination system */
+    int       TVxS;   /* Translation vector x in source system */
+    int       TVyS;   /* Translation vector y in source system */
+    float     SFx;    /* Scaling factor x  */
+    float     SFy;    /* Scaling factor y  */
 
-	if (!check || isInside(*x, *y))
-	{
-		/* The translation vector in the Destination system */
-		TVxD = m_destinationViewport.x;
-		TVyD = m_destinationViewport.y;
+    if (!check || isInside(*x, *y))
+    {
+        /* The translation vector in the Destination system */
+        TVxD = m_destinationViewport.x;
+        TVyD = m_destinationViewport.y;
 
-		/* The translation vector in the Source system */
-		TVxS = m_sourceViewport.x;
-		TVyS = m_sourceViewport.y;
+        /* The translation vector in the Source system */
+        TVxS = m_sourceViewport.x;
+        TVyS = m_sourceViewport.y;
 
-		/* Compute the scaling factors */
-		SFx = (float) m_sourceViewport.width  / (float) m_destinationViewport.width;
-		SFy = (float) m_sourceViewport.height / (float) m_destinationViewport.height;
+        /* Compute the scaling factors */
+        SFx = (float) m_sourceViewport.width  / (float) m_destinationViewport.width;
+        SFy = (float) m_sourceViewport.height / (float) m_destinationViewport.height;
 
-		/* Compute the rotation */
-		// To be done ...
+        /* Compute the rotation */
+        // To be done ...
 
-		/* Apply the transformations */
-		*x = ((*x - TVxD) * SFx) + TVxS;
-		*y = ((*y - TVyD) * SFy) + TVyS;
+        /* Apply the transformations */
+        *x = ((*x - TVxD) * SFx) + TVxS;
+        *y = ((*y - TVyD) * SFy) + TVyS;
 
-		ret = true;
-	}
-	else
-	{
-		ret = false;
-	}
+        ret = true;
+    }
+    else
+    {
+        ret = false;
+    }
 
-	return ret;
+    return ret;
 }
 

@@ -41,43 +41,47 @@
 
 extern "C"
 {
-    static int
-    x11GetNextEvent(xcb_connection_t *conn, xcb_generic_event_t **event, uint32_t mask)
+static int
+x11GetNextEvent(xcb_connection_t *conn, xcb_generic_event_t **event, uint32_t mask)
+{
+    if (mask & WL_EVENT_READABLE)
     {
-        if (mask & WL_EVENT_READABLE){
-            *event = xcb_poll_for_event(conn);
-        } else {
+        *event = xcb_poll_for_event(conn);
+    }
+    else
+    {
 #ifdef HAVE_XCB_POLL_FOR_QUEUED_EVENT
-            *event = xcb_poll_for_queued_event(conn);
+        *event = xcb_poll_for_queued_event(conn);
 #else
-            *event = xcb_poll_for_event(conn);
+        *event = xcb_poll_for_event(conn);
 #endif
-        }
-        return *event != NULL;
     }
+    return *event != NULL;
+}
 
-    static bool
-    getButtonEvent(xcb_generic_event_t *event, WLEvent *wlEvent, int /*state*/)
+static bool
+getButtonEvent(xcb_generic_event_t *event, WLEvent *wlEvent, int /*state*/)
+{
+    xcb_button_press_event_t *buttonEvent = (xcb_button_press_event_t*)event;
+    switch (buttonEvent->detail)
     {
-        xcb_button_press_event_t *buttonEvent = (xcb_button_press_event_t*)event;
-        switch (buttonEvent->detail){
-        default:
-            wlEvent->button = buttonEvent->detail + BTN_LEFT - 1;
-            break;
-        case 2:
-            wlEvent->button = BTN_MIDDLE;
-            break;
-        case 3:
-            wlEvent->button = BTN_RIGHT;
-            break;
-        case 4:
-        case 5:
-        case 6:
-        case 7:
-            return false;
-        }
-        return true;
+    default:
+        wlEvent->button = buttonEvent->detail + BTN_LEFT - 1;
+        break;
+    case 2:
+        wlEvent->button = BTN_MIDDLE;
+        break;
+    case 3:
+        wlEvent->button = BTN_RIGHT;
+        break;
+    case 4:
+    case 5:
+    case 6:
+    case 7:
+        return false;
     }
+    return true;
+}
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -112,20 +116,23 @@ WaylandX11InputEvent::setupInputEvent()
 
     WaylandX11WindowSystem* x11WindowSystem
         = dynamic_cast<WaylandX11WindowSystem*>(m_windowSystem);
-    if (!x11WindowSystem){
+    if (!x11WindowSystem)
+    {
         LOG_ERROR("WaylandX11InputEvent", "Invalid window system");
         return;
     }
 
     m_x11Display = x11WindowSystem->x11Display();
-    if (!m_x11Display){
+    if (!m_x11Display)
+    {
         LOG_ERROR("WaylandX11InputEvent", "ERROR: WindowSystem has not x11 display");
         return;
     }
 
     m_xcbConn = XGetXCBConnection(m_x11Display);
     XSetEventQueueOwner(m_x11Display, XCBOwnsEventQueue);
-    if (xcb_connection_has_error(m_xcbConn)){
+    if (xcb_connection_has_error(m_xcbConn))
+    {
         LOG_ERROR("WaylandX11InputEvent", "ERROR: xcb connection has error.");
         XCloseDisplay(m_x11Display);
         return;
@@ -136,22 +143,26 @@ WaylandX11InputEvent::setupInputEvent()
 
     // Get resources
     {
-        static const struct {
+        static const struct
+        {
             const char *name;
             int offset;
-        } atoms[] = {
-            { "STRING",           F(string)   },
+        }
+        atoms[] = {
+            { "STRING", F(string)   },
             { "_XKB_RULES_NAMES", F(xkbNames) }
         };
         xcb_intern_atom_cookie_t cookies[2];
         xcb_intern_atom_reply_t *reply;
         unsigned int i = 0;
-        for (i = 0; i < ARRAY_LENGTH(atoms); ++i){
+        for (i = 0; i < ARRAY_LENGTH(atoms); ++i)
+        {
             cookies[i] = xcb_intern_atom(m_xcbConn, 0,
                                          strlen(atoms[i].name),
                                          atoms[i].name);
         }
-        for (i = 0; i < ARRAY_LENGTH(atoms); ++i){
+        for (i = 0; i < ARRAY_LENGTH(atoms); ++i)
+        {
             reply = xcb_intern_atom_reply(m_xcbConn, cookies[i], NULL);
             *(xcb_atom_t*)((char *)(&m_atom) + atoms[i].offset) = reply->atom;
             free(reply);
@@ -165,7 +176,8 @@ WaylandX11InputEvent::setupInputEvent()
     setupXkb();
     struct xkb_keymap *keymap = getKeymap();
     initKeyboardDevice(keymap);
-    if (keymap){
+    if (keymap)
+    {
         xkb_map_unref(keymap);
     }
 
@@ -196,7 +208,8 @@ WaylandX11InputEvent::setupXkb()
     xcb_xkb_per_client_flags_reply_t *pcf_reply;
 
     ext = xcb_get_extension_data(m_xcbConn, &xcb_xkb_id);
-    if (!ext){
+    if (!ext)
+    {
         LOG_ERROR("WaylandX11InputEvent", "ERROR: XKB extension not available on "
                                           "host X11 server");
         return;
@@ -212,7 +225,8 @@ WaylandX11InputEvent::setupXkb()
                                    0,
                                    NULL);
     error = xcb_request_check(m_xcbConn, select);
-    if (error){
+    if (error)
+    {
         LOG_ERROR("WaylandX11InputEvent", "ERROR: Failed to select XKB state events");
         return;
     }
@@ -224,7 +238,8 @@ WaylandX11InputEvent::setupXkb()
                                    0, 0, 0);
     pcf_reply = xcb_xkb_per_client_flags_reply(m_xcbConn, pcf, &error);
     free(pcf_reply);
-    if (error){
+    if (error)
+    {
         LOG_ERROR("WaylandX11InputEvent", "ERROR: Failed to set XKB per-client flags, "
                                           "not using detectable repeat");
         return;
@@ -242,8 +257,10 @@ WaylandX11InputEvent::getKeymap()
     xcb_generic_error_t *error;
     struct xkb_rule_names names;
     struct xkb_keymap *ret;
-    char *value_all, *value_part;
-    int length_all, length_part;
+    char* value_all;
+    char* value_part;
+    int length_all;
+    int length_part;
 
     memset(&names, 0x00, sizeof(names));
 
@@ -254,12 +271,13 @@ WaylandX11InputEvent::getKeymap()
                               m_atom.string,
                               0, 1024);
     reply = xcb_get_property_reply(m_xcbConn, cookie, &error);
-    if (reply == NULL){
+    if (reply == NULL)
+    {
         LOG_ERROR("WaylandX11InputEvent", "ERROR: xcb_get_property_reply");
         return NULL;
     }
 
-    value_all  = static_cast<char*>(xcb_get_property_value(reply));
+    value_all = static_cast<char*>(xcb_get_property_value(reply));
     length_all = xcb_get_property_value_length(reply);
     value_part = value_all;
 
@@ -295,27 +313,33 @@ WaylandX11InputEvent::handleInputEvent(int /*fd*/, uint32_t mask, void *data)
     xcb_generic_event_t       *event;
     xcb_motion_notify_event_t *motionNotify;
     xcb_button_press_event_t  *buttonEvent;
-    xcb_key_press_event_t     *keyPress, *keyRelease;
+    xcb_key_press_event_t     *keyPress;
+    xcb_key_press_event_t     *keyRelease;
     InputDevice                deviceType = INPUT_DEVICE_POINTER;
-    InputEventState            state      = INPUT_STATE_MOTION;
+    InputEventState            state = INPUT_STATE_MOTION;
 
     int count = 0;
     xcb_generic_event_t *prev = NULL;
-    while (x11GetNextEvent(ins->connection(), &event, mask)){
-        switch (prev ? prev->response_type & ~0x80 : 0x80){
+    while (x11GetNextEvent(ins->connection(), &event, mask))
+    {
+        switch (prev ? prev->response_type & ~0x80 : 0x80)
+        {
         case XCB_KEY_RELEASE:
             keyRelease = (xcb_key_press_event_t*)prev;
             keyPress   = (xcb_key_press_event_t*)event;
             if ((event->response_type & ~0x80) == XCB_KEY_PRESS &&
                 keyRelease->time == keyPress->time &&
-                keyRelease->detail == keyPress->detail){
+                keyRelease->detail == keyPress->detail)
+            {
                 // Don't deliver the held key release event or
                 // the new key press even.
                 free(event);
                 free(prev);
                 prev = NULL;
                 continue;
-            } else {
+            }
+            else
+            {
                 free(prev);
                 prev = NULL;
                 break;
@@ -331,15 +355,16 @@ WaylandX11InputEvent::handleInputEvent(int /*fd*/, uint32_t mask, void *data)
 
         memset(&wlEvent, 0x00, sizeof(WLEvent));
 
-        switch (event->response_type & ~0x80){
+        switch (event->response_type & ~0x80)
+        {
         case XCB_KEY_PRESS:
             LOG_DEBUG("WaylandX11InputEvent", "[EVENT] XCB_KEY_PRESS");
             keyPress = (xcb_key_press_event_t *)event;
-            wlEvent.keyCode  = keyPress->detail - 8;
+            wlEvent.keyCode = keyPress->detail - 8;
             wlEvent.keyState = WL_KEYBOARD_KEY_STATE_PRESSED;
 
             deviceType = INPUT_DEVICE_KEYBOARD;
-            state      = INPUT_STATE_PRESSED;
+            state = INPUT_STATE_PRESSED;
             break;
         case XCB_KEY_RELEASE:
             LOG_DEBUG("WaylandX11InputEvent", "[EVENT] XCB_KEY_RELEASE");
@@ -348,11 +373,12 @@ WaylandX11InputEvent::handleInputEvent(int /*fd*/, uint32_t mask, void *data)
             wlEvent.keyState = WL_KEYBOARD_KEY_STATE_RELEASED;
 
             deviceType = INPUT_DEVICE_KEYBOARD;
-            state      = INPUT_STATE_RELEASED;
+            state = INPUT_STATE_RELEASED;
             break;
         case XCB_BUTTON_PRESS:
             LOG_DEBUG("WaylandX11InputEvent", "[EVENT] XCB_BUTTON_PRESS");
-            if (!getButtonEvent(event, &wlEvent, 1)){
+            if (!getButtonEvent(event, &wlEvent, 1))
+            {
                 continue; // not supported button event
             }
             buttonEvent = (xcb_button_press_event_t *)event;
@@ -361,11 +387,12 @@ WaylandX11InputEvent::handleInputEvent(int /*fd*/, uint32_t mask, void *data)
             wlEvent.buttonState = WL_POINTER_BUTTON_STATE_PRESSED;
 
             deviceType = INPUT_DEVICE_POINTER;
-            state      = INPUT_STATE_PRESSED;
+            state = INPUT_STATE_PRESSED;
             break;
         case XCB_BUTTON_RELEASE:
             LOG_DEBUG("WaylandX11InputEvent", "[EVENT] XCB_BUTTON_RELEASE");
-            if (!getButtonEvent(event, &wlEvent, 0)){
+            if (!getButtonEvent(event, &wlEvent, 0))
+            {
                 continue; // not suported button event
             }
             buttonEvent = (xcb_button_press_event_t *)event;
@@ -374,7 +401,7 @@ WaylandX11InputEvent::handleInputEvent(int /*fd*/, uint32_t mask, void *data)
             wlEvent.buttonState = WL_POINTER_BUTTON_STATE_RELEASED;
 
             deviceType = INPUT_DEVICE_POINTER;
-            state      = INPUT_STATE_RELEASED;
+            state = INPUT_STATE_RELEASED;
             break;
         case XCB_MOTION_NOTIFY:
             LOG_DEBUG("WaylandX11InputEvent", "[EVENT] XCB_MOTION_NOTIFY");
@@ -383,7 +410,7 @@ WaylandX11InputEvent::handleInputEvent(int /*fd*/, uint32_t mask, void *data)
             wlEvent.y = motionNotify->event_y;
 
             deviceType = INPUT_DEVICE_POINTER;
-            state      = INPUT_STATE_MOTION;
+            state = INPUT_STATE_MOTION;
             break;
         case XCB_EXPOSE:
         case XCB_ENTER_NOTIFY:
@@ -392,30 +419,34 @@ WaylandX11InputEvent::handleInputEvent(int /*fd*/, uint32_t mask, void *data)
         case XCB_FOCUS_OUT:
         default:
             LOG_DEBUG("WaylandX11InputEvent", "[EVENT] Not supported (" <<
-                      (event->response_type & ~0x80) << ")");
-            if (prev != event){
+                                                (event->response_type & ~0x80) << ")");
+            if (prev != event)
+            {
                 free(event);
             }
             continue;
         }
 
         ++count;
-        if (prev != event){
+        if (prev != event)
+        {
             free(event);
         }
     }
 
-    if (count == 0){
+    if (count == 0)
+    {
         goto rtn;
     }
 
-    switch (prev ? prev->response_type & ~0x80 : 0x80){
+    switch (prev ? prev->response_type & ~0x80 : 0x80)
+    {
     case XCB_KEY_RELEASE:
         keyRelease = (xcb_key_press_event_t*)prev;
-        wlEvent.keyCode  = keyRelease->detail - 8;
+        wlEvent.keyCode = keyRelease->detail - 8;
         wlEvent.keyState = WL_KEYBOARD_KEY_STATE_RELEASED;
         deviceType = INPUT_DEVICE_KEYBOARD;
-        state      = INPUT_STATE_RELEASED;
+        state = INPUT_STATE_RELEASED;
         free(prev);
         prev = NULL;
         break;

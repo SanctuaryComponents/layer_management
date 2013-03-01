@@ -16,8 +16,8 @@
  * limitations under the License.
  *
  ****************************************************************************/
-#ifndef _OpenGLES2App_h
-#define _OpenGLES2App_h
+#ifndef _OPENGLES2APP_H
+#define _OPENGLES2APP_H
 
 #include <GLES2/gl2.h>
 
@@ -89,4 +89,4 @@ protected:
 
 };
 
-#endif
+#endif /* _OPENGLES2APP_H */

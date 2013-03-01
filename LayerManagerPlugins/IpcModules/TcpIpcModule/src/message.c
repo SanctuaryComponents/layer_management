@@ -209,14 +209,14 @@ t_ilm_message receive(t_ilm_int timeoutInMs)
                     // receive data from socket
                     receiveFromSocket(msg, socketNumber);
 
-                    if(msg->paket.size > 0)
+                    if (msg->paket.size > 0)
                     {
                         // new message from client
                         getString(msg, msg->name);
                         continue;
                     }
 
-                    if(msg->paket.size == 0)
+                    if (msg->paket.size == 0)
                     {
                         // client disconnected
                         msg->paket.type = IpcMessageTypeDisconnect;
@@ -305,9 +305,9 @@ t_ilm_bool sendToSocket(struct SocketMessage* msg, int socketNumber)
     do
     {
         retVal += send(socketNumber,
-                       &msg->paket + sentBytes,
-                       sendSize - sentBytes,
-                       0);
+                        &msg->paket + sentBytes,
+                        sendSize - sentBytes,
+                        0);
         sentBytes += retVal;
     } while (retVal > 0 && sentBytes < sendSize);
 
@@ -329,9 +329,9 @@ void receiveFromSocket(struct SocketMessage* msg, int socketNumber)
     do
     {
         retVal = recv(msg->sender,
-                      &messageBuffer[receivedBytes],
-                      msg->paket.size - receivedBytes,
-                      0);
+                        &messageBuffer[receivedBytes],
+                        msg->paket.size - receivedBytes,
+                        0);
         receivedBytes += retVal;
     } while ((retVal > 0) && (receivedBytes < msg->paket.size));
 

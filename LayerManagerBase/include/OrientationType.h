@@ -17,8 +17,8 @@
 *
 ****************************************************************************/
 
-#ifndef _ORIENTATION_H
-#define _ORIENTATION_H
+#ifndef _ORIENTATIONTYPE_H
+#define _ORIENTATIONTYPE_H
 
 #include "ilm_types.h"
 
@@ -34,4 +34,4 @@ enum OrientationType
     TwoSeventy = ILM_TWOHUNDREDSEVENTY
 };
 
-#endif /* _ORIENTATION_H */
+#endif /* _ORIENTATIONTYPE_H */

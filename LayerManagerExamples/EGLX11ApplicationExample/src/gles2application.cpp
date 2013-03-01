@@ -58,15 +58,15 @@ const char * sourceVertShader = "\
 
 GLfloat triangleVertexData[] =
 {
-        -0.4f, -0.4f, 0.0f, -0.2f, -0.4f, 0.0f, -0.3f, -0.2f, 0.0f,
-        -0.2f, -0.4f, 0.0f, -0.0f, -0.4f, 0.0f, -0.1f, -0.2f, 0.0f,
-        -0.0f, -0.4f, 0.0f,  0.2f, -0.4f, 0.0f,  0.1f, -0.2f, 0.0f,
-         0.2f, -0.4f, 0.0f,  0.4f, -0.4f, 0.0f,  0.3f, -0.2f, 0.0f,
-        -0.3f, -0.2f, 0.0f, -0.1f, -0.2f, 0.0f, -0.2f, -0.0f, 0.0f,
-         0.1f, -0.2f, 0.0f,  0.3f, -0.2f, 0.0f,  0.2f, -0.0f, 0.0f,
-        -0.2f, -0.0f, 0.0f, -0.0f, -0.0f, 0.0f, -0.1f,  0.2f, 0.0f,
-         0.0f, -0.0f, 0.0f,  0.2f, -0.0f, 0.0f,  0.1f,  0.2f, 0.0f,
-        -0.1f,  0.2f, 0.0f,  0.1f,  0.2f, 0.0f,  0.0f,  0.4f, 0.0f
+    -0.4f, -0.4f, 0.0f, -0.2f, -0.4f, 0.0f, -0.3f, -0.2f, 0.0f,
+    -0.2f, -0.4f, 0.0f, -0.0f, -0.4f, 0.0f, -0.1f, -0.2f, 0.0f,
+    -0.0f, -0.4f, 0.0f, 0.2f, -0.4f, 0.0f, 0.1f, -0.2f, 0.0f,
+    0.2f, -0.4f, 0.0f, 0.4f, -0.4f, 0.0f, 0.3f, -0.2f, 0.0f,
+    -0.3f, -0.2f, 0.0f, -0.1f, -0.2f, 0.0f, -0.2f, -0.0f, 0.0f,
+    0.1f, -0.2f, 0.0f, 0.3f, -0.2f, 0.0f, 0.2f, -0.0f, 0.0f,
+    -0.2f, -0.0f, 0.0f, -0.0f, -0.0f, 0.0f, -0.1f, 0.2f, 0.0f,
+    0.0f, -0.0f, 0.0f, 0.2f, -0.0f, 0.0f, 0.1f, 0.2f, 0.0f,
+    -0.1f, 0.2f, 0.0f, 0.1f, 0.2f, 0.0f, 0.0f, 0.4f, 0.0f
 };
 
 t_ilm_bool initGlApplication()
@@ -104,7 +104,8 @@ t_ilm_bool initShader()
 
     if (!result)
     {
-        t_ilm_int infoLength, numberChars;
+        t_ilm_int infoLength;
+        t_ilm_int numberChars;
         glGetShaderiv(shader.fragmentShaderId, GL_INFO_LOG_LENGTH, &infoLength);
 
         // Allocate Log Space
@@ -130,7 +131,8 @@ t_ilm_bool initShader()
 
     if (!result)
     {
-        t_ilm_int infoLength, numberChars;
+        t_ilm_int infoLength;
+        t_ilm_int numberChars;
         glGetShaderiv(shader.vertexShaderId, GL_INFO_LOG_LENGTH, &infoLength);
 
         // Allocate Log Space
@@ -156,7 +158,8 @@ t_ilm_bool initShader()
 
     if (!result)
     {
-        t_ilm_int infoLength, numberChars;
+        t_ilm_int infoLength;
+        t_ilm_int numberChars;
         glGetShaderiv(shader.shaderProgramId, GL_INFO_LOG_LENGTH, &infoLength);
 
         // Allocate Log Space
@@ -203,7 +206,6 @@ void attachVertexBuffer()
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer.vbo);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
 }
 
 void detachVertexBuffer()
@@ -256,7 +258,6 @@ void draw(t_ilm_uint animTime)
         swapBuffers();
         startTime = currentTime;
     }
-
 }
 
 void destroyGlApplication()

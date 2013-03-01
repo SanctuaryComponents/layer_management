@@ -53,7 +53,7 @@ bool X11GLESRenderer::start(int width, int height, const char* displayname)
 
     // create X11 windows, register as composite manager etc
     m_pWindowSystem = new X11WindowSystem(displayname, width, height, m_pScene, m_pInputManager);
-    m_pGraphicSystem = new GLESGraphicsystem(width,height, ShaderProgramGLES::createProgram);
+    m_pGraphicSystem = new GLESGraphicsystem(width, height, ShaderProgramGLES::createProgram);
 
     if (!m_pWindowSystem->init(m_pGraphicSystem))
     {
@@ -93,7 +93,7 @@ bool X11GLESRenderer::start(int width, int height, const char* displayname)
     }
     return true;
 
-    fail: // TODO bad style
+fail: // TODO bad style
 
     LOG_ERROR("X11GLESRenderer", "Initialization failed !");
     return false;
@@ -108,7 +108,6 @@ void X11GLESRenderer::stop()
     {
         delete m_binder;
     }
-    
 }
 
 void X11GLESRenderer::doScreenShot(std::string fileToSave)
@@ -118,12 +117,12 @@ void X11GLESRenderer::doScreenShot(std::string fileToSave)
 
 void X11GLESRenderer::doScreenShotOfLayer(std::string fileToSave, uint id)
 {
-    m_pWindowSystem->doScreenShotOfLayer(fileToSave,id);
+    m_pWindowSystem->doScreenShotOfLayer(fileToSave, id);
 }
 
 void X11GLESRenderer::doScreenShotOfSurface(std::string fileToSave, uint id, uint layer_id)
 {
-    m_pWindowSystem->doScreenShotOfSurface(fileToSave,id,layer_id);
+    m_pWindowSystem->doScreenShotOfSurface(fileToSave, id, layer_id);
 }
 
 uint X11GLESRenderer::getNumberOfHardwareLayers(uint screenID)
@@ -195,7 +194,7 @@ Shader* X11GLESRenderer::createShader(const string* vertexName, const string* fr
     m_pScene->unlockScene();
     while (m_pWindowSystem->getSystemState() != IDLE_STATE);
     m_pGraphicSystem->activateGraphicContext();
-    result = Shader::createShader(*vertexName,*fragmentName);
+    result = Shader::createShader(*vertexName, *fragmentName);
     m_pGraphicSystem->releaseGraphicContext();
     m_pWindowSystem->setSystemState(WAKEUP_STATE);
     m_pScene->lockScene();

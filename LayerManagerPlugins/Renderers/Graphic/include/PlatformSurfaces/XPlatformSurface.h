@@ -24,7 +24,7 @@
 #include "Surface.h"
 #include "X11/X.h"
 
-class XPlatformSurface: public PlatformSurface
+class XPlatformSurface : public PlatformSurface
 {
 public:
     XPlatformSurface(Surface* surface)
@@ -39,7 +39,7 @@ public:
     ~XPlatformSurface()
     {
     }
-    
+
     bool enableRendering()
     {
         m_isReadyForRendering = true;
@@ -60,7 +60,7 @@ public:
     bool isMapped;
     Pixmap pixmap;
     uint texture;
-    bool m_isReadyForRendering;    
+    bool m_isReadyForRendering;
 };
 
 #endif /* _XPLATFORMSURFACE_H_ */

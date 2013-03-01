@@ -26,7 +26,7 @@
 #include "EGL/eglext.h"
 #include "XPlatformSurface.h"
 
-class EglXPlatformSurface: public XPlatformSurface
+class EglXPlatformSurface : public XPlatformSurface
 {
 public:
     EglXPlatformSurface(Surface* surface)

@@ -87,7 +87,7 @@ CommandResult ExpressionInterpreter::interpretCommand(string userInput)
 
         ExpressionList::const_iterator iter = currentState.begin();
         ExpressionList::const_iterator end = currentState.end();
-        for (;iter != end; ++iter)
+        for (; iter != end; ++iter)
         {
             Expression* expr = *iter;
             ExpressionList exprNextList = expr->getNextExpressionClosure(text);
@@ -110,7 +110,7 @@ CommandResult ExpressionInterpreter::interpretCommand(string userInput)
     nextState.clear();
     ExpressionList::const_iterator iter = currentState.begin();
     ExpressionList::const_iterator end = currentState.end();
-    for (;iter != end; ++iter)
+    for (; iter != end; ++iter)
     {
         Expression* expr = *iter;
         if (expr->isExecutable())
@@ -125,7 +125,7 @@ CommandResult ExpressionInterpreter::interpretCommand(string userInput)
 
             ExpressionList::const_iterator iter = children.begin();
             ExpressionList::const_iterator end = children.end();
-            for (;iter != end; ++iter)
+            for (; iter != end; ++iter)
             {
                 if ((*iter)->getName()[0] == '[')
                 {

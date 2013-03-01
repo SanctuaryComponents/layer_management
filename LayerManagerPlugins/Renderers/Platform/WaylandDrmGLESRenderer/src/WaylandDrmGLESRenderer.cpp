@@ -1,5 +1,5 @@
 /***************************************************************************
- * 
+ *
  * Copyright 2010-2012 BMW Car IT GmbH
  * Copyright (C) 2011 DENSO CORPORATION and Robert Bosch Car Multimedia Gmbh
  *

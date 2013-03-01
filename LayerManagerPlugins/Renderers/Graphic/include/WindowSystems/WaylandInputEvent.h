@@ -35,14 +35,16 @@
 #include "config.h"
 #include "WindowSystems/WaylandInputDevice.h"
 
-enum keyboard_modifier {
+enum keyboard_modifier
+{
     MODIFIER_CTRL  = (1 << 0),
     MODIFIER_ALT   = (1 << 1),
     MODIFIER_SUPER = (1 << 2),
     MODIFIER_SHIFT = (1 << 3)
 };
 
-enum keyboard_led {
+enum keyboard_led
+{
     LED_NUM_LOCK    = (1 << 0),
     LED_CAPS_LOCK   = (1 << 1),
     LED_SCROLL_LOCK = (1 << 2)
@@ -60,7 +62,8 @@ protected:
     struct wl_event_source  *m_wlEventSource;
     int m_fd;
 
-    struct weston_xkb_info {
+    struct weston_xkb_info
+    {
         struct xkb_keymap *keymap;
         int keymap_fd;
         size_t keymap_size;
@@ -78,7 +81,8 @@ protected:
         xkb_led_index_t scroll_led;
     } m_xkbInfo;
 
-    struct weston_xkb_state {
+    struct weston_xkb_state
+    {
         struct xkb_state *state;
         enum keyboard_led leds;
     } m_xkbState;
@@ -110,7 +114,13 @@ private:
     void buildGlobalKeymap();
 };
 
-inline WaylandInputDevice& WaylandInputEvent::inputDevice() const { return *m_inputDevice; }
-inline WaylandBaseWindowSystem& WaylandInputEvent::windowSystem() const { return *m_windowSystem; }
+inline WaylandInputDevice& WaylandInputEvent::inputDevice() const
+{
+    return *m_inputDevice;
+}
+inline WaylandBaseWindowSystem& WaylandInputEvent::windowSystem() const
+{
+    return *m_windowSystem;
+}
 
 #endif /* _WAYLANDINPUTEVENT_H_ */

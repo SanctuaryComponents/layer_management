@@ -177,7 +177,6 @@ public:
     virtual bool isLayerInCurrentRenderOrder(const uint id) = 0;
 
     bool debugMode;
-
 };
 
 #endif /* _ISCENE_H_ */

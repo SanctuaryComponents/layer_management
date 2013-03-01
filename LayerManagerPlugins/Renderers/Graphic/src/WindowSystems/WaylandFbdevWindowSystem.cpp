@@ -46,7 +46,11 @@
 #include <iomanip>
 #include "WindowSystems/WaylandEvdevInputEvent.h"
 
-WaylandFbdevWindowSystem::WaylandFbdevWindowSystem(const char* displayname, int width, int height, Scene* pScene, InputManager* pInputManager)
+WaylandFbdevWindowSystem::WaylandFbdevWindowSystem(const char* displayname,
+                                                    int width,
+                                                    int height,
+                                                    Scene* pScene,
+                                                    InputManager* pInputManager)
 : WaylandBaseWindowSystem(displayname, width, height, pScene, pInputManager)
 , m_fdFB(-1)
 {

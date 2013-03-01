@@ -17,8 +17,8 @@
  *
  ****************************************************************************/
  
-#ifndef _LAYERSCENE_PROVIDER_H_
-#define _LAYERSCENE_PROVIDER_H_
+#ifndef _LAYERSCENEPROVIDER_H_
+#define _LAYERSCENEPROVIDER_H_
 
 #include "ISceneProvider.h"
 
@@ -41,4 +41,4 @@ public:
 };
 
 
-#endif /* _LAYERSCENE_PROVIDER_H_ */
+#endif /* _LAYERSCENEPROVIDER_H_ */

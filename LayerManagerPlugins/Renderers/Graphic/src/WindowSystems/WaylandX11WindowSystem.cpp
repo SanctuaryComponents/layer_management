@@ -75,9 +75,9 @@ bool WaylandX11WindowSystem::initGraphicSystem()
     //. TODO: should not be here. graphicSystem should support.
     EGLDisplay eglDisplayhandle = ((GLESGraphicsystem*)(graphicSystem))->getEGLDisplay();
     PFNEGLBINDWAYLANDDISPLAYWL eglBindWaylandDisplayWL = (PFNEGLBINDWAYLANDDISPLAYWL)eglGetProcAddress("eglBindWaylandDisplayWL");
-    if( eglBindWaylandDisplayWL != NULL )
+    if (eglBindWaylandDisplayWL != NULL)
     {
-        eglBindWaylandDisplayWL( eglDisplayhandle, m_wlDisplay );
+        eglBindWaylandDisplayWL(eglDisplayhandle, m_wlDisplay);
     }
     else
     {

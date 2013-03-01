@@ -49,13 +49,13 @@ struct MethodTable
     const char *name;
     CallBackMethod function;
 };
-typedef std::map<std::string,MethodTable> CallBackTable;
+typedef std::map<std::string, MethodTable> CallBackTable;
 
 
 //=============================================================================
 // interface
 //=============================================================================
-class GenericCommunicator: public ICommunicator, protected ThreadBase, public PluginBase
+class GenericCommunicator : public ICommunicator, protected ThreadBase, public PluginBase
 {
 public:
     GenericCommunicator(ICommandExecutor& executor, Configuration& config);
@@ -69,7 +69,7 @@ public:
 
     // from ThreadBase
     virtual t_ilm_bool threadMainLoop();
-    
+
     // from PluginBase
     virtual t_ilm_const_string pluginGetName() const;
     virtual HealthCondition pluginGetHealth();

@@ -33,20 +33,20 @@
 #define ARRAY_LENGTH(a) (sizeof (a) / sizeof (a)[0])
 
 static const struct wl_interface *types[] = {
-	NULL,
+    NULL,
 };
 
 static const struct wl_message serverinfo_requests[] = {
-	{ "get_connection_id", "", types + 0 },
+    { "get_connection_id", "", types + 0 },
 };
 
 static const struct wl_message serverinfo_events[] = {
-	{ "connection_id", "u", types + 0 },
+    { "connection_id", "u", types + 0 },
 };
 
 extern "C" WL_EXPORT const struct wl_interface serverinfo_interface = {
-	"serverinfo", 1,
-	ARRAY_LENGTH(serverinfo_requests), serverinfo_requests,
-	ARRAY_LENGTH(serverinfo_events), serverinfo_events,
+    "serverinfo", 1,
+    ARRAY_LENGTH(serverinfo_requests), serverinfo_requests,
+    ARRAY_LENGTH(serverinfo_events), serverinfo_events,
 };
 

@@ -67,7 +67,6 @@ private:
     callback mFuncPtr;
     string mVarValue;
     string mMatchText;
-
 };
 
 #endif // __EXPRESSION_H__

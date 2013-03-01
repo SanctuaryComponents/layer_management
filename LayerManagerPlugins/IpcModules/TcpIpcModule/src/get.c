@@ -36,7 +36,7 @@ t_ilm_bool getGenericValue(struct SocketMessage* msg, void* value, const char pr
     {
         msg->index -= sizeof(readType);
         printf("command value type mismatch: expected '%s', got '%s'.\n",
-               &protocolType, &readType);
+                &protocolType, &readType);
         return ILM_FALSE;
     }
 
@@ -52,8 +52,8 @@ t_ilm_bool getGenericValue(struct SocketMessage* msg, void* value, const char pr
         msg->index -= sizeof(readType);
         msg->index -= sizeof(size);
         printf("command value size mismatch for type '%s': "
-               "expected %d bytes, got %d bytes.\n",
-               &protocolType, expectedSize, size);
+                "expected %d bytes, got %d bytes.\n",
+                &protocolType, expectedSize, size);
         return ILM_FALSE;
     }
 
@@ -118,7 +118,7 @@ t_ilm_bool getGenericArray(struct SocketMessage* msg, t_ilm_int* arraySize, void
     {
         msg->index -= sizeof(readType);
         printf("command value type mismatch: expected '%c', got '%s'.\n",
-               SOCKET_MESSAGE_TYPE_ARRAY, &readType);
+                SOCKET_MESSAGE_TYPE_ARRAY, &readType);
         return ILM_FALSE;
     }
 

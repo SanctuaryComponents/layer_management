@@ -186,7 +186,9 @@ DBusHandlerResult filterNameOwnerChanged(DBusConnection *connection, DBusMessage
 
     if (dbus_message_is_signal(message, DBUS_INTERFACE_DBUS, "NameOwnerChanged"))
     {
-        char *name, *old, *new;
+        char* name;
+        char* old;
+        char* new;
         if (!dbus_message_get_args(message, NULL,
                                   DBUS_TYPE_STRING, &name,
                                   DBUS_TYPE_STRING, &old,
@@ -203,7 +205,6 @@ DBusHandlerResult filterNameOwnerChanged(DBusConnection *connection, DBusMessage
             gpIncomingMessage->pMessage = dbus_message_copy(message);
             dbus_message_set_sender(gpIncomingMessage->pMessage, old);
         }
-
     }
 
     return DBUS_HANDLER_RESULT_NOT_YET_HANDLED;

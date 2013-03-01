@@ -75,7 +75,7 @@ ilmErrorTypes ilm_getScreenIDs(t_ilm_uint* pNumberOfIDs, t_ilm_uint** ppIDs);
  * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
-ilmErrorTypes ilm_getLayerIDs(t_ilm_int* pLength,t_ilm_layer** ppArray);
+ilmErrorTypes ilm_getLayerIDs(t_ilm_int* pLength, t_ilm_layer** ppArray);
 
 /**
  * \brief Get all LayerIds of the given screen
@@ -87,7 +87,7 @@ ilmErrorTypes ilm_getLayerIDs(t_ilm_int* pLength,t_ilm_layer** ppArray);
  * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
-ilmErrorTypes ilm_getLayerIDsOnScreen(t_ilm_uint screenID, t_ilm_int* pLength,t_ilm_layer** ppArray);
+ilmErrorTypes ilm_getLayerIDsOnScreen(t_ilm_uint screenID, t_ilm_int* pLength, t_ilm_layer** ppArray);
 
 /**
  * \brief Get all SurfaceIDs which are currently registered and managed by the services
@@ -98,7 +98,7 @@ ilmErrorTypes ilm_getLayerIDsOnScreen(t_ilm_uint screenID, t_ilm_int* pLength,t_
  * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
-ilmErrorTypes ilm_getSurfaceIDs(t_ilm_int* pLength,t_ilm_surface** ppArray);
+ilmErrorTypes ilm_getSurfaceIDs(t_ilm_int* pLength, t_ilm_surface** ppArray);
 
 /**
  * \brief Get all SurfaceIds which are currently registered to a given layer and are managed by the services
@@ -110,18 +110,18 @@ ilmErrorTypes ilm_getSurfaceIDs(t_ilm_int* pLength,t_ilm_surface** ppArray);
  * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
-ilmErrorTypes ilm_getSurfaceIDsOnLayer(t_ilm_layer layer,t_ilm_int* pLength,t_ilm_surface** ppArray);
+ilmErrorTypes ilm_getSurfaceIDsOnLayer(t_ilm_layer layer, t_ilm_int* pLength, t_ilm_surface** ppArray);
 
 /**
  * \brief Create a layer which should be managed by the service
  * \ingroup ilmControl
  * \param[out] pLayerId pointer where the id should be/is stored. It is possible
  *                      to set a id from outside, 0 will create a new id.
-  *\param[in] width     horizontal dimension of the layer
- *  
+ * \param[in] width     horizontal dimension of the layer
+ *
  * \param[in] height    vertical dimension of the layer
- *                      
-* 
+ *
+ *
  * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
@@ -169,7 +169,7 @@ ilmErrorTypes ilm_layerSetVisibility(t_ilm_layer layerId, t_ilm_bool newVisibili
  * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
-ilmErrorTypes ilm_layerGetVisibility(t_ilm_layer layerId,t_ilm_bool *pVisibility);
+ilmErrorTypes ilm_layerGetVisibility(t_ilm_layer layerId, t_ilm_bool *pVisibility);
 
 /**
  * \brief Set the opacity of a layer.
@@ -375,7 +375,7 @@ ilmErrorTypes ilm_surfaceGetOpacity(const t_ilm_surface surfaceId, t_ilm_float *
  * To receive keyboard events, 2 conditions must be fulfilled:
  *  1- The surface must accept events from keyboard. See ilm_UpdateInputEventAcceptanceOn
  *  2- The keyboard focus must be set on that surface
- * 
+ *
  * \ingroup ilmControl
  * \param[in] surfaceId Identifier of the surface to set the keyboard focus on.
  * \return ILM_SUCCESS if the method call was successful
@@ -385,7 +385,7 @@ ilmErrorTypes ilm_SetKeyboardFocusOn(t_ilm_surface surfaceId);
 
 /**
  * \brief Get the indentifier of the surface which hold the keyboard focus
- * 
+ *
  * \ingroup ilmControl
  * \param[out] pSurfaceId Pointer on the a surface identifier
  * \return ILM_SUCCESS if the method call was successful

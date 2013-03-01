@@ -39,7 +39,7 @@ ExecutionResult SurfaceSetChromaKeyCommand::execute(ICommandExecutor* executor)
     {
         if (surface)
         {
-            LOG_DEBUG("SurfaceSetChromaKeyCommand","new chromakey disable for id: " << m_surfaceid);
+            LOG_DEBUG("SurfaceSetChromaKeyCommand", "new chromakey disable for id: " << m_surfaceid);
             result = surface->setChromaKeyEnabled(false) ? ExecutionSuccessRedraw : ExecutionSuccess;
         }
     }
@@ -47,7 +47,7 @@ ExecutionResult SurfaceSetChromaKeyCommand::execute(ICommandExecutor* executor)
     {
         if (surface)
         {
-            LOG_DEBUG("SurfaceSetChromaKeyCommand","new chromakey (" << m_array[0] << ", " << m_array[1] << ", " << m_array[2] << ") for id: " << m_surfaceid);
+            LOG_DEBUG("SurfaceSetChromaKeyCommand", "new chromakey (" << m_array[0] << ", " << m_array[1] << ", " << m_array[2] << ") for id: " << m_surfaceid);
             bool ansSetEnabled = surface->setChromaKeyEnabled(true);
             bool ansSetValues = surface->setChromaKey((unsigned char)m_array[0], (unsigned char)m_array[1], (unsigned char)m_array[2]);
             if ((true == ansSetEnabled) | (true == ansSetValues))

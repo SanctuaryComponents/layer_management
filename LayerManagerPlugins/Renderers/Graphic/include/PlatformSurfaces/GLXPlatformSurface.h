@@ -24,7 +24,7 @@
 #include "Surface.h"
 #include "GL/glx.h"
 
-class GLXPlatformSurface: public XPlatformSurface
+class GLXPlatformSurface : public XPlatformSurface
 {
 public:
     GLXPlatformSurface(Surface* surface)

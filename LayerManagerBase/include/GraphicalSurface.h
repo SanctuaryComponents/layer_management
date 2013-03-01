@@ -101,8 +101,8 @@ public:
     bool DestToSourceCoordinates(int *x, int *y, bool check) const;
 
     int OriginalSourceWidth;
-    int OriginalSourceHeight;    
-    
+    int OriginalSourceHeight;
+
 private:
     OrientationType m_orientation; // Rotation of the graphical content
     Rectangle m_sourceViewport;
@@ -115,8 +115,8 @@ inline GraphicalSurface::GraphicalSurface(ObjectType type, int creatorPid)
 , OriginalSourceWidth(0)
 , OriginalSourceHeight(0)
 , m_orientation(Zero)
-, m_sourceViewport(0,0,0,0)
-, m_destinationViewport(0,0,0,0)
+, m_sourceViewport(0, 0, 0, 0)
+, m_destinationViewport(0, 0, 0, 0)
 {
 }
 
@@ -125,8 +125,8 @@ inline GraphicalSurface::GraphicalSurface(int externalId, ObjectType type, int c
 , OriginalSourceWidth(0)
 , OriginalSourceHeight(0)
 , m_orientation(Zero)
-, m_sourceViewport(0,0,0,0)
-, m_destinationViewport(0,0,0,0)
+, m_sourceViewport(0, 0, 0, 0)
+, m_destinationViewport(0, 0, 0, 0)
 {
 }
 
@@ -187,7 +187,7 @@ inline bool GraphicalSurface::setPosition(const unsigned int& x, const unsigned 
 
 inline Vector2 GraphicalSurface::getPosition()
 {
-    return Vector2(m_destinationViewport.x,m_destinationViewport.y);
+    return Vector2(m_destinationViewport.x, m_destinationViewport.y);
 }
 
 inline bool GraphicalSurface::setDimension(const unsigned int& width, const unsigned int& height)

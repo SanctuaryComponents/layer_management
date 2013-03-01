@@ -31,7 +31,7 @@
 #define _WAYLANDFBDEVWINDOWSYSTEM_H_
 #include "WindowSystems/WaylandBaseWindowSystem.h"
 
-class WaylandFbdevWindowSystem: public WaylandBaseWindowSystem
+class WaylandFbdevWindowSystem : public WaylandBaseWindowSystem
 {
 public:
     WaylandFbdevWindowSystem(const char* displayname, int width, int height, Scene* pScene, InputManager* pInputManager);

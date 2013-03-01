@@ -34,7 +34,7 @@ public:
      * \param[in] height height of surface
      * \ingroup Commands
      */
-    SurfaceSetDimensionCommand(pid_t sender, int id, unsigned int width,unsigned  int height)
+    SurfaceSetDimensionCommand(pid_t sender, int id, unsigned int width, unsigned  int height)
     : ICommand(ExecuteAsynchronous, sender)
     , m_id(id)
     , m_width(width)

@@ -16,8 +16,8 @@
  * limitations under the License.
  *
  ****************************************************************************/
-#ifndef __COMMANDINTERPRETER_H__
-#define __COMMANDINTERPRETER_H__
+#ifndef __EXPRESSIONINTERPRETER_H__
+#define __EXPRESSIONINTERPRETER_H__
 
 #include "Expression.h"
 #include <string>
@@ -47,4 +47,4 @@ private:
     string mErrorText;
 };
 
-#endif // __COMMANDINTERPRETER_H__
+#endif // __EXPRESSIONINTERPRETER_H__

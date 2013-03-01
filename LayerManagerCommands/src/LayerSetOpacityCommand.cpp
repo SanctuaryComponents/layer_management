@@ -31,7 +31,7 @@ ExecutionResult LayerSetOpacityCommand::execute(ICommandExecutor* executor)
 
     if (layer)
     {
-        LOG_DEBUG("LayerSetOpacityCommand","new opacity " << m_opacity << " for id: " << m_id);
+        LOG_DEBUG("LayerSetOpacityCommand", "new opacity " << m_opacity << " for id: " << m_id);
         if (layer->setOpacity(m_opacity))
         {
             result = ExecutionSuccessRedraw;

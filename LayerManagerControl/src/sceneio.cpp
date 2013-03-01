@@ -9,9 +9,9 @@
  *
  *        http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed in writing, software
+ * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either inputess or implied.
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
@@ -41,7 +41,6 @@ using namespace std;
 
 
 namespace {
-
 void captureSceneDataHelper(t_ilm_surface surfaceId, t_scene_data* pSceneData, IlmSurface* pSurface)
 {
     ilmSurfaceProperties& props = pSceneData->surfaceProperties[surfaceId];
@@ -371,14 +370,14 @@ void createSceneContentsHelper(IlmSurface* pIlmsurface)
         cout << "Failed to get available surface IDs\n";
     }
 
-
     if (find(surfaceArray, surfaceArray + surfaceCount, surfaceId)
             == surfaceArray + surfaceCount)
     {
         ilmPixelFormat pixelFormat;
         pixelFormat = toPixelFormat(props.pixelformat);
 
-        ilmErrorTypes callResult = ilm_surfaceCreate(props.nativeSurface, props.origSourceWidth, props.origSourceHeight, pixelFormat, &surfaceId);
+        ilmErrorTypes callResult = ilm_surfaceCreate(props.nativeSurface, props.origSourceWidth,
+                                                        props.origSourceHeight, pixelFormat, &surfaceId);
         if (ILM_SUCCESS != callResult)
         {
             cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
@@ -411,7 +410,7 @@ void createSceneContentsHelper(IlmLayer* pIlmlayer)
         if (ILM_SUCCESS != callResult)
         {
             cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
-            cout << "Failed to create layer width dimensions (" << props.origSourceWidth <<" ,"<< props.origSourceHeight << ")\n";
+            cout << "Failed to create layer width dimensions (" << props.origSourceWidth << " ," << props.origSourceHeight << ")\n";
         }
 
         ilm_commitChanges();
@@ -434,7 +433,7 @@ void createSceneContentsHelper(IlmLayer* pIlmlayer)
     if (ILM_SUCCESS != callResult)
     {
         cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
-        cout << "Failed to set render order for layer with ID "<< layerId << ")\n";
+        cout << "Failed to set render order for layer with ID " << layerId << ")\n";
     }
 
     ilm_commitChanges();
@@ -462,7 +461,7 @@ void createSceneContentsHelper(IlmDisplay* pIlmdisplay)
     if (ILM_SUCCESS != callResult)
     {
         cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
-        cout << "Failed to set render order for display with ID "<< displayId << ")\n";
+        cout << "Failed to set render order for display with ID " << displayId << ")\n";
     }
 
     ilm_commitChanges();
@@ -502,11 +501,12 @@ void restoreSceneHelper(IlmSurface* pIlmsurface)
     ilmPixelFormat pixelFormat;
     pixelFormat = toPixelFormat(props.pixelformat);
 
-    ilmErrorTypes callResult = ilm_surfaceSetNativeContent(props.nativeSurface, props.origSourceWidth, props.origSourceHeight, pixelFormat, surfaceId);
+    ilmErrorTypes callResult = ilm_surfaceSetNativeContent(props.nativeSurface, props.origSourceWidth,
+                                                            props.origSourceHeight, pixelFormat, surfaceId);
     if (ILM_SUCCESS != callResult)
     {
         cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
-        cout << "Failed to set native content for surface with ID "<< surfaceId << ")\n";
+        cout << "Failed to set native content for surface with ID " << surfaceId << ")\n";
     }
 
     ilm_commitChanges();
@@ -535,7 +535,7 @@ void restoreSceneHelper(IlmLayer* pIlmlayer)
     if (ILM_SUCCESS != callResult)
     {
         cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
-        cout << "Failed to set destination rectangle for layer with ID "<< layerId << ")\n";
+        cout << "Failed to set destination rectangle for layer with ID " << layerId << ")\n";
     }
 
     ilm_commitChanges();
@@ -591,7 +591,7 @@ void restoreScene(IlmScene* pIlmscene)
         if (ILM_SUCCESS != callResult)
         {
             cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
-            cout << "Failed to remove surface "<< it->first << " from layer " << it->second << ")\n";
+            cout << "Failed to remove surface " << it->first << " from layer " << it->second << ")\n";
         }
     }
 
@@ -622,7 +622,6 @@ void restoreScene(IlmScene* pIlmscene)
         restoreSceneHelper(*it);
     }
 }
-
 } //end of anonymous namespace
 
 
@@ -662,7 +661,7 @@ void exportSceneToFile(string filename)
 
     fstream stream(filename.c_str(), ios::out);
 
-    cout<<buffer.str()<<endl;
+    cout << buffer.str() << endl;
     stream << buffer.str();
     stream.flush();
     stream.close();

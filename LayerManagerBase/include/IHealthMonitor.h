@@ -17,8 +17,8 @@
 *
 ****************************************************************************/
 
-#ifndef __IHEALTH_H__
-#define __IHEALTH_H__
+#ifndef __IHEALTHMONITOR_H__
+#define __IHEALTHMONITOR_H__
 
 #include "ilm_types.h"
 
@@ -51,4 +51,4 @@ IHealthMonitor::~IHealthMonitor()
 {
 }
 
-#endif // __IHEALTH_H__
+#endif // __IHEALTHMONITOR_H__

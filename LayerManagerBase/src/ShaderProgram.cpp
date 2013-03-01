@@ -155,7 +155,7 @@ void ShaderProgram::loadCommonUniforms(const CommonUniforms& uniforms, const int
     {
         uniform1iv(m_texUnitLoc, texCount, uniforms.texUnit);
     }
-    if (m_chromaKeyLoc>= 0)
+    if (m_chromaKeyLoc >= 0)
     {
         uniform3fv(m_chromaKeyLoc, 1, uniforms.chromaKey);
     }

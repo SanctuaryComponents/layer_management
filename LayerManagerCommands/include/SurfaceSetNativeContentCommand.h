@@ -40,7 +40,12 @@ public:
      * \param[in] OriginalHeight original height for native content
      * \ingroup Commands
      */
-    SurfaceSetNativeContentCommand(pid_t sender, unsigned int surfaceId, unsigned int handle, PixelFormat pixelformat, uint OriginalWidth, uint OriginalHeight)
+    SurfaceSetNativeContentCommand(pid_t sender,
+                                    unsigned int surfaceId,
+                                    unsigned int handle,
+                                    PixelFormat pixelformat,
+                                    uint OriginalWidth,
+                                    uint OriginalHeight)
     : ICommand(ExecuteSynchronous, sender)
     , m_surfaceId(surfaceId)
     , m_nativeHandle(handle)
@@ -78,7 +83,8 @@ private:
     uint m_originalHeight;
 
     // for unit testing
-    //template <typename nativeHandle_type, typename pixelformat_type, typename OriginalWidth_type, typename OriginalHeight_type> friend class SurfaceSetRenderBufferCommandEqMatcherP4;
+    //template <typename nativeHandle_type, typename pixelformat_type, typename OriginalWidth_type,
+    //      typename OriginalHeight_type> friend class SurfaceSetRenderBufferCommandEqMatcherP4;
 };
 
 

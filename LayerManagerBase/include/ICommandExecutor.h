@@ -17,8 +17,8 @@
 *
 ****************************************************************************/
 
-#ifndef _COMMANDEXECUTOR_H_
-#define _COMMANDEXECUTOR_H_
+#ifndef _ICOMMANDEXECUTOR_H_
+#define _ICOMMANDEXECUTOR_H_
 
 #include "RendererList.h"
 #include "CommunicatorList.h"
@@ -236,4 +236,4 @@ public:
     virtual HealthCondition getHealth() = 0;
 };
 
-#endif /* _COMMANDEXECUTOR_H_ */
+#endif /* _ICOMMANDEXECUTOR_H_ */

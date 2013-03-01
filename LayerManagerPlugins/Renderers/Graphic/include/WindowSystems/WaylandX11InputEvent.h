@@ -37,9 +37,9 @@
 #include <wayland-server.h>
 #include <xcb/xcb.h>
 #ifdef HAVE_XCB_XKB // XCB-XKB Extension: not required
-  #define explicit tmpexplicit
-  #include <xcb/xkb.h>
-  #undef explicit
+#   define explicit tmpexplicit
+#   include <xcb/xkb.h>
+#   undef explicit
 #endif
 #include <xkbcommon/xkbcommon.h>
 #include <X11/Xlib.h>
@@ -52,10 +52,11 @@
 //////////////////////////////////////////////////////////////////////////////
 extern "C"
 {
-    struct atom_ {
-        xcb_atom_t xkbNames;
-        xcb_atom_t string;
-    };
+struct atom_
+{
+    xcb_atom_t xkbNames;
+    xcb_atom_t string;
+};
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -90,8 +91,19 @@ private:
     uint8_t xkbEventBase();
 };
 
-inline bool WaylandX11InputEvent::hasXkb() { return m_hasXkb; }
-inline xcb_connection_t* WaylandX11InputEvent::connection() { return m_xcbConn; }
-inline uint8_t WaylandX11InputEvent::xkbEventBase() { return m_xkbEventBase; }
+inline bool WaylandX11InputEvent::hasXkb()
+{
+    return m_hasXkb;
+}
+
+inline xcb_connection_t* WaylandX11InputEvent::connection()
+{
+    return m_xcbConn;
+}
+
+inline uint8_t WaylandX11InputEvent::xkbEventBase()
+{
+    return m_xkbEventBase;
+}
 
 #endif /* _WAYLANDX11INPUTEVENT_H_ */

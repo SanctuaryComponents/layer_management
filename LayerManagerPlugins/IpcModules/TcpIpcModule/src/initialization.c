@@ -76,8 +76,8 @@ t_ilm_bool initServiceMode()
         }
 
         if (0 != connect(gState.socket,
-                         (struct sockaddr *) &gState.serverAddrIn,
-                         sizeof(gState.serverAddrIn)))
+                        (struct sockaddr *) &gState.serverAddrIn,
+                        sizeof(gState.serverAddrIn)))
         {
             result = ILM_FALSE;
         }
@@ -98,7 +98,7 @@ t_ilm_bool initServiceMode()
 
         if (0 > bind(gState.socket,
                     (struct sockaddr *) &gState.serverAddrIn,
-                     sizeof(gState.serverAddrIn)))
+                    sizeof(gState.serverAddrIn)))
         {
             printf("TcpIpcModule: bind()...failed\n");
             result = ILM_FALSE;
@@ -170,8 +170,8 @@ t_ilm_bool initClientMode()
         }
 
         if (0 != connect(gState.socket,
-                         (struct sockaddr *) &gState.serverAddrIn,
-                         sizeof(gState.serverAddrIn)))
+                        (struct sockaddr *) &gState.serverAddrIn,
+                        sizeof(gState.serverAddrIn)))
         {
             result = ILM_FALSE;
         }
@@ -192,7 +192,7 @@ t_ilm_bool initClientMode()
 
         if (0 > bind(gState.socket,
                     (struct sockaddr *) &gState.serverAddrIn,
-                     sizeof(gState.serverAddrIn)))
+                    sizeof(gState.serverAddrIn)))
         {
             printf("TcpIpcModule: bind()...failed\n");
             result = ILM_FALSE;

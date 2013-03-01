@@ -43,7 +43,7 @@ ExecutionResult ShaderCreateCommand::execute(ICommandExecutor* executor)
     {
         // insert shader to shader map
         int id = shader->getId();
-        LOG_DEBUG("CreateShaderCommand","Shader with shader id : " << id << " successfully created");
+        LOG_DEBUG("CreateShaderCommand", "Shader with shader id : " << id << " successfully created");
         ShaderMap &shaderMap = scene.m_shaderMap;
         shaderMap[id] = shader;
         *m_returnID = id;

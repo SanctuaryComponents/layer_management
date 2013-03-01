@@ -17,11 +17,11 @@
  *
  ****************************************************************************/
 
-#ifndef _DBUSINTROSPECTION_H_
-#define _DBUSINTROSPECTION_H_
+#ifndef _INTROSPECTION_H_
+#define _INTROSPECTION_H_
 
 #include "common.h"
 
 void generateIntrospectionString(char* msgBuffer);
 
-#endif /* _DBUSINTROSPECTION_H_ */
+#endif /* _INTROSPECTION_H_ */

@@ -51,15 +51,15 @@ XVisualInfo* GLXGraphicsystem::GetMatchingVisual(Display *dpy)
     int screen = DefaultScreen(dpy);
     XVisualInfo *visinfo;
     int attribs[] = {
-            GLX_RGBA,
-            GLX_ALPHA_SIZE,8,
-            GLX_RED_SIZE, 1,
-            GLX_GREEN_SIZE, 1,
-            GLX_BLUE_SIZE, 1,
-            GLX_DEPTH_SIZE,8,
-            GLX_BUFFER_SIZE,32,
-            GLX_DOUBLEBUFFER,
-            None
+        GLX_RGBA,
+        GLX_ALPHA_SIZE, 8,
+        GLX_RED_SIZE, 1,
+        GLX_GREEN_SIZE, 1,
+        GLX_BLUE_SIZE, 1,
+        GLX_DEPTH_SIZE, 8,
+        GLX_BUFFER_SIZE, 32,
+        GLX_DOUBLEBUFFER,
+        None
     };
 
     visinfo = glXChooseVisual(dpy, screen, attribs);
@@ -69,12 +69,12 @@ XVisualInfo* GLXGraphicsystem::GetMatchingVisual(Display *dpy)
     }
     return visinfo;
 }
-bool GLXGraphicsystem::CheckConfigMask(Display *curDisplay,GLXFBConfig currentConfig, int attribute, int expectedValue)
+bool GLXGraphicsystem::CheckConfigMask(Display *curDisplay, GLXFBConfig currentConfig, int attribute, int expectedValue)
 {
     bool result = true;
     int returnedValue = 0;
 
-    glXGetFBConfigAttrib(curDisplay,currentConfig,attribute,&returnedValue);
+    glXGetFBConfigAttrib(curDisplay, currentConfig, attribute, &returnedValue);
     if (!(returnedValue & expectedValue))
     {
         result = false;
@@ -82,12 +82,12 @@ bool GLXGraphicsystem::CheckConfigMask(Display *curDisplay,GLXFBConfig currentCo
     return result;
 }
 
-bool GLXGraphicsystem::CheckConfigValue(Display *curDisplay,GLXFBConfig currentConfig, int attribute, int expectedValue)
+bool GLXGraphicsystem::CheckConfigValue(Display *curDisplay, GLXFBConfig currentConfig, int attribute, int expectedValue)
 {
     bool result = true;
     int returnedValue = 0;
 
-    glXGetFBConfigAttrib(curDisplay,currentConfig,attribute,&returnedValue);
+    glXGetFBConfigAttrib(curDisplay, currentConfig, attribute, &returnedValue);
     if ((returnedValue != expectedValue))
     {
         result = false;
@@ -97,10 +97,10 @@ bool GLXGraphicsystem::CheckConfigValue(Display *curDisplay,GLXFBConfig currentC
 
 void GLXGraphicsystem::activateGraphicContext()
 {
-    glXMakeCurrent(m_x11display, m_window, m_context);   
+    glXMakeCurrent(m_x11display, m_window, m_context);
 }
 
-void GLXGraphicsystem::releaseGraphicContext() 
+void GLXGraphicsystem::releaseGraphicContext()
 {
     glXMakeCurrent(m_x11display, None, NULL);
 }
@@ -109,16 +109,16 @@ GLXFBConfig* GLXGraphicsystem::GetMatchingPixmapConfig(Display *curDisplay)
 {
     int neededMaskAttribute[] =
     {
-        GLX_DRAWABLE_TYPE,GLX_PIXMAP_BIT,
-        GLX_DRAWABLE_TYPE,GLX_WINDOW_BIT,
-        GLX_BIND_TO_TEXTURE_TARGETS_EXT,GLX_TEXTURE_2D_BIT_EXT,
+        GLX_DRAWABLE_TYPE, GLX_PIXMAP_BIT,
+        GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT,
+        GLX_BIND_TO_TEXTURE_TARGETS_EXT, GLX_TEXTURE_2D_BIT_EXT,
         None
     };
     int neededValueAttribute[] =
     {
-        GLX_BUFFER_SIZE,32,
-        GLX_ALPHA_SIZE,8,
-        GLX_BIND_TO_TEXTURE_RGBA_EXT,True,
+        GLX_BUFFER_SIZE, 32,
+        GLX_ALPHA_SIZE, 8,
+        GLX_BIND_TO_TEXTURE_RGBA_EXT, True,
         None
     };
     LOG_DEBUG("GLXGraphicsystem", "Choose pixmap GL configuration");
@@ -135,13 +135,13 @@ GLXFBConfig* GLXGraphicsystem::GetMatchingPixmapConfig(Display *curDisplay)
         bool result = true;
         /* check first all mask values */
         j = 0;
-        while ( neededMaskAttribute[j] != None && result == true )
+        while (neededMaskAttribute[j] != None && result == true)
         {
-           result = CheckConfigMask(curDisplay,config, neededMaskAttribute[j], neededMaskAttribute[j+1]);
-           j += 2;
+            result = CheckConfigMask(curDisplay, config, neededMaskAttribute[j], neededMaskAttribute[j + 1]);
+            j += 2;
         }
         /* no matching found in needed mask attribute, skip config take next */
-        if (result == false )
+        if (result == false)
         {
             continue;
         }
@@ -150,14 +150,14 @@ GLXFBConfig* GLXGraphicsystem::GetMatchingPixmapConfig(Display *curDisplay)
         /* reset attribute counter */
         j = 0;
         /* check all fixed values */
-        while ( neededValueAttribute[j] != None && result == true )
+        while (neededValueAttribute[j] != None && result == true)
         {
-           result = CheckConfigValue(curDisplay,config, neededValueAttribute[j], neededValueAttribute[j+1]);
-           j += 2;
+            result = CheckConfigValue(curDisplay, config, neededValueAttribute[j], neededValueAttribute[j + 1]);
+            j += 2;
         }
         /* no matching found in needed fixed value attribute, skip config take next */
 
-        if (result == false )
+        if (result == false)
         {
             continue;
         }
@@ -203,14 +203,14 @@ bool GLXGraphicsystem::init(Display* x11Display, Window x11Window)
     }
     LOG_DEBUG("GLXGraphicsystem", "Make GLX Context current");
     glXMakeCurrent(m_x11display, m_window, m_context);
-    glEnable (GL_BLEND);
-    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glEnable(GL_TEXTURE_2D);
     glMatrixMode(GL_MODELVIEW);
     const char *ext;
     ext = glXQueryExtensionsString(m_x11display, 0);
-    if (!strstr(ext, "GLX_EXT_texture_from_pixmap") )
+    if (!strstr(ext, "GLX_EXT_texture_from_pixmap"))
     {
         m_zerocopy = false;
     }
@@ -260,7 +260,7 @@ bool GLXGraphicsystem::needsRedraw(Layer *layer)
     if (layer->visibility && layer->opacity > 0.0)
     {
         SurfaceList surfaces = layer->getAllSurfaces();
-        for(SurfaceListConstIterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++)
+        for (SurfaceListConstIterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++)
         {
             if ((*currentS)->renderPropertyChanged)
             {
@@ -307,11 +307,11 @@ void GLXGraphicsystem::renderSWLayer(Layer *layer, bool clear)
         clearBackground();
     }
 
-    if ( layer->visibility && layer->opacity > 0.0 )
+    if (layer->visibility && layer->opacity > 0.0)
     {
         SurfaceList surfaces = layer->getAllSurfaces();
         beginLayer(layer);
-        for(SurfaceListConstIterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++)
+        for (SurfaceListConstIterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++)
         {
             if ((*currentS)->hasNativeContent() && (*currentS)->visibility && (*currentS)->opacity>0.0f)
             {
@@ -352,16 +352,19 @@ void GLXGraphicsystem::renderSurface(Surface* currentSurface)
 {
 //    LOG_DEBUG("GLXGraphicsystem", "renderSurface " << currentSurface->getID() );
     GLenum glErrorCode = GL_NO_ERROR;
-    
+
     if (currentSurface->isCropped())
         return; // skip rendering of this surface, because it is cropped by layer source region
-        
+
     // check if surface is cropped completely, if so then skip rendering
     FloatRectangle targetSurfaceSource = currentSurface->getTargetSourceRegion();
     FloatRectangle targetSurfaceDestination = currentSurface->getTargetDestinationRegion();
 
     float textureCoordinates[4];
-    ViewportTransform::transformRectangleToTextureCoordinates(targetSurfaceSource, currentSurface->OriginalSourceWidth, currentSurface->OriginalSourceHeight, textureCoordinates);
+    ViewportTransform::transformRectangleToTextureCoordinates(targetSurfaceSource,
+                                                                currentSurface->OriginalSourceWidth,
+                                                                currentSurface->OriginalSourceHeight,
+                                                                textureCoordinates);
 
     glPushMatrix();
     if (false == m_binder->bindSurfaceTexture(currentSurface))
@@ -370,7 +373,7 @@ void GLXGraphicsystem::renderSurface(Surface* currentSurface)
         return;
     }
 //    glPushMatrix();
-    glColor4f(1.0f,1.0f,1.0f,currentSurface->opacity*(m_currentLayer)->opacity);
+    glColor4f(1.0f, 1.0f, 1.0f, currentSurface->opacity*(m_currentLayer)->opacity);
 
     glBegin(GL_QUADS);
 
@@ -380,28 +383,31 @@ void GLXGraphicsystem::renderSurface(Surface* currentSurface)
 //    LOG_DEBUG("GLXGraphicsystem","window: " << m_windowWidth << " " << m_windowHeight  );
 
     //bottom left
-    glTexCoord2d(textureCoordinates[0],textureCoordinates[3]);
-    glVertex2d((float)targetSurfaceDestination.x/m_windowWidth*2-1,  1-(float)(targetSurfaceDestination.y+targetSurfaceDestination.height)/m_windowHeight*2);
+    glTexCoord2d(textureCoordinates[0], textureCoordinates[3]);
+    glVertex2d((float)targetSurfaceDestination.x / m_windowWidth * 2 - 1,
+               1 - (float)(targetSurfaceDestination.y + targetSurfaceDestination.height) / m_windowHeight * 2);
 
     // bottom right
-    glTexCoord2f(textureCoordinates[2],textureCoordinates[3]);
-    glVertex2d( (float)(targetSurfaceDestination.x+targetSurfaceDestination.width)/m_windowWidth*2-1, 1-(float)(targetSurfaceDestination.y+targetSurfaceDestination.height)/m_windowHeight*2);
+    glTexCoord2f(textureCoordinates[2], textureCoordinates[3]);
+    glVertex2d((float)(targetSurfaceDestination.x + targetSurfaceDestination.width) / m_windowWidth * 2 - 1,
+               1 - (float)(targetSurfaceDestination.y + targetSurfaceDestination.height) / m_windowHeight * 2);
 
     // top right
     glTexCoord2f(textureCoordinates[2], textureCoordinates[1]);
-    glVertex2d((float)(targetSurfaceDestination.x+targetSurfaceDestination.width)/m_windowWidth*2-1, 1-(float)targetSurfaceDestination.y/m_windowHeight*2);
+    glVertex2d((float)(targetSurfaceDestination.x + targetSurfaceDestination.width) / m_windowWidth * 2 - 1,
+               1 - (float)targetSurfaceDestination.y / m_windowHeight * 2);
 
     // top left
     glTexCoord2f(textureCoordinates[0], textureCoordinates[1]);
-    glVertex2d((float)targetSurfaceDestination.x/m_windowWidth*2-1 ,  1-(float)targetSurfaceDestination.y/m_windowHeight*2);
+    glVertex2d((float)targetSurfaceDestination.x/m_windowWidth * 2 - 1, 1 - (float)targetSurfaceDestination.y / m_windowHeight * 2);
     glEnd();
 
     m_binder->unbindSurfaceTexture(currentSurface);
     glPopMatrix();
     glErrorCode = glGetError();
-    if ( GL_NO_ERROR != glErrorCode )
+    if (GL_NO_ERROR != glErrorCode)
     {
-        LOG_ERROR("GLXGraphicsystem", "GL Error occured :" << glErrorCode );
+        LOG_ERROR("GLXGraphicsystem", "GL Error occured :" << glErrorCode);
     }
     currentSurface->frameCounter++;
     currentSurface->drawCounter++;
@@ -409,19 +415,19 @@ void GLXGraphicsystem::renderSurface(Surface* currentSurface)
 
 void GLXGraphicsystem::saveScreenShotOfFramebuffer(std::string fileToSave)
 {
-    LOG_DEBUG("GLXGraphicsystem","taking screenshot and saving it to:" << fileToSave);
+    LOG_DEBUG("GLXGraphicsystem", "taking screenshot and saving it to:" << fileToSave);
 
     GLint viewport[4];
-    glGetIntegerv(GL_VIEWPORT,viewport); // x,y,width,height
+    glGetIntegerv(GL_VIEWPORT, viewport); // x,y,width,height
 
-    int WINDOW_WIDTH= viewport[2];
-    int WINDOW_HEIGHT= viewport[3];
-    LOG_DEBUG("GLXGraphicsystem","Screenshot: " << WINDOW_WIDTH << " * " << WINDOW_HEIGHT);
+    int WINDOW_WIDTH = viewport[2];
+    int WINDOW_HEIGHT = viewport[3];
+    LOG_DEBUG("GLXGraphicsystem", "Screenshot: " << WINDOW_WIDTH << " * " << WINDOW_HEIGHT);
     char *buffer = (char *)malloc(WINDOW_WIDTH * WINDOW_HEIGHT * 3 * sizeof(unsigned char));
-    glReadPixels(0,0,WINDOW_WIDTH,WINDOW_HEIGHT,GL_BGR,GL_UNSIGNED_BYTE, buffer);
+    glReadPixels(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT, GL_BGR, GL_UNSIGNED_BYTE, buffer);
 
-    writeBitmap(fileToSave,buffer,WINDOW_WIDTH,WINDOW_HEIGHT);
+    writeBitmap(fileToSave, buffer, WINDOW_WIDTH, WINDOW_HEIGHT);
     free(buffer);
-    LOG_DEBUG("GLXGraphicsystem","done taking screenshot");
+    LOG_DEBUG("GLXGraphicsystem", "done taking screenshot");
 }
 

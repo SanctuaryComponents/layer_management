@@ -45,18 +45,18 @@ BaseRenderer::~BaseRenderer()
 uint BaseRenderer::getLayerTypeCapabilities(LayerType layerType)
 {
     uint result = 0;
-    switch(layerType)
+    switch (layerType)
     {
-        case Software_2D:
-            result = LayerPosition | LayerScalable | LayerOrientable | LayerComposedByAlpha;
-            break;
+    case Software_2D:
+        result = LayerPosition | LayerScalable | LayerOrientable | LayerComposedByAlpha;
+        break;
 
-        case Software_2_5D:
-            result = LayerPosition | LayerScalable | LayerOrientable | LayerComposedByAlpha;
-            break;
+    case Software_2_5D:
+        result = LayerPosition | LayerScalable | LayerOrientable | LayerComposedByAlpha;
+        break;
 
-        default :
-            break;
+    default :
+        break;
     }
     return result;
 }

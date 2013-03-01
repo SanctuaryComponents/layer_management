@@ -31,7 +31,7 @@ ExecutionResult SurfaceSetOpacityCommand::execute(ICommandExecutor* executor)
 
     if (surface)
     {
-        LOG_DEBUG("SurfaceSetOpacityCommand","new opacity " << m_opacity << " for id: " << m_id);
+        LOG_DEBUG("SurfaceSetOpacityCommand", "new opacity " << m_opacity << " for id: " << m_id);
         if (surface->setOpacity(m_opacity))
         {
             executor->addClientNotification(surface, ILM_NOTIFICATION_OPACITY);

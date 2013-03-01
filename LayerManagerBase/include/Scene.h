@@ -37,7 +37,7 @@ class Surface;
 /*
  * Represents a list of Layers which contain the Surfaces.
  */
-class Scene: public IScene
+class Scene : public IScene
 {
     // TODO: these should use public interface instead
     friend class Layermanager;

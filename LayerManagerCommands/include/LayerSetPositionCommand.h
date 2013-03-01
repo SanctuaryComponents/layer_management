@@ -41,7 +41,6 @@ public:
     , m_y(y)
     {}
 
-
     /**
      * \brief default destructor
      */

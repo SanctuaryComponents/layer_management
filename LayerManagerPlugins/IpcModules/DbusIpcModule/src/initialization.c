@@ -47,9 +47,9 @@ t_ilm_bool initServiceMode()
     int ret;
 
     const char* rule = "type='signal',"
-                           "sender='"DBUS_INTERFACE_DBUS"',"
-                           "interface='"DBUS_INTERFACE_DBUS"',"
-                           "member='NameOwnerChanged'";
+                        "sender='"DBUS_INTERFACE_DBUS"',"
+                        "interface='"DBUS_INTERFACE_DBUS"',"
+                        "member='NameOwnerChanged'";
 
     memset(&gDbus, 0, sizeof(gDbus));
 
@@ -61,7 +61,7 @@ t_ilm_bool initServiceMode()
     dbus_error_init(&gDbus.error);
 
     useSessionBus = getenv("LM_USE_SESSION_BUS");
-    if (useSessionBus && strcmp(useSessionBus, "enable") == 0 )
+    if (useSessionBus && strcmp(useSessionBus, "enable") == 0)
     {
         gDbus.type = DBUS_BUS_SESSION;
         printf("DbusIpcmodule: using session bus\n");
@@ -155,7 +155,7 @@ t_ilm_bool initServiceMode()
         exit(1);
     }
 
-    if(!dbus_connection_set_watch_functions(gDbus.connection,
+    if (!dbus_connection_set_watch_functions(gDbus.connection,
                                             addWatch,
                                             removeWatch,
                                             toggleWatch,
@@ -183,7 +183,7 @@ t_ilm_bool initClientMode()
     dbus_error_init(&gDbus.error);
 
     useSessionBus = getenv("LM_USE_SESSION_BUS");
-    if (useSessionBus && strcmp(useSessionBus, "enable") == 0 )
+    if (useSessionBus && strcmp(useSessionBus, "enable") == 0)
     {
         gDbus.type = DBUS_BUS_SESSION;
         printf("DbusIpcmodule: using session bus\n");
@@ -252,7 +252,7 @@ t_ilm_bool initClientMode()
         exit(1);
     }
 
-    if(!dbus_connection_set_watch_functions(gDbus.connection,
+    if (!dbus_connection_set_watch_functions(gDbus.connection,
                                             addWatch,
                                             removeWatch,
                                             toggleWatch,
@@ -307,9 +307,9 @@ t_ilm_bool destroyService()
     t_ilm_bool errorset;
 
     const char* rule = "type='signal',"
-                       "sender='"DBUS_INTERFACE_DBUS"',"
-                       "interface='"DBUS_INTERFACE_DBUS"',"
-                       "member='NameOwnerChanged'";
+                        "sender='"DBUS_INTERFACE_DBUS"',"
+                        "interface='"DBUS_INTERFACE_DBUS"',"
+                        "member='NameOwnerChanged'";
 
     dbus_error_init(&err);
 

@@ -17,8 +17,8 @@
  *
  ****************************************************************************/
 
-#ifndef _TCPSOCKETCONFIGURATION_H_
-#define _TCPSOCKETCONFIGURATION_H_
+#ifndef _SOCKETCONFIGURATION_H_
+#define _SOCKETCONFIGURATION_H_
 
 //=============================================================================
 // tcp socket configuration
@@ -38,4 +38,4 @@
 #define ENV_TCP_HOST                    "LM_TCP_HOST"
 #define ENV_TCP_PORT                    "LM_TCP_PORT"
 
-#endif // _TCPSOCKETCONFIGURATION_H_
+#endif // _SOCKETCONFIGURATION_H_

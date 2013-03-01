@@ -35,7 +35,7 @@ ExecutionResult SurfaceGetOrientationCommand::execute(ICommandExecutor* executor
         result = ExecutionSuccess;
     }
 
-            return result;
+    return result;
 }
 
 const std::string SurfaceGetOrientationCommand::getString()

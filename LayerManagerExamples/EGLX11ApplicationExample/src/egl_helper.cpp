@@ -52,7 +52,8 @@ t_ilm_bool createX11Context(t_ilm_int width, t_ilm_int height)
     XSetWindowAttributes windowAttributes;
     unsigned int windowMask;
     int colorDepth;
-    int widthCorrected, heightCorrected;
+    int widthCorrected;
+    int heightCorrected;
 
     g_x11ContextStruct.x11Window = 0;
     g_x11ContextStruct.x11Display = NULL;
@@ -130,14 +131,16 @@ t_ilm_bool createEGLContext(t_ilm_int width, t_ilm_int height)
     g_eglContextStruct.eglSurface = NULL;
     g_eglContextStruct.eglContext = NULL;
 
-    g_eglContextStruct.eglDisplay = eglGetDisplay((EGLNativeDisplayType) g_x11ContextStruct.x11Display); // TODO: remove all C style casts in C++ code; use C++ casts
+    g_eglContextStruct.eglDisplay = eglGetDisplay(
+                        (EGLNativeDisplayType) g_x11ContextStruct.x11Display); // TODO: remove all C style casts in C++ code; use C++ casts
     EGLint eglstatus = eglGetError();
     if (!g_eglContextStruct.eglDisplay)
     {
         printf("Error: eglGetDisplay() failed.\n");
     }
 
-    EGLint iMajorVersion, iMinorVersion;
+    EGLint iMajorVersion;
+    EGLint iMinorVersion;
     if (!eglInitialize(g_eglContextStruct.eglDisplay, &iMajorVersion,
             &iMinorVersion))
     {
@@ -194,7 +197,7 @@ t_ilm_bool createEGLContext(t_ilm_int width, t_ilm_int height)
     t_ilm_surface surfaceid = (t_ilm_surface)SURFACE_EXAMPLE_EGLX11_APPLICATION;
 
     printf("create a surface %lu\n", (t_ilm_nativehandle) g_x11ContextStruct.x11Window);
-    ilm_surfaceCreate( (t_ilm_nativehandle) g_x11ContextStruct.x11Window, width, height,
+    ilm_surfaceCreate((t_ilm_nativehandle) g_x11ContextStruct.x11Window, width, height,
             ILM_PIXELFORMAT_RGBA_8888, &surfaceid);
 
     printf("set surface dest region\n");

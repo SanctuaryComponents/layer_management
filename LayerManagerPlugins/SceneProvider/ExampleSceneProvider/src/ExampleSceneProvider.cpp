@@ -41,14 +41,14 @@ ExampleSceneProvider::ExampleSceneProvider(ICommandExecutor& executor, Configura
 {
 }
 
-typedef struct t_layerScene 
+typedef struct t_layerScene
 {
     unsigned int layer;
     bool visibility;
     float opacity;
 } layerScene;
 
-typedef struct t_surfaceScene 
+typedef struct t_surfaceScene
 {
     unsigned int surface;
     bool visibility;
@@ -56,28 +56,28 @@ typedef struct t_surfaceScene
 } surfaceScene;
 
 
-static layerScene gInitialLayerScene[] = 
+static layerScene gInitialLayerScene[] =
 {
     { LAYER_EXAMPLE_VIDEO_APPLICATIONS, true, 1.0 },
     { LAYER_EXAMPLE_GLES_APPLICATIONS, true, 1.0 },
     { LAYER_EXAMPLE_X_APPLICATIONS, true, 1.0 }
 };
 
-static surfaceScene gInitialSurfaceScene[] = 
+static surfaceScene gInitialSurfaceScene[] =
 {
-    { SURFACE_EXAMPLE_EGLX11_APPLICATION,false,1.0 },
-    { SURFACE_EXAMPLE_GDTESTENV_APPLICATION_1,false,1.0 },
-    { SURFACE_EXAMPLE_GDTESTENV_APPLICATION_2,false,1.0 },
-    { SURFACE_EXAMPLE_GDTESTENV_APPLICATION_3,false,1.0 },
-    { SURFACE_EXAMPLE_GDTESTENV_APPLICATION_4,false,1.0 },
-    { SURFACE_EXAMPLE_GDTESTENV_APPLICATION_5,false,1.0 },
-    { SURFACE_EXAMPLE_GDTESTENV_APPLICATION_6,false,1.0 },
-    { SURFACE_EXAMPLE_GDTESTENV_APPLICATION_7,false,1.0 },
-    { SURFACE_EXAMPLE_GDTESTENV_APPLICATION_8,false,1.0 },
-    { SURFACE_EXAMPLE_GDTESTENV_APPLICATION_9,false,1.0 },
-    { SURFACE_EXAMPLE_GLXX11_APPLICATION,false,1.0 },
-    { SURFACE_EXAMPLE_EGLRAW_APPLICATION,false,1.0 },
-    { SURFACE_EXAMPLE_VIDEO_APPLICATION,false,1.0 }
+    { SURFACE_EXAMPLE_EGLX11_APPLICATION, false, 1.0 },
+    { SURFACE_EXAMPLE_GDTESTENV_APPLICATION_1, false, 1.0 },
+    { SURFACE_EXAMPLE_GDTESTENV_APPLICATION_2, false, 1.0 },
+    { SURFACE_EXAMPLE_GDTESTENV_APPLICATION_3, false, 1.0 },
+    { SURFACE_EXAMPLE_GDTESTENV_APPLICATION_4, false, 1.0 },
+    { SURFACE_EXAMPLE_GDTESTENV_APPLICATION_5, false, 1.0 },
+    { SURFACE_EXAMPLE_GDTESTENV_APPLICATION_6, false, 1.0 },
+    { SURFACE_EXAMPLE_GDTESTENV_APPLICATION_7, false, 1.0 },
+    { SURFACE_EXAMPLE_GDTESTENV_APPLICATION_8, false, 1.0 },
+    { SURFACE_EXAMPLE_GDTESTENV_APPLICATION_9, false, 1.0 },
+    { SURFACE_EXAMPLE_GLXX11_APPLICATION, false, 1.0 },
+    { SURFACE_EXAMPLE_EGLRAW_APPLICATION, false, 1.0 },
+    { SURFACE_EXAMPLE_VIDEO_APPLICATION, false, 1.0 }
 };
 
 
@@ -86,38 +86,58 @@ bool ExampleSceneProvider::delegateScene()
     bool result = true;
     pid_t layermanagerPid = getpid();
     int i = 0;
-    int numberOfLayers = sizeof(gInitialLayerScene) / sizeof (layerScene);
-    int numberOfSurfaces = sizeof(gInitialSurfaceScene) / sizeof (surfaceScene);
+    int numberOfLayers = sizeof(gInitialLayerScene) / sizeof(layerScene);
+    int numberOfSurfaces = sizeof(gInitialSurfaceScene) / sizeof(surfaceScene);
     unsigned int *renderOrder = new unsigned int [numberOfLayers];
     unsigned int* screenResolution = mExecutor.getScreenResolution(0);
-    if ( numberOfLayers > 0 ) 
+    if (numberOfLayers > 0)
     {
         /* setup inital layer scenery */
-        for (i = 0;i<numberOfLayers;i++)
+        for (i = 0; i<numberOfLayers; i++)
         {
-            result &= mExecutor.execute(new LayerCreateCommand(layermanagerPid, screenResolution[0], screenResolution[1], &(gInitialLayerScene[i].layer)));
-            result &= mExecutor.execute(new LayerSetSourceRectangleCommand(layermanagerPid, gInitialLayerScene[i].layer, 0, 0, screenResolution[0], screenResolution[1]));
-            result &= mExecutor.execute(new LayerSetDestinationRectangleCommand(layermanagerPid, gInitialLayerScene[i].layer, 0, 0, screenResolution[0], screenResolution[1]));
-            result &= mExecutor.execute(new LayerSetOpacityCommand(layermanagerPid, gInitialLayerScene[i].layer, gInitialLayerScene[i].opacity) );
-            result &= mExecutor.execute(new LayerSetVisibilityCommand(layermanagerPid, gInitialLayerScene[i].layer, gInitialLayerScene[i].visibility) );
+            result &= mExecutor.execute(new LayerCreateCommand(layermanagerPid,
+                                                               screenResolution[0],
+                                                               screenResolution[1],
+                                                               &(gInitialLayerScene[i].layer)));
+            result &= mExecutor.execute(new LayerSetSourceRectangleCommand(layermanagerPid,
+                                                                           gInitialLayerScene[i].layer,
+                                                                           0, 0,
+                                                                           screenResolution[0],
+                                                                           screenResolution[1]));
+            result &= mExecutor.execute(new LayerSetDestinationRectangleCommand(layermanagerPid,
+                                                                                gInitialLayerScene[i].layer,
+                                                                                0, 0,
+                                                                                screenResolution[0],
+                                                                                screenResolution[1]));
+            result &= mExecutor.execute(new LayerSetOpacityCommand(layermanagerPid,
+                                                                   gInitialLayerScene[i].layer,
+                                                                   gInitialLayerScene[i].opacity));
+            result &= mExecutor.execute(new LayerSetVisibilityCommand(layermanagerPid,
+                                                                      gInitialLayerScene[i].layer,
+                                                                      gInitialLayerScene[i].visibility));
             result &= mExecutor.execute(new CommitCommand(layermanagerPid));
             renderOrder[i]=gInitialLayerScene[i].layer;
-        }        
+        }
         /* Finally set the first executed renderorder */
         result &= mExecutor.execute(new ScreenSetRenderOrderCommand(layermanagerPid, 0, renderOrder, numberOfLayers));
         result &= mExecutor.execute(new CommitCommand(layermanagerPid));
     }
-    
-    if ( numberOfSurfaces > 0 ) 
+
+    if (numberOfSurfaces > 0)
     {
         /* setup inital surface scenery */
-        for (i = 0;i<numberOfSurfaces;i++)
+        for (i = 0; i<numberOfSurfaces; i++)
         {
-            result &= mExecutor.execute(new SurfaceCreateCommand(layermanagerPid, &(gInitialSurfaceScene[i].surface)));
-            result &= mExecutor.execute(new SurfaceSetOpacityCommand(layermanagerPid, gInitialSurfaceScene[i].surface, gInitialSurfaceScene[i].opacity));
-            result &= mExecutor.execute(new SurfaceSetVisibilityCommand(layermanagerPid, gInitialSurfaceScene[i].surface, gInitialSurfaceScene[i].visibility));
+            result &= mExecutor.execute(new SurfaceCreateCommand(layermanagerPid,
+                                                                 &(gInitialSurfaceScene[i].surface)));
+            result &= mExecutor.execute(new SurfaceSetOpacityCommand(layermanagerPid,
+                                                                     gInitialSurfaceScene[i].surface,
+                                                                     gInitialSurfaceScene[i].opacity));
+            result &= mExecutor.execute(new SurfaceSetVisibilityCommand(layermanagerPid,
+                                                                        gInitialSurfaceScene[i].surface,
+                                                                        gInitialSurfaceScene[i].visibility));
             result &= mExecutor.execute(new CommitCommand(layermanagerPid));
-        }        
+        }
         /* Finally set the first executed renderorder */
     }
     return result;

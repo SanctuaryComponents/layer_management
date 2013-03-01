@@ -16,8 +16,8 @@
  * limitations under the License.
  *
  ****************************************************************************/
-#ifndef _IUpdateable_h
-#define _IUpdateable_h
+#ifndef _IUPDATEABLE_H
+#define _IUPDATEABLE_H
 
 class IUpdateable
 {
@@ -26,4 +26,4 @@ public:
     virtual void update(int currentTimeInMs, int lastFrameTime) = 0;
 };
 
-#endif
+#endif /* _IUPDATEABLE_H */

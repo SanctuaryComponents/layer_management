@@ -95,83 +95,83 @@ GenericCommunicator::GenericCommunicator(ICommandExecutor& executor, Configurati
 {
     MethodTable manager_methods[] =
     {
-        { "ServiceConnect",                   &GenericCommunicator::ServiceConnect },
-        { "ServiceDisconnect",                &GenericCommunicator::ServiceDisconnect },
-        { "Debug",                            &GenericCommunicator::Debug },
-        { "ScreenShot",                       &GenericCommunicator::ScreenShot },
-        { "ScreenShotOfLayer",                &GenericCommunicator::ScreenShotOfLayer },
-        { "ScreenShotOfSurface",              &GenericCommunicator::ScreenShotOfSurface },
-        { "GetScreenResolution",              &GenericCommunicator::GetScreenResolution },
-        { "GetNumberOfHardwareLayers",        &GenericCommunicator::GetNumberOfHardwareLayers },
-        { "GetScreenIDs",                     &GenericCommunicator::GetScreenIDs },
-        { "ListAllLayerIDS",                  &GenericCommunicator::ListAllLayerIDS },
-        { "ListAllLayerIDsOnScreen",          &GenericCommunicator::ListAllLayerIDsOnScreen },
-        { "ListAllSurfaceIDS",                &GenericCommunicator::ListAllSurfaceIDS },
-        { "ListSurfaceofLayer",               &GenericCommunicator::ListSurfaceofLayer },
-        { "GetPropertiesOfSurface",           &GenericCommunicator::GetPropertiesOfSurface },
-        { "GetPropertiesOfLayer",             &GenericCommunicator::GetPropertiesOfLayer },
-        { "CreateSurface",                    &GenericCommunicator::CreateSurface },
-        { "CreateSurfaceFromId",              &GenericCommunicator::CreateSurfaceFromId },
-        { "InitializeSurface",                &GenericCommunicator::InitializeSurface },
-        { "InitializeSurfaceFromId",          &GenericCommunicator::InitializeSurfaceFromId },
-        { "SetSurfaceNativeContent",          &GenericCommunicator::SetSurfaceNativeContent },
-        { "RemoveSurfaceNativeContent",       &GenericCommunicator::RemoveSurfaceNativeContent },
-        { "RemoveSurface",                    &GenericCommunicator::RemoveSurface },
-        { "CreateLayer",                      &GenericCommunicator::CreateLayer },
-        { "CreateLayerFromId",                &GenericCommunicator::CreateLayerFromId },
-        { "CreateLayerWithDimension",         &GenericCommunicator::CreateLayerWithDimension },
-        { "CreateLayerFromIdWithDimension",   &GenericCommunicator::CreateLayerFromIdWithDimension },
-        { "RemoveLayer",                      &GenericCommunicator::RemoveLayer },
-        { "AddSurfaceToLayer",                &GenericCommunicator::AddSurfaceToLayer },
-        { "RemoveSurfaceFromLayer",           &GenericCommunicator::RemoveSurfaceFromLayer },
-        { "SetSurfaceSourceRegion",           &GenericCommunicator::SetSurfaceSourceRegion },
-        { "SetLayerSourceRegion",             &GenericCommunicator::SetLayerSourceRegion },
-        { "SetSurfaceDestinationRegion",      &GenericCommunicator::SetSurfaceDestinationRegion },
-        { "SetSurfacePosition",               &GenericCommunicator::SetSurfacePosition },
-        { "GetSurfacePosition",               &GenericCommunicator::GetSurfacePosition },
-        { "SetSurfaceDimension",              &GenericCommunicator::SetSurfaceDimension },
-        { "SetLayerDestinationRegion",        &GenericCommunicator::SetLayerDestinationRegion },
-        { "SetLayerPosition",                 &GenericCommunicator::SetLayerPosition },
-        { "GetLayerPosition",                 &GenericCommunicator::GetLayerPosition },
-        { "SetLayerDimension",                &GenericCommunicator::SetLayerDimension },
-        { "GetLayerDimension",                &GenericCommunicator::GetLayerDimension },
-        { "GetSurfaceDimension",              &GenericCommunicator::GetSurfaceDimension },
-        { "SetSurfaceOpacity",                &GenericCommunicator::SetSurfaceOpacity },
-        { "SetLayerOpacity",                  &GenericCommunicator::SetLayerOpacity },
-        { "GetSurfaceOpacity",                &GenericCommunicator::GetSurfaceOpacity },
-        { "GetLayerOpacity",                  &GenericCommunicator::GetLayerOpacity },
-        { "SetSurfaceOrientation",            &GenericCommunicator::SetSurfaceOrientation },
-        { "GetSurfaceOrientation",            &GenericCommunicator::GetSurfaceOrientation },
-        { "SetLayerOrientation",              &GenericCommunicator::SetLayerOrientation },
-        { "GetLayerOrientation",              &GenericCommunicator::GetLayerOrientation },
-        { "GetSurfacePixelformat",            &GenericCommunicator::GetSurfacePixelformat },
-        { "SetSurfaceVisibility",             &GenericCommunicator::SetSurfaceVisibility },
-        { "SetLayerVisibility",               &GenericCommunicator::SetLayerVisibility },
-        { "GetSurfaceVisibility",             &GenericCommunicator::GetSurfaceVisibility },
-        { "GetLayerVisibility",               &GenericCommunicator::GetLayerVisibility },
-        { "SetRenderOrderOfLayers",           &GenericCommunicator::SetRenderOrderOfLayers },
+        { "ServiceConnect", &GenericCommunicator::ServiceConnect },
+        { "ServiceDisconnect", &GenericCommunicator::ServiceDisconnect },
+        { "Debug", &GenericCommunicator::Debug },
+        { "ScreenShot", &GenericCommunicator::ScreenShot },
+        { "ScreenShotOfLayer", &GenericCommunicator::ScreenShotOfLayer },
+        { "ScreenShotOfSurface", &GenericCommunicator::ScreenShotOfSurface },
+        { "GetScreenResolution", &GenericCommunicator::GetScreenResolution },
+        { "GetNumberOfHardwareLayers", &GenericCommunicator::GetNumberOfHardwareLayers },
+        { "GetScreenIDs", &GenericCommunicator::GetScreenIDs },
+        { "ListAllLayerIDS", &GenericCommunicator::ListAllLayerIDS },
+        { "ListAllLayerIDsOnScreen", &GenericCommunicator::ListAllLayerIDsOnScreen },
+        { "ListAllSurfaceIDS", &GenericCommunicator::ListAllSurfaceIDS },
+        { "ListSurfaceofLayer", &GenericCommunicator::ListSurfaceofLayer },
+        { "GetPropertiesOfSurface", &GenericCommunicator::GetPropertiesOfSurface },
+        { "GetPropertiesOfLayer", &GenericCommunicator::GetPropertiesOfLayer },
+        { "CreateSurface", &GenericCommunicator::CreateSurface },
+        { "CreateSurfaceFromId", &GenericCommunicator::CreateSurfaceFromId },
+        { "InitializeSurface", &GenericCommunicator::InitializeSurface },
+        { "InitializeSurfaceFromId", &GenericCommunicator::InitializeSurfaceFromId },
+        { "SetSurfaceNativeContent", &GenericCommunicator::SetSurfaceNativeContent },
+        { "RemoveSurfaceNativeContent", &GenericCommunicator::RemoveSurfaceNativeContent },
+        { "RemoveSurface", &GenericCommunicator::RemoveSurface },
+        { "CreateLayer", &GenericCommunicator::CreateLayer },
+        { "CreateLayerFromId", &GenericCommunicator::CreateLayerFromId },
+        { "CreateLayerWithDimension", &GenericCommunicator::CreateLayerWithDimension },
+        { "CreateLayerFromIdWithDimension", &GenericCommunicator::CreateLayerFromIdWithDimension },
+        { "RemoveLayer", &GenericCommunicator::RemoveLayer },
+        { "AddSurfaceToLayer", &GenericCommunicator::AddSurfaceToLayer },
+        { "RemoveSurfaceFromLayer", &GenericCommunicator::RemoveSurfaceFromLayer },
+        { "SetSurfaceSourceRegion", &GenericCommunicator::SetSurfaceSourceRegion },
+        { "SetLayerSourceRegion", &GenericCommunicator::SetLayerSourceRegion },
+        { "SetSurfaceDestinationRegion", &GenericCommunicator::SetSurfaceDestinationRegion },
+        { "SetSurfacePosition", &GenericCommunicator::SetSurfacePosition },
+        { "GetSurfacePosition", &GenericCommunicator::GetSurfacePosition },
+        { "SetSurfaceDimension", &GenericCommunicator::SetSurfaceDimension },
+        { "SetLayerDestinationRegion", &GenericCommunicator::SetLayerDestinationRegion },
+        { "SetLayerPosition", &GenericCommunicator::SetLayerPosition },
+        { "GetLayerPosition", &GenericCommunicator::GetLayerPosition },
+        { "SetLayerDimension", &GenericCommunicator::SetLayerDimension },
+        { "GetLayerDimension", &GenericCommunicator::GetLayerDimension },
+        { "GetSurfaceDimension", &GenericCommunicator::GetSurfaceDimension },
+        { "SetSurfaceOpacity", &GenericCommunicator::SetSurfaceOpacity },
+        { "SetLayerOpacity", &GenericCommunicator::SetLayerOpacity },
+        { "GetSurfaceOpacity", &GenericCommunicator::GetSurfaceOpacity },
+        { "GetLayerOpacity", &GenericCommunicator::GetLayerOpacity },
+        { "SetSurfaceOrientation", &GenericCommunicator::SetSurfaceOrientation },
+        { "GetSurfaceOrientation", &GenericCommunicator::GetSurfaceOrientation },
+        { "SetLayerOrientation", &GenericCommunicator::SetLayerOrientation },
+        { "GetLayerOrientation", &GenericCommunicator::GetLayerOrientation },
+        { "GetSurfacePixelformat", &GenericCommunicator::GetSurfacePixelformat },
+        { "SetSurfaceVisibility", &GenericCommunicator::SetSurfaceVisibility },
+        { "SetLayerVisibility", &GenericCommunicator::SetLayerVisibility },
+        { "GetSurfaceVisibility", &GenericCommunicator::GetSurfaceVisibility },
+        { "GetLayerVisibility", &GenericCommunicator::GetLayerVisibility },
+        { "SetRenderOrderOfLayers", &GenericCommunicator::SetRenderOrderOfLayers },
         { "SetSurfaceRenderOrderWithinLayer", &GenericCommunicator::SetSurfaceRenderOrderWithinLayer },
-        { "GetLayerType",                     &GenericCommunicator::GetLayerType },
-        { "GetLayertypeCapabilities",         &GenericCommunicator::GetLayertypeCapabilities },
-        { "GetLayerCapabilities",             &GenericCommunicator::GetLayerCapabilities },
-        { "Exit",                             &GenericCommunicator::Exit },
-        { "CommitChanges",                    &GenericCommunicator::CommitChanges },
-        { "CreateShader",                     &GenericCommunicator::CreateShader },
-        { "DestroyShader",                    &GenericCommunicator::DestroyShader },
-        { "SetShader",                        &GenericCommunicator::SetShader },
-        { "SetUniforms",                      &GenericCommunicator::SetUniforms },
-        { "SetKeyboardFocusOn",               &GenericCommunicator::SetKeyboardFocusOn },
-        { "GetKeyboardFocusSurfaceId",        &GenericCommunicator::GetKeyboardFocusSurfaceId },
-        { "UpdateInputEventAcceptanceOn",     &GenericCommunicator::UpdateInputEventAcceptanceOn },
-        { "SetSurfaceChromaKey",              &GenericCommunicator::SetSurfaceChromaKey },
-        { "SetLayerChromaKey",                &GenericCommunicator::SetLayerChromaKey },
-        { "LayerAddNotification",             &GenericCommunicator::LayerAddNotification },
-        { "SurfaceAddNotification",           &GenericCommunicator::SurfaceAddNotification },
-        { "LayerRemoveNotification",          &GenericCommunicator::LayerRemoveNotification },
-        { "SurfaceRemoveNotification",        &GenericCommunicator::SurfaceRemoveNotification },
-        { "SetOptimizationMode",              &GenericCommunicator::SetOptimizationMode },
-        { "GetOptimizationMode",              &GenericCommunicator::GetOptimizationMode },
-        { "GetPropertiesOfScreen",            &GenericCommunicator::GetPropertiesOfScreen }
+        { "GetLayerType", &GenericCommunicator::GetLayerType },
+        { "GetLayertypeCapabilities", &GenericCommunicator::GetLayertypeCapabilities },
+        { "GetLayerCapabilities", &GenericCommunicator::GetLayerCapabilities },
+        { "Exit", &GenericCommunicator::Exit },
+        { "CommitChanges", &GenericCommunicator::CommitChanges },
+        { "CreateShader", &GenericCommunicator::CreateShader },
+        { "DestroyShader", &GenericCommunicator::DestroyShader },
+        { "SetShader", &GenericCommunicator::SetShader },
+        { "SetUniforms", &GenericCommunicator::SetUniforms },
+        { "SetKeyboardFocusOn", &GenericCommunicator::SetKeyboardFocusOn },
+        { "GetKeyboardFocusSurfaceId", &GenericCommunicator::GetKeyboardFocusSurfaceId },
+        { "UpdateInputEventAcceptanceOn", &GenericCommunicator::UpdateInputEventAcceptanceOn },
+        { "SetSurfaceChromaKey", &GenericCommunicator::SetSurfaceChromaKey },
+        { "SetLayerChromaKey", &GenericCommunicator::SetLayerChromaKey },
+        { "LayerAddNotification", &GenericCommunicator::LayerAddNotification },
+        { "SurfaceAddNotification", &GenericCommunicator::SurfaceAddNotification },
+        { "LayerRemoveNotification", &GenericCommunicator::LayerRemoveNotification },
+        { "SurfaceRemoveNotification", &GenericCommunicator::SurfaceRemoveNotification },
+        { "SetOptimizationMode", &GenericCommunicator::SetOptimizationMode },
+        { "GetOptimizationMode", &GenericCommunicator::GetOptimizationMode },
+        { "GetPropertiesOfScreen", &GenericCommunicator::GetPropertiesOfScreen }
     };
 
     int entryCount = sizeof(manager_methods) / sizeof(MethodTable);
@@ -221,10 +221,10 @@ bool GenericCommunicator::start()
 
 void GenericCommunicator::stop()
 {
-    LOG_INFO("GenericCommunicator","stopping");
+    LOG_INFO("GenericCommunicator", "stopping");
 
     threadStop();
-    
+
     if (m_running)
     {
         m_ipcModule.destroy();
@@ -244,37 +244,37 @@ void GenericCommunicator::process(int timeout_ms)
     t_ilm_const_string name = m_ipcModule.getMessageName(message);
     t_ilm_client_handle senderHandle = m_ipcModule.getSenderHandle(message);
 
-    switch(messageType)
+    switch (messageType)
     {
     case IpcMessageTypeCommand:
         if (m_callBackTable.end() != m_callBackTable.find(name))
         {
             LOG_DEBUG("GenericCommunicator", "received: " << name << " from "
-                       << m_executor->getSenderName(senderHandle)
-                       << "(" << m_executor->getSenderPid(senderHandle) << ")");
+                        << m_executor->getSenderName(senderHandle)
+                        << "(" << m_executor->getSenderPid(senderHandle) << ")");
             CallBackMethod method = m_callBackTable[name].function;
             (this->*method)(message);
         }
         else
         {
             LOG_WARNING("GenericCommunicator", "Received unknown command " << name
-                  << " from " << m_executor->getSenderName(senderHandle)
-                  << "(pid " << m_executor->getSenderPid(senderHandle) << ")");
+                    << " from " << m_executor->getSenderName(senderHandle)
+                    << "(pid " << m_executor->getSenderPid(senderHandle) << ")");
         }
         processNotificationQueue();
         break;
 
     case IpcMessageTypeConnect:
         LOG_DEBUG("GenericCommunicator", "client " << m_executor->getSenderName(senderHandle)
-                  << "(pid " << m_executor->getSenderPid(senderHandle) << ") connected");
+                    << "(pid " << m_executor->getSenderPid(senderHandle) << ") connected");
         break;
 
     case IpcMessageTypeDisconnect:
         LOG_DEBUG("GenericCommunicator", "client " << m_executor->getSenderName(senderHandle)
-                  << "(pid " << m_executor->getSenderPid(senderHandle) << ") disconnected");
+                    << "(pid " << m_executor->getSenderPid(senderHandle) << ") disconnected");
         {
             const LayerMap& layers = m_executor->getScene()->getAllLayers();
-            LayerMapConstIterator layerIter =  layers.begin();
+            LayerMapConstIterator layerIter = layers.begin();
             LayerMapConstIterator layerIterEnd = layers.end();
             for (; layerIter != layerIterEnd; ++layerIter)
             {
@@ -283,7 +283,7 @@ void GenericCommunicator::process(int timeout_ms)
             }
 
             const SurfaceMap& surfaces = m_executor->getScene()->getAllSurfaces();
-            SurfaceMapConstIterator surfaceIter =  surfaces.begin();
+            SurfaceMapConstIterator surfaceIter = surfaces.begin();
             SurfaceMapConstIterator surfaceIterEnd = surfaces.end();
             for (; surfaceIter != surfaceIterEnd; ++surfaceIter)
             {
@@ -295,8 +295,8 @@ void GenericCommunicator::process(int timeout_ms)
 
     case IpcMessageTypeError:
         LOG_DEBUG("GenericCommunicator", "Received error message " << name << " from "
-                  << m_executor->getSenderName(senderHandle)
-                  << "(pid " << m_executor->getSenderPid(senderHandle) << ")");
+                    << m_executor->getSenderName(senderHandle)
+                    << "(pid " << m_executor->getSenderPid(senderHandle) << ")");
         break;
 
     case IpcMessageTypeShutdown:
@@ -305,8 +305,8 @@ void GenericCommunicator::process(int timeout_ms)
 
     default:
         LOG_DEBUG("GenericCommunicator", "Received unknown data from "
-                  << m_executor->getSenderName(senderHandle)
-                  << "(pid " << m_executor->getSenderPid(senderHandle) << "), Message type: " << messageType);
+                    << m_executor->getSenderName(senderHandle)
+                    << "(pid " << m_executor->getSenderPid(senderHandle) << "), Message type: " << messageType);
         break;
     }
     m_ipcModule.destroyMessage(message);
@@ -341,8 +341,8 @@ void GenericCommunicator::ServiceConnect(t_ilm_message message)
     m_executor->addApplicationReference(clientHandle, new IApplicationReference(processName, processId));
 
     LOG_DEBUG("GenericCommunicator", "ServiceConnect called from "
-              << m_executor->getSenderName(clientHandle)
-              << "(" << m_executor->getSenderPid(clientHandle) << ")");
+                << m_executor->getSenderName(clientHandle)
+                << "(" << m_executor->getSenderPid(clientHandle) << ")");
 
     response = m_ipcModule.createResponse(message);
     m_ipcModule.sendToClients(response, &clientHandle, 1);
@@ -355,8 +355,8 @@ void GenericCommunicator::ServiceDisconnect(t_ilm_message message)
     t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
 
     LOG_DEBUG("GenericCommunicator", "ServiceDisconnect called from "
-              << m_executor->getSenderName(clientHandle)
-              << "(" << m_executor->getSenderPid(clientHandle) << ")");
+                << m_executor->getSenderName(clientHandle)
+                << "(" << m_executor->getSenderPid(clientHandle) << ")");
 
     m_executor->removeApplicationReference(clientHandle);
 
@@ -719,7 +719,6 @@ void GenericCommunicator::CreateSurface(t_ilm_message message)
     m_ipcModule.getUint(message, &pixelformat);
 
     pf = (PixelFormat) pixelformat;
-
 
     // First of all create the surface
     t_ilm_bool status = m_executor->execute(new SurfaceCreateCommand(clientPid, &id));
@@ -2330,149 +2329,149 @@ void GenericCommunicator::sendNotification(GraphicalObject* object, t_ilm_notifi
     switch (object->type)
     {
     case TypeLayer:
-    {
-        Layer* layer = static_cast<Layer*>(object);
-        if (layer)
         {
-            ApplicationReferenceList& arl = layer->getNotificationClients();
-
-            if (arl.size())
+            Layer* layer = static_cast<Layer*>(object);
+            if (layer)
             {
-                t_ilm_message notification;
-                Rectangle dest = layer->getDestinationRegion();
-                Rectangle src = layer->getSourceRegion();
-                OrientationType orientation = layer->getOrientation();
+                ApplicationReferenceList& arl = layer->getNotificationClients();
 
-                unsigned char chromaKeyRed = 0;
-                unsigned char chromaKeyGreen = 0;
-                unsigned char chromaKeyBlue = 0;
-                layer->getChromaKey(chromaKeyRed, chromaKeyGreen, chromaKeyBlue);
-
-                std::stringstream notificationName;
-                notificationName << "NotificationForLayer" << layer->getID();
-
-                notification = m_ipcModule.createNotification(notificationName.str().c_str());
-                m_ipcModule.appendUint(notification, layer->getID());
-                m_ipcModule.appendUint(notification, mask);
-
-                m_ipcModule.appendDouble(notification, layer->getOpacity());
-                m_ipcModule.appendUint(notification, src.x);
-                m_ipcModule.appendUint(notification, src.y);
-                m_ipcModule.appendUint(notification, src.width);
-                m_ipcModule.appendUint(notification, src.height);
-                m_ipcModule.appendUint(notification, layer->OriginalSourceWidth);
-                m_ipcModule.appendUint(notification, layer->OriginalSourceHeight);
-                m_ipcModule.appendUint(notification, dest.x);
-                m_ipcModule.appendUint(notification, dest.y);
-                m_ipcModule.appendUint(notification, dest.width);
-                m_ipcModule.appendUint(notification, dest.height);
-                m_ipcModule.appendUint(notification, orientation);
-                m_ipcModule.appendBool(notification, layer->getVisibility());
-                m_ipcModule.appendUint(notification, layer->getLayerType());
-                m_ipcModule.appendBool(notification, layer->getChromaKeyEnabled());
-                m_ipcModule.appendUint(notification, chromaKeyRed);
-                m_ipcModule.appendUint(notification, chromaKeyGreen);
-                m_ipcModule.appendUint(notification, chromaKeyBlue);
-                m_ipcModule.appendInt(notification, layer->getCreatorPid());
-
-                int clientCount = arl.size();
-                t_ilm_client_handle clientArray[256];
-
-                ApplicationReferenceList::iterator iter = arl.begin();
-                ApplicationReferenceList::iterator end = arl.end();
-
-                for (int clientNumber = 0;
-                     iter != end, clientNumber < 256;
-                     ++iter, ++clientNumber)
+                if (arl.size())
                 {
-                    t_ilm_client_handle client = *iter;
-                    clientArray[clientNumber] = client;
+                    t_ilm_message notification;
+                    Rectangle dest = layer->getDestinationRegion();
+                    Rectangle src = layer->getSourceRegion();
+                    OrientationType orientation = layer->getOrientation();
+
+                    unsigned char chromaKeyRed = 0;
+                    unsigned char chromaKeyGreen = 0;
+                    unsigned char chromaKeyBlue = 0;
+                    layer->getChromaKey(chromaKeyRed, chromaKeyGreen, chromaKeyBlue);
+
+                    std::stringstream notificationName;
+                    notificationName << "NotificationForLayer" << layer->getID();
+
+                    notification = m_ipcModule.createNotification(notificationName.str().c_str());
+                    m_ipcModule.appendUint(notification, layer->getID());
+                    m_ipcModule.appendUint(notification, mask);
+
+                    m_ipcModule.appendDouble(notification, layer->getOpacity());
+                    m_ipcModule.appendUint(notification, src.x);
+                    m_ipcModule.appendUint(notification, src.y);
+                    m_ipcModule.appendUint(notification, src.width);
+                    m_ipcModule.appendUint(notification, src.height);
+                    m_ipcModule.appendUint(notification, layer->OriginalSourceWidth);
+                    m_ipcModule.appendUint(notification, layer->OriginalSourceHeight);
+                    m_ipcModule.appendUint(notification, dest.x);
+                    m_ipcModule.appendUint(notification, dest.y);
+                    m_ipcModule.appendUint(notification, dest.width);
+                    m_ipcModule.appendUint(notification, dest.height);
+                    m_ipcModule.appendUint(notification, orientation);
+                    m_ipcModule.appendBool(notification, layer->getVisibility());
+                    m_ipcModule.appendUint(notification, layer->getLayerType());
+                    m_ipcModule.appendBool(notification, layer->getChromaKeyEnabled());
+                    m_ipcModule.appendUint(notification, chromaKeyRed);
+                    m_ipcModule.appendUint(notification, chromaKeyGreen);
+                    m_ipcModule.appendUint(notification, chromaKeyBlue);
+                    m_ipcModule.appendInt(notification, layer->getCreatorPid());
+
+                    int clientCount = arl.size();
+                    t_ilm_client_handle clientArray[256];
+
+                    ApplicationReferenceList::iterator iter = arl.begin();
+                    ApplicationReferenceList::iterator end = arl.end();
+
+                    for (int clientNumber = 0;
+                            iter != end, clientNumber < 256;
+                            ++iter, ++clientNumber)
+                    {
+                        t_ilm_client_handle client = *iter;
+                        clientArray[clientNumber] = client;
+                    }
+
+                    LOG_DEBUG("GenericCommunicator", "Sending " << clientCount << " notification(s): layer " << layer->getID() << " was updated.");
+
+                    if (!m_ipcModule.sendToClients(notification, clientArray, clientCount))
+                    {
+                        LOG_ERROR("GenericCommunicator", "Sending notification to clients failed.")
+                    }
+
+                    m_ipcModule.destroyMessage(notification);
                 }
-
-                LOG_DEBUG("GenericCommunicator", "Sending " << clientCount << " notification(s): layer " << layer->getID() << " was updated.");
-
-                if (!m_ipcModule.sendToClients(notification, clientArray, clientCount))
-                {
-                    LOG_ERROR("GenericCommunicator", "Sending notification to clients failed.")
-                }
-
-                m_ipcModule.destroyMessage(notification);
             }
         }
-    }
-    break;
+        break;
     case TypeSurface:
-    {
-        Surface* surface = static_cast<Surface*>(object);
-        if (surface)
         {
-            ApplicationReferenceList& arl = surface->getNotificationClients();
-
-            if (arl.size())
+            Surface* surface = static_cast<Surface*>(object);
+            if (surface)
             {
-                t_ilm_message notification;
-                std::stringstream notificationName;
-                notificationName << "NotificationForSurface" << surface->getID();
+                ApplicationReferenceList& arl = surface->getNotificationClients();
 
-                unsigned char chromaKeyRed = 0;
-                unsigned char chromaKeyGreen = 0;
-                unsigned char chromaKeyBlue = 0;
-                surface->getChromaKey(chromaKeyRed, chromaKeyGreen, chromaKeyBlue);
-
-                notification = m_ipcModule.createNotification(notificationName.str().c_str());
-                m_ipcModule.appendUint(notification, surface->getID());
-                m_ipcModule.appendUint(notification, mask);
-
-                m_ipcModule.appendDouble(notification, surface->getOpacity());
-                m_ipcModule.appendUint(notification, surface->getSourceRegion().x);
-                m_ipcModule.appendUint(notification, surface->getSourceRegion().y);
-                m_ipcModule.appendUint(notification, surface->getSourceRegion().width);
-                m_ipcModule.appendUint(notification, surface->getSourceRegion().height);
-                m_ipcModule.appendUint(notification, surface->OriginalSourceWidth);
-                m_ipcModule.appendUint(notification, surface->OriginalSourceHeight);
-                m_ipcModule.appendUint(notification, surface->getDestinationRegion().x);
-                m_ipcModule.appendUint(notification, surface->getDestinationRegion().y);
-                m_ipcModule.appendUint(notification, surface->getDestinationRegion().width);
-                m_ipcModule.appendUint(notification, surface->getDestinationRegion().height);
-                m_ipcModule.appendUint(notification, surface->getOrientation());
-                m_ipcModule.appendBool(notification, surface->getVisibility());
-                m_ipcModule.appendUint(notification, surface->frameCounter);
-                m_ipcModule.appendUint(notification, surface->drawCounter);
-                m_ipcModule.appendUint(notification, surface->updateCounter);
-                m_ipcModule.appendUint(notification, surface->getPixelFormat());
-                m_ipcModule.appendUint(notification, surface->getNativeContent());
-                m_ipcModule.appendUint(notification, surface->getInputEventAcceptanceOnDevices());
-                m_ipcModule.appendBool(notification, surface->getChromaKeyEnabled());
-                m_ipcModule.appendUint(notification, chromaKeyRed);
-                m_ipcModule.appendUint(notification, chromaKeyGreen);
-                m_ipcModule.appendUint(notification, chromaKeyBlue);
-                m_ipcModule.appendInt(notification, surface->getCreatorPid());
-
-                int clientCount = arl.size();
-                t_ilm_client_handle clients[256];
-
-                ApplicationReferenceList::iterator iter = arl.begin();
-                ApplicationReferenceList::iterator end = arl.end();
-
-                for (int clientNumber = 0;
-                     iter != end, clientNumber < 256;
-                     ++iter, ++clientNumber)
+                if (arl.size())
                 {
-                    clients[clientNumber] = *iter;
+                    t_ilm_message notification;
+                    std::stringstream notificationName;
+                    notificationName << "NotificationForSurface" << surface->getID();
+
+                    unsigned char chromaKeyRed = 0;
+                    unsigned char chromaKeyGreen = 0;
+                    unsigned char chromaKeyBlue = 0;
+                    surface->getChromaKey(chromaKeyRed, chromaKeyGreen, chromaKeyBlue);
+
+                    notification = m_ipcModule.createNotification(notificationName.str().c_str());
+                    m_ipcModule.appendUint(notification, surface->getID());
+                    m_ipcModule.appendUint(notification, mask);
+
+                    m_ipcModule.appendDouble(notification, surface->getOpacity());
+                    m_ipcModule.appendUint(notification, surface->getSourceRegion().x);
+                    m_ipcModule.appendUint(notification, surface->getSourceRegion().y);
+                    m_ipcModule.appendUint(notification, surface->getSourceRegion().width);
+                    m_ipcModule.appendUint(notification, surface->getSourceRegion().height);
+                    m_ipcModule.appendUint(notification, surface->OriginalSourceWidth);
+                    m_ipcModule.appendUint(notification, surface->OriginalSourceHeight);
+                    m_ipcModule.appendUint(notification, surface->getDestinationRegion().x);
+                    m_ipcModule.appendUint(notification, surface->getDestinationRegion().y);
+                    m_ipcModule.appendUint(notification, surface->getDestinationRegion().width);
+                    m_ipcModule.appendUint(notification, surface->getDestinationRegion().height);
+                    m_ipcModule.appendUint(notification, surface->getOrientation());
+                    m_ipcModule.appendBool(notification, surface->getVisibility());
+                    m_ipcModule.appendUint(notification, surface->frameCounter);
+                    m_ipcModule.appendUint(notification, surface->drawCounter);
+                    m_ipcModule.appendUint(notification, surface->updateCounter);
+                    m_ipcModule.appendUint(notification, surface->getPixelFormat());
+                    m_ipcModule.appendUint(notification, surface->getNativeContent());
+                    m_ipcModule.appendUint(notification, surface->getInputEventAcceptanceOnDevices());
+                    m_ipcModule.appendBool(notification, surface->getChromaKeyEnabled());
+                    m_ipcModule.appendUint(notification, chromaKeyRed);
+                    m_ipcModule.appendUint(notification, chromaKeyGreen);
+                    m_ipcModule.appendUint(notification, chromaKeyBlue);
+                    m_ipcModule.appendInt(notification, surface->getCreatorPid());
+
+                    int clientCount = arl.size();
+                    t_ilm_client_handle clients[256];
+
+                    ApplicationReferenceList::iterator iter = arl.begin();
+                    ApplicationReferenceList::iterator end = arl.end();
+
+                    for (int clientNumber = 0;
+                            iter != end, clientNumber < 256;
+                            ++iter, ++clientNumber)
+                    {
+                        clients[clientNumber] = *iter;
+                    }
+
+                    LOG_DEBUG("GenericCommunicator", "Sending " << clientCount << " notification(s): surface " << surface->getID() << " was updated.");
+
+                    if (!m_ipcModule.sendToClients(notification, clients, clientCount))
+                    {
+                        LOG_ERROR("GenericCommunicator", "Sending notification to clients failed.")
+                    }
+
+                    m_ipcModule.destroyMessage(notification);
                 }
-
-                LOG_DEBUG("GenericCommunicator", "Sending " << clientCount << " notification(s): surface " << surface->getID() << " was updated.");
-
-                if (!m_ipcModule.sendToClients(notification, clients, clientCount))
-                {
-                    LOG_ERROR("GenericCommunicator", "Sending notification to clients failed.")
-                }
-
-                m_ipcModule.destroyMessage(notification);
             }
         }
-    }
-    break;
+        break;
     default:
         LOG_INFO("GenericCommunicator", "Unknown notification found in queue.");
         break;
@@ -2494,26 +2493,26 @@ void GenericCommunicator::SetOptimizationMode(t_ilm_message message)
     t_ilm_message response;
     OptimizationType optimizationId;
     OptimizationModeType optimizationMode;
-    unsigned int o;    
+    unsigned int optMode;
     t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     t_ilm_uint clientPid = m_executor->getSenderPid(clientHandle);
 
-    m_ipcModule.getUint(message,&o);
-    optimizationId = (OptimizationType) o;
-    m_ipcModule.getUint(message,&o);
-    optimizationMode = (OptimizationModeType) o;
+    m_ipcModule.getUint(message, &optMode);
+    optimizationId = (OptimizationType)optMode;
+    m_ipcModule.getUint(message, &optMode);
+    optimizationMode = (OptimizationModeType)optMode;
 
     t_ilm_bool status = m_executor->execute(new SetOptimizationModeCommand(clientPid, optimizationId, optimizationMode));
     if (status)
     {
-        response = m_ipcModule.createResponse(message);       
+        response = m_ipcModule.createResponse(message);
     }
     else
     {
         response = m_ipcModule.createErrorResponse(message);
         m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
-    m_ipcModule.sendToClients(response,&clientHandle,1);
+    m_ipcModule.sendToClients(response, &clientHandle, 1);
     m_ipcModule.destroyMessage(response);
 }
 
@@ -2526,24 +2525,22 @@ void GenericCommunicator::GetOptimizationMode(t_ilm_message message)
     OptimizationModeType optimizationMode;
     unsigned int o;
 
-    m_ipcModule.getUint(message,&o);
+    m_ipcModule.getUint(message, &o);
     optimizationId = (OptimizationType)o;
 
     t_ilm_bool status = m_executor->execute(new GetOptimizationModeCommand(clientPid, optimizationId, &optimizationMode));
     if (status)
     {
-        
         response = m_ipcModule.createResponse(message);
-        m_ipcModule.appendUint(response,(unsigned int)optimizationMode);
+        m_ipcModule.appendUint(response, (unsigned int)optimizationMode);
     }
     else
     {
         response = m_ipcModule.createErrorResponse(message);
         m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
     }
-    m_ipcModule.sendToClients(response,&clientHandle,1);
+    m_ipcModule.sendToClients(response, &clientHandle, 1);
     m_ipcModule.destroyMessage(response);
-
 }
 
 void GenericCommunicator::GetPropertiesOfScreen(t_ilm_message message)
@@ -2571,7 +2568,7 @@ void GenericCommunicator::GetPropertiesOfScreen(t_ilm_message message)
 
         response = m_ipcModule.createResponse(message);
         m_ipcModule.appendUintArray(response, layerIdVector.data(), layerIdVector.size());
-        m_ipcModule.appendUint(response,numberOfHardwareLayers);
+        m_ipcModule.appendUint(response, numberOfHardwareLayers);
         m_ipcModule.appendUint(response, resolution[0]);
         m_ipcModule.appendUint(response, resolution[1]);
     }

@@ -49,18 +49,18 @@ typedef struct headerStruct
 
 void writeBitmap(std::string FileName, char* imagedataRGB, int width, int height)
 {
-    LOG_DEBUG("Bitmap","writing Bitmap to file:" <<FileName);
+    LOG_DEBUG("Bitmap", "writing Bitmap to file:" << FileName);
 
     BMPHeader bmpHeader;
     InfoHeader header;
-    int imagebytes=width*height*3;
+    int imagebytes = width*height*3;
     char firstbytes[2];
-    firstbytes[0]='B';
-    firstbytes[1]='M';
-    bmpHeader.size = 2+sizeof(BMPHeader)+sizeof(header)+imagebytes;
+    firstbytes[0] = 'B';
+    firstbytes[1] = 'M';
+    bmpHeader.size = 2 + sizeof(BMPHeader) + sizeof(header) + imagebytes;
     bmpHeader.a = 0;
     bmpHeader.b = 0;
-    bmpHeader.offset = 2+sizeof(BMPHeader)+sizeof(header);
+    bmpHeader.offset = 2 + sizeof(BMPHeader) + sizeof(header);
     header.headersize = sizeof(header);
     header.width = width;
     header.height = height;
@@ -75,17 +75,17 @@ void writeBitmap(std::string FileName, char* imagedataRGB, int width, int height
 
     // make sure parent directory exists
     std::size_t currentPos = 0;
-    std::size_t lastPos = FileName.find_first_of("/",currentPos);
+    std::size_t lastPos = FileName.find_first_of("/", currentPos);
     while (lastPos != std::string::npos)
     {
-        std::string directory = FileName.substr(0,lastPos);
-        LOG_DEBUG("Bitmap","Creating directory " << directory);
-        mkdir(directory.c_str(),0755);
+        std::string directory = FileName.substr(0, lastPos);
+        LOG_DEBUG("Bitmap", "Creating directory " << directory);
+        mkdir(directory.c_str(), 0755);
         currentPos = lastPos;
-        lastPos = FileName.find_first_of("/",currentPos+1);
+        lastPos = FileName.find_first_of("/", currentPos + 1);
     }
 
-    FILE* file = fopen(FileName.c_str(),"wb");
+    FILE* file = fopen(FileName.c_str(), "wb");
 
     if (file)
     {

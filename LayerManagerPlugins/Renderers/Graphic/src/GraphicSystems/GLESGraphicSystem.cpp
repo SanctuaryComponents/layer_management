@@ -32,22 +32,22 @@
 #include <algorithm>
 
 static const float vertices[8 * 12] =
-{ 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0,
+{
+    0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0,
 
-0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0,
+    0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0,
 
-0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0,
+    0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0,
 
-1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0,
+    1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0,
 
-0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0,
+    0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0,
 
-1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0,
+    1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0,
 
-0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0,
+    0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0,
 
-0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0
-
+    0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0
 };
 
 GLESGraphicsystem::GLESGraphicsystem(int windowWidth, int windowHeight, PfnShaderProgramCreator shaderProgram)
@@ -83,7 +83,7 @@ GLESGraphicsystem::GLESGraphicsystem(int windowWidth, int windowHeight, PfnShade
 , m_texId(0)
 {
     LOG_DEBUG("GLESGraphicsystem", "creating GLESGraphicsystem");
-    for (int i=0; i < OPT_COUNT; i++)
+    for (int i = 0; i < OPT_COUNT; i++)
     {
         m_optimizations[i] = OPT_MODE_HEURISTIC;
     }
@@ -113,7 +113,7 @@ void GLESGraphicsystem::activateGraphicContext()
     eglMakeCurrent(m_eglDisplay, m_eglSurface, m_eglSurface, m_eglContext);
 }
 
-void GLESGraphicsystem::releaseGraphicContext() 
+void GLESGraphicsystem::releaseGraphicContext()
 {
     eglMakeCurrent(m_eglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
 }
@@ -123,11 +123,13 @@ bool GLESGraphicsystem::init(EGLNativeDisplayType display, EGLNativeWindowType N
     m_nativeDisplay = display;
     m_nativeWindow = NativeWindow;
     LOG_INFO("GLESGraphicsystem", "Initialisation");
-    EGLint iMajorVersion, iMinorVersion;
+    EGLint iMajorVersion;
+    EGLint iMinorVersion;
     LOG_DEBUG("GLESGraphicsystem", "Getting EGL Display with native display " << m_nativeDisplay);
     m_eglDisplay = eglGetDisplay(m_nativeDisplay);
 
-    if (m_eglDisplay == EGL_NO_DISPLAY){
+    if (m_eglDisplay == EGL_NO_DISPLAY)
+    {
         LOG_ERROR("GLESGraphicsystem", "failed to Get EGL Display");
         return false;
     }
@@ -143,11 +145,11 @@ bool GLESGraphicsystem::init(EGLNativeDisplayType display, EGLNativeWindowType N
     eglBindAPI(EGL_OPENGL_ES_API);
 
     EGLint pi32ConfigAttribs[] = {
-            EGL_SURFACE_TYPE,    EGL_WINDOW_BIT | EGL_PBUFFER_BIT,
-            EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
-            EGL_RED_SIZE,        8,
-            EGL_ALPHA_SIZE,      8,
-            EGL_NONE
+        EGL_SURFACE_TYPE, EGL_WINDOW_BIT | EGL_PBUFFER_BIT,
+        EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+        EGL_RED_SIZE, 8,
+        EGL_ALPHA_SIZE, 8,
+        EGL_NONE
     };
 
     LOG_DEBUG("GLESGraphicsystem", "EGLChooseConfig");
@@ -169,21 +171,21 @@ bool GLESGraphicsystem::init(EGLNativeDisplayType display, EGLNativeWindowType N
     if (!m_eglSurface)
     {
         EGLenum status = eglGetError();
-        LOG_ERROR("GLESGraphicsystem", "Window Surface creation failed with EGL Error Code: "<< status);
+        LOG_ERROR("GLESGraphicsystem", "Window Surface creation failed with EGL Error Code: " << status);
         return false;
     }
     LOG_DEBUG("GLESGraphicsystem", "Window Surface creation successfull");
 
     EGLint contextAttrs[] = {
-            EGL_CONTEXT_CLIENT_VERSION,
-            2,
-            EGL_NONE
+        EGL_CONTEXT_CLIENT_VERSION,
+        2,
+        EGL_NONE
     };
 
     m_eglContext = eglCreateContext(m_eglDisplay, m_eglConfig, NULL, contextAttrs);
     if (!m_eglContext)
     {
-        LOG_ERROR("GLESGraphicsystem","EGL couldn't create context\n");
+        LOG_ERROR("GLESGraphicsystem", "EGL couldn't create context\n");
         return false;
     }
     LOG_DEBUG("GLESGraphicsystem", "EGL make current ...");
@@ -224,11 +226,11 @@ bool GLESGraphicsystem::init(EGLNativeDisplayType display, EGLNativeWindowType N
 #define SHADERKEY_TRANSPARENCY_MASK(x)  (0x1 << (SHADERKEY_TRANSPARENCY_SHIFT(x)))
 
 unsigned int GLESGraphicsystem::shaderKey(int numSurfaces,
-                                 int needsBlend,
-                                 int hasTransparency0, int hasAlphaChannel0, int hasChromakey0,
-                                 int hasTransparency1, int hasAlphaChannel1, int hasChromakey1,
-                                 int hasTransparency2, int hasAlphaChannel2, int hasChromakey2,
-                                 int hasTransparency3, int hasAlphaChannel3, int hasChromakey3)
+                                    int needsBlend,
+                                    int hasTransparency0, int hasAlphaChannel0, int hasChromakey0,
+                                    int hasTransparency1, int hasAlphaChannel1, int hasChromakey1,
+                                    int hasTransparency2, int hasAlphaChannel2, int hasChromakey2,
+                                    int hasTransparency3, int hasAlphaChannel3, int hasChromakey3)
 {
     return (((numSurfaces << SHADERKEY_NUM_SURF_SHIFT) & SHADERKEY_NUM_SURF_MASK) |
             ((needsBlend << SHADERKEY_BLEND_SHIFT) & SHADERKEY_BLEND_MASK) |
@@ -255,8 +257,8 @@ void GLESGraphicsystem::debugShaderKey(unsigned int key)
     int needsBlend =  ((key & SHADERKEY_BLEND_MASK) >> SHADERKEY_BLEND_SHIFT);
 
     LOG_DEBUG("GLESGraphicsystem", "Key: " << std::hex << key
-                               << " numSurfaces:" << numSurfaces
-                               << " needsBlend:" << needsBlend);
+                                            << " numSurfaces:" << numSurfaces
+                                            << " needsBlend:" << needsBlend);
 
     for (int i = 0; i < SHADERKEY_MAX_SURFACES; i++)
     {
@@ -264,9 +266,9 @@ void GLESGraphicsystem::debugShaderKey(unsigned int key)
         int hasAlphaChannel = ((key & SHADERKEY_ALPHA_CHANNEL_MASK(i)) >> SHADERKEY_ALPHA_CHANNEL_SHIFT(i));
         int hasTransparency = ((key & SHADERKEY_TRANSPARENCY_MASK(i)) >> SHADERKEY_TRANSPARENCY_SHIFT(i));
         LOG_DEBUG("GLESGraphicsystem", "    Surface" << i << ":"
-                                   << " hasTransparency:" << hasTransparency
-                                   << " hasAlphaChannel:" << hasAlphaChannel
-                                   << " hasChromakey:" << hasChromakey);
+                                                << " hasTransparency:" << hasTransparency
+                                                << " hasAlphaChannel:" << hasAlphaChannel
+                                                << " hasChromakey:" << hasChromakey);
     }
 }
 
@@ -299,7 +301,7 @@ bool GLESGraphicsystem::needsRedraw(Layer *layer)
     if (layer->visibility && layer->opacity > 0.0)
     {
         SurfaceList surfaces = layer->getAllSurfaces();
-        for(SurfaceListConstIterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++)
+        for (SurfaceListConstIterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++)
         {
             if ((*currentS)->renderPropertyChanged)
             {
@@ -356,7 +358,7 @@ void GLESGraphicsystem::renderSWLayer(Layer *layer, bool clear)
         clearBackground();
     }
 
-    if ( layer->visibility && layer->opacity > 0.0 )
+    if (layer->visibility && layer->opacity > 0.0)
     {
         bool bChromaKeyEnabled = m_currentLayer->getChromaKeyEnabled();
         if (bChromaKeyEnabled && !setupTextureForChromaKey())
@@ -366,7 +368,7 @@ void GLESGraphicsystem::renderSWLayer(Layer *layer, bool clear)
         }
 
         SurfaceList surfaces = m_currentLayer->getAllSurfaces();
-        for(std::list<Surface*>::const_iterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++)
+        for (std::list<Surface*>::const_iterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++)
         {
             if ((*currentS)->hasNativeContent() && (*currentS)->visibility && (*currentS)->opacity>0.0f)
             {
@@ -389,7 +391,7 @@ bool GLESGraphicsystem::setOptimizationMode(OptimizationType id, OptimizationMod
 {
     if ((int)id >= OPT_COUNT)
     {
-       return false;
+        return false;
     }
 
     if ((int)mode >= OPT_MODE_COUNT)
@@ -406,7 +408,7 @@ bool GLESGraphicsystem::getOptimizationMode(OptimizationType id, OptimizationMod
 {
     if ((int)id >= OPT_COUNT)
     {
-       return false;
+        return false;
     }
 
     *mode = m_optimizations[id];
@@ -423,7 +425,7 @@ bool GLESGraphicsystem::canMultitexture(LayerList layers)
     {
         // No layer rotation support currently for multitexture rendering
         // No multitexture rendering if one layer has chromaKeyEnabled
-        if ((*layer)->getOrientation() != 0 || (*layer)->getChromaKeyEnabled() )
+        if ((*layer)->getOrientation() != 0 || (*layer)->getChromaKeyEnabled())
         {
             return false;
         }
@@ -440,7 +442,7 @@ bool GLESGraphicsystem::canMultitexture(LayerList layers)
             }
 
             // TODO, other custom shaders okay too.
-            if ( (shader && shader != m_defaultShader) || (*surface)->getChromaKeyEnabled())
+            if ((shader && shader != m_defaultShader) || (*surface)->getChromaKeyEnabled())
             {
                 return false;
             }
@@ -457,7 +459,7 @@ bool GLESGraphicsystem::useMultitexture()
     static int count = 0;
     count++;
 
-    switch(m_optimizations[OPT_MULTITEXTURE])
+    switch (m_optimizations[OPT_MULTITEXTURE])
     {
     case OPT_MODE_FORCE_OFF:
         return false;
@@ -490,12 +492,14 @@ bool GLESGraphicsystem::canSkipClear()
 // not always wise.
 bool GLESGraphicsystem::useSkipClear(LayerList layers)
 {
-    float surfaceArea, displayArea, threshold;
+    float surfaceArea;
+    float displayArea;
+    float threshold;
     SurfaceList surfaces;
     static int count = 0;
     count++;
 
-    switch(m_optimizations[OPT_SKIP_CLEAR])
+    switch (m_optimizations[OPT_SKIP_CLEAR])
     {
     case OPT_MODE_FORCE_OFF:
         return false;
@@ -509,14 +513,14 @@ bool GLESGraphicsystem::useSkipClear(LayerList layers)
         displayArea = m_displayWidth * m_displayHeight;
         surfaceArea = 0;
         threshold = .75; // 75% (Needs to be refined by experimentation)
-        for(LayerListConstIterator layer = layers.begin(); layer != layers.end(); layer++)
+        for (LayerListConstIterator layer = layers.begin(); layer != layers.end(); layer++)
         {
             surfaces = (*layer)->getAllSurfaces();
 
             if (surfaces.size() == 0) continue;
             if (!(*layer)->visibility || (*layer)->getOpacity() <= 0.0f) continue;
 
-            for(SurfaceListConstIterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++)
+            for (SurfaceListConstIterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++)
             {
                 if ((*currentS)->visibility == true && (*currentS)->getOpacity() > 0.0f)
                 {
@@ -540,14 +544,14 @@ bool GLESGraphicsystem::useSkipClear(LayerList layers)
 
 static void incrementDrawCounters(LayerList layers)
 {
-    for(LayerListConstIterator layer = layers.begin(); layer != layers.end(); layer++)
+    for (LayerListConstIterator layer = layers.begin(); layer != layers.end(); layer++)
     {
         SurfaceList surfaces = (*layer)->getAllSurfaces();
 
         if (surfaces.size() == 0) continue;
         if (!(*layer)->visibility || (*layer)->getOpacity() <= 0.0f) continue;
 
-        for(SurfaceListConstIterator surface = surfaces.begin(); surface != surfaces.end(); surface++)
+        for (SurfaceListConstIterator surface = surfaces.begin(); surface != surfaces.end(); surface++)
         {
             if ((*surface)->visibility == true && (*surface)->getOpacity() > 0.0f)
             {
@@ -616,7 +620,9 @@ void GLESGraphicsystem::renderSWLayers(LayerList layers, bool clear)
                 {
                     renderRegion(*region, false); //don't blend
                 }
-            } else {
+            }
+            else
+            {
                 renderSWLayer(*layer, clear);
                 countersIncremented = true;
             }
@@ -658,7 +664,7 @@ Shader *GLESGraphicsystem::pickOptimizedShader(SurfaceList surfaces, bool needsB
 
         hastransparency[i] = ((*surface)->getOpacity() * layer->getOpacity()) < 1.0f;
         hasalphachannel[i] = PixelFormatHasAlpha((*surface)->getPixelFormat());
-        haschromakey[i] = (*surface)->getChromaKeyEnabled() ? 1:0 ;
+        haschromakey[i] = (*surface)->getChromaKeyEnabled() ? 1 : 0;
     }
 
     unsigned int key = shaderKey(numSurfaces,
@@ -678,14 +684,17 @@ Shader *GLESGraphicsystem::pickOptimizedShader(SurfaceList surfaces, bool needsB
         LOG_WARNING("GLESGraphicsystem", "No optimal shader found for key=" << std::hex << key);
         LOG_WARNING("GLESGraphicsystem", "Falling back to default shader");
 
-        switch (numSurfaces) {
+        switch (numSurfaces)
+        {
         case 0:
             return m_defaultShaderClear;
         case 1:
             if (haschromakey[0])
             {
                 return m_defaultShaderAddUniformChromaKey;
-            } else { 
+            }
+            else
+            {
                 return needsBlend ? m_defaultShader : m_defaultShaderNoBlend;
             }
         case 2:
@@ -751,18 +760,20 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
         shader = layerShader;
     }
 
-
     FloatRectangle targetSurfaceSource = surface->getTargetSourceRegion();
     FloatRectangle targetSurfaceDestination = surface->getTargetDestinationRegion();
 
     float textureCoordinates[4];
-    ViewportTransform::transformRectangleToTextureCoordinates(targetSurfaceSource, surface->OriginalSourceWidth, surface->OriginalSourceHeight, textureCoordinates);
+    ViewportTransform::transformRectangleToTextureCoordinates(targetSurfaceSource,
+                                                                surface->OriginalSourceWidth,
+                                                                surface->OriginalSourceHeight,
+                                                                textureCoordinates);
 
     applyLayerMatrix(layerMatrix);
     // update all common uniforms, scale values to display size
     // offsets are generated w.r.t lower left corner (following GL conventions)
     uniforms.x = targetSurfaceDestination.x / m_displayWidth;
-    uniforms.y = 1.0f - (targetSurfaceDestination.y + targetSurfaceDestination.height) / m_displayHeight;;
+    uniforms.y = 1.0f - (targetSurfaceDestination.y + targetSurfaceDestination.height) / m_displayHeight;
     uniforms.width = targetSurfaceDestination.width / m_displayWidth;
     uniforms.height = targetSurfaceDestination.height / m_displayHeight;
     uniforms.opacity[0] = (surface)->getOpacity() * m_currentLayer->getOpacity();
@@ -787,29 +798,29 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
     //We only know about specific Shaders, only do this if we start with the defaultShader
     if (shader == m_defaultShader && uniforms.opacity[0] == 1.0f)
     {
-        if(!PixelFormatHasAlpha((surface)->getPixelFormat()))
+        if (!PixelFormatHasAlpha((surface)->getPixelFormat()))
         {
             //disable alpha blend completely
-            glDisable (GL_BLEND);
+            glDisable(GL_BLEND);
         }
         else
         {
             //make sure alpha blend is enabled
-            glEnable (GL_BLEND);
+            glEnable(GL_BLEND);
         }
     }
     else
     {
         //make sure alpha blend is enabled
-        glEnable (GL_BLEND);
+        glEnable(GL_BLEND);
     }
 
     {
         SurfaceList sl;
         sl.push_back(surface);
         bool needblend = shader != m_defaultShader ||
-                         PixelFormatHasAlpha((surface)->getPixelFormat()) ||
-                         uniforms.opacity[0] < 1.0f;
+                            PixelFormatHasAlpha((surface)->getPixelFormat()) ||
+                            uniforms.opacity[0] < 1.0f;
         shader = pickOptimizedShader(sl, needblend);
     }
 
@@ -849,9 +860,9 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
 
     m_binder->unbindSurfaceTexture(surface);
     glErrorCode = glGetError();
-    if ( GL_NO_ERROR != glErrorCode )
+    if (GL_NO_ERROR != glErrorCode)
     {
-        LOG_ERROR("GLESGraphicsystem", "GL Error occured :" << glErrorCode );
+        LOG_ERROR("GLESGraphicsystem", "GL Error occured :" << glErrorCode);
     };
 }
 
@@ -876,7 +887,7 @@ bool GLESGraphicsystem::renderSurfaces(SurfaceList surfaces, FloatRectangle targ
     // update all common uniforms, scale values to display size
     // offsets are generated w.r.t lower left corner (following GL conventions)
     uniforms.x = targetDestination.x / m_displayWidth;
-    uniforms.y = 1.0f - (targetDestination.y + targetDestination.height) / m_displayHeight;;
+    uniforms.y = 1.0f - (targetDestination.y + targetDestination.height) / m_displayHeight;
     uniforms.width = targetDestination.width / m_displayWidth;
     uniforms.height = targetDestination.height / m_displayHeight;
     uniforms.matrix = &identityMatrix.f[0];
@@ -961,11 +972,11 @@ bool GLESGraphicsystem::renderSurfaces(SurfaceList surfaces, FloatRectangle targ
     // Set GL blend state (ignored for binary shaders)
     if (blend)
     {
-        glEnable (GL_BLEND);
+        glEnable(GL_BLEND);
     }
     else
     {
-        glDisable (GL_BLEND);
+        glDisable(GL_BLEND);
     }
 
     shader->use();
@@ -1022,9 +1033,9 @@ bool GLESGraphicsystem::renderSurfaces(SurfaceList surfaces, FloatRectangle targ
     }
 
     glErrorCode = glGetError();
-    if ( GL_NO_ERROR != glErrorCode )
+    if (GL_NO_ERROR != glErrorCode)
     {
-        LOG_ERROR("GLESGraphicsystem", "GL Error occured :" << glErrorCode );
+        LOG_ERROR("GLESGraphicsystem", "GL Error occured :" << glErrorCode);
         return false;
     };
 
@@ -1036,7 +1047,7 @@ void GLESGraphicsystem::renderRegion(MultiSurfaceRegion* region, bool blend)
     // Render all surfaces in this region, performing as many rendering
     // passes as necessary, each with up to MAX_MULTI_SURFACE surfaces.
     SurfaceList surfaceBatch;
-    for(SurfaceListConstIterator currentS = region->m_surfaces.begin(); currentS != region->m_surfaces.end(); currentS++)
+    for (SurfaceListConstIterator currentS = region->m_surfaces.begin(); currentS != region->m_surfaces.end(); currentS++)
     {
         surfaceBatch.push_back(*currentS);
 
@@ -1064,20 +1075,31 @@ void GLESGraphicsystem::renderRegion(MultiSurfaceRegion* region, bool blend)
     }
 }
 
-struct OrderedSurface {
+struct OrderedSurface
+{
     Surface *surface;
     int depth;
-    OrderedSurface(Surface *s, int d):surface(s),depth(d) {}
-    bool operator<(OrderedSurface rhs) const { return depth < rhs.depth; }
-    bool operator==(OrderedSurface rhs) const { return surface == rhs.surface; }
+    OrderedSurface(Surface *s, int d):surface(s), depth(d) {}
+    bool operator<(OrderedSurface rhs) const
+    {
+        return depth < rhs.depth;
+    }
+    bool operator==(OrderedSurface rhs) const
+    {
+        return surface == rhs.surface;
+    }
 };
 
-struct RegionLimit {
+struct RegionLimit
+{
     float value; // Location on either X or Y axis
     bool entry;  // 1=in, 0=out
     OrderedSurface orderedSurface;
-    RegionLimit(float v, bool e, OrderedSurface s):value(v),entry(e),orderedSurface(s) {}
-    bool operator<(RegionLimit rhs) const { return value < rhs.value; }
+    RegionLimit(float v, bool e, OrderedSurface s):value(v), entry(e), orderedSurface(s) {}
+    bool operator<(RegionLimit rhs) const
+    {
+        return value < rhs.value;
+    }
 };
 
 // Creates a list of non-overlapping screen-space regions, each with a list of
@@ -1123,14 +1145,14 @@ std::list<MultiSurfaceRegion*> GLESGraphicsystem::computeRegions(std::list<Layer
     std::list<MultiSurfaceRegion*> regions;
     std::vector<RegionLimit> xlimits;
     std::vector<RegionLimit> ylimits;
- 
+
     // If clear is needed enable a dummy surface so that additional zero-surface
     // regions will be created around the edges to fill screen (when necessary)
     if (clear)
     {
-        xlimits.push_back(RegionLimit(0,               true,  OrderedSurface(NULL, 0)));
-        xlimits.push_back(RegionLimit(m_displayWidth,  false, OrderedSurface(NULL, 0)));
-        ylimits.push_back(RegionLimit(0,               true,  OrderedSurface(NULL, 0)));
+        xlimits.push_back(RegionLimit(0, true, OrderedSurface(NULL, 0)));
+        xlimits.push_back(RegionLimit(m_displayWidth, false, OrderedSurface(NULL, 0)));
+        ylimits.push_back(RegionLimit(0, true, OrderedSurface(NULL, 0)));
         ylimits.push_back(RegionLimit(m_displayHeight, false, OrderedSurface(NULL, 0)));
     }
 
@@ -1139,7 +1161,7 @@ std::list<MultiSurfaceRegion*> GLESGraphicsystem::computeRegions(std::list<Layer
     // also stored in the edge information.
     LayerListConstIterator layer;
     int depth = 0;
-    for(layer = layers.begin(); layer != layers.end(); layer++)
+    for (layer = layers.begin(); layer != layers.end(); layer++)
     {
         if ((*layer)->visibility == false || (*layer)->getOpacity() <= 0.0f)
         {
@@ -1148,7 +1170,7 @@ std::list<MultiSurfaceRegion*> GLESGraphicsystem::computeRegions(std::list<Layer
 
         SurfaceList surfaces = (*layer)->getAllSurfaces();
         SurfaceListConstIterator surface;
-        for(surface = surfaces.begin(); surface != surfaces.end(); surface++)
+        for (surface = surfaces.begin(); surface != surfaces.end(); surface++)
         {
             if (!(*surface)->hasNativeContent())
             {
@@ -1164,9 +1186,9 @@ std::list<MultiSurfaceRegion*> GLESGraphicsystem::computeRegions(std::list<Layer
 
             FloatRectangle rect = (*surface)->getTargetDestinationRegion();
 
-            xlimits.push_back(RegionLimit(rect.x,               true,  OrderedSurface((*surface), depth)));
-            xlimits.push_back(RegionLimit(rect.x + rect.width,  false, OrderedSurface((*surface), depth)));
-            ylimits.push_back(RegionLimit(rect.y,               true,  OrderedSurface((*surface), depth)));
+            xlimits.push_back(RegionLimit(rect.x, true, OrderedSurface((*surface), depth)));
+            xlimits.push_back(RegionLimit(rect.x + rect.width, false, OrderedSurface((*surface), depth)));
+            ylimits.push_back(RegionLimit(rect.y, true, OrderedSurface((*surface), depth)));
             ylimits.push_back(RegionLimit(rect.y + rect.height, false, OrderedSurface((*surface), depth)));
         }
     }
@@ -1324,7 +1346,7 @@ bool GLESGraphicsystem::initOpenGLES(EGLint displayWidth, EGLint displayHeight)
     m_defaultShader = Shader::createShader("default", "default");
     m_defaultShaderNoBlend = Shader::createShader("default", "default_no_blend");
     m_defaultShaderNoUniformAlpha = Shader::createShader("default", "default_no_uniform_alpha");
-    m_defaultShaderAddUniformChromaKey= Shader::createShader("default", "default_add_uniform_chromakey");
+    m_defaultShaderAddUniformChromaKey = Shader::createShader("default", "default_add_uniform_chromakey");
     m_defaultShaderNoUniformAlphaNoBlend = Shader::createShader("default", "default_no_blend_no_uniform_alpha");
     m_defaultShader2surf = Shader::createShader("default_2surf", "default_2surf");
     m_defaultShader2surfNoBlend = Shader::createShader("default_2surf", "default_2surf_no_blend");
@@ -1376,22 +1398,22 @@ bool GLESGraphicsystem::initOpenGLES(EGLint displayWidth, EGLint displayHeight)
     //   C: Texture n has chromakey
     //                         0      1      2      3
     //                       -----  -----  -----  -----
-    //                  # B  T A C  T A C  T A C  T A C
-    m_shaders[shaderKey(0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0)] = m_defaultShaderClear;
-    m_shaders[shaderKey(1,1, 1,1,0, 0,0,0, 0,0,0, 0,0,0)] = m_defaultShader;
-    m_shaders[shaderKey(1,1, 1,1,1, 0,0,0, 0,0,0, 0,0,0)] = m_defaultShaderAddUniformChromaKey;
-    m_shaders[shaderKey(1,0, 1,1,0, 0,0,0, 0,0,0, 0,0,0)] = m_defaultShaderNoBlend;
-    m_shaders[shaderKey(1,1, 0,1,0, 0,0,0, 0,0,0, 0,0,0)] = m_defaultShaderNoUniformAlpha;
-    m_shaders[shaderKey(1,0, 0,1,0, 0,0,0, 0,0,0, 0,0,0)] = m_defaultShaderNoUniformAlphaNoBlend;
+    //                  #  B  T  A  C  T  A  C  T  A  C  T  A  C
+    m_shaders[shaderKey(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)] = m_defaultShaderClear;
+    m_shaders[shaderKey(1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)] = m_defaultShader;
+    m_shaders[shaderKey(1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0)] = m_defaultShaderAddUniformChromaKey;
+    m_shaders[shaderKey(1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)] = m_defaultShaderNoBlend;
+    m_shaders[shaderKey(1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)] = m_defaultShaderNoUniformAlpha;
+    m_shaders[shaderKey(1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)] = m_defaultShaderNoUniformAlphaNoBlend;
 
-    m_shaders[shaderKey(2,1, 1,1,0, 1,1,0, 0,0,0, 0,0,0)] = m_defaultShader2surf;
-    m_shaders[shaderKey(2,0, 1,1,0, 1,1,0, 0,0,0, 0,0,0)] = m_defaultShader2surfNoBlend;
-    m_shaders[shaderKey(2,1, 0,1,0, 0,1,0, 0,0,0, 0,0,0)] = m_defaultShader2surfNoUniformAlpha;
-    m_shaders[shaderKey(2,0, 0,1,0, 0,1,0, 0,0,0, 0,0,0)] = m_defaultShader2surfNoUniformAlphaNoBlend;
-    m_shaders[shaderKey(2,1, 0,1,0, 1,1,0, 0,0,0, 0,0,0)] = m_defaultShader2surfNoUniformAlpha0;
-    m_shaders[shaderKey(2,0, 0,1,0, 1,1,0, 0,0,0, 0,0,0)] = m_defaultShader2surfNoUniformAlpha0NoBlend;
-    m_shaders[shaderKey(2,1, 1,1,0, 0,1,0, 0,0,0, 0,0,0)] = m_defaultShader2surfNoUniformAlpha1;
-    m_shaders[shaderKey(2,0, 1,1,0, 0,1,0, 0,0,0, 0,0,0)] = m_defaultShader2surfNoUniformAlpha1NoBlend;
+    m_shaders[shaderKey(2, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0)] = m_defaultShader2surf;
+    m_shaders[shaderKey(2, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0)] = m_defaultShader2surfNoBlend;
+    m_shaders[shaderKey(2, 1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0)] = m_defaultShader2surfNoUniformAlpha;
+    m_shaders[shaderKey(2, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0)] = m_defaultShader2surfNoUniformAlphaNoBlend;
+    m_shaders[shaderKey(2, 1, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0)] = m_defaultShader2surfNoUniformAlpha0;
+    m_shaders[shaderKey(2, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0)] = m_defaultShader2surfNoUniformAlpha0NoBlend;
+    m_shaders[shaderKey(2, 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0)] = m_defaultShader2surfNoUniformAlpha1;
+    m_shaders[shaderKey(2, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0)] = m_defaultShader2surfNoUniformAlpha1NoBlend;
 
     return result;
 }
@@ -1407,15 +1429,15 @@ void GLESGraphicsystem::saveScreenShotOfFramebuffer(std::string fileToSave)
 {
     // clear error if any
     int error = glGetError();
-    LOG_DEBUG("GLESGraphicSystem","taking screenshot and saving it to:" << fileToSave);
+    LOG_DEBUG("GLESGraphicSystem", "taking screenshot and saving it to:" << fileToSave);
 
-    LOG_DEBUG("GLESGraphicSystem","Screenshot: " << m_displayWidth << " * " << m_displayHeight);
-    char *buffer = (char *) malloc( m_displayWidth * m_displayHeight * 4 * sizeof(char));
+    LOG_DEBUG("GLESGraphicSystem", "Screenshot: " << m_displayWidth << " * " << m_displayHeight);
+    char *buffer = (char *) malloc(m_displayWidth * m_displayHeight * 4 * sizeof(char));
     glReadPixels(0, 0, m_displayWidth, m_displayHeight, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
     error = glGetError();
     if (error != GL_NO_ERROR)
     {
-        LOG_DEBUG("GLESGraphicSystem","error reading pixels for screenshot: " << error);
+        LOG_DEBUG("GLESGraphicSystem", "error reading pixels for screenshot: " << error);
     }
     // convert to RGB for bitmap
     int pixelcount = m_displayHeight * m_displayWidth;
@@ -1459,11 +1481,11 @@ void GLESGraphicsystem::createPbufferSurface()
     }
 
     const FloatRectangle layerDestRegion = m_currentLayer->getDestinationRegion();
-    EGLint width  = static_cast<EGLint>(layerDestRegion.width);
+    EGLint width = static_cast<EGLint>(layerDestRegion.width);
     EGLint height = static_cast<EGLint>(layerDestRegion.height);
 
     EGLint pb_attrs[] = {
-        EGL_WIDTH,  width,
+        EGL_WIDTH, width,
         EGL_HEIGHT, height,
         EGL_TEXTURE_FORMAT, EGL_TEXTURE_RGBA,
         EGL_TEXTURE_TARGET, EGL_TEXTURE_2D,
@@ -1515,8 +1537,8 @@ void GLESGraphicsystem::destroyTempTexture()
 
 void GLESGraphicsystem::renderTempTexture()
 {
-    // TODO FIX IT , IS NOT ALREADY WORKING ANYMORE WITH MULTITEXTURE OPTIMIZATION, IF WE HAVE CHROMAKEY LAYER    
-    const FloatRectangle layerSourceRegion      = m_currentLayer->getSourceRegion();
+    // TODO FIX IT , IS NOT ALREADY WORKING ANYMORE WITH MULTITEXTURE OPTIMIZATION, IF WE HAVE CHROMAKEY LAYER
+    const FloatRectangle layerSourceRegion = m_currentLayer->getSourceRegion();
     const FloatRectangle layerDestinationRegion = m_currentLayer->getDestinationRegion();
     float textureCoordinates[4];
 
@@ -1532,8 +1554,8 @@ void GLESGraphicsystem::renderTempTexture()
 
     uniforms.x = layerDestinationRegion.x / m_displayWidth;
     uniforms.y = 1.0f - (layerDestinationRegion.y + layerDestinationRegion.height) / m_displayHeight;
-    uniforms.width   = layerDestinationRegion.width  / m_displayWidth;
-    uniforms.height  = layerDestinationRegion.height / m_displayHeight;
+    uniforms.width = layerDestinationRegion.width  / m_displayWidth;
+    uniforms.height = layerDestinationRegion.height / m_displayHeight;
     uniforms.opacity[0] = m_currentLayer->getOpacity();
     uniforms.texRange[0][0]  = textureCoordinates[2] - textureCoordinates[0];
     uniforms.texRange[0][1]  = textureCoordinates[3] - textureCoordinates[1];
@@ -1542,36 +1564,39 @@ void GLESGraphicsystem::renderTempTexture()
     uniforms.texUnit[0] = 0;
     uniforms.matrix = layerMatrix.f;
     uniforms.chromaKeyEnabled = m_currentLayer->getChromaKeyEnabled();
-    if (uniforms.chromaKeyEnabled == true) {
-        unsigned char red   = 0;
+    if (uniforms.chromaKeyEnabled == true)
+    {
+        unsigned char red = 0;
         unsigned char green = 0;
-        unsigned char blue  = 0;
+        unsigned char blue = 0;
         m_currentLayer->getChromaKey(red, green, blue);
         uniforms.chromaKey[0] = (float)red   / 255.0f;
         uniforms.chromaKey[1] = (float)green / 255.0f;
         uniforms.chromaKey[2] = (float)blue  / 255.0f;
     }
 
-    glEnable (GL_BLEND);
+    glEnable(GL_BLEND);
 
     Shader* shader = m_currentLayer->getShader();
-    if (!shader) {
+    if (!shader)
+    {
         shader = m_defaultShader;
     }
     //shader = pickOptimizedShader(shader, uniforms);
     shader = m_defaultShaderAddUniformChromaKey;
     shader->use();
-    shader->loadCommonUniforms(uniforms,0);
+    shader->loadCommonUniforms(uniforms, 0);
     shader->loadUniforms();
 
     glBindTexture(GL_TEXTURE_2D, m_texId);
 
     int orientation = m_currentLayer->getOrientation() % 4;
-    GLint index     = orientation * 12;
+    GLint index = orientation * 12;
     glDrawArrays(GL_TRIANGLES, index, 6);
 
     GLenum glErrorCode = glGetError();
-    if ( GL_NO_ERROR != glErrorCode ) {
-        LOG_ERROR("GLESGraphicsystem", "GL Error occured in renderTempTexture:" << glErrorCode );
+    if (GL_NO_ERROR != glErrorCode)
+    {
+        LOG_ERROR("GLESGraphicsystem", "GL Error occured in renderTempTexture:" << glErrorCode);
     }
 }

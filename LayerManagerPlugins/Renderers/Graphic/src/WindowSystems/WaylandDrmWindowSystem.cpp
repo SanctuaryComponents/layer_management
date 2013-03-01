@@ -53,15 +53,15 @@ WaylandDrmWindowSystem::WaylandDrmWindowSystem(const char* displayname, int widt
 
 WaylandDrmWindowSystem::~WaylandDrmWindowSystem()
 {
-	if (m_gbm != NULL)
-		gbm_device_destroy(m_gbm);
-	if (m_fdDev >= 0)
-		drmDropMaster(m_fdDev);
+    if (m_gbm != NULL)
+        gbm_device_destroy(m_gbm);
+    if (m_fdDev >= 0)
+        drmDropMaster(m_fdDev);
 }
 
 bool WaylandDrmWindowSystem::initGraphicSystem()
 {
-	graphicSystem->setBaseWindowSystem(this);
+    graphicSystem->setBaseWindowSystem(this);
     bool ans = graphicSystem->init((void*)m_gbm, (void*)NULL);
     if (true != ans)
     {
@@ -76,67 +76,67 @@ bool WaylandDrmWindowSystem::initGraphicSystem()
 
 bool WaylandDrmWindowSystem::createNativeContext()
 {
-	struct udev* udev;
-	struct udev_device *device, *drm_device;
-	struct udev_enumerate* e;
-	struct udev_list_entry* entry;
-	const char *path, *device_seat;
-	const char *seat = default_seat;
+    struct udev* udev;
+    struct udev_device *device, *drm_device;
+    struct udev_enumerate* e;
+    struct udev_list_entry* entry;
+    const char *path, *device_seat;
+    const char *seat = default_seat;
 
-	udev = udev_new();
-	if (udev == NULL)
-	{
-		LOG_ERROR("WaylandDrmWindowSystem", "failed to initialize udev context.");
-		return false;
-	}
+    udev = udev_new();
+    if (udev == NULL)
+    {
+        LOG_ERROR("WaylandDrmWindowSystem", "failed to initialize udev context.");
+        return false;
+    }
 
-	e = udev_enumerate_new(udev);
-	udev_enumerate_add_match_subsystem(e, "drm");
-	udev_enumerate_add_match_sysname(e, "card[0-9]*");
+    e = udev_enumerate_new(udev);
+    udev_enumerate_add_match_subsystem(e, "drm");
+    udev_enumerate_add_match_sysname(e, "card[0-9]*");
 
-	udev_enumerate_scan_devices(e);
-	drm_device = NULL;
-	udev_list_entry_foreach(entry, udev_enumerate_get_list_entry(e))
-	{
-		path = udev_list_entry_get_name(entry);
-		device = udev_device_new_from_syspath(udev, path);
-		device_seat = udev_device_get_property_value(device, "ID_SEAT");
-		if (!device_seat)
-			device_seat = default_seat;
-		if (strcmp(device_seat, seat) == 0)
-		{
-			drm_device = device;
-			break;
-		}
-		udev_device_unref(device);
-	}
+    udev_enumerate_scan_devices(e);
+    drm_device = NULL;
+    udev_list_entry_foreach(entry, udev_enumerate_get_list_entry(e))
+    {
+        path = udev_list_entry_get_name(entry);
+        device = udev_device_new_from_syspath(udev, path);
+        device_seat = udev_device_get_property_value(device, "ID_SEAT");
+        if (!device_seat)
+            device_seat = default_seat;
+        if (strcmp(device_seat, seat) == 0)
+        {
+            drm_device = device;
+            break;
+        }
+        udev_device_unref(device);
+    }
 
-	if (drm_device == NULL)
-	{
-		LOG_ERROR("WaylandDrmWindowSystem", "no drm device found");
-		return false;
-	}
+    if (drm_device == NULL)
+    {
+        LOG_ERROR("WaylandDrmWindowSystem", "no drm device found");
+        return false;
+    }
 
-	const char* filename;
+    const char* filename;
 
-	filename = udev_device_get_devnode(drm_device);
-	m_fdDev = open(filename, O_RDWR | O_CLOEXEC);
-	if (m_fdDev < 0)
-	{
+    filename = udev_device_get_devnode(drm_device);
+    m_fdDev = open(filename, O_RDWR | O_CLOEXEC);
+    if (m_fdDev < 0)
+    {
         LOG_ERROR("WaylandDrmWindowSystem", "failed to open device");
         return false;
-	}
+    }
 
-	LOG_DEBUG("WaylandDrmWindowSystem", "Device name: " << filename << " fd: " << m_fdDev);
+    LOG_DEBUG("WaylandDrmWindowSystem", "Device name: " << filename << " fd: " << m_fdDev);
 
-	m_gbm = gbm_create_device(m_fdDev);
-	if (m_gbm == NULL)
-	{
+    m_gbm = gbm_create_device(m_fdDev);
+    if (m_gbm == NULL)
+    {
         LOG_ERROR("WaylandDrmWindowSystem", "failed to create gbm device");
-		return false;
-	}
+        return false;
+    }
 
-	udev_device_unref(drm_device);
+    udev_device_unref(drm_device);
 
     LOG_DEBUG("WaylandDrmWindowSystem", "SUCCESS:create gbm device");
     return true;
@@ -158,10 +158,10 @@ void WaylandDrmWindowSystem::checkForNewSurfaceNativeContent()
     for (; iter != iterEnd; ++iter)
     {
         LayerList layers = m_pScene->getCurrentRenderOrder((*iter)->getID());
-        for(LayerListConstIterator current = layers.begin(); current != layers.end(); current++)
+        for (LayerListConstIterator current = layers.begin(); current != layers.end(); current++)
         {
             SurfaceList surfaces = (*current)->getAllSurfaces();
-            for(SurfaceListConstIterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++)
+            for (SurfaceListConstIterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++)
             {
                 if ((*currentS)->hasNativeContent())
                 {
@@ -199,7 +199,7 @@ void WaylandDrmWindowSystem::RedrawAllLayers(bool clear, bool swap)
                 graphicSystem->clearBackground();
             }
         }
-        for(std::list<Layer*>::const_iterator current = layers.begin(); current != layers.end(); current++)
+        for (std::list<Layer*>::const_iterator current = layers.begin(); current != layers.end(); current++)
         {
             if ((*current)->getLayerType() == Hardware)
             {

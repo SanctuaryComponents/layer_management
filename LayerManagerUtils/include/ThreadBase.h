@@ -1,5 +1,5 @@
 /***************************************************************************
- * 
+ *
  * Copyright 2010,2011 BMW Car IT GmbH
  *
  *
@@ -28,22 +28,22 @@ class ThreadBase
 public:
     ThreadBase();
     virtual ~ThreadBase();
-    
+
     t_ilm_bool threadCreate();
     t_ilm_bool threadInit();
     t_ilm_bool threadStart();
     t_ilm_bool threadStop();
-    
+
     pthread_t threadGetId() const;
     t_ilm_bool threadIsRunning();
-    
+
     // override in inheriting class if required
     virtual t_ilm_bool threadInitInThreadContext();
     virtual t_ilm_bool threadDestroyInThreadContext();
-    
+
     // implement in inheriting class
     virtual t_ilm_bool threadMainLoop() = 0;
-    
+
 private:
     static unsigned int mGlobalThreadCount;
     pthread_t mThreadId;

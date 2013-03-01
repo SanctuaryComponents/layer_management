@@ -23,24 +23,24 @@
 
 ExecutionResult SurfaceDumpCommand::execute(ICommandExecutor* executor)
 {
-	ExecutionResult result = ExecutionFailed;
+    ExecutionResult result = ExecutionFailed;
     Scene& scene = *(executor->getScene());
     RendererList& m_rendererList = *(executor->getRendererList());
 
     bool status = false;
     unsigned int layer_id = 0;
 
-    LOG_INFO("SurfaceDumpCommand","making screenshot, output file: " << m_filename);
+    LOG_INFO("SurfaceDumpCommand", "making screenshot, output file: " << m_filename);
 
-	if (scene.getSurface(m_id))
-	{
-		layer_id = scene.getSurface(m_id)->getContainingLayerId();
-		status = scene.isLayerInCurrentRenderOrder(layer_id);
-		if (!status)
-		{
-			LOG_WARNING("SurfaceDumpCommand","Requested surface: " << m_id << " does not belong to a layer which is part of the current render order");
-		}
-	}
+    if (scene.getSurface(m_id))
+    {
+        layer_id = scene.getSurface(m_id)->getContainingLayerId();
+        status = scene.isLayerInCurrentRenderOrder(layer_id);
+        if (!status)
+        {
+            LOG_WARNING("SurfaceDumpCommand", "Requested surface: " << m_id << " does not belong to a layer which is part of the current render order");
+        }
+    }
 
     if (status)
     {

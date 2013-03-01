@@ -23,7 +23,7 @@
 #include "ICommand.h"
 #include <string>
 
-class SurfaceDumpCommand: public ICommand
+class SurfaceDumpCommand : public ICommand
 {
 public:
     /*!

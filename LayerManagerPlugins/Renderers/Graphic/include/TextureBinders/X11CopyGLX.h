@@ -26,7 +26,7 @@
 #include "PlatformSurfaces/XPlatformSurface.h"
 #include <X11/extensions/Xcomposite.h>
 
-class X11CopyGLX: public X11Copy
+class X11CopyGLX : public X11Copy
 {
 public:
     X11CopyGLX(Display* display)
@@ -37,7 +37,6 @@ public:
     bool bindSurfaceTexture(Surface* surface);
     void createClientBuffer(Surface* surface);
     void destroyClientBuffer(Surface* surface);
-
 };
 
 #endif /* _X11COPYGLX_H_ */

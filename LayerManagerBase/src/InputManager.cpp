@@ -17,7 +17,6 @@
 *
 ****************************************************************************/
 
-
 #include <cassert>
 
 #include "Log.h"
@@ -73,7 +72,6 @@ bool InputManager::setKeyboardFocusOn(unsigned int surfId)
             LOG_ERROR("InputManager", "setKeyboardFocusOn() called on surface " << surfId << ". This surface does not accept keyboard event !");
         }
     }
-
 
     return ret;
 }
@@ -134,19 +132,19 @@ Surface * InputManager::reportKeyboardEvent(InputEventState state, long keyId)
 
     switch (state)
     {
-        case INPUT_STATE_PRESSED:
-            elected = _getKbdFocus();
-            m_KeyMap[keyId] = elected;
-            break;
+    case INPUT_STATE_PRESSED:
+        elected = _getKbdFocus();
+        m_KeyMap[keyId] = elected;
+        break;
 
-        case INPUT_STATE_RELEASED:
-            elected = m_KeyMap[keyId];
-            break;
+    case INPUT_STATE_RELEASED:
+        elected = m_KeyMap[keyId];
+        break;
 
-        default:
-            elected = NULL;
-            LOG_WARNING("InputManager", "Invalid input state reported for reportKeyboardEvent() : " << state);
-            break;
+    default:
+        elected = NULL;
+        LOG_WARNING("InputManager", "Invalid input state reported for reportKeyboardEvent() : " << state);
+        break;
     }
 
     return elected;
@@ -162,26 +160,26 @@ Surface * InputManager::reportPointerEvent(Point& p)
 
     switch (p.state)
     {
-        case INPUT_STATE_PRESSED:
-            elected = electSurfaceForPointerEvent(p.x, p.y);
-            _setPointerFocus(elected);
-            /* Pointer pressed also assigns the focus for touch events */
-            _setTouchFocus(elected);
-            break;
+    case INPUT_STATE_PRESSED:
+        elected = electSurfaceForPointerEvent(p.x, p.y);
+        _setPointerFocus(elected);
+        /* Pointer pressed also assigns the focus for touch events */
+        _setTouchFocus(elected);
+        break;
 
-        case INPUT_STATE_OTHER:
-        case INPUT_STATE_MOTION:
-        case INPUT_STATE_RELEASED:
-            elected = _getPointerFocus();
-            if (elected != NULL)
-            {
-                transformGlobalToLocalCoordinates(elected, p.x, p.y);
-            }
-            break;
+    case INPUT_STATE_OTHER:
+    case INPUT_STATE_MOTION:
+    case INPUT_STATE_RELEASED:
+        elected = _getPointerFocus();
+        if (elected != NULL)
+        {
+            transformGlobalToLocalCoordinates(elected, p.x, p.y);
+        }
+        break;
 
-        default:
-            elected = NULL;
-            LOG_WARNING("InputManager", "Invalid input state reported for reportPointerEvent() : " << p.state);
+    default:
+        elected = NULL;
+        LOG_WARNING("InputManager", "Invalid input state reported for reportPointerEvent() : " << p.state);
     }
 
     return elected;
@@ -212,42 +210,38 @@ Surface * InputManager::electSurfaceForPointerEvent(int& x, int& y)
     LayerList &ll = m_pScene->getCurrentRenderOrder(0);
     LayerListConstReverseIterator currentLayer;
     SurfaceListConstReverseIterator currentSurf;
-    int x_SurfCoordinate, y_SurfCoordinate;
+    int x_SurfCoordinate;
+    int y_SurfCoordinate;
 
     surf = NULL;
     /* Need to browse for all layers. 1st layer of m_currentRenderOrder is rendered
      * on bottom, last one is rendrered on top. So we have to reverse iterate */
     LayerListConstReverseIterator layerEnd(ll.rend());
-    for (currentLayer = ll.rbegin();
-         currentLayer != layerEnd && surf == NULL;
-         currentLayer++)
+    for (currentLayer = ll.rbegin(); currentLayer != layerEnd && surf == NULL; currentLayer++)
     {
-        if ( ((*currentLayer)->visibility) && ((*currentLayer)->getOpacity() != 0) )
+        if ((*currentLayer)->visibility
+            && ((*currentLayer)->getOpacity() != 0)
+            && (*currentLayer)->isInside(x, y))
         {
-            if ((*currentLayer)->isInside(x, y))
+            x_SurfCoordinate = x;
+            y_SurfCoordinate = y;
+            (*currentLayer)->DestToSourceCoordinates(&x_SurfCoordinate, &y_SurfCoordinate, false);
+            /* Need to browse for all surfaces */
+            SurfaceListConstReverseIterator surfEnd((*currentLayer)->getAllSurfaces().rend());
+            for (currentSurf = (*currentLayer)->getAllSurfaces().rbegin();
+                    currentSurf != surfEnd && surf == NULL;
+                    currentSurf++)
             {
-                x_SurfCoordinate = x;
-                y_SurfCoordinate = y;
-                (*currentLayer)->DestToSourceCoordinates(&x_SurfCoordinate, &y_SurfCoordinate, false);
-                /* Need to browse for all surfaces */
-                SurfaceListConstReverseIterator surfEnd((*currentLayer)->getAllSurfaces().rend());
-                for (currentSurf = (*currentLayer)->getAllSurfaces().rbegin();
-                     currentSurf !=  surfEnd && surf == NULL;
-                     currentSurf++)
+                if ((*currentSurf)->hasNativeContent()
+                    && (*currentSurf)->visibility
+                    && ((*currentSurf)->getOpacity() != 0)
+                    && (*currentSurf)->isInside(x_SurfCoordinate, y_SurfCoordinate)
+                    && (*currentSurf)->isInputEventAcceptedFrom(INPUT_DEVICE_POINTER))
                 {
-                    if ( ((*currentSurf)->hasNativeContent()) && ((*currentSurf)->visibility) && ((*currentSurf)->getOpacity() != 0) )
-                    {
-                        if ((*currentSurf)->isInside(x_SurfCoordinate, y_SurfCoordinate))
-                        {
-                            if ((*currentSurf)->isInputEventAcceptedFrom(INPUT_DEVICE_POINTER))
-                            {
-                                surf = *currentSurf;
-                                (*currentSurf)->DestToSourceCoordinates(&x_SurfCoordinate, &y_SurfCoordinate, false);
-                                x = x_SurfCoordinate;
-                                y = y_SurfCoordinate;
-                            }
-                        }
-                    }
+                    surf = *currentSurf;
+                    (*currentSurf)->DestToSourceCoordinates(&x_SurfCoordinate, &y_SurfCoordinate, false);
+                    x = x_SurfCoordinate;
+                    y = y_SurfCoordinate;
                 }
             }
         }
@@ -265,8 +259,8 @@ void InputManager::transformGlobalToLocalCoordinates(Surface* surf, int& x, int&
     layer = m_pScene->getLayer(surf->getContainingLayerId());
     if (layer != NULL)
     {
-        layer->DestToSourceCoordinates(&x,&y, false);
-        surf->DestToSourceCoordinates(&x,&y, false);
+        layer->DestToSourceCoordinates(&x, &y, false);
+        surf->DestToSourceCoordinates(&x, &y, false);
     }
 }
 

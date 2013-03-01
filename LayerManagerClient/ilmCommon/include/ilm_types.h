@@ -80,7 +80,7 @@ typedef enum e_ilmPixelFormat
 {
     ILM_PIXELFORMAT_R_8 = 0,           /*!< Pixelformat value, to describe a 8 bit luminance surface */
     ILM_PIXELFORMAT_RGB_888 = 1,       /*!< Pixelformat value, to describe a 24 bit rgb surface */
-    ILM_PIXELFORMAT_RGBA_8888 =2,      /*!< Pixelformat value, to describe a 24 bit rgb surface with 8 bit alpha */
+    ILM_PIXELFORMAT_RGBA_8888 = 2,      /*!< Pixelformat value, to describe a 24 bit rgb surface with 8 bit alpha */
     ILM_PIXELFORMAT_RGB_565 = 3,       /*!< Pixelformat value, to describe a 16 bit rgb surface */
     ILM_PIXELFORMAT_RGBA_5551 = 4,     /*!< Pixelformat value, to describe a 16 bit rgb surface, with binary mask */
     ILM_PIXELFORMAT_RGBA_6661 = 5,     /*!< Pixelformat value, to describe a 18 bit rgb surface, with binars mask */
@@ -97,7 +97,8 @@ typedef enum e_ilmLayerType
     ILM_LAYERTYPE_UNKNOWN = 0,         /*!< LayerType not known */
     ILM_LAYERTYPE_HARDWARE = 1,        /*!< LayerType value, to describe a hardware layer */
     ILM_LAYERTYPE_SOFTWARE2D = 2,      /*!< LayerType value, to describe a redirected offscreen buffer layer */
-    ILM_LAYERTYPE_SOFTWARE2_5D = 3     /*!< LayerType value, to describe a redirected offscreen buffer layer, which can be rotated in the 3d space */
+    ILM_LAYERTYPE_SOFTWARE2_5D = 3     /*!< LayerType value, to describe a redirected offscreen buffer layer,
+                                            which can be rotated in the 3d space */
 } ilmLayerType;
 
 /**
@@ -299,27 +300,27 @@ typedef void* t_ilm_message;
  */
 typedef enum
 {
-    ILM_NOTIFICATION_VISIBILITY         = ILM_BIT(1),
-    ILM_NOTIFICATION_OPACITY            = ILM_BIT(2),
-    ILM_NOTIFICATION_ORIENTATION        = ILM_BIT(3),
-    ILM_NOTIFICATION_SOURCE_RECT        = ILM_BIT(4),
-    ILM_NOTIFICATION_DEST_RECT          = ILM_BIT(5),
-    ILM_NOTIFICATION_ALL                = 0xffff
+    ILM_NOTIFICATION_VISIBILITY = ILM_BIT(1),
+    ILM_NOTIFICATION_OPACITY = ILM_BIT(2),
+    ILM_NOTIFICATION_ORIENTATION = ILM_BIT(3),
+    ILM_NOTIFICATION_SOURCE_RECT = ILM_BIT(4),
+    ILM_NOTIFICATION_DEST_RECT = ILM_BIT(5),
+    ILM_NOTIFICATION_ALL = 0xffff
 } t_ilm_notification_mask;
 
 /**
  * Typedef for notification callback on property changes of a layer
  */
 typedef void(*layerNotificationFunc)(t_ilm_layer layer,
-                                     struct ilmLayerProperties*,
-                                     t_ilm_notification_mask mask);
+                                        struct ilmLayerProperties*,
+                                        t_ilm_notification_mask mask);
 
 /**
  * Typedef for notification callback on property changes of a surface
  */
 typedef void(*surfaceNotificationFunc)(t_ilm_surface surface,
-                                     struct ilmSurfaceProperties*,
-                                     t_ilm_notification_mask mask);
+                                        struct ilmSurfaceProperties*,
+                                        t_ilm_notification_mask mask);
 
 /**
  * enum for identifying different health states
@@ -341,16 +342,16 @@ enum HealthCondition
  */
 typedef enum PluginApi
 {
-    Renderer_Api            = 0x00010000,
+    Renderer_Api = 0x00010000,
     Renderer_Api_v1,
 
-    SceneProvider_Api       = 0x00020000,
+    SceneProvider_Api = 0x00020000,
     SceneProvider_Api_v1,
 
-    Communicator_Api        = 0x00040000,
+    Communicator_Api = 0x00040000,
     Communicator_Api_v1,
 
-    HealthMonitor_Api       = 0x00080000,
+    HealthMonitor_Api = 0x00080000,
     HealthMonitor_Api_v1
 } ilmPluginApi;
 

@@ -26,7 +26,7 @@
 #include "IRenderer.h"
 #include "WindowSystems/BaseWindowSystem.h"
 
-class BaseRenderer: public IRenderer, public PluginBase
+class BaseRenderer : public IRenderer, public PluginBase
 {
 public:
     BaseRenderer(ICommandExecutor& executor, Configuration& config);
@@ -38,8 +38,12 @@ public:
 
     virtual void doScreenShot(std::string fileToSave) = 0;
     virtual uint getLayerTypeCapabilities(LayerType layerType);
-    virtual InputManager* getInputManager() const {return m_pInputManager;}
-    virtual Shader* createShader(const string* vertexName, const string* fragmentName); 
+    virtual InputManager* getInputManager() const
+    {
+        return m_pInputManager;
+    }
+
+    virtual Shader* createShader(const string* vertexName, const string* fragmentName);
     virtual bool setOptimizationMode(unsigned int id, unsigned int mode)
     {
         (void)id;
@@ -60,10 +64,10 @@ private:
     static bool debugMode;
 };
 
-inline Shader* BaseRenderer::createShader(const string* vertexName, const string* fragmentName) 
+inline Shader* BaseRenderer::createShader(const string* vertexName, const string* fragmentName)
 {
-	(void)vertexName; // TODO: removed, prevents warning
-	(void)fragmentName; // TODO: removed, prevents warning
+    (void)vertexName; // TODO: removed, prevents warning
+    (void)fragmentName; // TODO: removed, prevents warning
     return NULL;
 }
 inline void BaseRenderer::setdebug(bool onoff)

@@ -28,7 +28,7 @@
 #include <cmem.h>
 #include "PlatformSurfaces/BeaglePlatformSurface.h"
 
-class BeagleEglImage: public ITextureBinder
+class BeagleEglImage : public ITextureBinder
 {
 public:
     BeagleEglImage(EGLDisplay eglDisplay)
@@ -65,7 +65,6 @@ public:
 
     void unbindSurfaceTexture(Surface*s)
     {
-
     }
 
     PlatformSurface* createPlatformSurface(Surface* s)
@@ -100,8 +99,7 @@ public:
                 EGL_NO_CONTEXT, //eglContext,
                 EGL_NATIVE_PIXMAP_KHR, //EGL_GL_TEXTURE_2D_KHR,
                 pNativePixmap, //(void*)textureId0,//
-                NULL //miplevel 0 is fine, thank you
-                );
+                NULL); //miplevel 0 is fine, thank you
 
         if (nativeSurface->eglImage == 0)
         {

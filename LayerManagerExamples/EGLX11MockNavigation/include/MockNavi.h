@@ -16,8 +16,8 @@
  * limitations under the License.
  *
  ****************************************************************************/
-#ifndef _MockNavi_h
-#define _MockNavi_h
+#ifndef _MOCKNAVI_H
+#define _MOCKNAVI_H
 
 #include "OpenGLES2App.h"
 #include "IRenderable.h"
@@ -47,4 +47,4 @@ private:
     list<IUpdateable*> m_updateList;
 };
 
-#endif
+#endif /* _MOCKNAVI_H */

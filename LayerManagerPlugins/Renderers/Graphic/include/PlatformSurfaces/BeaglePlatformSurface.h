@@ -41,7 +41,7 @@ typedef struct _NATIVE_PIXMAP_STRUCT
 class BeaglePlatformSurface : public PlatformSurface
 {
 public:
-    BeaglePlatformSurface (Surface* surface)
+    BeaglePlatformSurface(Surface* surface)
     : PlatformSurface(surface)
     , eglImage(0)
     {

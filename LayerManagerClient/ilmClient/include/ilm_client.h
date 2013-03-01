@@ -92,7 +92,11 @@ ilmErrorTypes ilm_surfaceAddNotification(t_ilm_surface surface, surfaceNotificat
  * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
-ilmErrorTypes ilm_surfaceCreate(t_ilm_nativehandle nativehandle, t_ilm_int width, t_ilm_int height, ilmPixelFormat pixelFormat, t_ilm_surface *pSurfaceId);
+ilmErrorTypes ilm_surfaceCreate(t_ilm_nativehandle nativehandle,
+                                t_ilm_int width,
+                                t_ilm_int height,
+                                ilmPixelFormat pixelFormat,
+                                t_ilm_surface *pSurfaceId);
 
 /**
  * \brief Get the horizontal and vertical dimension of the surface.
@@ -159,7 +163,11 @@ ilmErrorTypes ilm_surfaceRemoveNotification(t_ilm_surface surface);
  * \return ILM_SUCCESS if the method call was successful
  * \return ILM_FAILED if the client can not call the method on the service.
  */
-ilmErrorTypes ilm_surfaceSetNativeContent(t_ilm_nativehandle nativehandle, t_ilm_int width, t_ilm_int height, ilmPixelFormat pixelFormat, t_ilm_surface surfaceId);
+ilmErrorTypes ilm_surfaceSetNativeContent(t_ilm_nativehandle nativehandle,
+                                            t_ilm_int width,
+                                            t_ilm_int height,
+                                            ilmPixelFormat pixelFormat,
+                                            t_ilm_surface surfaceId);
 
 /**
  * \brief Set the area of a surface which should be used for the rendering.
@@ -179,7 +187,7 @@ ilmErrorTypes ilm_surfaceSetSourceRectangle(t_ilm_surface surfaceId, t_ilm_int x
  * By default, a surface accept input events from all kind of devices (keyboards, pointer, ...)
  * By calling this function, you can adjust surface preferences. Note that this function only
  * adjust the acceptance for the specified devices. Non specified are keept untouched.
- * 
+ *
  * Typicall use case for this function is when dealing with pointer or touch events.
  * Those are normally dispatched to the first visible surface below the coordinate.
  * If you want a different behavior (i.e. forward events to an other surface below the coordinate,

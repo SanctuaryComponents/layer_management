@@ -66,7 +66,8 @@ private:
     uint m_surfaceId;
 
     // for unit testing
-    //template <typename nativeHandle_type, typename pixelformat_type, typename OriginalWidth_type, typename OriginalHeight_type> friend class SurfaceSetRenderBufferCommandEqMatcherP4;
+    //template <typename nativeHandle_type, typename pixelformat_type, typename OriginalWidth_type, typename OriginalHeight_type>
+    //friend class SurfaceSetRenderBufferCommandEqMatcherP4;
 };
 
 

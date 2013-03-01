@@ -34,17 +34,17 @@ Car::Car(vec3f position, vec3f size, vec4f color, ShaderBase* shader)
 , m_index(0, 1, 2)
 , m_pShader(shader)
 {
-	m_vertex[0].x = 0.0;
-	m_vertex[0].y = 0.0;
-	m_vertex[0].z = 0.0;
-    
-	m_vertex[1].x = 0.5 * m_size.x;
-	m_vertex[1].y = 0.0;
-	m_vertex[1].z = -m_size.z;
-    
-	m_vertex[2].x = m_size.x;
-	m_vertex[2].y = 0.0;
-	m_vertex[2].z = 0.0;
+    m_vertex[0].x = 0.0;
+    m_vertex[0].y = 0.0;
+    m_vertex[0].z = 0.0;
+
+    m_vertex[1].x = 0.5 * m_size.x;
+    m_vertex[1].y = 0.0;
+    m_vertex[1].z = -m_size.z;
+
+    m_vertex[2].x = m_size.x;
+    m_vertex[2].y = 0.0;
+    m_vertex[2].z = 0.0;
 }
 
 void Car::render()

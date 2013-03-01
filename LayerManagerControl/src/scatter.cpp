@@ -50,7 +50,6 @@ t_scene_data getScatteredScene(t_scene_data* pInitialScene)
     //make dummy scene
     t_scene_data scatteredScene = cloneToUniLayerScene(&initialScene);
 
-
     //get render order of surfaces in initial scene
     vector<t_ilm_surface> renderOrder = getSceneRenderOrder(&initialScene);
     //get surfaces' coordinates of surfaces in initial scene
@@ -71,7 +70,6 @@ t_scene_data getScatteredScene(t_scene_data* pInitialScene)
     float scale = min(1.0 / cols, 1.0 / rows);
     int maxWidth = static_cast<int>(initialScene.screenWidth * scale);
     int maxHeight = static_cast<int>(initialScene.screenHeight * scale);
-
 
     //scale surface coordinates
     int counter = 0;
@@ -101,10 +99,10 @@ void* scatterThreadCallback(void* param)
 {
     map<string, void*> * pParamMap = static_cast<map<string, void*>* >(param);
     t_ilm_surface* surface = static_cast<t_ilm_surface*>((*pParamMap)["pHighlighedSurface"]);
-    bool* stop= static_cast<bool*>((*pParamMap)["pStop"]);
-    while(! *stop)
+    bool* stop = static_cast<bool*>((*pParamMap)["pStop"]);
+    while (! *stop)
     {
-        if(*surface != 0xFFFFFFFF)
+        if (*surface != 0xFFFFFFFF)
         {
             t_ilm_surface currentSurface = *surface;
 
@@ -112,7 +110,7 @@ void* scatterThreadCallback(void* param)
             if (ILM_SUCCESS != callResult)
             {
                 cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
-                cout << "Failed to set visibility "<< false << " for surface with ID " << currentSurface << "\n";
+                cout << "Failed to set visibility " << false << " for surface with ID " << currentSurface << "\n";
             }
 
             ilm_commitChanges();
@@ -122,7 +120,7 @@ void* scatterThreadCallback(void* param)
             if (ILM_SUCCESS != callResult)
             {
                 cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
-                cout << "Failed to set visibility "<< true << " for surface with ID " << currentSurface << "\n";
+                cout << "Failed to set visibility " << true << " for surface with ID " << currentSurface << "\n";
             }
 
             ilm_commitChanges();
@@ -141,7 +139,7 @@ void scatterHandleUserInput(t_scene_data* pOriginalScene, t_scene_data* pScatter
     //make keys map
     map<string, t_ilm_surface> keySurfaceMap;
 
-    for(int i = 0 ; i < n ; ++i)
+    for (int i = 0; i < n; ++i)
     {
         int row = i / cols;
         int col = i % cols;
@@ -165,10 +163,10 @@ void scatterHandleUserInput(t_scene_data* pOriginalScene, t_scene_data* pScatter
     pthread_create(& highlightThread, NULL, scatterThreadCallback, &threadParamMap);
 
     char userInput[3];
-    while(true)
+    while (true)
     {
         //print Grid
-        for(int i = 0 ; i < n ; ++i)
+        for (int i = 0; i < n; ++i)
         {
             int row = i / cols;
             int col = i % cols;
@@ -177,18 +175,18 @@ void scatterHandleUserInput(t_scene_data* pOriginalScene, t_scene_data* pScatter
             key[0] = 'A' + row;
             key[1] = '0' + col;
             key[2] = '\0';
-            if(col == 0)
+            if (col == 0)
             {
-                cout<<endl;
-                cout<<string(5 * cols + 1, '-')<<endl;
-                cout <<"| ";
+                cout << endl;
+                cout << string(5 * cols + 1, '-') << endl;
+                cout << "| ";
             }
-            cout<<key<<" | ";
+            cout << key << " | ";
         }
 
-        cout<<endl<<string(5 * cols + 1, '-')<<endl;
+        cout << endl << string(5 * cols + 1, '-') << endl;
         //take input from user
-        cout<<"Choose a surface [Or press ENTER to exit...]:"<<endl;
+        cout << "Choose a surface [Or press ENTER to exit...]:" << endl;
 
         userInput[0] = cin.get();
 
@@ -207,21 +205,21 @@ void scatterHandleUserInput(t_scene_data* pOriginalScene, t_scene_data* pScatter
 
         userInput[1] = cin.get();
         //if the user presses Enter by mistake: reset input
-        if(userInput[1] == '\n')
+        if (userInput[1] == '\n')
         {
             continue;
         }
 
         userInput[2] = cin.get();
         //if the user DOES NOT press Enter by mistake: reset input
-        if(userInput[2] != '\n')
+        if (userInput[2] != '\n')
         {
             continue;
         }
 
         userInput[2] = '\0';
 
-        if(keySurfaceMap.find(userInput) != keySurfaceMap.end())
+        if (keySurfaceMap.find(userInput) != keySurfaceMap.end())
         {
             //this change is reflected in the highligh thread
             hightlightThreadSurface = keySurfaceMap[userInput];
@@ -253,26 +251,26 @@ void scatterHandleUserInput(t_scene_data* pOriginalScene, t_scene_data* pScatter
             stringstream tempStream;
             char fillChar = '-';
             int width = 20;
-            tempStream <<"\n--------------------------------\n";
-            tempStream <<std::setw(width)<<std::left<<std::setfill(fillChar)<<"Surface"<< ":" << hightlightThreadSurface << "\n";
-            tempStream <<std::setw(width)<<std::left<<std::setfill(fillChar)<<"Destination Region"<< ":" << "[x:"<< surfaceProperties.destX<< ", y:" << surfaceProperties.destY<< ", w:"<< surfaceProperties.destWidth<< ", h:"<< surfaceProperties.destHeight<< "]\n";
-            tempStream <<std::setw(width)<<std::left<<std::setfill(fillChar)<<"Source Region"<< ":" << "[x:"<< surfaceProperties.sourceX<< ", y:" << surfaceProperties.sourceY<< ", w:"<< surfaceProperties.sourceWidth<< ", h:"<< surfaceProperties.sourceHeight<< "]\n";
-            tempStream <<std::setw(width)<<std::left<<std::setfill(fillChar)<<"Original Dimensions"<< ":" << "[w:"<< surfaceProperties.origSourceWidth<< ", h:" << surfaceProperties.origSourceHeight<< "]\n";
-            tempStream <<std::setw(width)<<std::left<<std::setfill(fillChar)<<"Opacity"<< ":" << surfaceProperties.opacity  << "\n";
-            tempStream <<std::setw(width)<<std::left<<std::setfill(fillChar)<<"Visibility"<< ":" << surfaceProperties.visibility << "\n";
-            tempStream <<std::setw(width)<<std::left<<std::setfill(fillChar)<<"Input Devices"<< ":" << surfaceProperties.inputDevicesAcceptance << " [" << inputDeviceAcceptance<<"]\n";
-            tempStream <<std::setw(width)<<std::left<<std::setfill(fillChar)<<"Native Surface"<< ":" << surfaceProperties.nativeSurface << "\n";
-            tempStream <<std::setw(width)<<std::left<<std::setfill(fillChar)<<"Orientation"<< ":" << surfaceProperties.orientation  << " ["<< orientations[surfaceProperties.orientation]<< "]\n";
-            tempStream <<std::setw(width)<<std::left<<std::setfill(fillChar)<<"Pixel Format"<< ":" << surfaceProperties.pixelformat  << " ["<< pixelFormats[surfaceProperties.pixelformat]<< "]\n";
-            tempStream <<std::setw(width)<<std::left<<std::setfill(fillChar)<<"Update Counter"<< ":" << surfaceProperties.updateCounter << "\n";
-            tempStream <<std::setw(width)<<std::left<<std::setfill(fillChar)<<"Draw Counter"<< ":" << surfaceProperties.drawCounter << "\n";
-            tempStream <<std::setw(width)<<std::left<<std::setfill(fillChar)<<"Frame Counter"<< ":" << surfaceProperties.frameCounter << "\n";
+            tempStream << "\n--------------------------------\n";
+            tempStream << std::setw(width) << std::left << std::setfill(fillChar) << "Surface" << ":" << hightlightThreadSurface << "\n";
+            tempStream << std::setw(width) << std::left << std::setfill(fillChar) << "Destination Region" << ":" << "[x:" << surfaceProperties.destX << ", y:" << surfaceProperties.destY << ", w:" << surfaceProperties.destWidth << ", h:" << surfaceProperties.destHeight << "]\n";
+            tempStream << std::setw(width) << std::left << std::setfill(fillChar) << "Source Region" << ":" << "[x:" << surfaceProperties.sourceX << ", y:" << surfaceProperties.sourceY << ", w:" << surfaceProperties.sourceWidth << ", h:" << surfaceProperties.sourceHeight << "]\n";
+            tempStream << std::setw(width) << std::left << std::setfill(fillChar) << "Original Dimensions" << ":" << "[w:" << surfaceProperties.origSourceWidth << ", h:" << surfaceProperties.origSourceHeight << "]\n";
+            tempStream << std::setw(width) << std::left << std::setfill(fillChar) << "Opacity" << ":" << surfaceProperties.opacity << "\n";
+            tempStream << std::setw(width) << std::left << std::setfill(fillChar) << "Visibility" << ":" << surfaceProperties.visibility << "\n";
+            tempStream << std::setw(width) << std::left << std::setfill(fillChar) << "Input Devices" << ":" << surfaceProperties.inputDevicesAcceptance << " [" << inputDeviceAcceptance << "]\n";
+            tempStream << std::setw(width) << std::left << std::setfill(fillChar) << "Native Surface" << ":" << surfaceProperties.nativeSurface << "\n";
+            tempStream << std::setw(width) << std::left << std::setfill(fillChar) << "Orientation" << ":" << surfaceProperties.orientation << " [" << orientations[surfaceProperties.orientation] << "]\n";
+            tempStream << std::setw(width) << std::left << std::setfill(fillChar) << "Pixel Format" << ":" << surfaceProperties.pixelformat << " [" << pixelFormats[surfaceProperties.pixelformat] << "]\n";
+            tempStream << std::setw(width) << std::left << std::setfill(fillChar) << "Update Counter" << ":" << surfaceProperties.updateCounter << "\n";
+            tempStream << std::setw(width) << std::left << std::setfill(fillChar) << "Draw Counter" << ":" << surfaceProperties.drawCounter << "\n";
+            tempStream << std::setw(width) << std::left << std::setfill(fillChar) << "Frame Counter" << ":" << surfaceProperties.frameCounter << "\n";
 
-            cout<<tempStream.str();
+            cout << tempStream.str();
         }
         else
         {
-            cout<<"Unrecognized input!"<<endl;
+            cout << "Unrecognized input!" << endl;
         }
     }
 }
@@ -290,7 +288,6 @@ void scatter()
 
     //transform from initial to scattered scene
     transformScene(&initialScene, &scatteredScene, 1000, 50);
-
 
     //wait for user input
     scatterHandleUserInput(&initialScene, &scatteredScene);
@@ -319,7 +316,7 @@ void scatterAll()
         t_ilm_surface surface = *it;
 
         //if surface does not belong to a layer or layer does not belong to a surface
-        if( ! surfaceRenderedOnScreen(initialScene, surface ))
+        if (! surfaceRenderedOnScreen(initialScene, surface))
         {
             modifiedScene.surfaces.push_back(surface);
             modifiedScene.surfaceProperties[surface] = initialScene.surfaceProperties[surface];
@@ -337,7 +334,6 @@ void scatterAll()
         modifiedScene.surfaceProperties[surface].opacity = 1;
         modifiedScene.surfaceProperties[surface].visibility = true;
     }
-
 
     //just scatter !!
     setScene(&modifiedScene);

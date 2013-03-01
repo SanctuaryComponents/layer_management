@@ -23,12 +23,12 @@
 
 ExecutionResult ScreenDumpCommand::execute(ICommandExecutor* executor)
 {
-	ExecutionResult result = ExecutionFailed;
+    ExecutionResult result = ExecutionFailed;
     RendererList& m_rendererList = *(executor->getRendererList());
 
     bool status = false;
 
-    LOG_INFO("ScreenDumpCommand","making screenshot, output file: " << m_filename);
+    LOG_INFO("ScreenDumpCommand", "making screenshot, output file: " << m_filename);
 
     status = (m_id == 0);
 

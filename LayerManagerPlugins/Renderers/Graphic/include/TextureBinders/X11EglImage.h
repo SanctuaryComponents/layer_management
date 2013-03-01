@@ -29,7 +29,7 @@
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
 
-class X11EglImage: public ITextureBinder
+class X11EglImage : public ITextureBinder
 {
 public:
     virtual PlatformSurface* createPlatformSurface(Surface* surface);

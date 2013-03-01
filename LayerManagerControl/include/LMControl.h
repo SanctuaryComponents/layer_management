@@ -58,20 +58,22 @@ struct t_scene_data
 /*
  * Vector of four integers <x y z w>
  */
-class tuple4
+struct tuple4
 {
 public:
-    int x, y, z, w;
+    int x;
+    int y;
+    int z;
+    int w;
+
     tuple4(int _x, int _y, int _z, int _w) :
         x(_x), y(_y), z(_z), w(_w)
     {
-
     }
 
     tuple4() :
         x(0), y(0), z(0), w(0)
     {
-
     }
 
     tuple4(const tuple4& other)
@@ -98,7 +100,6 @@ public:
         w = other.w;
         return *this;
     }
-
 };
 
 

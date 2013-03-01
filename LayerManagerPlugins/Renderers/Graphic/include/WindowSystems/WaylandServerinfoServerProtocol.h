@@ -1,6 +1,6 @@
 /***************************************************************************
  *
- * Copyright 2010, 2011 BMW Car IT GmbH  
+ * Copyright 2010, 2011 BMW Car IT GmbH
  * Copyright (C) 2011 DENSO CORPORATION and Robert Bosch Car Multimedia Gmbh
  *
  *
@@ -26,8 +26,8 @@
  * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  ****************************************************************************/
 
-#ifndef WAYLAND_SERVERINFO_SERVER_PROTOCOL_H
-#define WAYLAND_SERVERINFO_SERVER_PROTOCOL_H
+#ifndef WAYLANDSERVERINFOSERVERPROTOCOL_H
+#define WAYLANDSERVERINFOSERVERPROTOCOL_H
 
 #ifdef  __cplusplus
 extern "C" {
@@ -46,15 +46,16 @@ struct serverinfo;
 
 extern const struct wl_interface serverinfo_interface;
 
-struct serverinfo_interface {
-	void (*get_connection_id)(struct wl_client *client,
-				  struct wl_resource *resource);
+struct serverinfo_interface
+{
+    void (*get_connection_id)(struct wl_client *client,
+                    struct wl_resource *resource);
 };
 
-#define SERVERINFO_CONNECTION_ID	0
+#define SERVERINFO_CONNECTION_ID    0
 
 #ifdef  __cplusplus
 }
 #endif
 
-#endif
+#endif /* WAYLANDSERVERINFOSERVERPROTOCOL_H */

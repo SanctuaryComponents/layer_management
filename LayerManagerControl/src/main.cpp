@@ -27,7 +27,7 @@ int main(int argc, char* argv[])
     // create full string of arguments
     string userCommand;
 
-    if(argc == 1)
+    if (argc == 1)
     {
         userCommand = "help";
     }

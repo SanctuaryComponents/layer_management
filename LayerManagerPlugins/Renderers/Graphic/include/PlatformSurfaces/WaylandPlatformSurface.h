@@ -1,6 +1,6 @@
 /***************************************************************************
  *
- * Copyright 2010, 2011 BMW Car IT GmbH  
+ * Copyright 2010, 2011 BMW Car IT GmbH
  * Copyright (C) 2011 DENSO CORPORATION and Robert Bosch Car Multimedia Gmbh
  *
  *
@@ -24,7 +24,7 @@
 #include "PlatformSurface.h"
 #include "Surface.h"
 
-class WaylandPlatformSurface: public PlatformSurface
+class WaylandPlatformSurface : public PlatformSurface
 {
 public:
     unsigned short connectionId;
@@ -42,17 +42,17 @@ public:
     ~WaylandPlatformSurface()
     {
     }
-    
+
     bool enableRendering()
     {
         m_isReadyForRendering = true;
-	return true;
+        return true;
     }
 
     bool disableRendering()
     {
         m_isReadyForRendering = false;
-	return true;
+        return true;
     }
 
     bool isReadyForRendering()
@@ -60,7 +60,7 @@ public:
         return m_isReadyForRendering;
     }
     uint texture;
-    bool m_isReadyForRendering;    
+    bool m_isReadyForRendering;
 };
 
 #endif /* _WAYLANDPLATFORMSURFACE_H_ */

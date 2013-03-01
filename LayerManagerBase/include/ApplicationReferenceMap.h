@@ -16,8 +16,8 @@
 * limitations under the License.
 *
 ****************************************************************************/
-#ifndef _APPLICATION_REFERENCE_MAP_H_
-#define _APPLICATION_REFERENCE_MAP_H_
+#ifndef _APPLICATIONREFERENCEMAP_H_
+#define _APPLICATIONREFERENCEMAP_H_
 
 #include <map>
 #include "IApplicationReference.h"
@@ -27,4 +27,4 @@ typedef std::map<t_ilm_client_handle, IApplicationReference*> ApplicationReferen
 typedef std::map<t_ilm_client_handle, IApplicationReference*>::iterator ApplicationReferenceMapIterator;
 typedef std::map<t_ilm_client_handle, IApplicationReference*>::const_iterator ApplicationReferenceMapConstIterator;
 
-#endif /* _APPLICATION_REFERENCE_MAP_H_ */
+#endif /* _APPLICATIONREFERENCEMAP_H_ */

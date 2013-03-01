@@ -36,7 +36,7 @@ struct MultiSurfaceRegion
     SurfaceList m_surfaces;
 };
 
-class GLESGraphicsystem: public BaseGraphicSystem<EGLNativeDisplayType, EGLNativeWindowType>
+class GLESGraphicsystem : public BaseGraphicSystem<EGLNativeDisplayType, EGLNativeWindowType>
 {
 public:
 
@@ -80,11 +80,11 @@ public:
 
     virtual bool needsBlending(SurfaceList surfaces);
     virtual unsigned shaderKey(int numSurfaces,
-                               int needsBlend,
-                               int hasTransparency1, int hasAlphaChannel1, int hasChromakey1,
-                               int hasTransparency2, int hasAlphaChannel2, int hasChromakey2,
-                               int hasTransparency3, int hasAlphaChannel3, int hasChromakey3,
-                               int hasTransparency4, int hasAlphaChannel4, int hasChromakey4);
+                                int needsBlend,
+                                int hasTransparency1, int hasAlphaChannel1, int hasChromakey1,
+                                int hasTransparency2, int hasAlphaChannel2, int hasChromakey2,
+                                int hasTransparency3, int hasAlphaChannel3, int hasChromakey3,
+                                int hasTransparency4, int hasAlphaChannel4, int hasChromakey4);
     virtual void debugShaderKey(unsigned key);
 protected:
 

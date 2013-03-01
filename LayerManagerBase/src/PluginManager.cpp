@@ -1,5 +1,5 @@
 /***************************************************************************
- * 
+ *
  * Copyright 2012 BMW Car IT GmbH
  *
  *
@@ -28,7 +28,6 @@
 #include <dlfcn.h>
 #include <stdlib.h>
 
-
 StaticPluginCreateFuncList PluginManager::mStaticPluginCreateFuncList;
 
 //===========================================================================
@@ -44,16 +43,16 @@ PluginManager::PluginManager(ICommandExecutor& executor, Configuration& config)
 , mConfiguration(config)
 {
     LOG_DEBUG("PluginManager", "loading plugins from " << mConfiguration.getPluginPath());
-    
+
     // create static plugins
     createStaticallyLinkedPlugins();
-    
+
 #ifndef WITH_STATIC_LIBRARIES
     // create dynamic plugins
     getAllFilesInPluginPath(mConfiguration.getPluginPath());
     createDynamicallyLinkedPlugins();
 #endif
-    
+
     LOG_INFO("PluginManager", "created " << mPluginList.size() << " plugins");
 }
 
@@ -61,7 +60,7 @@ PluginManager::~PluginManager()
 {
     PluginList::iterator iter = mPluginList.begin();
     PluginList::iterator iterEnd = mPluginList.end();
-    
+
     for (; iter != iterEnd; ++iter)
     {
         IPlugin* plugin = *iter;
@@ -78,7 +77,7 @@ void PluginManager::getRendererList(RendererList& list)
 {
     PluginList::const_iterator iter = mPluginList.begin();
     PluginList::const_iterator iterEnd = mPluginList.end();
-    
+
     for (; iter != iterEnd; ++iter)
     {
         IPlugin* plugin = *iter;
@@ -95,7 +94,7 @@ void PluginManager::getHealthMonitorList(HealthMonitorList& list)
 {
     PluginList::const_iterator iter = mPluginList.begin();
     PluginList::const_iterator iterEnd = mPluginList.end();
-    
+
     for (; iter != iterEnd; ++iter)
     {
         IPlugin* plugin = *iter;
@@ -115,7 +114,7 @@ void PluginManager::getSceneProviderList(SceneProviderList& list)
 {
     PluginList::const_iterator iter = mPluginList.begin();
     PluginList::const_iterator iterEnd = mPluginList.end();
-    
+
     for (; iter != iterEnd; ++iter)
     {
         IPlugin* plugin = *iter;
@@ -132,7 +131,7 @@ void PluginManager::getCommunicatorList(CommunicatorList& list)
 {
     PluginList::const_iterator iter = mPluginList.begin();
     PluginList::const_iterator iterEnd = mPluginList.end();
-    
+
     for (; iter != iterEnd; ++iter)
     {
         IPlugin* plugin = *iter;
@@ -161,7 +160,7 @@ void PluginManager::createStaticallyLinkedPlugins()
 {
     StaticPluginCreateFuncList::iterator iter = mStaticPluginCreateFuncList.begin();
     StaticPluginCreateFuncList::iterator iterEnd = mStaticPluginCreateFuncList.end();
-    
+
     for (; iter != iterEnd; ++iter)
     {
         StaticPluginCreateFunc func = *iter;
@@ -175,37 +174,37 @@ void PluginManager::getAllFilesInPluginPath(std::string path)
 {
     DIR *directory = opendir(path.c_str());
     struct dirent *itemInDirectory = 0;
-    
+
     while (directory && (itemInDirectory = readdir(directory)))
     {
         unsigned char entryType = itemInDirectory->d_type;
         std::string entryName = itemInDirectory->d_name;
         std::string fullPath = path + "/" + entryName;
-        
+
         if (entryName.at(0) == '.')
         {
             continue;
         }
-        
+
         switch (entryType)
         {
-            case DT_REG:
-            case DT_LNK:
-            case DT_UNKNOWN:
-                mFileList.push_back(fullPath);
-                LOG_DEBUG("PluginManager", "considering File " << fullPath);
-                break;
-                
-            case DT_DIR:
-                getAllFilesInPluginPath(fullPath);
-                break;
-                
-            default:
-                LOG_DEBUG("PluginManager", "ignored file " << fullPath);
-                break;
+        case DT_REG:
+        case DT_LNK:
+        case DT_UNKNOWN:
+            mFileList.push_back(fullPath);
+            LOG_DEBUG("PluginManager", "considering File " << fullPath);
+            break;
+
+        case DT_DIR:
+            getAllFilesInPluginPath(fullPath);
+            break;
+
+        default:
+            LOG_DEBUG("PluginManager", "ignored file " << fullPath);
+            break;
         }
     }
-    
+
     closedir(directory);
 }
 
@@ -213,7 +212,7 @@ void PluginManager::createDynamicallyLinkedPlugins()
 {
     FileList::const_iterator iter = mFileList.begin();
     FileList::const_iterator iterEnd = mFileList.end();
-    
+
     for (; iter != iterEnd; ++iter)
     {
         IPlugin* plugin = createDynamicallyLinkedPlugin(*iter);
@@ -227,7 +226,7 @@ void PluginManager::createDynamicallyLinkedPlugins()
 IPlugin* PluginManager::createDynamicallyLinkedPlugin(std::string path)
 {
     IPlugin* returnValue = NULL;
-    
+
     // open library
     void *libraryHandle;
     dlerror(); // Clear any existing error
@@ -238,22 +237,22 @@ IPlugin* PluginManager::createDynamicallyLinkedPlugin(std::string path)
         LOG_DEBUG("PluginManager", "not a shared library: " << dlopen_error);
         return NULL;
     }
-    
+
     // load entry point
     union
     {
         void* data;
         IPlugin* (*createFunc)(ICommandExecutor&, Configuration&);
     } convertUnion;
-    
+
     int cutBegin = path.find_last_of('/') + 4;      // remove '*/lib' from name
     int cutEnd = path.find_first_of('.', cutBegin); // remove '.extension' from name
-    
+
     std::string createFunctionName = "create";
     createFunctionName += path.substr(cutBegin, cutEnd - cutBegin);
-    
+
     convertUnion.data = dlsym(libraryHandle, createFunctionName.c_str());
-    
+
     // create plugin instance from entry point
     const char* dlsym_error = dlerror();
     if (convertUnion.data && !dlsym_error)
@@ -267,6 +266,6 @@ IPlugin* PluginManager::createDynamicallyLinkedPlugin(std::string path)
         dlclose(libraryHandle);
         returnValue = NULL;
     }
-    
+
     return returnValue;
 }

@@ -35,7 +35,7 @@ using std::cout;
 #define DEFAULT_NOSKY    false
 #define DEFAULT_HELP     false
 
-int main (int argc, const char * argv[])
+int main(int argc, const char * argv[])
 {
     FloatArgument fps("fps", DEFAULT_FPS, argc, argv);
     FloatArgument animSpeed("anim", DEFAULT_ANIM, argc, argv);
@@ -48,7 +48,7 @@ int main (int argc, const char * argv[])
     FloatArgument opacity("opacity", DEFAULT_OPACITY, argc, argv);
     BoolArgument nosky("nosky", DEFAULT_NOSKY, argc, argv);
     BoolArgument help("help", DEFAULT_HELP, argc, argv);
-    
+
     if (help.get())
     {
         cout << "\nUsage: " << argv[0] << " [options]\n"

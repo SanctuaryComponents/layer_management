@@ -55,7 +55,7 @@ public:
     std::string getPluginPath();
 
     void logAllSettings();
-    
+
 private:
     void processCommandLine(int argc, char** argv);
     void processBuildFlags();

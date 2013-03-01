@@ -31,7 +31,7 @@
 /*
  * A graphical Layerobject which contains Surfaces.
  */
-class Layer: public GraphicalSurface
+class Layer : public GraphicalSurface
 {
     friend class Scene;
 
@@ -142,7 +142,7 @@ inline bool Layer::removeAllSurfaces()
     SurfaceListConstIterator iter = m_surfaces.begin();
     SurfaceListConstIterator iterEnd = m_surfaces.end();
 
-    if(iter == iterEnd)
+    if (iter == iterEnd)
         return false;
 
     for (; iter != iterEnd; ++iter)
@@ -166,15 +166,15 @@ inline void Layer::setContainingScreenId(unsigned int id)
 
 inline void Layer::applySurfaceTransform()
 {
-	SurfaceListConstIterator iter = m_surfaces.begin();
-	SurfaceListConstIterator iterEnd = m_surfaces.end();
-	if(iter != iterEnd) 
-	{
-		for (; iter != iterEnd; ++iter)
-		{
-			(*iter)->calculateTargetDestination(getSourceRegion(),getDestinationRegion());
-		}
-	}
+    SurfaceListConstIterator iter = m_surfaces.begin();
+    SurfaceListConstIterator iterEnd = m_surfaces.end();
+    if (iter != iterEnd)
+    {
+        for (; iter != iterEnd; ++iter)
+        {
+            (*iter)->calculateTargetDestination(getSourceRegion(), getDestinationRegion());
+        }
+    }
 }
 
 #endif /* _LAYER_H_ */

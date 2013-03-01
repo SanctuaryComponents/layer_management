@@ -59,13 +59,14 @@ bool WaylandGLESTexture::bindSurfaceTexture(Surface* surface)
         {
             /* Wayland SHM buffer */
             unsigned int* pBuf = (unsigned int*)wl_shm_buffer_get_data(buffer);
-            if( (NULL != buffer) && (NULL != pBuf) )
+            if ((NULL != buffer) && (NULL != pBuf))
             {
-                LOG_DEBUG("WaylandGLESTexture", "SHM buffer address:"<<pBuf);
+                LOG_DEBUG("WaylandGLESTexture", "SHM buffer address:" << pBuf);
                 unsigned int* pTmp = (unsigned int*)pBuf;
                 unsigned int col = 0;
                 int cnt = 0;
-                unsigned int* pCnvImg = (unsigned int*)malloc(sizeof(unsigned int) * surface->OriginalSourceWidth * surface->OriginalSourceHeight);
+                unsigned int* pCnvImg = (unsigned int*)malloc(sizeof(unsigned int)
+                                                * surface->OriginalSourceWidth * surface->OriginalSourceHeight);
                 unsigned int* pCnvImgTmp = pCnvImg;
                 for (cnt = 0; cnt < surface->OriginalSourceWidth * surface->OriginalSourceHeight; cnt++, pTmp++, pCnvImgTmp++)
                 {
@@ -75,22 +76,29 @@ bool WaylandGLESTexture::bindSurfaceTexture(Surface* surface)
                 }
 
                 glBindTexture(GL_TEXTURE_2D, nativeSurface->texture);
-                glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,     GL_CLAMP_TO_EDGE);
-                glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,     GL_CLAMP_TO_EDGE);
+                glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+                glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
                 glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
                 glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface->OriginalSourceWidth, surface->OriginalSourceHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, pCnvImg);
+                glTexImage2D(GL_TEXTURE_2D,
+                             0,
+                             GL_RGBA,
+                             surface->OriginalSourceWidth,
+                             surface->OriginalSourceHeight,
+                             0,
+                             GL_RGBA,
+                             GL_UNSIGNED_BYTE,
+                             pCnvImg);
                 free(pCnvImg);
             }
             return true;
-
         }
         else
         {
             /* Wayland Not SHM buffer */
             if (nativeSurface->eglImage)
             {
-                LOG_DEBUG("WaylandGLESTexture", "nativeSurface->eglImage:"<<nativeSurface->eglImage);
+                LOG_DEBUG("WaylandGLESTexture", "nativeSurface->eglImage:" << nativeSurface->eglImage);
                 glBindTexture(GL_TEXTURE_2D, nativeSurface->texture);
                 return true;
             }
@@ -114,17 +122,17 @@ void WaylandGLESTexture::createClientBuffer(Surface* surface)
     LOG_DEBUG("WaylandGLESTexture", "creating client buffer with native display: " << m_wlDisplay << " for native handle: " << surface->getNativeContent());
     EglWaylandPlatformSurface* nativeSurface = (EglWaylandPlatformSurface*)surface->platform;
 
-    if (NULL!=nativeSurface)
+    if (NULL != nativeSurface)
     {
         struct wl_buffer* buffer = (struct wl_buffer*)surface->getNativeContent();
         if (wl_buffer_is_shm(buffer))
         {
             if (nativeSurface->texture)
-	    {
-                glDeleteTextures(1,&nativeSurface->texture);
+            {
+                glDeleteTextures(1, &nativeSurface->texture);
                 nativeSurface->texture = 0;
             }
-            glGenTextures(1,&nativeSurface->texture);
+            glGenTextures(1, &nativeSurface->texture);
         }
         else
         {
@@ -133,15 +141,15 @@ void WaylandGLESTexture::createClientBuffer(Surface* surface)
             if (nativeSurface->eglImage)
             {
                 m_pfEglDestroyImageKHR(m_eglDisplay, nativeSurface->eglImage);
-                glDeleteTextures(1,&nativeSurface->texture);
+                glDeleteTextures(1, &nativeSurface->texture);
                 nativeSurface->eglImage = 0;
                 nativeSurface->texture = 0;
             }
             eglImage = m_pfEglCreateImageKHR(m_eglDisplay,
-                                         EGL_NO_CONTEXT,
-                                         EGL_WAYLAND_BUFFER_WL,
-                                         (EGLClientBuffer)buffer,
-                                         NULL);
+                                            EGL_NO_CONTEXT,
+                                            EGL_WAYLAND_BUFFER_WL,
+                                            (EGLClientBuffer)buffer,
+                                            NULL);
             if (!eglImage)
             {
                 LOG_DEBUG("WaylandGLESTexture", "could not allocate EGL Image for window");
@@ -149,14 +157,14 @@ void WaylandGLESTexture::createClientBuffer(Surface* surface)
             else
             {
                 nativeSurface->eglImage = eglImage;
-                glGenTextures(1,&nativeSurface->texture);
+                glGenTextures(1, &nativeSurface->texture);
                 glBindTexture(GL_TEXTURE_2D, nativeSurface->texture);
-                glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,     GL_CLAMP_TO_EDGE);
-                glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T,     GL_CLAMP_TO_EDGE);
+                glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+                glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
                 glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
                 glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
                 m_pfGLEglImageTargetTexture2DOES(GL_TEXTURE_2D, nativeSurface->eglImage);
-           }
+            }
         }
     }
 }
@@ -175,7 +183,7 @@ void WaylandGLESTexture::destroyClientBuffer(Surface* surface)
     {
         if (nativeSurface && nativeSurface->texture)
         {
-            glDeleteTextures(1,&nativeSurface->texture);
+            glDeleteTextures(1, &nativeSurface->texture);
             nativeSurface->texture = 0;
         }
     }
@@ -184,7 +192,7 @@ void WaylandGLESTexture::destroyClientBuffer(Surface* surface)
         if (nativeSurface && nativeSurface->eglImage)
         {
             m_pfEglDestroyImageKHR(m_eglDisplay, nativeSurface->eglImage);
-            glDeleteTextures(1,&nativeSurface->texture);
+            glDeleteTextures(1, &nativeSurface->texture);
             nativeSurface->eglImage = 0;
             nativeSurface->texture = 0;
         }

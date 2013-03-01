@@ -26,8 +26,8 @@
 *
 ****************************************************************************/
 
-#ifndef WAYLAND_SERVERINFO_CLIENT_PROTOCOL_H
-#define WAYLAND_SERVERINFO_CLIENT_PROTOCOL_H
+#ifndef WAYLANDSERVERINFOCLIENTPROTOCOL_H
+#define WAYLANDSERVERINFOCLIENTPROTOCOL_H
 
 #ifdef  __cplusplus
 extern "C" {
@@ -89,4 +89,4 @@ serverinfo_get_connection_id(struct serverinfo *serverinfo)
 }
 #endif
 
-#endif
+#endif /* WAYLANDSERVERINFOCLIENTPROTOCOL_H */

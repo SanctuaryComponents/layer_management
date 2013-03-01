@@ -34,7 +34,7 @@ public:
     : ICommand(ExecuteSynchronous, sender)
     {}
 
-     /**
+    /**
      * \brief default destructor
      */
     virtual ~CommitCommand() {}

@@ -16,8 +16,8 @@
  * limitations under the License.
  *
  ****************************************************************************/
-#ifndef _IRenderable_h
-#define _IRenderable_h
+#ifndef _IRENDERABLE_H
+#define _IRENDERABLE_H
 
 class IRenderable
 {
@@ -26,4 +26,4 @@ public:
     virtual void render() = 0;
 };
 
-#endif
+#endif /* _IRENDERABLE_H */

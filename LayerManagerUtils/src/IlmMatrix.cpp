@@ -44,10 +44,25 @@
 
 void IlmMatrixIdentity(IlmMatrix &mOut)
 {
-    mOut.f[0] = 1.0f;    mOut.f[4] = 0.0f;    mOut.f[8]  = 0.0f;    mOut.f[12] = 0.0f;
-    mOut.f[1] = 0.0f;    mOut.f[5] = 1.0f;    mOut.f[9]  = 0.0f;    mOut.f[13] = 0.0f;
-    mOut.f[2] = 0.0f;    mOut.f[6] = 0.0f;    mOut.f[10] = 1.0f;    mOut.f[14] = 0.0f;
-    mOut.f[3] = 0.0f;    mOut.f[7] = 0.0f;    mOut.f[11] = 0.0f;    mOut.f[15] = 1.0f;
+    mOut.f[0] = 1.0f;
+    mOut.f[1] = 0.0f;
+    mOut.f[2] = 0.0f;
+    mOut.f[3] = 0.0f;
+
+    mOut.f[4] = 0.0f;
+    mOut.f[5] = 1.0f;
+    mOut.f[6] = 0.0f;
+    mOut.f[7] = 0.0f;
+
+    mOut.f[8] = 0.0f;
+    mOut.f[9] = 0.0f;
+    mOut.f[10] = 1.0f;
+    mOut.f[11] = 0.0f;
+
+    mOut.f[12] = 0.0f;
+    mOut.f[13] = 0.0f;
+    mOut.f[14] = 0.0f;
+    mOut.f[15] = 1.0f;
 }
 
 void IlmMatrixMultiply(IlmMatrix &mOut, const IlmMatrix &mA, const IlmMatrix &mB)
@@ -79,18 +94,48 @@ void IlmMatrixMultiply(IlmMatrix &mOut, const IlmMatrix &mA, const IlmMatrix &mB
 
 void IlmMatrixTranslation(IlmMatrix &mOut, const float X, const float Y, const float Z)
 {
-    mOut.f[0] = 1.0f;    mOut.f[4] = 0.0f;    mOut.f[8]  = 0.0f;    mOut.f[12] = X;
-    mOut.f[1] = 0.0f;    mOut.f[5] = 1.0f;    mOut.f[9]  = 0.0f;    mOut.f[13] = Y;
-    mOut.f[2] = 0.0f;    mOut.f[6] = 0.0f;    mOut.f[10] = 1.0f;    mOut.f[14] = Z;
-    mOut.f[3] = 0.0f;    mOut.f[7] = 0.0f;    mOut.f[11] = 0.0f;    mOut.f[15] = 1.0f;
+    mOut.f[0] = 1.0f;
+    mOut.f[1] = 0.0f;
+    mOut.f[2] = 0.0f;
+    mOut.f[3] = 0.0f;
+
+    mOut.f[4] = 0.0f;
+    mOut.f[5] = 1.0f;
+    mOut.f[6] = 0.0f;
+    mOut.f[7] = 0.0f;
+
+    mOut.f[8] = 0.0f;
+    mOut.f[9] = 0.0f;
+    mOut.f[10] = 1.0f;
+    mOut.f[11] = 0.0f;
+
+    mOut.f[12] = X;
+    mOut.f[13] = Y;
+    mOut.f[14] = Z;
+    mOut.f[15] = 1.0f;
 }
 
 void IlmMatrixScaling(IlmMatrix &mOut, const float X, const float Y, const float Z)
 {
-    mOut.f[0] = X;       mOut.f[4] = 0.0f;    mOut.f[8]  = 0.0f;    mOut.f[12] = 0.0f;
-    mOut.f[1] = 0.0f;    mOut.f[5] = Y;       mOut.f[9]  = 0.0f;    mOut.f[13] = 0.0f;
-    mOut.f[2] = 0.0f;    mOut.f[6] = 0.0f;    mOut.f[10] = Z;       mOut.f[14] = 0.0f;
-    mOut.f[3] = 0.0f;    mOut.f[7] = 0.0f;    mOut.f[11] = 0.0f;    mOut.f[15] = 1.0f;
+    mOut.f[0] = X;
+    mOut.f[1] = 0.0f;
+    mOut.f[2] = 0.0f;
+    mOut.f[3] = 0.0f;
+
+    mOut.f[4] = 0.0f;
+    mOut.f[5] = Y;
+    mOut.f[6] = 0.0f;
+    mOut.f[7] = 0.0f;
+
+    mOut.f[8] = 0.0f;
+    mOut.f[9] = 0.0f;
+    mOut.f[10] = Z;
+    mOut.f[11] = 0.0f;
+
+    mOut.f[12] = 0.0f;
+    mOut.f[13] = 0.0f;
+    mOut.f[14] = 0.0f;
+    mOut.f[15] = 1.0f;
 }
 
 void IlmMatrixRotateX(IlmMatrix &mOut, const float angle)
@@ -100,10 +145,25 @@ void IlmMatrixRotateX(IlmMatrix &mOut, const float angle)
     float fSine = (float)sin(degToRad(angle));
 
     // Create the trigonometric matrix corresponding to X Rotation
-    mOut.f[0] = 1.0f;    mOut.f[4] = 0.0f;      mOut.f[8]  = 0.0f;      mOut.f[12] = 0.0f;
-    mOut.f[1] = 0.0f;    mOut.f[5] = fCosine;   mOut.f[9]  = fSine;     mOut.f[13] = 0.0f;
-    mOut.f[2] = 0.0f;    mOut.f[6] = -fSine;    mOut.f[10] = fCosine;   mOut.f[14] = 0.0f;
-    mOut.f[3] = 0.0f;    mOut.f[7] = 0.0f;      mOut.f[11] = 0.0f;      mOut.f[15] = 1.0f;
+    mOut.f[0] = 1.0f;
+    mOut.f[1] = 0.0f;
+    mOut.f[2] = 0.0f;
+    mOut.f[3] = 0.0f;
+
+    mOut.f[4] = 0.0f;
+    mOut.f[5] = fCosine;
+    mOut.f[6] = -fSine;
+    mOut.f[7] = 0.0f;
+
+    mOut.f[8] = 0.0f;
+    mOut.f[9] = fSine;
+    mOut.f[10] = fCosine;
+    mOut.f[11] = 0.0f;
+
+    mOut.f[12] = 0.0f;
+    mOut.f[13] = 0.0f;
+    mOut.f[14] = 0.0f;
+    mOut.f[15] = 1.0f;
 }
 
 void IlmMatrixRotateY(IlmMatrix &mOut, const float angle)
@@ -113,10 +173,25 @@ void IlmMatrixRotateY(IlmMatrix &mOut, const float angle)
     float fSine = (float)sin(degToRad(angle));
 
     // Create the trigonometric matrix corresponding to Y Rotation
-    mOut.f[0] = fCosine;   mOut.f[4] = 0.0f;    mOut.f[8]  = -fSine;    mOut.f[12] = 0.0f;
-    mOut.f[1] = 0.0f;      mOut.f[5] = 1.0f;    mOut.f[9]  = 0.0f;      mOut.f[13] = 0.0f;
-    mOut.f[2] = fSine;     mOut.f[6] = 0.0f;    mOut.f[10] = fCosine;   mOut.f[14] = 0.0f;
-    mOut.f[3] = 0.0f;      mOut.f[7] = 0.0f;    mOut.f[11] = 0.0f;      mOut.f[15] = 1.0f;
+    mOut.f[0] = fCosine;
+    mOut.f[1] = 0.0f;
+    mOut.f[2] = fSine;
+    mOut.f[3] = 0.0f;
+
+    mOut.f[4] = 0.0f;
+    mOut.f[5] = 1.0f;
+    mOut.f[6] = 0.0f;
+    mOut.f[7] = 0.0f;
+
+    mOut.f[8]  = -fSine;
+    mOut.f[9]  = 0.0f;
+    mOut.f[10] = fCosine;
+    mOut.f[11] = 0.0f;
+
+    mOut.f[12] = 0.0f;
+    mOut.f[13] = 0.0f;
+    mOut.f[14] = 0.0f;
+    mOut.f[15] = 1.0f;
 }
 
 void IlmMatrixRotateZ(IlmMatrix &mOut, const float angle)
@@ -126,42 +201,57 @@ void IlmMatrixRotateZ(IlmMatrix &mOut, const float angle)
     float fSine = (float)sin(degToRad(angle));
 
     // Create the trigonometric matrix corresponding to Z Rotation
-    mOut.f[0] = fCosine;   mOut.f[4] = fSine;    mOut.f[8]  = 0.0f;    mOut.f[12] = 0.0f;
-    mOut.f[1] = -fSine;    mOut.f[5] = fCosine;  mOut.f[9]  = 0.0f;    mOut.f[13] = 0.0f;
-    mOut.f[2] = 0.0f;      mOut.f[6] = 0.0f;     mOut.f[10] = 1.0f;    mOut.f[14] = 0.0f;
-    mOut.f[3] = 0.0f;      mOut.f[7] = 0.0f;     mOut.f[11] = 0.0f;    mOut.f[15] = 1.0f;
+    mOut.f[0] = fCosine;
+    mOut.f[1] = -fSine;
+    mOut.f[2] = 0.0f;
+    mOut.f[3] = 0.0f;
+
+    mOut.f[4] = fSine;
+    mOut.f[5] = fCosine;
+    mOut.f[6] = 0.0f;
+    mOut.f[7] = 0.0f;
+
+    mOut.f[8]  = 0.0f;
+    mOut.f[9]  = 0.0f;
+    mOut.f[10] = 1.0f;
+    mOut.f[11] = 0.0f;
+
+    mOut.f[12] = 0.0f;
+    mOut.f[13] = 0.0f;
+    mOut.f[14] = 0.0f;
+    mOut.f[15] = 1.0f;
 }
 
 void IlmMatrixProjection(IlmMatrix &mOut, const float fov, const float near, const float far, const float aspect)
 {
-	// Precompute borders for projection
-	float range = near * tan(degToRad(fov) / 2.0);
-	float left = -range * aspect;
-	float right = range * aspect;
-	float bottom = -range;
-	float top = range;
+    // Precompute borders for projection
+    float range = near * tan(degToRad(fov) / 2.0);
+    float left = -range * aspect;
+    float right = range * aspect;
+    float bottom = -range;
+    float top = range;
 
-	// Column 1
-	mOut.f[0] = 2 * near / (right - left);
-	mOut.f[1] = 0.0;
-	mOut.f[2] = 0.0;
-	mOut.f[3] = 0.0;
+    // Column 1
+    mOut.f[0] = 2 * near / (right - left);
+    mOut.f[1] = 0.0;
+    mOut.f[2] = 0.0;
+    mOut.f[3] = 0.0;
 
-	// Column 2
-	mOut.f[4] = 0.0;
-	mOut.f[5] = 2 * near / (top - bottom);
-	mOut.f[6] = 0.0;
-	mOut.f[7] = 0.0;
+    // Column 2
+    mOut.f[4] = 0.0;
+    mOut.f[5] = 2 * near / (top - bottom);
+    mOut.f[6] = 0.0;
+    mOut.f[7] = 0.0;
 
-	// Column 3
-	mOut.f[8] = 0.0;
-	mOut.f[9] = 0.0;
-	mOut.f[10] = -(far + near) / (far - near);
-	mOut.f[11] = -1;
+    // Column 3
+    mOut.f[8] = 0.0;
+    mOut.f[9] = 0.0;
+    mOut.f[10] = -(far + near) / (far - near);
+    mOut.f[11] = -1;
 
-	// Column 4
-	mOut.f[12] = 0.0;
-	mOut.f[13] = 0.0;
-	mOut.f[14] = -(2 * far * near) / (far - near);
-	mOut.f[15] = 0.0;
+    // Column 4
+    mOut.f[12] = 0.0;
+    mOut.f[13] = 0.0;
+    mOut.f[14] = -(2 * far * near) / (far - near);
+    mOut.f[15] = 0.0;
 }
