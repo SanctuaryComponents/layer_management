@@ -122,6 +122,8 @@ endif(WITH_SYSTEMD_HEALTH_MONITOR)
 build_flag (WITH_GENERIC_COMMUNICATOR "Build Generic Communicator Plugin based on IpcModules" ON)
 #===========================================================================================================
 if (WITH_GENERIC_COMMUNICATOR)
+    add_subdirectory_once (LayerManagerUtils)
+    add_subdirectory_once (LayerManagerBase)
     add_subdirectory_once (LayerManagerPlugins/IpcModules)
     add_subdirectory_once (LayerManagerCommands)
     add_subdirectory_once (LayerManagerPlugins/Communicators/GenericCommunicator)
