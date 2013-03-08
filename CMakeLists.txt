@@ -94,6 +94,7 @@ build_flag (WITH_CONTROL_BIN "Build LayerManagerControl binary" ON)
 if (WITH_CONTROL_BIN)
     add_subdirectory_once (LayerManagerUtils)
     add_subdirectory_once (LayerManagerClient/ilmClient)
+    add_subdirectory_once (LayerManagerClient/ilmControl)
     add_subdirectory_once (LayerManagerControl)
 endif(WITH_CONTROL_BIN)
 

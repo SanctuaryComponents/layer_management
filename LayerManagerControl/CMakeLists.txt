@@ -23,6 +23,7 @@ project_type(CORE)
 include_directories(
     include
     "${CMAKE_SOURCE_DIR}/LayerManagerClient/ilmClient/include"
+    "${CMAKE_SOURCE_DIR}/LayerManagerClient/ilmControl/include"
     "${CMAKE_SOURCE_DIR}/LayerManagerUtils/include"
 )
 
@@ -43,9 +44,10 @@ add_executable(${PROJECT_NAME}
 
 add_dependencies(${PROJECT_NAME}
     ilmClient
+    ilmControl
     LayerManagerUtils
 )
 
-target_link_libraries(${PROJECT_NAME} ilmClient)
+target_link_libraries(${PROJECT_NAME} ilmClient ilmControl)
 
 install (TARGETS ${PROJECT_NAME} DESTINATION bin)
