@@ -21,6 +21,7 @@
 #include <iostream>
 
 #include "ilm_client.h"
+#include "ilm_control.h"
 #include "LayerScene.h"
 #include "xevents.h"
 

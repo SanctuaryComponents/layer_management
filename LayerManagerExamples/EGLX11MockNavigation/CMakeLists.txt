@@ -31,6 +31,7 @@ include_directories(
     ${X11_INCLUDE_DIR}
     "include"
     "../../LayerManagerClient/ilmClient/include"
+    "../../LayerManagerClient/ilmControl/include"
     "../LayerSceneDescriptionExample/include"
     "../../LayerManagerUtils/include"
 )
@@ -73,6 +74,7 @@ add_executable(EGLX11MockNavigation
 
 add_dependencies(EGLX11MockNavigation
     ilmClient
+    ilmControl
     EGLX11MockNavigation LayerManagerUtils
 )
 
@@ -83,6 +85,7 @@ set(LIBS
 	${EGL_LIBRARY}
 	LayerManagerUtils
 	ilmClient
+	ilmControl
 )
 
 target_link_libraries(EGLX11MockNavigation ${LIBS})

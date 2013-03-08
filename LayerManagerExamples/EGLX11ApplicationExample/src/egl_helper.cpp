@@ -18,6 +18,7 @@
  ****************************************************************************/
 #include "egl_helper.h"
 #include "LayerScene.h"
+#include "ilm_control.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/time.h>

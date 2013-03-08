@@ -19,6 +19,7 @@
 #include "OpenGLES2App.h"
 #include "LayerScene.h"
 #include <ilm_client.h>
+#include <ilm_control.h>
 
 #include <iostream>
 using std::cout;

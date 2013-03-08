@@ -23,12 +23,13 @@ project_type(EXAMPLE)
 
 include_directories ("include")
 include_directories ("../../LayerManagerClient/ilmClient/include")
+include_directories ("../../LayerManagerClient/ilmControl/include")
 include_directories ("../LayerSceneDescriptionExample/include")
 include_directories ("../../LayerManagerUtils/include")
 
 add_executable(EGLWLApplicationExample src/egl_helper.cpp src/eglWL_application.cpp src/gles2application.cpp src/WaylandServerinfoProtocol.cpp)
 
-add_dependencies(EGLWLApplicationExample ilmClient)
+add_dependencies(EGLWLApplicationExample ilmClient ilmControl)
 add_dependencies(EGLWLApplicationExample LayerManagerUtils)
 
 find_package (GLESv2 REQUIRED)
@@ -42,6 +43,6 @@ include_directories(${WAYLAND_CLIENT_INCLUDE_DIR} ${FFI_INCLUDE_DIR})
 add_dependencies(EGLWLApplicationExample wayland-client)
 
 set(LIBS ${LIBS} ${GLESv2_LIBRARIES} ${WAYLAND_CLIENT_LIBRARIES} ${WAYLAND_EGL_LIBRARIES} ${FFI_LIBRARIES} ${EGL_LIBRARY} LayerManagerUtils)
-target_link_libraries(EGLWLApplicationExample ${LIBS} ilmClient -ldl)
+target_link_libraries(EGLWLApplicationExample ${LIBS} ilmClient ilmControl -ldl)
 
 install (TARGETS EGLWLApplicationExample DESTINATION bin)

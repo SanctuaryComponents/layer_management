@@ -21,13 +21,14 @@
 project_type(EXAMPLE)
 
 include_directories ("../../LayerManagerClient/ilmClient/include")
+include_directories ("../../LayerManagerClient/ilmControl/include")
 include_directories ("../LayerSceneDescriptionExample/include")
 include_directories ("../../LayerManagerUtils/include")
 
 add_executable(LayerManagerClientExample src/LayermanagerClientTest.c)
-add_dependencies(LayerManagerClientExample ilmClient)
+add_dependencies(LayerManagerClientExample ilmClient ilmControl)
 add_dependencies(LayerManagerClientExample LayerManagerUtils)
 
-target_link_libraries(LayerManagerClientExample ${LIBS} ilmClient)
+target_link_libraries(LayerManagerClientExample ${LIBS} ilmClient ilmControl)
 
 install (TARGETS LayerManagerClientExample DESTINATION bin)

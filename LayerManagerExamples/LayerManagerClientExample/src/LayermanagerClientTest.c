@@ -17,6 +17,7 @@
  *
  ****************************************************************************/
 #include "ilm_client.h"
+#include "ilm_control.h"
 #include "LayerScene.h"
 #include <stdio.h>
 #include <stdlib.h>

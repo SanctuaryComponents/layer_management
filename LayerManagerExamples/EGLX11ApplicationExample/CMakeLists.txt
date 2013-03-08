@@ -23,12 +23,13 @@ project_type(EXAMPLE)
 
 include_directories ("include")
 include_directories ("../../LayerManagerClient/ilmClient/include")
+include_directories ("../../LayerManagerClient/ilmControl/include")
 include_directories ("../LayerSceneDescriptionExample/include")
 include_directories ("../../LayerManagerUtils/include")
 
 add_executable(EGLX11ApplicationExample src/egl_helper.cpp src/eglX11_application.cpp src/gles2application.cpp)
 
-add_dependencies(EGLX11ApplicationExample ilmClient)
+add_dependencies(EGLX11ApplicationExample ilmControl ilmClient)
 add_dependencies(EGLX11ApplicationExample LayerManagerUtils)
 
 find_package (GLESv2 REQUIRED)
@@ -41,6 +42,6 @@ find_package (X11 REQUIRED)
 include_directories(${X11_INCLUDE_DIR})
 
 set(LIBS ${LIBS} ${GLESv2_LIBRARIES} ${X11_LIBRARIES} ${EGL_LIBRARY} LayerManagerUtils) 
-target_link_libraries(EGLX11ApplicationExample ${LIBS} ilmClient)
+target_link_libraries(EGLX11ApplicationExample ${LIBS} ilmClient ilmControl)
 
 install (TARGETS EGLX11ApplicationExample DESTINATION bin)

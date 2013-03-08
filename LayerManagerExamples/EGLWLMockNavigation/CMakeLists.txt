@@ -33,6 +33,7 @@ include_directories(
     ${FFI_INCLUDE_DIR}
     "include"
     "../../LayerManagerClient/ilmClient/include"
+    "../../LayerManagerClient/ilmControl/include"
     "../LayerSceneDescriptionExample/include"
     "../../LayerManagerUtils/include"
 )
@@ -88,6 +89,7 @@ set(LIBS
 	${EGL_LIBRARY}
 	LayerManagerUtils
 	ilmClient
+	ilmControl
 )
 
 #target_link_libraries(EGLWLMockNavigation ${LIBS} wayland-client -ldl)

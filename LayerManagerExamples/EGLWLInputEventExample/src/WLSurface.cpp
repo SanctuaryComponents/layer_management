@@ -22,6 +22,7 @@
 #include <string.h>
 #include <assert.h>
 #include "WLSurface.h"
+#include "ilm_control.h"
 
 WLSurface::WLSurface(WLContext* wlContext)
 : m_wlContext(wlContext)

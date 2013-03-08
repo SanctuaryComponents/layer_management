@@ -25,12 +25,13 @@ include_directories ("include")
 include_directories ("${PROJECT_SOURCE_DIR}/config")
 include_directories ("../../LayerManagerService/include")
 include_directories ("../../LayerManagerClient/ilmClient/include")
+include_directories ("../../LayerManagerClient/ilmControl/include")
 include_directories ("../LayerSceneDescriptionExample/include")
 include_directories ("../../LayerManagerUtils/include")
 
 add_executable(GLX11ApplicationExample src/glx_helper.cpp src/glxX11_application.cpp src/gl2application.cpp src/xevents.cpp)
 
-add_dependencies(GLX11ApplicationExample ilmClient)
+add_dependencies(GLX11ApplicationExample ilmClient ilmControl)
 add_dependencies(GLX11ApplicationExample LayerManagerUtils) 
 
 find_package (OpenGL REQUIRED)
@@ -40,6 +41,6 @@ find_package(X11 REQUIRED)
 include_directories(${X11_INCLUDE_DIR})
 
 set(LIBS ${LIBS} ${OPENGL_LIBRARIES} ${X11_LIBRARIES} LayerManagerUtils) 
-target_link_libraries(GLX11ApplicationExample ${LIBS} ilmClient)
+target_link_libraries(GLX11ApplicationExample ${LIBS} ilmClient ilmControl)
 
 install (TARGETS GLX11ApplicationExample DESTINATION bin) 

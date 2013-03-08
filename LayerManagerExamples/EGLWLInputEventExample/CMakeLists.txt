@@ -33,7 +33,9 @@ include_directories(
     ${FFI_INCLUDE_DIR}
     "include"
     "../../LayerManagerClient/ilmClient/include"
+    "../../LayerManagerClient/ilmControl/include"
     "../../LayerManagerService/include"
+    "../../LayerManagerUtils/include"
 )
 
 set (HEADER_FILES
@@ -65,6 +67,7 @@ add_dependencies(EGLWLInputEventExample
     wayland-client
     wayland-egl
     ilmClient
+    ilmControl
 )
 
 set(LIBS
@@ -75,6 +78,7 @@ set(LIBS
     ${FFI_LIBRARIES}
 	${EGL_LIBRARY}
 	ilmClient
+	ilmControl
 )
 
 target_link_libraries(EGLWLInputEventExample ${LIBS})
