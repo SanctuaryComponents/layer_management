@@ -544,7 +544,16 @@ t_scene_data cloneToUniLayerScene(t_scene_data* pScene)
         extraLayer = pScene->layers[0];
     }
 
-    ilmErrorTypes callResult = ilm_layerCreate(&extraLayer);
+    t_ilm_uint screenWidth;
+    t_ilm_uint screenHeight;
+    ilmErrorTypes callResult = ilm_getScreenResolution(0, &screenWidth, &screenHeight);
+    if (ILM_SUCCESS != callResult)
+    {
+        cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+        cout << "Failed to create layer\n";
+    }
+
+    callResult = ilm_layerCreateWithDimension(&extraLayer, screenWidth, screenHeight);
     if (ILM_SUCCESS != callResult)
     {
         cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";

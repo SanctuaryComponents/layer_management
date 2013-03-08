@@ -576,34 +576,19 @@ COMMAND("set layer|surface <id> position <x> <y>")
 }
 
 //=============================================================================
-COMMAND("create layer <layerid> [<width> <height>]")
+COMMAND("create layer <layerid> <width> <height>")
 //=============================================================================
 {
-    if (input->contains("width") && input->contains("height"))
-    {
-        unsigned int layerid = input->getUint("layerid");
-        unsigned int width = input->getUint("width");
-        unsigned int height = input->getUint("height");
+    unsigned int layerid = input->getUint("layerid");
+    unsigned int width = input->getUint("width");
+    unsigned int height = input->getUint("height");
 
-        ilmErrorTypes callResult = ilm_layerCreateWithDimension(&layerid, width, height);
-        if (ILM_SUCCESS != callResult)
-        {
-            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
-            cout << "Failed to create layer with ID " << layerid << "\n";
-            return;
-        }
-    }
-    else
+    ilmErrorTypes callResult = ilm_layerCreateWithDimension(&layerid, width, height);
+    if (ILM_SUCCESS != callResult)
     {
-        unsigned int layerid = input->getUint("layerid");
-
-        ilmErrorTypes callResult = ilm_layerCreate(&layerid);
-        if (ILM_SUCCESS != callResult)
-        {
-            cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
-            cout << "Failed to create layer with ID " << layerid << "\n";
-            return;
-        }
+        cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
+        cout << "Failed to create layer with ID " << layerid << "\n";
+        return;
     }
 }
 

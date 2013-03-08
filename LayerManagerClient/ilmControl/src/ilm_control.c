@@ -198,41 +198,6 @@ ilmErrorTypes ilm_getSurfaceIDsOnLayer(t_ilm_layer layer, t_ilm_int* pLength, t_
     return returnValue;
 }
 
-
-ilmErrorTypes ilm_layerCreate(t_ilm_layer* pLayerId)
-{
-    ilmErrorTypes returnValue = ILM_FAILED;
-
-    if (pLayerId && (INVALID_ID != *pLayerId))
-    {
-        t_ilm_message response = 0;
-        t_ilm_message command = gIpcModule.createMessage("CreateLayerFromId");
-        if (command
-            && gIpcModule.appendUint(command, *pLayerId)
-            && sendAndWaitForResponse(command, &response, RESPONSE_TIMEOUT_IN_MS, &returnValue)
-            && gIpcModule.getUint(response, pLayerId))
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
-        gIpcModule.destroyMessage(command);
-    }
-    else
-    {
-        t_ilm_message response = 0;
-        t_ilm_message command = gIpcModule.createMessage("CreateLayer");
-        if (command
-            && sendAndWaitForResponse(command, &response, RESPONSE_TIMEOUT_IN_MS, &returnValue)
-            && gIpcModule.getUint(response, pLayerId))
-        {
-            returnValue = ILM_SUCCESS;
-        }
-        gIpcModule.destroyMessage(response);
-        gIpcModule.destroyMessage(command);
-    }
-    return returnValue;
-}
-
 ilmErrorTypes ilm_layerCreateWithDimension(t_ilm_layer* pLayerId, t_ilm_uint width, t_ilm_uint height)
 {
     ilmErrorTypes returnValue = ILM_FAILED;

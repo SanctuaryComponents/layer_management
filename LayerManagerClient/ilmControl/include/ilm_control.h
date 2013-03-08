@@ -114,17 +114,6 @@ ilmErrorTypes ilm_getSurfaceIDsOnLayer(t_ilm_layer layer,t_ilm_int* pLength,t_il
 
 /**
  * \brief Create a layer which should be managed by the service
- * \deprecated Will be removed in later version please use ilm_layerCreateWithDimension
- * \ingroup ilmControl
- * \param[out] pLayerId pointer where the id should be/is stored. It is possible
- *                      to set a id from outside, 0 will create a new id.
- * \return ILM_SUCCESS if the method call was successful
- * \return ILM_FAILED if the client can not call the method on the service.
- */
-ilmErrorTypes ilm_layerCreate(t_ilm_layer* pLayerId);
-
-/**
- * \brief Create a layer which should be managed by the service
  * \ingroup ilmControl
  * \param[out] pLayerId pointer where the id should be/is stored. It is possible
  *                      to set a id from outside, 0 will create a new id.
