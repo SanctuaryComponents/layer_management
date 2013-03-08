@@ -75,7 +75,7 @@ set (COMPILER_FLAGS_CORE     "-fPIC -Wall -Wextra -pedantic -Wno-long-long -Wno-
 include_directories(
     ${CMAKE_SOURCE_DIR}/config
     ${CMAKE_SOURCE_DIR}/3rdParty
-    ${CMAKE_SOURCE_DIR}/LayerManagerClient/ilmClient/include
+    ${CMAKE_SOURCE_DIR}/LayerManagerClient/ilmCommon/include
 )
 
 

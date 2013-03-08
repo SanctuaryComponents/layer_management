@@ -20,8 +20,9 @@
 
 /**
  * \defgroup ServiceAPI      Layer Management Service API
- * \defgroup ilmClient       Layer Management Client API
- * \defgroup ilmControl      Layer Management Control API
+ * \defgroup ilmCommon       Layer Management Common API - API used by all clients implementing lifecycle and communication
+ * \defgroup ilmClient       Layer Management Client API - API which each application (including HMI) has to use. 
+ * \defgroup ilmControl      Layer Management Control API - Special Control API which has to be used from the HMI/Tooling to control the composition.
  * \defgroup SceneAPI        Layer Management Scene API
  * \defgroup RendererAPI     Layer Management Renderer API
  * \defgroup CommunicatorAPI Layer Management Communicator API

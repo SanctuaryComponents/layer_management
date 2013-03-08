@@ -19,7 +19,7 @@
 
 cmake_minimum_required (VERSION 2.6)
 
-project(ilmClient)
+project(ilmControl)
 project_type(CORE)
 
 find_package(Threads)
@@ -33,7 +33,7 @@ include_directories(
 )
 
 add_library(${PROJECT_NAME} SHARED
-    src/ilm_client.c
+    src/ilm_control.c
 )
 
 add_dependencies(${PROJECT_NAME}
@@ -58,7 +58,8 @@ install (
 )
 
 install (
-    FILES       include/ilm_client.h
+    FILES       include/ilm_control.h
     DESTINATION include/ilm
 )
 
+add_subdirectory(tests)

@@ -234,9 +234,21 @@ endif (WITH_SERVICE_BIN)
 build_flag (WITH_CLIENT_LIB "Build LayerManagement client library" ON)
 #===========================================================================================================
 if (WITH_CLIENT_LIB)
+    add_subdirectory_once (LayerManagerUtils)
     add_subdirectory_once (LayerManagerPlugins/IpcModules)
+    add_subdirectory_once (LayerManagerClient/ilmCommon)
     add_subdirectory_once (LayerManagerClient/ilmClient)
 endif (WITH_CLIENT_LIB)
+
+#===========================================================================================================
+build_flag (WITH_CONTROL_LIB "Build LayerManagement control library" OFF)
+#===========================================================================================================
+if (WITH_CONTROL_LIB)
+    add_subdirectory_once (LayerManagerUtils)
+    add_subdirectory_once (LayerManagerPlugins/IpcModules)
+    add_subdirectory_once (LayerManagerClient/ilmCommon)
+    add_subdirectory_once (LayerManagerClient/ilmControl)
+endif (WITH_CONTROL_LIB)
 
 #===========================================================================================================
 # store used build configuration

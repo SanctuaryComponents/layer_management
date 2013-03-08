@@ -23,17 +23,22 @@ if (WITH_TESTS)
 
     enable_testing()
 
-    project(ilmClient_Test)
+    include_directories(
+        "${CMAKE_SOURCE_DIR}/LayerManagerClient/ilmClient/include"
+    )
+
+    project(ilmControl_Test)
     project_type(TEST)
 
     set(LIBS
         ${LIBS}
         ilmClient
+        ilmControl
     )
 
     add_executable(${PROJECT_NAME}
-        IlmCommandTest.cpp
-        IlmNotificationTest.cpp
+        ilm_control_test.cpp
+        ilm_control_notification_test.cpp
     )
 
     target_link_libraries(${PROJECT_NAME}
@@ -46,6 +51,6 @@ if (WITH_TESTS)
         DESTINATION bin
     )
 
-    add_test(ilmClient ${PROJECT_NAME})
+    add_test(ilmControl ${PROJECT_NAME})
 
 endif(WITH_TESTS) 

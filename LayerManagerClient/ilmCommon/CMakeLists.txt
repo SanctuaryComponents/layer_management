@@ -19,7 +19,7 @@
 
 cmake_minimum_required (VERSION 2.6)
 
-project(ilmClient)
+project(ilmCommon)
 project_type(CORE)
 
 find_package(Threads)
@@ -27,38 +27,38 @@ find_package(Threads)
 include_directories(
     "include"
     "${CMAKE_SOURCE_DIR}/config"
-    "${CMAKE_SOURCE_DIR}/LayerManagerClient/ilmCommon/include"
     "${CMAKE_SOURCE_DIR}/LayerManagerBase/include"
     "${CMAKE_SOURCE_DIR}/LayerManagerUtils/include"
 )
 
-add_library(${PROJECT_NAME} SHARED
-    src/ilm_client.c
+add_library(${PROJECT_NAME} STATIC
+    src/ilm_common.c
+    src/ilm_tools.c
 )
 
 add_dependencies(${PROJECT_NAME}
     LayerManagerUtils
-    ilmCommon
 )
 
 set(LIBS
     ${LIBS}
     LayerManagerUtils
-    ilmCommon
     rt
     dl
     ${CMAKE_THREAD_LIBS_INIT}
 )
 
-target_link_libraries(${PROJECT_NAME} ${LIBS})
+target_link_libraries(${PROJECT_NAME} ${LIBS} -ldl)
+
+#install (
+#    TARGETS             ${PROJECT_NAME}
+#    LIBRARY DESTINATION lib
+#)
 
 install (
-    TARGETS             ${PROJECT_NAME}
-    LIBRARY DESTINATION lib
-)
-
-install (
-    FILES       include/ilm_client.h
+    FILES       include/ilm_common.h
+                include/ilm_types.h
+                include/ilm_client_platform.h
     DESTINATION include/ilm
 )
 

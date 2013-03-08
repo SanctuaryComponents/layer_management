@@ -22,8 +22,8 @@ project_type(CORE)
 
 include_directories(
     include
-    "../../LayerManagerClient/ilmClient/include"
-    "../../LayerManagerUtils/include"
+    "${CMAKE_SOURCE_DIR}/LayerManagerClient/ilmClient/include"
+    "${CMAKE_SOURCE_DIR}/LayerManagerUtils/include"
 )
 
 add_executable(${PROJECT_NAME}

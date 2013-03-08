@@ -34,6 +34,7 @@
 
 extern "C" {
     #include "ilm_client.h"
+    #include "ilm_control.h"
 }
 
 class IlmCommandTest : public ::testing::Test {
@@ -90,7 +91,7 @@ TEST_F(IlmCommandTest, SetGetSurfaceDimension) {
 TEST_F(IlmCommandTest, SetGetLayerDimension) {
     uint layer = 4316;
 
-    ilm_layerCreate(&layer);
+    ilm_layerCreateWithDimension(&layer, 800, 480);
 
     t_ilm_uint dim[2] = {115,125};
     ilm_layerSetDimension(layer,dim);
@@ -120,7 +121,7 @@ TEST_F(IlmCommandTest, SetGetSurfacePosition) {
 TEST_F(IlmCommandTest, SetGetLayerPosition) {
     uint layer = 4316;
 
-    ilm_layerCreate(&layer);
+    ilm_layerCreateWithDimension(&layer, 800, 480);
 
     t_ilm_uint pos[2] = {115,125};
     ilm_layerSetPosition(layer,pos);
@@ -160,7 +161,7 @@ TEST_F(IlmCommandTest, SetGetSurfaceOrientation) {
 
 TEST_F(IlmCommandTest, SetGetLayerOrientation) {
     uint layer = 4316;
-    ilm_layerCreate(&layer);
+    ilm_layerCreateWithDimension(&layer, 800, 480);
     ilm_commitChanges();
     ilmOrientation returned;
 
@@ -209,8 +210,8 @@ TEST_F(IlmCommandTest, SetGetLayerOpacity) {
     uint layer2 = 44;
     t_ilm_float opacity;
 
-    ilm_layerCreate(&layer1);
-    ilm_layerCreate(&layer2);
+    ilm_layerCreateWithDimension(&layer1, 800, 480);
+    ilm_layerCreateWithDimension(&layer2, 800, 480);
 
     ilm_layerSetOpacity(layer1,0.88);
     ilm_commitChanges();
@@ -249,7 +250,7 @@ TEST_F(IlmCommandTest, SetGetLayerVisibility) {
     uint layer1 = 36;
     t_ilm_bool visibility;
 
-    ilm_layerCreate(&layer1);
+    ilm_layerCreateWithDimension(&layer1, 800, 480);
 
     ilm_layerSetVisibility(layer1,ILM_TRUE);
     ilm_commitChanges();
@@ -291,8 +292,8 @@ TEST_F(IlmCommandTest, ilm_getLayerIDs) {
     uint layer1 = 3246;
     uint layer2 = 46586;
 
-    ilm_layerCreate(&layer1);
-    ilm_layerCreate(&layer2);
+    ilm_layerCreateWithDimension(&layer1, 800, 480);
+    ilm_layerCreateWithDimension(&layer2, 800, 480);
     ilm_commitChanges();
 
     t_ilm_int length;
@@ -308,8 +309,8 @@ TEST_F(IlmCommandTest, ilm_getLayerIDsOfScreen) {
     t_ilm_layer layer2 = 46586;
     t_ilm_uint roLength = 2;
     t_ilm_layer idRenderOrder[2] = {layer1,layer2};
-    ilm_layerCreate(&layer1);
-    ilm_layerCreate(&layer2);
+    ilm_layerCreateWithDimension(&layer1, 800, 480);
+    ilm_layerCreateWithDimension(&layer2, 800, 480);
     ilm_displaySetRenderOrder(0,idRenderOrder,roLength);
     ilm_commitChanges();
 
@@ -368,8 +369,8 @@ TEST_F(IlmCommandTest, ilm_surfaceCreate_Remove) {
 TEST_F(IlmCommandTest, ilm_layerCreate_Remove) {
     uint layer1 = 3246;
     uint layer2 = 46586;
-    ilm_layerCreate(&layer1);
-    ilm_layerCreate(&layer2);
+    ilm_layerCreateWithDimension(&layer1, 800, 480);
+    ilm_layerCreateWithDimension(&layer2, 800, 480);
     ilm_commitChanges();
 
     t_ilm_int length;
@@ -410,7 +411,7 @@ TEST_F(IlmCommandTest, ilm_surface_initialize) {
 
 TEST_F(IlmCommandTest, ilm_layerAddSurface_ilm_layerRemoveSurface_ilm_getSurfaceIDsOnLayer) {
     uint layer = 3246;
-    ilm_layerCreate(&layer);
+    ilm_layerCreateWithDimension(&layer, 800, 480);
     uint surface1 = 3246;
     uint surface2 = 46586;
     ilm_surfaceCreate(0,0,0,ILM_PIXELFORMAT_RGBA_8888,&surface1);
@@ -506,7 +507,7 @@ TEST_F(IlmCommandTest, ilm_getPropertiesOfSurface_ilm_surfaceSetSourceRectangle_
 TEST_F(IlmCommandTest, ilm_getPropertiesOfLayer_ilm_layerSetSourceRectangle_ilm_layerSetDestinationRectangle_ilm_layerSetChromaKey) {
     t_ilm_uint layer;
     t_ilm_int chromaKey[3] = {3, 22, 111};
-    ilm_layerCreate(&layer);
+    ilm_layerCreateWithDimension(&layer, 800, 480);
     ilm_commitChanges();
 
     ilm_layerSetOpacity(layer,0.8765);
@@ -733,9 +734,9 @@ TEST_F(IlmCommandTest, ilm_getPropertiesOfScreen) {
     ilmScreenProperties screenProperties;
 
     t_ilm_layer layerIds[3] = {100, 200, 300};//t_ilm_layer layerIds[3] = {0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF};
-    ilm_layerCreate(layerIds);
-    ilm_layerCreate(layerIds + 1);
-    ilm_layerCreate(layerIds + 2);
+    ilm_layerCreateWithDimension(layerIds, 800, 480);
+    ilm_layerCreateWithDimension(layerIds + 1, 800, 480);
+    ilm_layerCreateWithDimension(layerIds + 2, 800, 480);
 
     ilm_commitChanges();
 

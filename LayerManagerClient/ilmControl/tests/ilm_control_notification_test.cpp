@@ -28,6 +28,7 @@
 
 extern "C" {
     #include "ilm_client.h"
+    #include "ilm_control.h"
 }
 
 
@@ -61,7 +62,7 @@ public:
 		layer = 345;
 		ilm_layerRemove(layer);
 		ilm_commitChanges();
-		ilm_layerCreate(&layer);
+		ilm_layerCreateWithDimension(&layer, 800, 480);
 		ilm_commitChanges();
 		// create a surface
 		surface = 456;
@@ -155,7 +156,7 @@ TEST_F(NotificationTest, ilm_layerAddNotificationWithoutCallback)
 	// create a layer
 	t_ilm_uint layer = 89;
 
-	ASSERT_EQ(ILM_SUCCESS,ilm_layerCreate(&layer));
+	ASSERT_EQ(ILM_SUCCESS,ilm_layerCreateWithDimension(&layer, 800, 480));
 	ASSERT_EQ(ILM_SUCCESS,ilm_commitChanges());
 	// add notification
 
