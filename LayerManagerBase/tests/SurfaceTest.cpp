@@ -87,7 +87,7 @@ TEST_F(SurfaceTest, defaultConstructor)
 TEST_F(SurfaceTest, specialConstructor)
 {
     unsigned int expectedId = 144;
-    Surface surface(expectedId);
+    Surface surface(expectedId, getpid());
 
     /// make sure surface has specified id
     EXPECT_EQ(expectedId, surface.getID());
@@ -168,7 +168,7 @@ TEST_F(SurfaceTest, setPixelFormat)
 TEST_F(SurfaceTest, getContainingLayerId)
 {
     unsigned int expectedLayerId = 202;
-    Layer layer(expectedLayerId);
+    Layer layer(expectedLayerId, getpid());
 
     /// make sure, surface has no containg layer
     EXPECT_EQ(GraphicalObject::INVALID_ID, m_pSurface->getContainingLayerId());

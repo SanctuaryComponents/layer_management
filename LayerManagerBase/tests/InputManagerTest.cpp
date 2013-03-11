@@ -473,7 +473,7 @@ TEST_F(InputManagerTest, PointerEvent_Focus_On_Pressed)
 
     p.state = INPUT_STATE_MOTION;
     p.x = 42;
-    p.x = 43;
+    p.y = 43;
 
     surf = m_pInputManager->reportPointerEvent(p);
     EXPECT_EQ(surf, (Surface*)NULL);  // No focus, so NULL is returned
@@ -482,7 +482,7 @@ TEST_F(InputManagerTest, PointerEvent_Focus_On_Pressed)
 
     p.state = INPUT_STATE_RELEASED;
     p.x = 44;
-    p.x = 45;
+    p.y = 45;
 
     surf = m_pInputManager->reportPointerEvent(p);
     EXPECT_EQ((Surface*)NULL, surf);
@@ -491,7 +491,7 @@ TEST_F(InputManagerTest, PointerEvent_Focus_On_Pressed)
 
     p.state = INPUT_STATE_OTHER;
     p.x = 46;
-    p.x = 47;
+    p.y = 47;
 
     surf = m_pInputManager->reportPointerEvent(p);
     EXPECT_EQ((Surface*)NULL, surf);
@@ -501,10 +501,10 @@ TEST_F(InputManagerTest, PointerEvent_Focus_On_Pressed)
     // Pressed somewhere in Content
     p.state = INPUT_STATE_PRESSED;
     p.x = 700;
-    p.x = 400;
+    p.y = 400;
 
     surf = m_pInputManager->reportPointerEvent(p);
-    EXPECT_NE(surf, (Surface*)NULL);  // Pressed under a surface, so not NULL is returned
+    ASSERT_NE(surf, (Surface*)NULL);  // Pressed under a surface, so not NULL is returned
     EXPECT_EQ(CPLX_SCREEN_LAY2_SURF_CONTENT_ID, surf->getID());  // Make sure the elected surface is the appropriate one
     EXPECT_NE(700, p.x);  // Coordinates must have changed
     EXPECT_NE(400, p.y);
@@ -524,10 +524,10 @@ TEST_F(InputManagerTest, PointerEvent_Focus_Remain)
     // Pressed somewhere in Content
     p.state = INPUT_STATE_PRESSED;
     p.x = 700;
-    p.x = 400;
+    p.y = 400;
 
     surf = m_pInputManager->reportPointerEvent(p);
-    EXPECT_NE(surf, (Surface*)NULL);
+    ASSERT_NE(surf, (Surface*)NULL);
     EXPECT_EQ(CPLX_SCREEN_LAY2_SURF_CONTENT_ID, surf->getID());
     EXPECT_NE(700, p.x);
     EXPECT_NE(400, p.y);
@@ -535,7 +535,7 @@ TEST_F(InputManagerTest, PointerEvent_Focus_Remain)
     // motion somewhere outside of Content
     p.state = INPUT_STATE_MOTION;
     p.x = 10;
-    p.x = 20;
+    p.y = 20;
 
     surf = m_pInputManager->reportPointerEvent(p);
     EXPECT_EQ(CPLX_SCREEN_LAY2_SURF_CONTENT_ID, surf->getID());
@@ -545,7 +545,7 @@ TEST_F(InputManagerTest, PointerEvent_Focus_Remain)
     // motion somewhere outside of Content
     p.state = INPUT_STATE_MOTION;
     p.x = 0;
-    p.x = 200;
+    p.y = 200;
 
     surf = m_pInputManager->reportPointerEvent(p);
     EXPECT_EQ(CPLX_SCREEN_LAY2_SURF_CONTENT_ID, surf->getID());
@@ -555,7 +555,7 @@ TEST_F(InputManagerTest, PointerEvent_Focus_Remain)
     // release somewhere outside of Content
     p.state = INPUT_STATE_RELEASED;
     p.x = 500;
-    p.x = 30;
+    p.y = 30;
 
     surf = m_pInputManager->reportPointerEvent(p);
     EXPECT_EQ(CPLX_SCREEN_LAY2_SURF_CONTENT_ID, surf->getID());
@@ -567,7 +567,7 @@ TEST_F(InputManagerTest, PointerEvent_Focus_Remain)
     // Pressed somewhere in Status bar
     p.state = INPUT_STATE_PRESSED;
     p.x = 100;
-    p.x = 30;
+    p.y = 30;
 
     surf = m_pInputManager->reportPointerEvent(p);
     EXPECT_EQ(CPLX_SCREEN_LAY1_SURF_STATUSBAR_ID, surf->getID());
@@ -577,7 +577,7 @@ TEST_F(InputManagerTest, PointerEvent_Focus_Remain)
     // Motion somewhere outside of Status bar
     p.state = INPUT_STATE_MOTION;
     p.x = 500;
-    p.x = 500;
+    p.y = 500;
 
     surf = m_pInputManager->reportPointerEvent(p);
     EXPECT_EQ(CPLX_SCREEN_LAY1_SURF_STATUSBAR_ID, surf->getID());
@@ -585,7 +585,7 @@ TEST_F(InputManagerTest, PointerEvent_Focus_Remain)
     // Released somewhere outside of Status bar
     p.state = INPUT_STATE_RELEASED;
     p.x = 800;
-    p.x = 480;
+    p.y = 480;
 
     surf = m_pInputManager->reportPointerEvent(p);
     EXPECT_EQ(CPLX_SCREEN_LAY1_SURF_STATUSBAR_ID, surf->getID());
@@ -617,18 +617,20 @@ TEST_F(InputManagerTest, PointerEvent_Focus_Conditions)
     // (100,225) is in the middle of the popup
     p.state = INPUT_STATE_PRESSED;
     p.x = 100;
-    p.x = 225;
+    p.y = 225;
 
     surf = m_pInputManager->reportPointerEvent(p);
+    ASSERT_TRUE(NULL != surf);
     EXPECT_EQ(CPLX_SCREEN_LAY2_SURF_POPUP_ID, surf->getID());
 
     // popup not visible
     m_pPopup->setVisibility(false);
     p.state = INPUT_STATE_PRESSED;
     p.x = 100;
-    p.x = 225;
+    p.y = 225;
 
     surf = m_pInputManager->reportPointerEvent(p);
+    ASSERT_TRUE(NULL != surf);
     EXPECT_EQ(CPLX_SCREEN_LAY2_SURF_CONTENT_ID, surf->getID());
 
     // popup visible and small opacity
@@ -636,9 +638,10 @@ TEST_F(InputManagerTest, PointerEvent_Focus_Conditions)
     m_pPopup->setOpacity(0.1);
     p.state = INPUT_STATE_PRESSED;
     p.x = 100;
-    p.x = 225;
+    p.y = 225;
 
     surf = m_pInputManager->reportPointerEvent(p);
+    ASSERT_TRUE(NULL != surf);
     EXPECT_EQ(CPLX_SCREEN_LAY2_SURF_POPUP_ID, surf->getID());
 
     // popup visible and no opacity
@@ -646,9 +649,10 @@ TEST_F(InputManagerTest, PointerEvent_Focus_Conditions)
     m_pPopup->setOpacity(0);
     p.state = INPUT_STATE_PRESSED;
     p.x = 100;
-    p.x = 225;
+    p.y = 225;
 
     surf = m_pInputManager->reportPointerEvent(p);
+    ASSERT_TRUE(NULL != surf);
     EXPECT_EQ(CPLX_SCREEN_LAY2_SURF_CONTENT_ID, surf->getID());
 
     // popup visible, with opacity, but no native content
@@ -657,11 +661,11 @@ TEST_F(InputManagerTest, PointerEvent_Focus_Conditions)
     m_pPopup->removeNativeContent();
     p.state = INPUT_STATE_PRESSED;
     p.x = 100;
-    p.x = 225;
+    p.y = 225;
 
     surf = m_pInputManager->reportPointerEvent(p);
+    ASSERT_TRUE(NULL != surf);
     EXPECT_EQ(CPLX_SCREEN_LAY2_SURF_CONTENT_ID, surf->getID());
-
 }
 
 
@@ -687,10 +691,10 @@ TEST_F(InputManagerTest, PointerEvent_Election_Conditions_Check)
     // Pressed somewhere in Content
     p.state = INPUT_STATE_PRESSED;
     p.x = 700;
-    p.x = 400;
+    p.y = 400;
 
     surf = m_pInputManager->reportPointerEvent(p);
-    EXPECT_NE(surf, (Surface*)NULL);
+    ASSERT_NE(surf, (Surface*)NULL);
     EXPECT_EQ(CPLX_SCREEN_LAY2_SURF_CONTENT_ID, surf->getID());
 
     // No visibility
@@ -698,10 +702,10 @@ TEST_F(InputManagerTest, PointerEvent_Election_Conditions_Check)
     // Pressed somewhere in Content
     p.state = INPUT_STATE_PRESSED;
     p.x = 700;
-    p.x = 400;
+    p.y = 400;
 
     surf = m_pInputManager->reportPointerEvent(p);
-    EXPECT_NE(surf, (Surface*)NULL);
+    ASSERT_NE(surf, (Surface*)NULL);
     EXPECT_EQ(CPLX_SCREEN_LAY1_SURF_BACKGROUND_ID, surf->getID());
 
 
@@ -711,10 +715,10 @@ TEST_F(InputManagerTest, PointerEvent_Election_Conditions_Check)
     // Pressed somewhere in Content
     p.state = INPUT_STATE_PRESSED;
     p.x = 700;
-    p.x = 400;
+    p.y = 400;
 
     surf = m_pInputManager->reportPointerEvent(p);
-    EXPECT_NE(surf, (Surface*)NULL);
+    ASSERT_NE(surf, (Surface*)NULL);
     EXPECT_EQ(CPLX_SCREEN_LAY1_SURF_BACKGROUND_ID, surf->getID());
 }
 
@@ -755,9 +759,10 @@ TEST_F(InputManagerTest, PointerEvent_Coordinates_translation)
     // Since no transformation, screen wide (10,20) coordinate should become ... (10,20) in the surface coordinate system
     p.state = INPUT_STATE_PRESSED;
     p.x = 10;
-    p.x = 20;
+    p.y = 20;
 
     surf = m_pInputManager->reportPointerEvent(p);
+    ASSERT_TRUE(NULL != surf);
     EXPECT_EQ(sid, surf->getID());
     EXPECT_EQ(10, p.x);
     EXPECT_EQ(20, p.y);
@@ -766,9 +771,10 @@ TEST_F(InputManagerTest, PointerEvent_Coordinates_translation)
     newSurf->setDestinationRegion(Rectangle(10, 100, sw, sh));
     p.state = INPUT_STATE_PRESSED;
     p.x = 10;
-    p.x = 150;
+    p.y = 150;
 
     surf = m_pInputManager->reportPointerEvent(p);
+    ASSERT_TRUE(NULL != surf);
     EXPECT_EQ(sid, surf->getID());
     EXPECT_EQ(0, p.x);  // 10 global is 0 local
     EXPECT_EQ(50, p.y); // 150 global is 50 local
@@ -776,9 +782,10 @@ TEST_F(InputManagerTest, PointerEvent_Coordinates_translation)
     // motion at (0,40) global should still elect newSurf at (-10,-60)
     p.state = INPUT_STATE_MOTION;
     p.x = 0;
-    p.x = 40;
+    p.y = 40;
 
     surf = m_pInputManager->reportPointerEvent(p);
+    ASSERT_TRUE(NULL != surf);
     EXPECT_EQ(sid, surf->getID());
     EXPECT_EQ(-10, p.x);  // 10 global is 0 local
     EXPECT_EQ(-60, p.y);
@@ -786,9 +793,10 @@ TEST_F(InputManagerTest, PointerEvent_Coordinates_translation)
     // release at (800,100) global should still elect newSurf at (790,0)
     p.state = INPUT_STATE_RELEASED;
     p.x = 800;
-    p.x = 100;
+    p.y = 100;
 
     surf = m_pInputManager->reportPointerEvent(p);
+    ASSERT_TRUE(NULL != surf);
     EXPECT_EQ(sid, surf->getID());
     EXPECT_EQ(790, p.x);  // 10 global is 0 local
     EXPECT_EQ(0, p.y);
@@ -831,9 +839,10 @@ TEST_F(InputManagerTest, PointerEvent_Coordinates_croping)
 
     p.state = INPUT_STATE_PRESSED;
     p.x = 10;
-    p.x = 20;
+    p.y = 20;
 
     surf = m_pInputManager->reportPointerEvent(p);
+    ASSERT_TRUE(NULL != surf);
     EXPECT_EQ(sid, surf->getID());
     EXPECT_EQ(60, p.x);
     EXPECT_EQ(70, p.y);
@@ -842,9 +851,10 @@ TEST_F(InputManagerTest, PointerEvent_Coordinates_croping)
     newSurf->setDestinationRegion(Rectangle(10, 100, 50, 50));
     p.state = INPUT_STATE_PRESSED;
     p.x = 20;
-    p.x = 120;
+    p.y = 120;
 
     surf = m_pInputManager->reportPointerEvent(p);
+    ASSERT_TRUE(NULL != surf);
     EXPECT_EQ(sid, surf->getID());
     EXPECT_EQ(60, p.x);
     EXPECT_EQ(70, p.y);
@@ -852,12 +862,13 @@ TEST_F(InputManagerTest, PointerEvent_Coordinates_croping)
     // motion at (10,40) global should still elect newSurf at (40,-10)
     p.state = INPUT_STATE_MOTION;
     p.x = 0;
-    p.x = 40;
+    p.y = 40;
 
-   surf = m_pInputManager->reportPointerEvent(p);
-   EXPECT_EQ(sid, surf->getID());
-   EXPECT_EQ(40, p.x);  // 10 global is 0 local
-   EXPECT_EQ(-10, p.y);
+    surf = m_pInputManager->reportPointerEvent(p);
+    ASSERT_TRUE(NULL != surf);
+    EXPECT_EQ(sid, surf->getID());
+    EXPECT_EQ(40, p.x);  // 10 global is 0 local
+    EXPECT_EQ(-10, p.y);
 }
 
 
@@ -898,9 +909,10 @@ TEST_F(InputManagerTest, PointerEvent_Coordinates_scaling)
 
     p.state = INPUT_STATE_PRESSED;
     p.x = 10;
-    p.x = 20;
+    p.y = 20;
 
     surf = m_pInputManager->reportPointerEvent(p);
+    ASSERT_TRUE(NULL != surf);
     EXPECT_EQ(sid, surf->getID());
     EXPECT_EQ(5, p.x);
     EXPECT_EQ(10, p.y);
@@ -909,9 +921,10 @@ TEST_F(InputManagerTest, PointerEvent_Coordinates_scaling)
     newSurf->setDestinationRegion(Rectangle(10, 100, sw, sh));
     p.state = INPUT_STATE_PRESSED;
     p.x = 20;
-    p.x = 120;
+    p.y = 120;
 
     surf = m_pInputManager->reportPointerEvent(p);
+    ASSERT_TRUE(NULL != surf);
     EXPECT_EQ(sid, surf->getID());
     EXPECT_EQ(5, p.x);
     EXPECT_EQ(10, p.y);
@@ -920,9 +933,10 @@ TEST_F(InputManagerTest, PointerEvent_Coordinates_scaling)
     newSurf->setSourceRegion(Rectangle(10, 10, sw/2, sh/2));
     p.state = INPUT_STATE_PRESSED;
     p.x = 30;
-    p.x = 140;
+    p.y = 140;
 
     surf = m_pInputManager->reportPointerEvent(p);
+    ASSERT_TRUE(NULL != surf);
     EXPECT_EQ(sid, surf->getID());
     EXPECT_EQ(20, p.x);
     EXPECT_EQ(30, p.y);
@@ -953,9 +967,10 @@ TEST_F(InputManagerTest, PointerEvent_InputEventAcceptance)
     // (100,225) is in the middle of the popup
     p.state = INPUT_STATE_PRESSED;
     p.x = 100;
-    p.x = 225;
+    p.y = 225;
 
     surf = m_pInputManager->reportPointerEvent(p);
+    ASSERT_TRUE(NULL != surf);
     EXPECT_EQ((uint)CPLX_SCREEN_LAY2_SURF_POPUP_ID, surf->getID());
 
     pPopup->updateInputEventAcceptanceFrom(INPUT_DEVICE_POINTER, false);
@@ -963,9 +978,10 @@ TEST_F(InputManagerTest, PointerEvent_InputEventAcceptance)
     // (100,225) is in the middle of the popup, but popup now refuse pointer event
     p.state = INPUT_STATE_PRESSED;
     p.x = 100;
-    p.x = 225;
+    p.y = 225;
 
     surf = m_pInputManager->reportPointerEvent(p);
+    ASSERT_TRUE(NULL != surf);
     EXPECT_NE((uint)CPLX_SCREEN_LAY2_SURF_POPUP_ID, surf->getID());
     EXPECT_EQ((uint)CPLX_SCREEN_LAY2_SURF_CONTENT_ID, surf->getID());
 
@@ -977,9 +993,10 @@ TEST_F(InputManagerTest, PointerEvent_InputEventAcceptance)
     // Finally event should be dispatched to Background of Layer 1
     p.state = INPUT_STATE_PRESSED;
     p.x = 100;
-    p.x = 225;
+    p.y = 225;
 
     surf = m_pInputManager->reportPointerEvent(p);
+    ASSERT_TRUE(NULL != surf);
     EXPECT_EQ((uint)CPLX_SCREEN_LAY1_SURF_BACKGROUND_ID, surf->getID());
 
     pBackground = m_pScene->getSurface(CPLX_SCREEN_LAY1_SURF_BACKGROUND_ID);
@@ -989,11 +1006,10 @@ TEST_F(InputManagerTest, PointerEvent_InputEventAcceptance)
     // popup -> content -> Background -> NULL
     p.state = INPUT_STATE_PRESSED;
     p.x = 100;
-    p.x = 225;
+    p.y = 225;
 
     surf = m_pInputManager->reportPointerEvent(p);
     EXPECT_FALSE(surf);
-
 }
 
 /**
@@ -1046,6 +1062,7 @@ TEST_F(InputManagerTest, TouchEvent)
     // (300,200) screen wide is (200,150) surface wide
     // (0,10)  screen wide is   (-100,-40)   surface wide
     surf = m_pInputManager->reportTouchEvent(pv);
+    ASSERT_TRUE(NULL != surf);
 
     EXPECT_EQ(CPLX_SCREEN_LAY2_SURF_CONTENT_ID, surf->getID());
     EXPECT_EQ(0   , pv[0].x);

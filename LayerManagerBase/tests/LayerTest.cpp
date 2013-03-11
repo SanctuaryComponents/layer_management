@@ -83,7 +83,7 @@ TEST_F(LayerTest, defaultConstructor)
 TEST_F(LayerTest, specialConstructor)
 {
     unsigned int expectedId = 144;
-    Layer layer(expectedId);
+    Layer layer(expectedId, getpid());
 
     /// make sure Layer has specified id
     EXPECT_EQ(expectedId, layer.getID());
