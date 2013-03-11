@@ -54,7 +54,7 @@ const std::string SurfaceSetDimensionCommand::getString()
 {
     std::stringstream description;
     description << "SurfaceSetDimensionCommand("
-                << "id=" << m_id
+                << "id=" << m_id << "(0x" << std::hex << m_id << ")" << std::dec
                 << ", width=" << m_width
                 << ", height=" << m_height
                 << ")";

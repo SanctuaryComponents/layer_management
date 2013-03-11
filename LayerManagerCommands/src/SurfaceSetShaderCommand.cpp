@@ -79,7 +79,7 @@ const std::string SurfaceSetShaderCommand::getString()
 {
     std::stringstream description;
     description << "SurfaceSetShaderCommand("
-                << "id=" << m_id
+                << "id=" << m_id << "(0x" << std::hex << m_id << ")" << std::dec
                 << ", shaderid=" << m_shaderid
                 << ")";
     return description.str();

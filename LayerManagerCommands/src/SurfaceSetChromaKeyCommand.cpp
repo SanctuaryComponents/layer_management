@@ -68,7 +68,7 @@ const std::string SurfaceSetChromaKeyCommand::getString()
 {
     std::stringstream description;
     description << "SurfaceSetChromaKeyCommand("
-                << "surfaceid=" << m_surfaceid
+                << "surfaceid=" << m_surfaceid << "(0x" << std::hex << m_surfaceid << ")" << std::dec
                 << ", m_array=[";
 
     for (unsigned int i = 0; i < m_length; ++i)

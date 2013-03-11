@@ -50,7 +50,7 @@ const std::string SurfaceSetVisibilityCommand::getString()
 {
     std::stringstream description;
     description << "SurfaceSetVisibilityCommand("
-                << "idtoSet=" << m_idtoSet
+                << "idtoSet=" << m_idtoSet << "(0x" << std::hex << m_idtoSet << ")" << std::dec
                 << ", visibility=" << m_visibility
                 << ")";
     return description.str();

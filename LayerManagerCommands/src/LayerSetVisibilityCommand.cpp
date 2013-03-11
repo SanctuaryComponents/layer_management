@@ -50,7 +50,7 @@ const std::string LayerSetVisibilityCommand::getString()
 {
     std::stringstream description;
     description << "LayerSetVisibilityCommand("
-                << "idtoSet=" << m_idtoSet
+                << "idtoSet=" << m_idtoSet << "(0x" << std::hex << m_idtoSet << ")" << std::dec
                 << ", visibility=" << m_visibility
                 << ")";
     return description.str();

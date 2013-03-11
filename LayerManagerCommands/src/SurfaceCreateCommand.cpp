@@ -41,7 +41,7 @@ const std::string SurfaceCreateCommand::getString()
 {
     std::stringstream description;
     description << "SurfaceCreateCommand("
-                << "idReturn=" << m_idReturn << "=" << *m_idReturn
+                << "idReturn=" << m_idReturn << "=" << *m_idReturn << "(0x" << std::hex << *m_idReturn << ")" << std::dec
                 << ")";
     return description.str();
 }

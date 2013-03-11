@@ -52,7 +52,7 @@ const std::string SurfaceGetKeyboardFocusCommand::getString()
 {
     std::stringstream description;
     description << "SurfaceGetKeyboardFocusCommand("
-                << "pSurfId=" << m_pSurfId << "=" << *m_pSurfId
+                << "pSurfId=" << m_pSurfId << "=" << *m_pSurfId << "(0x" << std::hex << *m_pSurfId << ")" << std::dec
                 << ")";
     return description.str();
 }

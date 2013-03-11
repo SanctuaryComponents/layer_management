@@ -50,7 +50,7 @@ const std::string SurfaceSetOpacityCommand::getString()
 {
     std::stringstream description;
     description << "SurfaceSetOpacityCommand("
-                << "id=" << m_id
+                << "id=" << m_id << "(0x" << std::hex << m_id << ")" << std::dec
                 << ", opacity=" << m_opacity
                 << ")";
     return description.str();

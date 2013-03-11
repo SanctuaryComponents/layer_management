@@ -48,7 +48,7 @@ const std::string LayerCreateCommand::getString()
     description << "LayerCreateCommand("
                 << "OriginalWidth=" << m_originalWidth
                 << ", OriginalHeight=" << m_originalHeight
-                << ", idReturn=" << m_idReturn << "=" << *m_idReturn
+                << ", idReturn=" << m_idReturn << "=" << *m_idReturn << "(0x" << std::hex << *m_idReturn << ")" << std::dec
                 << ")";
     return description.str();
 }

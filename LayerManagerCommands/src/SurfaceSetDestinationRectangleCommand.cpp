@@ -55,7 +55,7 @@ const std::string SurfaceSetDestinationRectangleCommand::getString()
 {
     std::stringstream description;
     description << "SurfaceSetDestinationRectangleCommand("
-                << "id=" << m_id
+                << "id=" << m_id << "(0x" << std::hex << m_id << ")" << std::dec
                 << ", x=" << m_x
                 << ", y=" << m_y
                 << ", width=" << m_width

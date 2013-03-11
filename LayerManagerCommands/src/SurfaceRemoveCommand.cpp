@@ -41,7 +41,7 @@ const std::string SurfaceRemoveCommand::getString()
 {
     std::stringstream description;
     description << "SurfaceRemoveCommand("
-                << "idToRemove=" << m_idToRemove
+                << "idToRemove=" << m_idToRemove << "(0x" << std::hex << m_idToRemove << ")" << std::dec
                 << ")";
     return description.str();
 }

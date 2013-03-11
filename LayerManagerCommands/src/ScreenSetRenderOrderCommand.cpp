@@ -90,7 +90,7 @@ const std::string ScreenSetRenderOrderCommand::getString()
 {
     std::stringstream description;
     description << "ScreenSetRenderOrderCommand("
-                << "m_screenID=" << m_screenID
+                << "m_screenID=" << m_screenID << "(0x" << std::hex << m_screenID << ")" << std::dec
                 << ", m_array=[";
 
     for (unsigned int i = 0; i < m_length; ++i)

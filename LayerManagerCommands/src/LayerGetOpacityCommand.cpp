@@ -42,7 +42,7 @@ const std::string LayerGetOpacityCommand::getString()
 {
     std::stringstream description;
     description << "LayerGetOpacityCommand("
-                << "id=" << m_id
+                << "id=" << m_id << "(0x" << std::hex << m_id << ")" << std::dec
                 << ", pReturnOpacity=" << m_pReturnOpacity << "=" << *m_pReturnOpacity
                 << ")";
     return description.str();

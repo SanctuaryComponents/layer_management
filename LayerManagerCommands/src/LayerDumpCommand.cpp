@@ -66,7 +66,7 @@ const std::string LayerDumpCommand::getString()
     std::stringstream description;
     description << "LayerDumpCommand("
                 << "filename=" << m_filename
-                << ", id=" << m_id
+                << ", id=" << m_id << "(0x" << std::hex << m_id << ")" << std::dec
                 << ")";
     return description.str();
 }

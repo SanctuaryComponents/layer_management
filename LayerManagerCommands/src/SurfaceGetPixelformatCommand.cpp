@@ -41,7 +41,7 @@ const std::string SurfaceGetPixelformatCommand::getString()
 {
     std::stringstream description;
     description << "SurfaceGetPixelformatCommand("
-                << "id=" << m_id
+                << "id=" << m_id << "(0x" << std::hex << m_id << ")" << std::dec
                 << ", pFormatreturn=" << m_pFormatreturn << "=" << *m_pFormatreturn
                 << ")";
     return description.str();

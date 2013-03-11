@@ -49,7 +49,7 @@ const std::string SurfaceRemoveNativeContentCommand::getString()
 {
     std::stringstream description;
     description << "SurfaceRemoveNativeContentCommand("
-                << "surfaceId=" << m_surfaceId
+                << "surfaceId=" << m_surfaceId << "(0x" << std::hex << m_surfaceId << ")" << std::dec
                 << ")";
     return description.str();
 }

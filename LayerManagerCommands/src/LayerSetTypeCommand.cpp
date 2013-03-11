@@ -51,7 +51,7 @@ const std::string LayerSetTypeCommand::getString()
 {
     std::stringstream description;
     description << "LayerSetTypeCommand("
-                << "idtoSet=" << m_idtoSet
+                << "idtoSet=" << m_idtoSet << "(0x" << std::hex << m_idtoSet << ")" << std::dec
                 << ", layertype=" << m_layerType
                 << ")";
     return description.str();

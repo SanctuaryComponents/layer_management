@@ -42,8 +42,8 @@ const std::string LayerRemoveSurfaceCommand::getString()
 {
     std::stringstream description;
     description << "LayerRemoveSurfaceCommand("
-                << "layerid=" << m_layerid
-                << ", surfaceid=" << m_surfaceid
+                << "layerid=" << m_layerid << "(0x" << std::hex << m_layerid << ")" << std::dec
+                << ", surfaceid=" << m_surfaceid << "(0x" << std::hex << m_surfaceid << ")" << std::dec
                 << ")";
     return description.str();
 }

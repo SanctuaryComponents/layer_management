@@ -56,7 +56,7 @@ const std::string SurfaceSetNativeContentCommand::getString()
 {
     std::stringstream description;
     description << "SurfaceSetNativeContentCommand("
-                << "surfaceId=" << m_surfaceId
+                << "surfaceId=" << m_surfaceId << "(0x" << std::hex << m_surfaceId << ")" << std::dec
                 << ", nativeHandle=" << m_nativeHandle
                 << ", pixelformat=" << m_pixelformat
                 << ", OriginalWidth=" << m_originalWidth

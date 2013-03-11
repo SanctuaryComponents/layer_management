@@ -49,7 +49,7 @@ const std::string SurfaceGetDimensionCommand::getString()
 {
     std::stringstream description;
     description << "SurfaceGetDimensionCommand("
-                << "id=" << m_id
+                << "id=" << m_id << "(0x" << std::hex << m_id << ")" << std::dec
                 << ", pWidth=" << m_pWidth << "=" << *m_pWidth
                 << ", m_pHeight=" << m_pHeight << "=" << *m_pHeight
                 << ")";

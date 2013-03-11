@@ -58,7 +58,7 @@ const std::string ScreenDumpCommand::getString()
     std::stringstream description;
     description << "ScreenDumpCommand("
                 << "filename=" << m_filename
-                << ", id=" << m_id
+                << ", id=" << m_id << "(0x" << std::hex << m_id << ")" << std::dec
                 << ")";
     return description.str();
 }

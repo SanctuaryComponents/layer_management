@@ -50,7 +50,7 @@ const std::string LayerRemoveCommand::getString()
 {
     std::stringstream description;
     description << "LayerRemoveCommand("
-                << "idToRemove=" << m_idToRemove
+                << "idToRemove=" << m_idToRemove << "(0x" << std::hex << m_idToRemove << ")" << std::dec
                 << ")";
     return description.str();
 }

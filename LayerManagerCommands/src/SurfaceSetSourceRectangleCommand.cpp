@@ -54,7 +54,7 @@ const std::string SurfaceSetSourceRectangleCommand::getString()
 {
     std::stringstream description;
     description << "SurfaceSetSourceRectangleCommand("
-                << "id=" << m_id
+                << "id=" << m_id << "(0x" << std::hex << m_id << ")" << std::dec
                 << ", x=" << m_x
                 << ", y=" << m_y
                 << ", width=" << m_width

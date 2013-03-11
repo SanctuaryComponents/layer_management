@@ -44,7 +44,7 @@ const std::string LayerGetVisibilityCommand::getString()
 {
     std::stringstream description;
     description << "LayerGetVisibilityCommand("
-                << "id=" << m_id
+                << "id=" << m_id << "(0x" << std::hex << m_id << ")" << std::dec
                 << ", pVisibility=" << m_pVisibility << "=" << *m_pVisibility
                 << ")";
     return description.str();

@@ -45,7 +45,7 @@ const std::string SurfaceUpdateInputEventAcceptance::getString()
     std::stringstream description;
 
     description << "SurfaceUpdateInputEventAcceptance("
-                << "m_surfId=" << m_surfId
+                << "m_surfId=" << m_surfId << "(0x" << std::hex << m_surfId << ")" << std::dec
                 << ")";
     return description.str();
 }

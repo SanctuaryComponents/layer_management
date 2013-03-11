@@ -106,7 +106,7 @@ const std::string ShaderDestroyCommand::getString()
 {
     std::stringstream description;
     description << "DestroyShaderCommand("
-                << "id=" << m_id
+                << "id=" << m_id << "(0x" << std::hex << m_id << ")" << std::dec
                 << ")";
     return description.str();
 }

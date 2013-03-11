@@ -68,7 +68,7 @@ const std::string SurfaceDumpCommand::getString()
     std::stringstream description;
     description << "SurfaceDumpCommand("
                 << "filename=" << m_filename
-                << ", id=" << m_id
+                << ", id=" << m_id << "(0x" << std::hex << m_id << ")" << std::dec
                 << ")";
     return description.str();
 }

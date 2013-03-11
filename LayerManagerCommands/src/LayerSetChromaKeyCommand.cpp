@@ -69,7 +69,7 @@ const std::string LayerSetChromaKeyCommand::getString()
 {
     std::stringstream description;
     description << "LayerSetChromaKeyCommand("
-                << "layerid=" << m_layerid
+                << "layerid=" << m_layerid << "(0x" << std::hex << m_layerid << ")" << std::dec
                 << ", m_array=[";
 
     for (unsigned int i = 0; i < m_length; ++i)

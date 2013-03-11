@@ -53,7 +53,7 @@ const std::string SurfaceSetPositionCommand::getString()
 {
     std::stringstream description;
     description << "SurfaceSetPositionCommand("
-                << "id=" << m_id
+                << "id=" << m_id << "(0x" << std::hex << m_id << ")" << std::dec
                 << ", m_x=" << m_x
                 << ", m_y=" << m_y
                 << ")";

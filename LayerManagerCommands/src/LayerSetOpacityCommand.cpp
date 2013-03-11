@@ -50,7 +50,7 @@ const std::string LayerSetOpacityCommand::getString()
 {
     std::stringstream description;
     description << "LayerSetOpacityCommand("
-                << "id=" << m_id
+                << "id=" << m_id << "(0x" << std::hex << m_id << ")" << std::dec
                 << ", opacity=" << m_opacity
                 << ")";
     return description.str();

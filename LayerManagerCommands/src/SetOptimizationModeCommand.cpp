@@ -46,7 +46,7 @@ const std::string SetOptimizationModeCommand::getString()
 {
     std::stringstream description;
     description << "SetOptimizationModeCommand("
-                << "id=" << (int)m_id
+                << "id=" << (int)m_id << "(0x" << std::hex << (int)m_id << ")" << std::dec
                 << ", mode=" << (int)m_mode
                 << ")";
     return description.str();

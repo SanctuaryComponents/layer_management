@@ -49,7 +49,7 @@ const std::string LayerSetPositionCommand::getString()
 {
     std::stringstream description;
     description << "LayerSetPositionCommand("
-                << "id=" << m_id
+                << "id=" << m_id << "(0x" << std::hex << m_id << ")" << std::dec
                 << ", m_x=" << m_x
                 << ", m_y=" << m_y
                 << ")";

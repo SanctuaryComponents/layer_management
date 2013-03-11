@@ -50,7 +50,7 @@ const std::string LayerGetDimensionCommand::getString()
 {
     std::stringstream description;
     description << "LayerGetDimensionCommand("
-                << "id=" << m_id
+                << "id=" << m_id << "(0x" << std::hex << m_id << ")" << std::dec
                 << ", pWidth=" << m_pWidth << "=" << *m_pWidth
                 << ", m_pHeight=" << m_pHeight << "=" << *m_pHeight
                 << ")";

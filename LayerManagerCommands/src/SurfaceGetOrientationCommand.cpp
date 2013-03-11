@@ -42,7 +42,7 @@ const std::string SurfaceGetOrientationCommand::getString()
 {
     std::stringstream description;
     description << "SurfaceGetOrientationCommand("
-                << "id=" << m_id
+                << "id=" << m_id << "(0x" << std::hex << m_id << ")" << std::dec
                 << ", pReturnOrientation=" << m_pReturnOrientation << "=" << *m_pReturnOrientation
                 << ")";
     return description.str();
