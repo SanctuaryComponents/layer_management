@@ -102,10 +102,13 @@ bool X11GLESRenderer::start(int width, int height, const char* displayname)
 void X11GLESRenderer::stop()
 {
     m_pWindowSystem->stop();
+    delete m_pGraphicSystem;
+    delete m_pWindowSystem;
     if (m_binder)
     {
         delete m_binder;
     }
+    
 }
 
 void X11GLESRenderer::doScreenShot(std::string fileToSave)
