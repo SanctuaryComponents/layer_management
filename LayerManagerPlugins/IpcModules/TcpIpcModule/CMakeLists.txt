@@ -25,7 +25,6 @@ project_type(CORE)
 include_directories(
     include
     ${CMAKE_SOURCE_DIR}/LayerManagerClient/ilmClient/include
-    ${CMAKE_SOURCE_DIR}/LayerManagerPlugins/IpcModules/IpcModuleLoader/include
     ${CMAKE_SOURCE_DIR}/LayerManagerUtils/include
 )
 
@@ -45,10 +44,3 @@ target_link_libraries(${PROJECT_NAME} ${LIBS})
 install (TARGETS             ${PROJECT_NAME}
          LIBRARY DESTINATION lib/layermanager/ipcmodules
 )
-
-if (WITH_TESTS)
-    add_executable(${PROJECT_NAME}_Test tests/LoopbackTest.cpp)
-    target_link_libraries(${PROJECT_NAME}_Test ${LIBS} IpcModuleLoader gtest gmock pthread)
-    enable_testing()
-    add_test(${PROJECT_NAME} ${PROJECT_NAME}_Test)
-endif(WITH_TESTS) 
