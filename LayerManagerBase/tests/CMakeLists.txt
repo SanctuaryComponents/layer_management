@@ -56,9 +56,6 @@ if (WITH_TESTS)
 
     add_dependencies(${PROJECT_NAME} ${LIBS})
 
-    install(FILES       ${PROJECT_NAME}
-            DESTINATION bin)
-
     add_test(LayerManagerBase ${PROJECT_NAME})
 
 endif(WITH_TESTS) 
