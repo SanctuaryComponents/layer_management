@@ -89,6 +89,25 @@ GLESGraphicsystem::GLESGraphicsystem(int windowWidth, int windowHeight, PfnShade
     }
 }
 
+GLESGraphicsystem::~GLESGraphicsystem()
+{
+    LOG_DEBUG("GLESGraphicsystem", "destroying GLESGraphicsystem");
+    delete m_defaultShaderClear;
+    delete m_defaultShader;
+    delete m_defaultShaderNoBlend;
+    delete m_defaultShaderNoUniformAlpha;
+    delete m_defaultShaderAddUniformChromaKey;
+    delete m_defaultShaderNoUniformAlphaNoBlend;
+    delete m_defaultShader2surf;
+    delete m_defaultShader2surfNoBlend;
+    delete m_defaultShader2surfNoUniformAlpha;
+    delete m_defaultShader2surfNoUniformAlphaNoBlend;
+    delete m_defaultShader2surfNoUniformAlpha0;
+    delete m_defaultShader2surfNoUniformAlpha0NoBlend;
+    delete m_defaultShader2surfNoUniformAlpha1;
+    delete m_defaultShader2surfNoUniformAlpha1NoBlend;
+}
+
 void GLESGraphicsystem::activateGraphicContext()
 {
     eglMakeCurrent(m_eglDisplay, m_eglSurface, m_eglSurface, m_eglContext);

@@ -43,6 +43,8 @@ public:
     GLESGraphicsystem(int windowHeight, int windowWidth,
             PfnShaderProgramCreator shaderProgram);
 
+    ~GLESGraphicsystem();
+
     virtual bool init(EGLNativeDisplayType display, EGLNativeWindowType window);
 
     virtual void clearBackground();
