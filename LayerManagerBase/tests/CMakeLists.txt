@@ -46,6 +46,7 @@ if (WITH_TESTS)
         ShaderProgramTest.cpp
         ShaderProgramFactoryTest.cpp
         RectangleTest.cpp
+        ViewportTransformTest.cpp
     )
 
     target_link_libraries(${PROJECT_NAME}

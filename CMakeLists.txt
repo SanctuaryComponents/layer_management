@@ -137,6 +137,7 @@ endif(WITH_DESKTOP)
 build_flag (WITH_GLX_LIB "Build development library for OpenGL/X11 based renderers" OFF)
 #===========================================================================================================
 if (WITH_GLX_LIB)
+    add_subdirectory_once (LayerManagerPlugins/Renderers/Graphic)
     add_subdirectory_once (LayerManagerPlugins/Renderers/GraphicLib/LayerManagerGraphicGLX)
 endif(WITH_GLX_LIB)
 
@@ -155,6 +156,7 @@ endif(WITH_WAYLAND_X11)
 build_flag (WITH_WAYLAND_X11_LIB "Build development library for GLES/Wayland X11 based renderers" OFF)
 #===========================================================================================================
 if (WITH_WAYLAND_X11_LIB)
+    add_subdirectory_once (LayerManagerPlugins/Renderers/Graphic)
     add_subdirectory_once (LayerManagerPlugins/Renderers/GraphicLib/LayerManagerGraphicWaylandX11GLESv2)
 endif(WITH_WAYLAND_X11_LIB)
 
@@ -173,6 +175,7 @@ endif(WITH_WAYLAND_DRM)
 build_flag (WITH_WAYLAND_DRM_LIB "Build development library for GLES/Wayland DRM based renderers" OFF)
 #===========================================================================================================
 if (WITH_WAYLAND_DRM_LIB)
+    add_subdirectory_once (LayerManagerPlugins/Renderers/Graphic)
     add_subdirectory_once (LayerManagerPlugins/Renderers/GraphicLib/LayerManagerGraphicWaylandDrmGLESv2)
 endif(WITH_WAYLAND_DRM_LIB)
 
@@ -191,6 +194,7 @@ endif(WITH_WAYLAND_FBDEV)
 build_flag (WITH_WAYLAND_FBDEV_LIB "Build development library for GLES/Wayland FBDEV based renderers" OFF)
 #===========================================================================================================
 if (WITH_WAYLAND_FBDEV_LIB)
+    add_subdirectory_once (LayerManagerPlugins/Renderers/Graphic)
     add_subdirectory_once (LayerManagerPlugins/Renderers/GraphicLib/LayerManagerGraphicWaylandFbdevGLESv2)
 endif(WITH_WAYLAND_FBDEV_LIB)
 
@@ -206,6 +210,7 @@ endif(WITH_X11_GLES)
 build_flag (WITH_GLESv2_LIB "Build development library for GLES/X11 based renderers" OFF)
 #===========================================================================================================
 if (WITH_GLESv2_LIB)
+    add_subdirectory_once (LayerManagerPlugins/Renderers/Graphic)
     add_subdirectory_once (LayerManagerPlugins/Renderers/GraphicLib/LayerManagerGraphicGLESv2)
 endif(WITH_GLESv2_LIB)
 
