@@ -292,7 +292,7 @@ t_ilm_bool destroy()
         pthread_mutex_destroy(&gDbus.mutex);
     }
 
-    return gDbus.initialized;
+    return !gDbus.initialized;
 }
 
 
