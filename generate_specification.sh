@@ -1,13 +1,13 @@
 #!/bin/bash
 
-LATEX_PATH=./doc_generated/latex
+LATEX_PATH=`pwd`/doc_generated/latex
+PDF_PATH=`pwd`/doc_generated
 PDF_NAME=GENIVI_LayerManagement_Design_v2_0_MG0001
 
 
 #==============================================================================
-echo "starting doxygen."
+echo "running doxygen..."
 #==============================================================================
-echo "generating html and latex documentation..."
 doxygen
 
 #==============================================================================
@@ -30,7 +30,7 @@ echo "$MAIN_PAGE" \
 
 
 #==============================================================================
-echo "creating PDF from latex documentation."
+echo "creating PDF from latex documentation..."
 #==============================================================================
 cd $LATEX_PATH
 make &> /dev/null
@@ -40,11 +40,11 @@ cd -
 #==============================================================================
 echo "applying name to PDF document..."
 #==============================================================================
-cp $LATEX_PATH/refman.pdf ./$PDF_NAME.pdf
+cp $LATEX_PATH/refman.pdf $PDF_PATH/$PDF_NAME.pdf
 
 
 #==============================================================================
 echo "The LayerManagement specification was stored here:"
 #==============================================================================
-echo "`pwd`/$PDF_NAME.pdf"
+echo "$PDF_PATH/$PDF_NAME.pdf"
 
