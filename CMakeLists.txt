@@ -55,6 +55,19 @@ endif (WITH_STYLE_CHECKING)
 add_custom_target(check-style COMMAND ${CMAKE_SOURCE_DIR}/scripts/check_style.sh)
 
 #===========================================================================================================
+build_flag (WITH_DOCUMENTATION "Generate documentation during build (requires doxygen)" OFF)
+#===========================================================================================================
+if (WITH_DOCUMENTATION)
+    add_custom_target(doc ALL
+                      COMMAND ${CMAKE_SOURCE_DIR}/generate_specification.sh
+                      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+else (WITH_DOCUMENTATION)
+    add_custom_target(doc
+                      COMMAND ${CMAKE_SOURCE_DIR}/generate_specification.sh
+                      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+endif (WITH_DOCUMENTATION)
+
+#===========================================================================================================
 build_flag (WITH_TESTS "Build unit test binaries for all enabled components" OFF)
 #===========================================================================================================
 if (WITH_TESTS)
