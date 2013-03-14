@@ -1,8 +1,46 @@
-next
+Version 1.0
 ------------------
-Improvements:
-- removed LayerGroups, SurfaceGroups
+This version includes the following enhancements.
 
+Bugfixes :
+- fixed return codes in ilmCommon/ilmClient/ilmControl
+- fixed various logging issues
+- fixed dependency tracking in build system
+- fixed memory leak in notification handling
+- fixed warnings detected by code style checking scripts
+- fixed array handling in LayerManagerCommands
+- fixed compilation error in TcpIpcModule on some platforms
+- fixed input issues in LayerManagerControl
+- fixed ilm_screenSetRenderOrder handling of empty input
+- fixed ilm_getPropertiesOfScreen handling of invalid screen
+
+Improvements:
+- updated build system
+- support for statically linked plugins
+- "make doc" build target: generate specification document
+- "make check-style" build target: check code style guide
+- ilmClient API splitted into
+    - ilmCommon: lifecycle, threading, communication
+    - ilmClient: restricted API for default client applications
+    - ilmControl: full featured API for scene controlling applications
+- LayerManagerService splitted into
+    - LayerManagerBase: base implementation, Interface declarations
+    - LayerManagerService: application using LayerManagerBase
+- added ilm_isInitialized in ilmCommon API
+- replaced POSIX message queues with custom thread-safe queue implementation
+- added multi-screen support for Wayland-based renderer plugins
+- added optimizationMode support for GLXRenderer
+- updated ilmCommon/ilmClient/ilmControl to be thread-safe
+- improved performance for Wayland renderer plugin with DRM backend
+- added TextRenderer
+- added support for optional command expressions in LayerManagerControl
+- improved plugin loading
+- removed LayerGroup APIs
+- removed SurfaceGroup APIs
+- removed deprecated function ilm_createLayer
+- removed BeagleRenderer
+- removed NullWindowSystem
+- removed LayerManagerToolBox
 
 Version 0.9.9
 ------------------

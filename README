@@ -6,7 +6,6 @@ Sections in this file describe:
 - Change the environment during Runtime
 - Running Testapplications
 
-
 Introduction
 ====================================
 In the automotive domain, the most HMI systems are using their own window manager implementation. 
@@ -77,12 +76,12 @@ x-damage
 
 EGL / OpenGL ES 2.0:
 
-EGL_IMAGE_KHR : 
+EGL_IMAGE_KHR:
 The following functions should be supported by the vendor specific graphic driver
 glEGLImageTargetTexture2DOES
 eglCreateImageKHR
 eglDestroyImageKHR
-Furthermore it should be supported to create an egl image from an x11 pixmap.  
+Furthermore it should be supported to create an egl image from an x11 pixmap.
 
 Platform with X11 and OpenGL
 ===
@@ -126,8 +125,8 @@ Building the LayerManager breaks down to the following steps:
 
    Example: cd <build-dir>
             cmake <source-dir> [optional_build_options]
-   
-   For a full list of available build options in [optional_build_options] see "Supported Build Options"   
+
+   For a full list of available build options in [optional_build_options] see "Supported Build Options"
 
 4. Start the build.
 
@@ -159,7 +158,7 @@ build an EGL Image from X11Pixmap
 Vendor specific OpenGL ES 2.0 Libraries, with JIT compiler to support shader which are
 delivered as source code
 
-X11Renderer:
+GLXRenderer:
 ---
 Core X11 libraries
 X11 Composite libraries
@@ -170,42 +169,45 @@ GLX
 Supported Build Options
 ===
 
-- Build configuration:
-  Option: -DCMAKE_BUILD_TYPE=Debug or
-          -DCMAKE_BUILD_TYPE=Release
+Build Flag                      Default Value   Description
 
-- Build for X11 Desktop with OpenGL / GLX Renderer
-  Option: -DWITH_DESKTOP=ON or
-          -DWITH_DESKTOP=OFF
+WITH_CLIENTEXAMPLES             ON              Build examples for client library usage
+WITH_CLIENT_LIB                 ON              Build LayerManagement client library
+WITH_DESKTOP                    OFF             Build renderer plugin for OpenGL/X11 based platforms
+WITH_CONTROL_BIN                ON              Build LayerManagerControl binary
+WITH_CONTROL_LIB                OFF             Build LayerManagement control library
+WITH_DLT                        OFF             Build with DLT logging support
+WITH_DOCUMENTATION              OFF             Generate documentation during build (requires doxygen)
+WITH_EGL_EXAMPLE                ON              Build examples for GLES/X11 based platforms
+WITH_EXAMPLE_SCENE_PROVIDER     OFF             Build scene provider plugin to run example applications
+WITH_FORCE_COPY                 OFF             Force Software Copy of Pixmaps (compatibility for VMs)
+WITH_GENERIC_COMMUNICATOR       ON              Build Generic Communicator Plugin based on IpcModules
+WITH_GLESv2_LIB                 OFF             Build development library for GLES/X11 based renderers
+WITH_GLX_EXAMPLE                OFF             Build examples for OpenGL/X11 based platforms
+WITH_GLX_LIB                    OFF             Build development library for OpenGL/X11 based renderers
+WITH_SERVICE_BIN                ON              Build LayerManagerService binary
+WITH_STATIC_LIBRARIES           OFF             Link all plugins and libraries statically
+WITH_STYLE_CHECKING             OFF             Report styleguide problems during build (requires python)
+WITH_SYSTEMD_HEALTH_MONITOR     OFF             Build plugin for systemd based health monitoring
+WITH_TESTS                      OFF             Build unit test binaries for all enabled components
+WITH_TEXT_RENDERER              OFF             Build renderer plugin with pure logging (no rendering)
+WITH_WAYLAND_X11                OFF             Build renderer plugin for GLES/Wayland with X11 backend
+WITH_WAYLAND_X11_LIB            OFF             Build development library for GLES/Wayland X11 based renderers
+WITH_WAYLAND_DRM                OFF             Build renderer plugin for GLES/Wayland with DRM backend
+WITH_WAYLAND_DRM_LIB            OFF             Build development library for GLES/Wayland DRM based renderers
+WITH_WAYLAND_FBDEV              OFF             Build renderer plugin for GLES/Wayland with FBDEV backend
+WITH_WAYLAND_FBDEV_LIB          OFF             Build development library for GLES/Wayland FBDEV based renderers
+WITH_WL_EXAMPLE                 OFF             Build examples for GLES/Wayland based platforms
+WITH_X11_GLES                   ON              Build renderer plugin for GLES/X11 based platforms
 
-- Build for X11 with OpenGL ES 2.0 Renderer
-  Option: -DWITH_X11_GLES=ON or
-          -DWITH_X11_GLES=OFF
-          
-- Build EGL examples
-  Option: -DWITH_EGL_EXAMPLE=ON or
-          -DWITH_EGL_EXAMPLE=OFF
+You can set either of them during cmake execution, e.g.
 
-- Build OpenGL / GLX examples
-  Option: -DWITH_GLX_EXAMPLE=ON or
-          -DWITH_GLX_EXAMPLE=OFF
-          
-- Build Client examples
-  Option: -DWITH_CLIENT_EXAMPLES=ON or
-          -DWITH_CLIENT_EXAMPLES=OFF
-          
-- Build with copy of textures for target platform which does not support the
-  GLX_TEXTURE_FROM_PIXMAP or EGL_IMAGE_KHR on X11 pixmaps Extensions
-  Option: -DWITH_FORCE_COPY=ON or
-          -DWITH_FORCE_COPY=OFF
+    cmake -DWITH_FORCE_COPY=ON -DWITH_EGL_EXAMPLE=OFF <source_dir>
 
-- Build available tests
-  Option: -DWITH_TESTS=ON or
-          -DWITH_TESTS=OFF
+or you can update your CmakeCache variables afterwards using tools like ccmake.
 
-  Remark: Test File are currently not upstreamed.	
-
-- Build for different Platforms
+Build for different Platforms
+===
 
   You have the choice to use GLXRenderer or X11GLESRenderer.
 
@@ -228,7 +230,7 @@ LM_PLUGIN_PATH          set the path for the location of communicator and render
 LM_USE_SESSION_BUS      enables the DBUS communication to run on Session bus instead of Systembus
                         default : disabled run on system bus
                         Example : export LM_USE_SESSION_BUS=enable
-                        
+
 Commandline parameter :
 LayerManagerService : -w<horizontalresolution> - default 1280
                       -h<verticalresolution> - default 480
