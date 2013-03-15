@@ -86,3 +86,17 @@ set (STATICALLY_LINKED_PLUGINS "" CACHE INTERNAL "list of static plugins")
 set (BUILD_FLAG_LIST           "" CACHE INTERNAL "list of build flag names")
 set (BUILD_FLAG_ARRAY          "" CACHE INTERNAL "array of build flags for logging")
 
+
+#==============================================================================
+# cppcheck configuration
+#==============================================================================
+set (CPPCHECK_CONFIG
+    --quiet
+    --enable=performance,portability
+    --template='{file}:{line}: warning: {message} [{severity}]'
+)
+
+FOREACH (ARG ${CPPCHECK_CONFIG})
+    set (CPPCHECK_CONFIG_STRING "${CPPCHECK_CONFIG_STRING} ${ARG}")
+ENDFOREACH(ARG)
+

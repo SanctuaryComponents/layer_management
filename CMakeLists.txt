@@ -68,6 +68,16 @@ else (WITH_DOCUMENTATION)
 endif (WITH_DOCUMENTATION)
 
 #===========================================================================================================
+build_flag (WITH_CPPCHECK "Run cppcheck during build (requires cppcheck)" OFF)
+# add build target 'cppcheck' to run pre-defined configuration of cppcheck
+#===========================================================================================================
+if (WITH_CPPCHECK)
+    set(CMAKE_C_COMPILE_OBJECT "${CMAKE_C_COMPILE_OBJECT}; cppcheck <SOURCE> ${CPPCHECK_CONFIG_STRING}")
+    set(CMAKE_CXX_COMPILE_OBJECT "${CMAKE_CXX_COMPILE_OBJECT}; cppcheck <SOURCE> ${CPPCHECK_CONFIG_STRING}")
+endif (WITH_CPPCHECK)
+add_custom_target(cppcheck COMMAND cppcheck ${CMAKE_SOURCE_DIR}/LayerManager*/ ${CPPCHECK_CONFIG})
+
+#===========================================================================================================
 build_flag (WITH_TESTS "Build unit test binaries for all enabled components" OFF)
 #===========================================================================================================
 if (WITH_TESTS)
@@ -288,3 +298,4 @@ endif (WITH_CONTROL_LIB)
 # store used build configuration
 #===========================================================================================================
 add_subdirectory_once(config)
+
