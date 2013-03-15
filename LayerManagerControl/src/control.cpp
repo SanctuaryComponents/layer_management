@@ -148,6 +148,7 @@ void setSurfaceAcceptsInput(t_ilm_surface surfaceId, string kbdPointerTouch, t_i
     {
         cout << "LayerManagerService returned: " << ILM_ERROR_STRING(callResult) << "\n";
         cout << "Failed to update input event acceptance on surface with ID " << surfaceId << "\n";
+        delete[] str;
         return;
     }
 
