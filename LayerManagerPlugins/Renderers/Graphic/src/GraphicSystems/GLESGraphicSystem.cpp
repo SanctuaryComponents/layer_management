@@ -368,7 +368,7 @@ void GLESGraphicsystem::renderSWLayer(Layer *layer, bool clear)
         }
 
         SurfaceList surfaces = m_currentLayer->getAllSurfaces();
-        for (std::list<Surface*>::const_iterator currentS = surfaces.begin(); currentS != surfaces.end(); currentS++)
+        for (std::list<Surface*>::const_iterator currentS = surfaces.begin(); currentS != surfaces.end(); ++currentS)
         {
             if ((*currentS)->hasNativeContent() && (*currentS)->visibility && (*currentS)->opacity>0.0f)
             {
@@ -596,7 +596,7 @@ void GLESGraphicsystem::renderSWLayers(LayerList layers, bool clear)
 
         bool blend = !clear;
 
-        for (std::list<MultiSurfaceRegion*>::const_iterator region = regions.begin(); region != regions.end(); region++)
+        for (std::list<MultiSurfaceRegion*>::const_iterator region = regions.begin(); region != regions.end(); ++region)
         {
             renderRegion(*region, blend);
         }
@@ -616,7 +616,7 @@ void GLESGraphicsystem::renderSWLayers(LayerList layers, bool clear)
                 LayerList singleLayer;
                 singleLayer.push_back(*layer);
                 std::list<MultiSurfaceRegion*> regions = computeRegions(singleLayer, true); //do clear
-                for (std::list<MultiSurfaceRegion*>::const_iterator region = regions.begin(); region != regions.end(); region++)
+                for (std::list<MultiSurfaceRegion*>::const_iterator region = regions.begin(); region != regions.end(); ++region)
                 {
                     renderRegion(*region, false); //don't blend
                 }
@@ -1271,7 +1271,7 @@ std::list<MultiSurfaceRegion*> GLESGraphicsystem::computeRegions(std::list<Layer
                     MultiSurfaceRegion *region = new MultiSurfaceRegion();
                     region->m_rect = FloatRectangle(x1, y1, x2-x1, y2-y1);
                     std::list<OrderedSurface>::iterator si;
-                    for (si = regionsurfaces.begin(); si != regionsurfaces.end(); si++)
+                    for (si = regionsurfaces.begin(); si != regionsurfaces.end(); ++si)
                     {
                         if ((*si).surface)
                         {
@@ -1280,7 +1280,7 @@ std::list<MultiSurfaceRegion*> GLESGraphicsystem::computeRegions(std::list<Layer
                     }
                     // Add the new region to the list we return.  Only create
                     // empty regions when 'clear' was requested
-                    if (clear || regionsurfaces.size() > 0)
+                    if (clear || !regionsurfaces.empty())
                     {
                         regions.push_back(region);
                     }
@@ -1298,7 +1298,7 @@ std::list<MultiSurfaceRegion*> GLESGraphicsystem::computeRegions(std::list<Layer
                     // be able to render with the surfaces layered properly.
                     bool inserted = false;
                     std::list<OrderedSurface>::iterator si;
-                    for (si = regionsurfaces.begin(); si != regionsurfaces.end(); si++)
+                    for (si = regionsurfaces.begin(); si != regionsurfaces.end(); ++si)
                     {
                         if ((*si).depth >= xlimits[x].orderedSurface.depth)
                         {

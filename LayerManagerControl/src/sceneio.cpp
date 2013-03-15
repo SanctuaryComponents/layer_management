@@ -728,7 +728,7 @@ void exportXtext(string fileName, string grammar, string url)
     list<string> doneTypes;
     list<StringMapTree*> waitingNodes;
     waitingNodes.push_back(&grammarTree);
-    while (waitingNodes.size() != 0)
+    while (!waitingNodes.empty())
     {
         //pop first element of the waiting types
         StringMapTree* typeNode = *(waitingNodes.begin());

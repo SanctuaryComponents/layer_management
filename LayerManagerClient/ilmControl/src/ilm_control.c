@@ -60,30 +60,32 @@ ilmErrorTypes ilm_getPropertiesOfScreen(t_ilm_display screenID, struct ilmScreen
 {
     ilmErrorTypes returnValue = ILM_FAILED;
 
-    t_ilm_message response = 0;
-    t_ilm_message command = gIpcModule.createMessage("GetPropertiesOfScreen");
-    if (pScreenProperties
-        && command
-        && gIpcModule.appendUint(command, screenID)
-        && sendAndWaitForResponse(command, &response, RESPONSE_TIMEOUT_IN_MS, &returnValue)
-        && gIpcModule.getUintArray(response, &pScreenProperties->layerIds, (int*)(&pScreenProperties->layerCount))
-        && gIpcModule.getUint(response, &pScreenProperties->harwareLayerCount)
-        && gIpcModule.getUint(response, &pScreenProperties->screenWidth)
-        && gIpcModule.getUint(response, &pScreenProperties->screenHeight))
+    if (pScreenProperties)
     {
-        returnValue = ILM_SUCCESS;
-    }
-    else
-    {
-        pScreenProperties->layerCount = 0;
-        pScreenProperties->harwareLayerCount = 0;
-        pScreenProperties->layerIds = NULL;
-        pScreenProperties->screenWidth = 0;
-        pScreenProperties->screenHeight = 0;
-    }
+        t_ilm_message response = 0;
+        t_ilm_message command = gIpcModule.createMessage("GetPropertiesOfScreen");
+        if (command
+            && gIpcModule.appendUint(command, screenID)
+            && sendAndWaitForResponse(command, &response, RESPONSE_TIMEOUT_IN_MS, &returnValue)
+            && gIpcModule.getUintArray(response, &pScreenProperties->layerIds, (int*)(&pScreenProperties->layerCount))
+            && gIpcModule.getUint(response, &pScreenProperties->harwareLayerCount)
+            && gIpcModule.getUint(response, &pScreenProperties->screenWidth)
+            && gIpcModule.getUint(response, &pScreenProperties->screenHeight))
+        {
+            returnValue = ILM_SUCCESS;
+        }
+        else
+        {
+            pScreenProperties->layerCount = 0;
+            pScreenProperties->harwareLayerCount = 0;
+            pScreenProperties->layerIds = NULL;
+            pScreenProperties->screenWidth = 0;
+            pScreenProperties->screenHeight = 0;
+        }
 
-    gIpcModule.destroyMessage(response);
-    gIpcModule.destroyMessage(command);
+        gIpcModule.destroyMessage(response);
+        gIpcModule.destroyMessage(command);
+    }
     return returnValue;
 }
 

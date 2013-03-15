@@ -199,7 +199,7 @@ void WaylandDrmWindowSystem::RedrawAllLayers(bool clear, bool swap)
                 graphicSystem->clearBackground();
             }
         }
-        for (std::list<Layer*>::const_iterator current = layers.begin(); current != layers.end(); current++)
+        for (std::list<Layer*>::const_iterator current = layers.begin(); current != layers.end(); ++current)
         {
             if ((*current)->getLayerType() == Hardware)
             {

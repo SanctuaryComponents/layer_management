@@ -590,7 +590,7 @@ void X11WindowSystem::calculateFps()
         FPS = ((float)(Frame)) / timeSinceLastCalc;
         char floatStringBuffer[256];
         sprintf(floatStringBuffer, "Overall fps: %f", FPS);
-        for (std::list<Layer*>::const_iterator current = layers.begin(); current != layers.end(); current++)
+        for (std::list<Layer*>::const_iterator current = layers.begin(); current != layers.end(); ++current)
         {
             SurfaceList surfaceList = (*current)->getAllSurfaces();
             SurfaceListIterator surfaceIter = surfaceList.begin();
@@ -612,7 +612,7 @@ void X11WindowSystem::RedrawAllLayers(bool clear, bool swap)
     LayerList swLayers;
 
     // Refresh HW Layers, find SW Layers
-    for (LayerListConstIterator current = layers.begin(); current != layers.end(); current++)
+    for (LayerListConstIterator current = layers.begin(); current != layers.end(); ++current)
     {
         if ((*current)->getLayerType() == Hardware)
         {

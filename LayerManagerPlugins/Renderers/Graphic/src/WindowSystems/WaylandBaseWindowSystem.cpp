@@ -326,7 +326,7 @@ void WaylandBaseWindowSystem::calculateFps()
     sprintf(floatStringBuffer, "Overall fps: %f", FPS);
 
     timeSinceLastCalc = (float)(tv.tv_sec-tv0_forRender.tv_sec) + 0.000001*((float)(tv.tv_usec-tv0_forRender.tv_usec));
-    for (std::list<Layer*>::const_iterator current = layers.begin(); current != layers.end(); current++)
+    for (std::list<Layer*>::const_iterator current = layers.begin(); current != layers.end(); ++current)
     {
         SurfaceList surfaceList = (*current)->getAllSurfaces();
         SurfaceListIterator surfaceIter = surfaceList.begin();
@@ -359,7 +359,7 @@ void WaylandBaseWindowSystem::RedrawAllLayers(bool clear, bool swap)
         }
 #endif /* WL_OMIT_CLEAR_GB */
     }
-    for (std::list<Layer*>::const_iterator current = layers.begin(); current != layers.end(); current++)
+    for (std::list<Layer*>::const_iterator current = layers.begin(); current != layers.end(); ++current)
     {
         if ((*current)->getLayerType() == Hardware)
         {
