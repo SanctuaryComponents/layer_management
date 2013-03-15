@@ -2,7 +2,7 @@
 
 LATEX_PATH=`pwd`/doc_generated/latex
 PDF_PATH=`pwd`/doc_generated
-PDF_NAME=GENIVI_LayerManagement_Design_v2_0_MG0001
+PDF_NAME=IVI_LayerManagement_Design_v3_0_MG0001
 
 
 #==============================================================================
@@ -33,7 +33,7 @@ echo "$MAIN_PAGE" \
 echo "creating PDF from latex documentation..."
 #==============================================================================
 cd $LATEX_PATH
-make &> /dev/null
+make 1> /dev/null
 cd -
 
 
