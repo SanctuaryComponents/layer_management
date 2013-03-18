@@ -177,7 +177,6 @@ void PluginManager::getAllFilesInPluginPath(std::string path)
 
     while (directory && (itemInDirectory = readdir(directory)))
     {
-        unsigned char entryType = itemInDirectory->d_type;
         std::string entryName = itemInDirectory->d_name;
         std::string fullPath = path + "/" + entryName;
 
@@ -186,23 +185,9 @@ void PluginManager::getAllFilesInPluginPath(std::string path)
             continue;
         }
 
-        switch (entryType)
-        {
-        case DT_REG:
-        case DT_LNK:
-        case DT_UNKNOWN:
-            mFileList.push_back(fullPath);
-            LOG_DEBUG("PluginManager", "considering File " << fullPath);
-            break;
-
-        case DT_DIR:
-            getAllFilesInPluginPath(fullPath);
-            break;
-
-        default:
-            LOG_DEBUG("PluginManager", "ignored file " << fullPath);
-            break;
-        }
+        mFileList.push_back(fullPath);
+        LOG_DEBUG("PluginManager", "considering " << fullPath);
+        getAllFilesInPluginPath(fullPath);
     }
 
     closedir(directory);
@@ -234,7 +219,6 @@ IPlugin* PluginManager::createDynamicallyLinkedPlugin(std::string path)
     const char* dlopen_error = dlerror();
     if (dlopen_error)
     {
-        LOG_DEBUG("PluginManager", "not a shared library: " << dlopen_error);
         return NULL;
     }
 
