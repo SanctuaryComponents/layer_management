@@ -1,6 +1,6 @@
 /***************************************************************************
 *
-* Copyright 2010,2011 BMW Car IT GmbH
+* Copyright 2010-2013 BMW Car IT GmbH
 *
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,8 +16,8 @@
 * limitations under the License.
 *
 ****************************************************************************/
-#ifndef _ILM_CLIENT_PLATFORM_H_
-#define _ILM_CLIENT_PLATFORM_H_
+#ifndef _ILM_PLATFORM_H_
+#define _ILM_PLATFORM_H_
 
 typedef unsigned int  t_ilm_bool;
 typedef unsigned int  t_ilm_uint;
@@ -31,5 +31,5 @@ typedef double        t_ilm_float;
 typedef unsigned long t_ilm_ulong;
 typedef long          t_ilm_long;
 
-#endif /* _ILM_CLIENT_PLATFORM_H_ */
+#endif /* _ILM_PLATFORM_H_ */
 

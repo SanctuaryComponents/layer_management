@@ -60,7 +60,7 @@ install (
                 include/ilm_types.h
                 include/ilm_configuration.h
                 include/ilm_tools.h
-                include/ilm_client_platform.h
+                include/ilm_platform.h
     DESTINATION include/ilm
 )
 

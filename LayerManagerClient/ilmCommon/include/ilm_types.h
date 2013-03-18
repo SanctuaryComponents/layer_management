@@ -20,7 +20,7 @@
 #ifndef _ILM_TYPES_H_
 #define _ILM_TYPES_H_
 
-#include "ilm_client_platform.h"
+#include "ilm_platform.h"
 
 /**
  * convenience macro to access single bits of a bitmask
