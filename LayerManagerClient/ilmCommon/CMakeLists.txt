@@ -31,7 +31,7 @@ include_directories(
     "${CMAKE_SOURCE_DIR}/LayerManagerUtils/include"
 )
 
-add_library(${PROJECT_NAME} STATIC
+add_library(${PROJECT_NAME} SHARED
     src/ilm_common.c
     src/ilm_tools.c
 )
@@ -50,14 +50,16 @@ set(LIBS
 
 target_link_libraries(${PROJECT_NAME} ${LIBS} -ldl)
 
-#install (
-#    TARGETS             ${PROJECT_NAME}
-#    LIBRARY DESTINATION lib
-#)
+install (
+    TARGETS             ${PROJECT_NAME}
+    LIBRARY DESTINATION lib
+)
 
 install (
     FILES       include/ilm_common.h
                 include/ilm_types.h
+                include/ilm_configuration.h
+                include/ilm_tools.h
                 include/ilm_client_platform.h
     DESTINATION include/ilm
 )

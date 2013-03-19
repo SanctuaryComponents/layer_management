@@ -69,6 +69,7 @@ install(FILES
             include/LogMessageBuffer.h
             include/IlmMatrix.h
             include/Bitmap.h
+            include/IpcModuleLoader.h
         DESTINATION
             include/layermanager
 )

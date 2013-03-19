@@ -25,9 +25,9 @@ project (LayerManager)
 # cmake configuration
 #===========================================================================================================
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/")
-include(${CMAKE_MODULE_PATH}/DefaultSettings.txt)
-include(${CMAKE_MODULE_PATH}/CMakeVersions.txt)
-include(${CMAKE_MODULE_PATH}/CustomMacros.txt)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/DefaultSettings.txt)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/CMakeVersions.txt)
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/CustomMacros.txt)
 add_subdirectory(cmake/optionalFeatures)
 
 #===========================================================================================================
@@ -49,7 +49,7 @@ build_flag (WITH_STATIC_LIBRARIES "Link all plugins and libraries statically" OF
 build_flag (WITH_STYLE_CHECKING "Report styleguide problems during build (requires python)" OFF)
 #===========================================================================================================
 if (WITH_STYLE_CHECKING)
-    set(CMAKE_C_COMPILE_OBJECT "${CMAKE_C_COMPILE_OBJECT}; echo 'Checking style...<SOURCE>'; ${CMAKE_SOURCE_DIR}/scripts/check_all_styles.py <SOURCE>")
+    set(CMAKE_C_COMPILE_OBJECT "${CMAKE_C_COMPILE_OBJECT}; ${CMAKE_SOURCE_DIR}/scripts/check_all_styles.py <SOURCE>")
     set(CMAKE_CXX_COMPILE_OBJECT "${CMAKE_CXX_COMPILE_OBJECT}; ${CMAKE_SOURCE_DIR}/scripts/check_all_styles.py <SOURCE>")
 endif (WITH_STYLE_CHECKING)
 add_custom_target(check-style COMMAND ${CMAKE_SOURCE_DIR}/scripts/check_style.sh)
@@ -181,7 +181,6 @@ endif(WITH_DESKTOP)
 build_flag (WITH_GLX_LIB "Build development library for OpenGL/X11 based renderers" OFF)
 #===========================================================================================================
 if (WITH_GLX_LIB)
-    add_subdirectory_once (LayerManagerPlugins/Renderers/Graphic)
     add_subdirectory_once (LayerManagerPlugins/Renderers/GraphicLib/LayerManagerGraphicGLX)
 endif(WITH_GLX_LIB)
 
@@ -200,7 +199,6 @@ endif(WITH_WAYLAND_X11)
 build_flag (WITH_WAYLAND_X11_LIB "Build development library for GLES/Wayland X11 based renderers" OFF)
 #===========================================================================================================
 if (WITH_WAYLAND_X11_LIB)
-    add_subdirectory_once (LayerManagerPlugins/Renderers/Graphic)
     add_subdirectory_once (LayerManagerPlugins/Renderers/GraphicLib/LayerManagerGraphicWaylandX11GLESv2)
 endif(WITH_WAYLAND_X11_LIB)
 
@@ -219,7 +217,6 @@ endif(WITH_WAYLAND_DRM)
 build_flag (WITH_WAYLAND_DRM_LIB "Build development library for GLES/Wayland DRM based renderers" OFF)
 #===========================================================================================================
 if (WITH_WAYLAND_DRM_LIB)
-    add_subdirectory_once (LayerManagerPlugins/Renderers/Graphic)
     add_subdirectory_once (LayerManagerPlugins/Renderers/GraphicLib/LayerManagerGraphicWaylandDrmGLESv2)
 endif(WITH_WAYLAND_DRM_LIB)
 
@@ -238,7 +235,6 @@ endif(WITH_WAYLAND_FBDEV)
 build_flag (WITH_WAYLAND_FBDEV_LIB "Build development library for GLES/Wayland FBDEV based renderers" OFF)
 #===========================================================================================================
 if (WITH_WAYLAND_FBDEV_LIB)
-    add_subdirectory_once (LayerManagerPlugins/Renderers/Graphic)
     add_subdirectory_once (LayerManagerPlugins/Renderers/GraphicLib/LayerManagerGraphicWaylandFbdevGLESv2)
 endif(WITH_WAYLAND_FBDEV_LIB)
 
@@ -254,7 +250,6 @@ endif(WITH_X11_GLES)
 build_flag (WITH_GLESv2_LIB "Build development library for GLES/X11 based renderers" OFF)
 #===========================================================================================================
 if (WITH_GLESv2_LIB)
-    add_subdirectory_once (LayerManagerPlugins/Renderers/Graphic)
     add_subdirectory_once (LayerManagerPlugins/Renderers/GraphicLib/LayerManagerGraphicGLESv2)
 endif(WITH_GLESv2_LIB)
 
@@ -285,7 +280,7 @@ if (WITH_CLIENT_LIB)
 endif (WITH_CLIENT_LIB)
 
 #===========================================================================================================
-build_flag (WITH_CONTROL_LIB "Build LayerManagement control library" OFF)
+build_flag (WITH_CONTROL_LIB "Build LayerManagement control library" ON)
 #===========================================================================================================
 if (WITH_CONTROL_LIB)
     add_subdirectory_once (LayerManagerUtils)
