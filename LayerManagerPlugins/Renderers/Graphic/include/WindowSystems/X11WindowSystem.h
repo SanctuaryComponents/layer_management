@@ -25,6 +25,7 @@
 #include "Surface.h"
 #include "PlatformSurfaces/XPlatformSurface.h"
 #include <X11/Xutil.h>
+#include <X11/extensions/Xfixes.h>
 #include "Log.h"
 #include "ScreenShotType.h"
 
@@ -94,6 +95,7 @@ private:
 protected:
     Display* x11Display;
 
+    XserverRegion x11DamageRegion;
     pthread_t renderThread;
     //void setDisplayMode();
     int windowWidth;

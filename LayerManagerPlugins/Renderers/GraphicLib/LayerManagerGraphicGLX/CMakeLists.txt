@@ -60,6 +60,7 @@ set(LIBS
     ${X11_X11_LIB}
     ${X11_Xcomposite_LIB}
     ${X11_Xdamage_LIB}
+    ${X11_Xfixes_LIB}
     ${GLX_LIBRARIES}
     LayerManagerUtils
     LayerManagerBase

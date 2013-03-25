@@ -158,6 +158,7 @@ bool X11WindowSystem::checkForDamageExtension()
         return false;
     }
     XDamageQueryVersion(x11Display, &damage_major, &damage_minor);
+    x11DamageRegion = XFixesCreateRegion(x11Display, 0, 0);
     LOG_DEBUG("X11WindowSystem", "Found damage extension: damage opcode: " << damage_opcode);
     LOG_DEBUG("X11WindowSystem", "damage_major: " << damage_major);
     LOG_DEBUG("X11WindowSystem", "damage_minor: " << damage_minor);
@@ -286,6 +287,8 @@ void X11WindowSystem::configureSurfaceWindow(Window window)
         surface->OriginalSourceHeight = winHeight;
         surface->OriginalSourceWidth = winWidth;
 
+        surface->damaged = false; // Waiting for damage event to get updated content
+        surface->m_surfaceResized = true /*surface->synchronized*/;
         LOG_DEBUG("X11WindowSystem", "Done Updating window " << window);
     }
 }
@@ -858,8 +861,15 @@ init_complete:
             checkRedraw = true;
             break;
         case Expose:
-            LOG_DEBUG("X11WindowSystem", "Expose Event");
-            checkRedraw = true;
+            if (event.xexpose.window == this->CompositorWindow)
+            {
+                checkRedraw = true;
+                LOG_DEBUG("X11WindowSystem", "Expose Event triggered by internal Redraw");
+            }
+            else
+            {
+                LOG_DEBUG("X11WindowSystem", "Expose Event triggered by external Application");
+            }
             break;
         case MapNotify:
             LOG_DEBUG("X11WindowSystem", "Map Event");
@@ -904,7 +914,7 @@ init_complete:
         default:
             if (event.type == this->damage_event + XDamageNotify)
             {
-                XDamageSubtract(this->x11Display, ((XDamageNotifyEvent*)(&event))->damage, None, None);
+                XDamageSubtract(this->x11Display, ((XDamageNotifyEvent*)(&event))->damage, None, x11DamageRegion);
                 Surface* currentSurface = this->getSurfaceForWindow(((XDamageNotifyEvent*)(&event))->drawable);
                 if (currentSurface == NULL)
                 {
@@ -915,14 +925,34 @@ init_complete:
                 {
                     if (currentSurface->platform != NULL)
                     {
+                        XRectangle* rectangles;
+                        XRectangle bounds;
+                        int numberRects;
                         /* Enable Rendering for Surface, after damage Notification was send successfully */
                         /* This will ensure, that the content is not dirty */
                         ((XPlatformSurface *)(currentSurface->platform))->enableRendering();
+                        rectangles = XFixesFetchRegionAndBounds(this->x11Display, x11DamageRegion, &numberRects, &bounds);
+                        if (currentSurface->OriginalSourceWidth != bounds.width || currentSurface->OriginalSourceHeight != bounds.height)
+                        {
+                            LOG_DEBUG("X11WindowSystem", "Damaged Bounds differs from size : [ " << bounds.x << ", " << bounds.y <<
+                                                                ", " << bounds.width << ", " << bounds.height << " ]");
+                            currentSurface->m_surfaceResized = true /*currentSurface->synchronized*/;
+                        }
+                        XFree(rectangles);
                     }
                 }
-                currentSurface->damaged = true;
-                currentSurface->updateCounter++;
-                checkRedraw = true;
+                /* Ignore Damage Events after Resize, the content can be invalid */
+                if (!currentSurface->m_surfaceResized)
+                {
+                    currentSurface->damaged = true;
+                    currentSurface->updateCounter++;
+                    checkRedraw = true;
+                }
+                else
+                {
+                    LOG_DEBUG("X11WindowSystem", "Skipping Damage Event which was triggered after ConfigureNotify");
+                    currentSurface->m_surfaceResized = false;
+                }
             }
             break;
         }
@@ -1041,6 +1071,7 @@ void X11WindowSystem::cleanup()
     {
         Window root = RootWindow(x11Display, DefaultScreen(x11Display));
         XCompositeUnredirectSubwindows(x11Display, root, CompositeRedirectManual);
+        XFixesDestroyRegion(x11Display, x11DamageRegion);
         XDestroyWindow(x11Display, CompositorWindow);
     }
 
@@ -1076,12 +1107,6 @@ bool X11WindowSystem::init(BaseGraphicSystem<Display*, Window>* base)
     mThreadId = renderThread;
 
     pthread_cond_wait(&init_condition, &init_lock);
-/*  while (!m_initialized)
-    {
-        usleep(1000); // TODO
-        LOG_DEBUG("X11WindowSystem","Waiting start complete " << m_initialized);
-    }
-*/
     pthread_mutex_unlock(&init_lock);
     LOG_INFO("X11WindowSystem", "Initialization complete success :" << m_success);
     return m_success;
