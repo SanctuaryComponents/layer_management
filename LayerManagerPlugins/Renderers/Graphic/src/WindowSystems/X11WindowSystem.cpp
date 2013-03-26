@@ -21,6 +21,7 @@
 #include "config.h"
 #include "Log.h"
 #include "Layer.h"
+#include "Rectangle.h"
 #include <time.h>
 #include <sys/time.h>
 #include <X11/Xlib.h>
@@ -263,8 +264,6 @@ void X11WindowSystem::configureSurfaceWindow(Window window)
     if (isWindowValid(window))
     {
         LOG_DEBUG("X11WindowSystem", "Updating window " << window);
-        UnMapWindow(window);
-        MapWindow(window);
         XWindowAttributes att;
         XGetWindowAttributes(x11Display, window, &att);
         int winWidth = att.width;
@@ -284,11 +283,28 @@ void X11WindowSystem::configureSurfaceWindow(Window window)
 
         LOG_DEBUG("X11WindowSystem", "Updating surface " << surface->getID());
 
-        surface->OriginalSourceHeight = winHeight;
-        surface->OriginalSourceWidth = winWidth;
+        if (surface->OriginalSourceHeight != winHeight || surface->OriginalSourceWidth != winWidth)
+        {
+            surface->OriginalSourceHeight = winHeight;
+            surface->OriginalSourceWidth = winWidth;
 
-        surface->damaged = false; // Waiting for damage event to get updated content
-        surface->m_surfaceResized = true /*surface->synchronized*/;
+            surface->damaged = false; // Waiting for damage event to get updated content
+            surface->m_surfaceResized = true /*surface->synchronized*/;
+
+            Rectangle newDestination = surface->getDestinationRegion();
+            newDestination.width = surface->OriginalSourceWidth;
+            newDestination.height = surface->OriginalSourceHeight;
+            surface->setDestinationRegion(newDestination);
+
+            Rectangle newSource = surface->getSourceRegion();
+            newSource.width = surface->OriginalSourceWidth;
+            newSource.height = surface->OriginalSourceHeight;
+            surface->setSourceRegion(newSource);
+        }
+
+        UnMapWindow(window);
+        MapWindow(window);
+
         LOG_DEBUG("X11WindowSystem", "Done Updating window " << window);
     }
 }
