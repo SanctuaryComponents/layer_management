@@ -19,7 +19,8 @@
 ###########################################################################
 
 """
-    Runs all enabled style checking
+Runs all enabled style checking
+
 """
 
 import sys, re, string
@@ -57,7 +58,7 @@ CHECK_CLASS_NAME                    = "ON"
 if __name__ == "__main__":
     targets = sys.argv[1:]
     targets = get_all_files(targets)
-    
+
     if len(targets) == 0:
         print """
 \tTakes a list of files and directories as input and runs all enabled style-checking on all files.
@@ -65,11 +66,11 @@ if __name__ == "__main__":
 \tTo enable/disable style-checking you can toggle the "ON"/"OFF" value of the configuration variables inside the file.
 """
         exit(0)
-    
+
     for t in targets:
         if t[-2:] == ".h" or t[-4:] == ".cpp" or t[-2:] == ".c":
             file_contents, clean_file_contents, file_lines, clean_file_lines = read_file(t)
-            
+
             if CHECK_LICENSE == "ON":
                 check_license_in_file(t, file_contents)
             if CHECK_HEADER_GUARDS == "ON" and t[-2:] == ".h":

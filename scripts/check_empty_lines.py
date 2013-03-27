@@ -20,10 +20,13 @@
 
 import sys, re, string
 from common_modules.common import *
-from common_modules.config import G_MAX_INDENTATION_THRESHOLD
 
 
 def check_empty_lines(filename, file_contents, file_lines):
+    """
+    Check that there are no non-necessary empty lines
+
+    """
     #keep track of the current indentation
     #need only to know if level of indent is zero or not
     line_indent_zero = True
@@ -38,6 +41,11 @@ def check_empty_lines(filename, file_contents, file_lines):
         next_line = file_lines[i + 1] if i < len(file_lines) - 1 else ""
 
         def is_next_indent_zero():
+            """
+            Checks the indentation of the next non-empty line
+            return True if it is at zero-level indentation
+
+            """
             for j in range(i + 1, len(file_lines)):
                 if not is_line_empty(file_lines[j]):
                     return re.match(r'(\s+)(\S+)', file_lines[j]) == None
@@ -57,12 +65,13 @@ def check_empty_lines(filename, file_contents, file_lines):
             #if the line after it is a block end
             elif re.match(r'(\s*)\}', next_line):
                 log_warning(filename, i + 1, "unneeded empty line (block ends with empty line)")
-        #if non-empty line
         else:
+            #if non-empty line: check if line is at zero indentation
             #if the line contains one or more white-space characters followed by
             #one or more non white-space characters
             line_indent_zero = re.match(r'(\s+)(\S+)', line) == None
 
+    #if file does not end with an empty line: give warning
     if re.search(r'\n$', file_contents) == None:
         log_warning(filename, len(file_lines), "file does not end with new line")
 
@@ -73,7 +82,7 @@ if __name__ == "__main__":
 
     if len(targets) == 0:
         print """
-\t**** No input provided ***
+\t**** No input provided ****
 \tTakes a list of files/directories as input and performs specific style checking on all files/directories
 
 \tGives warnings if there are unneeded empty lines
