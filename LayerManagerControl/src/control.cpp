@@ -80,7 +80,7 @@ void getCommunicatorPerformance()
 
     signal(SIGALRM, SIG_DFL);
 
-    cout << (runs/runtimeInSec) << " transactions/second\n";
+    cout << (runs / runtimeInSec) << " transactions/second\n";
 }
 
 void setSurfaceKeyboardFocus(t_ilm_surface surface)

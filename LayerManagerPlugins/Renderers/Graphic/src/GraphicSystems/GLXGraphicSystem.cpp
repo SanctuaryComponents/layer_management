@@ -399,7 +399,7 @@ void GLXGraphicsystem::renderSurface(Surface* currentSurface)
 
     // top left
     glTexCoord2f(textureCoordinates[0], textureCoordinates[1]);
-    glVertex2d((float)targetSurfaceDestination.x/m_windowWidth * 2 - 1, 1 - (float)targetSurfaceDestination.y / m_windowHeight * 2);
+    glVertex2d((float)targetSurfaceDestination.x / m_windowWidth * 2 - 1, 1 - (float)targetSurfaceDestination.y / m_windowHeight * 2);
     glEnd();
 
     m_binder->unbindSurfaceTexture(currentSurface);

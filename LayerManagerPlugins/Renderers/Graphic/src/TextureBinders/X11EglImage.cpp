@@ -72,7 +72,9 @@ void X11EglImage::createClientBuffer(Surface* surface)
         if (windowPixmap == 0)
         {
             LOG_ERROR("X11EglImage", "didnt create pixmap!");
-        } else {
+        }
+        else
+        {
             nativeSurface->pixmap = windowPixmap;
         }
 
@@ -125,7 +127,7 @@ void X11EglImage::destroyClientBuffer(Surface* surface)
         nativeSurface->texture = 0;
     }
     // We have to clean up the XServer side pixmap too
-    if (nativeSurface && nativeSurface->pixmap )
+    if (nativeSurface && nativeSurface->pixmap)
     {
         XFreePixmap(m_x11display, nativeSurface->pixmap);
         nativeSurface->pixmap = None;

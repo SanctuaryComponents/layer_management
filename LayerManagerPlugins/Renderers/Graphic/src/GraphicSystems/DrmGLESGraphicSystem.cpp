@@ -348,7 +348,8 @@ bool DrmGLESGraphicSystem::createOutputs()
 
     drmModeConnector* connector;
     drmModeRes*       resources;
-    int x = 0, y = 0;
+    int x = 0;
+    int y = 0;
 
     resources = drmModeGetResources(m_fdDev);
     if (!resources)

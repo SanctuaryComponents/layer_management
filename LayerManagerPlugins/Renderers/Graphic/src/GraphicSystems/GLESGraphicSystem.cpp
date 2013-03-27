@@ -1554,7 +1554,7 @@ void GLESGraphicsystem::renderTempTexture()
 
     uniforms.x = layerDestinationRegion.x / m_displayWidth;
     uniforms.y = 1.0f - (layerDestinationRegion.y + layerDestinationRegion.height) / m_displayHeight;
-    uniforms.width = layerDestinationRegion.width  / m_displayWidth;
+    uniforms.width = layerDestinationRegion.width / m_displayWidth;
     uniforms.height = layerDestinationRegion.height / m_displayHeight;
     uniforms.opacity[0] = m_currentLayer->getOpacity();
     uniforms.texRange[0][0]  = textureCoordinates[2] - textureCoordinates[0];
@@ -1570,9 +1570,9 @@ void GLESGraphicsystem::renderTempTexture()
         unsigned char green = 0;
         unsigned char blue = 0;
         m_currentLayer->getChromaKey(red, green, blue);
-        uniforms.chromaKey[0] = (float)red   / 255.0f;
+        uniforms.chromaKey[0] = (float)red / 255.0f;
         uniforms.chromaKey[1] = (float)green / 255.0f;
-        uniforms.chromaKey[2] = (float)blue  / 255.0f;
+        uniforms.chromaKey[2] = (float)blue / 255.0f;
     }
 
     glEnable(GL_BLEND);

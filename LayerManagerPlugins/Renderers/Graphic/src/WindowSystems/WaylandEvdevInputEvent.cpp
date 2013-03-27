@@ -153,8 +153,8 @@ configureTouchpadPressure(struct touchpad_dispatch *touchpad,
         touchpad->pressure.touch_high = pressure_min + 1;
         break;
     default:
-        touchpad->pressure.touch_low = pressure_min + range * (25.0/256.0);
-        touchpad->pressure.touch_high = pressure_min + range * (30.0/256.0);
+        touchpad->pressure.touch_low = pressure_min + range * (25.0 / 256.0);
+        touchpad->pressure.touch_high = pressure_min + range * (30.0 / 256.0);
         break;
     }
 
@@ -909,7 +909,8 @@ WaylandEvdevInputEvent::notifyKeyboardFocus()
 {
     struct evdev_input_device *device;
     struct wl_array keys;
-    char evdev_keys[(KEY_CNT + 7) / 8], all_keys[(KEY_CNT + 7) / 8];
+    char evdev_keys[(KEY_CNT + 7) / 8];
+    char all_keys[(KEY_CNT + 7) / 8];
     uint32_t *k;
     unsigned int i, set;
     int ret;

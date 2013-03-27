@@ -55,7 +55,7 @@ tuple4 getSurfaceScreenCoordinates(ilmSurfaceProperties targetSurfaceProperties,
     t_ilm_float targetX2 = targetX1 + horizontalScale * targetSurfaceProperties.destWidth;
 
     t_ilm_float verticalScale = targetLayerProperties.sourceHeight ?
-            1.0 * targetLayerProperties.destHeight/ targetLayerProperties.sourceHeight : 0;
+            1.0 * targetLayerProperties.destHeight / targetLayerProperties.sourceHeight : 0;
 
     t_ilm_float targetY1 = targetLayerProperties.destY + verticalScale
             * (targetSurfaceProperties.destY - targetLayerProperties.sourceY);
@@ -148,7 +148,8 @@ void captureSceneData(t_scene_data* pScene)
     t_scene_data& scene = *pScene;
 
     //get screen information
-    t_ilm_uint screenWidth = 0, screenHeight = 0;
+    t_ilm_uint screenWidth = 0;
+    t_ilm_uint screenHeight = 0;
 
     ilmErrorTypes callResult = ilm_getScreenResolution(0, &screenWidth, &screenHeight);
     if (ILM_SUCCESS != callResult)
