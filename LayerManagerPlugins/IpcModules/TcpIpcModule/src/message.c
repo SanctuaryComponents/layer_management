@@ -25,19 +25,21 @@
 #include <unistd.h>
 
 
-//=============================================================================
-// prototypes
-//=============================================================================
+/*=============================================================================
+ * prototypes
+ * =============================================================================
+ */
 t_ilm_bool acceptClientConnection();
 t_ilm_bool sendToSocket(struct SocketMessage* msg, int socketNumber);
 void receiveFromSocket(struct SocketMessage* msg, int socketNumber);
 
-//=============================================================================
-// incoming queue handling (one select may return more than one active
-// descriptor, but receive must only return one message at a time.
-// all messages are first received and added to this queue, so no
-// messages get lost
-//=============================================================================
+/*=============================================================================
+ * incoming queue handling (one select may return more than one active
+ * descriptor, but receive must only return one message at a time.
+ * all messages are first received and added to this queue, so no
+ * messages get lost
+ * =============================================================================
+ */
 struct QueueElement
 {
     struct SocketMessage* data;
@@ -68,17 +70,18 @@ struct SocketMessage* getFromIncomingQueue()
     struct SocketMessage* data = NULL;
     if (oldest)
     {
-        data = oldest->data;
         struct QueueElement* delPtr = oldest;
+        data = oldest->data;
         oldest = oldest->next;
         free(delPtr);
     }
     return data;
 }
 
-//=============================================================================
-// message handling
-//=============================================================================
+/*=============================================================================
+ * message handling
+ * =============================================================================
+ */
 t_ilm_message createMessage(t_ilm_const_string name)
 {
     struct SocketMessage* newMessage = (struct SocketMessage*)malloc(sizeof(struct SocketMessage));
@@ -127,14 +130,14 @@ t_ilm_bool destroyMessage(t_ilm_message message)
 
 t_ilm_bool sendToClients(t_ilm_message message, t_ilm_client_handle* receiverList, int receiverCount)
 {
+    t_ilm_bool result = ILM_TRUE;
+    int i = 0;
+
     struct SocketMessage* msg = (struct SocketMessage*)message;
     if (gState.isClient)
     {
         return ILM_FALSE;
     }
-
-    t_ilm_bool result = ILM_TRUE;
-    int i = 0;
 
     for (i = 0; i < receiverCount; ++i)
     {
@@ -157,15 +160,14 @@ t_ilm_bool sendToService(t_ilm_message message)
 
 t_ilm_message receive(t_ilm_int timeoutInMs)
 {
+    fd_set readFds = gState.monitoredSockets;
+    int numberOfFdsReady = 0;
+
     struct SocketMessage* queuedMessage = getFromIncomingQueue();
     if (queuedMessage)
     {
         return queuedMessage;
     }
-
-    fd_set readFds = gState.monitoredSockets;
-
-    int numberOfFdsReady = 0;
 
     if (timeoutInMs < 0)
     {
@@ -200,39 +202,41 @@ t_ilm_message receive(t_ilm_int timeoutInMs)
                 {
                     if (gState.socket == socketNumber)
                     {
-                        // New client connected
+                        /* New client connected */
                         msg->paket.type = IpcMessageTypeConnect;
                         acceptClientConnection();
                         continue;
                     }
 
-                    // receive data from socket
+                    /* receive data from socket */
                     receiveFromSocket(msg, socketNumber);
 
                     if (msg->paket.size > 0)
                     {
-                        // new message from client
+                        /* new message from client */
                         getString(msg, msg->name);
                         continue;
                     }
 
                     if (msg->paket.size == 0)
                     {
-                        // client disconnected
+                        /* client disconnected */
                         msg->paket.type = IpcMessageTypeDisconnect;
                         close(socketNumber);
                         FD_CLR(socketNumber, &gState.monitoredSockets);
                         continue;
                     }
 
-                    // error
-                    msg->paket.type = IpcMessageTypeError;
-                    const char* errorMsg = (char*)strerror(errno);
-                    printf("TcpIpcModule: receive error socket %d (%s)\n", msg->sender, errorMsg);
+                    /* error */
+                    {
+                        const char* errorMsg = (char*)strerror(errno);
+                        msg->paket.type = IpcMessageTypeError;
+                        printf("TcpIpcModule: receive error socket %d (%s)\n", msg->sender, errorMsg);
+                    }
                 }
                 else
                 {
-                    // receive LayerManager response or notification
+                    /* receive LayerManager response or notification */
                     receiveFromSocket(msg, socketNumber);
                     getString(msg, msg->name);
                 }
@@ -270,9 +274,10 @@ t_ilm_client_handle getSenderHandle(t_ilm_message message)
 }
 
 
-//=============================================================================
-//private
-//=============================================================================
+/*=============================================================================
+ * private
+ * =============================================================================
+ */
 t_ilm_bool acceptClientConnection()
 {
     t_ilm_bool result = ILM_TRUE;
@@ -295,12 +300,13 @@ t_ilm_bool acceptClientConnection()
 t_ilm_bool sendToSocket(struct SocketMessage* msg, int socketNumber)
 {
     int sentBytes = 0;
+    int sendSize = 0;
     int retVal = 0;
 
     int headerSize = sizeof(msg->paket) - sizeof(msg->paket.data);
     msg->paket.size = msg->index + headerSize;
 
-    int sendSize = msg->paket.size;
+    sendSize = msg->paket.size;
 
     do
     {
@@ -318,13 +324,14 @@ void receiveFromSocket(struct SocketMessage* msg, int socketNumber)
 {
     int receivedBytes = 0;
     int retVal = 0;
+    char* messageBuffer = 0;
 
     msg->sender = socketNumber;
 
-    // receive header in first run (contains message size)
+    /* receive header in first run (contains message size) */
     msg->paket.size = sizeof(msg->paket) - sizeof(msg->paket.data);
 
-    char* messageBuffer = (char*)&msg->paket;
+    messageBuffer = (char*)&msg->paket;
 
     do
     {
@@ -337,7 +344,7 @@ void receiveFromSocket(struct SocketMessage* msg, int socketNumber)
 
     if (0 == retVal)
     {
-        // client disconnect
+        /* client disconnect */
         msg->paket.size = 0;
     }
 }

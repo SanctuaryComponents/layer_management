@@ -19,19 +19,23 @@
 #include "IpcModule.h"
 #include "socketShared.h"
 #include <stdio.h>
-#include <stdlib.h> // malloc
+#include <stdlib.h> /* malloc */
 
-//-----------------------------------------------------------------------------
-// get simple data types
-//-----------------------------------------------------------------------------
+/*
+ * -----------------------------------------------------------------------------
+ * get simple data types
+ * -----------------------------------------------------------------------------
+ */
 
 t_ilm_bool getGenericValue(struct SocketMessage* msg, void* value, const char protocolType, const char expectedSize)
 {
-    // get protocol value from message
+    char size = 0;
+
+    /* get protocol value from message */
     char readType = msg->paket.data[msg->index];
     msg->index += sizeof(readType);
 
-    // if type mismatch, return to previous state, return with error
+    /* if type mismatch, return to previous state, return with error */
     if (readType != protocolType)
     {
         msg->index -= sizeof(readType);
@@ -40,12 +44,12 @@ t_ilm_bool getGenericValue(struct SocketMessage* msg, void* value, const char pr
         return ILM_FALSE;
     }
 
-    // get size of value
-    char size = msg->paket.data[msg->index];
+    /* get size of value */
+    size = msg->paket.data[msg->index];
     msg->index += sizeof(size);
 
-    // if size mismatch, return to previous state, return with error
-    // exception: strings have varying length
+    /* if size mismatch, return to previous state, return with error
+     * exception: strings have varying length*/
     if (protocolType != SOCKET_MESSAGE_TYPE_STRING
         && size != expectedSize)
     {
@@ -57,11 +61,11 @@ t_ilm_bool getGenericValue(struct SocketMessage* msg, void* value, const char pr
         return ILM_FALSE;
     }
 
-    // copy data to caller
+    /* copy data to caller */
     memcpy(value, &msg->paket.data[msg->index], size);
     msg->index += size;
 
-    // if value is string, add end of string
+    /* if value is string, add end of string */
     if (protocolType == SOCKET_MESSAGE_TYPE_STRING)
     {
         char* str = (char *)value + size;
@@ -101,19 +105,20 @@ t_ilm_bool getString(t_ilm_message message, char* value)
     return getGenericValue(msg, value, SOCKET_MESSAGE_TYPE_STRING, sizeof(t_ilm_const_string));
 }
 
-//-----------------------------------------------------------------------------
-// get array data types
-//-----------------------------------------------------------------------------
+/*-----------------------------------------------------------------------------
+ * get array data types
+ *-----------------------------------------------------------------------------
+ */
 
 t_ilm_bool getGenericArray(struct SocketMessage* msg, t_ilm_int* arraySize, void** value, const char protocolType, const char expectedSize)
 {
     t_ilm_bool result = ILM_TRUE;
 
-    // get protocol value from message
+    /* get protocol value from message */
     char readType = msg->paket.data[msg->index];
     msg->index += sizeof(readType);
 
-    // if type mismatch, return to previous state, return with error
+    /* if type mismatch, return to previous state, return with error */
     if (readType != SOCKET_MESSAGE_TYPE_ARRAY)
     {
         msg->index -= sizeof(readType);
@@ -122,14 +127,14 @@ t_ilm_bool getGenericArray(struct SocketMessage* msg, t_ilm_int* arraySize, void
         return ILM_FALSE;
     }
 
-    // get size of array
+    /* get size of array */
     *arraySize = msg->paket.data[msg->index];
     msg->index += sizeof(msg->paket.data[msg->index]);
 
-    // create array for result and set callers pointer
+    /* create array for result and set callers pointer */
     *value = malloc(*arraySize * expectedSize);
 
-    // get all values from array
+    /* get all values from array */
     char i = 0;
     for (i = 0; i < *arraySize; ++i)
     {

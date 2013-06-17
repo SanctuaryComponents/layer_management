@@ -23,15 +23,18 @@
 #include "socketConfiguration.h"
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <netdb.h>  // struct hostent
+#include <netdb.h>  /* struct hostent */
 #include <string.h>
 #include <stdio.h>
 #include <sys/select.h>
 
-//=============================================================================
-// type definitions
-//=============================================================================
-// this data is transferred via socket
+/*
+ * =============================================================================
+ * type definitions
+ * =============================================================================
+ */
+
+/* this data is transferred via socket */
 struct SocketMessagePaket
 {
     int  size;
@@ -39,7 +42,7 @@ struct SocketMessagePaket
     char data[SOCKET_MAX_MESSAGE_SIZE];
 };
 
-// wraps socket message with management information
+/* wraps socket message with management information */
 struct SocketMessage
 {
     unsigned int              index;
@@ -48,7 +51,7 @@ struct SocketMessage
     struct SocketMessagePaket paket;
 };
 
-// contains all state information
+/* contains all state information */
 struct State
 {
     t_ilm_bool            isClient;
@@ -60,10 +63,12 @@ struct State
 };
 
 
-//=============================================================================
-// global variables
-//=============================================================================
+/*
+ * =============================================================================
+ * global variables
+ * =============================================================================
+ */
 struct State gState;
 
 
-#endif // __SOCKETSHARED_H__
+#endif /* __SOCKETSHARED_H__ */

@@ -20,9 +20,11 @@
 #ifndef _SOCKETCONFIGURATION_H_
 #define _SOCKETCONFIGURATION_H_
 
-//=============================================================================
-// tcp socket configuration
-//=============================================================================
+/*
+ * =============================================================================
+ * tcp socket configuration
+ * =============================================================================
+ */
 #define SOCKET_TCP_HOST                 "localhost"
 #define SOCKET_TCP_PORT                 22232
 #define SOCKET_MAX_MESSAGE_SIZE         1024
@@ -38,4 +40,4 @@
 #define ENV_TCP_HOST                    "LM_TCP_HOST"
 #define ENV_TCP_PORT                    "LM_TCP_PORT"
 
-#endif // _SOCKETCONFIGURATION_H_
+#endif /* _SOCKETCONFIGURATION_H_ */

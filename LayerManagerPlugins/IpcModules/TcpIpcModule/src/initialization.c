@@ -19,20 +19,21 @@
 #include "IpcModule.h"
 #include "socketShared.h"
 #include <stdio.h>
-#include <stdlib.h>  // getenv
-#include <string.h>  // memset
+#include <stdlib.h>  /* getenv */
+#include <string.h>  /* memset */
 #include <signal.h>
 #include <unistd.h>
 
 
 t_ilm_bool initServiceMode()
 {
-    // ignore broken pipe, if clients disconnect, handled in receive()
-    signal(SIGPIPE, SIG_IGN);
-
     t_ilm_bool isClient = ILM_FALSE;
-
     t_ilm_bool result = ILM_TRUE;
+    const char* portString = getenv(ENV_TCP_PORT);
+    int port = portString ? atoi(portString) : SOCKET_TCP_PORT;
+
+    /* ignore broken pipe, if clients disconnect, handled in receive() */
+    signal(SIGPIPE, SIG_IGN);
 
     gState.isClient = isClient;
 
@@ -44,26 +45,19 @@ t_ilm_bool initServiceMode()
         result = ILM_FALSE;
     }
 
-    const char* portString = getenv(ENV_TCP_PORT);
-    int port = SOCKET_TCP_PORT;
-    if (portString)
-    {
-        port = atoi(portString);
-    }
-
     gState.serverAddrIn.sin_family = AF_INET;
     gState.serverAddrIn.sin_port = htons(port);
     memset(&(gState.serverAddrIn.sin_zero), '\0', 8);
 
-    if (gState.isClient)  // Client
+    if (gState.isClient)  /* Client */
     {
+        struct hostent* server;
         const char* hostname = getenv(ENV_TCP_HOST);
         if (!hostname)
         {
             hostname = SOCKET_TCP_HOST;
         }
 
-        struct hostent* server;
         server = gethostbyname(hostname);
         if (!server)
         {
@@ -89,7 +83,7 @@ t_ilm_bool initServiceMode()
         FD_SET(gState.socket, &gState.monitoredSockets);
         gState.monitoredSocketMax = gState.socket;
     }
-    else  // LayerManagerService
+    else  /* LayerManagerService */
     {
         int on = 1;
         setsockopt(gState.socket, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
@@ -121,12 +115,13 @@ t_ilm_bool initServiceMode()
 
 t_ilm_bool initClientMode()
 {
-    // ignore broken pipe, if clients disconnect, handled in receive()
-    signal(SIGPIPE, SIG_IGN);
-
     t_ilm_bool isClient = ILM_TRUE;
-
     t_ilm_bool result = ILM_TRUE;
+    const char* portString = getenv(ENV_TCP_PORT);
+    int port = portString ? atoi(portString) : SOCKET_TCP_PORT;
+
+    /* ignore broken pipe, if clients disconnect, handled in receive() */
+    signal(SIGPIPE, SIG_IGN);
 
     gState.isClient = isClient;
 
@@ -138,18 +133,11 @@ t_ilm_bool initClientMode()
         result = ILM_FALSE;
     }
 
-    const char* portString = getenv(ENV_TCP_PORT);
-    int port = SOCKET_TCP_PORT;
-    if (portString)
-    {
-        port = atoi(portString);
-    }
-
     gState.serverAddrIn.sin_family = AF_INET;
     gState.serverAddrIn.sin_port = htons(port);
     memset(&(gState.serverAddrIn.sin_zero), '\0', 8);
 
-    if (gState.isClient)  // Client
+    if (gState.isClient)  /* Client */
     {
         const char* hostname = getenv(ENV_TCP_HOST);
         if (!hostname)
@@ -183,7 +171,7 @@ t_ilm_bool initClientMode()
         FD_SET(gState.socket, &gState.monitoredSockets);
         gState.monitoredSocketMax = gState.socket;
     }
-    else  // LayerManagerService
+    else  /* LayerManagerService */
     {
         int on = 1;
         setsockopt(gState.socket, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
@@ -225,7 +213,7 @@ t_ilm_bool destroy()
         }
     }
 
-    // return to default signal handling
+    /* return to default signal handling */
     signal(SIGPIPE, SIG_DFL);
 
     return ILM_TRUE;

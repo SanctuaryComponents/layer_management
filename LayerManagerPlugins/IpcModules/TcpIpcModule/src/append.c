@@ -19,30 +19,31 @@
 #include "IpcModule.h"
 #include "socketShared.h"
 
-//-----------------------------------------------------------------------------
-// append simple data types
-//-----------------------------------------------------------------------------
+/*-----------------------------------------------------------------------------
+ * append simple data types
+ * -----------------------------------------------------------------------------
+ */
 
 t_ilm_bool appendGenericValue(struct SocketMessage* msg, const char protocolType, const char size, const void* value)
 {
-    // size check: is message size reached
-    if (sizeof(msg->paket) - sizeof(msg->paket.data)  // header
-        + msg->index + size                           // + data
+    /* size check: is message size reached */
+    if (sizeof(msg->paket) - sizeof(msg->paket.data)  /* header */
+        + msg->index + size                           /* + data */
         > SOCKET_MAX_MESSAGE_SIZE)
     {
         printf("Error: max message size exceeded.\n");
         return ILM_FALSE;
     }
 
-    // append protocol type
+    /* append protocol type */
     msg->paket.data[msg->index] = protocolType;
     msg->index += sizeof(protocolType);
 
-    // append size of data
+    /* append size of data */
     msg->paket.data[msg->index] = size;
     msg->index += sizeof(size);
 
-    // append data
+    /* append data */
     memcpy(&msg->paket.data[msg->index], value, size);
     msg->index += size;
 
@@ -79,26 +80,27 @@ t_ilm_bool appendString(t_ilm_message message, t_ilm_const_string value)
     return appendGenericValue(msg, SOCKET_MESSAGE_TYPE_STRING, strlen(value), value);
 }
 
-//-----------------------------------------------------------------------------
-// append array data types
-//-----------------------------------------------------------------------------
+/*-----------------------------------------------------------------------------
+ * append array data types
+ * -----------------------------------------------------------------------------
+ */
 
 t_ilm_bool appendGenericArray(struct SocketMessage* msg, const char arraySize, const char protocolType, const char size, const void* value)
 {
     t_ilm_bool result = ILM_TRUE;
+    char i = 0;
 
-    // TODO: size check: is message size reached?
+    /* TODO: size check: is message size reached? */
 
-    // append array type
+    /* append array type */
     msg->paket.data[msg->index] = SOCKET_MESSAGE_TYPE_ARRAY;
     msg->index += sizeof(protocolType);
 
-    // append size of array
+    /* append size of array */
     msg->paket.data[msg->index] = arraySize;
     msg->index += sizeof(arraySize);
 
-    // append data for each array entry
-    char i = 0;
+    /* append data for each array entry */
     for (i = 0; i < arraySize; ++i)
     {
         result &= appendGenericValue(msg, protocolType, size, (void*)((unsigned int)value + i * size));
@@ -131,4 +133,4 @@ t_ilm_bool appendDoubleArray(t_ilm_message message, const t_ilm_float* valueArra
     return appendGenericArray(msg, arraySize, SOCKET_MESSAGE_TYPE_DOUBLE, sizeof(t_ilm_float), valueArray);
 }
 
-// TODO appendStringArray()
+/* TODO appendStringArray() */
