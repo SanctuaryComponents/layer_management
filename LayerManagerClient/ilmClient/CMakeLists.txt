@@ -36,6 +36,9 @@ add_library(${PROJECT_NAME} SHARED
     src/ilm_client.c
 )
 
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    RESOURCE "${CMAKE_BINARY_DIR}/LayerManagerClient/ilmClient/ilm.pc")
+
 add_dependencies(${PROJECT_NAME}
     LayerManagerUtils
     ilmCommon
@@ -52,9 +55,19 @@ set(LIBS
 
 target_link_libraries(${PROJECT_NAME} ${LIBS})
 
+configure_file(ilm.pc.in ilm.pc @ONLY)
+
+if(NOT PKG_CONFIG_INSTALL_LIBDIR)
+    include(FindPkgConfig)
+    execute_process(COMMAND ${PKG_CONFIG_EXECUTABLE} --variable=pc_path pkg-config OUTPUT_VARIABLE PC_PATHS)
+    string(REPLACE ":" ";" PC_PATHS ${PC_PATHS})
+    list(GET PC_PATHS 0 PKG_CONFIG_INSTALL_LIBDIR)
+endif(NOT PKG_CONFIG_INSTALL_LIBDIR)
+
 install (
     TARGETS             ${PROJECT_NAME}
     LIBRARY DESTINATION lib
+    RESOURCE DESTINATION ${PKG_CONFIG_INSTALL_LIBDIR}
 )
 
 install (
