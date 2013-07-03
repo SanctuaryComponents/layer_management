@@ -121,7 +121,7 @@ public:
 
     static void *processLoop(void * ptr) {
         while (((DBUSCommunicatorTest*) ptr)->running) {
-            ((DBUSCommunicatorTest*) ptr)->communicatorUnderTest->process(100);
+            ((DBUSCommunicatorTest*) ptr)->communicatorUnderTest->process();
         }
         return NULL;
     }
@@ -135,7 +135,7 @@ public:
         }
         Configuration config(0, NULL);
         communicatorUnderTest = new GenericCommunicator(mockCommandExecutor, config);
-        this->communicatorUnderTest->start();
+        this->communicatorUnderTest->start(100);
        
         DefaultValue<ApplicationReferenceMap*>::Set((ApplicationReferenceMap*) &this->refmap);
         running = true;
