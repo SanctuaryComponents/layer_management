@@ -94,7 +94,7 @@ void X11EglImage::createClientBuffer(Surface* surface)
                                         NULL);
         if (!eglImage)
         {
-            LOG_DEBUG("X11EglImage", "could not allocate EGL Image for window");
+            LOG_ERROR("X11EglImage", "could not allocate EGL Image for window");
         }
         else
         {

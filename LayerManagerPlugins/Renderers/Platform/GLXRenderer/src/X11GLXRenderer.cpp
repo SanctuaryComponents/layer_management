@@ -35,7 +35,7 @@ X11GLXRenderer::X11GLXRenderer(ICommandExecutor& executor, Configuration& config
 {
 }
 
-bool X11GLXRenderer::start(int width, int height, const char* displayname)
+bool X11GLXRenderer::start(int width, int height, const char* displayname, int maxIterationDurationInMS)
 {
     bool result = false;
     ITextureBinder *binder = NULL;
@@ -78,7 +78,7 @@ bool X11GLXRenderer::start(int width, int height, const char* displayname)
                 if (binder != NULL)
                 {
                     m_pGraphicSystem->setTextureBinder(binder);
-                    result = m_pWindowSystem->start();
+                    result = m_pWindowSystem->start(maxIterationDurationInMS);
                 }
             }
         }
@@ -163,6 +163,11 @@ bool X11GLXRenderer::getOptimizationMode(OptimizationType id, OptimizationModeTy
 bool X11GLXRenderer::setOptimizationMode(OptimizationType id, OptimizationModeType mode)
 {
     return m_pGraphicSystem->setOptimizationMode(id, (unsigned int)mode);
+}
+
+int X11GLXRenderer::getIterationCounter()
+{
+    return m_pWindowSystem->getIterationCounter();
 }
 
 DECLARE_LAYERMANAGEMENT_PLUGIN(X11GLXRenderer)

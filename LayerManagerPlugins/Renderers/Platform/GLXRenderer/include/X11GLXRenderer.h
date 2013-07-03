@@ -36,7 +36,7 @@ public:
     uint getNumberOfHardwareLayers(uint screenID);
     uint* getScreenResolution(uint screenID);
     uint* getScreenIDs(uint* length);
-    bool start(int, int, const char*);
+    bool start(int, int, const char*, int);
     void stop();
 
     void signalWindowSystemRedraw();
@@ -45,6 +45,9 @@ public:
     // from IRenderer
     virtual bool getOptimizationMode(OptimizationType id, OptimizationModeType* mode);
     virtual bool setOptimizationMode(OptimizationType id, OptimizationModeType mode);
+
+    // from PluginBase
+    virtual int getIterationCounter();
 
 private:
     X11WindowSystem*  m_pWindowSystem;
