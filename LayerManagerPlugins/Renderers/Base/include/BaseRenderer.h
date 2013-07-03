@@ -36,7 +36,7 @@ public:
     void stop() = 0;
     void setdebug(bool onoff);
 
-    virtual void doScreenShot(std::string fileToSave) = 0;
+    virtual void doScreenShot(std::string fileToSave, const uint screen_id) = 0;
     virtual uint getLayerTypeCapabilities(LayerType layerType);
     virtual InputManager* getInputManager() const
     {

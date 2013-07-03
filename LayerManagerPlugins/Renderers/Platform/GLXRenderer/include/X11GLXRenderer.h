@@ -30,7 +30,7 @@ class X11GLXRenderer : public BaseRenderer
 public:
     X11GLXRenderer(ICommandExecutor& executor, Configuration& config);
     virtual ~X11GLXRenderer();
-    void doScreenShot(std::string fileToSave);
+    void doScreenShot(std::string fileToSave, const uint screen_id);
     void doScreenShotOfLayer(std::string fileToSave, uint id);
     void doScreenShotOfSurface(std::string fileToSave, uint id, uint layer_id);
     uint getNumberOfHardwareLayers(uint screenID);

@@ -110,9 +110,9 @@ void X11GLESRenderer::stop()
     }
 }
 
-void X11GLESRenderer::doScreenShot(std::string fileToSave)
+void X11GLESRenderer::doScreenShot(std::string fileToSave, uint screen_id)
 {
-    m_pWindowSystem->doScreenShot(fileToSave);
+    m_pWindowSystem->doScreenShot(fileToSave, screen_id);
 }
 
 void X11GLESRenderer::doScreenShotOfLayer(std::string fileToSave, uint id)

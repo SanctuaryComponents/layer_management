@@ -96,9 +96,9 @@ X11GLXRenderer::~X11GLXRenderer()
     delete m_pWindowSystem;
 }
 
-void X11GLXRenderer::doScreenShot(std::string fileToSave)
+void X11GLXRenderer::doScreenShot(std::string fileToSave, uint screen_id)
 {
-    m_pWindowSystem->doScreenShot(fileToSave);
+    m_pWindowSystem->doScreenShot(fileToSave,screen_id);
 }
 
 void X11GLXRenderer::doScreenShotOfLayer(std::string fileToSave, uint id)

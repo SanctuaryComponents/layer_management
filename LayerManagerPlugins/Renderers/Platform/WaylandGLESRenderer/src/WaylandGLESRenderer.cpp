@@ -103,9 +103,9 @@ void WaylandGLESRenderer::stop()
     }
 }
 
-void WaylandGLESRenderer::doScreenShot(std::string fileToSave)
+void WaylandGLESRenderer::doScreenShot(std::string fileToSave, const uint screen_id)
 {
-    m_pWindowSystem->doScreenShot(fileToSave);
+    m_pWindowSystem->doScreenShot(fileToSave, screen_id);
 }
 
 void WaylandGLESRenderer::doScreenShotOfLayer(std::string fileToSave, uint id)

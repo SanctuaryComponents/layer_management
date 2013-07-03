@@ -35,7 +35,7 @@ public:
     WaylandGLESRenderer(ICommandExecutor& executor, Configuration& config);
     bool start(int, int, const char*, int);
     void stop();
-    void doScreenShot(std::string fileToSave);
+    void doScreenShot(std::string fileToSave, uint screen_id);
     void doScreenShotOfLayer(std::string fileToSave, uint id);
     void doScreenShotOfSurface(std::string fileToSave, uint id, uint layer_id);
     uint getNumberOfHardwareLayers(uint screenID);

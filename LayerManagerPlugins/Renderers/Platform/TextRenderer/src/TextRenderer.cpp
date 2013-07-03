@@ -60,10 +60,11 @@ TextRenderer::~TextRenderer()
     LOG_DEBUG("TextRenderer", "destroyed");
 }
 
-void TextRenderer::doScreenShot(std::string fileToSave)
+void TextRenderer::doScreenShot(std::string fileToSave, uint screen_id)
 {
     LOG_DEBUG("TextRenderer", "doScreenShot("
-                << "fileToSave=" << fileToSave << ")");
+                << "fileToSave=" << fileToSave
+                << ", screenID=" << screen_id <<")");
     std::fstream file(fileToSave.c_str());
 }
 
