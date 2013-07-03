@@ -73,7 +73,7 @@ public:
      * \ingroup    RendererAPI
      * \param[in]  fileToSave path to bitmap file to store the graphical content
      */
-    virtual void doScreenShot(std::string fileToSave) = 0;
+    virtual void doScreenShot(std::string fileToSave, const unsigned int screen_id) = 0;
 
     /**
      * \brief      Store graphical content of layer to bitmap
