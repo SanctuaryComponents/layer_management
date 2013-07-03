@@ -78,6 +78,7 @@ ExecutionResult ScreenSetRenderOrderCommand::execute(ICommandExecutor* executor)
         if (layer)
         {
             LOG_DEBUG("ScreenSetRenderOrderCommand", "Adding Layer: " << m_array[i] << " to current render order");
+            layer->setContainingScreenId(m_screenID);
             scene.getCurrentRenderOrder(m_screenID).push_back(layer);
             result = ExecutionSuccessRedraw;
         }

@@ -23,6 +23,9 @@
 
 ExecutionResult ScreenDumpCommand::execute(ICommandExecutor* executor)
 {
+    uint length = 0;
+    uint i = 0;
+    uint* IDs = executor->getScreenIDs(&length);
     ExecutionResult result = ExecutionFailed;
     RendererList& m_rendererList = *(executor->getRendererList());
 
@@ -30,7 +33,13 @@ ExecutionResult ScreenDumpCommand::execute(ICommandExecutor* executor)
 
     LOG_INFO("ScreenDumpCommand", "making screenshot, output file: " << m_filename);
 
-    status = (m_id == 0);
+    for (i = 0; i < length; i++)
+    {
+        if (m_id == IDs[i])
+        {
+            status = true;
+        }
+    }
 
     if (status)
     {
@@ -44,7 +53,7 @@ ExecutionResult ScreenDumpCommand::execute(ICommandExecutor* executor)
 
             if (renderer)
             {
-                renderer->doScreenShot(m_filename);
+                renderer->doScreenShot(m_filename, m_id);
             }
         }
         result = ExecutionSuccessRedraw;
