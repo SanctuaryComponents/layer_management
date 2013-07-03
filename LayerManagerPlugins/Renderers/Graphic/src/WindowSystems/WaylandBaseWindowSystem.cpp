@@ -1183,7 +1183,6 @@ bool WaylandBaseWindowSystem::init(BaseGraphicSystem<void*, void*>* base)
         return false;
     }
 
-    mThreadId = renderThread;
     while (false == m_initialized)
     {
         usleep(10000); // TODO
@@ -1193,8 +1192,9 @@ bool WaylandBaseWindowSystem::init(BaseGraphicSystem<void*, void*>* base)
     return m_success;
 }
 
-bool WaylandBaseWindowSystem::start()
+bool WaylandBaseWindowSystem::start(int maxIterationDurationInMS)
 {
+    m_maxIterationDurationInMS = maxIterationDurationInMS;
     bool result = true;
     LOG_DEBUG("WaylandBaseWindowSystem", "Starting / Creating thread");
     // let thread actually run

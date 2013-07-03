@@ -1,4 +1,4 @@
-next version
+Version 1.1
 ----------------------
 This version includes the following enhancements.
 

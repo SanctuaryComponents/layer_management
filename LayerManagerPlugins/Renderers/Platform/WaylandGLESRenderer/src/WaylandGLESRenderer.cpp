@@ -35,7 +35,7 @@ WaylandGLESRenderer::WaylandGLESRenderer(ICommandExecutor& executor, Configurati
     LOG_DEBUG("WaylandGLESRenderer", "Creating Renderer");
 }
 
-bool WaylandGLESRenderer::start(int width, int height, const char* displayname)
+bool WaylandGLESRenderer::start(int width, int height, const char* displayname, int maxIterationDurationInMS)
 {
     struct wl_display* nativeDisplayHandle = NULL;
     EGLDisplay eglDisplayhandle = NULL;
@@ -77,7 +77,7 @@ bool WaylandGLESRenderer::start(int width, int height, const char* displayname)
     {
         m_pGraphicSystem->setTextureBinder(m_binder);
 
-        if (!m_pWindowSystem->start())
+        if (!m_pWindowSystem->start(maxIterationDurationInMS))
         {
             goto fail; // TODO bad style
         }
@@ -164,11 +164,6 @@ bool WaylandGLESRenderer::getOptimizationMode(OptimizationType id, OptimizationM
     return m_pGraphicSystem->getOptimizationMode(id, mode);
 }
 
-HealthCondition WaylandGLESRenderer::pluginGetHealth()
-{
-    return BaseRenderer::pluginGetHealth();
-}
-
 Shader* WaylandGLESRenderer::createShader(const string* vertexName, const string* fragmentName)
 {
     Shader *result = NULL;
@@ -179,4 +174,21 @@ Shader* WaylandGLESRenderer::createShader(const string* vertexName, const string
     m_pGraphicSystem->releaseGraphicContext();
     m_pWindowSystem->setSystemState(IDLE_STATE);
     return result;
+}
+
+int WaylandGLESRenderer::getIterationCounter()
+{
+    // TODO: add real thread iteration counter here
+    // The renderer plugin thread must wake up at least once in
+    // each health monitoring interval. This interval is passed
+    // to the plugin as argument in its start() method.
+    // Each time the plugin thread gets active, it must
+    // increment the internal iteration counter.
+    // This way the health monitor can detect, if the plugin
+    // thread is running, dead or blocked.
+
+    // TODO: remove this placeholder, which just returns an
+    // incremented interation counter to make health monitoring happy.
+    static int iteration = 0;
+    return ++iteration;
 }

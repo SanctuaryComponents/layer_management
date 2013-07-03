@@ -33,7 +33,7 @@ class WaylandGLESRenderer : public BaseRenderer
 {
 public:
     WaylandGLESRenderer(ICommandExecutor& executor, Configuration& config);
-    bool start(int, int, const char*);
+    bool start(int, int, const char*, int);
     void stop();
     void doScreenShot(std::string fileToSave);
     void doScreenShotOfLayer(std::string fileToSave, uint id);
@@ -48,7 +48,7 @@ public:
     virtual bool getOptimizationMode(OptimizationType id, OptimizationModeType *mode);
 
     // from PluginBase
-    virtual HealthCondition pluginGetHealth();
+    virtual int getIterationCounter();
 
     // implement in inheriting classes
     virtual WaylandBaseWindowSystem* getWindowSystem(const char* displayname) = 0;

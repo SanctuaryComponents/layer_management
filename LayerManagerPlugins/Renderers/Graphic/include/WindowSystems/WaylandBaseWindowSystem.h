@@ -76,7 +76,7 @@ public:
     WaylandBaseWindowSystem(const char* displayname, int width, int height, Scene* pScene, InputManager* pInputManager);
     virtual ~WaylandBaseWindowSystem();
     bool init(BaseGraphicSystem<void*, void*>* sys);
-    bool start();
+    bool start(int maxIterationDurationInMS);
     void stop();
     void signalRedrawEvent();
     void wakeUpRendererThread();
@@ -132,6 +132,8 @@ protected:
 
     struct wl_list m_listFrameCallback;
     struct wl_list m_nativeSurfaceList;
+
+    int m_maxIterationDurationInMS;
 
     void createServerinfo(WaylandBaseWindowSystem* windowSystem);
     struct native_surface* createNativeSurface();
