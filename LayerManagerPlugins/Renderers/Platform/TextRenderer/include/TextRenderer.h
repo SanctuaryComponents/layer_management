@@ -34,7 +34,7 @@ public:
     uint getNumberOfHardwareLayers(uint screenID);
     uint* getScreenResolution(uint screenID);
     uint* getScreenIDs(uint* length);
-    bool start(int, int, const char*);
+    bool start(int, int, const char*, int maxIterationDurationInMS);
     void stop();
 
     void signalWindowSystemRedraw();
@@ -44,8 +44,8 @@ public:
     virtual bool getOptimizationMode(OptimizationType id, OptimizationModeType* mode);
 
     // from PluginBase
-    virtual HealthCondition pluginGetHealth();
     virtual t_ilm_const_string pluginGetName() const;
+    virtual int getIterationCounter();
 
 private:
     uint m_width;

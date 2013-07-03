@@ -31,8 +31,10 @@ TextRenderer::TextRenderer(ICommandExecutor& executor, Configuration& config)
     LOG_DEBUG("TextRenderer", "created");
 }
 
-bool TextRenderer::start(int width, int height, const char* displayname)
+bool TextRenderer::start(int width, int height, const char* displayname, int maxIterationDurationInMS)
 {
+    (void)maxIterationDurationInMS;
+    
     m_height = height;
     m_width = width;
 
@@ -141,14 +143,16 @@ bool TextRenderer::getOptimizationMode(OptimizationType id, OptimizationModeType
     return true;
 }
 
-HealthCondition TextRenderer::pluginGetHealth()
-{
-    return HealthRunning;
-}
-
 t_ilm_const_string TextRenderer::pluginGetName() const
 {
     return "TextRenderer";
+}
+
+int TextRenderer::getIterationCounter()
+{
+    // no internal thread, fake thread iterations
+    static int i = 0;
+    return ++i;
 }
 
 DECLARE_LAYERMANAGEMENT_PLUGIN(TextRenderer)
