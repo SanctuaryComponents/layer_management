@@ -151,7 +151,7 @@ void generateIntrospectionString(char* msgBuffer)
     int i = 0;
 
     msgBuffer += addHeader(msgBuffer);
-    msgBuffer += openNode(msgBuffer, DBUS_SERVICE_PREFIX);
+    msgBuffer += openNode(msgBuffer, ILM_PATH_COMPOSITE_SERVICE);
     msgBuffer += openInterface(msgBuffer, "org.freedesktop.DBus.Introspectable");
     msgBuffer += openMethod(msgBuffer, "Introspect");
     msgBuffer += addArgument(msgBuffer, "data", "out", "s");
@@ -209,45 +209,51 @@ void generateIntrospectionString(char* msgBuffer)
 
 unsigned int addHeader(char* msgBuffer)
 {
-    return sprintf(msgBuffer, "<!DOCTYPE node PUBLIC \"-//freedesktop//DTD D-BUS Object Introspection 1.0//EN\" \"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd\">");
+    return sprintf(msgBuffer, "<!DOCTYPE node PUBLIC \"-//freedesktop//DTD D-BUS Object Introspection 1.0//EN\" \"http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd\">\n");
 }
 
 unsigned int openNode(char* msgBuffer, const char* nodename)
 {
-    return sprintf(msgBuffer, "<node name=\"%s\">", nodename);
+    if (nodename == NULL) 
+    {
+        return sprintf(msgBuffer, "<node>\n");
+    } else 
+    {
+        return sprintf(msgBuffer, "<node name=\"%s\">\n", nodename);
+    }
 }
 
 unsigned int openInterface(char* msgBuffer, const char* interfacename)
 {
-    return sprintf(msgBuffer, "<interface name=\"%s\">", interfacename);
+    return sprintf(msgBuffer, "<interface name=\"%s\">\n", interfacename);
 }
 
 unsigned int openMethod(char* msgBuffer, const char* methodname)
 {
-    return sprintf(msgBuffer, "<method name=\"%s\">", methodname);
+    return sprintf(msgBuffer, "<method name=\"%s\">\n", methodname);
 }
 
 unsigned int addArgument(char* msgBuffer, const char* argname, const char* direction, const char* type)
 {
-    return sprintf(msgBuffer, "<arg name=\"%s\" direction=\"%s\" type=\"%c\"/>", argname, direction, type[0]);
+    return sprintf(msgBuffer, "<arg name=\"%s\" direction=\"%s\" type=\"%c\"/>\n", argname, direction, type[0]);
 }
 
 unsigned int addArrayArgument(char* msgBuffer, const char* argname, const char* direction, const char* type)
 {
-    return sprintf(msgBuffer, "<arg name=\"%s\" direction=\"%s\" type=\"a%c\"/>", argname, direction, type[0]);
+    return sprintf(msgBuffer, "<arg name=\"%s\" direction=\"%s\" type=\"a%c\"/>\n", argname, direction, type[0]);
 }
 
 unsigned int closeMethod(char* msgBuffer)
 {
-    return sprintf(msgBuffer, "</method>");
+    return sprintf(msgBuffer, "</method>\n");
 }
 
 unsigned int closeInterface(char* msgBuffer)
 {
-    return sprintf(msgBuffer, "</interface>");
+    return sprintf(msgBuffer, "</interface>\n");
 }
 
 unsigned int closeNode(char* msgBuffer)
 {
-    return sprintf(msgBuffer, "</node>");
+    return sprintf(msgBuffer, "</node>\n");
 }

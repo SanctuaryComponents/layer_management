@@ -1,3 +1,13 @@
+next version
+----------------------
+This version includes the following enhancements.
+
+Bugfixes:
+- Fixing minor memory leaks
+- LayerManagerCommands: fixed array handling, memory leak removed
+- X11EglImage: fixing a issue which causes memory leak in XServer
+- dbusIpcModule: DBUS Interspection result corrected
+
 Version 1.0
 ------------------
 This version includes the following enhancements.

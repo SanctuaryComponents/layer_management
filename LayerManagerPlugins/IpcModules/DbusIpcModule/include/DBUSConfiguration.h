@@ -23,16 +23,13 @@
 /*
  * DBUS configuration
  */
-#define DBUS_SERVICE_PREFIX             "org.genivi.layermanagementservice\0"
-/*#define DBUS_SERVICE_OBJECT_PATH        "/org/genivi/layermanagementservice\0" */
+#define DBUS_SERVICE_PREFIX             "org.genivi.layermanagementservice"
 #define DBUS_SERVICE_ERROR              "org.genivi.layermanagementservice.error"
 #define DBUS_RECEIVE_TIMEOUT_IN_MS      500
 
 #define ILM_SERVICE_NAME                "org.genivi.layermanagementservice"
-/*#define ILM_PATH_COMPOSITE_SERVICE      "/org/genivi/layermanagementservice" */
-#define ILM_PATH_COMPOSITE_SERVICE      "/"
+#define ILM_PATH_COMPOSITE_SERVICE      "/org/genivi/layermanagementservice"
 #define ILM_INTERFACE_COMPOSITE_SERVICE "org.genivi.layermanagementservice"
 #define ILM_INTERFACE_COMPOSITE_CLIENT  "org.genivi.layermanagementclient"
-
 
 #endif /* _DBUSCONFIGURATION_H_ */
