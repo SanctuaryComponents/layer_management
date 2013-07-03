@@ -30,7 +30,7 @@ class X11GLESRenderer : public BaseRenderer
 {
 public:
     X11GLESRenderer(ICommandExecutor& executor, Configuration& config);
-    bool start(int, int, const char*);
+    bool start(int, int, const char*, int);
     void stop();
     void doScreenShot(std::string fileToSave);
     void doScreenShotOfLayer(std::string fileToSave, uint id);
@@ -43,9 +43,9 @@ public:
     Shader* createShader(const string* vertexName, const string* fragmentName);
     virtual bool setOptimizationMode(OptimizationType id, OptimizationModeType mode);
     virtual bool getOptimizationMode(OptimizationType id, OptimizationModeType *mode);
+    virtual int getIterationCounter();
 
     // from PluginBase
-    virtual HealthCondition pluginGetHealth();
     virtual t_ilm_const_string pluginGetName() const;
 
 private:
@@ -54,6 +54,7 @@ private:
     uint m_width;
     uint m_height;
     ITextureBinder* m_binder;
+    int m_maxIterationDurationInMS;
 };
 
 #endif /* _X11GLESRENDERER_H_*/

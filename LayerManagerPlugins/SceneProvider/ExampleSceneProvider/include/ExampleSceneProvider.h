@@ -41,6 +41,7 @@ public:
 
     //from PluginBase
     virtual t_ilm_const_string pluginGetName() const;
+    virtual int getIterationCounter();
 
 protected:
     ICommandExecutor& mExecutor;

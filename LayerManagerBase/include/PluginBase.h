@@ -38,7 +38,7 @@ public:
     virtual HealthCondition pluginGetHealth();
 
 protected:
-    void pluginSetHealth(HealthCondition health);
+    virtual int getIterationCounter() = 0;
 
 protected:
     ICommandExecutor& mExecutor;
@@ -46,7 +46,7 @@ protected:
 
 private:
     PluginApi mApi;
-    HealthCondition mHealth;
+    int m_previousIterationCounter;
 };
 
 #endif // __PLUGINBASE_H__

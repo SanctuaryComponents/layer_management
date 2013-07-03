@@ -89,6 +89,7 @@ private:
     void stopAllCommunicators();
     bool executeCommand(ICommand* commandToBeExecuted);
     bool enqueueCommand(ICommand* commandToBeExecuted);
+    int getPluginReportIntervalInMs();
 
 private:
     Scene* m_pScene;

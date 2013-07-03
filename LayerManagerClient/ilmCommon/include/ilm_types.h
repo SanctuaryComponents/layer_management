@@ -282,6 +282,7 @@ typedef enum e_t_ilm_message_type
     IpcMessageTypeDisconnect,
     IpcMessageTypeNotification,
     IpcMessageTypeError,
+    IpcMessageTypeTimeout,
     IpcMessageTypeShutdown
 } t_ilm_message_type;
 

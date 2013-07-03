@@ -148,4 +148,11 @@ t_ilm_const_string ExampleSceneProvider::pluginGetName() const
     return "ExampleSceneProvider";
 }
 
+int ExampleSceneProvider::getIterationCounter()
+{
+    // this plugin is one-shot and is not monitored.
+    static int dummyValue = 0;
+    return ++dummyValue;
+}
+
 DECLARE_LAYERMANAGEMENT_PLUGIN(ExampleSceneProvider)

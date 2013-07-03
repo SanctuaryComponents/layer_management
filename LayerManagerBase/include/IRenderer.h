@@ -49,10 +49,11 @@ public:
      * \param[in]  width width of display handled by this renderer
      * \param[in]  height height of display handled by this renderer
      * \param[in]  displayName name of display handled by this renderer
+     * \param[in]  maxIterationTimeInMS expected wakup time for health reporting in milliseconds (-1 to disable wakeup)
      * \return     TRUE: renderer was started successfully
      * \return     FALSE: renderer start failed
      */
-    virtual bool start(int width, int height, const char* displayName) = 0;
+    virtual bool start(int width, int height, const char* displayName, int maxIterationDurationInMS) = 0;
 
     /**
      * \brief      Stop rendering process (stop render loop)

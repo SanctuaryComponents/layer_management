@@ -32,7 +32,7 @@ public:
     BaseRenderer(ICommandExecutor& executor, Configuration& config);
     virtual ~BaseRenderer();
 
-    bool start(int, int, const char*) = 0;
+    bool start(int, int, const char*, int) = 0;
     void stop() = 0;
     void setdebug(bool onoff);
 

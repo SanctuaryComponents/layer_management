@@ -34,6 +34,7 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <signal.h>
+#include <limits.h>
 
 static const char* NO_SENDER_NAME = "unknown";
 
@@ -377,10 +378,36 @@ bool Layermanager::execute(ICommand* commandToBeExecuted)
     return status;
 }
 
+int Layermanager::getPluginReportIntervalInMs()
+{
+    int retVal = INT_MAX;
+    HealthMonitorList monitors;
+    m_pPluginManager->getHealthMonitorList(monitors);
+    
+    if (0 == monitors.size())
+    {
+        retVal = -1;
+    }
+    else
+    {
+        HealthMonitorListIterator iter = monitors.begin();
+        HealthMonitorListIterator end = monitors.end();
+        for (; iter != end; ++iter)
+        {
+            IHealthMonitor* monitor = *iter;
+            int monitorInterval = monitor->getPluginReportIntervalInMs();
+            retVal = (monitorInterval < retVal ? monitorInterval : retVal);
+        }    
+    }
+    return retVal;
+}
+
 bool Layermanager::startAllRenderers(const int width, const int height,
         const char *displayName)
 {
     bool allStarted = false;
+
+    int maxIterationDurationInMS = getPluginReportIntervalInMs();
 
     RendererListIterator iter = m_pRendererList->begin();
     RendererListIterator iterEnd = m_pRendererList->end();
@@ -389,7 +416,7 @@ bool Layermanager::startAllRenderers(const int width, const int height,
         IRenderer* renderer = *iter;
         if (renderer)
         {
-            allStarted = renderer->start(width, height, displayName);
+            allStarted = renderer->start(width, height, displayName, maxIterationDurationInMS);
         }
         if (renderer == NULL || allStarted == false)
         {
@@ -433,6 +460,8 @@ bool Layermanager::startAllCommunicators()
 {
     bool allStarted = true;
 
+    int maxIterationDurationInMS = getPluginReportIntervalInMs();
+
     CommunicatorListIterator communicatorIter = m_pCommunicatorList->begin();
     CommunicatorListIterator communicatorIterEnd = m_pCommunicatorList->end();
 
@@ -441,7 +470,7 @@ bool Layermanager::startAllCommunicators()
         ICommunicator *communicator = *communicatorIter;
         if (communicator)
         {
-            allStarted &= communicator->start();
+            allStarted &= communicator->start(maxIterationDurationInMS);
         }
         else
         {
@@ -560,6 +589,7 @@ HealthCondition Layermanager::getHealth()
     {
         IPlugin* monitoredPlugin = *iter;
         returnValue = monitoredPlugin->pluginGetHealth();
+        LOG_INFO("Layermanager", "Plugin " << monitoredPlugin->pluginGetName() << " health: " << (returnValue == HealthRunning ? "Running" : "Dead"));
         ++iter;
     }
 

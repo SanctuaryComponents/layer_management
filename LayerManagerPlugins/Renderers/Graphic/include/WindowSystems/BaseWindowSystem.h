@@ -39,7 +39,7 @@ public:
     {
     }
 
-    virtual bool start() = 0;
+    virtual bool start(int maxIterationDurationInMS) = 0;
     virtual void stop() = 0;
     virtual void allocatePlatformSurface(Surface *surface) = 0;
     virtual void doScreenShot(std::string fileName) = 0;
@@ -47,7 +47,6 @@ public:
     virtual void doScreenShotOfSurface(std::string fileName, const uint id, const uint layer_id) = 0;
     virtual void finishFrame() { }
 
-    unsigned long int mThreadId; // TODO: remove
 protected:
     virtual void ClearDamage();
     InputManager* m_pInputManager;

@@ -30,7 +30,6 @@ BaseRenderer::BaseRenderer(ICommandExecutor& executor, Configuration& config)
 {
     LOG_DEBUG("BaseRenderer", "Creating Renderer");
     m_pInputManager = new InputManager(m_pScene);
-    pluginSetHealth(HealthRunning);
 }
 
 BaseRenderer::~BaseRenderer()
@@ -39,7 +38,6 @@ BaseRenderer::~BaseRenderer()
     {
         delete m_pInputManager;
     }
-    pluginSetHealth(HealthStopped);
 }
 
 uint BaseRenderer::getLayerTypeCapabilities(LayerType layerType)

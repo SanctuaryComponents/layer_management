@@ -62,17 +62,17 @@ public:
     virtual ~GenericCommunicator() {}
 
     // from ICommunicator
-    virtual bool start();
+    virtual bool start(int maxIterationTimeInMS);
     virtual void stop();
-    virtual void process(int timeout_ms);
+    virtual void process();
     virtual void setdebug(bool onoff);
+    virtual int getIterationCounter();
 
     // from ThreadBase
     virtual t_ilm_bool threadMainLoop();
 
     // from PluginBase
     virtual t_ilm_const_string pluginGetName() const;
-    virtual HealthCondition pluginGetHealth();
 
 private:
     void ServiceConnect(t_ilm_message message);
@@ -168,6 +168,8 @@ private:
     CallBackTable m_callBackTable;
     bool m_running;
     unsigned long int mThreadId;
+    int m_iterationCounter;
+    int m_maxIterationDurationInMS;
 };
 
 #endif // __GENERICCOMMUNICATOR_H__

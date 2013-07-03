@@ -94,6 +94,7 @@ GenericCommunicator::GenericCommunicator(ICommandExecutor& executor, Configurati
 : ICommunicator(&executor)
 , PluginBase(executor, config, Communicator_Api_v1)
 , m_running(ILM_FALSE)
+, m_iterationCounter(0)
 {
     MethodTable manager_methods[] =
     {
@@ -195,8 +196,10 @@ GenericCommunicator::GenericCommunicator(ICommandExecutor& executor, Configurati
     mThreadId = pthread_self();
 }
 
-bool GenericCommunicator::start()
+bool GenericCommunicator::start(int maxIterationTimeInMS)
 {
+    m_maxIterationDurationInMS = maxIterationTimeInMS;
+
     LOG_DEBUG("GenericCommunicator", "Starting up IpcModules.");
 
     if (!loadIpcModule(&m_ipcModule))
@@ -214,7 +217,6 @@ bool GenericCommunicator::start()
     LOG_DEBUG("GenericCommunicator", "Initializing IpcModule success.");
 
     m_running = ILM_TRUE;
-    pluginSetHealth(HealthRunning);
 
     threadCreate();
     threadInit();
@@ -233,12 +235,13 @@ void GenericCommunicator::stop()
     {
         m_ipcModule.destroy();
     }
-    pluginSetHealth(HealthStopped);
 }
 
-void GenericCommunicator::process(int timeout_ms)
+void GenericCommunicator::process()
 {
-    t_ilm_message message = m_ipcModule.receive(timeout_ms);
+    ++m_iterationCounter;
+
+    t_ilm_message message = m_ipcModule.receive(m_maxIterationDurationInMS);
     if (!message)
     {
         return;
@@ -308,6 +311,10 @@ void GenericCommunicator::process(int timeout_ms)
     case IpcMessageTypeNone:
         break;
 
+    case IpcMessageTypeTimeout:
+        LOG_INFO("GenericCommunicator", "no incoming message for " << m_maxIterationDurationInMS << "ms, force wakeup for health monitoring");
+        break;
+
     default:
         LOG_DEBUG("GenericCommunicator", "Received unknown data from "
                     << m_executor->getSenderName(senderHandle)
@@ -317,6 +324,7 @@ void GenericCommunicator::process(int timeout_ms)
     m_ipcModule.destroyMessage(message);
 }
 
+
 void GenericCommunicator::setdebug(bool onoff)
 {
     (void)onoff; // TODO: remove, only prevents warning
@@ -324,8 +332,13 @@ void GenericCommunicator::setdebug(bool onoff)
 
 t_ilm_bool GenericCommunicator::threadMainLoop()
 {
-    process(-1);
+    process();
     return ILM_TRUE;
+}
+
+int GenericCommunicator::getIterationCounter()
+{
+    return m_iterationCounter;
 }
 
 t_ilm_const_string GenericCommunicator::pluginGetName() const
@@ -2574,16 +2587,6 @@ void GenericCommunicator::sendNotification(GraphicalObject* object, t_ilm_notifi
         LOG_INFO("GenericCommunicator", "Unknown notification found in queue.");
         break;
     }
-}
-
-HealthCondition GenericCommunicator::pluginGetHealth()
-{
-    HealthCondition health = PluginBase::pluginGetHealth();
-    if (0 != pthread_kill(mThreadId, 0))
-    {
-        health = HealthDead;
-    }
-    return health;
 }
 
 void GenericCommunicator::SetOptimizationMode(t_ilm_message message)

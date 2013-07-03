@@ -38,7 +38,7 @@ X11GLESRenderer::X11GLESRenderer(ICommandExecutor& executor, Configuration& conf
     LOG_DEBUG("X11GLESRenderer", "Creating Renderer");
 }
 
-bool X11GLESRenderer::start(int width, int height, const char* displayname)
+bool X11GLESRenderer::start(int width, int height, const char* displayname, int maxIterationDurationInMS)
 {
     Display* nativeDisplayHandle = NULL;
     EGLDisplay eglDisplayhandle = NULL;
@@ -82,7 +82,7 @@ bool X11GLESRenderer::start(int width, int height, const char* displayname)
     {
         m_pGraphicSystem->setTextureBinder(m_binder);
 
-        if (!m_pWindowSystem->start())
+        if (!m_pWindowSystem->start(maxIterationDurationInMS))
         {
             goto fail; // TODO bad style
         }
@@ -201,14 +201,9 @@ Shader* X11GLESRenderer::createShader(const string* vertexName, const string* fr
     return result;
 }
 
-HealthCondition X11GLESRenderer::pluginGetHealth()
+int X11GLESRenderer::getIterationCounter()
 {
-    HealthCondition health = PluginBase::pluginGetHealth();
-    if (0 != pthread_kill(m_pWindowSystem->mThreadId, 0))
-    {
-        health = HealthDead;
-    }
-    return health;
+    return m_pWindowSystem->getIterationCounter();
 }
 
 DECLARE_LAYERMANAGEMENT_PLUGIN(X11GLESRenderer)

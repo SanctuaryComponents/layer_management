@@ -69,6 +69,7 @@ X11WindowSystem::X11WindowSystem(const char* displayname,
 , m_success(false)
 , m_systemState(IDLE_STATE)
 , m_displayEnvironment(NULL)
+, m_iterationCounter(0)
 , x11Display(0)
 , renderThread(0)
 , windowWidth(width)
@@ -865,14 +866,40 @@ init_complete:
     this->graphicSystem->swapBuffers();
     XFlush(this->x11Display);
 
+    // variables required for blocking of file descriptor using select()
+    int x11FD = ConnectionNumber(this->x11Display);
+    fd_set x11FDS;
+
     while (this->m_running)
     {
-        XEvent event;
-        // blocking wait for event
-        XNextEvent(this->x11Display, &event);
-        this->m_pScene->lockScene();
-        switch (event.type)
+        ++m_iterationCounter;
+
+        FD_ZERO(&x11FDS);
+        FD_SET(x11FD, &x11FDS);
+
+        if (m_maxIterationDurationInMS > 0)
         {
+            if (0 == XPending(this->x11Display))
+            {
+                // wait for event on file descriptor with timeout
+                struct timeval timeout;
+                timeout.tv_sec = m_maxIterationDurationInMS / 1000;
+                timeout.tv_usec = (m_maxIterationDurationInMS % 1000) * 1000;
+
+                if (0 == select(x11FD + 1, &x11FDS, NULL, NULL, &timeout))
+                {
+                    LOG_INFO("X11WindowSystem", "no renderer event for " << m_maxIterationDurationInMS << "ms, force wakeup for health monitoring");
+                    continue;
+                }
+            }
+        }
+
+    XEvent event;
+    // blocking wait for event
+    XNextEvent(this->x11Display, &event);
+    this->m_pScene->lockScene();
+    switch (event.type)
+    {
         case CreateNotify:
             {
                 if (this->debugMode)
@@ -1162,16 +1189,15 @@ bool X11WindowSystem::init(BaseGraphicSystem<Display*, Window>* base)
         pthread_mutex_unlock(&init_lock);
         return false;
     }
-    mThreadId = renderThread;
-
     pthread_cond_wait(&init_condition, &init_lock);
     pthread_mutex_unlock(&init_lock);
     LOG_INFO("X11WindowSystem", "Initialization complete success :" << m_success);
     return m_success;
 }
 
-bool X11WindowSystem::start()
+bool X11WindowSystem::start(int maxIterationDurationInMS)
 {
+    m_maxIterationDurationInMS = maxIterationDurationInMS;
     bool result = true;
     pthread_mutex_lock(&this->run_lock);
     LOG_DEBUG("X11WindowSystem", "Startup");
@@ -1260,6 +1286,10 @@ void X11WindowSystem::doScreenShotOfSurface(std::string fileName, const uint id,
     screenShotLayerID = layer_id;
 }
 
+int X11WindowSystem::getIterationCounter()
+{
+    return m_iterationCounter;
+}
 
 
 /**

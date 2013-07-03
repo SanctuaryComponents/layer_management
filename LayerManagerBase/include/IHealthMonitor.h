@@ -33,6 +33,7 @@ public:
 
     virtual t_ilm_bool start() = 0;
     virtual t_ilm_bool stop() = 0;
+    virtual int getPluginReportIntervalInMs() = 0;
 
 protected:
     ICommandExecutor& mExecutor;

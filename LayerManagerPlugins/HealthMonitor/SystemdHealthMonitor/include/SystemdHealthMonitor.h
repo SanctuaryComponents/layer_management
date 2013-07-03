@@ -32,9 +32,11 @@ public:
     // from IHealthMonitor
     virtual t_ilm_bool start();
     virtual t_ilm_bool stop();
+    virtual int getPluginReportIntervalInMs();
 
     //from PluginBase
     virtual t_ilm_const_string pluginGetName() const;
+    virtual int getIterationCounter();
 
 private:
     void reportStartupComplete();
@@ -48,6 +50,7 @@ private:
 
 private:
     int mIntervalInMs;
+    int m_iterationCounter;
 };
 
 #endif // __SYSTEMDHEALTHMONITOR_H__

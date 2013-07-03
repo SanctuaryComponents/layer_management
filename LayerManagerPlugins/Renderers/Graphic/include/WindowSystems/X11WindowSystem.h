@@ -51,7 +51,7 @@ public:
                     GetVisualInfoFunction func = X11WindowSystem::getDefaultVisual);
     virtual ~X11WindowSystem();
     bool init(BaseGraphicSystem<Display*, Window>* sys);
-    bool start();
+    bool start(int maxIterationDurationInMS);
     void stop();
     static XVisualInfo * getDefaultVisual(Display *dpy);
     void signalRedrawEvent();
@@ -65,6 +65,7 @@ public:
     void doScreenShot(std::string fileName);
     void doScreenShotOfLayer(std::string fileName, const uint id);
     void doScreenShotOfSurface(std::string fileName, const uint id, const uint layer_id);
+    int getIterationCounter();
 private:
     ScreenShotType takeScreenshot;
     std::string screenShotFile;
@@ -91,6 +92,8 @@ private:
     bool m_success;
     X11WindowSystemStates m_systemState;
     const char* m_displayEnvironment;
+    int m_iterationCounter;
+    int m_maxIterationDurationInMS;
 
 protected:
     Display* x11Display;

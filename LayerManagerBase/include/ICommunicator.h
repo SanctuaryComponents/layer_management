@@ -44,8 +44,9 @@ public:
     /**
      * \brief     Start communication process, i.e. start specific listening process of communication method
      * \ingroup   CommunicatorAPI
+     * \param[in] maxIterationTimeInMS expected wakup time for health reporting in milliseconds (-1 to disable wakeup)
      */
-    virtual bool start() = 0;
+    virtual bool start(int maxIterationTimeInMS) = 0;
 
     /**
      * \brief     Stop communication. Stop sending command objects.
@@ -56,9 +57,8 @@ public:
     /**
      * \brief     Process communication.
      * \ingroup   CommunicatorAPI
-     * \param[in] timeout_ms timeout value in milliseconds
      */
-    virtual void process(int timeout_ms) = 0;
+    virtual void process() = 0;
 
     /**
      * \brief     Switch debug mode of this component on or off

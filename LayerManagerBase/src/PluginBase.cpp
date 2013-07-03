@@ -20,12 +20,13 @@
 #include "PluginBase.h"
 #include "ICommandExecutor.h"
 #include "Scene.h"
+#include "Log.h"
 
 PluginBase::PluginBase(ICommandExecutor& executor, Configuration& config, ilmPluginApi api)
 : mExecutor(executor)
 , mConfiguration(config)
 , mApi(api)
-, mHealth(HealthStopped)
+, m_previousIterationCounter(0)
 {
 }
 
@@ -45,10 +46,24 @@ t_ilm_const_string PluginBase::pluginGetName() const
 
 HealthCondition PluginBase::pluginGetHealth()
 {
-    return mHealth;
-}
+    HealthCondition health = HealthDead;
 
-void PluginBase::pluginSetHealth(HealthCondition health)
-{
-    mHealth = health;
+    int currentIterationCounter = getIterationCounter();
+    
+    if (0 == currentIterationCounter)
+    {
+        // plugin has 0 iterations, so it is not running yet.
+        return HealthRunning;
+    }
+
+    if (m_previousIterationCounter != currentIterationCounter)
+    {
+        health = HealthRunning;
+        m_previousIterationCounter = currentIterationCounter;
+    }
+    else
+    {
+        LOG_ERROR(pluginGetName(), "Internal loop counter did not increase. Possible dead-lock detected.");
+    }
+    return health;
 }

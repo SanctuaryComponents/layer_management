@@ -280,7 +280,7 @@ t_ilm_message receive(t_ilm_int timeoutInMs)
         break;
 
     case 0: /* timeout */
-        gpIncomingMessage->type = IpcMessageTypeNone;
+        gpIncomingMessage->type = IpcMessageTypeTimeout;
         break;
 
     default: /* message or shutdown */

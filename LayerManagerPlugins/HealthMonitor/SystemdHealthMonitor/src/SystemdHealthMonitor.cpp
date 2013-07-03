@@ -31,6 +31,7 @@ SystemdHealthMonitor::SystemdHealthMonitor(ICommandExecutor& executor, Configura
 : IHealthMonitor(executor, config)
 , PluginBase(executor, config, HealthMonitor_Api_v1)
 , mIntervalInMs(-1)
+, m_iterationCounter(0)
 {
     char* envVar = getenv("WATCHDOG_USEC");
     if (envVar)
@@ -94,12 +95,28 @@ bool SystemdHealthMonitor::watchdogEnabled()
 
 t_ilm_bool SystemdHealthMonitor::threadMainLoop()
 {
-    if (watchdogEnabled() && PluginBase::mExecutor.getHealth())
+    if (watchdogEnabled() && PluginBase::mExecutor.getHealth() == HealthRunning)
     {
+        ++m_iterationCounter;
         signalWatchdog();
         usleep(mIntervalInMs * 1000);
     }
     return ILM_TRUE;
+}
+
+int SystemdHealthMonitor::getPluginReportIntervalInMs()
+{
+    int result = -1;
+    if (watchdogEnabled())
+    {
+        result = mIntervalInMs / 2;
+    }
+    return result;
+}
+
+int SystemdHealthMonitor::getIterationCounter()
+{
+    return m_iterationCounter;
 }
 
 DECLARE_LAYERMANAGEMENT_PLUGIN(SystemdHealthMonitor)
