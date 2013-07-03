@@ -62,13 +62,14 @@ public:
     Window getCompositorNativeWindowHandle();
     virtual void allocatePlatformSurface(Surface *surface);
     virtual void deallocatePlatformSurface(Surface *surface);
-    void doScreenShot(std::string fileName);
+    void doScreenShot(std::string fileName, const uint screen_id);
     void doScreenShotOfLayer(std::string fileName, const uint id);
     void doScreenShotOfSurface(std::string fileName, const uint id, const uint layer_id);
     int getIterationCounter();
 private:
     ScreenShotType takeScreenshot;
     std::string screenShotFile;
+    uint screenShotScreenID;
     uint screenShotSurfaceID;
     uint screenShotLayerID;
     const char* displayname;

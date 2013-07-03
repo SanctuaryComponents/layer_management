@@ -42,7 +42,7 @@ public:
     virtual bool start(int maxIterationDurationInMS) = 0;
     virtual void stop() = 0;
     virtual void allocatePlatformSurface(Surface *surface) = 0;
-    virtual void doScreenShot(std::string fileName) = 0;
+    virtual void doScreenShot(std::string fileName, const uint screen_id) = 0;
     virtual void doScreenShotOfLayer(std::string fileName, const uint id) = 0;
     virtual void doScreenShotOfSurface(std::string fileName, const uint id, const uint layer_id) = 0;
     virtual void finishFrame() { }

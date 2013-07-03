@@ -149,6 +149,7 @@ WaylandBaseWindowSystem::WaylandBaseWindowSystem(const char* displayname, int wi
 , m_systemState(IDLE_STATE)
 , m_manageConnectionId(256)
 , m_screenShotFile()
+, m_screenShotScreenID(0)
 , m_screenShotSurfaceID(0)
 , m_screenShotLayerID(0)
 , m_debugMode(false)
@@ -447,13 +448,17 @@ void WaylandBaseWindowSystem::Screenshot()
     if (m_takeScreenshot == ScreenshotOfDisplay)
     {
         LOG_DEBUG("WaylandBaseWindowSystem", "Taking screenshot");
+        graphicSystem->switchScreen(m_screenShotScreenID);
+
         RedrawAllLayers(true, false); // Do clear, Don't swap
     }
     else if (m_takeScreenshot == ScreenshotOfLayer)
     {
         LOG_DEBUG("WaylandBaseWindowSystem", "Taking screenshot of layer");
         Layer* layer = m_pScene->getLayer(m_screenShotLayerID);
+        graphicSystem->switchScreen(layer->getContainingScreenId());
 
+        graphicSystem->clearBackground();
         if (layer != NULL)
         {
             graphicSystem->renderSWLayer(layer, true); // Do clear
@@ -464,6 +469,7 @@ void WaylandBaseWindowSystem::Screenshot()
         LOG_DEBUG("WaylandBaseWindowSystem", "Taking screenshot of surface");
         Layer* layer = m_pScene->getLayer(m_screenShotLayerID);
         Surface* surface = m_pScene->getSurface(m_screenShotSurfaceID);
+        graphicSystem->switchScreen(layer->getContainingScreenId());
 
         graphicSystem->clearBackground();
         if (layer != NULL && surface != NULL)
@@ -1274,10 +1280,11 @@ void WaylandBaseWindowSystem::deallocatePlatformSurface(Surface* surface)
     LOG_DEBUG("WaylandBaseWindowSystem", "deallocatePlatformSurface end");
 }
 
-void WaylandBaseWindowSystem::doScreenShot(std::string fileName)
+void WaylandBaseWindowSystem::doScreenShot(std::string fileName, const uint screen_id)
 {
     m_takeScreenshot = ScreenshotOfDisplay;
     m_screenShotFile = fileName;
+    m_screenShotScreenID = screen_id;
 }
 
 void WaylandBaseWindowSystem::doScreenShotOfLayer(std::string fileName, const uint id)

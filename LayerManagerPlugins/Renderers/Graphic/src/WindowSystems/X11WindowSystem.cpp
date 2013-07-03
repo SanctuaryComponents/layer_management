@@ -1265,10 +1265,11 @@ void X11WindowSystem::deallocatePlatformSurface(Surface* surface)
     LOG_DEBUG("X11WindowSystem", "deallocatePlatformSurface end");
 }
 
-void X11WindowSystem::doScreenShot(std::string fileName)
+void X11WindowSystem::doScreenShot(std::string fileName, const uint screen_id)
 {
     takeScreenshot = ScreenshotOfDisplay;
     screenShotFile = fileName;
+    screenShotScreenID = screen_id;
 }
 
 void X11WindowSystem::doScreenShotOfLayer(std::string fileName, const uint id)
