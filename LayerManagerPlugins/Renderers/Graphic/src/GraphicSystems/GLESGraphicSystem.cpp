@@ -796,9 +796,11 @@ void GLESGraphicsystem::renderSurface(Surface* surface)
         shader = layerShader;
     }
 
-    FloatRectangle targetSurfaceSource = surface->getTargetSourceRegion();
-    FloatRectangle targetSurfaceDestination = surface->getTargetDestinationRegion();
 
+    // calculate the target destination in each composition, safe step but increase cpu cycless
+    surface->calculateTargetDestination(m_currentLayer->getSourceRegion(),m_currentLayer->getDestinationRegion());
+    FloatRectangle targetSurfaceSource = surface->getTargetSourceRegion();
+    FloatRectangle targetSurfaceDestination = surface->getTargetDestinationRegion();    
     float textureCoordinates[4];
     ViewportTransform::transformRectangleToTextureCoordinates(targetSurfaceSource,
                                                                 surface->OriginalSourceWidth,
