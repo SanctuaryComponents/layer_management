@@ -8,6 +8,7 @@ Bugfixes:
 - X11WindowSystem: fixed resize handling
 - X11EglImage: fixing a issue which causes memory leak in XServer
 - dbusIpcModule: DBUS Interspection result corrected
+- Fixing a timing issue during parameter assignment
 
 Improvements:
 - Improved watchdog plug-in monitoring, to detect possible

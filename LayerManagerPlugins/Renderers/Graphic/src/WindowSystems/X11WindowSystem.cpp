@@ -263,7 +263,8 @@ void X11WindowSystem::configureSurfaceWindow(Window window)
 {
     if (isWindowValid(window))
     {
-        LOG_DEBUG("X11WindowSystem", "Updating window " << window);
+        LOG_INFO("X11WindowSystem", "Configure surface window " << window);
+
         XWindowAttributes att;
         XGetWindowAttributes(x11Display, window, &att);
         int winWidth = att.width;
@@ -275,16 +276,11 @@ void X11WindowSystem::configureSurfaceWindow(Window window)
             LOG_WARNING("X11WindowSystem", "Could not find surface for window " << window);
             return;
         }
-        if (!surface->platform)
-        {
-            LOG_WARNING("X11WindowSystem", "Platform surface not available for window " << window);
-            return;
-        }
-
-        LOG_DEBUG("X11WindowSystem", "Updating surface " << surface->getID());
+        LOG_INFO("X11WindowSystem", "Configure surface dimension " << surface->getID());
 
         if (surface->OriginalSourceHeight != winHeight || surface->OriginalSourceWidth != winWidth)
         {
+            LOG_INFO("X11WindowSystem","Surface dimension differs from creation dimension");
             unsigned int layerid = surface->getContainingLayerId();
             surface->OriginalSourceHeight = winHeight;
             surface->OriginalSourceWidth = winWidth;
@@ -305,12 +301,20 @@ void X11WindowSystem::configureSurfaceWindow(Window window)
             }
             surface->damaged = false; // Waiting for damage event to get updated content
             surface->m_surfaceResized = true;
+            LOG_INFO("X11WindowSystem", "Dimension  : " << surface->OriginalSourceWidth << ", " << surface->OriginalSourceHeight);
+            LOG_INFO("X11WindowSystem", "SourceDim  : " << surface->getSourceRegion().width << ", " << surface->getSourceRegion().height);
+            LOG_INFO("X11WindowSystem", "DestDim    : " << surface->getDestinationRegion().width << ", " << surface->getDestinationRegion().height);
+        }
+                
+        if (!surface->platform)
+        {
+            LOG_WARNING("X11WindowSystem", "Platform surface not available for window " << window);
+            return;
         }
 
         UnMapWindow(window);
-        MapWindow(window);
-
-        LOG_DEBUG("X11WindowSystem", "Done Updating window " << window);
+        MapWindow(window);        
+        LOG_INFO("X11WindowSystem", "Done configure surface " << surface->getID() << " for window " << window);
     }
 }
 
@@ -423,7 +427,7 @@ void X11WindowSystem::NewWindow(Surface* surface, Window window)
 {
     if (isWindowValid(window))
     {
-        LOG_DEBUG("X11WindowSystem", "Creating Surface for new window " << window);
+        LOG_INFO("X11WindowSystem", "Creating Surface for new window " << window);
         // get the windows attributes
         XWindowAttributes att;
         int status = XGetWindowAttributes(x11Display, window, &att);
@@ -478,7 +482,7 @@ void X11WindowSystem::NewWindow(Surface* surface, Window window)
     {
         LOG_DEBUG("X11WindowSystem", "skipping window");
     }
-    LOG_DEBUG("X11WindowSystem", "created the new surface");
+    LOG_INFO("X11WindowSystem", "created the new surface");
 }
 
 void X11WindowSystem::DestroyWindow(Window window)
