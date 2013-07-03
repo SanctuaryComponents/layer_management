@@ -116,6 +116,7 @@ bool ExampleSceneProvider::delegateScene()
         }        
         /* Finally set the first executed renderorder */
     }
+    delete [] screenResolution;
     return result;
 }
 

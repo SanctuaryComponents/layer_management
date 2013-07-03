@@ -294,6 +294,7 @@ void GenericCommunicator::process(int timeout_ms)
                 Surface* surface = surfaceIter->second;
                 surface->removeNotification(senderHandle);
             }
+            m_executor->removeApplicationReference(senderHandle);
         }
         break;
 
@@ -405,6 +406,8 @@ void GenericCommunicator::GetScreenResolution(t_ilm_message message)
     m_ipcModule.appendUint(response, resolution[1]);
     m_ipcModule.sendToClients(response, &clientHandle, 1);
     m_ipcModule.destroyMessage(response);
+
+    delete [] resolution;
 }
 
 void GenericCommunicator::GetNumberOfHardwareLayers(t_ilm_message message)
@@ -430,6 +433,7 @@ void GenericCommunicator::GetScreenIDs(t_ilm_message message)
     m_ipcModule.appendUintArray(response, IDs, length);
     m_ipcModule.sendToClients(response, &clientHandle, 1);
     m_ipcModule.destroyMessage(response);
+    delete [] IDs;
 }
 
 void GenericCommunicator::ScreenShot(t_ilm_message message)
@@ -547,6 +551,8 @@ void GenericCommunicator::ListAllLayerIDsOnScreen(t_ilm_message message)
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
     m_ipcModule.destroyMessage(response);
+
+    delete [] array;
 }
 
 void GenericCommunicator::ListAllSurfaceIDS(t_ilm_message message)
@@ -590,6 +596,7 @@ void GenericCommunicator::ListSurfaceofLayer(t_ilm_message message)
 
         response = m_ipcModule.createResponse(message);
         m_ipcModule.appendUintArray(response, array, length);
+        delete [] array;
     }
     else
     {
@@ -960,6 +967,8 @@ void GenericCommunicator::CreateLayerFromId(t_ilm_message message)
 
     m_ipcModule.sendToClients(response, &clientHandle, 1);
     m_ipcModule.destroyMessage(response);
+
+    delete [] resolution;
 }
 
 
@@ -1665,7 +1674,7 @@ void GenericCommunicator::GetSurfacePixelformat(t_ilm_message message)
     t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     t_ilm_uint clientPid = m_executor->getSenderPid(clientHandle);
     uint id = 0;
-    PixelFormat pixelFormat;
+    PixelFormat pixelFormat = (PixelFormat)ILM_PIXEL_FORMAT_UNKNOWN;
 
     m_ipcModule.getUint(message, &id);
 
@@ -1743,7 +1752,7 @@ void GenericCommunicator::GetSurfaceVisibility(t_ilm_message message)
     t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     t_ilm_uint clientPid = m_executor->getSenderPid(clientHandle);
     uint id = 0;
-    bool visibility;
+    bool visibility = false;
 
     m_ipcModule.getUint(message, &id);
 
@@ -1769,7 +1778,7 @@ void GenericCommunicator::GetLayerVisibility(t_ilm_message message)
     t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     t_ilm_uint clientPid = m_executor->getSenderPid(clientHandle);
     uint id = 0;
-    bool visibility;
+    bool visibility = false;
 
     m_ipcModule.getUint(message, &id);
 
@@ -1860,11 +1869,21 @@ void GenericCommunicator::SetRenderOrderOfLayers(t_ilm_message message)
     t_ilm_message response;
     t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     t_ilm_uint clientPid = m_executor->getSenderPid(clientHandle);
+
+    // ipcArray was created in ipcModule using malloc (it's implemented C)
+    // so we copy it to a buffer created with new() and discard
+    // the ipcArray using free() to avoid memory corruption
+    uint* ipcArray = NULL;
     uint* array = NULL;
     int length = 0;
+    m_ipcModule.getUintArray(message, &ipcArray, &length);
+    array = new uint[length];
+    memset(array, 0, length * sizeof(uint));
+    memcpy(array, ipcArray, length * sizeof(uint));
+    free(ipcArray);
+
     uint screenID = 0;
 
-    m_ipcModule.getUintArray(message, &array, &length);
     m_ipcModule.getUint(message, &screenID);
 
     t_ilm_bool status = m_executor->execute(new ScreenSetRenderOrderCommand(clientPid, screenID, array, length));
@@ -1887,12 +1906,21 @@ void GenericCommunicator::SetSurfaceRenderOrderWithinLayer(t_ilm_message message
     t_ilm_message response;
     t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
     t_ilm_uint clientPid = m_executor->getSenderPid(clientHandle);
+
+    uint layerid = 0;
+    m_ipcModule.getUint(message, &layerid);
+
+    // ipcArray was created in ipcModule using malloc (it's implemented C)
+    // so we copy it to a buffer created with new() and discard
+    // the ipcArray using free() to avoid memory corruption
+    uint* ipcArray = NULL;
     uint* array = NULL;
     int length = 0;
-    uint layerid = 0;
-
-    m_ipcModule.getUint(message, &layerid);
-    m_ipcModule.getUintArray(message, &array, &length);
+    m_ipcModule.getUintArray(message, &ipcArray, &length);
+    array = new uint[length];
+    memset(array, 0, length * sizeof(uint));
+    memcpy(array, ipcArray, length * sizeof(uint));
+    free(ipcArray);
 
     t_ilm_bool status = m_executor->execute(new LayerSetRenderOrderCommand(clientPid, layerid, array, length));
     if (status)

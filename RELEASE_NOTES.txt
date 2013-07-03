@@ -16,6 +16,7 @@ Improvements:
 - adding new interface ilm_setSynchronizedSurfaces, ilm_removeSynchronizedSurfaces
   to establish synchronized composition on dedicated surfaces this avoids e.g.
   flickering during night/day switch.
+- X11EglImage: fixing a issue which causes memory leak in XServer
 
 Version 1.0
 ------------------

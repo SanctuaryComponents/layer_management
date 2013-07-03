@@ -88,6 +88,8 @@ Log::~Log()
 {
     // TODO Auto-generated destructor stub
     m_fileStream->close();
+    delete m_fileStream;
+    m_fileStream = NULL;
     pthread_mutex_destroy(&m_LogBufferMutex);
     Log::m_instance = NULL;
 #ifdef WITH_DLT
@@ -95,6 +97,16 @@ Log::~Log()
     delete((DltContext*)m_logContext);
     DLT_UNREGISTER_APP();
 #endif
+    Log::DiagnosticCallbackMap::iterator iter = m_diagnosticCallbackMap->begin();
+    Log::DiagnosticCallbackMap::iterator iterEnd = m_diagnosticCallbackMap->end();
+    for (; iter != iterEnd; ++iter)
+    {
+        diagnosticCallbackData* callback = iter->second;
+        if (callback)
+        {
+            delete callback;
+        }
+    }
     delete m_diagnosticCallbackMap;
     m_diagnosticCallbackMap = NULL;
     m_logContext = NULL;
@@ -220,6 +232,7 @@ void Log::registerDiagnosticInjectionCallback(unsigned int module_id, diagnostic
 
 void Log::unregisterDiagnosticInjectionCallback(unsigned int module_id)
 {
+    delete (*m_diagnosticCallbackMap)[module_id];
     m_diagnosticCallbackMap->erase(module_id);
 }
 

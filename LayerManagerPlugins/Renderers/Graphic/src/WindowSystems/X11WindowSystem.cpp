@@ -93,6 +93,7 @@ X11WindowSystem::~X11WindowSystem()
     if (windowVis)
     {
         delete windowVis;
+        windowVis = NULL;
     }
 }
 
@@ -1134,6 +1135,7 @@ void X11WindowSystem::cleanup()
     if (windowVis)
     {
         delete windowVis;
+        windowVis = NULL;
     }
 
     if (NULL != displaySignal)

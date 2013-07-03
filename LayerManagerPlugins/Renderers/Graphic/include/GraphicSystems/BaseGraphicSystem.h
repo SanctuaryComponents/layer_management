@@ -35,6 +35,10 @@ public:
     virtual bool init(DisplayType display, WindowType window)=0;
     virtual ~BaseGraphicSystem()
     {
+        if (m_binder)
+        {
+            delete m_binder;
+        }
     };
     virtual void beginLayer(Layer* layer) = 0;
     virtual void endLayer() = 0;

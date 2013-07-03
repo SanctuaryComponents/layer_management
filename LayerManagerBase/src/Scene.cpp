@@ -34,6 +34,31 @@ Scene::Scene()
 
 Scene::~Scene()
 {
+    {
+        ShaderMap::iterator iter = m_shaderMap.begin();
+        ShaderMap::iterator end = m_shaderMap.end();
+        for (; iter != end; ++iter)
+        {
+            delete iter->second;
+        }
+    }
+    {
+        SurfaceMap::iterator iter = m_surfaceMap.begin();
+        SurfaceMap::iterator end = m_surfaceMap.end();
+        for (; iter != end; ++iter)
+        {
+            delete iter->second;
+        }
+    }
+    {
+        LayerMap::iterator iter = m_layerMap.begin();
+        LayerMap::iterator end = m_layerMap.end();
+        for (; iter != end; ++iter)
+        {
+            delete iter->second;
+        }
+    }
+
     pthread_mutex_destroy(&m_layerListMutex);
 }
 

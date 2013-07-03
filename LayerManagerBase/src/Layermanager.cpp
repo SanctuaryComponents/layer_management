@@ -79,19 +79,58 @@ Layermanager::~Layermanager()
         delete m_pHealthMonitorList;
     }
 
+    if (m_pScene)
+    {
+        delete m_pScene;
+    }
+
+    if (m_pRendererList)
+    {
+        RendererListIterator iter = m_pRendererList->begin();
+        RendererListIterator iterEnd = m_pRendererList->end();
+        for (; iter != iterEnd; ++iter)
+        {
+            delete *iter;
+        }
+        delete m_pRendererList;
+    }
+
+    if (m_pCommunicatorList)
+    {
+        CommunicatorListIterator iter = m_pCommunicatorList->begin();
+        CommunicatorListIterator iterEnd = m_pCommunicatorList->end();
+        for (; iter != iterEnd; ++iter)
+        {
+            delete *iter;
+        }
+        delete m_pCommunicatorList;
+    }
+
     if (m_pApplicationReferenceMap)
     {
+        ApplicationReferenceMap::iterator iter = m_pApplicationReferenceMap->begin();
+        ApplicationReferenceMap::iterator end = m_pApplicationReferenceMap->end();
+        for (; iter != end; ++iter)
+        {
+            delete iter->second;
+        }
         delete m_pApplicationReferenceMap;
+    }
+
+    if (m_pSceneProviderList)
+    {
+        SceneProviderListIterator iter = m_pSceneProviderList->begin();
+        SceneProviderListIterator iterEnd = m_pSceneProviderList->end();
+        for (; iter != iterEnd; ++iter)
+        {
+            delete *iter;
+        }
+        delete m_pSceneProviderList;
     }
 
     if (m_pPluginManager)
     {
         delete m_pPluginManager;
-    }
-
-    if (m_pScene)
-    {
-        delete m_pScene;
     }
 }
 
@@ -186,6 +225,7 @@ void Layermanager::removeApplicationReference(t_ilm_client_handle client)
     {
         unsigned int pid = getSenderPid(client);
         LOG_INFO("LayerManagerService", "Disconnect from application " << getSenderName(client) << "(" << pid << ")");
+        delete (*m_pApplicationReferenceMap)[client];
         m_pApplicationReferenceMap->erase(client);
         m_pidToProcessNameTable.erase(pid);
 
@@ -195,6 +235,15 @@ void Layermanager::removeApplicationReference(t_ilm_client_handle client)
         // commands of currently running applications
         if (0 != pid)
         {
+            CommandList& commandList = m_EnqueuedCommands[pid];
+            CommandList::iterator iter = commandList.begin();
+            CommandList::iterator end = commandList.end();
+            for (; iter != end; ++iter)
+            {
+                delete *iter;
+            }
+
+            m_EnqueuedCommands[pid].clear();
             m_EnqueuedCommands.erase(pid);
         }
     }
