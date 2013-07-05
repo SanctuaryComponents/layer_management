@@ -110,7 +110,7 @@ protected:
     pthread_cond_t run_condition;
     BaseGraphicSystem<Display*, Window>* graphicSystem;
     virtual bool initXServer();
-    virtual void RedrawAllLayers(bool clear, bool swap);
+    virtual bool RedrawAllLayers(bool clear, bool swap);
     virtual void renderHWLayer(Layer* layer);
     virtual void calculateFps();
     virtual void calculateSurfaceFps(Surface *currentSurface, float time);

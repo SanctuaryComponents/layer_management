@@ -285,21 +285,26 @@ void X11WindowSystem::configureSurfaceWindow(Window window)
 
         if (surface->OriginalSourceHeight != winHeight || surface->OriginalSourceWidth != winWidth)
         {
+            unsigned int layerid = surface->getContainingLayerId();
             surface->OriginalSourceHeight = winHeight;
             surface->OriginalSourceWidth = winWidth;
-
-            surface->damaged = false; // Waiting for damage event to get updated content
-            surface->m_surfaceResized = true /*surface->synchronized*/;
 
             Rectangle newDestination = surface->getDestinationRegion();
             newDestination.width = surface->OriginalSourceWidth;
             newDestination.height = surface->OriginalSourceHeight;
             surface->setDestinationRegion(newDestination);
-
             Rectangle newSource = surface->getSourceRegion();
             newSource.width = surface->OriginalSourceWidth;
             newSource.height = surface->OriginalSourceHeight;
             surface->setSourceRegion(newSource);
+
+            if ( layerid != Surface::INVALID_ID ) 
+            {
+                surface->calculateTargetDestination(m_pScene->getLayer(layerid)->getSourceRegion()
+                                                    ,m_pScene->getLayer(layerid)->getDestinationRegion());
+            }
+            surface->damaged = false; // Waiting for damage event to get updated content
+            surface->m_surfaceResized = true;
         }
 
         UnMapWindow(window);
@@ -494,6 +499,9 @@ void X11WindowSystem::DestroyWindow(Window window)
         surface->removeNativeContent();
         /* To force a recomposition of all surface which are behind of that surface inside the Layer RenderOrder */
         surface->renderPropertyChanged = true;
+        /* Remove synchronized flag, no damage will occur anymore */
+        surface->setSynchronized(false);
+        surface->m_resizesync = false;
         delete surface->platform;
         surface->platform = NULL;
     }
@@ -625,8 +633,9 @@ void X11WindowSystem::calculateFps()
     }
 }
 
-void X11WindowSystem::RedrawAllLayers(bool clear, bool swap)
+bool X11WindowSystem::RedrawAllLayers(bool clear, bool swap)
 {
+    bool result = false;
     LayerList layers = m_pScene->getCurrentRenderOrder(0);
     LayerList swLayers;
 
@@ -650,6 +659,7 @@ void X11WindowSystem::RedrawAllLayers(bool clear, bool swap)
     if (m_forceComposition || graphicSystem->needsRedraw(swLayers))
     {
         graphicSystem->renderSWLayers(swLayers, clear);
+        result = true;
 
         if (swap)
         {
@@ -663,6 +673,7 @@ void X11WindowSystem::RedrawAllLayers(bool clear, bool swap)
 
         calculateFps();
     }
+    return result;
 }
 
 void X11WindowSystem::renderHWLayer(Layer *layer)
@@ -674,10 +685,14 @@ void X11WindowSystem::Redraw()
 {
     // draw all the layers
     /*LOG_INFO("X11WindowSystem","Locking List");*/
+    bool clear = false;
     m_pScene->lockScene();
 
-    RedrawAllLayers(true, true);  // Clear and Swap
-    ClearDamage();
+    clear = RedrawAllLayers(true, true);  // Clear and Swap
+    if (clear)
+    {
+        ClearDamage();
+    };
 
     m_pScene->unlockScene();
 
@@ -866,9 +881,15 @@ init_complete:
                 break;
             }
         case ConfigureNotify:
-            LOG_DEBUG("X11WindowSystem", "Configure notify Event");
-            this->configureSurfaceWindow(event.xconfigure.window);
-            checkRedraw = true;
+            {
+                LOG_DEBUG("X11WindowSystem", "Configure notify Event");
+                this->configureSurfaceWindow( event.xconfigure.window);
+                Surface* surfaceWindow = this->getSurfaceForWindow( event.xconfigure.window);
+                if (surfaceWindow!=NULL)
+                {
+                    checkRedraw = !surfaceWindow->m_surfaceResized;
+                }
+            }
             break;
 
         case DestroyNotify:
@@ -942,32 +963,47 @@ init_complete:
                     if (currentSurface->platform != NULL)
                     {
                         XRectangle* rectangles;
+                        XRectangle geometry;
+                        XRectangle area;
                         XRectangle bounds;
                         int numberRects;
                         /* Enable Rendering for Surface, after damage Notification was send successfully */
                         /* This will ensure, that the content is not dirty */
                         ((XPlatformSurface *)(currentSurface->platform))->enableRendering();
-                        rectangles = XFixesFetchRegionAndBounds(this->x11Display, x11DamageRegion, &numberRects, &bounds);
-                        if (currentSurface->OriginalSourceWidth != bounds.width || currentSurface->OriginalSourceHeight != bounds.height)
+                        geometry = ((XDamageNotifyEvent*)(&event))->geometry;
+                        area = ((XDamageNotifyEvent*)(&event))->area;
+
+                        LOG_DEBUG("X11WindowSystem","Damaged Geometry : [ " << geometry.x << ", " << geometry.y <<
+                                                                ", " << geometry.width << ", " << geometry.height << " ]");
+                        LOG_DEBUG("X11WindowSystem","Damaged Area     : [ " << area.x << ", " << area.y <<
+                                                                ", " << area.width << ", " << area.height << " ]");
+
+                        rectangles = XFixesFetchRegionAndBounds (this->x11Display, x11DamageRegion, &numberRects, &bounds);
+
+                        LOG_DEBUG("X11WindowSystem","Damaged Bounds   : [ " << bounds.x << ", " << bounds.y <<
+                                ", " << bounds.width << ", " << bounds.height << " ]\n");
+                        // e->geometry is the geometry of the damaged window
+                        // e->area     is the bounding rect for the damaged area
+                        if ( currentSurface->OriginalSourceWidth != geometry.width || currentSurface->OriginalSourceHeight != geometry.height )
                         {
-                            LOG_DEBUG("X11WindowSystem", "Damaged Bounds differs from size : [ " << bounds.x << ", " << bounds.y <<
-                                                                ", " << bounds.width << ", " << bounds.height << " ]");
-                            currentSurface->m_surfaceResized = true /*currentSurface->synchronized*/;
+                            LOG_DEBUG("X11WindowSystem","Damaged Geometry differs from size : [ " << geometry.x << ", " << geometry.y <<
+                                                                ", " << geometry.width << ", " << geometry.height << " ]");
+                            currentSurface->m_surfaceResized = true;
                         }
                         XFree(rectangles);
                     }
-                }
-                /* Ignore Damage Events after Resize, the content can be invalid */
-                if (!currentSurface->m_surfaceResized)
-                {
-                    currentSurface->damaged = true;
-                    currentSurface->updateCounter++;
-                    checkRedraw = true;
-                }
-                else
-                {
-                    LOG_DEBUG("X11WindowSystem", "Skipping Damage Event which was triggered after ConfigureNotify");
-                    currentSurface->m_surfaceResized = false;
+                    /* Ignore Damage Events after Resize, the content can be invalid */
+                    if (!currentSurface->m_surfaceResized)
+                    {
+                        currentSurface->damaged = true;
+                        currentSurface->updateCounter++;
+                        currentSurface->m_resizesync = false;
+                        checkRedraw = true;
+                    } else {
+                        LOG_DEBUG("X11WindowSystem", "Skipping Damage Event which was triggered after ConfigureNotify");
+                        currentSurface->m_resizesync = true;
+                        currentSurface->m_surfaceResized = false;
+                    }
                 }
             }
             break;

@@ -29,6 +29,9 @@ void BaseWindowSystem::ClearDamage()
         {
             // Clear Surface Damage
             (*surface)->damaged = false;
+            // Reset the synchronized flag if we have done a composition
+            // comment this line if it has to be reset after first swap
+            /* (*surface)->setSynchronized(false);*/
             (*surface)->renderPropertyChanged = false;
         }
         // Clear Layer Damage
