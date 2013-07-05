@@ -325,6 +325,42 @@ bool GLESGraphicsystem::needsRedraw(Layer *layer)
 bool GLESGraphicsystem::needsRedraw(LayerList layers)
 {
     // TODO: Ignore damage from completely obscured surfaces
+    for (LayerListConstIterator layer = layers.begin(); layer != layers.end(); layer++)
+    {
+        if ((*layer)->getLayerType() == Hardware && layers.size() > 1)
+        {
+            // Damage in a hardware layer should not imply a redraw in other layers
+            LOG_WARNING("GLESGraphicsystem", "needsRedraw() called with layers not in the same composition");
+        }
+        // Only check synchronized surfaces if the layer is visible
+        if ((*layer)->visibility)
+        {
+            SurfaceList synchronizedSurfaces;
+            SurfaceList surfaces = (*layer)->getAllSurfaces();
+
+            // LOG_DEBUG("GLESGraphicsystem", "Checking surfaces");
+            // Check if we got a synchronized surfaces, only if all synchronized surfaces are damaged, trigger a redraw
+            for ( SurfaceListConstIterator surface = surfaces.begin(); surface != surfaces.end(); surface++ )
+            {
+                //LOG_DEBUG("GLESGraphicsystem", "Checking Surface for sychronization " << (*surface)->getID() );
+                if ( ( (*surface)->synchronized || (*surface)->m_resizesync  ) && (*surface)->visibility)
+                {
+                    synchronizedSurfaces.push_back((*surface));
+                }
+            }
+            // LOG_DEBUG("GLESGraphicsystem", "Checking synchronizedSurfaces");
+            for ( SurfaceListConstIterator syncSurface = synchronizedSurfaces.begin(); syncSurface != synchronizedSurfaces.end(); syncSurface++ )
+            {
+                if ( !(*syncSurface)->damaged )
+                {
+                    LOG_INFO("GLESGraphicsystem","synchronized surface " << (*syncSurface)->getID() << " not damaged, skipping");
+                    return false;
+                } else {
+                    LOG_INFO("GLESGraphicsystem","synchronized surface " << (*syncSurface)->getID() << " damaged, trigger composition");
+                }
+            }
+        }
+    }
 
     for (LayerListConstIterator layer = layers.begin(); layer != layers.end(); layer++)
     {
