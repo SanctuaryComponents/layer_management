@@ -103,6 +103,7 @@ public:
     int OriginalSourceWidth;
     int OriginalSourceHeight;
     bool m_surfaceResized;
+    bool m_resizesync;
 
 private:
     OrientationType m_orientation; // Rotation of the graphical content
@@ -116,6 +117,7 @@ inline GraphicalSurface::GraphicalSurface(ObjectType type, int creatorPid)
 , OriginalSourceWidth(0)
 , OriginalSourceHeight(0)
 , m_surfaceResized(false)
+, m_resizesync(false)
 , m_orientation(Zero)
 , m_sourceViewport(0, 0, 0, 0)
 , m_destinationViewport(0, 0, 0, 0)
@@ -127,6 +129,7 @@ inline GraphicalSurface::GraphicalSurface(int externalId, ObjectType type, int c
 , OriginalSourceWidth(0)
 , OriginalSourceHeight(0)
 , m_surfaceResized(false)
+, m_resizesync(false)
 , m_orientation(Zero)
 , m_sourceViewport(0, 0, 0, 0)
 , m_destinationViewport(0, 0, 0, 0)

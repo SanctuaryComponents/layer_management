@@ -1,4 +1,4 @@
-/***************************************************************************
+ /***************************************************************************
  *
  * Copyright 2010,2011 BMW Car IT GmbH
  * Copyright (C) 2012 DENSO CORPORATION and Robert Bosch Car Multimedia Gmbh
@@ -85,6 +85,25 @@ public:
      */
     void getChromaKey(unsigned char& red, unsigned char& green, unsigned char& blue) const;
 
+    
+    /**
+     * Set the synchronized compositing flag for this object.
+     * Synchronized composition forces screen updates, if all synchronized objects are
+     * were updated, otherwise the composition is freezed.  
+     * @param[in] newSynchnronized set this object synchronized (true) or not (false)
+     * @return TRUE if the new synchronized value is not equal to the current synchronized value
+     *         FALSE if they are equal
+     */
+    bool setSynchronized(bool newSynchnronized);
+
+    /**
+     * Get the synchronized compositing flag for this object.
+     * @param[in] newSynchnronized set this object synchronized (true) or not (false)
+     * @return TRUE if the synchronized value is set
+     *         FALSE if they synchronized value is unset
+     */
+    bool getSynchronized() const;
+
     /**
      * Set the visibility
      * @param[in] newVisibility set this object visible (true) or invisible (false)
@@ -149,6 +168,7 @@ public:
     Shader* shader;
     double opacity;
     bool visibility;
+    bool synchronized;
     bool chromaKeyEnabled;
     unsigned char chromaKeyRed;
     unsigned char chromaKeyGreen;
@@ -171,6 +191,7 @@ inline GraphicalObject::GraphicalObject(ObjectType type, double opacity, bool vi
 , shader(0)
 , opacity(opacity)
 , visibility(visibility)
+, synchronized(false)
 , chromaKeyEnabled(false)
 , chromaKeyRed(0)
 , chromaKeyGreen(0)
@@ -188,6 +209,7 @@ inline GraphicalObject::GraphicalObject(int externalId, ObjectType type, double 
 , shader(0)
 , opacity(opacity)
 , visibility(visibility)
+, synchronized(false)
 , chromaKeyEnabled(false)
 , chromaKeyRed(0)
 , chromaKeyGreen(0)
@@ -224,6 +246,22 @@ inline bool GraphicalObject::setVisibility(bool newVisibility)
     }
     return false;
 }
+
+inline bool GraphicalObject::setSynchronized(bool newSynchnronized)
+{
+    if (synchronized != newSynchnronized)
+    {
+        synchronized = newSynchnronized;
+        return true;
+    }
+    return synchronized;
+}
+
+inline bool GraphicalObject::getSynchronized() const
+{
+    return synchronized;
+}
+
 
 inline bool GraphicalObject::getVisibility() const
 {
