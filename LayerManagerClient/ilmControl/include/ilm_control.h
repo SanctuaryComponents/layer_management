@@ -569,6 +569,27 @@ ilmErrorTypes ilm_layerAddNotification(t_ilm_layer layer, layerNotificationFunc 
  */
 ilmErrorTypes ilm_layerRemoveNotification(t_ilm_layer layer);
 
+/**
+ * \brief Enables sychronized composition dependent on the surface list
+ * \ingroup ilmControl
+ * \param[in] pSurfaceId array of surface ids
+ * \param[in] number number of surfaceids in the given array
+ * \return ILM_SUCCESS if the method call was successful
+ * \return ILM_FAILED if the client can not call the method on the service.
+ */
+ilmErrorTypes ilm_setSynchronizedSurfaces(t_ilm_surface *pSurfacId, const t_ilm_uint number);
+
+/**
+ * \brief Disables sychronized composition dependent on the surface list
+ * \ingroup ilmControl
+ * \param[in] pSurfaceId array of surface ids
+ * \param[in] number number of surfaceids in the given array
+ * \return ILM_SUCCESS if the method call was successful
+ * \return ILM_FAILED if the client can not call the method on the service.
+ */
+ilmErrorTypes ilm_removeSynchronizedSurfaces(t_ilm_surface *pSurfacId, const t_ilm_uint number);
+
+
 #ifdef __cplusplus
 } /**/
 #endif /* __cplusplus */

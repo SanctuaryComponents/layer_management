@@ -1037,3 +1037,40 @@ ilmErrorTypes ilm_layerRemoveNotification(t_ilm_layer layer)
     gIpcModule.destroyMessage(command);
     return returnValue;
 }
+
+ilmErrorTypes ilm_setSynchronizedSurfaces(t_ilm_surface *pSurfaceId, const t_ilm_uint number)
+{
+    ilmErrorTypes returnValue = ILM_FAILED;
+
+    t_ilm_message response = 0;
+    t_ilm_message command = gIpcModule.createMessage("SetSynchronizedSurfaces");
+    if (pSurfaceId
+        && command
+        && gIpcModule.appendUintArray(command, pSurfaceId, number)
+        && sendAndWaitForResponse(command, &response, RESPONSE_TIMEOUT_IN_MS, &returnValue))
+    {
+        returnValue = ILM_SUCCESS;
+    }
+    gIpcModule.destroyMessage(response);
+    gIpcModule.destroyMessage(command);
+    return returnValue;
+}
+
+ilmErrorTypes ilm_removeSynchronizedSurfaces(t_ilm_surface *pSurfaceId, const t_ilm_uint number)
+{
+    ilmErrorTypes returnValue = ILM_FAILED;
+
+    t_ilm_message response = 0;
+    t_ilm_message command = gIpcModule.createMessage("RemoveSynchronizedSurfaces");
+    if (pSurfaceId
+        && command
+        && gIpcModule.appendUintArray(command, pSurfaceId, number)
+        && sendAndWaitForResponse(command, &response, RESPONSE_TIMEOUT_IN_MS, &returnValue))
+    {
+        returnValue = ILM_SUCCESS;
+    }
+    gIpcModule.destroyMessage(response);
+    gIpcModule.destroyMessage(command);
+    return returnValue;
+}
+
