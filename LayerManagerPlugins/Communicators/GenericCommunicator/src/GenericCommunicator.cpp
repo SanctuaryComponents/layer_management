@@ -76,6 +76,8 @@
 #include "LayerSetChromaKeyCommand.h"
 #include "SetOptimizationModeCommand.h"
 #include "GetOptimizationModeCommand.h"
+#include "SetSynchronizedSurfacesCommand.h"
+#include "RemoveSynchronizedSurfacesCommand.h"
 #include <stdbool.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -171,7 +173,9 @@ GenericCommunicator::GenericCommunicator(ICommandExecutor& executor, Configurati
         { "SurfaceRemoveNotification", &GenericCommunicator::SurfaceRemoveNotification },
         { "SetOptimizationMode", &GenericCommunicator::SetOptimizationMode },
         { "GetOptimizationMode", &GenericCommunicator::GetOptimizationMode },
-        { "GetPropertiesOfScreen", &GenericCommunicator::GetPropertiesOfScreen }
+        { "GetPropertiesOfScreen", &GenericCommunicator::GetPropertiesOfScreen },
+        { "SetSynchronizedSurfaces", &GenericCommunicator::SetSynchronizedSurfaces },
+        { "RemoveSynchronizedSurfaces", &GenericCommunicator::RemoveSynchronizedSurfaces }
     };
 
     int entryCount = sizeof(manager_methods) / sizeof(MethodTable);
@@ -1774,6 +1778,72 @@ void GenericCommunicator::GetLayerVisibility(t_ilm_message message)
     {
         response = m_ipcModule.createResponse(message);
         m_ipcModule.appendBool(response, visibility);
+    }
+    else
+    {
+        response = m_ipcModule.createErrorResponse(message);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
+    }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1);
+    m_ipcModule.destroyMessage(response);
+}
+
+void GenericCommunicator::SetSynchronizedSurfaces(t_ilm_message message)
+{
+    t_ilm_message response;
+    t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
+    t_ilm_uint clientPid = m_executor->getSenderPid(clientHandle);
+
+    // ipcArray was created in ipcModule using malloc (it's implemented C)
+    // so we copy it to a buffer created with new() and discard
+    // the ipcArray using free() to avoid memory corruption
+    uint* ipcArray = NULL;
+    uint* array = NULL;
+    int length = 0;
+    m_ipcModule.getUintArray(message, &ipcArray, &length);
+    array = new uint[length];
+    memset(array, 0, length * sizeof(uint));
+    memcpy(array, ipcArray, length * sizeof(uint));
+    free(ipcArray);
+
+    t_ilm_bool status = m_executor->execute(new SetSynchronizedSurfacesCommand(clientPid, array, length));
+    if (status)
+    {
+        response = m_ipcModule.createResponse(message);
+    }
+    else
+    {
+        response = m_ipcModule.createErrorResponse(message);
+        m_ipcModule.appendUint(response, ILM_ERROR_RESOURCE_NOT_FOUND);
+    }
+
+    m_ipcModule.sendToClients(response, &clientHandle, 1);
+    m_ipcModule.destroyMessage(response);
+}
+
+void GenericCommunicator::RemoveSynchronizedSurfaces(t_ilm_message message)
+{
+    t_ilm_message response;
+    t_ilm_client_handle clientHandle = m_ipcModule.getSenderHandle(message);
+    t_ilm_uint clientPid = m_executor->getSenderPid(clientHandle);
+
+    // ipcArray was created in ipcModule using malloc (it's implemented C)
+    // so we copy it to a buffer created with new() and discard
+    // the ipcArray using free() to avoid memory corruption
+    uint* ipcArray = NULL;
+    uint* array = NULL;
+    int length = 0;
+    m_ipcModule.getUintArray(message, &ipcArray, &length);
+    array = new uint[length];
+    memset(array, 0, length * sizeof(uint));
+    memcpy(array, ipcArray, length * sizeof(uint));
+    free(ipcArray);
+
+    t_ilm_bool status = m_executor->execute(new RemoveSynchronizedSurfacesCommand(clientPid, array, length));
+    if (status)
+    {
+        response = m_ipcModule.createResponse(message);
     }
     else
     {

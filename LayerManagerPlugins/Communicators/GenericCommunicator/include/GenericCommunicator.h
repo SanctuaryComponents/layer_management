@@ -96,6 +96,8 @@ private:
     void CreateSurfaceFromId(t_ilm_message message);
     void SetSurfaceNativeContent(t_ilm_message message);
     void RemoveSurfaceNativeContent(t_ilm_message message);
+    void SetSynchronizedSurfaces(t_ilm_message message);
+    void RemoveSynchronizedSurfaces(t_ilm_message message);
     void RemoveSurface(t_ilm_message message);
     void CreateLayer(t_ilm_message message);
     void CreateLayerFromId(t_ilm_message message);
