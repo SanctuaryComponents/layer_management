@@ -24,7 +24,7 @@ FIND_PATH(WAYLAND_CLIENT_INCLUDE_DIR /wayland-client.h
 
 FIND_LIBRARY(WAYLAND_CLIENT_LIBRARIES
 NAMES wayland-client
-PATHS /usr/lib /usr/local/lib
+PATHS /usr/lib /usr/local/lib /lib64 /usr/lib64
 )
 
 FIND_PATH(WAYLAND_SERVER_INCLUDE_DIR /wayland-server.h
@@ -33,12 +33,12 @@ FIND_PATH(WAYLAND_SERVER_INCLUDE_DIR /wayland-server.h
 
 FIND_LIBRARY(WAYLAND_SERVER_LIBRARIES
 NAMES wayland-server
-PATHS /usr/lib /usr/local/lib
+PATHS /usr/lib /usr/local/lib /lib64 /usr/lib64
 )
 
 FIND_LIBRARY(WAYLAND_EGL_LIBRARIES
 NAMES wayland-egl
-PATHS /usr/lib /usr/local/lib
+PATHS /usr/lib /usr/local/lib /lib64 /usr/lib64
 )
 
 FIND_PATH(FFI_INCLUDE_DIR /ffi.h
@@ -47,7 +47,7 @@ FIND_PATH(FFI_INCLUDE_DIR /ffi.h
 
 FIND_LIBRARY(FFI_LIBRARIES
 NAMES ffi
-PATHS /usr/lib /usr/local/lib
+PATHS /usr/lib /usr/local/lib /lib64 /usr/lib64
 )
 
 FIND_PATH(XKB_INCLUDE_DIR /xkbcommon.h
@@ -56,7 +56,7 @@ FIND_PATH(XKB_INCLUDE_DIR /xkbcommon.h
 
 FIND_LIBRARY(XKB_LIBRARIES
 NAMES xkbcommon
-PATHS /usr/lib /usr/local/lib
+PATHS /usr/lib /usr/local/lib /lib64 /usr/lib64
 )
 
 FIND_PATH(MTDEV_INCLUDE_DIR /mtdev.h
@@ -65,7 +65,7 @@ FIND_PATH(MTDEV_INCLUDE_DIR /mtdev.h
 
 FIND_LIBRARY(MTDEV_LIBRARIES
 NAMES mtdev
-PATHS /usr/lib /usr/local/lib
+PATHS /usr/lib /usr/local/lib /lib64 /usr/lib64
 )
 
 SET( WAYLAND_FOUND "NO" )
