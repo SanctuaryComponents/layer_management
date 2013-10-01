@@ -290,6 +290,19 @@ if (WITH_CONTROL_LIB)
 endif (WITH_CONTROL_LIB)
 
 #===========================================================================================================
+build_flag (WITH_DIRECTFB "Build renderer plugin DirectFB" OFF)
+#===========================================================================================================
+if (WITH_DIRECTFB)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-variadic-macros -std=c++0x")
+    add_subdirectory_once (LayerManagerUtils)
+    add_subdirectory_once (LayerManagerBase)
+    add_subdirectory_once (LayerManagerClient/ilmClient)
+    add_subdirectory_once (LayerManagerPlugins/Renderers/GraphicLib/LayerManagerGraphicDFB)
+    add_subdirectory_once (LayerManagerPlugins/Renderers/Platform/DFBRenderer)
+    add_subdirectory_once (LayerManagerExamples/EGLDFBApplicationExample)
+endif(WITH_DIRECTFB)
+
+#===========================================================================================================
 # store used build configuration
 #===========================================================================================================
 add_subdirectory_once(config)

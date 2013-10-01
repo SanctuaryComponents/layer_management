@@ -54,6 +54,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/layermanager/ipcmodules/*.so
 %{_libdir}/libIpcModuleLoader.so
 %{_libdir}/libLayerManagerCommands.so
+%{_libdir}/libLayerManagerGraphicDFB.so
 %{_libdir}/libLayerManagerGraphicGLESv2.so
 %dir %_libdir/layermanager/renderer
 %{_libdir}/layermanager/renderer/libX11GLESRenderer.so
@@ -67,6 +68,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_includedir}/ilm/*
 %{_libdir}/libilmClient.so
 
+%{_bindir}/EGLDFBApplicationExample
 %{_bindir}/EGLX11ApplicationExample
 %{_bindir}/LayerManagerClientExample
 %{_bindir}/LayerManagerControl
