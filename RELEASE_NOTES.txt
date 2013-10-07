@@ -1,3 +1,11 @@
+Version 1.2
+----------------------
+This version includes the following enhancements.
+
+Improvements:
+- DirectFB backend support
+- pkg-config support
+
 Version 1.1
 ----------------------
 This version includes the following enhancements.
